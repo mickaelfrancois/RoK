@@ -18,7 +18,7 @@ public sealed partial class OptionsPage : Page
 
     private async void AddLibraryFolderButton_Click(object? sender, Microsoft.UI.Xaml.RoutedEventArgs e)
     {
-        var folderPicker = new FolderPicker
+        FolderPicker folderPicker = new()
         {
             ViewMode = PickerViewMode.List,
             SuggestedStartLocation = PickerLocationId.MusicLibrary

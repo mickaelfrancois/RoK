@@ -13,6 +13,8 @@ public class NovaApiService : INovaApiService, IDisposable
 {
     private const int KCacheDelayMinutes = 60 * 24;
 
+    private const int KMinApiDelayDays = 7;
+
     private readonly NovaApiOptions _novaApiOptions;
 
     private readonly IAppOptions _appOptions;
@@ -43,6 +45,7 @@ public class NovaApiService : INovaApiService, IDisposable
         ConfigureHttpClient();
     }
 
+
     private void ConfigureHttpClient()
     {
         if (!_appOptions.NovaApiEnabled || _novaApiOptions.BaseAddress is null)
@@ -61,6 +64,7 @@ public class NovaApiService : INovaApiService, IDisposable
         _httpClient.DefaultRequestHeaders.Add("User-Agent", $"Rok/{appVersion}");
         _httpClient.Timeout = TimeSpan.FromSeconds(10);
     }
+
 
     private static string GetAppVersion()
     {
@@ -224,6 +228,15 @@ public class NovaApiService : INovaApiService, IDisposable
         return lyrics;
     }
 
+
+    public static bool IsApiRetryAllowed(DateTime? lastAttempt)
+    {
+        if (!lastAttempt.HasValue)
+            return true;
+
+        DateTime threshold = lastAttempt.Value.AddDays(KMinApiDelayDays);
+        return DateTime.UtcNow >= threshold;
+    }
 
     private void SaveArtistToCache(string key, ApiArtistModel? artist)
     {

@@ -1,7 +1,12 @@
-﻿namespace Rok.Infrastructure.Migration;
+﻿using Microsoft.Extensions.Logging;
 
-public class MigrationService(IDbConnection database) : IMigrationService
+namespace Rok.Infrastructure.Migration;
+
+public class MigrationService(IDbConnection database, IEnumerable<IMigration>? migrations, ILogger<MigrationService> logger) : IMigrationService
 {
+    private readonly List<IMigration> _migrations = (migrations ?? Enumerable.Empty<IMigration>())
+                                                    .OrderBy(m => m.TargetVersion).ToList();
+
     private readonly IDbConnection _database = Guard.Against.Null(database);
 
     public void Initial()
@@ -27,6 +32,32 @@ public class MigrationService(IDbConnection database) : IMigrationService
     {
         _database.Execute($"PRAGMA user_version={version}");
     }
+
+    public void MigrateToLatest()
+    {
+        int current = GetDatabaseVersion();
+        IOrderedEnumerable<IMigration> pending = _migrations.Where(m => m.TargetVersion > current).OrderBy(m => m.TargetVersion);
+
+        foreach (IMigration? migration in pending)
+        {
+            try
+            {
+                logger.LogInformation("Applying migration to version {Version}", migration.TargetVersion);
+
+                migration.Apply(_database);
+
+                SetDatabaseVersion(migration.TargetVersion);
+
+                logger.LogInformation("Migration to version {Version} applyed", migration.TargetVersion);
+            }
+            catch (Exception ex)
+            {
+                logger.LogCritical(ex, "Migration to version {Version} failed", migration.TargetVersion);
+                throw;
+            }
+        }
+    }
+
 
     private void CreateTableGenres()
     {

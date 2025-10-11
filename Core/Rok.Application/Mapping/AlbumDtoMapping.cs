@@ -40,7 +40,8 @@ internal static class AlbumDtoMapping
             CountryName = album.CountryName,
             Id = album.Id,
             CreatDate = album.CreatDate,
-            EditDate = album.EditDate
+            EditDate = album.EditDate,
+            GetMetaDataLastAttempt = album.GetMetaDataLastAttempt
         };
     }
 

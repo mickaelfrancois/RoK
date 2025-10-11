@@ -1,6 +1,7 @@
 ﻿using Rok.Application.Dto.Lyrics;
 using Rok.Application.Features.Playlists.PlaylistMenu;
 using Rok.Application.Features.Tracks.Command;
+using Rok.Infrastructure.NovaApi;
 using Rok.Logic.Services.Player;
 
 namespace Rok.Logic.ViewModels.Tracks;
@@ -220,6 +221,11 @@ public partial class TrackViewModel : ObservableObject, IDisposable
     {
         if (string.IsNullOrEmpty(Track.MusicFile) || string.IsNullOrEmpty(Track.ArtistName) || string.IsNullOrEmpty(Track.Title))
             return;
+
+        if (!NovaApiService.IsApiRetryAllowed(Track.GetLyricsLastAttempt))
+            return;
+
+        await _mediator.SendMessageAsync(new UpdateTrackGetLyricsLastAttemptCommand(Track.Id));
 
         _logger.LogTrace("Fetching lyrics for {Artist} - {Title} from API", Track.ArtistName, Track.Title);
 

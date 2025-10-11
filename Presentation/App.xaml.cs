@@ -4,7 +4,6 @@ using Rok.Import;
 using Rok.Infrastructure;
 using Serilog;
 using System.IO;
-using System.Reflection;
 using Windows.Storage;
 using WinRT.Interop;
 
@@ -179,7 +178,7 @@ namespace Rok
                 ILogger<App>? logger = ServiceProvider.GetService<Microsoft.Extensions.Logging.ILogger<App>>();
                 logger?.LogError(e.Exception, "Exception non gérée: {Message}", e.Exception.Message);
 
-                
+
 #if DEBUG
                 // handle to avoid crash:
                 e.Handled = true;

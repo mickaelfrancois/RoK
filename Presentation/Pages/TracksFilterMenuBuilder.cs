@@ -1,6 +1,5 @@
 ﻿using Microsoft.UI.Xaml.Controls;
 using Microsoft.Windows.ApplicationModel.Resources;
-using Rok.Logic.ViewModels.Albums;
 using Rok.Logic.ViewModels.Tracks;
 
 namespace Rok.Pages;
@@ -19,7 +18,7 @@ internal class TracksFilterMenuBuilder
 
     private static readonly string[] TypeFilterOptions =
     [
-        "LIVE",        
+        "LIVE",
         "NEVERLISTENED",
     ];
 

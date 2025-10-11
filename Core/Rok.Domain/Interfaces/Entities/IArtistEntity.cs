@@ -36,6 +36,7 @@ public interface IArtistEntity : IEntity
     string? WikipediaUrl { get; set; }
     int? YearMaxi { get; set; }
     int? YearMini { get; set; }
+    DateTime? GetMetaDataLastAttempt { get; set; }
 
     string ToString();
 }

@@ -224,7 +224,7 @@ namespace Rok
             });
         }
 
- 
+
         private async Task SearchNoResultHandleAsync()
         {
             ContentDialog dialog = new()

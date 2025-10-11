@@ -9,14 +9,13 @@ using Rok.Domain.Entities;
 using Rok.Import.Models;
 using Rok.Shared;
 using Rok.Shared.Extensions;
-using System;
 using System.Collections.Concurrent;
 using System.Diagnostics;
 
 namespace Rok.Import;
 
 public class ImportService : IImport
-{    
+{
     public bool UpdateInProgress { get; private set; }
 
     private readonly IFolderResolver _folderResolver;
@@ -98,7 +97,7 @@ public class ImportService : IImport
 
 
     public async Task ImportAsync(CancellationToken cancellationToken)
-    {        
+    {
         bool errorOccurred = false;
 
         Statistics = new();
@@ -109,7 +108,7 @@ public class ImportService : IImport
 
         await LoadCachesAsync();
 
-        List<string> pathsToImport = new List<string>();
+        List<string> pathsToImport = new();
         if (_options.LibraryPath is not null)
             pathsToImport.AddRange(_options.LibraryPath.Where(p => !string.IsNullOrWhiteSpace(p)));
 

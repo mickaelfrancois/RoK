@@ -307,7 +307,7 @@ public partial class ArtistsViewModel : ObservableObject, IDisposable
 
         _filteredArtists = filteredArtists.ToList();
 
-        IEnumerable<ArtistsGroupCategoryViewModel> artists = ArtistsGroupCategory.GetGroupedItems(_groupByText, _filteredArtists);        
+        IEnumerable<ArtistsGroupCategoryViewModel> artists = ArtistsGroupCategory.GetGroupedItems(_groupByText, _filteredArtists);
         GroupedItems.InitWithAddRange(artists);
 
         TotalCount = _filteredArtists.Count;

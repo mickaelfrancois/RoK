@@ -51,6 +51,9 @@ public class AlbumEntity : BaseEntity, IAlbumEntity
 
     public DateTime? LastListen { get; set; }
 
+    public DateTime? GetMetaDataLastAttempt { get; set; }
+
+
     [Write(false)]
     public string GenreName { get; set; } = string.Empty;
 

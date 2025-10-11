@@ -40,6 +40,8 @@ public class TrackEntity : BaseEntity
 
     public DateTime? LastSkip { get; set; }
 
+    public DateTime? GetLyricsLastAttempt { get; set; }
+
 
     [Write(false)]
     public string AlbumName { get; set; } = string.Empty;
