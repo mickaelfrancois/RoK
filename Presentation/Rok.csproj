@@ -1,0 +1,298 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<OutputType>WinExe</OutputType>
+		<TargetFramework>net9.0-windows10.0.26100.0</TargetFramework>
+		<TargetPlatformMinVersion>10.0.17763.0</TargetPlatformMinVersion>
+		<RootNamespace>Rok</RootNamespace>
+		<ApplicationManifest>app.manifest</ApplicationManifest>
+		<Platforms>x86;x64;ARM64</Platforms>
+		<RuntimeIdentifiers>win-x86;win-x64;win-arm64</RuntimeIdentifiers>
+		<PublishProfile>win-$(Platform).pubxml</PublishProfile>
+		<UseWinUI>true</UseWinUI>
+		<EnableMsixTooling>true</EnableMsixTooling>
+		<Nullable>enable</Nullable>
+		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+		<WindowsAppSDKSelfContained>true</WindowsAppSDKSelfContained>
+	  <UserSecretsId>d0581b7b-fae8-471b-96ec-491f08740dcb</UserSecretsId>
+  </PropertyGroup>
+
+
+	<Target Name="DetectUnlocalizedXaml" AfterTargets="Build">
+		<Exec Command="powershell -ExecutionPolicy Bypass -File &quot;$(ProjectDir)find-unlocalized.ps1&quot;" StandardOutputImportance="High" />
+	</Target>
+
+
+	<ItemGroup>
+		<None Remove="Assets\BadgeLogo.scale-100.png" />
+		<None Remove="Assets\BadgeLogo.scale-125.png" />
+		<None Remove="Assets\BadgeLogo.scale-150.png" />
+		<None Remove="Assets\BadgeLogo.scale-200.png" />
+		<None Remove="Assets\BadgeLogo.scale-400.png" />
+		<None Remove="Commons\BackdropControl.xaml" />
+		<None Remove="Commons\CompactPlayerControl.xaml" />
+		<None Remove="Commons\FullScreenControl.xaml" />
+		<None Remove="Commons\InlineEditableText.xaml" />
+		<None Remove="Commons\NotificationControl.xaml" />
+		<None Remove="Commons\NotificationItemControl.xaml" />
+		<None Remove="Commons\PlaylistGroup.xaml" />
+		<None Remove="Commons\PlaylistGroupFilter.xaml" />
+		<None Remove="Commons\RatingControlLightControl.xaml" />
+		<None Remove="Commons\SplashScreenControl.xaml" />
+		<None Remove="Pages\AlbumsPage.xaml" />
+		<None Remove="Pages\ArtistPage.xaml" />
+		<None Remove="Pages\ArtistsPage.xaml" />
+		<None Remove="Pages\GenrePage.xaml" />
+		<None Remove="Pages\GenresPage.xaml" />
+		<None Remove="Pages\ListeningPage.xaml" />
+		<None Remove="Pages\OptionsPage.xaml" />
+		<None Remove="Pages\PlayerView.xaml" />
+		<None Remove="Pages\PlaylistsPage.xaml" />
+		<None Remove="Pages\SearchPage.xaml" />
+		<None Remove="Pages\TrackPage.xaml" />
+		<None Remove="Pages\TracksPage.xaml" />
+		<None Remove="Pages\WelcomePage.xaml" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<Content Include="Assets\SplashScreen.scale-200.png" />
+		<Content Include="Assets\LockScreenLogo.scale-200.png" />
+		<Content Include="Assets\Square150x150Logo.scale-200.png" />
+		<Content Include="Assets\Square44x44Logo.scale-200.png" />
+		<Content Include="Assets\Square44x44Logo.targetsize-24_altform-unplated.png" />
+		<Content Include="Assets\Wide310x150Logo.scale-200.png" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<Manifest Include="$(ApplicationManifest)" />
+	</ItemGroup>
+
+	<!--
+    Defining the "Msix" ProjectCapability here allows the Single-project MSIX Packaging
+    Tools extension to be activated for this project even if the Windows App SDK Nuget
+    package has not yet been restored.
+  -->
+	<ItemGroup Condition="'$(DisableMsixProjectCapabilityAddedByProject)'!='true' and '$(EnableMsixTooling)'=='true'">
+		<ProjectCapability Include="Msix" />
+	</ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="Microsoft.Extensions.Configuration.FileExtensions" Version="9.0.9" />
+		<PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="9.0.9" />
+		<PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.9" />
+		<PackageReference Include="Microsoft.Extensions.Http" Version="9.0.9" />
+		<PackageReference Include="Microsoft.Extensions.Logging" Version="9.0.9" />
+		<PackageReference Include="Microsoft.Extensions.Logging.Console" Version="9.0.9" />
+		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="9.0.9" />
+		<PackageReference Include="Microsoft.Windows.CsWin32" Version="0.3.205">
+		  <PrivateAssets>all</PrivateAssets>
+		  <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+		<PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.26100.6584" />
+		<PackageReference Include="Microsoft.WindowsAppSDK" Version="1.8.250916003" />
+		<PackageReference Include="MiF.Guard" Version="1.0.0" />
+		<PackageReference Include="MiF.Messenger" Version="1.0.0" />
+		<PackageReference Include="MiF.RelayCommand" Version="1.0.0" />
+	</ItemGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\Core\Rok.Application\Rok.Application.csproj" />
+		<ProjectReference Include="..\Core\Rok.Import\Rok.Import.csproj" />
+		<ProjectReference Include="..\Core\Rok.Shared\Rok.Shared.csproj" />
+		<ProjectReference Include="..\Infrastructure\Rok.Infrastructure\Rok.Infrastructure.csproj" />
+	</ItemGroup>
+	<ItemGroup>
+	  <Content Update="Assets\albumFallback.png">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </Content>
+	  <Content Update="Assets\artistFallback.png">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </Content>
+	  <Content Update="Assets\Square44x44Logo.ico">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </Content>
+	  <Content Update="Assets\Square44x44Logo.png">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </Content>
+	</ItemGroup>
+	<ItemGroup>
+	  <Page Update="Pages\WelcomePage.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </Page>
+	</ItemGroup>
+	<ItemGroup>
+	  <Page Update="Pages\OptionsPage.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </Page>
+	</ItemGroup>
+	<ItemGroup>
+	  <Page Update="Commons\RatingControlDarkControl.xaml">
+	    <SubType>Designer</SubType>
+	  </Page>
+	  <Page Update="Commons\RatingControlLightControl.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </Page>
+	</ItemGroup>
+	<ItemGroup>
+	  <Page Update="Commons\InlineEditableText.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </Page>
+	</ItemGroup>
+	<ItemGroup>
+	  <Page Update="Commons\CompactPlayerControl.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </Page>
+	</ItemGroup>
+	<ItemGroup>
+	  <Page Update="Commons\PlaylistGroupFilter.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </Page>
+	</ItemGroup>
+	<ItemGroup>
+	  <Page Update="Commons\PlaylistGroup.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </Page>
+	  <Page Update="Pages\PlaylistPage.xaml">
+	    <SubType>Designer</SubType>
+	  </Page>
+	</ItemGroup>
+	<ItemGroup>
+	  <Page Update="Pages\SmartPlaylistPage.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </Page>
+	</ItemGroup>
+	<ItemGroup>
+	  <Page Update="Pages\PlaylistsPage.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </Page>
+	</ItemGroup>
+	<ItemGroup>
+	  <Page Update="Commons\AnimatedButton.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </Page>
+	</ItemGroup>
+	<ItemGroup>
+		<Page Update="Pages\AlbumPage.xaml">
+			<Generator>MSBuild:Compile</Generator>
+		</Page>
+	</ItemGroup>
+	<ItemGroup>
+		<Page Update="Pages\ArtistPage.xaml">
+			<Generator>MSBuild:Compile</Generator>
+		</Page>
+	</ItemGroup>
+	<ItemGroup>
+		<Page Update="Pages\AlbumsPage.xaml">
+			<Generator>MSBuild:Compile</Generator>
+		</Page>
+	</ItemGroup>
+	<ItemGroup>
+		<Page Update="Pages\ArtistsPage.xaml">
+			<Generator>MSBuild:Compile</Generator>
+		</Page>
+	</ItemGroup>
+	<ItemGroup>
+	  <Page Update="Pages\SearchPage.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </Page>
+	</ItemGroup>
+	<ItemGroup>
+	  <Page Update="Pages\ListeningPage.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </Page>
+	</ItemGroup>
+	<ItemGroup>
+	  <Page Update="Commons\SplashScreenControl.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </Page>
+	</ItemGroup>
+	<ItemGroup>
+	  <Page Update="Commons\BackdropControl.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </Page>
+	</ItemGroup>
+	<ItemGroup>
+	  <Page Update="Commons\FullScreenControl.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </Page>
+	</ItemGroup>
+	<ItemGroup>
+		<Page Update="Pages\PlayerView.xaml">
+			<Generator>MSBuild:Compile</Generator>
+		</Page>
+	</ItemGroup>
+	<ItemGroup>
+		<Page Update="Pages\TracksPage.xaml">
+			<Generator>MSBuild:Compile</Generator>
+		</Page>
+	</ItemGroup>
+	<ItemGroup>
+		<Page Update="Pages\TrackPage.xaml">
+			<Generator>MSBuild:Compile</Generator>
+		</Page>
+	</ItemGroup>
+	<ItemGroup>
+		<Page Update="Pages\GenresPage.xaml">
+			<Generator>MSBuild:Compile</Generator>
+		</Page>
+	</ItemGroup>
+	<ItemGroup>
+		<Page Update="Pages\GenrePage.xaml">
+			<Generator>MSBuild:Compile</Generator>
+		</Page>
+	</ItemGroup>
+	<ItemGroup>
+	  <Folder Include="Commons\Extensions\" />
+	  <Folder Include="Services\" />
+	</ItemGroup>
+	<ItemGroup>
+	  <None Update="appsettings.json">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </None>
+	</ItemGroup>
+	<ItemGroup>
+	  <Page Update="Styles\ButtonStyles.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </Page>
+	</ItemGroup>
+	<ItemGroup>
+	  <Page Update="Commons\NotificationItemControl.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </Page>
+	</ItemGroup>
+	<ItemGroup>
+	  <Page Update="Commons\NotificationControl.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </Page>
+	</ItemGroup>
+	
+	<!--
+    Defining the "HasPackageAndPublishMenuAddedByProject" property here allows the Solution
+    Explorer "Package and Publish" context menu entry to be enabled for this project even if
+    the Windows App SDK Nuget package has not yet been restored.
+  -->
+	<PropertyGroup Condition="'$(DisableHasPackageAndPublishMenuAddedByProject)'!='true' and '$(EnableMsixTooling)'=='true'">
+		<HasPackageAndPublishMenu>true</HasPackageAndPublishMenu>
+	</PropertyGroup>
+
+	<!-- Publish Properties -->
+	<PropertyGroup>
+		<PublishReadyToRun Condition="'$(Configuration)' == 'Debug'">False</PublishReadyToRun>
+		<PublishReadyToRun Condition="'$(Configuration)' != 'Debug'">True</PublishReadyToRun>
+		<PublishTrimmed Condition="'$(Configuration)' == 'Debug'">False</PublishTrimmed>
+		<PublishTrimmed Condition="'$(Configuration)' != 'Debug'">False</PublishTrimmed>
+		<DefaultLanguage>fr-FR</DefaultLanguage>
+		<GenerateAppInstallerFile>False</GenerateAppInstallerFile>
+		<AppxPackageSigningEnabled>True</AppxPackageSigningEnabled>
+		<PackageCertificateThumbprint>0B64272F4D9082BEA33ECB85AEA958DF1A732789</PackageCertificateThumbprint>
+		<AppxPackageSigningTimestampDigestAlgorithm>SHA256</AppxPackageSigningTimestampDigestAlgorithm>
+		<AppxAutoIncrementPackageRevision>True</AppxAutoIncrementPackageRevision>
+		<AppxSymbolPackageEnabled>True</AppxSymbolPackageEnabled>
+		<GenerateTestArtifacts>True</GenerateTestArtifacts>
+		<AppxBundle>Never</AppxBundle>
+		<AppInstallerUri>D:\Temp\Rok</AppInstallerUri>
+		<HoursBetweenUpdateChecks>0</HoursBetweenUpdateChecks>
+		<GenerateTemporaryStoreCertificate>True</GenerateTemporaryStoreCertificate>
+		<AppxBundlePlatforms>x86|x64</AppxBundlePlatforms>
+		<PlatformTarget>AnyCPU</PlatformTarget>
+		<ApplicationIcon>Assets\Square44x44Logo.ico</ApplicationIcon>
+	</PropertyGroup>
+	  
+</Project>

@@ -1,0 +1,37 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		<TargetFramework>net9.0-windows10.0.26100.0</TargetFramework>
+		<EnableWindowsTargeting>true</EnableWindowsTargeting>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Dapper" Version="2.1.66" />
+		<PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="9.0.9" />
+		<PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="9.0.9" />
+		<PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="9.0.9" />
+		<PackageReference Include="Microsoft.Extensions.Logging" Version="9.0.9" />
+		<PackageReference Include="MiF.Guard" Version="1.0.0" />
+		<PackageReference Include="MiF.Messenger" Version="1.0.0" />
+		<PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
+		<PackageReference Include="Serilog.Extensions.Logging" Version="9.0.2" />
+		<PackageReference Include="Serilog.Settings.Configuration" Version="9.0.0" />
+		<PackageReference Include="Serilog.Sinks.Console" Version="6.0.0" />
+		<PackageReference Include="Serilog.Sinks.Debug" Version="3.0.0" />
+		<PackageReference Include="Serilog.Sinks.File" Version="7.0.0" />
+		<PackageReference Include="TagLibSharp" Version="2.3.0" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\..\Core\Rok.Application\Rok.Application.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Compile Update="Telemetry\TelemetryClient.cs">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </Compile>
+	</ItemGroup>
+
+</Project>

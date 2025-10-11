@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<UserControl x:Class="Rok.Commons.NotificationControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <StackPanel x:Name="notificationsPanel"
+                Orientation="Vertical"
+                Spacing="8"
+                VerticalAlignment="Top"
+                HorizontalAlignment="Center"
+                Margin="12" />
+</UserControl>

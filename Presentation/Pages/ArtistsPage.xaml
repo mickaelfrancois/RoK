@@ -1,0 +1,238 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Page
+    x:Class="Rok.Pages.ArtistsPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:Rok.Pages"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+    xmlns:artists="using:Rok.Logic.ViewModels.Artists" 
+    xmlns:common="using:Rok.Commons"     
+    x:Name="artistsView"
+    mc:Ignorable="d">
+
+    <Page.Resources>
+        <CollectionViewSource x:Name="groupedItemsViewSource" IsSourceGrouped="True" Source="{x:Bind ViewModel.GroupedItems}" ItemsPath="Items" />
+    </Page.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="{ThemeResource headerListRowHeight}"></RowDefinition>
+            <RowDefinition Height="*"></RowDefinition>
+        </Grid.RowDefinitions>
+
+        <!-- Actions menu -->
+        <CommandBar Grid.Row="0" Style="{StaticResource headerListCommandBar}">
+            <CommandBar.Content>
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Spacing="8">
+
+                    <!-- Listen -->
+                    <AppBarButton x:Uid="artistViewListen"                                   
+                                  Style="{StaticResource listenAppBarButtonCompactStyle}" 
+                                  Command="{x:Bind ViewModel.ListenCommand}"/>
+
+                    <!-- Sort -->
+                    <SplitButton VerticalAlignment="Center">
+                        <SplitButton.Content>
+                            <StackPanel Orientation="Horizontal" 
+                                        Spacing="6" 
+                                        VerticalAlignment="Center" 
+                                        AutomationProperties.Name="{x:Bind ViewModel.GroupByText, Mode=OneWay}" 
+                                        ToolTipService.ToolTip="{x:Bind ViewModel.GroupByText, Mode=OneWay}">
+                                
+                                <FontIcon Glyph="&#xE8CB;" 
+                                          FontSize="{ThemeResource ControlContentThemeFontSize}" 
+                                          VerticalAlignment="Center"/>
+                                
+                                <TextBlock x:Uid="artistsViewGroupBy" 
+                                           Style="{StaticResource BodyTextBlockStyle}" 
+                                           VerticalAlignment="Center" 
+                                           Margin="0,0,2,0" 
+                                           TextTrimming="CharacterEllipsis"/>
+
+                                <TextBlock Text="{x:Bind ViewModel.GroupByText, Mode=OneWay}" 
+                                           Style="{StaticResource BodyTextBlockStyle}" 
+                                           VerticalAlignment="Center" 
+                                           MaxWidth="140"
+                                           TextTrimming="CharacterEllipsis"/>
+                            </StackPanel>
+                        </SplitButton.Content>
+                        <SplitButton.Flyout>
+                            <Flyout ShowMode="TransientWithDismissOnPointerMoveAway" Placement="RightEdgeAlignedBottom">
+                                <StackPanel Orientation="Vertical" MinWidth="180">
+                                    <MenuFlyoutItem x:Uid="artistsViewGroupByCreatDateMenu"   Command="{x:Bind ViewModel.GroupByCommand}" CommandParameter="CREATDATE"/>
+                                    <MenuFlyoutItem x:Uid="artistsViewGroupByArtistMenu"      Command="{x:Bind ViewModel.GroupByCommand}" CommandParameter="ARTISTNAME"/>
+                                    <MenuFlyoutItem x:Uid="artistsViewGroupByYearMenu"        Command="{x:Bind ViewModel.GroupByCommand}" CommandParameter="YEAR"/>
+                                    <MenuFlyoutItem x:Uid="artistsViewGroupByDecadeMenu"      Command="{x:Bind ViewModel.GroupByCommand}" CommandParameter="DECADE"/>
+                                    <MenuFlyoutItem x:Uid="artistsViewGroupByCountryMenu"     Command="{x:Bind ViewModel.GroupByCommand}" CommandParameter="COUNTRY"/>
+                                    <MenuFlyoutItem x:Uid="artistsViewGroupByLastListenMenu"  Command="{x:Bind ViewModel.GroupByCommand}" CommandParameter="LASTLISTEN"/>
+                                    <MenuFlyoutItem x:Uid="artistsViewGroupByListenCountMenu" Command="{x:Bind ViewModel.GroupByCommand}" CommandParameter="LISTENCOUNT"/>
+                                </StackPanel>
+                            </Flyout>
+                        </SplitButton.Flyout>
+                    </SplitButton>
+
+                    <!-- Filter -->
+                    <SplitButton x:Name="buttonFilter" VerticalAlignment="Center">
+                        <SplitButton.Content>
+                            <StackPanel Orientation="Horizontal"
+                                        Spacing="6"
+                                        VerticalAlignment="Center"
+                                        AutomationProperties.Name="{x:Bind ViewModel.FilterByText, Mode=OneWay}"
+                                        ToolTipService.ToolTip="{x:Bind ViewModel.FilterByText, Mode=OneWay}">
+                                
+                                <FontIcon Glyph="&#xE71C;"
+                                          FontSize="{ThemeResource ControlContentThemeFontSize}"
+                                          VerticalAlignment="Center"/>
+                                
+                                <TextBlock x:Uid="artistsViewFilterBy"
+                                           Style="{StaticResource BodyTextBlockStyle}"
+                                           VerticalAlignment="Center"
+                                           Margin="0,0,2,0"
+                                           TextTrimming="CharacterEllipsis"/>
+                                
+                                <TextBlock Text="{x:Bind ViewModel.FilterByText, Mode=OneWay}"
+                                           Style="{StaticResource BodyTextBlockStyle}"
+                                           VerticalAlignment="Center"
+                                           TextTrimming="CharacterEllipsis"
+                                           MaxWidth="140"/>
+                            </StackPanel>
+                        </SplitButton.Content>
+                        <SplitButton.Flyout>
+                            <MenuFlyout x:Name="filterMenu"
+                                        ShowMode="TransientWithDismissOnPointerMoveAway"
+                                        Placement="RightEdgeAlignedBottom"
+                                        Opened="FilterFlyout_Opened">
+                            </MenuFlyout>
+                        </SplitButton.Flyout>
+                    </SplitButton>
+
+                </StackPanel>
+            </CommandBar.Content>
+        </CommandBar>
+
+        <!-- Main content-->
+        <Grid Grid.Row="1" Style="{StaticResource gridList}">
+            <SemanticZoom x:Name="GridZoom" ScrollViewer.ZoomMode="Enabled" IsZoomOutButtonEnabled="True">
+                <SemanticZoom.ZoomedInView>
+                    <common:GridViewExtended x:Name="grid" ContainerContentChanging="GridContainerContentChanging" 
+                                 ItemsSource="{Binding Source={StaticResource groupedItemsViewSource}}"                                         
+                                 BindableSelectedItems="{x:Bind ViewModel.Selected, Mode=OneWay}"                                 
+                                 SelectionMode="Multiple" 
+                                 IsMultiSelectCheckBoxEnabled="{x:Bind ViewModel.IsSelectedItems, Mode=OneWay}" 
+                                 IsItemClickEnabled="True"
+                                 Margin="0" 
+                                 ScrollViewer.VerticalScrollMode="Enabled" 
+                                 ScrollViewer.VerticalScrollBarVisibility="Auto">
+
+                        <GridView.ItemTemplate>
+                            <DataTemplate x:DataType="artists:ArtistViewModel">
+                                <Grid Style="{StaticResource MainGridCoverStyle}">
+                                    <Border CornerRadius="10">
+                                        <common:PictureControl Style="{StaticResource PictureCoverStyle}"
+                                                               Cover="{x:Bind Picture, Mode=OneWay}"
+                                                               x:Phase="2"
+                                                               PlayButtonVisibility="Visible"
+                                                               Command="{x:Bind ListenCommand}" />
+                                    </Border>
+
+                                    <Grid Style="{StaticResource GridCoverBottomStyle}">
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="{ThemeResource gridListFirstRowHeight}" />
+                                            <RowDefinition Height="{ThemeResource gridListSecondRowHeight}" />
+                                        </Grid.RowDefinitions>
+
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition></ColumnDefinition>
+                                            <ColumnDefinition Width="50"></ColumnDefinition>
+                                        </Grid.ColumnDefinitions>
+
+                                        <HyperlinkButton Grid.ColumnSpan="2" 
+                                                         Content="{x:Bind Artist.Name}" 
+                                                         x:Phase="0" 
+                                                         Command="{x:Bind ArtistOpenCommand}"  
+                                                         Style="{StaticResource GridCoverBottomFirstLineStyle}" />
+                                        
+                                        <TextBlock Grid.Row="1" 
+                                                   Style="{StaticResource GridCoverBottomSecondLineStyle}" 
+                                                   Text="{x:Bind SubTitle, Mode=OneWay}" 
+                                                   x:Phase="1" />
+
+                                        <common:AnimatedButton Grid.Row="1"
+                                                               Grid.Column="1"
+                                                               HorizontalAlignment="Right"
+                                                               VerticalAlignment="Stretch"
+                                                               Margin="-15,0,0,0"
+                                                               Icon="{StaticResource HeartPath}"
+                                                               Color="{x:Bind IsFavorite, Converter={StaticResource FavoriteToColorConverter}, Mode=OneWay}"
+                                                               Command="{x:Bind ArtistFavoriteCommand}"
+                                                               CommandParameter="{x:Bind IsFavorite, Converter={StaticResource BoolToInvertBoolConverter}, Mode=OneWay}" />
+                                    </Grid>
+                                </Grid>
+                            </DataTemplate>
+                        </GridView.ItemTemplate>
+
+                        <GridView.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <ItemsWrapGrid Orientation="Horizontal"
+                                               ItemHeight="310"
+                                               ItemWidth="310"
+                                               Margin="0,0,2,2" />
+                            </ItemsPanelTemplate>
+                        </GridView.ItemsPanel>
+
+                        <GridView.GroupStyle>
+                            <GroupStyle HidesIfEmpty="True">
+                                <GroupStyle.HeaderTemplate>
+                                    <DataTemplate x:DataType="artists:ArtistsGroupCategoryViewModel">
+                                        <StackPanel Orientation="Horizontal" Visibility="Visible">
+                                            <HyperlinkButton Content="{x:Bind Title}" Style="{StaticResource HyperlinkGroupButtonStyle}" />
+                                            <Button Margin="10,0,0,0" 
+                                                    Command="{Binding ElementName=artistsView, Path=DataContext.ListenGroupCommand}" 
+                                                    CommandParameter="{x:Bind}" 
+                                                    VerticalAlignment="Center"
+                                                    Tapped="GroupButton_Tapped">
+                                                <StackPanel Orientation="Horizontal" VerticalAlignment="Top" >
+                                                    <FontIcon Glyph="&#xEE4A;"
+                                                              Margin="0,0,6,0"
+                                                              FontSize="{ThemeResource ControlContentThemeFontSize}"
+                                                              VerticalAlignment="Center"/>
+                                                    <TextBlock x:Uid="artistsViewListenListGroup" />
+                                                </StackPanel>
+                                            </Button>
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </GroupStyle.HeaderTemplate>
+
+                                <GroupStyle.Panel>
+                                    <ItemsPanelTemplate>
+                                        <VariableSizedWrapGrid Orientation="Vertical" Margin="0,0,80,0"/>
+                                    </ItemsPanelTemplate>
+                                </GroupStyle.Panel>
+                            </GroupStyle>
+                        </GridView.GroupStyle>
+                    </common:GridViewExtended>
+                </SemanticZoom.ZoomedInView>
+
+                <SemanticZoom.ZoomedOutView>
+                    <GridView x:Name="ZoomoutCollectionGrid"  
+                              ItemsSource="{x:Bind groupedItemsViewSource.View.CollectionGroups}"                              
+                              VerticalAlignment="Center">
+
+                        <GridView.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock HorizontalAlignment="Center" Width="200" Text="{Binding Group.Title}"/>
+                            </DataTemplate>
+                        </GridView.ItemTemplate>
+                        
+                        <GridView.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <WrapGrid Orientation="Horizontal" VerticalChildrenAlignment="Center" MaximumRowsOrColumns="8" ></WrapGrid>
+                            </ItemsPanelTemplate>
+                        </GridView.ItemsPanel>
+                    </GridView>
+                </SemanticZoom.ZoomedOutView>
+            </SemanticZoom>
+        </Grid>
+    </Grid>
+</Page>

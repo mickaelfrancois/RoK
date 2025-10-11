@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<UserControl
+    x:Class="Rok.Commons.SplashScreenControl"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:Rok.Commons"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d">
+
+    <Grid Background="#202020">
+        <Grid.Resources>
+            <Storyboard x:Name="myStoryboard" Completed="myStoryboard_Completed">
+                <DoubleAnimation From="2" To="1" Duration="00:00:2" 
+             Storyboard.TargetName="rectScaleTransform" 
+             Storyboard.TargetProperty="ScaleX">
+                    <DoubleAnimation.EasingFunction>
+                        <ElasticEase x:Name="myElasticEase" 
+                                  Oscillations="1" 
+                                  Springiness="2"                                      
+                                  EasingMode="EaseOut"/>
+                    </DoubleAnimation.EasingFunction>
+                </DoubleAnimation>
+
+                <DoubleAnimation From="2" To="1" Duration="00:00:2" Storyboard.TargetName="rectScaleTransform2" Storyboard.TargetProperty="ScaleX">        
+                    <DoubleAnimation.EasingFunction>
+                        <ElasticEase x:Name="myElasticEase2" 
+                                  Oscillations="1" 
+                                  Springiness="2"                                      
+                                  EasingMode="EaseOut"/>
+                    </DoubleAnimation.EasingFunction>
+                </DoubleAnimation>
+
+                <DoubleAnimation From="0" To="1" Duration="00:00:1" Storyboard.TargetName="and" Storyboard.TargetProperty="(Button.Opacity)">
+                </DoubleAnimation>
+            </Storyboard>
+        </Grid.Resources>
+
+        <Image VerticalAlignment="Center" HorizontalAlignment="Center" Stretch="None" Source="ms-appx:///Assets/SplashScreen.png"></Image>
+
+        <TextBlock x:Name="live" 
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center" 
+                Margin="-100,130,0,0" Text="Live" FontSize="40" Foreground="White" FlowDirection="RightToLeft" FontFamily="Impact">
+            <TextBlock.RenderTransform>
+                <ScaleTransform x:Name="rectScaleTransform" />
+            </TextBlock.RenderTransform>
+        </TextBlock>
+
+        <TextBlock x:Name="and" 
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center" 
+                Margin="0,130,0,0" Text="&amp;" FontSize="20" Foreground="White" Opacity="0.1" >
+        </TextBlock>
+
+        <TextBlock x:Name="loud" 
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center" 
+                Margin="120,130,0,0" Text="Loud" FontSize="40" Foreground="White" FontFamily="Impact" >
+            <TextBlock.RenderTransform>
+                <ScaleTransform x:Name="rectScaleTransform2" />
+            </TextBlock.RenderTransform>
+        </TextBlock>
+    </Grid>
+</UserControl>

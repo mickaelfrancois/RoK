@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<UserControl
+    x:Class="Rok.Commons.PlaylistGroupFilter"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:Rok.Commons"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    d:DesignHeight="300"
+    d:DesignWidth="400"
+    mc:Ignorable="d">
+
+    <Grid>
+        <StackPanel  Orientation="Horizontal" VerticalAlignment="Top">
+            <ComboBox x:Name="cbEntities" SelectionChanged="EntitiesSelectionChanged" Margin="0,0,10,0"></ComboBox>
+            <ComboBox x:Name="cbFields" SelectionChanged="FieldsSelectionChanged" Margin="0,0,10,0"></ComboBox>
+            <ComboBox x:Name="cbOperators" SelectionChanged="OperatorsSelectionChanged" Margin="0,0,10,0"></ComboBox>
+
+            <ComboBox x:Name="cbValue" Visibility="Collapsed"></ComboBox>
+            <TextBox x:Name="tbValue" Visibility="Collapsed"></TextBox>
+            <NumberBox x:Name="nbValue" Visibility="Collapsed"></NumberBox>
+            <NumberBox x:Name="nbValue2" Visibility="Collapsed"></NumberBox>
+
+            <Button x:Name="filterNew" Click="FilterNew_Click" Margin="10,0,10,0">
+                <SymbolIcon Symbol="Add"></SymbolIcon>
+            </Button>
+            <Button x:Name="filterRemove" Click="FilterRemove_Click">
+                <SymbolIcon Symbol="Delete"></SymbolIcon>
+            </Button>
+        </StackPanel>
+    </Grid>
+</UserControl>

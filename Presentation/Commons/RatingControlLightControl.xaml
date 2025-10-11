@@ -1,0 +1,83 @@
+<UserControl
+    x:Class="Rok.Commons.RatingControlLightControl"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    x:Name="root"
+    Background="Transparent">
+    <StackPanel Orientation="Horizontal"
+                HorizontalAlignment="Left"
+                Spacing="{Binding StarSpacing, ElementName=root}">
+        
+        <StackPanel.Resources>
+            <ControlTemplate x:Key="StarToggleTemplate" TargetType="ToggleButton">
+                <Grid>
+                    <VisualStateManager.VisualStateGroups>
+                        <VisualStateGroup x:Name="CommonStates">
+                            <VisualState x:Name="Normal">
+                                <Storyboard>
+                                    <ColorAnimation To="{Binding StarEmptyColor, ElementName=root}"
+                                                    Duration="0:0:0.15"
+                                                    Storyboard.TargetName="StarPath"
+                                                    Storyboard.TargetProperty="(Path.Fill).(SolidColorBrush.Color)"/>
+                                    <ColorAnimation To="{Binding StarStrokeColor, ElementName=root}"
+                                                    Duration="0"
+                                                    Storyboard.TargetName="StarPath"
+                                                    Storyboard.TargetProperty="(Path.Stroke).(SolidColorBrush.Color)"/>
+                                </Storyboard>
+                            </VisualState>
+                            <VisualState x:Name="PointerOver">
+                                <Storyboard>
+                                    <ColorAnimation To="{Binding StarPointerOverColor, ElementName=root}"
+                                                    Duration="0:0:0.05"
+                                                    Storyboard.TargetName="StarPath"
+                                                    Storyboard.TargetProperty="(Path.Fill).(SolidColorBrush.Color)"/>
+                                </Storyboard>
+                            </VisualState>
+                            <VisualState x:Name="Checked">
+                                <Storyboard>
+                                    <ColorAnimation To="{Binding StarSelectedColor, ElementName=root}"
+                                                    Duration="0:0:0.05"
+                                                    Storyboard.TargetName="StarPath"
+                                                    Storyboard.TargetProperty="(Path.Fill).(SolidColorBrush.Color)"/>
+                                </Storyboard>
+                            </VisualState>
+                            <VisualState x:Name="CheckedPointerOver">
+                                <Storyboard>
+                                    <ColorAnimation To="{Binding StarCheckedPointerOverColor, ElementName=root}"
+                                                    Duration="0:0:0.05"
+                                                    Storyboard.TargetName="StarPath"
+                                                    Storyboard.TargetProperty="(Path.Fill).(SolidColorBrush.Color)"/>
+                                    <ColorAnimation To="{Binding StarStrokeColor, ElementName=root}"
+                                                    Duration="0"
+                                                    Storyboard.TargetName="StarPath"
+                                                    Storyboard.TargetProperty="(Path.Stroke).(SolidColorBrush.Color)"/>
+                                </Storyboard>
+                            </VisualState>
+                        </VisualStateGroup>
+                    </VisualStateManager.VisualStateGroups>
+
+                    <Viewbox Width="{Binding StarSize, ElementName=root}"
+                             Height="{Binding StarSize, ElementName=root}">
+                        <Path x:Name="StarPath" StrokeThickness="1">
+                            <Path.Stroke>
+                                <SolidColorBrush Color="{Binding StarStrokeColor, ElementName=root}"/>
+                            </Path.Stroke>
+                            <Path.Fill>
+                                <SolidColorBrush Color="{Binding StarEmptyColor, ElementName=root}"/>
+                            </Path.Fill>
+                            <Path.Data>
+                                M 0,0 l 10,0 l 5,-10 l 5,10 l 10,0 l -7,10 l 2,10 l -10,-5 l -10,5 l 2,-10 Z
+                            </Path.Data>
+                        </Path>
+                    </Viewbox>
+                </Grid>
+            </ControlTemplate>
+        </StackPanel.Resources>
+
+        <ToggleButton Tag="1" Template="{StaticResource StarToggleTemplate}" Click="RatingButtonClickEventHandler"/>
+        <ToggleButton Tag="2" Template="{StaticResource StarToggleTemplate}" Click="RatingButtonClickEventHandler"/>
+        <ToggleButton Tag="3" Template="{StaticResource StarToggleTemplate}" Click="RatingButtonClickEventHandler"/>
+        <ToggleButton Tag="4" Template="{StaticResource StarToggleTemplate}" Click="RatingButtonClickEventHandler"/>
+        <ToggleButton Tag="5" Template="{StaticResource StarToggleTemplate}" Click="RatingButtonClickEventHandler"/>
+    </StackPanel>
+</UserControl>

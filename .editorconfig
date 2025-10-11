@@ -1,0 +1,4 @@
+﻿[*.{cs,vb}]
+
+# IDE0305: Simplifier l'initialisation des collections
+dotnet_style_prefer_collection_expression = never
