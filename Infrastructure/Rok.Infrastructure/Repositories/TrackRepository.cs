@@ -17,7 +17,7 @@ public class TrackRepository(IDbConnection db, [FromKeyedServices("BackgroundCon
     public async Task<IEnumerable<TrackEntity>> GetByPlaylistIdAsync(long playlistId, RepositoryConnectionKind kind = RepositoryConnectionKind.Foreground)
     {
         string sql = GetSelectQuery() +
-                     "\r\nINNER JOIN playlisttracks AS pt ON pt.trackId = tracks.id AND pt.playlistId = @playlistId";
+                     "INNER JOIN playlisttracks AS pt ON pt.trackId = tracks.id AND pt.playlistId = @playlistId";
 
         return await ExecuteQueryAsync(sql, kind, new { playlistId });
     }
@@ -114,6 +114,15 @@ public class TrackRepository(IDbConnection db, [FromKeyedServices("BackgroundCon
         return rowsAffected > 0;
     }
 
+    public async Task<bool> UpdateGetLyricsLastAttemptAsync(long id, RepositoryConnectionKind kind = RepositoryConnectionKind.Foreground)
+    {
+        string sql = "UPDATE tracks SET getLyricsLastAttempt = @lastAttemptDate WHERE id = @id";
+
+        IDbConnection localConnection = ResolveConnection(kind);
+        int rowsAffected = await localConnection.ExecuteAsync(sql, new { lastAttemptDate = DateTime.UtcNow, id });
+
+        return rowsAffected > 0;
+    }
 
     public override string GetSelectQuery(string? whereParam = null)
     {

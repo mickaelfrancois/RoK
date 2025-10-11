@@ -21,6 +21,8 @@ public class AppDbContext(IDbConnection connection, [FromKeyedServices("Backgrou
             _migrationService.Initial();
             IsFirstStart = true;
         }
+
+        _migrationService.MigrateToLatest();
     }
 
 

@@ -35,7 +35,8 @@ internal static class TrackDtoMapping
             CountryName = track.CountryName,
             Id = track.Id,
             CreatDate = track.CreatDate,
-            EditDate = track.EditDate
+            EditDate = track.EditDate,
+            GetLyricsLastAttempt = track.GetLyricsLastAttempt
         };
     }
 }

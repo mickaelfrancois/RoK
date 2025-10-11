@@ -2,8 +2,6 @@
 using Rok.Application.Features.Tracks.Query;
 using Rok.Application.Randomizer;
 using Rok.Logic.Services.Player;
-using Rok.Logic.ViewModels.Albums;
-using Rok.Logic.ViewModels.Artists;
 
 namespace Rok.Logic.ViewModels.Tracks;
 
@@ -19,7 +17,7 @@ public partial class TracksViewModel : ObservableObject, IDisposable
     public List<TrackViewModel> ViewModels { get; set; } = [];
 
     private bool _libraryUpdated = false;
-    private bool _stateLoaded = false;
+    private readonly bool _stateLoaded = false;
 
     public RangeObservableCollection<TracksGroupCategoryViewModel> GroupedItems { get; private set; } = [];
 

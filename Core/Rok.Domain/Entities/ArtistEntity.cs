@@ -65,6 +65,9 @@ public class ArtistEntity : BaseEntity, IArtistEntity
 
     public string? Biography { get; set; }
 
+    public DateTime? GetMetaDataLastAttempt { get; set; }
+
+
     [Write(false)]
     public string GenreName { get; set; } = string.Empty;
 

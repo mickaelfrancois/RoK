@@ -1,7 +1,9 @@
 ﻿using Rok.Application.Features.Albums.Query;
 using Rok.Application.Features.Artists.Command;
+using Rok.Application.Features.Tracks.Command;
 using Rok.Application.Features.Tracks.Query;
 using Rok.Application.Randomizer;
+using Rok.Infrastructure.NovaApi;
 using Rok.Logic.Services.Player;
 using Rok.Logic.ViewModels.Albums;
 using Rok.Logic.ViewModels.Tracks;
@@ -535,6 +537,11 @@ public partial class ArtistViewModel : ObservableObject
     {
         if (string.IsNullOrEmpty(Artist.Name))
             return;
+
+        if (!NovaApiService.IsApiRetryAllowed(Artist.GetMetaDataLastAttempt))
+            return;
+
+        await _mediator.SendMessageAsync(new UpdateArtistGetMetaDataLastAttemptCommand(Artist.Id));
 
         ApiArtistModel? artistApi = await _novaApiService.GetArtistAsync(Artist.Name);
         if (artistApi != null)

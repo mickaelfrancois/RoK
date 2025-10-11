@@ -1,13 +1,9 @@
-using System;
-using System.Collections.Generic;
 using Microsoft.UI.Xaml.Controls;
+using Rok.Logic.ViewModels.Main;
 using Rok.Logic.ViewModels.Start;
 using Windows.Storage;
-using Windows.Storage.AccessCache;
 using Windows.Storage.Pickers;
 using WinRT.Interop;
-using Microsoft.Extensions.DependencyInjection;
-using Rok.Logic.ViewModels.Main;
 
 namespace Rok.Pages;
 
@@ -23,7 +19,7 @@ public sealed partial class WelcomePage : Page
 
         ViewModel = App.ServiceProvider.GetRequiredService<StartViewModel>();
         MainViewModel = App.ServiceProvider.GetRequiredService<MainViewModel>();
-    } 
+    }
 
 
     private async void Button_Click(object sender, RoutedEventArgs e)
@@ -44,7 +40,7 @@ public sealed partial class WelcomePage : Page
                 ViewModel.AddLibraryFolderCommand.Execute(folder);
         }
         catch
-        {  
+        {
             // Ignore
         }
     }

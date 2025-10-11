@@ -92,6 +92,16 @@ public class AlbumRepository(IDbConnection connection, [FromKeyedServices("Backg
         return rowsAffected > 0;
     }
 
+    public async Task<bool> UpdateGetMetaDataLastAttemptAsync(long id, RepositoryConnectionKind kind = RepositoryConnectionKind.Foreground)
+    {
+        string sql = "UPDATE albums SET getMetaDataLastAttempt = @lastAttemptDate WHERE id = @id";
+
+        IDbConnection localConnection = ResolveConnection(kind);
+        int rowsAffected = await localConnection.ExecuteAsync(sql, new { lastAttemptDate = DateTime.UtcNow, id });
+
+        return rowsAffected > 0;
+    }
+
 
     public async Task<int> DeleteAlbumsWithoutTracks(RepositoryConnectionKind kind = RepositoryConnectionKind.Foreground)
     {

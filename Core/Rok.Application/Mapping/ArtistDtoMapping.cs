@@ -47,7 +47,8 @@ internal static class ArtistDtoMapping
             CountryName = artist.CountryName,
             Id = artist.Id,
             CreatDate = artist.CreatDate,
-            EditDate = artist.EditDate
+            EditDate = artist.EditDate,
+            GetMetaDataLastAttempt = artist.GetMetaDataLastAttempt
         };
     }
 

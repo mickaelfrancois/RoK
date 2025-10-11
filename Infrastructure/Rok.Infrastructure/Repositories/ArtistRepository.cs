@@ -96,6 +96,15 @@ public class ArtistRepository(IDbConnection connection, [FromKeyedServices("Back
         return rowsAffected > 0;
     }
 
+    public async Task<bool> UpdateGetMetaDataLastAttemptAsync(long id, RepositoryConnectionKind kind = RepositoryConnectionKind.Foreground)
+    {
+        string sql = "UPDATE artists SET getMetaDataLastAttempt = @lastAttemptDate WHERE id = @id";
+
+        IDbConnection localConnection = ResolveConnection(kind);
+        int rowsAffected = await localConnection.ExecuteAsync(sql, new { lastAttemptDate = DateTime.UtcNow, id });
+
+        return rowsAffected > 0;
+    }
 
     public async Task<int> DeleteArtistsWithoutTracks(RepositoryConnectionKind kind = RepositoryConnectionKind.Foreground)
     {

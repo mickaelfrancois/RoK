@@ -41,8 +41,10 @@ public static class DependencyInjection
         services.AddSingleton<ILyricsService, LyricsService>();
         services.AddSingleton<ILyricsParser, LyricsParser>();
 
-        services.AddScoped<IMigrationService, MigrationService>();
         services.AddScoped<IAppDbContext, AppDbContext>();
+
+        services.AddSingleton<IMigrationService, MigrationService>();
+        services.AddSingleton<IMigration, Migration2>();
 
         services.AddScoped<IArtistRepository, ArtistRepository>();
         services.AddScoped<IAlbumRepository, AlbumRepository>();

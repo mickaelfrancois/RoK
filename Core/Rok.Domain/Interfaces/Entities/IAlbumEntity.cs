@@ -31,6 +31,7 @@ public interface IAlbumEntity : IEntity
     int TrackCount { get; set; }
     string? Wikipedia { get; set; }
     int? Year { get; set; }
+    DateTime? GetMetaDataLastAttempt { get; set; }
 
     string ToString();
 }
