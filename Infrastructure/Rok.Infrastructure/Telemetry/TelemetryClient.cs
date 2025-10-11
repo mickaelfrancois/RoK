@@ -13,7 +13,7 @@ public class TelemetryClient : ITelemetryClient
     private readonly IAppOptions _appOptions;
 
     private readonly TelemetryOptions _telemetryOptions;
-    
+
     private bool _isEnabled = true;
 
 
@@ -29,7 +29,7 @@ public class TelemetryClient : ITelemetryClient
 
     private void ConfigureHttpClient()
     {
-        if(_telemetryOptions.BaseAddress is null || _telemetryOptions.ApiKey is null)
+        if (!_appOptions.TelemetryEnabled || _telemetryOptions.BaseAddress is null || _telemetryOptions.ApiKey is null)
         {
             _isEnabled = false;
             return;
