@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Options;
+﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Rok.Application.Interfaces;
 using Rok.Application.Options;
 using System.Net.Http.Json;
@@ -8,6 +9,8 @@ namespace Rok.Infrastructure.Telemetry;
 
 public class TelemetryClient : ITelemetryClient
 {
+    private readonly ILogger<TelemetryClient> _logger;
+
     private readonly HttpClient _httpClient;
 
     private readonly IAppOptions _appOptions;
@@ -17,11 +20,12 @@ public class TelemetryClient : ITelemetryClient
     private bool _isEnabled = true;
 
 
-    public TelemetryClient(HttpClient httpClient, IAppOptions appOptions, IOptions<TelemetryOptions> telemetryOptions)
+    public TelemetryClient(HttpClient httpClient, IAppOptions appOptions, IOptions<TelemetryOptions> telemetryOptions, ILogger<TelemetryClient> logger)
     {
         _httpClient = httpClient;
         _appOptions = appOptions;
         _telemetryOptions = telemetryOptions.Value;
+        _logger = logger;
 
         ConfigureHttpClient();
     }
@@ -31,9 +35,13 @@ public class TelemetryClient : ITelemetryClient
     {
         if (!_appOptions.TelemetryEnabled || _telemetryOptions.BaseAddress is null || _telemetryOptions.ApiKey is null)
         {
+            _logger.LogInformation("Telemetry is disabled.");
+
             _isEnabled = false;
             return;
         }
+
+        _logger.LogInformation("Telemetry is enabled.");
 
         string appVersion = GetAppVersion();
 

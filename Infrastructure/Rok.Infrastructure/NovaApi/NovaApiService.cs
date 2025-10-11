@@ -13,9 +13,9 @@ public class NovaApiService : INovaApiService, IDisposable
 {
     private const int KCacheDelayMinutes = 60 * 24;
 
-    private readonly string _apiUrl = "https://nova-api4.fpc-france.com/v2/";
-
     private readonly NovaApiOptions _novaApiOptions;
+
+    private readonly IAppOptions _appOptions;
 
     private readonly HttpClient _httpClient;
 
@@ -33,9 +33,10 @@ public class NovaApiService : INovaApiService, IDisposable
 
     private bool disposedValue;
 
-    public NovaApiService(HttpClient httpClient, IOptions<NovaApiOptions> novaApiOptions, ILogger<NovaApiService> logger)
+    public NovaApiService(HttpClient httpClient, IAppOptions appOptions, IOptions<NovaApiOptions> novaApiOptions, ILogger<NovaApiService> logger)
     {
         _httpClient = httpClient;
+        _appOptions = appOptions;
         _novaApiOptions = novaApiOptions.Value;
         _logger = logger;
 
@@ -44,11 +45,15 @@ public class NovaApiService : INovaApiService, IDisposable
 
     private void ConfigureHttpClient()
     {
-        if (_novaApiOptions.BaseAddress is null)
+        if (!_appOptions.NovaApiEnabled || _novaApiOptions.BaseAddress is null)
         {
+            _logger.LogInformation("Nova API is disabled.");
+
             IsEnable = false;
             return;
         }
+
+        _logger.LogInformation("Nova API is enabled.");
 
         string appVersion = GetAppVersion();
 
@@ -94,7 +99,7 @@ public class NovaApiService : INovaApiService, IDisposable
         Guard.Against.NullOrEmpty(category, nameof(category));
         Guard.Against.NullOrEmpty(artistFile, nameof(artistFile));
 
-        string pictureUri = $"{_apiUrl}artists/picture/{musicBrainzID}/{category}";
+        string pictureUri = $"artists/picture/{musicBrainzID}/{category}";
 
         try
         {
@@ -112,7 +117,7 @@ public class NovaApiService : INovaApiService, IDisposable
         if (!IsEnable)
             return;
 
-        string pictureUrl = $"{_apiUrl}artists/fanart/{musicBrainzId}";
+        string pictureUrl = $"artists/fanart/{musicBrainzId}";
 
         for (int i = 0; i < fanartsCount; i++)
         {
@@ -181,7 +186,7 @@ public class NovaApiService : INovaApiService, IDisposable
         Guard.Against.NullOrEmpty(musicBrainzID, nameof(musicBrainzID));
         Guard.Against.NullOrEmpty(albumFile, nameof(albumFile));
 
-        string pictureUri = $"{_apiUrl}albums/cover/{musicBrainzID}";
+        string pictureUri = $"albums/cover/{musicBrainzID}";
 
         try
         {
@@ -250,8 +255,6 @@ public class NovaApiService : INovaApiService, IDisposable
     private async Task<T?> GetASync<T>(string url, CancellationToken cancellationToken = default)
     {
         T result = default!;
-        string fullUrl = _apiUrl + url;
-
         bool acquired;
 
         try
@@ -268,7 +271,7 @@ public class NovaApiService : INovaApiService, IDisposable
         {
             try
             {
-                HttpResponseMessage response = await _httpClient.GetAsync(new Uri(fullUrl), cancellationToken);
+                HttpResponseMessage response = await _httpClient.GetAsync(url, cancellationToken);
 
                 if (response.IsSuccessStatusCode)
                 {
@@ -282,11 +285,11 @@ public class NovaApiService : INovaApiService, IDisposable
             }
             catch (OperationCanceledException)
             {
-                _logger.LogWarning("Request cancelled {Url}", fullUrl);
+                _logger.LogWarning("Request cancelled {Url}", url);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "HTTP error {Url}", fullUrl);
+                _logger.LogError(ex, "HTTP error {Url}", url);
             }
             finally
             {
@@ -296,7 +299,7 @@ public class NovaApiService : INovaApiService, IDisposable
                 }
                 catch (SemaphoreFullException)
                 {
-                    _logger.LogWarning("Semaphore release called when full for {Url}", fullUrl);
+                    _logger.LogWarning("Semaphore release called when full for {Url}", url);
                 }
             }
         }
