@@ -966,4 +966,7 @@
   <data name="OptionsTelemetryEnabledSwitch.Header" xml:space="preserve">
     <value>Telemetry</value>
   </data>
+  <data name="OptionsCrossFadeSwitch.Header" xml:space="preserve">
+    <value>Crossfade</value>
+  </data>
 </root>

@@ -10,6 +10,8 @@ public interface IAppOptions
 
     List<string> LibraryTokens { get; set; }
 
+    bool CrossFade { get; set; }
+
     bool HideArtistsWithoutAlbum { get; set; }
 
     bool RefreshLibraryAtStartup { get; set; }

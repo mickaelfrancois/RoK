@@ -46,6 +46,9 @@
                     <StackPanel Spacing="12">
                         <ToggleSwitch x:Uid="OptionsHideArtistsSwitch"
                                       IsOn="{x:Bind Options.HideArtistsWithoutAlbum, Mode=TwoWay}" />
+
+                        <ToggleSwitch x:Uid="OptionsCrossFadeSwitch"
+                                      IsOn="{x:Bind Options.CrossFade, Mode=TwoWay}" />
                     </StackPanel>
 
                     <StackPanel Spacing="8">

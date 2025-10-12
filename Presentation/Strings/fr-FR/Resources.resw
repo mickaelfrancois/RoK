@@ -966,4 +966,7 @@
   <data name="OptionsTelemetryEnabledSwitch.Header" xml:space="preserve">
     <value>Télémétrie</value>
   </data>
+  <data name="OptionsCrossFadeSwitch.Header" xml:space="preserve">
+    <value>Fondu enchaîné</value>
+  </data>
 </root>

@@ -53,6 +53,9 @@ public class TrackEntity : BaseEntity
     public bool IsAlbumCompilation { get; set; }
 
     [Write(false)]
+    public bool IsAlbumLive { get; set; }
+
+    [Write(false)]
     public string GenreName { get; set; } = string.Empty;
 
     [Write(false)]
