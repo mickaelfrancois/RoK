@@ -1,4 +1,7 @@
-﻿using Rok.Application.Player;
+﻿using System;
+using System.Threading;
+using System.Threading.Tasks;
+using Rok.Application.Player;
 
 namespace Rok.Logic.Services.Player;
 
@@ -28,6 +31,23 @@ public class PlayerService : IPlayerService
             _player.SetVolume(_volume);
         }
     }
+
+    private bool _isCrossfadeEnabled;
+
+    private TimeSpan _crossfadeDuration = TimeSpan.FromSeconds(3);
+    public TimeSpan CrossfadeDuration
+    {
+        get => _crossfadeDuration;
+        set
+        {
+            if (value <= TimeSpan.Zero)
+                throw new ArgumentOutOfRangeException(nameof(CrossfadeDuration));
+
+            _crossfadeDuration = value;
+        }
+    }
+
+    private CancellationTokenSource? _crossfadeCts;
 
     public bool IsLoopingEnabled { get; set; }
 
@@ -121,10 +141,12 @@ public class PlayerService : IPlayerService
     private readonly ILogger<PlayerService> _logger;
 
 
-    public PlayerService(IPlayerEngine player, ILogger<PlayerService> logger)
+    public PlayerService(IPlayerEngine player, IAppOptions appOptions, ILogger<PlayerService> logger)
     {
         _player = Guard.Against.Null(player, nameof(player));
         _logger = Guard.Against.Null(logger, nameof(logger));
+
+        _isCrossfadeEnabled = appOptions.CrossFade;
 
         InitEvents();
 
@@ -172,7 +194,12 @@ public class PlayerService : IPlayerService
         _logger.LogDebug("Event Media about to end fired.");
 
         Messenger.Send(new MediaAboutToEndEvent(CurrentTrack));
+
+        if (_isCrossfadeEnabled)
+            _ = Task.Run(() => CrossfadeToNextTrackAsync());
     }
+
+    #endregion
 
 
     public void LoadPlaylist(List<TrackDto> tracks, TrackDto? startTrack = null)
@@ -264,6 +291,8 @@ public class PlayerService : IPlayerService
 
     public void Stop(bool firePlaybackStateChange)
     {
+        // Cancel any ongoing crossfade
+        _crossfadeCts?.Cancel();
         _player.Stop();
 
         if (firePlaybackStateChange)
@@ -277,6 +306,9 @@ public class PlayerService : IPlayerService
 
     public void Next()
     {
+        // Cancel any ongoing crossfade
+        _crossfadeCts?.Cancel();
+
         if (_currentIndex + 1 >= Playlist.Count)
         {
             if (IsLoopingEnabled)
@@ -309,9 +341,6 @@ public class PlayerService : IPlayerService
         Play();
     }
 
-    #endregion
-
-
     #region Engine
 
     private bool LoadFile(TrackDto track)
@@ -326,6 +355,109 @@ public class PlayerService : IPlayerService
         }
 
         return res;
+    }
+
+
+    private async Task CrossfadeToNextTrackAsync()
+    {
+        try
+        {
+            // Cancel previous if any
+            if (_crossfadeCts != null)
+            {
+                try
+                {
+                    _crossfadeCts.Cancel();
+                }
+                catch { /* ignore */ }
+                finally
+                {
+                    _crossfadeCts.Dispose();
+                    _crossfadeCts = null;
+                }
+            }
+
+            _crossfadeCts = new CancellationTokenSource();
+            CancellationToken ct = _crossfadeCts.Token;
+
+            // Determine next index
+            int nextIndex = _currentIndex + 1;
+            if (nextIndex >= Playlist.Count)
+            {
+                if (IsLoopingEnabled)
+                    nextIndex = 0;
+                else
+                    return; // nothing to do
+            }
+
+            TrackDto nextTrack = Playlist[nextIndex];
+
+            // If muted or single very short crossfade duration, skip ramping
+            if (_isMuted || CrossfadeDuration <= TimeSpan.FromMilliseconds(100) || (CurrentTrack.IsAlbumLive && nextTrack.IsAlbumLive))
+            {
+                LoadFile(nextTrack);
+                Play();
+                return;
+            }
+
+            double masterVolume = _volume; // keep master volume
+            TimeSpan duration = CrossfadeDuration;
+            const int intervalMs = 50; // plus fluide
+            int steps = Math.Max(1, (int)(duration.TotalMilliseconds / intervalMs));
+
+            // Fade-out current (use dB interpolation for perceptual linearity)
+            for (int i = 0; i <= steps; i++)
+            {
+                ct.ThrowIfCancellationRequested();
+
+                double progress = Math.Clamp((double)i / steps, 0.0, 1.0); // 0..1
+                double vol = AudioRamping.DbInterpolate(progress, masterVolume);
+                _player.SetVolume(vol);
+
+                await Task.Delay(intervalMs, ct);
+            }
+
+            // Ensure fully silent
+            _player.SetVolume(0);
+
+            // Load and start next track with zero volume
+            LoadFile(nextTrack);
+            _player.SetVolume(0);
+            _player.Play();
+            PlaybackState = EPlaybackState.Playing;
+            _currentIndex = nextIndex;
+
+            // Fade-in next track (inverse progress)
+            for (int i = 0; i <= steps; i++)
+            {
+                ct.ThrowIfCancellationRequested();
+
+                double progress = Math.Clamp((double)i / steps, 0.0, 1.0);
+                double vol = AudioRamping.DbInterpolate(1.0 - progress, masterVolume);
+                _player.SetVolume(vol);
+
+                await Task.Delay(intervalMs, ct);
+            }
+
+            // Ensure master volume restored
+            _player.SetVolume(masterVolume);
+        }
+        catch (OperationCanceledException)
+        {
+            _logger.LogDebug("Crossfade canceled.");
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error during crossfade.");
+        }
+        finally
+        {
+            if (_crossfadeCts != null && _crossfadeCts.IsCancellationRequested)
+            {
+                _crossfadeCts.Dispose();
+                _crossfadeCts = null;
+            }
+        }
     }
 
     #endregion

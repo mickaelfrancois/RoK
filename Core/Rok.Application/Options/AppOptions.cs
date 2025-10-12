@@ -12,6 +12,8 @@ public class AppOptions : IAppOptions
 
     public List<string> LibraryTokens { get; set; } = [];
 
+    public bool CrossFade { get; set; } = true;
+
     public bool HideArtistsWithoutAlbum { get; set; } = true;
 
     public bool RefreshLibraryAtStartup { get; set; } = true;

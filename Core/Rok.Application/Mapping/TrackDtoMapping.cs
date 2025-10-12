@@ -27,6 +27,7 @@ internal static class TrackDtoMapping
             AlbumName = track.AlbumName,
             IsAlbumFavorite = track.IsAlbumFavorite,
             IsAlbumCompilation = track.IsAlbumCompilation,
+            IsAlbumLive = track.IsAlbumLive,
             GenreName = track.GenreName,
             IsGenreFavorite = track.IsGenreFavorite,
             ArtistName = track.ArtistName,
