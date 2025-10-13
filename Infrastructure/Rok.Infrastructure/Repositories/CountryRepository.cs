@@ -14,7 +14,7 @@ public class CountryRepository(IDbConnection db, [FromKeyedServices("BackgroundC
                 """;
 
         if (string.IsNullOrEmpty(whereParam) == false)
-            query += $" WHERE albums.{whereParam} = @{whereParam}";
+            query += $" WHERE countries.{whereParam} = @{whereParam}";
 
         return query;
     }
