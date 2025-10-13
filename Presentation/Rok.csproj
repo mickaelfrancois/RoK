@@ -240,7 +240,6 @@
 	</ItemGroup>
 	<ItemGroup>
 	  <Folder Include="Commons\Extensions\" />
-	  <Folder Include="Services\" />
 	</ItemGroup>
 	<ItemGroup>
 	  <None Update="appsettings.json">

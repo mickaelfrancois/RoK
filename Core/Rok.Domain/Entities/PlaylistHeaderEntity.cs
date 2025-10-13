@@ -20,9 +20,4 @@ public class PlaylistHeaderEntity : BaseEntity
     public string GroupsJson { get; set; } = string.Empty;
 
     public int Type { get; set; }
-
-
-    [JsonIgnore]
-    [Write(false)]
-    public bool IsSmart => Type == 0;
 }
