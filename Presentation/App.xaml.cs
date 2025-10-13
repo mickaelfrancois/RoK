@@ -11,8 +11,6 @@ namespace Rok
 {
     public partial class App : Microsoft.UI.Xaml.Application
     {
-        private Window? m_window;
-
         public static ServiceProvider ServiceProvider { get; private set; } = null!;
 
         public static Window MainWindow { get; private set; } = null!;
@@ -77,18 +75,25 @@ namespace Rok
             NavigationService navigationService = ServiceProvider.GetRequiredService<NavigationService>();
             ResourceLoader resourceLoader = ServiceProvider.GetRequiredService<ResourceLoader>();
 
-            m_window = new MainWindow(navigationService, resourceLoader, appDbContext);
-            m_window.Activate();
-            m_window.Closed += MainWindow_Closed;
+            string iconPath = Path.Combine(AppContext.BaseDirectory, "Assets/Square44x44Logo.ico");
 
-            MainWindow = m_window;
-            MainWindowHandle = WindowNative.GetWindowHandle(m_window);
+            MainWindow = new MainWindow(navigationService, resourceLoader, appDbContext);
+            MainWindow.AppWindow.SetIcon(iconPath);
+            MainWindow.Title = "RoK";
+#if DEBUG
+            MainWindow.Title += " [DEBUG]";
+#endif
+            MainWindow.Activate();
+            MainWindow.Closed += MainWindow_Closed;
+
+            MainWindowHandle = WindowNative.GetWindowHandle(MainWindow);
+
 
 #if DEBUG
             TryEnableXamlDiagnostics();
 #endif
 
-            ThemeManager.Initialize(options.Theme, m_window);
+            ThemeManager.Initialize(options.Theme, MainWindow);
         }
 
 
