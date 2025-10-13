@@ -67,10 +67,6 @@ namespace Rok
             Messenger.Subscribe<SearchNoResultMessage>(async (message) => await SearchNoResultHandleAsync());
             Messenger.Subscribe<CompactModeMessage>((message) => ToggleCompactMode());
 
-#if DEBUG
-            AppWindow.Title = "RoK [DEBUG]";
-#endif
-
             ContentFrame.Navigated += ContentFrame_Navigated;
         }
 
