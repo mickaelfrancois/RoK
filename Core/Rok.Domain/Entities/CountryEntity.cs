@@ -1,6 +1,6 @@
 ﻿namespace Rok.Domain.Entities;
 
-[Table("Coutry")]
+[Table("Countries")]
 public class CountryEntity : BaseEntity
 {
     public override string ToString() => French;
