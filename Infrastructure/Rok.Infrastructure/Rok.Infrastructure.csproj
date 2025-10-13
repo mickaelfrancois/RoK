@@ -15,7 +15,6 @@
 		<PackageReference Include="Microsoft.Extensions.Logging" Version="9.0.9" />
 		<PackageReference Include="MiF.Guard" Version="1.0.0" />
 		<PackageReference Include="MiF.Messenger" Version="1.0.0" />
-		<PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
 		<PackageReference Include="Serilog.Extensions.Logging" Version="9.0.2" />
 		<PackageReference Include="Serilog.Settings.Configuration" Version="9.0.0" />
 		<PackageReference Include="Serilog.Sinks.Console" Version="6.0.0" />

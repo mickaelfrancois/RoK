@@ -1,11 +1,12 @@
 ﻿using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Newtonsoft.Json;
 using Rok.Application.Dto.NovaApi;
 using Rok.Application.Interfaces;
 using Rok.Application.Options;
+using System.Net.Http.Json;
 using System.Reflection;
+using System.Text.Json;
 
 namespace Rok.Infrastructure.NovaApi;
 
@@ -34,6 +35,11 @@ public class NovaApiService : INovaApiService, IDisposable
     private readonly MemoryCache _lyricsCache = new(new MemoryCacheOptions());
 
     private bool disposedValue;
+
+    private static readonly JsonSerializerOptions _jsonOptions = new()
+    {
+        PropertyNameCaseInsensitive = true
+    };
 
     public NovaApiService(HttpClient httpClient, IAppOptions appOptions, IOptions<NovaApiOptions> novaApiOptions, ILogger<NovaApiService> logger)
     {
@@ -288,8 +294,8 @@ public class NovaApiService : INovaApiService, IDisposable
 
                 if (response.IsSuccessStatusCode)
                 {
-                    string json = await response.Content.ReadAsStringAsync(cancellationToken);
-                    result = JsonConvert.DeserializeObject<T>(json);
+                    using var stream = await response.Content.ReadAsStreamAsync(cancellationToken);
+                    result = await JsonSerializer.DeserializeAsync<T>(stream, _jsonOptions, cancellationToken);
                 }
                 else
                 {
