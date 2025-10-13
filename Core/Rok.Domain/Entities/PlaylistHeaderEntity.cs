@@ -23,5 +23,6 @@ public class PlaylistHeaderEntity : BaseEntity
 
 
     [JsonIgnore]
+    [Write(false)]
     public bool IsSmart => Type == 0;
 }
