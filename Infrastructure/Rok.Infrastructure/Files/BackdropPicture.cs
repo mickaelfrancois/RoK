@@ -41,8 +41,11 @@ public class BackdropPicture
 
         string picturePath = GetArtistPictureFolder(artistName);
 
-        if (Directory.Exists(picturePath) == false)
+        if (!Directory.Exists(picturePath))
+        {
+            EnsureFolderExists(picturePath);
             return [];
+        }
 
         List<string> backdrops = [];
 
@@ -74,8 +77,14 @@ public class BackdropPicture
         Guard.Against.NullOrEmpty(artistName, nameof(artistName));
 
         string picturePath = GetArtistPictureFolder(artistName);
-        string[] files = Directory.GetFiles(picturePath, "backdrop*", SearchOption.TopDirectoryOnly);
 
+        if (!Directory.Exists(picturePath))
+        {
+            EnsureFolderExists(picturePath);
+            return false;
+        }
+
+        string[] files = Directory.GetFiles(picturePath, "backdrop*", SearchOption.TopDirectoryOnly);
         return files.Length != 0;
     }
 
