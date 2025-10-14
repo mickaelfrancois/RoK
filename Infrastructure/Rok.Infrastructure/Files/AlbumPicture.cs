@@ -27,6 +27,6 @@ public class AlbumPicture(IFileSystem _fileSystem) : IAlbumPicture
                 return path;
         }
 
-        return string.Empty;
+        return Path.Join(albumPath, _files[0]);
     }
 }
