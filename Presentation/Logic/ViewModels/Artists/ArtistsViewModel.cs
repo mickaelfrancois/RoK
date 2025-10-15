@@ -115,6 +115,7 @@ public partial class ArtistsViewModel : ObservableObject, IDisposable
 
         Messenger.Subscribe<LibraryRefreshMessage>((message) => LibraryRefreshHandle(message));
         Messenger.Subscribe<ArtistUpdateMessage>(async (message) => await ArtistUpdatedMessageHandleAsync(message));
+        Messenger.Subscribe<ArtistImportedMessage>((message) => _libraryUpdated = true);
 
         Selected.CollectionChanged += Selected_CollectionChanged;
     }

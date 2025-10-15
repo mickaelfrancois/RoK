@@ -25,7 +25,7 @@ public sealed partial class AlbumsPage : Page, IDisposable
 
 
     protected override async void OnNavigatedTo(NavigationEventArgs e)
-    {
+    {        
         await ViewModel.LoadDataAsync(forceReload: false);
 
         base.OnNavigatedTo(e);
