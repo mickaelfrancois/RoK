@@ -117,6 +117,7 @@ public partial class AlbumsViewModel : ObservableObject, IDisposable
 
         Messenger.Subscribe<LibraryRefreshMessage>(LibraryRefreshHandle);
         Messenger.Subscribe<AlbumUpdateMessage>(async (message) => await AlbumUpdatedMessageHandleAsync(message));
+        Messenger.Subscribe<AlbumImportedMessage>((message) => _libraryUpdated = true);
 
         Selected.CollectionChanged += Selected_CollectionChanged;
     }

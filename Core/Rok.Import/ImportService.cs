@@ -566,7 +566,13 @@ public class ImportService : IImport
         {
             artist = await _importArtist.CreateAsync(file, genreId).ConfigureAwait(false);
             if (artist != null)
+            {
                 Statistics.ArtistImported++;
+
+                string artistName = file.Artist ?? string.Empty;
+
+                Messenger.Send(new ArtistImportedMessage(artistName));
+            }
         }
         catch (Exception ex)
         {

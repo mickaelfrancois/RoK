@@ -112,8 +112,9 @@ public partial class TracksViewModel : ObservableObject, IDisposable
         FilterByGenreCommand = new RelayCommand<long?>(FilterByGenreId);
         ListenCommand = new RelayCommand(ListenTracks);
         ListenGroupCommand = new RelayCommand<TracksGroupCategoryViewModel>(ListenGroup);
-
+        
         Messenger.Subscribe<LibraryRefreshMessage>(LibraryRefreshHandle);
+        Messenger.Subscribe<AlbumImportedMessage>((message) => _libraryUpdated = true);
 
         Selected.CollectionChanged += Selected_CollectionChanged;
     }

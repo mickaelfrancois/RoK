@@ -25,7 +25,7 @@ public class TagService : ITagService
     public void FillMusicProperties(string file, TrackFile track)
     {
         using TagLib.File tag = TagLib.File.Create(file);
-
+        
         track.Title = tag.Tag.Title?.Trim() ?? "";
         track.Artist = tag.Tag.FirstAlbumArtist?.Trim() ?? tag.Tag.FirstPerformer?.Trim() ?? "";
         track.Album = tag.Tag.Album?.Trim() ?? "";
