@@ -9,8 +9,6 @@ public sealed partial class ListeningPage : Page, IDisposable
 {
     public ListeningViewModel ViewModel { get; set; }
 
-    private readonly BaseScrollingPage _scrollingPage;
-
 
     public ListeningPage()
     {
@@ -18,13 +16,23 @@ public sealed partial class ListeningPage : Page, IDisposable
 
         ViewModel = App.ServiceProvider.GetRequiredService<ListeningViewModel>();
         DataContext = ViewModel;
+    }
 
-        _scrollingPage = new BaseScrollingPage(this, null, tracksList, headerRow, pictureColumn);
+
+    private void tracksList_ContainerContentChanging(ListViewBase sender, ContainerContentChangingEventArgs args)
+    {
+        if (args.InRecycleQueue)
+            return;
+
+        if (args.ItemContainer?.ContentTemplateRoot is FrameworkElement root &&
+            root.FindName("RowIndexText") is TextBlock tb)
+        {
+            tb.Text = (args.ItemIndex + 1).ToString() + ".";
+        }
     }
 
 
     public void Dispose()
     {
-        _scrollingPage?.Dispose();
     }
 }

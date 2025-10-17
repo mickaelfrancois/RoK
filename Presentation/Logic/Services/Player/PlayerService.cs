@@ -1,7 +1,5 @@
-﻿using System;
+﻿using Rok.Application.Player;
 using System.Threading;
-using System.Threading.Tasks;
-using Rok.Application.Player;
 
 namespace Rok.Logic.Services.Player;
 
@@ -32,7 +30,7 @@ public class PlayerService : IPlayerService
         }
     }
 
-    private bool _isCrossfadeEnabled;
+    private readonly bool _isCrossfadeEnabled;
 
     private TimeSpan _crossfadeDuration = TimeSpan.FromSeconds(3);
     public TimeSpan CrossfadeDuration
@@ -340,6 +338,39 @@ public class PlayerService : IPlayerService
         LoadFile(Playlist[--_currentIndex]);
         Play();
     }
+
+
+    public void ShuffleTracks()
+    {
+        if (Playlist == null || Playlist.Count <= 1)
+            return;
+
+        if (_currentIndex < 0) _currentIndex = 0;
+        if (_currentIndex >= Playlist.Count) _currentIndex = Playlist.Count - 1;
+
+        int prefixCount = Math.Clamp(_currentIndex + 1, 0, Playlist.Count);
+
+        if (prefixCount >= Playlist.Count)
+            return;
+
+        List<TrackDto> tail = Playlist.GetRange(prefixCount, Playlist.Count - prefixCount);
+
+        // Fisher-Yates shuffle (Random.Shared pour thread-safety et bonne qualité)
+        Random rng = Random.Shared;
+        for (int i = tail.Count - 1; i > 0; i--)
+        {
+            int j = rng.Next(i + 1);
+            TrackDto tmp = tail[i];
+            tail[i] = tail[j];
+            tail[j] = tmp;
+        }
+
+        Playlist.RemoveRange(prefixCount, Playlist.Count - prefixCount);
+        Playlist.InsertRange(prefixCount, tail);
+
+        Messenger.Send(new PlaylistChanged(Playlist));
+    }
+
 
     #region Engine
 

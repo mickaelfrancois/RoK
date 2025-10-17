@@ -605,6 +605,7 @@ public partial class PlayerViewModel : ObservableObject
             _player.Pause();
     }
 
+
     public async Task SkipNextAsync()
     {
         if (!CanSkipNext)
@@ -619,6 +620,7 @@ public partial class PlayerViewModel : ObservableObject
         _player.Skip();
     }
 
+
     public void SkipPrevious()
     {
         if (!CanSkipPrevious)
@@ -628,6 +630,7 @@ public partial class PlayerViewModel : ObservableObject
 
         CanSkipPrevious = false;
     }
+
 
     private void OpenListening()
     {
@@ -645,6 +648,7 @@ public partial class PlayerViewModel : ObservableObject
         else
             EnableFullScreen();
     }
+
 
     private void EnableFullScreen()
     {

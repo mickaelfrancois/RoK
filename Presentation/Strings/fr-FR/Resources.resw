@@ -969,4 +969,7 @@
   <data name="OptionsCrossFadeSwitch.Header" xml:space="preserve">
     <value>Fondu enchaîné</value>
   </data>
+  <data name="shuffleButton.Label" xml:space="preserve">
+    <value>Mélanger</value>
+  </data>
 </root>

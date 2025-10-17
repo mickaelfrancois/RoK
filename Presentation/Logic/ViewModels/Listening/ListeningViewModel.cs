@@ -40,6 +40,8 @@ public partial class ListeningViewModel : ObservableObject
 
     public AsyncRelayCommand<TrackViewModel> AddMoreFromArtistCommand { get; private set; }
 
+    public RelayCommand ShufflePlaylistCommand { get; private set; }
+
 
     public ListeningViewModel(IMediator mediator, IPlayerService playerService, ILogger<ListeningViewModel> logger)
     {
@@ -48,6 +50,7 @@ public partial class ListeningViewModel : ObservableObject
         _logger = Guard.Against.Null(logger);
 
         AddMoreFromArtistCommand = new AsyncRelayCommand<TrackViewModel>(AddMoreFromArtistAsync);
+        ShufflePlaylistCommand = new RelayCommand(ShuffleTracks);
 
         Messenger.Subscribe<MediaChangedMessage>(async (message) => await MediaChangedAsync(message));
         Messenger.Subscribe<PlaylistChanged>(async (message) => await PlaylistChangedAsync(message));
@@ -173,5 +176,11 @@ public partial class ListeningViewModel : ObservableObject
             return;
 
         _playerService.InsertTracksToPlaylist(shuffledTracks);
+    }
+
+
+    public void ShuffleTracks()
+    {
+        _playerService.ShuffleTracks();
     }
 }
