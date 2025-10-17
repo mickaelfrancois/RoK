@@ -11,77 +11,13 @@
       mc:Ignorable="d">
 
     <Grid>
-
-        <VisualStateManager.VisualStateGroups>
-
-            <!-- Header visual state group -->
-            <VisualStateGroup>
-                <VisualState x:Name="largeLayout">
-                    <VisualState.StateTriggers>
-                        <AdaptiveTrigger MinWindowWidth="{StaticResource largeScreen}" />
-                    </VisualState.StateTriggers>
-                    <VisualState.Setters>
-                        <Setter Target="pictureColumn.Width"
-                                Value="{Binding Source={StaticResource largeHeaderHeight}}" />
-                        <Setter Target="headerRow.Height"
-                                Value="{Binding Source={StaticResource largeHeaderHeight}}" />
-                        <Setter Target="headerRow.MaxHeight"
-                                Value="{Binding Source={StaticResource largeHeaderHeight}}" />
-                        <Setter Target="title.Visibility"
-                                Value="Visible" />
-                        <Setter Target="panelBiography.Visibility"
-                                Value="Visible" />
-                    </VisualState.Setters>
-                </VisualState>
-
-                <VisualState x:Name="mediumLayout">
-                    <VisualState.StateTriggers>
-                        <AdaptiveTrigger MinWindowWidth="{StaticResource mediumScreen}" />
-                    </VisualState.StateTriggers>
-                    <VisualState.Setters>
-                        <Setter Target="pictureColumn.Width"
-                                Value="{Binding Source={StaticResource normalHeaderHeight}}" />
-                        <Setter Target="headerRow.Height"
-                                Value="{Binding Source={StaticResource normalHeaderHeight}}" />
-                        <Setter Target="headerRow.MaxHeight"
-                                Value="{Binding Source={StaticResource normalHeaderHeight}}" />
-                        <Setter Target="title.Visibility"
-                                Value="Visible" />
-                        <Setter Target="panelBiography.Visibility"
-                                Value="Visible" />
-                    </VisualState.Setters>
-                </VisualState>
-
-                <VisualState x:Name="smallLayout">
-                    <VisualState.StateTriggers>
-                        <AdaptiveTrigger MinWindowWidth="0" />
-                    </VisualState.StateTriggers>
-                    <VisualState.Setters>
-                        <Setter Target="headerRow.Height"
-                                Value="{Binding Source={StaticResource normalHeaderHeight}}" />
-                        <Setter Target="headerRow.MaxHeight"
-                                Value="{Binding Source={StaticResource normalHeaderHeight}}" />
-                        <Setter Target="pictureColumn.Width"
-                                Value="{Binding Source={StaticResource normalHeaderHeight}}" />
-                        <Setter Target="title.Visibility"
-                                Value="Collapsed" />
-                        <Setter Target="panelBiography.Visibility"
-                                Value="Collapsed" />
-                    </VisualState.Setters>
-                </VisualState>
-            </VisualStateGroup>
-
-        </VisualStateManager.VisualStateGroups>
-
         <Grid.RowDefinitions>
-            <RowDefinition Height="auto"
-                           x:Name="playlistRow"></RowDefinition>
-            <RowDefinition Height="auto"
-                           x:Name="commandRow"></RowDefinition>
-            <RowDefinition MinHeight="{StaticResource normalHeaderHeight}"
-                           MaxHeight="{StaticResource normalHeaderHeight}"
+            <RowDefinition Height="auto" x:Name="playlistRow" />
+            <RowDefinition MinHeight="{StaticResource smallHeaderHeight}"
+                           MaxHeight="{StaticResource smallHeaderHeight}"
                            x:Name="headerRow" />
-            <RowDefinition></RowDefinition>
+            <RowDefinition Height="auto" x:Name="commandRow" />
+            <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
         <!-- Title -->
@@ -92,138 +28,35 @@
                         Margin="4,0,4,0" />
 
             <TextBlock x:Uid="ListeningViewTitle"
-                       x:Name="title"                       
+                       x:Name="title"
                        Style="{StaticResource HeaderStyle}" />
-            
+
             <TextBlock Text="{x:Bind ViewModel.TrackCount}"
                        Style="{StaticResource SubtitleTextBlockStyle}"
                        FontSize="16"
                        Margin="6,0,4,4"
                        VerticalAlignment="Bottom" />
-            
+
             <TextBlock x:Uid="ListeningViewTitleCount"
                        Style="{StaticResource SubtitleTextBlockStyle}"
                        FontSize="16"
                        Margin="0,0,4,4"
                        VerticalAlignment="Bottom" />
-            
+
             <TextBlock Text="{x:Bind ViewModel.Duration, Converter={StaticResource LongToTimespanConverter}}"
                        Style="{StaticResource SubtitleTextBlockStyle}"
                        FontSize="16"
                        Margin="0,0,4,4"
                        VerticalAlignment="Bottom" />
         </StackPanel>
-        
+
         <Line Stretch="Fill"
               Stroke="{StaticResource AppBarSeparatorForegroundThemeBrush}"
               VerticalAlignment="Bottom"
               X2="100"></Line>
 
-        <!-- Tracks -->
-        <common:ListViewExtended x:Name="tracksList"
-                                 ItemsSource="{x:Bind ViewModel.Tracks}"
-                                 Padding="{StaticResource normalHeaderThickness}"
-                                 Grid.Row="2"
-                                 Grid.RowSpan="2"
-                                 BorderThickness="0"
-                                 ItemContainerStyle="{StaticResource tracksListViewItem}"
-                                 Margin="0">
-
-            <ListView.ItemTemplate>
-                <DataTemplate x:DataType="track:TrackViewModel">
-                    <Grid HorizontalAlignment="Stretch"
-                          Background="Transparent"
-                          Margin="0,0,20,10">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="28" x:Name="listened"></ColumnDefinition>
-                            <ColumnDefinition Width="{ThemeResource gridHeaderTracksTitleColumnWidth}" />
-                            <ColumnDefinition Width="{ThemeResource gridHeaderTracksArtistColumnWidth}" />
-                            <ColumnDefinition Width="{ThemeResource gridHeaderTracksAlbumColumnWidth}" />
-                            <ColumnDefinition Width="{ThemeResource gridHeaderTracksScoreColumnWidth}" />
-                        </Grid.ColumnDefinitions>
-
-                        <Grid.ContextFlyout>
-                            <MenuFlyout ShowMode="TransientWithDismissOnPointerMoveAway"
-                                        common:MenuFlyoutExtensions.PlaylistMenuService="{x:Bind PlaylistMenuService}"
-                                        common:MenuFlyoutExtensions.TrackId="{x:Bind Track.Id}">
-                                <MenuFlyoutItem x:Uid="trackFlyoutAddMoreFromArtist"
-                                                Command="{Binding ElementName=PageRoot, Path=ViewModel.AddMoreFromArtistCommand}"
-                                                CommandParameter="{x:Bind}"
-                                                IsEnabled="{x:Bind Track.ArtistId.HasValue}">
-                                    <MenuFlyoutItem.Icon>
-                                        <FontIcon Glyph="&#xE725;" />
-                                    </MenuFlyoutItem.Icon>
-                                </MenuFlyoutItem>
-                                <MenuFlyoutItem x:Uid="trackFlyoutArtist"
-                                                Icon="People"
-                                                Command="{x:Bind ArtistOpenCommand}" />
-                                <MenuFlyoutItem x:Uid="trackFlyoutAlbum"
-                                                Command="{x:Bind AlbumOpenCommand}">
-                                    <MenuFlyoutItem.Icon>
-                                        <FontIcon Glyph="&#xE93C;" />
-                                    </MenuFlyoutItem.Icon>
-                                </MenuFlyoutItem>
-                                <MenuFlyoutSeparator />
-                                <MenuFlyoutItem x:Uid="trackFlyoutLyrics"
-                                                Command="{x:Bind LyricsOpenCommand}"
-                                                Visibility="{x:Bind LyricsExists, Converter={StaticResource BoolToVisibilityConverter}}">
-                                    <MenuFlyoutItem.Icon>
-                                        <FontIcon Glyph="&#xE90B;" />
-                                    </MenuFlyoutItem.Icon>
-                                </MenuFlyoutItem>
-                            </MenuFlyout>
-                        </Grid.ContextFlyout>
-
-                        <!-- Listening -->
-                        <Image Margin="0,0,2,0"
-                               HorizontalAlignment="Left"
-                               VerticalAlignment="Bottom"
-                               Stretch="None"
-                               Visibility="{x:Bind Listening, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">
-                            <Image.Source>
-                                <BitmapImage AutoPlay="True"
-                                             DecodePixelWidth="24"
-                                             DecodePixelHeight="24"
-                                             UriSource="ms-appx:///Assets/equalizer.gif" />
-                            </Image.Source>
-                        </Image>
-
-                        <StackPanel Grid.Column="1"
-                                    Orientation="Horizontal">
-
-                            <HyperlinkButton Style="{StaticResource gridTracksTitleText}"
-                                             Command="{x:Bind ListenCommand}"
-                                             CommandParameter="{x:Bind}" />
-
-                            <HyperlinkButton x:Uid="lyricsTag"
-                                             Visibility="{x:Bind LyricsExists, Converter={StaticResource BoolToVisibilityConverter}}"
-                                             Style="{StaticResource gridTracksLyricsText}"
-                                             Command="{x:Bind LyricsOpenCommand}" />
-                        </StackPanel>
-                        
-                        <HyperlinkButton Grid.Column="2"
-                                         Style="{StaticResource gridTracksArtistText}"
-                                         Command="{Binding ArtistOpenCommand}" />
-                        
-                        <HyperlinkButton Grid.Column="3"
-                                         Style="{StaticResource gridTracksArtistText}" 
-                                         Command="{Binding AlbumOpenCommand}" />
-
-                        <common:RatingControlLightControl Grid.Column="4"
-                                                          Style="{StaticResource gridTracksScore}"
-                                                          RatingValue="{x:Bind Score, Mode=TwoWay}" />
-                    </Grid>
-                </DataTemplate>
-            </ListView.ItemTemplate>
-        </common:ListViewExtended>
-
-        <!-- Commands -->
-        <Grid Grid.Row="1">
-        </Grid>
-
         <!-- Header -->
-        <Grid Grid.Row="2"
-              Margin="{StaticResource scrollAwareThickness}">
+        <Grid Grid.Row="1">
 
             <Grid.Background>
                 <SolidColorBrush Color="{ThemeResource CardBackgroundFillColorDefault}"
@@ -231,7 +64,7 @@
             </Grid.Background>
 
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="180"
+                <ColumnDefinition Width="100"
                                   x:Name="pictureColumn"></ColumnDefinition>
                 <ColumnDefinition Width="*"></ColumnDefinition>
             </Grid.ColumnDefinitions>
@@ -247,7 +80,7 @@
             <Grid Margin="6"
                   Padding="0"
                   CornerRadius="10">
-                <common:PictureControl x:Name="artistPicture"
+                <common:PictureControl x:Name="artistPicture" Height="100" Width="100"
                                        Cover="{x:Bind ViewModel.Artist.Picture, Mode=OneWay}"
                                        Style="{StaticResource headerPicture}" />
                 <common:AnimatedButton Grid.Row="1"
@@ -332,6 +165,160 @@
                                TextTrimming="Clip" />
                 </ScrollViewer>
             </RelativePanel>
+        </Grid>
+
+        <!-- Commands -->
+        <RelativePanel Grid.Row="2"
+                       Margin="6,0,0,0">
+            <CommandBar RelativePanel.AlignBottomWithPanel="True"
+                        Style="{StaticResource headerCommandBar}">
+                <AppBarButton x:Uid="shuffleButton"
+                              Style="{StaticResource AppBarButtonCompactStyle}"
+                              Icon="Shuffle"
+                              Label="Mélanger"
+                              Command="{x:Bind ViewModel.ShufflePlaylistCommand}" />
+            </CommandBar>
+        </RelativePanel>
+
+        <!-- Tracks -->
+
+        <Grid x:Name="tracks"
+              Grid.Row="3">
+
+            <Grid.RowDefinitions>
+                <RowDefinition Height="{ThemeResource gridHeaderTracksHeight}" />
+                <RowDefinition />
+            </Grid.RowDefinitions>
+
+            <Grid Style="{StaticResource gridTracks}">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="28" />
+                    <ColumnDefinition Width="{ThemeResource gridHeaderTracksTitleColumnWidth}"
+                                      x:Name="trackTitle" />
+                    <ColumnDefinition Width="{ThemeResource gridHeaderTracksArtistColumnWidth}"
+                                      x:Name="trackArtist" />
+                    <ColumnDefinition Width="{ThemeResource gridHeaderTracksAlbumColumnWidth}"
+                                      x:Name="trackAlbum" />
+                    <ColumnDefinition Width="{ThemeResource gridHeaderTracksScoreColumnWidth}"
+                                      x:Name="trackScore" />
+                </Grid.ColumnDefinitions>
+
+                <TextBlock x:Uid="gridHeaderTitle"
+                           Grid.Column="1"
+                           Style="{StaticResource gridHeaderTracksText}" />
+                <TextBlock x:Uid="gridHeaderArtist"
+                           Grid.Column="2"
+                           Style="{StaticResource gridHeaderTracksText}" />
+                <TextBlock x:Uid="gridHeaderAlbum"
+                           Grid.Column="3"
+                           Style="{StaticResource gridHeaderTracksText}" />
+                <TextBlock x:Uid="gridHeaderScore"
+                           Grid.Column="4"
+                           Style="{StaticResource gridHeaderTracksText}" />
+            </Grid>
+
+            <common:ListViewExtended x:Name="tracksList"
+                                     ItemsSource="{x:Bind ViewModel.Tracks}"
+                                     ContainerContentChanging="tracksList_ContainerContentChanging"
+                                     Grid.Row="3"
+                                     BorderThickness="0"
+                                     ItemContainerStyle="{StaticResource tracksListViewItem}"
+                                     Margin="0">
+
+                <ListView.ItemTemplate>
+                    <DataTemplate x:DataType="track:TrackViewModel">
+                        <Grid HorizontalAlignment="Stretch"
+                              Background="Transparent"
+                              Margin="0,0,20,10">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="28"
+                                                  x:Name="listened" />
+                                <ColumnDefinition Width="{ThemeResource gridHeaderTracksTitleColumnWidth}" />
+                                <ColumnDefinition Width="{ThemeResource gridHeaderTracksArtistColumnWidth}" />
+                                <ColumnDefinition Width="{ThemeResource gridHeaderTracksAlbumColumnWidth}" />
+                                <ColumnDefinition Width="{ThemeResource gridHeaderTracksScoreColumnWidth}" />
+                            </Grid.ColumnDefinitions>
+
+                            <Grid.ContextFlyout>
+                                <MenuFlyout ShowMode="TransientWithDismissOnPointerMoveAway"
+                                            common:MenuFlyoutExtensions.PlaylistMenuService="{x:Bind PlaylistMenuService}"
+                                            common:MenuFlyoutExtensions.TrackId="{x:Bind Track.Id}">
+                                    <MenuFlyoutItem x:Uid="trackFlyoutAddMoreFromArtist"
+                                                    Command="{Binding ElementName=PageRoot, Path=ViewModel.AddMoreFromArtistCommand}"
+                                                    CommandParameter="{x:Bind}"
+                                                    IsEnabled="{x:Bind Track.ArtistId.HasValue}">
+                                        <MenuFlyoutItem.Icon>
+                                            <FontIcon Glyph="&#xE725;" />
+                                        </MenuFlyoutItem.Icon>
+                                    </MenuFlyoutItem>
+                                    <MenuFlyoutItem x:Uid="trackFlyoutArtist"
+                                                    Icon="People"
+                                                    Command="{x:Bind ArtistOpenCommand}" />
+                                    <MenuFlyoutItem x:Uid="trackFlyoutAlbum"
+                                                    Command="{x:Bind AlbumOpenCommand}">
+                                        <MenuFlyoutItem.Icon>
+                                            <FontIcon Glyph="&#xE93C;" />
+                                        </MenuFlyoutItem.Icon>
+                                    </MenuFlyoutItem>
+                                    <MenuFlyoutSeparator />
+                                    <MenuFlyoutItem x:Uid="trackFlyoutLyrics"
+                                                    Command="{x:Bind LyricsOpenCommand}"
+                                                    Visibility="{x:Bind LyricsExists, Converter={StaticResource BoolToVisibilityConverter}}">
+                                        <MenuFlyoutItem.Icon>
+                                            <FontIcon Glyph="&#xE90B;" />
+                                        </MenuFlyoutItem.Icon>
+                                    </MenuFlyoutItem>
+                                </MenuFlyout>
+                            </Grid.ContextFlyout>
+
+                            <!-- Listening -->
+                            <Grid>
+                                <Image Margin="0,0,2,0"
+                                       HorizontalAlignment="Left"
+                                       VerticalAlignment="Bottom"
+                                       Stretch="None"
+                                       Visibility="{x:Bind Listening, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">
+                                    <Image.Source>
+                                        <BitmapImage AutoPlay="True"
+                                                     DecodePixelWidth="24"
+                                                     DecodePixelHeight="24"
+                                                     UriSource="ms-appx:///Assets/equalizer.gif" />
+                                    </Image.Source>
+                                </Image>
+
+                                <TextBlock x:Name="RowIndexText"
+                                           Visibility="{x:Bind Listening, Mode=OneWay, Converter={StaticResource BoolToInvertVisibilityConverter}}"
+                                           Style="{StaticResource gridTracksRowIndexText}" />
+                            </Grid>
+
+                            <StackPanel Grid.Column="1"
+                                        Orientation="Horizontal">
+
+                                <HyperlinkButton Style="{StaticResource gridTracksTitleText}"
+                                                 Command="{x:Bind ListenCommand}"
+                                                 CommandParameter="{x:Bind}" />
+
+                                <HyperlinkButton x:Uid="lyricsTag"
+                                                 Visibility="{x:Bind LyricsExists, Converter={StaticResource BoolToVisibilityConverter}}"
+                                                 Style="{StaticResource gridTracksLyricsText}"
+                                                 Command="{x:Bind LyricsOpenCommand}" />
+                            </StackPanel>
+
+                            <HyperlinkButton Grid.Column="2"
+                                             Style="{StaticResource gridTracksArtistText}"
+                                             Command="{Binding ArtistOpenCommand}" />
+
+                            <HyperlinkButton Grid.Column="3"
+                                             Style="{StaticResource gridTracksAlbumText}"
+                                             Command="{x:Bind AlbumOpenCommand}" />
+
+                            <common:RatingControlLightControl Grid.Column="4"
+                                                              Style="{StaticResource gridTracksScore}"
+                                                              RatingValue="{x:Bind Score, Mode=TwoWay}" />
+                        </Grid>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </common:ListViewExtended>
         </Grid>
     </Grid>
 </Page>

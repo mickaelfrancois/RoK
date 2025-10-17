@@ -45,4 +45,6 @@ public interface IPlayerService
     void Start(TrackDto? startTrack = null, TimeSpan? startPosition = null);
 
     void Stop(bool firePlaybackStateChange);
+
+    void ShuffleTracks();
 }
