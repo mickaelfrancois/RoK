@@ -9,10 +9,10 @@
 
 	<ItemGroup>
 		<PackageReference Include="Dapper" Version="2.1.66" />
-		<PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="9.0.9" />
-		<PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="9.0.9" />
-		<PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="9.0.9" />
-		<PackageReference Include="Microsoft.Extensions.Logging" Version="9.0.9" />
+		<PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="9.0.10" />
+		<PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="9.0.10" />
+		<PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="9.0.10" />
+		<PackageReference Include="Microsoft.Extensions.Logging" Version="9.0.10" />
 		<PackageReference Include="MiF.Guard" Version="1.0.0" />
 		<PackageReference Include="MiF.Messenger" Version="1.0.0" />
 		<PackageReference Include="Serilog.Extensions.Logging" Version="9.0.2" />
