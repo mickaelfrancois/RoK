@@ -32,7 +32,7 @@ public class PlayerService : IPlayerService
 
     private readonly bool _isCrossfadeEnabled;
 
-    private TimeSpan _crossfadeDuration = TimeSpan.FromSeconds(3);
+    private TimeSpan _crossfadeDuration = TimeSpan.FromSeconds(5);
     public TimeSpan CrossfadeDuration
     {
         get => _crossfadeDuration;
@@ -398,7 +398,7 @@ public class PlayerService : IPlayerService
             {
                 try
                 {
-                    _crossfadeCts.Cancel();
+                    await _crossfadeCts.CancelAsync();
                 }
                 catch { /* ignore */ }
                 finally
@@ -431,6 +431,19 @@ public class PlayerService : IPlayerService
                 return;
             }
 
+            // Calculate when to start crossfade: wait until (track length - crossfade duration)
+            double trackLength = _player.Length;
+            double currentPosition = _player.Position;
+            double crossfadeDurationSeconds = CrossfadeDuration.TotalSeconds;
+            double timeToWait = Math.Max(0, trackLength - currentPosition - crossfadeDurationSeconds);
+
+            // Wait until it's time to start the crossfade
+            if (timeToWait > 0)
+            {
+                _logger.LogDebug("Waiting {TimeToWait:F2}s before starting crossfade", timeToWait);
+                await Task.Delay(TimeSpan.FromSeconds(timeToWait), ct);
+            }
+
             double masterVolume = _volume; // keep master volume
             TimeSpan duration = CrossfadeDuration;
             const int intervalMs = 50; // plus fluide
@@ -442,8 +455,10 @@ public class PlayerService : IPlayerService
                 ct.ThrowIfCancellationRequested();
 
                 double progress = Math.Clamp((double)i / steps, 0.0, 1.0); // 0..1
-                double vol = AudioRamping.DbInterpolate(progress, masterVolume);
-                _player.SetVolume(vol);
+                double volume = AudioRamping.DbInterpolate(progress, masterVolume);
+                _player.SetVolume(volume);
+
+                _logger.LogInformation("Fade-out SetVolume {Volume:F2}", volume);
 
                 await Task.Delay(intervalMs, ct);
             }
@@ -464,8 +479,10 @@ public class PlayerService : IPlayerService
                 ct.ThrowIfCancellationRequested();
 
                 double progress = Math.Clamp((double)i / steps, 0.0, 1.0);
-                double vol = AudioRamping.DbInterpolate(1.0 - progress, masterVolume);
-                _player.SetVolume(vol);
+                double volume = AudioRamping.DbInterpolate(1.0 - progress, masterVolume);
+                _player.SetVolume(volume);
+
+                _logger.LogInformation("Fade-in SetVolume {Volume:F2}", volume);
 
                 await Task.Delay(intervalMs, ct);
             }
