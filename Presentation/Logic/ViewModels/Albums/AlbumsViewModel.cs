@@ -60,6 +60,7 @@ public partial class AlbumsViewModel : ObservableObject, IDisposable
     }
 
     private string _groupByText = AlbumsGroupCategory.KGroupByAlbum;
+    public string GroupById => _groupByText;
     public string GroupByText
     {
         get

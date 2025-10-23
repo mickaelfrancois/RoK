@@ -59,18 +59,7 @@
                             </StackPanel>
                         </SplitButton.Content>
                         <SplitButton.Flyout>
-                            <Flyout ShowMode="TransientWithDismissOnPointerMoveAway" Placement="RightEdgeAlignedBottom">
-                                <StackPanel Orientation="Vertical" MinWidth="180">
-                                    <MenuFlyoutItem x:Uid="albumsViewGroupByCreatDateMenu"   Command="{x:Bind ViewModel.GroupByCommand}" CommandParameter="CREATDATE"></MenuFlyoutItem>
-                                    <MenuFlyoutItem x:Uid="albumsViewGroupByYearMenu"        Command="{x:Bind ViewModel.GroupByCommand}" CommandParameter="YEAR"></MenuFlyoutItem>
-                                    <MenuFlyoutItem x:Uid="albumsViewGroupByDecadeMenu"      Command="{x:Bind ViewModel.GroupByCommand}" CommandParameter="DECADE"></MenuFlyoutItem>
-                                    <MenuFlyoutItem x:Uid="albumsViewGroupByCountryMenu"     Command="{x:Bind ViewModel.GroupByCommand}" CommandParameter="COUNTRY"></MenuFlyoutItem>
-                                    <MenuFlyoutItem x:Uid="albumsViewGroupByArtistMenu"      Command="{x:Bind ViewModel.GroupByCommand}" CommandParameter="ARTISTNAME"></MenuFlyoutItem>
-                                    <MenuFlyoutItem x:Uid="albumsViewGroupByAlbumMenu"       Command="{x:Bind ViewModel.GroupByCommand}" CommandParameter="ALBUMNAME"></MenuFlyoutItem>
-                                    <MenuFlyoutItem x:Uid="albumsViewGroupByLastListenMenu"  Command="{x:Bind ViewModel.GroupByCommand}" CommandParameter="LASTLISTEN"></MenuFlyoutItem>
-                                    <MenuFlyoutItem x:Uid="albumsViewGroupByListenCountMenu" Command="{x:Bind ViewModel.GroupByCommand}" CommandParameter="LISTENCOUNT"></MenuFlyoutItem>
-                                </StackPanel>
-                            </Flyout>
+                            <MenuFlyout x:Name="groupByMenu" ShowMode="TransientWithDismissOnPointerMoveAway" Placement="RightEdgeAlignedBottom" Opened="GroupByFlyout_Opened" />
                         </SplitButton.Flyout>
                     </SplitButton>
 

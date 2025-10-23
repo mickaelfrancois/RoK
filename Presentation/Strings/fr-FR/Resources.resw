@@ -288,7 +288,7 @@
   <data name="tracksViewGroupByListenCountMenu.Text" xml:space="preserve">
     <value>les plus écoutés</value>
   </data>
-  <data name="tracksViewGroupByTitleMenu.Text" xml:space="preserve">
+  <data name="groupBytitle" xml:space="preserve">
     <value>titres</value>
   </data>
   <data name="tracksViewGroupByYearMenu.Text" xml:space="preserve">
@@ -336,7 +336,7 @@
   <data name="albumsViewGroupByDecade" xml:space="preserve">
     <value>décennie</value>
   </data>
-  <data name="albumsViewGroupByDecadeMenu.Text" xml:space="preserve">
+  <data name="groupBydecade" xml:space="preserve">
     <value>décennie</value>
   </data>
   <data name="albumsViewFilterBy.Text" xml:space="preserve">
@@ -381,37 +381,37 @@
   <data name="albumsViewGroupByArtist" xml:space="preserve">
     <value>artistes</value>
   </data>
-  <data name="albumsViewGroupByArtistMenu.Text" xml:space="preserve">
+  <data name="groupByartistname" xml:space="preserve">
     <value>artistes</value>
   </data>
-  <data name="albumsViewGroupByCountry" xml:space="preserve">
+  <data name="groupBycountry" xml:space="preserve">
     <value>pays</value>
   </data>
-  <data name="albumsViewGroupByCountryMenu.Text" xml:space="preserve">
+  <data name="albumsViewGroupByCountry" xml:space="preserve">
     <value>pays</value>
   </data>
   <data name="albumsViewGroupByCreatDate" xml:space="preserve">
     <value>date d'ajout</value>
   </data>
-  <data name="albumsViewGroupByCreatDateMenu.Text" xml:space="preserve">
+  <data name="groupBycreatdate" xml:space="preserve">
     <value>date d'ajout</value>
   </data>
   <data name="albumsViewGroupByLastListen" xml:space="preserve">
     <value>écoutés récemment</value>
   </data>
-  <data name="albumsViewGroupByLastListenMenu.Text" xml:space="preserve">
+  <data name="groupBylastlisten" xml:space="preserve">
     <value>écoutés récemment</value>
   </data>
   <data name="albumsViewGroupByListenCount" xml:space="preserve">
     <value>les plus écoutés</value>
   </data>
-  <data name="albumsViewGroupByListenCountMenu.Text" xml:space="preserve">
+  <data name="groupBylistencount" xml:space="preserve">
     <value>les plus écoutés</value>
   </data>
   <data name="albumsViewGroupByYear" xml:space="preserve">
     <value>années</value>
   </data>
-  <data name="albumsViewGroupByYearMenu.Text" xml:space="preserve">
+  <data name="groupByyear" xml:space="preserve">
     <value>années</value>
   </data>
   <data name="albumsViewListen.Text" xml:space="preserve">
@@ -420,7 +420,7 @@
   <data name="albumsViewGroupByAlbum" xml:space="preserve">
     <value>albums</value>
   </data>
-  <data name="albumsViewGroupByAlbumMenu.Text" xml:space="preserve">
+  <data name="groupByalbumname" xml:space="preserve">
     <value>albums</value>
   </data>
   <data name="searchArtistHeader.Text" xml:space="preserve">
@@ -726,7 +726,7 @@
   <data name="tracksViewGroupByAlbumMenu.Text" xml:space="preserve">
     <value>albums</value>
   </data>
-  <data name="tracksViewGroupByGenreMenu.Text" xml:space="preserve">
+  <data name="groupBygenrename" xml:space="preserve">
     <value>genres</value>
   </data>
   <data name="tracksViewGroupByArtist" xml:space="preserve">
