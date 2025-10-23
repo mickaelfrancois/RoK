@@ -58,17 +58,7 @@
                             </StackPanel>
                         </SplitButton.Content>
                         <SplitButton.Flyout>
-                            <Flyout ShowMode="TransientWithDismissOnPointerMoveAway" Placement="RightEdgeAlignedBottom">
-                                <StackPanel Orientation="Vertical" MinWidth="180">
-                                    <MenuFlyoutItem x:Uid="artistsViewGroupByCreatDateMenu"   Command="{x:Bind ViewModel.GroupByCommand}" CommandParameter="CREATDATE"/>
-                                    <MenuFlyoutItem x:Uid="artistsViewGroupByArtistMenu"      Command="{x:Bind ViewModel.GroupByCommand}" CommandParameter="ARTISTNAME"/>
-                                    <MenuFlyoutItem x:Uid="artistsViewGroupByYearMenu"        Command="{x:Bind ViewModel.GroupByCommand}" CommandParameter="YEAR"/>
-                                    <MenuFlyoutItem x:Uid="artistsViewGroupByDecadeMenu"      Command="{x:Bind ViewModel.GroupByCommand}" CommandParameter="DECADE"/>
-                                    <MenuFlyoutItem x:Uid="artistsViewGroupByCountryMenu"     Command="{x:Bind ViewModel.GroupByCommand}" CommandParameter="COUNTRY"/>
-                                    <MenuFlyoutItem x:Uid="artistsViewGroupByLastListenMenu"  Command="{x:Bind ViewModel.GroupByCommand}" CommandParameter="LASTLISTEN"/>
-                                    <MenuFlyoutItem x:Uid="artistsViewGroupByListenCountMenu" Command="{x:Bind ViewModel.GroupByCommand}" CommandParameter="LISTENCOUNT"/>
-                                </StackPanel>
-                            </Flyout>
+                            <MenuFlyout x:Name="groupByMenu" ShowMode="TransientWithDismissOnPointerMoveAway" Placement="RightEdgeAlignedBottom" Opened="GroupByFlyout_Opened" />
                         </SplitButton.Flyout>
                     </SplitButton>
 

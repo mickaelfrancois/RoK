@@ -58,6 +58,7 @@ public partial class ArtistsViewModel : ObservableObject, IDisposable
     }
 
     private string _groupByText = ArtistsGroupCategory.KGroupByArtist;
+    public string GroupById => _groupByText;
     public string GroupByText
     {
         get

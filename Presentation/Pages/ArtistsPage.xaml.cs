@@ -11,6 +11,9 @@ public sealed partial class ArtistsPage : Page, IDisposable
 
     private readonly ArtistsFilterMenuBuilder _filterMenuBuilder = new();
 
+    private readonly ArtistsGroupByMenuBuilder _groupByMenuBuilder = new();
+
+
     public ArtistsPage()
     {
         this.InitializeComponent();
@@ -60,6 +63,11 @@ public sealed partial class ArtistsPage : Page, IDisposable
     {
         if (args.Item is ArtistViewModel item && item.Picture == null)
             item.LoadPicture();
+    }
+
+    private void GroupByFlyout_Opened(object sender, object e)
+    {
+        _groupByMenuBuilder.PopulateGroupByMenu(groupByMenu, ViewModel);
     }
 
 

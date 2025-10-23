@@ -63,36 +63,7 @@
                             </StackPanel>
                         </SplitButton.Content>
                         <SplitButton.Flyout>
-                            <Flyout ShowMode="TransientWithDismissOnPointerMoveAway"
-                                    Placement="RightEdgeAlignedBottom">
-                                <StackPanel Orientation="Vertical"
-                                            MinWidth="180">
-                                    <MenuFlyoutItem x:Uid="tracksViewGroupByCreatDateMenu"
-                                                    Command="{x:Bind ViewModel.GroupByCommand}"
-                                                    CommandParameter="CREATDATE"></MenuFlyoutItem>
-                                    <MenuFlyoutItem x:Uid="tracksViewGroupByTitleMenu"
-                                                    Command="{x:Bind ViewModel.GroupByCommand}"
-                                                    CommandParameter="TITLE"></MenuFlyoutItem>
-                                    <MenuFlyoutItem x:Uid="tracksViewGroupByArtistMenu"
-                                                    Command="{x:Bind ViewModel.GroupByCommand}"
-                                                    CommandParameter="ARTISTNAME"></MenuFlyoutItem>
-                                    <MenuFlyoutItem x:Uid="tracksViewGroupByAlbumMenu"
-                                                    Command="{x:Bind ViewModel.GroupByCommand}"
-                                                    CommandParameter="ALBUMNAME"></MenuFlyoutItem>
-                                    <MenuFlyoutItem x:Uid="tracksViewGroupByGenreMenu"
-                                                    Command="{x:Bind ViewModel.GroupByCommand}"
-                                                    CommandParameter="GENRENAME"></MenuFlyoutItem>
-                                    <MenuFlyoutItem x:Uid="tracksViewGroupByCountryMenu"
-                                                    Command="{x:Bind ViewModel.GroupByCommand}"
-                                                    CommandParameter="COUNTRY"></MenuFlyoutItem>
-                                    <MenuFlyoutItem x:Uid="tracksViewGroupByLastListenMenu"
-                                                    Command="{x:Bind ViewModel.GroupByCommand}"
-                                                    CommandParameter="LASTLISTEN"></MenuFlyoutItem>
-                                    <MenuFlyoutItem x:Uid="tracksViewGroupByListenCountMenu"
-                                                    Command="{x:Bind ViewModel.GroupByCommand}"
-                                                    CommandParameter="LISTENCOUNT"></MenuFlyoutItem>
-                                </StackPanel>
-                            </Flyout>
+                            <MenuFlyout x:Name="groupByMenu" ShowMode="TransientWithDismissOnPointerMoveAway" Placement="RightEdgeAlignedBottom" Opened="GroupByFlyout_Opened" />
                         </SplitButton.Flyout>
                     </SplitButton>
 

@@ -59,6 +59,7 @@ public partial class TracksViewModel : ObservableObject, IDisposable
     }
 
     private string _groupByText = TracksGroupCategory.KGroupByTitle;
+    public string GroupById => _groupByText;
     public string GroupByText
     {
         get

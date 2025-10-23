@@ -12,6 +12,8 @@ public sealed partial class TracksPage : Page, IDisposable
 
     private readonly TracksFilterMenuBuilder _filterMenuBuilder = new();
 
+    private readonly TracksGroupByMenuBuilder _groupByMenuBuilder = new();
+
 
     public TracksPage()
     {
@@ -56,6 +58,11 @@ public sealed partial class TracksPage : Page, IDisposable
     private void GroupButton_Tapped(object sender, Microsoft.UI.Xaml.Input.TappedRoutedEventArgs e)
     {
         e.Handled = true;
+    }
+
+    private void GroupByFlyout_Opened(object sender, object e)
+    {
+        _groupByMenuBuilder.PopulateGroupByMenu(groupByMenu, ViewModel);
     }
 
 

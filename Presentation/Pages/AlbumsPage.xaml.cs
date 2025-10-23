@@ -11,6 +11,8 @@ public sealed partial class AlbumsPage : Page, IDisposable
 
     private readonly AlbumsFilterMenuBuilder _filterMenuBuilder = new();
 
+    private readonly AlbumsGroupByMenuBuilder _groupByMenuBuilder = new();
+
 
     public AlbumsPage()
     {
@@ -64,7 +66,10 @@ public sealed partial class AlbumsPage : Page, IDisposable
         if (args.Item is AlbumViewModel item && item.Picture == null)
             item.LoadPicture();
     }
-
+    private void GroupByFlyout_Opened(object sender, object e)
+    {
+        _groupByMenuBuilder.PopulateGroupByMenu(groupByMenu, ViewModel);
+    }
 
     public void Dispose()
     {
