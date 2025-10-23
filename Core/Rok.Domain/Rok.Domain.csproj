@@ -8,7 +8,7 @@
 
   <ItemGroup>
     <PackageReference Include="Dapper.Contrib" Version="2.0.78" />
-    <PackageReference Include="Microsoft.Data.Sqlite" Version="9.0.9" />
+    <PackageReference Include="Microsoft.Data.Sqlite" Version="9.0.10" />
     <PackageReference Include="MiF.Guard" Version="1.0.0" />
   </ItemGroup>
 
