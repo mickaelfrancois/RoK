@@ -21,8 +21,6 @@ namespace Rok
             HookGlobalDiagnostics();
             this.UnhandledException += Application_UnhandledException;
 
-            ServiceProvider = ConfigureServices();
-
             this.InitializeComponent();
 
 #if DEBUG
@@ -66,6 +64,8 @@ namespace Rok
         /// <param name="args">Details about the launch request and process.</param>
         protected override void OnLaunched(Microsoft.UI.Xaml.LaunchActivatedEventArgs args)
         {
+            ServiceProvider = ConfigureServices();
+
             IAppOptions options = LoadOptions();
 
             IAppDbContext appDbContext = ServiceProvider.GetRequiredService<IAppDbContext>();
