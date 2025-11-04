@@ -4,6 +4,7 @@ using Rok.Import;
 using Rok.Infrastructure;
 using Serilog;
 using System.IO;
+using System.Threading;
 using Windows.Storage;
 using WinRT.Interop;
 
@@ -29,34 +30,7 @@ namespace Rok
         }
 
 
-        private void HookGlobalDiagnostics()
-        {
-            // 1st chance
-            AppDomain.CurrentDomain.FirstChanceException += (_, e) =>
-            {
-#if DEBUG
-                if (e.Exception is NullReferenceException or InvalidOperationException or FileNotFoundException)
-                    Debug.WriteLine("[FirstChance] " + e.Exception.GetType().Name + " - " + e.Exception.Message);
-#endif
-            };
 
-            AppDomain.CurrentDomain.UnhandledException += async (_, e) =>
-            {
-                Debug.WriteLine("[AppDomain.Unhandled] " + e.ExceptionObject);
-
-                if (e.ExceptionObject is Exception ex)
-                {
-                    ITelemetryClient telemetry = ServiceProvider.GetRequiredService<ITelemetryClient>();
-                    await telemetry.CaptureExceptionAsync(ex);
-                }
-            };
-
-            TaskScheduler.UnobservedTaskException += (_, e) =>
-            {
-                Debug.WriteLine("[TaskScheduler.Unobserved] " + e.Exception);
-                e.SetObserved();
-            };
-        }
 
         /// <summary>
         /// Invoked when the application is launched.
@@ -196,6 +170,45 @@ namespace Rok
             {
                 // Ignore any logging errors to avoid masking the original exception.
             }
+        }
+
+        private void HookGlobalDiagnostics()
+        {
+            // 1st chance
+            AppDomain.CurrentDomain.FirstChanceException += (_, e) =>
+            {
+#if DEBUG
+                if (e.Exception is NullReferenceException or InvalidOperationException or FileNotFoundException)
+                    Debug.WriteLine("[FirstChance] " + e.Exception.GetType().Name + " - " + e.Exception.Message);
+#endif
+            };
+
+            AppDomain.CurrentDomain.UnhandledException += (_, e) =>
+            {
+                Debug.WriteLine("[AppDomain.Unhandled] " + e.ExceptionObject);
+
+#if !DEBUG
+                if (e.ExceptionObject is Exception ex)
+                {
+                    ITelemetryClient telemetry = ServiceProvider.GetRequiredService<ITelemetryClient>();
+                    telemetry.CaptureExceptionAsync(ex);
+                    Thread.Sleep(500); // Give some time to send the telemetry before exiting
+                }
+#endif
+            };
+
+            TaskScheduler.UnobservedTaskException += (_, e) =>
+            {
+                if (e.Exception is Exception ex)
+                {
+#if !DEBUG
+                    ITelemetryClient telemetry = ServiceProvider.GetRequiredService<ITelemetryClient>();
+                    Task.Run(async () => await telemetry.CaptureExceptionAsync(ex))
+                        .Wait(TimeSpan.FromSeconds(2));
+#endif
+                }
+                e.SetObserved();
+            };
         }
     }
 }
