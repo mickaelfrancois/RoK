@@ -9,6 +9,7 @@ using Rok.Infrastructure.Lyrics;
 using Rok.Infrastructure.Migration;
 using Rok.Infrastructure.NovaApi;
 using Rok.Infrastructure.Repositories;
+using Rok.Infrastructure.Social;
 using Rok.Infrastructure.Tag;
 using Rok.Infrastructure.Telemetry;
 using Serilog;
@@ -58,6 +59,7 @@ public static class DependencyInjection
         services.AddSingleton<ITagService, TagService>();
         services.AddSingleton<INovaApiService, NovaApiService>();
         services.AddSingleton<ITelemetryClient, TelemetryClient>();
+        services.AddSingleton<DiscordRichPresenceService>();
 
         return services;
     }

@@ -24,6 +24,8 @@ public class AppOptions : IAppOptions
 
     public bool TelemetryEnabled { get; set; } = true;
 
+    public bool DiscordRichPresenceEnabled { get; set; } = true;
+
     public string CachePath { get; set; } = string.Empty;
 
     public List<string> LibraryPath { get; set; } = [];

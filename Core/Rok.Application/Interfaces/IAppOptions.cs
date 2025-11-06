@@ -22,6 +22,8 @@ public interface IAppOptions
 
     bool TelemetryEnabled { get; set; }
 
+    bool DiscordRichPresenceEnabled { get; set; }
+
     string CachePath { get; set; }
 
     List<string> LibraryPath { get; set; }

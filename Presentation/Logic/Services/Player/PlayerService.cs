@@ -1,4 +1,5 @@
 ﻿using Rok.Application.Player;
+using Rok.Infrastructure.Social;
 using System.Threading;
 
 namespace Rok.Logic.Services.Player;
@@ -6,6 +7,10 @@ namespace Rok.Logic.Services.Player;
 public class PlayerService : IPlayerService
 {
     private EPlaybackState _playerState = EPlaybackState.Stopped;
+
+    private readonly DiscordRichPresenceService? _discordService;
+
+    private readonly IAppOptions _appOptions;
 
     public EPlaybackState PlaybackState
     {
@@ -139,12 +144,16 @@ public class PlayerService : IPlayerService
     private readonly ILogger<PlayerService> _logger;
 
 
-    public PlayerService(IPlayerEngine player, IAppOptions appOptions, ILogger<PlayerService> logger)
+    public PlayerService(IPlayerEngine player, IAppOptions appOptions, DiscordRichPresenceService? discordService, ILogger<PlayerService> logger)
     {
         _player = Guard.Against.Null(player, nameof(player));
+        _appOptions = Guard.Against.Null(appOptions, nameof(appOptions));
+        _discordService = discordService;
         _logger = Guard.Against.Null(logger, nameof(logger));
 
         _isCrossfadeEnabled = appOptions.CrossFade;
+
+        _discordService?.Initialize();
 
         InitEvents();
 
@@ -276,6 +285,8 @@ public class PlayerService : IPlayerService
         PlaybackState = EPlaybackState.Paused;
 
         _player.Pause();
+
+        _discordService?.ClearPresence();
     }
 
     public void Play()
@@ -285,6 +296,8 @@ public class PlayerService : IPlayerService
         _player.Play();
 
         PlaybackState = EPlaybackState.Playing;
+
+        UpdateDiscordPresence(CurrentTrack, isPlaying: true);
     }
 
     public void Stop(bool firePlaybackStateChange)
@@ -295,6 +308,8 @@ public class PlayerService : IPlayerService
 
         if (firePlaybackStateChange)
             PlaybackState = EPlaybackState.Stopped;
+
+        _discordService?.ClearPresence();
     }
 
     public void Skip()
@@ -383,9 +398,39 @@ public class PlayerService : IPlayerService
         if (res)
         {
             CurrentTrack = track;
+
+            UpdateDiscordPresence(track, isPlaying: false);
         }
 
         return res;
+    }
+
+    private void UpdateDiscordPresence(TrackDto track, bool isPlaying)
+    {
+        if (_discordService == null || !_appOptions.DiscordRichPresenceEnabled)
+            return;
+
+        try
+        {
+            if (isPlaying)
+            {
+                _discordService.UpdatePresence(
+                    trackTitle: track.Title,
+                    artistName: track.ArtistName,
+                    albumName: track.AlbumName,
+                    elapsed: TimeSpan.FromSeconds(_player.Position),
+                    duration: TimeSpan.FromMilliseconds(track.Duration)
+                );
+            }
+            else
+            {
+                _discordService.ClearPresence();
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Erreur lors de la mise à jour Discord Presence");
+        }
     }
 
 
