@@ -389,7 +389,7 @@
                        VerticalAlignment="Bottom" 
                        Margin="340,0,0,80" 
                        FontSize="30" 
-                       Foreground="#FF42CB0F" 
+                       Foreground="White" 
                        HorizontalAlignment="Left" 
                        TextWrapping="NoWrap" 
                        Width="auto" 
