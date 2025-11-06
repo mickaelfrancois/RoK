@@ -8,6 +8,101 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d">
 
+    <UserControl.Resources>
+        <!-- Ken Burns animation (zoom + pan effect) -->
+        <Storyboard x:Key="KenBurnsAnimation" RepeatBehavior="Forever" AutoReverse="True">
+            <DoubleAnimation
+               Storyboard.TargetName="BackdropImage"
+               Storyboard.TargetProperty="(UIElement.RenderTransform).(CompositeTransform.ScaleX)"
+               From="1.0" To="1.12"
+               Duration="0:0:20"
+               EnableDependentAnimation="True">
+                <DoubleAnimation.EasingFunction>
+                    <SineEase EasingMode="EaseInOut"/>
+                </DoubleAnimation.EasingFunction>
+            </DoubleAnimation>
+            <DoubleAnimation
+               Storyboard.TargetName="BackdropImage"
+               Storyboard.TargetProperty="(UIElement.RenderTransform).(CompositeTransform.ScaleY)"
+               From="1.0" To="1.12"
+               Duration="0:0:20"
+               EnableDependentAnimation="True">
+                <DoubleAnimation.EasingFunction>
+                    <SineEase EasingMode="EaseInOut"/>
+                </DoubleAnimation.EasingFunction>
+            </DoubleAnimation>
+            <DoubleAnimation
+               Storyboard.TargetName="BackdropImage"
+               Storyboard.TargetProperty="(UIElement.RenderTransform).(CompositeTransform.TranslateX)"
+               From="0" To="-40"
+               Duration="0:0:20"
+               EnableDependentAnimation="True">
+                <DoubleAnimation.EasingFunction>
+                    <SineEase EasingMode="EaseInOut"/>
+                </DoubleAnimation.EasingFunction>
+            </DoubleAnimation>
+        </Storyboard>
+
+        <!-- Fade in for new backdrop -->
+        <Storyboard x:Key="BackdropFadeIn">
+            <DoubleAnimation
+               Storyboard.TargetName="BackdropImage"
+               Storyboard.TargetProperty="Opacity"
+               From="0" To="1"
+               Duration="0:0:1.5">
+                <DoubleAnimation.EasingFunction>
+                    <QuadraticEase EasingMode="EaseOut"/>
+                </DoubleAnimation.EasingFunction>
+            </DoubleAnimation>
+        </Storyboard>
+
+        <!-- Fade out for old backdrop -->
+        <Storyboard x:Key="BackdropFadeOut">
+            <DoubleAnimation
+               Storyboard.TargetName="BackdropImage"
+               Storyboard.TargetProperty="Opacity"
+               From="1" To="0"
+               Duration="0:0:1">
+                <DoubleAnimation.EasingFunction>
+                    <QuadraticEase EasingMode="EaseIn"/>
+                </DoubleAnimation.EasingFunction>
+            </DoubleAnimation>
+        </Storyboard>
+
+        <!-- Cover entrance animation -->
+        <Storyboard x:Key="CoverEntranceAnimation">
+            <DoubleAnimation
+               Storyboard.TargetName="cover"
+               Storyboard.TargetProperty="Opacity"
+               From="0" To="1"
+               Duration="0:0:0.8">
+                <DoubleAnimation.EasingFunction>
+                    <BackEase EasingMode="EaseOut"/>
+                </DoubleAnimation.EasingFunction>
+            </DoubleAnimation>
+            <DoubleAnimation
+               Storyboard.TargetName="coverTransform"
+               Storyboard.TargetProperty="ScaleX"
+               From="0.8" To="1"
+               Duration="0:0:0.8"
+               EnableDependentAnimation="True">
+                <DoubleAnimation.EasingFunction>
+                    <BackEase EasingMode="EaseOut"/>
+                </DoubleAnimation.EasingFunction>
+            </DoubleAnimation>
+            <DoubleAnimation
+               Storyboard.TargetName="coverTransform"
+               Storyboard.TargetProperty="ScaleY"
+               From="0.8" To="1"
+               Duration="0:0:0.8"
+               EnableDependentAnimation="True">
+                <DoubleAnimation.EasingFunction>
+                    <BackEase EasingMode="EaseOut"/>
+                </DoubleAnimation.EasingFunction>
+            </DoubleAnimation>
+        </Storyboard>
+    </UserControl.Resources>
+
     <Grid Background="Black">
 
         <VisualStateManager.VisualStateGroups>
@@ -39,7 +134,31 @@
             </VisualStateGroup>
         </VisualStateManager.VisualStateGroups>
 
-        <local:BackdropControl Source="{x:Bind PlayerViewModel.CurrentArtist.Backdrop, Mode=OneWay}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"></local:BackdropControl>
+        <!-- Animated backdrop replacing BackdropControl -->
+        <Grid x:Name="BackdropContainer">
+            <Image x:Name="BackdropImage"
+           Source="{x:Bind PlayerViewModel.CurrentArtist.Backdrop, Mode=OneWay}"
+           Stretch="UniformToFill"
+           HorizontalAlignment="Center"
+           VerticalAlignment="Center">
+                <Image.RenderTransform>
+                    <CompositeTransform x:Name="BackdropTransform"
+                                CenterX="0.5"
+                                CenterY="0.5"/>
+                </Image.RenderTransform>
+            </Image>
+
+            <!-- Gradient overlay for better text readability -->
+            <Grid>
+                <Grid.Background>
+                    <LinearGradientBrush StartPoint="0.5,0" EndPoint="0.5,1">
+                        <GradientStop Color="Transparent" Offset="0"/>
+                        <GradientStop Color="#33000000" Offset="0.5"/>
+                        <GradientStop Color="#66000000" Offset="1"/>
+                    </LinearGradientBrush>
+                </Grid.Background>
+            </Grid>
+        </Grid>
 
         <!-- Lyrics raw -->
         <Grid Margin="0,85,00,130" Opacity="0.7" Visibility="{x:Bind PlayerViewModel.CurrentTrack.LyricsExists, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">
@@ -70,13 +189,12 @@
                 <RowDefinition Height="20"></RowDefinition>
             </Grid.RowDefinitions>
 
-            <!-- Remplacé StackPanel par Grid pour centrer le 1er CommandBar et aligner le 2nd à droite -->
             <Grid VerticalAlignment="Top" HorizontalAlignment="Stretch" Padding="4">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" />
                     <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
-                
+
                 <CommandBar Grid.Column="0"
                             Grid.ColumnSpan="2"
                             Background="Transparent"
@@ -242,15 +360,57 @@
             </ListBox>
         </Grid>
 
+        <!-- Album cover with animation -->
         <Grid>
-            <Border x:Name="cover" HorizontalAlignment="Left" Margin="60,0,0,10" VerticalAlignment="Bottom" Height="256" Width="256" Padding="6" BorderBrush="LightGray" BorderThickness="1" Background="White">
-                <Image Width="240" Height="240" Source="{x:Bind PlayerViewModel.CurrentAlbum.Picture, Mode=OneWay}" Stretch="UniformToFill" VerticalAlignment="Top"/>
+            <Border x:Name="cover" 
+                HorizontalAlignment="Left" 
+                Margin="60,0,0,10" 
+                VerticalAlignment="Bottom" 
+                Height="256" 
+                Width="256" 
+                Padding="6" 
+                BorderBrush="LightGray" 
+                BorderThickness="1" 
+                Background="White"
+                RenderTransformOrigin="0.5,0.5">
+                <Border.RenderTransform>
+                    <CompositeTransform x:Name="coverTransform"/>
+                </Border.RenderTransform>
+                <Image Width="240" 
+                   Height="240" 
+                   Source="{x:Bind PlayerViewModel.CurrentAlbum.Picture, Mode=OneWay}" 
+                   Stretch="UniformToFill" 
+                   VerticalAlignment="Top"/>
             </Border>
 
             <Grid x:Name="trackInfo">
-                <TextBlock x:Name="title" Text="{x:Bind PlayerViewModel.CurrentTrack.Title, Mode=OneWay}" VerticalAlignment="Bottom" Margin="340, 0,0,80" FontSize="30"  Foreground="#FF42CB0F" HorizontalAlignment="Left"  TextWrapping="NoWrap"   Width="auto" FontWeight="Bold" />
-                <TextBlock x:Name="artist" Text="{x:Bind PlayerViewModel.CurrentTrack.ArtistName, Mode=OneWay}" VerticalAlignment="Bottom" Margin="340, 0,0,40" FontSize="30"  Foreground="White" HorizontalAlignment="Left"  TextWrapping="NoWrap"   Width="600" FontWeight="Bold" />
-                <local:RatingControlDarkControl x:Name="score" Value="{x:Bind PlayerViewModel.CurrentTrack.Score, Mode=TwoWay}" VerticalAlignment="Bottom" Margin="0, 0, 20, 50" Height="30" BorderThickness="0" HorizontalAlignment="Right" />
+                <TextBlock x:Name="title" 
+                       Text="{x:Bind PlayerViewModel.CurrentTrack.Title, Mode=OneWay}" 
+                       VerticalAlignment="Bottom" 
+                       Margin="340,0,0,80" 
+                       FontSize="30" 
+                       Foreground="#FF42CB0F" 
+                       HorizontalAlignment="Left" 
+                       TextWrapping="NoWrap" 
+                       Width="auto" 
+                       FontWeight="Bold"/>
+                <TextBlock x:Name="artist" 
+                       Text="{x:Bind PlayerViewModel.CurrentTrack.ArtistName, Mode=OneWay}" 
+                       VerticalAlignment="Bottom" 
+                       Margin="340,0,0,40" 
+                       FontSize="30" 
+                       Foreground="White" 
+                       HorizontalAlignment="Left" 
+                       TextWrapping="NoWrap" 
+                       Width="600" 
+                       FontWeight="Bold"/>
+                <local:RatingControlDarkControl x:Name="score" 
+                                            Value="{x:Bind PlayerViewModel.CurrentTrack.Score, Mode=TwoWay}" 
+                                            VerticalAlignment="Bottom" 
+                                            Margin="0,0,20,50" 
+                                            Height="30" 
+                                            BorderThickness="0" 
+                                            HorizontalAlignment="Right"/>
             </Grid>
         </Grid>
     </Grid>
