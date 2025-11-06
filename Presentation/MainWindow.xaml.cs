@@ -174,9 +174,9 @@ namespace Rok
 
         private void MediaChanged()
         {
-            _dispatcherQueue.TryEnqueue(() =>
+            _dispatcherQueue.TryEnqueue(async () =>
             {
-                fullscreen.TrackChanged();
+                await fullscreen.TrackChangedAsync();
             });
         }
 
