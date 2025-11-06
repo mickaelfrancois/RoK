@@ -9,6 +9,7 @@
 
 	<ItemGroup>
 		<PackageReference Include="Dapper" Version="2.1.66" />
+		<PackageReference Include="DiscordRichPresence" Version="1.6.1.70" />
 		<PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="9.0.10" />
 		<PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="9.0.10" />
 		<PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="9.0.10" />

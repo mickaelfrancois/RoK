@@ -105,6 +105,7 @@ namespace Rok
             services.AddSingleton<IConfiguration>(config);
             services.Configure<TelemetryOptions>(config.GetSection("Telemetry"));
             services.Configure<NovaApiOptions>(config.GetSection("NovaApi"));
+            services.Configure<DiscordOptions>(config.GetSection("Discord"));
 
             services.AddHttpClient();
 
