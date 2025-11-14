@@ -90,7 +90,7 @@ public class TelemetryClient : ITelemetryClient
     }
 
 
-    public async Task CaptureEventAsync(string eventName)
+    public async Task CaptureEventAsync(string eventName, Dictionary<string, object>? properties = null)
     {
         if (!_isEnabled)
             return;
@@ -100,6 +100,9 @@ public class TelemetryClient : ITelemetryClient
             ["event"] = eventName,
             ["distinct_id"] = _appOptions.Id
         };
+
+        if (properties is not null && properties.Count > 0)
+            payload["properties"] = properties;
 
         using CancellationTokenSource cts = new(TimeSpan.FromSeconds(10));
 
@@ -169,7 +172,7 @@ public class TelemetryClient : ITelemetryClient
                     ["synthetic"] = false
                 }
             };
-            
+
             if (!string.IsNullOrEmpty(currentException.StackTrace))
             {
                 exceptionData["stacktrace"] = new Dictionary<string, object>

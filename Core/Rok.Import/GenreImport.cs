@@ -9,6 +9,9 @@ public class GenreImport(IGenreRepository _genreRepository)
 {
     public int CreatedCount { get; private set; } = 0;
 
+    public int CountInCache => _cache.Count;
+
+
     private readonly Dictionary<string, GenreCacheItem> _cache = new(StringComparer.InvariantCultureIgnoreCase);
 
 

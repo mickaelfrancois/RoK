@@ -12,6 +12,8 @@ public class ArtistImport(IArtistRepository _artistRepository, CountryCache _cou
 {
     public int CreatedCount { get; private set; } = 0;
 
+    public int CountInCache => _cache.Count;
+
     private readonly Dictionary<string, ArtistCacheItem> _cache = new(StringComparer.InvariantCultureIgnoreCase);
 
 

@@ -2,7 +2,7 @@
 
 public interface ITelemetryClient
 {
-    Task CaptureEventAsync(string eventName);
+    Task CaptureEventAsync(string eventName, Dictionary<string, object>? properties = null);
 
     Task CaptureScreenAsync(string screenName);
 
