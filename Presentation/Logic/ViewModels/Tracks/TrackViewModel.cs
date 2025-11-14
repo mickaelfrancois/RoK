@@ -1,4 +1,5 @@
-﻿using Rok.Application.Dto.Lyrics;
+﻿using Microsoft.UI.Dispatching;
+using Rok.Application.Dto.Lyrics;
 using Rok.Application.Features.Playlists.PlaylistMenu;
 using Rok.Application.Features.Tracks.Command;
 using Rok.Infrastructure.NovaApi;
@@ -243,7 +244,16 @@ public partial class TrackViewModel : ObservableObject, IDisposable
 
             _logger.LogTrace("Lyrics saved to {File}", fileName);
 
-            OnPropertyChanged(nameof(LyricsExists));
+
+            DispatcherQueue dispatcher = DispatcherQueue.GetForCurrentThread();
+            if (dispatcher != null)
+            {
+                dispatcher.TryEnqueue(() => OnPropertyChanged(nameof(LyricsExists)));
+            }
+            else
+            {
+                OnPropertyChanged(nameof(LyricsExists));
+            }
         }
     }
 
