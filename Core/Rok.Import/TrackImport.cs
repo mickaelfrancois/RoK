@@ -8,6 +8,8 @@ public class TrackImport(ITrackRepository _trackRepository)
 {
     public int CreatedCount { get; private set; } = 0;
 
+    public int CountInCache => _cache.Count;
+
     private readonly Dictionary<string, TrackEntity> _cache = new(StringComparer.InvariantCultureIgnoreCase);
 
 

@@ -148,6 +148,8 @@ public class ImportService : IImport
 
         if (!errorOccurred)
             await CleanDataAsync(cancellationToken);
+
+        await SendMetricsAsync().ConfigureAwait(false);
     }
 
 
@@ -161,6 +163,18 @@ public class ImportService : IImport
             await _statistics.UpdateAlbumsAsync(_albumsUpdated);
             await _statistics.UpdateGenresAsync(_genresUpdated);
         }
+    }
+
+
+    private async Task SendMetricsAsync()
+    {
+        await _telemetryClient.CaptureEventAsync("stats", new Dictionary<string, object>
+        {
+            ["tracks"] = _importTrack.CountInCache,
+            ["artists"] = _importArtist.CountInCache,
+            ["genres"] = _importGenre.CountInCache,
+            ["albums"] = _importAlbum.CountInCache
+        });
     }
 
 
