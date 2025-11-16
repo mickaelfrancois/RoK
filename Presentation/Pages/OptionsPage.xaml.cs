@@ -26,7 +26,17 @@ public sealed partial class OptionsPage : Page
 
         InitializeWithWindow.Initialize(folderPicker, Rok.App.MainWindowHandle);
 
-        StorageFolder? folder = await folderPicker.PickSingleFolderAsync();
+        StorageFolder? folder = null;
+
+        try
+        {
+            folder = await folderPicker.PickSingleFolderAsync();
+        }
+        catch
+        {
+            // Ignore            
+        }
+
         if (folder is null)
             return;
 

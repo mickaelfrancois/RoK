@@ -56,8 +56,9 @@
                         
                         <StackPanel Orientation="Horizontal" Spacing="8">
                             <Button x:Uid="AddLibraryFolderButton" x:Name="AddLibraryFolderButton" Click="AddLibraryFolderButton_Click" />
-                            <Button x:Uid="RemoveLibraryFolderButton" x:Name="RemoveLibraryFolderButton" Click="RemoveLibraryFolderButton_Click"
-                                    IsEnabled="{Binding ElementName=LibraryPathsList, Path=SelectedItem, Converter={StaticResource BoolToInvertBoolConverter}, ConverterParameter=invert}" />
+                            <Button x:Uid="RemoveLibraryFolderButton"
+                                    x:Name="RemoveLibraryFolderButton"
+                                    Click="RemoveLibraryFolderButton_Click"></Button>
                         </StackPanel>
 
                         <ListView x:Name="LibraryPathsList"
