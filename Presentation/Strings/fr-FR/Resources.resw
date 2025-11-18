@@ -778,7 +778,7 @@
     <value>Bibliothèque</value>
   </data>
   <data name="optionsRefreshAtStartupSwitch.Header" xml:space="preserve">
-    <value>Actualiser la bibliothèque au démarrage</value>
+    <value>Actualiser automatiquement la bibliothèque au démarrage de l'application</value>
   </data>
   <data name="LibraryFoldersLabel.Text" xml:space="preserve">
     <value>Dossiers de la bibliothèque</value>
@@ -790,16 +790,16 @@
     <value>Supprimer le dossier sélectionné</value>
   </data>
   <data name="CachePathLabel.Text" xml:space="preserve">
-    <value>Chemin du cache</value>
+    <value>Chemin d'accès au cache pour stocker les photos des artistes</value>
   </data>
   <data name="BrowseCachePathButton.Content" xml:space="preserve">
     <value>Parcourir</value>
   </data>
   <data name="OptionsHideArtistsSwitch.Header" xml:space="preserve">
-    <value>Masquer les artistes sans album</value>
+    <value>Masquer les artistes sans album de la liste des artistes</value>
   </data>
   <data name="OptionsImportWithArtistGenreSwitch.Header" xml:space="preserve">
-    <value>Importer les pistes avec le genre de l'artiste</value>
+    <value>Lors de l'import des chansons, utiliser le genre défini sur l'artiste</value>
   </data>
   <data name="trackFlyoutAddMoreFromArtist.Text" xml:space="preserve">
     <value>Ajouter plus de chansons de cet artiste</value>
@@ -961,13 +961,13 @@
     <value>Services</value>
   </data>
   <data name="OptionsNovaApiEnabledSwitch.Header" xml:space="preserve">
-    <value>Nova API</value>
+    <value>Autoriser la récupération de données sur les artistes et albums (pochette, image, biographie, paroles)</value>
   </data>
   <data name="OptionsTelemetryEnabledSwitch.Header" xml:space="preserve">
-    <value>Télémétrie</value>
+    <value>Autoriser l'envoi d'informations de télémétrie sur l'usage de l'application afin de permettre son amélioration</value>
   </data>
   <data name="OptionsCrossFadeSwitch.Header" xml:space="preserve">
-    <value>Fondu enchaîné</value>
+    <value>Activer le fondu enchainé entre deux chansons</value>
   </data>
   <data name="shuffleButton.Label" xml:space="preserve">
     <value>Mélanger</value>

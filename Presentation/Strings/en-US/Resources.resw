@@ -778,7 +778,7 @@
     <value>Library</value>
   </data>
   <data name="optionsRefreshAtStartupSwitch.Header" xml:space="preserve">
-    <value>Refresh library at startup</value>
+    <value>Automatically update the library when the application starts</value>
   </data>
   <data name="LibraryFoldersLabel.Text" xml:space="preserve">
     <value>Library folders</value>
@@ -790,16 +790,16 @@
     <value>Remove selected folder</value>
   </data>
   <data name="CachePathLabel.Text" xml:space="preserve">
-    <value>Cache path</value>
+    <value>Cache path for storing artists pictures</value>
   </data>
   <data name="BrowseCachePathButton.Content" xml:space="preserve">
     <value>Browse</value>
   </data>
   <data name="OptionsHideArtistsSwitch.Header" xml:space="preserve">
-    <value>Hide artists without album</value>
+    <value>Hide artists without albums from the artist list</value>
   </data>
   <data name="OptionsImportWithArtistGenreSwitch.Header" xml:space="preserve">
-    <value>Import tracks with artist genre</value>
+    <value>When importing songs, use the genre defined for the artist</value>
   </data>
   <data name="trackFlyoutAddMoreFromArtist.Text" xml:space="preserve">
     <value>Add more songs from this artist</value>
@@ -961,13 +961,13 @@
     <value>Services</value>
   </data>
   <data name="OptionsNovaApiEnabledSwitch.Header" xml:space="preserve">
-    <value>Nova API</value>
+    <value>Allow retrieval of data on artists and albums (cover art, images, biography, lyrics)</value>
   </data>
   <data name="OptionsTelemetryEnabledSwitch.Header" xml:space="preserve">
-    <value>Telemetry</value>
+    <value>Allow telemetry information about the use of the application to be sent in order to enable its improvement</value>
   </data>
   <data name="OptionsCrossFadeSwitch.Header" xml:space="preserve">
-    <value>Crossfade</value>
+    <value>Enable crossfade between two songs</value>
   </data>
   <data name="shuffleButton.Label" xml:space="preserve">
     <value>Shuffle</value>
