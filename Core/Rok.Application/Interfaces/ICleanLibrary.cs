@@ -4,5 +4,5 @@ namespace Rok.Application.Interfaces;
 
 public interface ICleanLibrary
 {
-    Task CleanAsync(ConcurrentBag<long> trackIDReaded, CancellationToken cancellationToken);
+    Task CleanAsync(ConcurrentBag<long> trackIDReaded, ImportStatisticsDto statistics, CancellationToken cancellationToken);
 }

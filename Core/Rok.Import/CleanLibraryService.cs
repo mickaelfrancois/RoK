@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 using MiF.Guard;
+using Rok.Application.Dto;
 using Rok.Application.Interfaces;
 using Rok.Domain.Entities;
 using System.Collections.Concurrent;
@@ -17,40 +18,25 @@ public class CleanLibraryService(ITrackRepository trackRepository, IArtistReposi
     private readonly ILogger<CleanLibraryService> _logger = Guard.Against.Null(logger);
 
 
-    public async Task CleanAsync(ConcurrentBag<long> trackIDReaded, CancellationToken cancellationToken)
+    public async Task CleanAsync(ConcurrentBag<long> trackIDReaded, ImportStatisticsDto statistics, CancellationToken cancellationToken)
     {
-        Stopwatch stopwatch = Stopwatch.StartNew();
-
-        await CleanTracksWithoutFileAsync(trackIDReaded, cancellationToken);
-
-        stopwatch.Stop();
-        _logger.LogInformation("Cleaning tracks without file took {ElapsedMilliseconds} ms", stopwatch.ElapsedMilliseconds);
-
-        stopwatch.Reset();
-        await CleanAlbumsWithoutTrackAsync();
-        stopwatch.Stop();
-        _logger.LogInformation("Cleaning albums without track took {ElapsedMilliseconds} ms", stopwatch.ElapsedMilliseconds);
-
-        stopwatch.Reset();
-        await CleanArtistsWithoutTrackAsync();
-        stopwatch.Stop();
-        _logger.LogInformation("Cleaning artists without track took {ElapsedMilliseconds} ms", stopwatch.ElapsedMilliseconds);
-
-        stopwatch.Reset();
-        await CleanGenresWithoutTrackAsync();
-        stopwatch.Stop();
-        _logger.LogInformation("Cleaning genres without track took {ElapsedMilliseconds} ms", stopwatch.ElapsedMilliseconds);
+        statistics.TracksDeleted += await RemoveTracksNotInLibraryAsync(trackIDReaded, cancellationToken);
+        statistics.AlbumsDeleted += await CleanAlbumsWithoutTrackAsync();
+        statistics.ArtistsDeleted += await CleanArtistsWithoutTrackAsync();
+        statistics.GenresDeleted += await CleanGenresWithoutTrackAsync();
     }
 
-    private async Task CleanTracksWithoutFileAsync(ConcurrentBag<long> trackIDReaded, CancellationToken cancellationToken)
+    private async Task<int> RemoveTracksNotInLibraryAsync(ConcurrentBag<long> trackIDReaded, CancellationToken cancellationToken)
     {
         int count = 0;
+
+        Stopwatch stopwatch = Stopwatch.StartNew();
 
         IEnumerable<TrackEntity> tracks = await _trackRepository.GetAllAsync(RepositoryConnectionKind.Background);
 
         HashSet<long> trackIDReadedSet = new(trackIDReaded);
         List<TrackEntity> tracksToDelete = tracks
-            .Where(track => !trackIDReadedSet.Contains(track.Id) && !File.Exists(track.MusicFile))
+            .Where(track => !trackIDReadedSet.Contains(track.Id))
             .ToList();
 
         using TransactionScope scope = new(TransactionScopeAsyncFlowOption.Enabled);
@@ -60,7 +46,7 @@ public class CleanLibraryService(ITrackRepository trackRepository, IArtistReposi
             foreach (TrackEntity track in tracksToDelete)
             {
                 if (cancellationToken.IsCancellationRequested)
-                    return;
+                    break;
 
                 await _trackRepository.DeleteAsync(track, RepositoryConnectionKind.Background);
                 count++;
@@ -69,37 +55,51 @@ public class CleanLibraryService(ITrackRepository trackRepository, IArtistReposi
             scope.Complete();
 
             if (count > 0)
-                _logger.LogTrace("{Count} tracks were deleted from database", count);
+            {
+                _logger.LogTrace("{Count} tracks were deleted from database in {ElapsedMilliseconds} ms", count, stopwatch.ElapsedMilliseconds);
+                stopwatch.Stop();
+            }
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "An error occurred while cleaning tracks without file.");
             scope.Dispose();
-            return;
         }
+
+        return count;
     }
 
-    private async Task CleanAlbumsWithoutTrackAsync()
+    private async Task<int> CleanAlbumsWithoutTrackAsync()
     {
+        Stopwatch stopwatch = Stopwatch.StartNew();
+
         int count = await _albumRepository.DeleteAlbumsWithoutTracks(RepositoryConnectionKind.Background);
 
         if (count > 0)
-            _logger.LogTrace("{Count} albums without track were deleted from database", count);
+            _logger.LogTrace("{Count} albums without track were deleted from database in {ElapsedMilliseconds} ms", count, stopwatch.ElapsedMilliseconds);
+
+        return count;
     }
 
-    private async Task CleanArtistsWithoutTrackAsync()
+    private async Task<int> CleanArtistsWithoutTrackAsync()
     {
+        Stopwatch stopwatch = Stopwatch.StartNew();
         int count = await _artistRepository.DeleteArtistsWithoutTracks(RepositoryConnectionKind.Background);
 
         if (count > 0)
-            _logger.LogTrace("{Count} artists without track were deleted from database", count);
+            _logger.LogTrace("{Count} artists without track were deleted from database in {ElapsedMilliseconds} ms", count, stopwatch.ElapsedMilliseconds);
+
+        return count;
     }
 
-    private async Task CleanGenresWithoutTrackAsync()
+    private async Task<int> CleanGenresWithoutTrackAsync()
     {
+        Stopwatch stopwatch = Stopwatch.StartNew();
         int count = await _genreRepository.DeleteGenresWithoutTracks(RepositoryConnectionKind.Background);
 
         if (count > 0)
-            _logger.LogTrace("{Count} genres without track were deleted from database", count);
+            _logger.LogTrace("{Count} genres without track were deleted from database in {ElapsedMilliseconds} ms", count, stopwatch.ElapsedMilliseconds);
+
+        return count;
     }
 }
