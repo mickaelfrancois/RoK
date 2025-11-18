@@ -11,49 +11,66 @@
     x:Name="OptionsView">
 
     <Grid>
-        <ScrollViewer Padding="16">
-            <StackPanel Spacing="20">
-                
-                <StackPanel Spacing="8">
-                    <TextBlock x:Uid="optionsAppearanceTitle"
-                               FontSize="20"
-                               FontWeight="SemiBold" />
-                    <StackPanel Orientation="Horizontal"
-                                Spacing="12"
-                                VerticalAlignment="Center">
-                        <TextBlock x:Uid="optionsThemeLabel"
-                                   Width="180"
-                                   VerticalAlignment="Center" />
-                        <ComboBox Width="220"
-                                  SelectedValuePath="Tag"
-                                  SelectedValue="{x:Bind Options.Theme, Mode=TwoWay}">
-                            <ComboBoxItem x:Uid="optionsThemeSystemItem"
-                                          Tag="{x:Bind enums:AppTheme.System}" />
-                            <ComboBoxItem x:Uid="optionsThemeLightItem"
-                                          Tag="{x:Bind enums:AppTheme.Light}" />
-                            <ComboBoxItem x:Uid="optionsThemeDarkItem"
-                                          Tag="{x:Bind enums:AppTheme.Dark}" />
+
+        <Pivot>
+            <PivotItem Header="Options">
+                <StackPanel Spacing="10" Margin="6,12,0,0">
+                    <StackPanel Orientation="Vertical" Spacing="12" VerticalAlignment="Center">
+                        <TextBlock x:Uid="optionsThemeLabel" VerticalAlignment="Center" />
+                        <ComboBox Width="220" SelectedValuePath="Tag" SelectedValue="{x:Bind ThemeString, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+                            <ComboBoxItem x:Uid="optionsThemeSystemItem" Tag="System" Content="Système" />
+                            <ComboBoxItem x:Uid="optionsThemeLightItem" Tag="Light" Content="Clair" />
+                            <ComboBoxItem x:Uid="optionsThemeDarkItem" Tag="Dark" Content="Sombre" />
                         </ComboBox>
                     </StackPanel>
+
+                    <ToggleSwitch x:Uid="OptionsHideArtistsSwitch" IsOn="{x:Bind Options.HideArtistsWithoutAlbum, Mode=TwoWay}" x:Name="HideArtistsSwitch" VerticalAlignment="Center"/>
+                    <ToggleSwitch x:Uid="OptionsCrossFadeSwitch" x:Name="OptionsCrossFadeSwitch" IsOn="{x:Bind Options.CrossFade, Mode=TwoWay}" />
+                    <ToggleSwitch x:Uid="optionsRefreshAtStartupSwitch" x:Name="optionsRefreshAtStartupSwitch" IsOn="{x:Bind Options.RefreshLibraryAtStartup, Mode=TwoWay}" />
+                    <ToggleSwitch x:Uid="OptionsImportWithArtistGenreSwitch" IsOn="{x:Bind Options.ImportTrackWithArtistGenre, Mode=TwoWay}" />
+                    <ToggleSwitch x:Uid="OptionsNovaApiEnabledSwitch" IsOn="{x:Bind Options.NovaApiEnabled, Mode=TwoWay}" />
+                    <ToggleSwitch x:Uid="OptionsTelemetryEnabledSwitch" IsOn="{x:Bind Options.TelemetryEnabled, Mode=TwoWay}" />
+
                 </StackPanel>
+            </PivotItem>
+
+            <PivotItem Header="Library">
+                <StackPanel Spacing="10" Margin="6,12,0,0">
+
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <Button x:Uid="AddLibraryFolderButton" x:Name="AddLibraryFolderButton" Click="AddLibraryFolderButton_Click" />
+                        <Button x:Uid="RemoveLibraryFolderButton" x:Name="RemoveLibraryFolderButton" Click="RemoveLibraryFolderButton_Click" />
+                    </StackPanel>
+
+                    <ListView x:Name="LibraryPathsList" ItemsSource="{x:Bind Options.LibraryPath}" BorderBrush="{ThemeResource DividerStrokeColorDefaultBrush}" BorderThickness="1" SelectionMode="Single" Height="120" Width="420" HorizontalAlignment="Left">
+                        <ListView.ItemTemplate>
+                            <DataTemplate x:DataType="x:String">
+                                <StackPanel Orientation="Horizontal" Spacing="8">
+                                    <FontIcon Glyph="&#xE8B7;" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                                    <TextBlock Text="{x:Bind}"/>
+                                </StackPanel>
+                            </DataTemplate>
+                        </ListView.ItemTemplate>
+                    </ListView>
+                </StackPanel>
+            </PivotItem>
+        </Pivot>
+
+        <!--<ScrollViewer Padding="16">
+            <StackPanel Spacing="20">
+
+
 
                 <Rectangle Height="1" Fill="{ThemeResource DividerStrokeColorDefaultBrush}"/>
 
-                <!-- Library -->
+                --><!-- Library --><!--
                 <StackPanel Spacing="12">
                     <TextBlock x:Uid="optionsLibraryTitle" FontSize="20" FontWeight="SemiBold"/>
 
-                    <StackPanel Spacing="12">
-                        <ToggleSwitch x:Uid="OptionsHideArtistsSwitch"
-                                      IsOn="{x:Bind Options.HideArtistsWithoutAlbum, Mode=TwoWay}" />
-
-                        <ToggleSwitch x:Uid="OptionsCrossFadeSwitch"
-                                      IsOn="{x:Bind Options.CrossFade, Mode=TwoWay}" />
-                    </StackPanel>
 
                     <StackPanel Spacing="8">
                         <TextBlock x:Uid="LibraryFoldersLabel"/>
-                        
+
                         <StackPanel Orientation="Horizontal" Spacing="8">
                             <Button x:Uid="AddLibraryFolderButton" x:Name="AddLibraryFolderButton" Click="AddLibraryFolderButton_Click" />
                             <Button x:Uid="RemoveLibraryFolderButton" x:Name="RemoveLibraryFolderButton" Click="RemoveLibraryFolderButton_Click"
@@ -88,16 +105,11 @@
 
                 <Rectangle Height="1" Fill="{ThemeResource DividerStrokeColorDefaultBrush}"/>
 
-                <!-- Import -->                
+                --><!-- Import --><!--
                 <StackPanel Spacing="8">
                     <TextBlock x:Uid="OptionsImportTitle" FontSize="20" FontWeight="SemiBold"/>
 
-                    <ToggleSwitch x:Uid="optionsRefreshAtStartupSwitch"
-                                  IsOn="{x:Bind Options.RefreshLibraryAtStartup, Mode=TwoWay}" />
 
-                    <ToggleSwitch
-                        x:Uid="OptionsImportWithArtistGenreSwitch"
-                        IsOn="{x:Bind Options.ImportTrackWithArtistGenre, Mode=TwoWay}" />
                 </StackPanel>
 
                 <Rectangle Height="1" Fill="{ThemeResource DividerStrokeColorDefaultBrush}"/>
@@ -107,14 +119,10 @@
                                FontSize="20"
                                FontWeight="SemiBold" />
 
-                    <ToggleSwitch x:Uid="OptionsNovaApiEnabledSwitch"
-                                  IsOn="{x:Bind Options.NovaApiEnabled, Mode=TwoWay}" />
 
-                    <ToggleSwitch x:Uid="OptionsTelemetryEnabledSwitch"
-                                  IsOn="{x:Bind Options.TelemetryEnabled, Mode=TwoWay}" />
 
                 </StackPanel>
             </StackPanel>
-        </ScrollViewer>
+        </ScrollViewer>-->
     </Grid>
 </Page>

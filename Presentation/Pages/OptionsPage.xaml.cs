@@ -9,11 +9,23 @@ namespace Rok.Pages;
 
 public sealed partial class OptionsPage : Page
 {
-    public IAppOptions Options { get; } = App.ServiceProvider.GetRequiredService<IAppOptions>();
+    public IAppOptions Options { get; }
+
+    public string ThemeString
+    {
+        get => Options.Theme.ToString();
+        set
+        {
+            if (Enum.TryParse<AppTheme>(value, out AppTheme theme))
+                Options.Theme = theme;
+        }
+    }
 
     public OptionsPage()
     {
         InitializeComponent();
+
+        Options = App.ServiceProvider.GetRequiredService<IAppOptions>();
     }
 
     private async void AddLibraryFolderButton_Click(object? sender, Microsoft.UI.Xaml.RoutedEventArgs e)
@@ -52,6 +64,9 @@ public sealed partial class OptionsPage : Page
             if (LibraryPathsList.SelectedItem is not string selectedPath)
                 return;
 
+            if (Options.LibraryPath?.Count <= 1)
+                return;
+
             Options.LibraryPath?.RemoveAll(p => string.Equals(p, selectedPath, StringComparison.OrdinalIgnoreCase));
             Options.LibraryTokens?.RemoveAll(t => string.Equals(t, selectedPath, StringComparison.OrdinalIgnoreCase));
 
@@ -70,6 +85,7 @@ public sealed partial class OptionsPage : Page
         }
         catch
         {
+            // Ignore
         }
     }
 }
