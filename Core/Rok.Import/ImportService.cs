@@ -77,6 +77,7 @@ public class ImportService : IImport
                 await Task.Delay(delayInSeconds);
 
             await ImportAsync(_cancellationToken.Token);
+
         }, _cancellationToken.Token)
         .ContinueWith(async c =>
         {
@@ -86,7 +87,7 @@ public class ImportService : IImport
                 await _telemetryClient.CaptureExceptionAsync(c.Exception);
             }
 
-            _logger.LogTrace("Files read: {FilesRead}, Tracks imported: {TracksImported}, Albums imported: {AlbumImported}, Artists imported: {ArtistImported}, Genres imported: {GenreImported}. End of refresh library in {ElapsedMilliseconds} ms.", Statistics.FilesRead, Statistics.TracksImported, Statistics.AlbumImported, Statistics.ArtistImported, Statistics.GenreImported, stopwatch.ElapsedMilliseconds);
+            _logger.LogTrace("Files read: {FilesRead}, Tracks imported: {TracksImported}, Albums imported: {AlbumImported}, Artists imported: {ArtistImported}, Genres imported: {GenreImported}. End of refresh library in {ElapsedMilliseconds} ms.", Statistics.FilesRead, Statistics.TracksImported, Statistics.AlbumsImported, Statistics.ArtistsImported, Statistics.GenresImported, stopwatch.ElapsedMilliseconds);
 
             UpdateInProgress = false;
             Messenger.Send(new LibraryRefreshMessage() { ProcessState = LibraryRefreshMessage.EState.Stop, Statistics = Statistics });
@@ -183,7 +184,8 @@ public class ImportService : IImport
         using (PerfLogger perfLogger = new PerfLogger(_logger).Parameters("Clean data"))
         {
             Messenger.Send(new LibraryRefreshMessage() { ProcessState = LibraryRefreshMessage.EState.CleanData });
-            await _cleanLibraryService.CleanAsync(_trackIDReaded, cancellationToken);
+
+            await _cleanLibraryService.CleanAsync(_trackIDReaded, Statistics, cancellationToken);
         }
     }
 
@@ -581,7 +583,7 @@ public class ImportService : IImport
             artist = await _importArtist.CreateAsync(file, genreId).ConfigureAwait(false);
             if (artist != null)
             {
-                Statistics.ArtistImported++;
+                Statistics.ArtistsImported++;
 
                 string artistName = file.Artist ?? string.Empty;
 
@@ -611,7 +613,7 @@ public class ImportService : IImport
         {
             genre = await _importGenre.CreateAsync(genreName).ConfigureAwait(false);
             if (genre != null)
-                Statistics.GenreImported++;
+                Statistics.GenresImported++;
         }
         catch (Exception ex)
         {
@@ -638,7 +640,7 @@ public class ImportService : IImport
 
             if (album != null)
             {
-                Statistics.AlbumImported++;
+                Statistics.AlbumsImported++;
 
                 string albumName = album.Name ?? string.Empty;
                 string artistName = file.Artist ?? string.Empty;
