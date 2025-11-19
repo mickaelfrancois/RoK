@@ -19,6 +19,8 @@ namespace Rok
 
         private readonly IAppDbContext _dbContext;
 
+        private readonly IAppOptions _appOptions;
+
         private MainViewModel? _viewModel;
         public MainViewModel? ViewModel
         {
@@ -44,11 +46,12 @@ namespace Rok
         };
 
 
-        public MainWindow(NavigationService navigationService, ResourceLoader resourceLoader, IAppDbContext dbContext)
+        public MainWindow(NavigationService navigationService, ResourceLoader resourceLoader, IAppDbContext dbContext, IAppOptions appOptions)
         {
             _navigationService = Guard.Against.Null(navigationService);
             _resourceLoader = Guard.Against.Null(resourceLoader);
             _dbContext = Guard.Against.Null(dbContext);
+            _appOptions = Guard.Against.Null(appOptions);
 
             this.InitializeComponent();
 
@@ -134,6 +137,10 @@ namespace Rok
             MainGrid.Visibility = Visibility.Visible;
             SplashScreen.Visibility = Visibility.Collapsed;
             SplashScreen.Completed -= SplashScreen_Completed;
+
+
+            if (_appOptions.RefreshLibraryAtStartup)
+                libraryRefreshButton_Tapped(this, new TappedRoutedEventArgs());
         }
 
 
