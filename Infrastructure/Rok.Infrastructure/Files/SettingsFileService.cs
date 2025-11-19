@@ -5,7 +5,7 @@ using System.Text.Json.Serialization.Metadata;
 
 namespace Rok.Infrastructure.Files;
 
-public class SettingsFileService(string applicationPath) : ISettingsFile
+public class SettingsFileService(string applicationPath, IFolderResolver folderResolver) : ISettingsFile
 {
     private readonly string _path = Path.Combine(applicationPath, "settings.json");
 
@@ -34,5 +34,21 @@ public class SettingsFileService(string applicationPath) : ISettingsFile
     {
         string jsonString = JsonSerializer.Serialize(options, _jsonOptions);
         File.WriteAllText(_path, jsonString, Encoding.UTF8);
+    }
+
+
+    public async Task RemoveInvalidLibraryTokensAsync(IAppOptions options)
+    {
+        List<string> tokensToRemove = [];
+
+        foreach (string token in options.LibraryTokens ?? Enumerable.Empty<string>())
+        {
+            string? path = await folderResolver.GetDisplayNameFromTokenAsync(token);
+            if (path is null)
+                tokensToRemove.Add(token);
+        }
+
+        if (tokensToRemove.Count > 0)
+            options.LibraryTokens!.RemoveAll(t => tokensToRemove.Contains(t));
     }
 }

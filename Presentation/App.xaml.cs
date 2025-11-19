@@ -4,8 +4,8 @@ using Rok.Import;
 using Rok.Infrastructure;
 using Serilog;
 using System.IO;
-using System.Threading;
 using Windows.Storage;
+using Windows.Storage.AccessCache;
 using WinRT.Interop;
 
 namespace Rok
@@ -36,11 +36,11 @@ namespace Rok
         /// Invoked when the application is launched.
         /// </summary>
         /// <param name="args">Details about the launch request and process.</param>
-        protected override void OnLaunched(Microsoft.UI.Xaml.LaunchActivatedEventArgs args)
+        protected override async void OnLaunched(Microsoft.UI.Xaml.LaunchActivatedEventArgs args)
         {
             ServiceProvider = ConfigureServices();
 
-            IAppOptions options = LoadOptions();
+            IAppOptions options = await LoadOptionsAsync();
 
             IAppDbContext appDbContext = ServiceProvider.GetRequiredService<IAppDbContext>();
             appDbContext.GetOpenConnection();
@@ -51,7 +51,7 @@ namespace Rok
 
             string iconPath = Path.Combine(AppContext.BaseDirectory, "Assets/Square44x44Logo.ico");
 
-            MainWindow = new MainWindow(navigationService, resourceLoader, appDbContext);
+            MainWindow = new MainWindow(navigationService, resourceLoader, appDbContext, options);
             MainWindow.AppWindow.SetIcon(iconPath);
             MainWindow.Title = "RoK";
 #if DEBUG
@@ -119,7 +119,7 @@ namespace Rok
         }
 
 
-        private static IAppOptions LoadOptions()
+        private static async Task<IAppOptions> LoadOptionsAsync()
         {
             IAppOptions options = ServiceProvider.GetRequiredService<IAppOptions>();
             ISettingsFile settingFileService = ServiceProvider.GetRequiredService<ISettingsFile>();
@@ -129,15 +129,22 @@ namespace Rok
                 IAppOptions? newOptions = settingFileService.Load<AppOptions>();
                 if (newOptions != null)
                     options.CopyFrom(newOptions);
+
+                await settingFileService.RemoveInvalidLibraryTokensAsync(options);
             }
             else
             {
                 options.InitializeOptions(ApplicationData.Current.LocalFolder.Path);
             }
 
+            if (options.LibraryTokens.Count == 0)
+            {
+                string token = StorageApplicationPermissions.FutureAccessList.Add(KnownFolders.MusicLibrary);
+                options.LibraryTokens.Add(token);
+            }
+
             return options;
         }
-
 
 
         private void MainWindow_Closed(object sender, WindowEventArgs args)

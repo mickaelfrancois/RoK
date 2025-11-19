@@ -11,6 +11,9 @@ public sealed partial class OptionsPage : Page
 {
     public IAppOptions Options { get; }
 
+    private readonly List<PathItem> _paths = [];
+    public List<PathItem> Paths { get => _paths; }
+
     public string ThemeString
     {
         get => Options.Theme.ToString();
@@ -21,11 +24,31 @@ public sealed partial class OptionsPage : Page
         }
     }
 
+    private readonly IFolderResolver _folderResolver;
+
+
     public OptionsPage()
     {
         InitializeComponent();
 
         Options = App.ServiceProvider.GetRequiredService<IAppOptions>();
+        _folderResolver = App.ServiceProvider.GetRequiredService<IFolderResolver>();
+    }
+
+    protected override async void OnNavigatedTo(Microsoft.UI.Xaml.Navigation.NavigationEventArgs e)
+    {
+        base.OnNavigatedTo(e);
+
+        _paths.Clear();
+
+        foreach (string token in Options.LibraryTokens ?? Enumerable.Empty<string>())
+        {
+            string? path = await _folderResolver.GetDisplayNameFromTokenAsync(token);
+            if (path is not null)
+            {
+                _paths.Add(new PathItem(token, path));
+            }
+        }
     }
 
     private async void AddLibraryFolderButton_Click(object? sender, Microsoft.UI.Xaml.RoutedEventArgs e)
@@ -52,38 +75,38 @@ public sealed partial class OptionsPage : Page
         if (folder is null)
             return;
 
-        Options.LibraryTokens ??= new List<string>();
-        Options.LibraryPath ??= new List<string>();
-
-        if (Options.LibraryPath.Any(p => string.Equals(p, folder.Path, StringComparison.OrdinalIgnoreCase)))
-            return;
-
         string token = StorageApplicationPermissions.FutureAccessList.Add(folder);
 
+        Options.LibraryTokens ??= new List<string>();
+
+        if (Options.LibraryTokens.Any(p => string.Equals(p, token, StringComparison.OrdinalIgnoreCase)))
+            return;
+
         Options.LibraryTokens.Add(token);
-        Options.LibraryPath.Add(folder.Path);
+
+        Paths.Add(new PathItem(token, folder.Path));
 
         LibraryPathsList.ItemsSource = null;
-        LibraryPathsList.ItemsSource = Options.LibraryPath;
+        LibraryPathsList.ItemsSource = Paths;
     }
 
     private void RemoveLibraryFolderButton_Click(object? sender, Microsoft.UI.Xaml.RoutedEventArgs e)
     {
         try
         {
-            if (LibraryPathsList.SelectedItem is not string selectedPath)
+            if (LibraryPathsList.SelectedItem is not PathItem selectedPath)
                 return;
 
-            if (Options.LibraryPath?.Count <= 1)
+            if (Options.LibraryTokens?.Count <= 1)
                 return;
 
-            Options.LibraryPath?.RemoveAll(p => string.Equals(p, selectedPath, StringComparison.OrdinalIgnoreCase));
-            Options.LibraryTokens?.RemoveAll(t => string.Equals(t, selectedPath, StringComparison.OrdinalIgnoreCase));
+            Options.LibraryTokens?.RemoveAll(t => string.Equals(t, selectedPath.Key, StringComparison.OrdinalIgnoreCase));
+            Paths.RemoveAll(p => string.Equals(p.Key, selectedPath.Key, StringComparison.OrdinalIgnoreCase));
 
             try
             {
-                if (StorageApplicationPermissions.FutureAccessList.ContainsItem(selectedPath))
-                    StorageApplicationPermissions.FutureAccessList.Remove(selectedPath);
+                if (StorageApplicationPermissions.FutureAccessList.ContainsItem(selectedPath.Key))
+                    StorageApplicationPermissions.FutureAccessList.Remove(selectedPath.Key);
             }
             catch
             {
@@ -91,11 +114,18 @@ public sealed partial class OptionsPage : Page
             }
 
             LibraryPathsList.ItemsSource = null;
-            LibraryPathsList.ItemsSource = Options.LibraryPath;
+            LibraryPathsList.ItemsSource = Paths;
         }
         catch
         {
             // Ignore
         }
     }
+}
+
+public class PathItem(string key, string value)
+{
+    public string Key { get; } = key;
+
+    public string Value { get; } = value;
 }

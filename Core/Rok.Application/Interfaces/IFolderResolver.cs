@@ -2,5 +2,7 @@
 
 public interface IFolderResolver
 {
-    Task<string?> ResolveLibraryTokenAsync(string token, CancellationToken cancellationToken = default);
+    Task<string?> GetDisplayNameFromTokenAsync(string token);
+
+    Task<List<string>> GetPathFromTokenAsync(string token);
 }

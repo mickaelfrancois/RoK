@@ -28,8 +28,6 @@ public class AppOptions : IAppOptions
 
     public string CachePath { get; set; } = string.Empty;
 
-    public List<string> LibraryPath { get; set; } = [];
-
     public string ArtistsGroupBy { get; set; } = string.Empty;
 
     public List<long> ArtistsFilterByGenresId { get; set; } = [];
@@ -56,8 +54,6 @@ public class AppOptions : IAppOptions
 
     public void InitializeOptions(string applicationPath)
     {
-        LibraryPath.Add(Environment.GetFolderPath(Environment.SpecialFolder.MyMusic));
-
         CachePath = Path.Combine(applicationPath, "Cache");
         Directory.CreateDirectory(CachePath);
 
@@ -68,7 +64,7 @@ public class AppOptions : IAppOptions
     }
 
 
-    public void SetPath(string path)
+    public void SetCachePath(string path)
     {
         Guard.Against.NullOrEmpty(path);
 
@@ -78,9 +74,12 @@ public class AppOptions : IAppOptions
     public void CopyFrom(IAppOptions options)
     {
         Id = options.Id;
-        LibraryPath = options.LibraryPath;
+
         LibraryTokens = options.LibraryTokens;
+
         CachePath = options.CachePath;
+
+        Theme = options.Theme;
         RefreshLibraryAtStartup = options.RefreshLibraryAtStartup;
         HideArtistsWithoutAlbum = options.HideArtistsWithoutAlbum;
         TelemetryEnabled = options.TelemetryEnabled;

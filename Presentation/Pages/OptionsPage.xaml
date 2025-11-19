@@ -6,7 +6,8 @@
     xmlns:local="using:Rok.Pages"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:enums="using:Rok.Shared.Enums"
+    xmlns:enums="using:Rok.Shared.Enums" 
+    xmlns:generic="using:System.Collections.Generic"
     mc:Ignorable="d"
     x:Name="OptionsView">
 
@@ -42,12 +43,12 @@
                         <Button x:Uid="RemoveLibraryFolderButton" x:Name="RemoveLibraryFolderButton" Click="RemoveLibraryFolderButton_Click" />
                     </StackPanel>
 
-                    <ListView x:Name="LibraryPathsList" ItemsSource="{x:Bind Options.LibraryPath}" BorderBrush="{ThemeResource DividerStrokeColorDefaultBrush}" BorderThickness="1" SelectionMode="Single" Height="120" Width="420" HorizontalAlignment="Left">
+                    <ListView x:Name="LibraryPathsList" ItemsSource="{x:Bind Paths}" BorderBrush="{ThemeResource DividerStrokeColorDefaultBrush}" BorderThickness="1" SelectionMode="Single" Height="120" Width="420" HorizontalAlignment="Left">
                         <ListView.ItemTemplate>
-                            <DataTemplate x:DataType="x:String">
+                            <DataTemplate x:DataType="local:PathItem">
                                 <StackPanel Orientation="Horizontal" Spacing="8">
                                     <FontIcon Glyph="&#xE8B7;" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
-                                    <TextBlock Text="{x:Bind}"/>
+                                    <TextBlock Text="{x:Bind Value}" />
                                 </StackPanel>
                             </DataTemplate>
                         </ListView.ItemTemplate>
@@ -55,75 +56,5 @@
                 </StackPanel>
             </PivotItem>
         </Pivot>
-
-        <!--<ScrollViewer Padding="16">
-            <StackPanel Spacing="20">
-
-
-
-                <Rectangle Height="1" Fill="{ThemeResource DividerStrokeColorDefaultBrush}"/>
-
-                --><!-- Library --><!--
-                <StackPanel Spacing="12">
-                    <TextBlock x:Uid="optionsLibraryTitle" FontSize="20" FontWeight="SemiBold"/>
-
-
-                    <StackPanel Spacing="8">
-                        <TextBlock x:Uid="LibraryFoldersLabel"/>
-
-                        <StackPanel Orientation="Horizontal" Spacing="8">
-                            <Button x:Uid="AddLibraryFolderButton" x:Name="AddLibraryFolderButton" Click="AddLibraryFolderButton_Click" />
-                            <Button x:Uid="RemoveLibraryFolderButton"
-                                    x:Name="RemoveLibraryFolderButton"
-                                    Click="RemoveLibraryFolderButton_Click"></Button>
-                        </StackPanel>
-
-                        <ListView x:Name="LibraryPathsList"
-                                  ItemsSource="{x:Bind Options.LibraryPath}"
-                                  BorderBrush="{ThemeResource ListBoxBorderThemeBrush}"
-                                  BorderThickness="1"
-                                  SelectionMode="Single"
-                                  Height="80"
-                                  MinWidth="420">
-                            <ListView.ItemTemplate>
-                                <DataTemplate x:DataType="x:String">
-                                    <StackPanel Orientation="Horizontal" Spacing="8">
-                                        <FontIcon Glyph="&#xE8B7;" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
-                                        <TextBlock Text="{x:Bind}"/>
-                                    </StackPanel>
-                                </DataTemplate>
-                            </ListView.ItemTemplate>
-                        </ListView>
-                    </StackPanel>
-
-                    <StackPanel Orientation="Horizontal" Spacing="12" VerticalAlignment="Center">
-                        <TextBlock x:Uid="CachePathLabel" Width="180" VerticalAlignment="Center"/>
-                        <TextBox Text="{x:Bind Options.CachePath, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                 MinWidth="360" />
-                        <Button  x:Uid="BrowseCachePathButton" x:Name="BrowseCachePathButton" />
-                    </StackPanel>
-                </StackPanel>
-
-                <Rectangle Height="1" Fill="{ThemeResource DividerStrokeColorDefaultBrush}"/>
-
-                --><!-- Import --><!--
-                <StackPanel Spacing="8">
-                    <TextBlock x:Uid="OptionsImportTitle" FontSize="20" FontWeight="SemiBold"/>
-
-
-                </StackPanel>
-
-                <Rectangle Height="1" Fill="{ThemeResource DividerStrokeColorDefaultBrush}"/>
-
-                <StackPanel Spacing="8">
-                    <TextBlock x:Uid="OptionsNovaApiTitle"
-                               FontSize="20"
-                               FontWeight="SemiBold" />
-
-
-
-                </StackPanel>
-            </StackPanel>
-        </ScrollViewer>-->
     </Grid>
 </Page>
