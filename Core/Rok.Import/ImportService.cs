@@ -61,11 +61,16 @@ public class ImportService : IImport
     {
         Guard.Against.Negative(delayInSeconds);
 
+        if (_options.LibraryTokens is null)
+        {
+            _logger.LogWarning("No library tokens configured, import process will not start.");
+            return;
+        }
+
         if (UpdateInProgress)
             return;
 
         _cancellationToken = new CancellationTokenSource();
-
         UpdateInProgress = true;
 
         Messenger.Send(new LibraryRefreshMessage() { ProcessState = LibraryRefreshMessage.EState.Running });
@@ -97,6 +102,8 @@ public class ImportService : IImport
     }
 
 
+
+
     public async Task ImportAsync(CancellationToken cancellationToken)
     {
         bool errorOccurred = false;
@@ -109,30 +116,7 @@ public class ImportService : IImport
 
         await LoadCachesAsync();
 
-        List<string> pathsToImport = new();
-        if (_options.LibraryPath is not null)
-            pathsToImport.AddRange(_options.LibraryPath.Where(p => !string.IsNullOrWhiteSpace(p)));
-
-        if (_options.LibraryTokens is not null)
-        {
-            foreach (string token in _options.LibraryTokens)
-            {
-                if (cancellationToken.IsCancellationRequested)
-                    break;
-
-                string? folderPath = await _folderResolver.ResolveLibraryTokenAsync(token, cancellationToken).ConfigureAwait(false);
-                if (!string.IsNullOrWhiteSpace(folderPath))
-                {
-                    if (!pathsToImport.Any(p => string.Equals(p, folderPath, StringComparison.OrdinalIgnoreCase)))
-                        pathsToImport.Add(folderPath);
-                }
-                else
-                {
-                    _logger.LogWarning("Library token {Token} could not be resolved to a folder.", token);
-                }
-            }
-        }
-
+        List<string> pathsToImport = await GetLibraryImportPathsAsync(cancellationToken);
 
         foreach (string path in pathsToImport)
         {
@@ -151,6 +135,28 @@ public class ImportService : IImport
             await CleanDataAsync(cancellationToken);
 
         await SendMetricsAsync().ConfigureAwait(false);
+    }
+
+
+    private async Task<List<string>> GetLibraryImportPathsAsync(CancellationToken cancellationToken)
+    {
+        List<string> pathsToImport = new();
+
+        foreach (string token in _options.LibraryTokens)
+        {
+            if (cancellationToken.IsCancellationRequested)
+                break;
+
+            List<string> folderPaths = await _folderResolver.GetPathFromTokenAsync(token).ConfigureAwait(false);
+
+            foreach (string folderPath in folderPaths)
+            {
+                if (!pathsToImport.Any(p => string.Equals(p, folderPath, StringComparison.OrdinalIgnoreCase)))
+                    pathsToImport.Add(folderPath);
+            }
+        }
+
+        return pathsToImport;
     }
 
 
@@ -418,20 +424,20 @@ public class ImportService : IImport
             {
                 foreach (Exception ex in aggEx.InnerExceptions)
                 {
-                    _logger.LogError(ex, "An error occurred while accessing folders in {Path}", path);
+                    _logger.LogError(aggEx, "An error occurred while accessing folders in {Path}: {ExceptionMessage}", path, ex.Message);
                 }
             }
             catch (UnauthorizedAccessException ex)
             {
-                _logger.LogWarning(ex, "Access denied to one or more folders in {Path}", path);
+                _logger.LogWarning(ex, "Access denied to one or more folders in {Path}: {ExceptionMessage}", path, ex.Message);
             }
             catch (DirectoryNotFoundException ex)
             {
-                _logger.LogError(ex, "The folder was not found: {Path}", path);
+                _logger.LogError(ex, "The folder was not found: {Path}: {ExceptionMessage}", path, ex.Message);
             }
             catch (IOException ex)
             {
-                _logger.LogError(ex, "I/O exception while accessing folder: {Path}", path);
+                _logger.LogError(ex, "I/O exception while accessing folder: {Path}: {ExceptionMessage}", path, ex.Message);
             }
 
             return [];
@@ -449,6 +455,9 @@ public class ImportService : IImport
             foreach (string file in Directory.EnumerateFiles(path, "*.*", SearchOption.TopDirectoryOnly))
             {
                 if (!validExtensions.Contains(Path.GetExtension(file)))
+                    continue;
+
+                if (FileHelpers.IsOnline(file))
                     continue;
 
                 try

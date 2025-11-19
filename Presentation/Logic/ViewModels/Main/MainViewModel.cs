@@ -45,7 +45,7 @@ public partial class MainViewModel : ObservableObject
         Messenger.Subscribe<MediaChangedMessage>(OnMediaChanged);
 
         SearchCommand = new RelayCommand<string>(async (s) => await SearchAsync(s));
-        RefreshLibraryCommand = new RelayCommand(() => RefreshLibraryAsync(), () => CanRefreshLibrary());
+        RefreshLibraryCommand = new RelayCommand(() => RefreshLibrary(), () => CanRefreshLibrary());
     }
 
 
@@ -62,7 +62,7 @@ public partial class MainViewModel : ObservableObject
         return !_importService.UpdateInProgress;
     }
 
-    private void RefreshLibraryAsync()
+    private void RefreshLibrary()
     {
         if (CanRefreshLibrary())
             _importService.StartAsync(0);
