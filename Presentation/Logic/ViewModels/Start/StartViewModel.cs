@@ -131,9 +131,8 @@ public class StartViewModel : ObservableObject
 
         if (!_appOptions.LibraryTokens.Contains(token))
         {
-            _appOptions.LibraryPath.Clear(); // In start process, we clear all library path as we haven't found music in.
+            _appOptions.LibraryTokens.Clear(); // In start process, we clear all library path as we haven't found music in.
             _appOptions.LibraryTokens.Add(token);
-            _appOptions.LibraryPath.Add(folder.Path);
             _settingsFile.Save(_appOptions);
 
             ErrorOccurred = false;

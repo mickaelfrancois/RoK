@@ -7,4 +7,6 @@ public interface ISettingsFile
     IAppOptions? Load<T>() where T : IAppOptions;
 
     void Save(IAppOptions options);
+
+    Task RemoveInvalidLibraryTokensAsync(IAppOptions options);
 }
