@@ -26,8 +26,6 @@ public interface IAppOptions
 
     string CachePath { get; set; }
 
-    List<string> LibraryPath { get; set; }
-
     string ArtistsGroupBy { get; set; }
 
     List<string> ArtistsFilterBy { get; set; }
@@ -46,7 +44,7 @@ public interface IAppOptions
 
     List<long> TracksFilterByGenresId { get; set; }
 
-    void SetPath(string path);
+    void SetCachePath(string path);
 
     void CopyFrom(IAppOptions options);
 
