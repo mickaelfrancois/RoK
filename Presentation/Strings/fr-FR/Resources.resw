@@ -972,4 +972,10 @@
   <data name="shuffleButton.Label" xml:space="preserve">
     <value>Mélanger</value>
   </data>
+  <data name="NoLibraryFoldersTitleMessage" xml:space="preserve">
+    <value>Aucune librarie</value>
+  </data>
+  <data name="NoLibraryFoldersMessage" xml:space="preserve">
+    <value>ous n'avez encore ajouté aucun dossier de bibliothèque. Veuillez ajouter au moins un dossier de bibliothèque dans les paramètres pour actualiser la bibliothèque.</value>
+  </data>
 </root>
