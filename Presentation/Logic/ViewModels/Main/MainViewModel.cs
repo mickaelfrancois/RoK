@@ -35,12 +35,21 @@ public partial class MainViewModel : ObservableObject
 
     public RelayCommand<string> SearchCommand { get; private set; }
 
+    private readonly IAppOptions _appOptions;
 
-    public MainViewModel(IImport importService, IMediator mediator, NavigationService navigationService)
+    private readonly IDialogService _dialogService;
+
+    private readonly ResourceLoader _resourceLoader;
+
+
+    public MainViewModel(IImport importService, IMediator mediator, NavigationService navigationService, IAppOptions appOptions, IDialogService dialogService, ResourceLoader resourceLoader)
     {
         _importService = importService;
         _mediator = mediator;
         _navigationService = navigationService;
+        _appOptions = appOptions;
+        _dialogService = dialogService;
+        _resourceLoader = resourceLoader;
 
         Messenger.Subscribe<MediaChangedMessage>(OnMediaChanged);
 
@@ -59,6 +68,14 @@ public partial class MainViewModel : ObservableObject
 
     private bool CanRefreshLibrary()
     {
+        if (_appOptions.LibraryTokens.Count == 0)
+        {
+            string message = _resourceLoader.GetString("NoLibraryFoldersMessage");
+            string title = _resourceLoader.GetString("NoLibraryFoldersTitleMessage");
+            _dialogService.ShowTextAsync(title, message, "OK");
+            return false;
+        }
+
         return !_importService.UpdateInProgress;
     }
 

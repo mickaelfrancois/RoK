@@ -972,4 +972,10 @@
   <data name="shuffleButton.Label" xml:space="preserve">
     <value>Shuffle</value>
   </data>
+  <data name="NoLibraryFoldersMessage" xml:space="preserve">
+    <value>You have not added any library folders yet. Please add at least one library folder in the settings to refresh the library.</value>
+  </data>
+  <data name="NoLibraryFoldersTitleMessage" xml:space="preserve">
+    <value>No library</value>
+  </data>
 </root>
