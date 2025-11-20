@@ -121,6 +121,9 @@ namespace Rok
                 {
                     ContentFrame.Navigate(pageType, null, new EntranceNavigationTransitionInfo());
                 }
+
+                if (_appOptions.RefreshLibraryAtStartup)
+                    libraryRefreshButton_Tapped(this, new TappedRoutedEventArgs());
             }
         }
 
@@ -137,10 +140,6 @@ namespace Rok
             MainGrid.Visibility = Visibility.Visible;
             SplashScreen.Visibility = Visibility.Collapsed;
             SplashScreen.Completed -= SplashScreen_Completed;
-
-
-            if (_appOptions.RefreshLibraryAtStartup)
-                libraryRefreshButton_Tapped(this, new TappedRoutedEventArgs());
         }
 
 
