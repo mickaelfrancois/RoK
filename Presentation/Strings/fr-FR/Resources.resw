@@ -978,4 +978,34 @@
   <data name="NoLibraryFoldersMessage" xml:space="preserve">
     <value>ous n'avez encore ajouté aucun dossier de bibliothèque. Veuillez ajouter au moins un dossier de bibliothèque dans les paramètres pour actualiser la bibliothèque.</value>
   </data>
+  <data name="albumViewEdit.Label" xml:space="preserve">
+    <value>Modifier</value>
+  </data>
+  <data name="EditAlbumDialog.Title" xml:space="preserve">
+    <value>Modification album</value>
+  </data>
+  <data name="EditAlbumDialog.PrimaryButtonText" xml:space="preserve">
+    <value>Enregistrer</value>
+  </data>
+  <data name="EditAlbumDialog.CloseButtonText" xml:space="preserve">
+    <value>Annuler</value>
+  </data>
+  <data name="liveSwitch.OnContent" xml:space="preserve">
+    <value>Live</value>
+  </data>
+  <data name="liveSwitch.OffContent" xml:space="preserve">
+    <value>Live</value>
+  </data>
+  <data name="bestOfSwitch.OnContent" xml:space="preserve">
+    <value>Best of</value>
+  </data>
+  <data name="bestOfSwitch.OffContent" xml:space="preserve">
+    <value>Best of</value>
+  </data>
+  <data name="compilationSwitch.OnContent" xml:space="preserve">
+    <value>Compilation</value>
+  </data>
+  <data name="compilationSwitch.OffContent" xml:space="preserve">
+    <value>Compilation</value>
+  </data>
 </root>

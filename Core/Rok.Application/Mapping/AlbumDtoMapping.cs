@@ -68,7 +68,10 @@ internal static class AlbumDtoMapping
             ReleaseDate = album.ReleaseDate,
             ReleaseFormat = album.ReleaseFormat,
             Wikipedia = album.Wikipedia,
-            Theme = album.Theme
+            Theme = album.Theme,
+            IsBestOf = album.IsBestOf,
+            IsLive = album.IsLive,
+            IsCompilation = album.IsCompilation
         };
     }
 }

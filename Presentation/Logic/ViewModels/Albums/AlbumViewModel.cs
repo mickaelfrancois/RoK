@@ -1,7 +1,9 @@
-﻿using Rok.Application.Features.Albums.Command;
+﻿using Microsoft.UI.Xaml.Controls;
+using Rok.Application.Features.Albums.Command;
 using Rok.Application.Features.Albums.Query;
 using Rok.Application.Features.Tracks.Command;
 using Rok.Application.Features.Tracks.Query;
+using Rok.Dialogs;
 using Rok.Infrastructure.NovaApi;
 using Rok.Logic.Services.Player;
 using Rok.Logic.ViewModels.Tracks;
@@ -14,8 +16,6 @@ namespace Rok.Logic.ViewModels.Albums;
 
 public partial class AlbumViewModel : ObservableObject
 {
-    private BitmapImage FallbackPicture => new(new Uri("ms-appx:///Assets/albumFallback.png"));
-
     public AlbumDto Album { get; private set; } = new();
 
     public RangeObservableCollection<TrackViewModel> Tracks { get; set; } = [];
@@ -123,6 +123,7 @@ public partial class AlbumViewModel : ObservableObject
     public RelayCommand OpenArtistsByCountryCommand { get; private set; }
     public AsyncRelayCommand AlbumFavoriteCommand { get; private set; }
     public AsyncRelayCommand SelectPictureCommand { get; private set; }
+    public AsyncRelayCommand EditAlbumCommand { get; }
 
     private readonly IMediator _mediator;
     private readonly NavigationService _navigationService;
@@ -159,6 +160,7 @@ public partial class AlbumViewModel : ObservableObject
         GenreOpenCommand = new RelayCommand(() => { });
         OpenArtistsByCountryCommand = new RelayCommand(() => { });
         SelectPictureCommand = new AsyncRelayCommand(SelectPictureAsync);
+        EditAlbumCommand = new AsyncRelayCommand(EditAlbumAsync);
     }
 
 
@@ -359,15 +361,15 @@ public partial class AlbumViewModel : ObservableObject
         PatchAlbumCommand patchAlbumCommand = new()
         {
             Id = Album.Id,
-            Label = albumApi.Label,
-            Sales = albumApi.Sales,
-            Mood = albumApi.Mood,
-            MusicBrainzID = albumApi.MusicBrainzID,
-            Speed = albumApi.Speed,
-            ReleaseDate = albumApi.ReleaseDate,
-            ReleaseFormat = albumApi.ReleaseFormat,
-            Wikipedia = albumApi.Wikipedia,
-            Theme = albumApi.Theme
+            Label = new PatchField<string>(albumApi.Label),
+            Sales = new PatchField<string>(albumApi.Sales),
+            Mood = new PatchField<string>(albumApi.Mood),
+            MusicBrainzID = new PatchField<string>(albumApi.MusicBrainzID),
+            Speed = new PatchField<string>(albumApi.Speed),
+            ReleaseDate = new PatchField<DateTime?>(albumApi.ReleaseDate),
+            ReleaseFormat = new PatchField<string>(albumApi.ReleaseFormat),
+            Wikipedia = new PatchField<string>(albumApi.Wikipedia),
+            Theme = new PatchField<string>(albumApi.Theme)
         };
 
         await _mediator.SendMessageAsync(patchAlbumCommand);
@@ -375,6 +377,40 @@ public partial class AlbumViewModel : ObservableObject
         Album = albumResult.Value!;
 
         Messenger.Send(new AlbumUpdateMessage(Album.Id, ActionType.Update));
+    }
+
+
+    private async Task EditAlbumAsync()
+    {
+        EditAlbumDialog dialog = new()
+        {
+            IsBestOf = Album.IsBestOf,
+            IsLive = Album.IsLive,
+            IsCompilation = Album.IsCompilation,
+            XamlRoot = App.MainWindow.Content.XamlRoot
+        };
+
+        ContentDialogResult result = await dialog.ShowAsync();
+
+        if (result != ContentDialogResult.Primary)
+            return;
+
+        PatchAlbumCommand patchAlbumCommand = new()
+        {
+            Id = Album.Id,
+            IsBestOf = new PatchField<bool>(dialog.IsBestOf),
+            IsLive = new PatchField<bool>(dialog.IsLive),
+            IsCompilation = new PatchField<bool>(Album.IsCompilation)
+        };
+
+        await _mediator.SendMessageAsync(patchAlbumCommand);
+
+        Album.IsBestOf = dialog.IsBestOf;
+        Album.IsLive = dialog.IsLive;
+        Album.IsCompilation = dialog.IsCompilation;
+
+        Messenger.Send(new AlbumUpdateMessage(Album.Id, ActionType.Update));
+        OnPropertyChanged(nameof(Album));
     }
 
 

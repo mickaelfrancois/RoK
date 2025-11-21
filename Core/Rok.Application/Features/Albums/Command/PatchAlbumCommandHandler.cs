@@ -1,4 +1,5 @@
 ﻿using Rok.Application.Interfaces;
+using Rok.Shared;
 
 namespace Rok.Application.Features.Albums.Command;
 
@@ -7,24 +8,31 @@ public class PatchAlbumCommand : ICommand<Result<bool>>
     [RequiredGreaterThanZero]
     public long Id { get; set; }
 
-    public string? Sales { get; set; }
+    public PatchField<string>? Sales { get; set; }
 
-    public string? Label { get; set; }
+    public PatchField<string>? Label { get; set; }
 
-    public string? Mood { get; set; }
+    public PatchField<string>? Mood { get; set; }
 
-    public string? MusicBrainzID { get; set; }
+    public PatchField<string>? MusicBrainzID { get; set; }
 
-    public string? Speed { get; set; }
+    public PatchField<string>? Speed { get; set; }
 
-    public DateTime? ReleaseDate { get; set; }
+    public PatchField<DateTime?>? ReleaseDate { get; set; }
 
-    public string? ReleaseFormat { get; set; }
+    public PatchField<string>? ReleaseFormat { get; set; }
 
-    public string? Wikipedia { get; set; }
+    public PatchField<string>? Wikipedia { get; set; }
 
-    public string? Theme { get; set; }
+    public PatchField<string>? Theme { get; set; }
+
+    public PatchField<bool>? IsLive { get; set; }
+
+    public PatchField<bool>? IsBestOf { get; set; }
+
+    public PatchField<bool>? IsCompilation { get; set; }
 }
+
 
 public class PatchAlbumCommandHandler(IAlbumRepository _albumRepository) : ICommandHandler<PatchAlbumCommand, Result<bool>>
 {

@@ -38,6 +38,7 @@
 		<None Remove="Commons\PlaylistGroupFilter.xaml" />
 		<None Remove="Commons\RatingControlLightControl.xaml" />
 		<None Remove="Commons\SplashScreenControl.xaml" />
+		<None Remove="Dialogs\EditAlbumDialog.xaml" />
 		<None Remove="Pages\AlbumsPage.xaml" />
 		<None Remove="Pages\ArtistPage.xaml" />
 		<None Remove="Pages\ArtistsPage.xaml" />
@@ -245,6 +246,9 @@
 	  <None Update="appsettings.json">
 	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 	  </None>
+	  <Page Update="Dialogs\EditAlbumDialog.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </Page>
 	</ItemGroup>
 	<ItemGroup>
 	  <Page Update="Styles\ButtonStyles.xaml">

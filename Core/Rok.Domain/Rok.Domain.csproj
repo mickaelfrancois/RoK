@@ -12,4 +12,8 @@
     <PackageReference Include="MiF.Guard" Version="1.0.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Rok.Shared\Rok.Shared.csproj" />
+  </ItemGroup>
+
 </Project>
