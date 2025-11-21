@@ -3,6 +3,7 @@ using Rok.Logic.ViewModels.Albums;
 using Rok.Logic.ViewModels.Artists;
 using Rok.Logic.ViewModels.Playlists;
 using Rok.Logic.ViewModels.Search;
+using Rok.Logic.ViewModels.Tracks;
 using Rok.Pages;
 
 namespace Rok.Logic.Services;
@@ -47,6 +48,16 @@ public class NavigationService(ITelemetryClient telemetryClient)
         _ = telemetryClient.CaptureScreenAsync("AlbumPage");
 
         MainFrame.Navigate(typeof(AlbumPage), new AlbumOpenArgs(albumId));
+    }
+
+
+    public void NavigateToTrack(long trackId)
+    {
+        Guard.Against.NegativeOrZero(trackId);
+
+        _ = telemetryClient.CaptureScreenAsync("TrackPage");
+
+        MainFrame.Navigate(typeof(TrackPage), new TrackOpenArgs(trackId));
     }
 
 

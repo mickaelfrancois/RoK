@@ -139,6 +139,9 @@ public class TrackRepository(IDbConnection db, [FromKeyedServices("BackgroundCon
                      LEFT JOIN countries ON countries.Id = artists.countryId 
                 """;
 
+        if (!string.IsNullOrEmpty(whereParam))
+            query += $" WHERE tracks.{whereParam} = @{whereParam}";
+
         return query;
     }
 
