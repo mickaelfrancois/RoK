@@ -185,7 +185,7 @@ public partial class ArtistViewModel : ObservableObject
         }
     }
 
-    public BitmapImage? _backdrop = null;
+    private BitmapImage? _backdrop = null;
     public BitmapImage? Backdrop
     {
         get => _backdrop;

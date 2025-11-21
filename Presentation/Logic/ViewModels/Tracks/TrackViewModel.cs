@@ -2,6 +2,7 @@
 using Rok.Application.Dto.Lyrics;
 using Rok.Application.Features.Playlists.PlaylistMenu;
 using Rok.Application.Features.Tracks.Command;
+using Rok.Application.Features.Tracks.Query;
 using Rok.Infrastructure.NovaApi;
 using Rok.Logic.Services.Player;
 
@@ -95,6 +96,17 @@ public partial class TrackViewModel : ObservableObject, IDisposable
 
     public BitmapImage Picture { get; set; } = null!;
 
+    private BitmapImage? _backdrop = null;
+    public BitmapImage? Backdrop
+    {
+        get => _backdrop;
+        set
+        {
+            _backdrop = value;
+            OnPropertyChanged();
+        }
+    }
+
     private bool _listening = false;
     public bool Listening
     {
@@ -123,6 +135,8 @@ public partial class TrackViewModel : ObservableObject, IDisposable
 
     private readonly IDialogService _dialogService;
 
+    private readonly BackdropPicture _backdropPicture;
+
     public RelayCommand AlbumOpenCommand { get; init; }
     public RelayCommand ArtistOpenCommand { get; init; }
     public RelayCommand TrackOpenCommand { get; init; }
@@ -130,9 +144,10 @@ public partial class TrackViewModel : ObservableObject, IDisposable
     public RelayCommand ListenCommand { get; init; }
 
 
-    public TrackViewModel(IPlaylistMenuService playlistMenuService, IMediator mediator, NavigationService navigationService, ResourceLoader resourceLoader, IDialogService dialogService, IPlayerService playerService, INovaApiService novaApiService, ILyricsService lyricsService, ILogger<TrackViewModel> logger)
+    public TrackViewModel(BackdropPicture backdropPicture, IPlaylistMenuService playlistMenuService, IMediator mediator, NavigationService navigationService, ResourceLoader resourceLoader, IDialogService dialogService, IPlayerService playerService, INovaApiService novaApiService, ILyricsService lyricsService, ILogger<TrackViewModel> logger)
     {
-        PlaylistMenuService = playlistMenuService;
+        _backdropPicture = Guard.Against.Null(backdropPicture);
+        PlaylistMenuService = Guard.Against.Null(playlistMenuService);
         _mediator = Guard.Against.Null(mediator);
         _navigationService = Guard.Against.Null(navigationService);
         _resourceLoader = Guard.Against.Null(resourceLoader);
@@ -151,6 +166,19 @@ public partial class TrackViewModel : ObservableObject, IDisposable
         Messenger.Subscribe<TrackScoreUpdateMessage>((message) => TrackScoreUpdateMessageHandle(message));
     }
 
+
+    public async Task LoadDataAsync(long trackId)
+    {
+        Result<TrackDto> trackResult = await _mediator.SendMessageAsync(new GetTrackByIdQuery(trackId));
+        if (trackResult.IsError)
+            return;
+
+        Track = trackResult.Value!;
+
+        LoadBackdrop();
+
+        OnPropertyChanged(string.Empty);
+    }
 
     public void SetData(TrackDto track)
     {
@@ -188,7 +216,8 @@ public partial class TrackViewModel : ObservableObject, IDisposable
 
     private void TrackOpen()
     {
-        // TODO
+        if (Track.Id > 0)
+            _navigationService.NavigateToTrack(Track.Id);
     }
 
     private async Task LyricsOpenAsync()
@@ -254,6 +283,35 @@ public partial class TrackViewModel : ObservableObject, IDisposable
             {
                 OnPropertyChanged(nameof(LyricsExists));
             }
+        }
+    }
+
+
+    public void LoadBackdrop()
+    {
+        if (Track.Id <= 0)
+            return;
+
+        try
+        {
+            string filePath;
+
+            List<string> backdrops = _backdropPicture.GetBackdrops(Track.ArtistName);
+            if (backdrops.Count > 0)
+            {
+                int index = Random.Shared.Next(backdrops.Count);
+                filePath = backdrops[index];
+            }
+            else
+            {
+                filePath = _backdropPicture.GetRandomGenericBackdrop();
+            }
+
+            Backdrop = new BitmapImage(new Uri(filePath, UriKind.Absolute));
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to load backdrop for artist: {ArtistName}", Track.ArtistName);
         }
     }
 
