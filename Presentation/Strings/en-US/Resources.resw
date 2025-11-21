@@ -978,4 +978,34 @@
   <data name="NoLibraryFoldersTitleMessage" xml:space="preserve">
     <value>No library</value>
   </data>
+  <data name="albumViewEdit.Label" xml:space="preserve">
+    <value>Edit</value>
+  </data>
+  <data name="EditAlbumDialog.Title" xml:space="preserve">
+    <value>Album edit</value>
+  </data>
+  <data name="EditAlbumDialog.PrimaryButtonText" xml:space="preserve">
+    <value>Save</value>
+  </data>
+  <data name="EditAlbumDialog.CloseButtonText" xml:space="preserve">
+    <value>Cancel</value>
+  </data>
+  <data name="liveSwitch.OnContent" xml:space="preserve">
+    <value>Live</value>
+  </data>
+  <data name="liveSwitch.OffContent" xml:space="preserve">
+    <value>Live</value>
+  </data>
+  <data name="bestOfSwitch.OnContent" xml:space="preserve">
+    <value>Best of</value>
+  </data>
+  <data name="bestOfSwitch.OffContent" xml:space="preserve">
+    <value>Best of</value>
+  </data>
+  <data name="compilationSwitch.OnContent" xml:space="preserve">
+    <value>Compilation</value>
+  </data>
+  <data name="compilationSwitch.OffContent" xml:space="preserve">
+    <value>Compilation</value>
+  </data>
 </root>

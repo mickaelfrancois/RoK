@@ -32,34 +32,23 @@ public class AlbumRepository(IDbConnection connection, [FromKeyedServices("Backg
 
     public async Task<bool> PatchAsync(IUpdateAlbumEntity entity, RepositoryConnectionKind kind = RepositoryConnectionKind.Foreground)
     {
-        string sql = $"UPDATE albums SET " +
-            "Sales = @Sales," +
-            "Label = @Label, " +
-            "Mood = @Mood, " +
-            "MusicBrainzID = @MusicBrainzID, " +
-            "Speed = @Speed, " +
-            "ReleaseDate = @ReleaseDate, " +
-            "ReleaseFormat = @ReleaseFormat, " +
-            "Wikipedia = @Wikipedia, " +
-            "Theme = @Theme " +
-            "WHERE Id = @Id";
+        AlbumEntity? album = await GetByIdAsync(entity.Id, kind);
+        if (album == null) return false;
 
-        IDbConnection localConnection = ResolveConnection(kind);
-        int rowsAffected = await localConnection.ExecuteAsync(sql, new
-        {
-            entity.Sales,
-            entity.Label,
-            entity.Mood,
-            entity.MusicBrainzID,
-            entity.Speed,
-            entity.ReleaseDate,
-            entity.ReleaseFormat,
-            entity.Wikipedia,
-            entity.Theme,
-            entity.Id
-        });
+        if (entity.Label?.IsSet == true) album.Label = entity.Label.Value;
+        if (entity.Mood?.IsSet == true) album.Mood = entity.Mood.Value;
+        if (entity.MusicBrainzID?.IsSet == true) album.MusicBrainzID = entity.MusicBrainzID.Value;
+        if (entity.ReleaseDate?.IsSet == true) album.ReleaseDate = entity.ReleaseDate.Value;
+        if (entity.ReleaseFormat?.IsSet == true) album.ReleaseFormat = entity.ReleaseFormat.Value;
+        if (entity.Sales?.IsSet == true) album.Sales = entity.Sales.Value;
+        if (entity.Speed?.IsSet == true) album.Speed = entity.Speed.Value;
+        if (entity.Theme?.IsSet == true) album.Theme = entity.Theme.Value;
+        if (entity.Wikipedia?.IsSet == true) album.Wikipedia = entity.Wikipedia.Value;
+        if (entity.IsLive?.IsSet == true) album.IsLive = entity.IsLive.Value;
+        if (entity.IsBestOf?.IsSet == true) album.IsBestOf = entity.IsBestOf.Value;
+        if (entity.IsCompilation?.IsSet == true) album.IsCompilation = entity.IsCompilation.Value;
 
-        return rowsAffected > 0;
+        return await UpdateAsync(album, kind);
     }
 
     public async Task<bool> UpdateFavoriteAsync(long id, bool isFavorite, RepositoryConnectionKind kind = RepositoryConnectionKind.Foreground)

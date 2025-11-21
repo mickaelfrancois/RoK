@@ -1,0 +1,17 @@
+<ContentDialog
+    x:Class="Rok.Dialogs.EditAlbumDialog"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:Rok.Dialogs"
+    x:Uid="EditAlbumDialog"
+    Title=""
+    MinWidth="400"
+    PrimaryButtonText=""
+    CloseButtonText="">
+
+    <StackPanel>
+        <ToggleSwitch x:Uid="liveSwitch" IsOn="{x:Bind IsLive, Mode=TwoWay}"></ToggleSwitch>
+        <ToggleSwitch x:Uid="bestOfSwitch" IsOn="{x:Bind IsBestOf, Mode=TwoWay}"></ToggleSwitch>
+        <ToggleSwitch x:Uid="compilationSwitch" IsOn="{x:Bind IsCompilation, Mode=TwoWay}"></ToggleSwitch>
+    </StackPanel>
+</ContentDialog>
