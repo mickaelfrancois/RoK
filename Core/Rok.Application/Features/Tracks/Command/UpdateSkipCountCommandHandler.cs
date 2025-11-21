@@ -2,13 +2,13 @@
 
 namespace Rok.Application.Features.Tracks.Command;
 
-public class UpdateSkipCountCommand() : IRequest<Result<bool>>
+public class UpdateSkipCountCommand : ICommand<Result<bool>>
 {
     public long TrackId { get; set; }
 }
 
 
-internal class UpdateSkipCountCommandHandler(ITrackRepository _trackRepository) : IRequestHandler<UpdateSkipCountCommand, Result<bool>>
+internal class UpdateSkipCountCommandHandler(ITrackRepository _trackRepository) : ICommandHandler<UpdateSkipCountCommand, Result<bool>>
 {
     public async Task<Result<bool>> HandleAsync(UpdateSkipCountCommand request, CancellationToken cancellationToken)
     {
