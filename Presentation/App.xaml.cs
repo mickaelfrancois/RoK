@@ -4,6 +4,7 @@ using Rok.Import;
 using Rok.Infrastructure;
 using Serilog;
 using System.IO;
+using System.Threading;
 using Windows.Storage;
 using Windows.Storage.AccessCache;
 using WinRT.Interop;
