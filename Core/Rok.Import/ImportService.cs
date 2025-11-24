@@ -322,8 +322,12 @@ public class ImportService : IImport
             }
             else
             {
-                await _importTrack.CreateAsync(track).ConfigureAwait(false);
+                TrackEntity? newTrack = await _importTrack.CreateAsync(track).ConfigureAwait(false);
+                if (newTrack == null)
+                    return;
+
                 Statistics.TracksImported++;
+                _trackIDReaded.Add(newTrack.Id);
             }
         }
         catch (Exception ex)
