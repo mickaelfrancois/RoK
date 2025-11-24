@@ -16,6 +16,49 @@ public partial class TrackViewModel : ObservableObject, IDisposable
 
     public TrackDto Track { get; private set; } = new();
 
+    public string BitrateStr
+    {
+        get
+        {
+            int bitRate = Track.Bitrate;
+
+            if (bitRate > 1000)
+                return $"{Track.Bitrate / 1000} kbps";
+            else if (bitRate > 0)
+                return $"{bitRate} bps";
+            else
+                return "";
+        }
+    }
+
+    public string SizeStr
+    {
+        get
+        {
+            long size = Track.Size;
+
+            if (size >= 1073741824)
+                return $"{size / 1073741824.0:F2} GB";
+            else if (size >= 1048576)
+                return $"{size / 1048576.0:F2} MB";
+            else if (size >= 1024)
+                return $"{size / 1024.0:F2} KB";
+            else if (size > 0)
+                return $"{size} B";
+            else
+                return "";
+        }
+    }
+
+    public string DurationStr
+    {
+        get
+        {
+            TimeSpan time = TimeSpan.FromSeconds(Track.Duration);
+            return time.Hours > 0 ? time.ToString(@"h\:mm\:ss") : time.ToString(@"mm\:ss");
+        }
+    }
+
     public int? TrackNumber { get { return Track.TrackNumber; } }
 
     public string TrackNumberStr

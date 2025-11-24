@@ -1,18 +1,30 @@
 using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Navigation;
+using Rok.Logic.ViewModels.Tracks;
 
-// To learn more about WinUI, the WinUI project structure,
-// and more about our project templates, see: http://aka.ms/winui-project-info.
 
-namespace Rok.Pages
+namespace Rok.Pages;
+
+public sealed partial class TrackPage : Page
 {
-    /// <summary>
-    /// An empty page that can be used on its own or navigated to within a Frame.
-    /// </summary>
-    public sealed partial class TrackPage : Page
+    public TrackViewModel ViewModel { get; set; } = null!;
+
+    public TrackPage()
     {
-        public TrackPage()
-        {
-            this.InitializeComponent();
-        }
+        this.InitializeComponent();
+    }
+
+
+    protected override async void OnNavigatedTo(NavigationEventArgs e)
+    {
+        if (e.Parameter is not TrackOpenArgs options)
+            throw new ArgumentException("Navigation parameters must be type of TrackOpenArgs", nameof(e));
+
+        ViewModel = App.ServiceProvider.GetRequiredService<TrackViewModel>();
+        DataContext = ViewModel;
+
+        await ViewModel.LoadDataAsync(options.TrackId);
+
+        base.OnNavigatedTo(e);
     }
 }

@@ -265,6 +265,9 @@
                                             <MenuFlyoutItem x:Uid="trackFlyoutArtist" 
                                                             Icon="People"
                                                             Command="{x:Bind ArtistOpenCommand}" />
+                                            <MenuFlyoutItem x:Uid="trackFlyoutTrack"
+                                                            Icon="Audio"
+                                                            Command="{x:Bind TrackOpenCommand}" />
                                             <MenuFlyoutSeparator />
                                             <MenuFlyoutItem x:Uid="trackFlyoutLyrics" 
                                                             Command="{x:Bind LyricsOpenCommand}" 
