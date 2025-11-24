@@ -56,7 +56,7 @@ public class CleanLibraryService(ITrackRepository trackRepository, IArtistReposi
 
             if (count > 0)
             {
-                _logger.LogTrace("{Count} tracks were deleted from database in {ElapsedMilliseconds} ms", count, stopwatch.ElapsedMilliseconds);
+                _logger.LogInformation("{Count} tracks were deleted from database in {ElapsedMilliseconds} ms", count, stopwatch.ElapsedMilliseconds);
                 stopwatch.Stop();
             }
         }
