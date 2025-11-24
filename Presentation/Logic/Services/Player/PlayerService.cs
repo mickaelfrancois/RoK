@@ -456,7 +456,6 @@ public class PlayerService : IPlayerService
             _crossfadeCts = new CancellationTokenSource();
             CancellationToken ct = _crossfadeCts.Token;
 
-            // Determine next index
             int nextIndex = _currentIndex + 1;
             if (nextIndex >= Playlist.Count)
             {
@@ -503,7 +502,7 @@ public class PlayerService : IPlayerService
                 double volume = AudioRamping.DbInterpolate(progress, masterVolume);
                 _player.SetVolume(volume);
 
-                _logger.LogInformation("Fade-out SetVolume {Volume:F2}", volume);
+                _logger.LogDebug("Fade-out SetVolume {Volume:F2}", volume);
 
                 await Task.Delay(intervalMs, ct);
             }
@@ -527,7 +526,7 @@ public class PlayerService : IPlayerService
                 double volume = AudioRamping.DbInterpolate(1.0 - progress, masterVolume);
                 _player.SetVolume(volume);
 
-                _logger.LogInformation("Fade-in SetVolume {Volume:F2}", volume);
+                _logger.LogDebug("Fade-in SetVolume {Volume:F2}", volume);
 
                 await Task.Delay(intervalMs, ct);
             }
