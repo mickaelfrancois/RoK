@@ -45,6 +45,8 @@ namespace Rok
             { "Options", typeof(Pages.OptionsPage) },
         };
 
+        private MicaBackdrop _micaBackdrop;
+
 
         public MainWindow(NavigationService navigationService, ResourceLoader resourceLoader, IAppDbContext dbContext, IAppOptions appOptions)
         {
@@ -71,6 +73,19 @@ namespace Rok
             Messenger.Subscribe<CompactModeMessage>((message) => ToggleCompactMode());
 
             ContentFrame.Navigated += ContentFrame_Navigated;
+
+            TrySetSystemBackdrop();
+        }
+
+        private void TrySetSystemBackdrop()
+        {
+#if WINDOWS
+            if (OperatingSystem.IsWindowsVersionAtLeast(10, 0, 17763))
+            {
+                _micaBackdrop = new MicaBackdrop();
+                SystemBackdrop = _micaBackdrop;
+            }
+#endif
         }
 
 

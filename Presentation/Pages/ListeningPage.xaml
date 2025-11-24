@@ -260,6 +260,9 @@
                                             <FontIcon Glyph="&#xE93C;" />
                                         </MenuFlyoutItem.Icon>
                                     </MenuFlyoutItem>
+                                    <MenuFlyoutItem x:Uid="trackFlyoutTrack"
+                                        Icon="Audio"
+                                        Command="{x:Bind TrackOpenCommand}" />
                                     <MenuFlyoutSeparator />
                                     <MenuFlyoutItem x:Uid="trackFlyoutLyrics"
                                                     Command="{x:Bind LyricsOpenCommand}"

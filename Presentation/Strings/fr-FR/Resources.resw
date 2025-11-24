@@ -1008,4 +1008,31 @@
   <data name="compilationSwitch.OffContent" xml:space="preserve">
     <value>Compilation</value>
   </data>
+  <data name="trackFlyoutTrack.Text" xml:space="preserve">
+    <value>Voir la chanson</value>
+  </data>
+  <data name="genByLabel.Text" xml:space="preserve">
+    <value>Par</value>
+  </data>
+  <data name="genOnLabel.Text" xml:space="preserve">
+    <value>Sur</value>
+  </data>
+  <data name="trackListenCountLabel.Text" xml:space="preserve">
+    <value>Nombre d'écoutes :</value>
+  </data>
+  <data name="trackLastListenLabel.Text" xml:space="preserve">
+    <value>Dernière écoute :</value>
+  </data>
+  <data name="trackMusicBrainzIdLabel.Text" xml:space="preserve">
+    <value>MusicBrainz ID :</value>
+  </data>
+  <data name="trackStorageLabel.Text" xml:space="preserve">
+    <value>Emplacement :</value>
+  </data>
+  <data name="trackSkipCountLabel.Text" xml:space="preserve">
+    <value>Nombre de sauts :</value>
+  </data>
+  <data name="trackLastSkipLabel.Text" xml:space="preserve">
+    <value>Dernier saut :</value>
+  </data>
 </root>

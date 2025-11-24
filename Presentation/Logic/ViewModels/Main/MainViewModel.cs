@@ -41,7 +41,6 @@ public partial class MainViewModel : ObservableObject
 
     private readonly ResourceLoader _resourceLoader;
 
-
     public MainViewModel(IImport importService, IMediator mediator, NavigationService navigationService, IAppOptions appOptions, IDialogService dialogService, ResourceLoader resourceLoader)
     {
         _importService = importService;
