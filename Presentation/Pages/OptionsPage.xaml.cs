@@ -1,4 +1,5 @@
 using Microsoft.UI.Xaml.Controls;
+using Windows.ApplicationModel;
 using Windows.Storage;
 using Windows.Storage.AccessCache;
 using Windows.Storage.Pickers;
@@ -26,6 +27,15 @@ public sealed partial class OptionsPage : Page
 
     private readonly IFolderResolver _folderResolver;
 
+    public string AppVersionString
+    {
+        get
+        {
+            PackageVersion version = Windows.ApplicationModel.Package.Current.Id.Version;
+            return $"{version.Major}.{version.Minor}.{version.Build}.{version.Revision}";
+        }
+    }
+
 
     public OptionsPage()
     {
@@ -48,6 +58,31 @@ public sealed partial class OptionsPage : Page
             {
                 _paths.Add(new PathItem(token, path));
             }
+        }
+    }
+
+    private void StorePageButton_Click(object sender, RoutedEventArgs e)
+    {
+        Uri uri = new("https://apps.microsoft.com/store/detail/9NX19R28Q92S?cid=DevShareMCLPCS");
+        _ = Windows.System.Launcher.LaunchUriAsync(uri);
+    }
+
+    private void GitHubPageButton_Click(object sender, RoutedEventArgs e)
+    {
+        Uri uri = new("https://github.com/mickaelfrancois/RoK");
+        _ = Windows.System.Launcher.LaunchUriAsync(uri);
+    }
+
+    private async void OpenLogButton_Click(object sender, RoutedEventArgs e)
+    {
+        try
+        {
+            StorageFolder localFolder = ApplicationData.Current.LocalFolder;
+            await Windows.System.Launcher.LaunchFolderAsync(localFolder);
+        }
+        catch
+        {
+            // Ignore
         }
     }
 
@@ -121,6 +156,7 @@ public sealed partial class OptionsPage : Page
             // Ignore
         }
     }
+
 }
 
 public class PathItem(string key, string value)

@@ -1035,4 +1035,13 @@
   <data name="trackStorageLabel.Text" xml:space="preserve">
     <value>Storage:</value>
   </data>
+  <data name="OptionTabLibrary.Header" xml:space="preserve">
+    <value>Library</value>
+  </data>
+  <data name="OptionTabAbout.Header" xml:space="preserve">
+    <value>About</value>
+  </data>
+  <data name="OptionTabOptions.Header" xml:space="preserve">
+    <value>Options</value>
+  </data>
 </root>
