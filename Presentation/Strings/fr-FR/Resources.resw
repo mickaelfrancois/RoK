@@ -1035,4 +1035,13 @@
   <data name="trackLastSkipLabel.Text" xml:space="preserve">
     <value>Dernier saut :</value>
   </data>
+  <data name="OptionTabLibrary.Header" xml:space="preserve">
+    <value>Librairie</value>
+  </data>
+  <data name="OptionTabAbout.Header" xml:space="preserve">
+    <value>A propos de</value>
+  </data>
+  <data name="OptionTabOptions.Header" xml:space="preserve">
+    <value>Options</value>
+  </data>
 </root>

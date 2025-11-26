@@ -14,7 +14,7 @@
     <Grid>
 
         <Pivot>
-            <PivotItem Header="Options">
+            <PivotItem x:Uid="OptionTabOptions">
                 <StackPanel Spacing="10" Margin="6,12,0,0">
                     <StackPanel Orientation="Vertical" Spacing="12" VerticalAlignment="Center">
                         <TextBlock x:Uid="optionsThemeLabel" VerticalAlignment="Center" />
@@ -35,7 +35,7 @@
                 </StackPanel>
             </PivotItem>
 
-            <PivotItem Header="Library">
+            <PivotItem x:Uid="OptionTabLibrary">
                 <StackPanel Spacing="10" Margin="6,12,0,0">
 
                     <StackPanel Orientation="Horizontal" Spacing="8">
@@ -54,6 +54,112 @@
                         </ListView.ItemTemplate>
                     </ListView>
                 </StackPanel>
+            </PivotItem>
+
+            <PivotItem x:Uid="OptionTabAbout">
+                <Border Background="{ThemeResource CardBackgroundFillColorDefault}"
+                        Padding="4"
+                        CornerRadius="12"
+                        Margin="8">
+
+                    <StackPanel Spacing="16"
+                                Margin="24,18,24,18">
+                        <StackPanel Orientation="Horizontal"
+                                    Spacing="1">
+
+                            <TextBlock FontSize="22"
+                                       FontWeight="Bold"
+                                       Text="RoK music player"
+                                       VerticalAlignment="Bottom"
+                                       Foreground="{StaticResource AccentTextFillColorPrimaryBrush}" />
+                            <TextBlock FontSize="18"
+                                       FontStyle="Italic"
+                                       VerticalAlignment="Bottom"
+                                       Text="v"
+                                       Margin="6,0,0,0" />
+                            <TextBlock FontSize="18"
+                                       FontStyle="Italic"
+                                       VerticalAlignment="Bottom"
+                                       Text="{x:Bind AppVersionString}"
+                                       Margin="0,0,0,0" />
+                        </StackPanel>
+
+                        <StackPanel Orientation="Horizontal"
+                                    Spacing="8"
+                                    Margin="0,0,0,12">
+                            <FontIcon Glyph="&#xE13D;"
+                                      FontSize="16"
+                                      Foreground="{ThemeResource AccentFillColorDefaultBrush}" />
+                            <TextBlock FontSize="14"
+                                       Text="Developed by Mickaël FRANCOIS" />
+                        </StackPanel>
+
+                        <StackPanel Orientation="Horizontal"
+                                    Spacing="16"
+                                    Margin="0,0,0,8">
+
+                            <Button Click="StorePageButton_Click">
+                                <Button.Content>
+                                    <StackPanel Orientation="Horizontal"
+                                                Spacing="6">
+                                        <SymbolIcon Symbol="Shop"></SymbolIcon>
+                                        <TextBlock Text="Store page"></TextBlock>
+                                    </StackPanel>
+                                </Button.Content>
+                            </Button>
+
+                            <Button Click="GitHubPageButton_Click">
+                                <Button.Content>
+                                    <StackPanel Orientation="Horizontal"
+                                                Spacing="6">
+                                        <SymbolIcon Symbol="Globe"></SymbolIcon>
+                                        <TextBlock Text="Source code on GitHub"></TextBlock>
+                                    </StackPanel>
+                                </Button.Content>
+                            </Button>
+
+                            <Button Click="OpenLogButton_Click">
+                                <Button.Content>
+                                    <StackPanel Orientation="Horizontal"
+                                                Spacing="6">
+                                        <SymbolIcon Symbol="Document"></SymbolIcon>
+                                        <TextBlock Text="Access logs"></TextBlock>
+                                    </StackPanel>
+                                </Button.Content>
+                            </Button>
+                        </StackPanel>
+
+                        <Line Margin="0,4,0,0"
+                              Stroke="{ThemeResource AccentFillColorDefaultBrush}"
+                              StrokeThickness="1"
+                              X1="0"
+                              Y1="0"
+                              X2="600"
+                              Y2="0" />
+
+
+                        <StackPanel Orientation="Horizontal"
+                                    Spacing="8"
+                                    Margin="0,0,0,6">
+                            <FontIcon Glyph="&#xE8EF;"
+                                      FontSize="14"
+                                      Foreground="{ThemeResource AccentFillColorDefaultBrush}" />
+                            <TextBlock FontSize="13"
+                                       Text="Great libraries used:"
+                                       FontWeight="SemiBold" />
+                        </StackPanel>
+
+                        <ItemsControl>
+                            <ItemsControl.Items>
+                                <TextBlock Text="🔹Dapper (Sam Saffron, Marc Gravell, Nick Craver)" />
+                                <TextBlock Text="🔹DiscordRichPresence (Lachee)" />
+                                <TextBlock Text="🔹TagLibSharp (Brian Nickel, Gabriel Burt, Stephen Shaw, etc.)" />
+                                <TextBlock Text="🔹Moq (Daniel Cazzulino, kzu)" />
+                                <TextBlock Text="🔹Serilog" />
+                            </ItemsControl.Items>
+                        </ItemsControl>
+                    </StackPanel>
+                </Border>
             </PivotItem>
         </Pivot>
     </Grid>
