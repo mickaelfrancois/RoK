@@ -118,7 +118,7 @@ public partial class ArtistViewModel : ObservableObject
                                 + Artist.ListenCount + " "
                                 + _resourceLoader.GetString("listenCountTimes") + ", "
                                 + _resourceLoader.GetString("lastListen") + " "
-                               + Artist.LastListen;
+                               + Artist.LastListen?.ToString("g");
             }
 
             return label;
@@ -129,18 +129,21 @@ public partial class ArtistViewModel : ObservableObject
     {
         get
         {
-            if (Artist.FormedYear.HasValue && Artist.DiedYear.HasValue)
+            bool formedYearDefined = Artist.FormedYear.HasValue && Artist.FormedYear.GetValueOrDefault(0) > 0;
+
+            if (formedYearDefined && Artist.DiedYear.GetValueOrDefault(0) > 0)
                 return $"{Artist.FormedYear} - {Artist.DiedYear}";
-            if (Artist.FormedYear.HasValue && Artist.Disbanded)
+            if (formedYearDefined && Artist.Disbanded)
                 return $"{Artist.FormedYear} -";
-            if (Artist.FormedYear.HasValue)
-                return Artist.FormedYear.Value.ToString();
+            if (formedYearDefined)
+                return Artist.FormedYear!.Value.ToString();
 
             if (Artist.YearMini.HasValue && Artist.YearMaxi.HasValue)
                 return $"{Artist.YearMini} - {Artist.YearMaxi}";
 
             if (Artist.YearMini.HasValue)
                 return $"{Artist.YearMini}";
+
             if (Artist.YearMaxi.HasValue)
                 return $"{Artist.YearMaxi}";
 
