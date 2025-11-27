@@ -15,45 +15,92 @@
 
         <Pivot>
             <PivotItem x:Uid="OptionTabOptions">
-                <StackPanel Spacing="10" Margin="6,12,0,0">
-                    <StackPanel Orientation="Vertical" Spacing="12" VerticalAlignment="Center">
-                        <TextBlock x:Uid="optionsThemeLabel" VerticalAlignment="Center" />
-                        <ComboBox Width="220" SelectedValuePath="Tag" SelectedValue="{x:Bind ThemeString, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
-                            <ComboBoxItem x:Uid="optionsThemeSystemItem" Tag="System" Content="Système" />
-                            <ComboBoxItem x:Uid="optionsThemeLightItem" Tag="Light" Content="Clair" />
-                            <ComboBoxItem x:Uid="optionsThemeDarkItem" Tag="Dark" Content="Sombre" />
-                        </ComboBox>
+                <Border Background="{ThemeResource CardBackgroundFillColorDefault}"
+                        Padding="4"
+                        CornerRadius="12"
+                        Margin="8">
+                    <StackPanel Spacing="10"
+                                Margin="6,12,0,0">
+                        <StackPanel Orientation="Vertical"
+                                    Spacing="12"
+                                    VerticalAlignment="Center">
+                            <TextBlock x:Uid="optionsThemeLabel"
+                                       VerticalAlignment="Center" />
+                            <ComboBox Width="220"
+                                      SelectedValuePath="Tag"
+                                      SelectedValue="{x:Bind ThemeString, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+                                <ComboBoxItem x:Uid="optionsThemeSystemItem"
+                                              Tag="System"
+                                              Content="Système" />
+                                <ComboBoxItem x:Uid="optionsThemeLightItem"
+                                              Tag="Light"
+                                              Content="Clair" />
+                                <ComboBoxItem x:Uid="optionsThemeDarkItem"
+                                              Tag="Dark"
+                                              Content="Sombre" />
+                            </ComboBox>
+                        </StackPanel>
+
+                        <ToggleSwitch x:Uid="OptionsHideArtistsSwitch"
+                                      IsOn="{x:Bind Options.HideArtistsWithoutAlbum, Mode=TwoWay}"
+                                      x:Name="HideArtistsSwitch"
+                                      VerticalAlignment="Center" />
+                        <ToggleSwitch x:Uid="OptionsCrossFadeSwitch"
+                                      x:Name="OptionsCrossFadeSwitch"
+                                      IsOn="{x:Bind Options.CrossFade, Mode=TwoWay}" />
+                        <ToggleSwitch x:Uid="optionsRefreshAtStartupSwitch"
+                                      x:Name="optionsRefreshAtStartupSwitch"
+                                      IsOn="{x:Bind Options.RefreshLibraryAtStartup, Mode=TwoWay}" />
+                        <ToggleSwitch x:Uid="OptionsImportWithArtistGenreSwitch"
+                                      IsOn="{x:Bind Options.ImportTrackWithArtistGenre, Mode=TwoWay}" />
+                        <ToggleSwitch x:Uid="OptionsNovaApiEnabledSwitch"
+                                      IsOn="{x:Bind Options.NovaApiEnabled, Mode=TwoWay}" />
+                        <ToggleSwitch x:Uid="OptionsTelemetryEnabledSwitch"
+                                      IsOn="{x:Bind Options.TelemetryEnabled, Mode=TwoWay}" />
+
                     </StackPanel>
-
-                    <ToggleSwitch x:Uid="OptionsHideArtistsSwitch" IsOn="{x:Bind Options.HideArtistsWithoutAlbum, Mode=TwoWay}" x:Name="HideArtistsSwitch" VerticalAlignment="Center"/>
-                    <ToggleSwitch x:Uid="OptionsCrossFadeSwitch" x:Name="OptionsCrossFadeSwitch" IsOn="{x:Bind Options.CrossFade, Mode=TwoWay}" />
-                    <ToggleSwitch x:Uid="optionsRefreshAtStartupSwitch" x:Name="optionsRefreshAtStartupSwitch" IsOn="{x:Bind Options.RefreshLibraryAtStartup, Mode=TwoWay}" />
-                    <ToggleSwitch x:Uid="OptionsImportWithArtistGenreSwitch" IsOn="{x:Bind Options.ImportTrackWithArtistGenre, Mode=TwoWay}" />
-                    <ToggleSwitch x:Uid="OptionsNovaApiEnabledSwitch" IsOn="{x:Bind Options.NovaApiEnabled, Mode=TwoWay}" />
-                    <ToggleSwitch x:Uid="OptionsTelemetryEnabledSwitch" IsOn="{x:Bind Options.TelemetryEnabled, Mode=TwoWay}" />
-
-                </StackPanel>
+                </Border>
             </PivotItem>
 
             <PivotItem x:Uid="OptionTabLibrary">
-                <StackPanel Spacing="10" Margin="6,12,0,0">
+                <Border Background="{ThemeResource CardBackgroundFillColorDefault}"
+                        Padding="4"
+                        CornerRadius="12"
+                        Margin="8">
+                    <StackPanel Spacing="10"
+                                Margin="6,12,0,0">
 
-                    <StackPanel Orientation="Horizontal" Spacing="8">
-                        <Button x:Uid="AddLibraryFolderButton" x:Name="AddLibraryFolderButton" Click="AddLibraryFolderButton_Click" />
-                        <Button x:Uid="RemoveLibraryFolderButton" x:Name="RemoveLibraryFolderButton" Click="RemoveLibraryFolderButton_Click" />
+                        <StackPanel Orientation="Horizontal"
+                                    Spacing="8">
+                            <Button x:Uid="AddLibraryFolderButton"
+                                    x:Name="AddLibraryFolderButton"
+                                    Click="AddLibraryFolderButton_Click" />
+                            <Button x:Uid="RemoveLibraryFolderButton"
+                                    x:Name="RemoveLibraryFolderButton"
+                                    Click="RemoveLibraryFolderButton_Click" />
+                        </StackPanel>
+
+                        <ListView x:Name="LibraryPathsList"
+                                  ItemsSource="{x:Bind Paths}"
+                                  BorderBrush="{ThemeResource DividerStrokeColorDefaultBrush}"
+                                  BorderThickness="1"
+                                  SelectionMode="Single"
+                                  Height="120"
+                                  Width="420"
+                                  HorizontalAlignment="Left">
+                            <ListView.ItemTemplate>
+                                <DataTemplate x:DataType="local:PathItem">
+                                    <StackPanel Orientation="Horizontal"
+                                                Spacing="8">
+                                        <FontIcon Glyph="&#xE8B7;"
+                                                  Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                                        <TextBlock Text="{x:Bind Value}" />
+                                    </StackPanel>
+                                </DataTemplate>
+                            </ListView.ItemTemplate>
+                        </ListView>
                     </StackPanel>
-
-                    <ListView x:Name="LibraryPathsList" ItemsSource="{x:Bind Paths}" BorderBrush="{ThemeResource DividerStrokeColorDefaultBrush}" BorderThickness="1" SelectionMode="Single" Height="120" Width="420" HorizontalAlignment="Left">
-                        <ListView.ItemTemplate>
-                            <DataTemplate x:DataType="local:PathItem">
-                                <StackPanel Orientation="Horizontal" Spacing="8">
-                                    <FontIcon Glyph="&#xE8B7;" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
-                                    <TextBlock Text="{x:Bind Value}" />
-                                </StackPanel>
-                            </DataTemplate>
-                        </ListView.ItemTemplate>
-                    </ListView>
-                </StackPanel>
+                </Border>
             </PivotItem>
 
             <PivotItem x:Uid="OptionTabAbout">
