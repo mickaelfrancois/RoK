@@ -26,6 +26,8 @@ public partial class ArtistViewModel : ObservableObject
 
     private IEnumerable<TrackDto>? _tracks = null;
 
+    public bool LastFmPageAvailable { get; set; }
+
     public bool IsFavorite
     {
         get => Artist.IsFavorite;
@@ -151,7 +153,6 @@ public partial class ArtistViewModel : ObservableObject
         }
     }
 
-    private double _durationTotal;
     public string DurationTotal
     {
         get
@@ -199,13 +200,14 @@ public partial class ArtistViewModel : ObservableObject
         }
     }
 
-    public AsyncRelayCommand ListenCommand { get; private set; }
-    public RelayCommand ArtistOpenCommand { get; private set; }
-    public RelayCommand ArtistsByCountryOpenCommand { get; private set; }
-    public RelayCommand GenreOpenCommand { get; private set; }
-    public AsyncRelayCommand ArtistFavoriteCommand { get; private set; }
-    public AsyncRelayCommand SelectPictureCommand { get; private set; }
-    public AsyncRelayCommand OpenOfficielSiteCommand { get; private set; }
+    public AsyncRelayCommand ListenCommand { get; }
+    public RelayCommand ArtistOpenCommand { get; }
+    public RelayCommand ArtistsByCountryOpenCommand { get; }
+    public RelayCommand GenreOpenCommand { get; }
+    public AsyncRelayCommand ArtistFavoriteCommand { get; }
+    public AsyncRelayCommand SelectPictureCommand { get; }
+    public AsyncRelayCommand OpenOfficielSiteCommand { get; }
+    public RelayCommand OpenLastFmPageCommand { get; }
 
     private readonly IMediator _mediator;
     private readonly IArtistPicture _artistPicture;
@@ -215,13 +217,15 @@ public partial class ArtistViewModel : ObservableObject
     private readonly ILogger<ArtistViewModel> _logger;
     private readonly IPlayerService _playerService;
     private readonly INovaApiService _novaApiService;
+    private readonly ILastFmClient _lastFmClient;
 
     public override string ToString() => Artist?.Name ?? string.Empty;
 
 
 
-    public ArtistViewModel(INovaApiService novaApiService, IMediator mediator, IPlayerService playerService, IArtistPicture artistPicture, BackdropPicture backdropPicture, NavigationService navigationService, ResourceLoader resourceLoader, ILogger<ArtistViewModel> logger)
+    public ArtistViewModel(ILastFmClient lastFmClient, INovaApiService novaApiService, IMediator mediator, IPlayerService playerService, IArtistPicture artistPicture, BackdropPicture backdropPicture, NavigationService navigationService, ResourceLoader resourceLoader, ILogger<ArtistViewModel> logger)
     {
+        _lastFmClient = Guard.Against.Null(lastFmClient);
         _novaApiService = Guard.Against.Null(novaApiService);
         _mediator = Guard.Against.Null(mediator);
         _playerService = Guard.Against.Null(playerService);
@@ -238,6 +242,7 @@ public partial class ArtistViewModel : ObservableObject
         ArtistOpenCommand = new RelayCommand(ArtistOpen);
         SelectPictureCommand = new AsyncRelayCommand(SelectPictureAsync);
         OpenOfficielSiteCommand = new AsyncRelayCommand(OpenOfficialSiteAsync);
+        OpenLastFmPageCommand = new RelayCommand(OpenLastFmPage);
     }
 
 
@@ -274,6 +279,8 @@ public partial class ArtistViewModel : ObservableObject
                                 loadAlbums,
                                 loadTracks,
                                 fetchApi);
+
+        await CheckLastFmUrlAsync();
     }
 
 
@@ -348,10 +355,8 @@ public partial class ArtistViewModel : ObservableObject
     {
         _tracks = await _mediator.SendMessageAsync(new GetTracksByArtistIdQuery(artistId));
         if (_tracks != null)
-        {
             Tracks.AddRange(TrackViewModelMap.CreateViewModels(_tracks.ToList()));
-            _durationTotal = _tracks.Sum(c => c.Duration);
-        }
+
         OnPropertyChanged(nameof(DurationTotal));
     }
 
@@ -616,5 +621,25 @@ public partial class ArtistViewModel : ObservableObject
         Artist = artistResult.Value!;
 
         Messenger.Send(new ArtistUpdateMessage(Artist.Id, ActionType.Update));
+    }
+
+
+    private async Task CheckLastFmUrlAsync()
+    {
+        LastFmPageAvailable = await _lastFmClient.IsArtistPageAvailableAsync(Artist.Name);
+
+        OnPropertyChanged(nameof(LastFmPageAvailable));
+    }
+
+
+    private void OpenLastFmPage()
+    {
+        if (LastFmPageAvailable)
+        {
+            string artistPageUrl = _lastFmClient.GetArtistPageUrl(Artist.Name);
+
+            Uri uri = new(artistPageUrl);
+            _ = Windows.System.Launcher.LaunchUriAsync(uri);
+        }
     }
 }

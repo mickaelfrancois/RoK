@@ -553,12 +553,12 @@ public partial class PlayerViewModel : ObservableObject
                     SyncLyrics = syncLyrics;
                 }
             }
-
-            OnPropertyChanged(nameof(Lyrics));
-            OnPropertyChanged(nameof(LyricsExist));
-            OnPropertyChanged(nameof(IsSynchronizedLyrics));
-            OnPropertyChanged(nameof(PlainLyrics));
         }
+
+        OnPropertyChanged(nameof(Lyrics));
+        OnPropertyChanged(nameof(LyricsExist));
+        OnPropertyChanged(nameof(IsSynchronizedLyrics));
+        OnPropertyChanged(nameof(PlainLyrics));
     }
 
 
@@ -590,6 +590,9 @@ public partial class PlayerViewModel : ObservableObject
 
     private void ResetLyrics()
     {
+        _lyrics = new();
+        SyncLyrics = new();
+        Lyrics.Clear();
         _lyricsCurrentIndex = -1;
         CurrentLyric = new();
 
