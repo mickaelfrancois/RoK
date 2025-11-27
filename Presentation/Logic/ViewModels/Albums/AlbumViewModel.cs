@@ -22,6 +22,8 @@ public partial class AlbumViewModel : ObservableObject
 
     private IEnumerable<TrackDto>? _tracks = null;
 
+    public bool LastFmPageAvailable { get; set; }
+
     public bool IsFavorite
     {
         get => Album.IsFavorite;
@@ -124,6 +126,7 @@ public partial class AlbumViewModel : ObservableObject
     public AsyncRelayCommand AlbumFavoriteCommand { get; private set; }
     public AsyncRelayCommand SelectPictureCommand { get; private set; }
     public AsyncRelayCommand EditAlbumCommand { get; }
+    public RelayCommand OpenLastFmPageCommand { get; }
 
     private readonly IMediator _mediator;
     private readonly NavigationService _navigationService;
@@ -133,6 +136,7 @@ public partial class AlbumViewModel : ObservableObject
     private readonly IPlayerService _playerService;
     private readonly ILogger<AlbumViewModel> _logger;
     private readonly INovaApiService _novaApiService;
+    private readonly ILastFmClient _lastFmClient;
 
     public override string ToString()
     {
@@ -142,8 +146,9 @@ public partial class AlbumViewModel : ObservableObject
     }
 
 
-    public AlbumViewModel(INovaApiService novaApiService, IMediator mediator, NavigationService navigationService, IPlayerService playerService, IAlbumPicture albumPicture, BackdropPicture backdropPicture, ResourceLoader resourceLoader, ILogger<AlbumViewModel> logger)
+    public AlbumViewModel(ILastFmClient lastFmClient, INovaApiService novaApiService, IMediator mediator, NavigationService navigationService, IPlayerService playerService, IAlbumPicture albumPicture, BackdropPicture backdropPicture, ResourceLoader resourceLoader, ILogger<AlbumViewModel> logger)
     {
+        _lastFmClient = Guard.Against.Null(lastFmClient);
         _novaApiService = Guard.Against.Null(novaApiService);
         _mediator = Guard.Against.Null(mediator);
         _navigationService = Guard.Against.Null(navigationService);
@@ -161,6 +166,7 @@ public partial class AlbumViewModel : ObservableObject
         OpenArtistsByCountryCommand = new RelayCommand(() => { });
         SelectPictureCommand = new AsyncRelayCommand(SelectPictureAsync);
         EditAlbumCommand = new AsyncRelayCommand(EditAlbumAsync);
+        OpenLastFmPageCommand = new RelayCommand(OpenLastFmPage);
     }
 
 
@@ -183,7 +189,9 @@ public partial class AlbumViewModel : ObservableObject
         await GetDataFromApiAsync();
 
         stopwatch.Stop();
-        _logger.LogInformation("Album {albumId} loaded in {ElapsedMilliseconds} ms", albumId, stopwatch.ElapsedMilliseconds);
+        _logger.LogInformation("Album {AlbumId} loaded in {ElapsedMilliseconds} ms", albumId, stopwatch.ElapsedMilliseconds);
+
+        await CheckLastFmUrlAsync();
     }
 
 
@@ -463,11 +471,30 @@ public partial class AlbumViewModel : ObservableObject
         BitmapImage bitmap = new();
         await bitmap.SetSourceAsync(stream);
 
-        // Affecter sur le thread UI
         if (Rok.App.MainWindow.DispatcherQueue is { } dq)
             dq.TryEnqueue(() => Picture = bitmap);
         else
             Picture = bitmap;
+    }
+
+
+    private async Task CheckLastFmUrlAsync()
+    {
+        LastFmPageAvailable = await _lastFmClient.IsAlbumPageAvailableAsync(Album.ArtistName, Album.Name);
+
+        OnPropertyChanged(nameof(LastFmPageAvailable));
+    }
+
+
+    private void OpenLastFmPage()
+    {
+        if (LastFmPageAvailable)
+        {
+            string artistPageUrl = _lastFmClient.GetAlbumPageUrl(Album.ArtistName, Album.Name);
+
+            Uri uri = new(artistPageUrl);
+            _ = Windows.System.Launcher.LaunchUriAsync(uri);
+        }
     }
 }
 

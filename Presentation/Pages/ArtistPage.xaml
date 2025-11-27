@@ -96,6 +96,11 @@
                                   Command="{x:Bind ViewModel.OpenOfficielSiteCommand}"
                                   Visibility="{x:Bind ViewModel.Artist.OfficialSiteUrl, Converter={StaticResource StringToVisibilityConverter}}" />
 
+                    <AppBarButton x:Uid="artistViewLastFm"
+                                  Style="{StaticResource headerLastFmButton}"
+                                  Command="{x:Bind ViewModel.OpenLastFmPageCommand, Mode=OneWay}"
+                                  Visibility="{x:Bind ViewModel.LastFmPageAvailable, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" />
+
                     <AppBarButton x:Uid="artistViewBiography" 
                                   Style="{StaticResource headerBiographyButton}"
                                   Click="ArtistViewBiography_Click"
@@ -106,10 +111,10 @@
                                   Visibility="Collapsed"                                    
                                   IsEnabled="False"/>
 
-                    <AppBarButton x:Uid="artistViewEdit" 
+                    <AppBarButton x:Uid="artistViewEdit"
                                   Style="{StaticResource headerEditButton}"
-                                  Visibility="Collapsed"                                    
-                                  IsEnabled="False"/>
+                                  Visibility="Collapsed"
+                                  IsEnabled="False" />
                 </CommandBar>
             </RelativePanel>
 

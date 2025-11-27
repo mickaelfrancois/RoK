@@ -5,6 +5,7 @@ using Rok.Application.Interfaces;
 using Rok.Application.Tag;
 using Rok.Infrastructure.Files;
 using Rok.Infrastructure.FileSystem;
+using Rok.Infrastructure.LastFm;
 using Rok.Infrastructure.Lyrics;
 using Rok.Infrastructure.Migration;
 using Rok.Infrastructure.NovaApi;
@@ -57,6 +58,7 @@ public static class DependencyInjection
 
         services.AddSingleton<ITagService, TagService>();
         services.AddSingleton<INovaApiService, NovaApiService>();
+        services.AddSingleton<ILastFmClient, LastFmClient>();
         services.AddSingleton<ITelemetryClient, TelemetryClient>();
         services.AddSingleton<DiscordRichPresenceService>();
 
