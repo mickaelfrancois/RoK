@@ -1,29 +1,52 @@
 <?xml version="1.0" encoding="utf-8"?>
-<UserControl
-    x:Class="Rok.Commons.PictureControl"
-    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:local="using:Rok.Commons"
-    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    x:Name="parent"
-    mc:Ignorable="d">
+<UserControl x:Class="Rok.Commons.PictureControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="using:Rok.Commons"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             x:Name="parent"
+             mc:Ignorable="d">
 
-    <Grid PointerExited="Cover_PointerExited" PointerEntered="Cover_PointerEntered">
+    <Grid PointerExited="Cover_PointerExited"
+          PointerEntered="Cover_PointerEntered">
         <VisualStateManager.VisualStateGroups>
             <VisualStateGroup x:Name="CommonStates">
                 <VisualState x:Name="Normal">
                     <Storyboard>
-                        <DoubleAnimation Duration="0" To="0.0" Storyboard.TargetProperty="UIElement.Opacity" Storyboard.TargetName="btPlay"  />
-                        <DoubleAnimation Duration="0" To="0.0" Storyboard.TargetProperty="UIElement.Opacity" Storyboard.TargetName="btAddPlaylist"  />
-                        <DoubleAnimation Storyboard.TargetName="img1" Storyboard.TargetProperty="Opacity" To="1.0" />
+                        <DoubleAnimation Duration="0"
+                                         To="0.0"
+                                         Storyboard.TargetProperty="UIElement.Opacity"
+                                         Storyboard.TargetName="btPlay" />
+                        <DoubleAnimation Duration="0"
+                                         To="0.0"
+                                         Storyboard.TargetProperty="UIElement.Opacity"
+                                         Storyboard.TargetName="btAddPlaylist" />
+                        <DoubleAnimation Storyboard.TargetName="img1"
+                                         Storyboard.TargetProperty="Opacity"
+                                         To="1.0" />
                     </Storyboard>
                 </VisualState>
                 <VisualState x:Name="PointerOver">
                     <Storyboard>
-                        <DoubleAnimation Storyboard.TargetName="btPlay" Storyboard.TargetProperty="Opacity" To="1.0" />
-                        <DoubleAnimation Storyboard.TargetName="btAddPlaylist" Storyboard.TargetProperty="Opacity" To="1.0" />
-                        <DoubleAnimation Storyboard.TargetName="img1" Storyboard.TargetProperty="Opacity" To="0.7" />
+                        <DoubleAnimation Storyboard.TargetName="btPlay"
+                                         Storyboard.TargetProperty="Opacity"
+                                         To="1.0" />
+                        <DoubleAnimation Storyboard.TargetName="btAddPlaylist"
+                                         Storyboard.TargetProperty="Opacity"
+                                         To="1.0" />
+                        <DoubleAnimation Storyboard.TargetName="img1"
+                                         Storyboard.TargetProperty="Opacity"
+                                         To="0.7" />
+
+                        <DoubleAnimation Storyboard.TargetName="img1Scale"
+                                         Storyboard.TargetProperty="ScaleX"
+                                         To="1.08"
+                                         Duration="0:0:0.2" />
+                        <DoubleAnimation Storyboard.TargetName="img1Scale"
+                                         Storyboard.TargetProperty="ScaleY"
+                                         To="1.08"
+                                         Duration="0:0:0.2" />
                     </Storyboard>
                 </VisualState>
             </VisualStateGroup>
@@ -31,22 +54,85 @@
             <VisualStateGroup x:Name="imgAnimation">
                 <VisualState x:Name="imgLoaded">
                     <Storyboard>
-                        <DoubleAnimation Duration="0:0:0" From="0.4" To="0" Storyboard.TargetProperty="Opacity" Storyboard.TargetName="imgDefault"  />
-                        <DoubleAnimation Duration="0:0:2" From="0" To="1.0" Storyboard.TargetProperty="Opacity" Storyboard.TargetName="img1"  />
+                        <DoubleAnimation Duration="0:0:0"
+                                         From="0.4"
+                                         To="0"
+                                         Storyboard.TargetProperty="Opacity"
+                                         Storyboard.TargetName="imgDefault" />
+                        <DoubleAnimation Duration="0:0:2"
+                                         From="0"
+                                         To="1.0"
+                                         Storyboard.TargetProperty="Opacity"
+                                         Storyboard.TargetName="img1" />
+
+                        <DoubleAnimation Storyboard.TargetName="img1Scale"
+                                         Storyboard.TargetProperty="ScaleX"
+                                         To="1.0"
+                                         Duration="0:0:0.2" />
+                        <DoubleAnimation Storyboard.TargetName="img1Scale"
+                                         Storyboard.TargetProperty="ScaleY"
+                                         To="1.0"
+                                         Duration="0:0:0.2" />
                     </Storyboard>
                 </VisualState>
             </VisualStateGroup>
         </VisualStateManager.VisualStateGroups>
-        
-        <TextBlock FontFamily="Segoe MDL2 Assets" Text="{Binding ElementName=parent,Path=Icon}" x:Name="imgDefault" VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="128" Opacity="0.4" Margin="0"></TextBlock>
 
-        <Grid Width="{Binding ElementName=parent,Path=Width}" Height="{Binding ElementName=parent,Path=Height}">
-            <Image x:Name="img1" Margin="0" Source="{Binding ElementName=parent,Path=Cover}" Loaded="img_Loaded" UseLayoutRounding="True" HorizontalAlignment="Center" VerticalAlignment="Center" Stretch="UniformToFill" />
+        <TextBlock FontFamily="Segoe MDL2 Assets"
+                   Text="{Binding ElementName=parent,Path=Icon}"
+                   x:Name="imgDefault"
+                   VerticalAlignment="Center"
+                   HorizontalAlignment="Center"
+                   FontSize="128"
+                   Opacity="0.4"
+                   Margin="0"></TextBlock>
+
+        <Grid Width="{Binding ElementName=parent,Path=Width}"
+              Height="{Binding ElementName=parent,Path=Height}">
+            <Image x:Name="img1"
+                   Margin="0"
+                   Source="{Binding ElementName=parent,Path=Cover}"
+                   Loaded="ImgLoaded"
+                   SizeChanged="ImgSizeChanged"
+                   UseLayoutRounding="True"
+                   HorizontalAlignment="Center"
+                   VerticalAlignment="Center"
+                   Stretch="UniformToFill">
+                <Image.RenderTransform>
+                    <ScaleTransform x:Name="img1Scale"
+                                    ScaleX="1"
+                                    ScaleY="1" />
+                </Image.RenderTransform>
+            </Image>
         </Grid>
 
-        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
-            <AppBarButton Style="{StaticResource coverPlayButtonCircle}" Icon="Play" IsCompact="True" Visibility="Collapsed" Opacity="0.0" BorderThickness="0" Command="{Binding ElementName=parent, Path=Command}" BorderBrush="{x:Null}" x:Name="btPlay" Background="Gray"  Width="96" Height="96"  ></AppBarButton>
-            <AppBarButton Style="{StaticResource coverPlayButtonCircle}" Icon="Add" IsCompact="True" Visibility="Collapsed" Opacity="0.0" BorderThickness="0" Flyout="{Binding ElementName=parent, Path=Flyout}" BorderBrush="{x:Null}" x:Name="btAddPlaylist" Background="Gray"  Width="96" Height="96"  ></AppBarButton>
+        <StackPanel Orientation="Horizontal"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center">
+            <AppBarButton Style="{StaticResource coverPlayButtonCircle}"
+                          Icon="Play"
+                          IsCompact="True"
+                          Visibility="Collapsed"
+                          Opacity="0.0"
+                          BorderThickness="0"
+                          Command="{Binding ElementName=parent, Path=Command}"
+                          BorderBrush="{x:Null}"
+                          x:Name="btPlay"
+                          Background="Gray"
+                          Width="96"
+                          Height="96"></AppBarButton>
+            <AppBarButton Style="{StaticResource coverPlayButtonCircle}"
+                          Icon="Add"
+                          IsCompact="True"
+                          Visibility="Collapsed"
+                          Opacity="0.0"
+                          BorderThickness="0"
+                          Flyout="{Binding ElementName=parent, Path=Flyout}"
+                          BorderBrush="{x:Null}"
+                          x:Name="btAddPlaylist"
+                          Background="Gray"
+                          Width="96"
+                          Height="96"></AppBarButton>
         </StackPanel>
 
     </Grid>
