@@ -11,6 +11,7 @@ namespace Rok.Infrastructure.Repositories;
 public partial class GenericRepository<T>(IDbConnection db, [FromKeyedServices("BackgroundConnection")] IDbConnection backgroundDb, IDbTransaction? transaction, ILogger<GenericRepository<T>> logger)
                                 : IRepository<T> where T : class
 {
+    private const int SlowQueryThresholdMilliseconds = 1000;
     protected readonly IDbConnection _connection = db ?? throw new ArgumentNullException(nameof(db));
     protected readonly IDbConnection _backgroundConnection = backgroundDb ?? throw new ArgumentNullException(nameof(backgroundDb));
     protected readonly IDbTransaction? _transaction = transaction;
@@ -95,23 +96,6 @@ public partial class GenericRepository<T>(IDbConnection db, [FromKeyedServices("
         }
     }
 
-    protected async Task<T> ExecuteScalarAsync(string sql, RepositoryConnectionKind kind = RepositoryConnectionKind.Foreground, object? param = null)
-    {
-        Stopwatch stopwatch = Stopwatch.StartNew();
-
-        try
-        {
-            IDbConnection localConnection = ResolveConnection(kind);
-            IEnumerable<T> result = await localConnection.QueryAsync<T>(sql, param: param);
-
-            return result.FirstOrDefault()!;
-        }
-        finally
-        {
-            stopwatch.Stop();
-            LogQuery(kind, sql, stopwatch, param);
-        }
-    }
 
     protected async Task<T?> QuerySingleOrDefaultAsync(string sql, RepositoryConnectionKind kind, object? param)
     {
@@ -134,7 +118,11 @@ public partial class GenericRepository<T>(IDbConnection db, [FromKeyedServices("
         if (_transaction is not null)
         {
             if (kind == RepositoryConnectionKind.Background)
-                _logger.LogWarning("Tentative d'utiliser la connexion background pendant une transaction : fall‑back sur la connexion principale.");
+            {
+                _logger.LogCritical("Attempt to use background connection while a transaction is active. This is not allowed.");
+                throw new InvalidOperationException("Cannot use background connection when a transaction is active.");
+            }
+
             return _connection;
         }
 
@@ -157,6 +145,13 @@ public partial class GenericRepository<T>(IDbConnection db, [FromKeyedServices("
             // En cas d'échec de sérialisation, logguer l'exception mais continuer.
             _logger.LogWarning(ex, "Failed to serialize query parameters for logging.");
             serializedParams = "<unserializable>";
+        }
+
+        if (stopwatch.ElapsedMilliseconds > SlowQueryThresholdMilliseconds)
+        {
+            _logger.LogWarning("Slow SQL execution detected ({Kind}): {Sql} | Params: {Params} | Elapsed: {ElapsedMilliseconds}ms",
+                               kind, sql, serializedParams, stopwatch.ElapsedMilliseconds);
+            return;
         }
 
         _logger.LogInformation("Executed SQL ({Kind}): {Sql} | Params: {Params} | Elapsed: {ElapsedMilliseconds}ms",

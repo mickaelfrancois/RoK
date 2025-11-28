@@ -114,7 +114,7 @@ public class AlbumRepository(IDbConnection connection, [FromKeyedServices("Backg
                      LEFT JOIN countries ON countries.Id = artists.countryId
                 """;
 
-        if (string.IsNullOrEmpty(whereParam) == false)
+        if (!string.IsNullOrEmpty(whereParam))
             query += $" WHERE albums.{whereParam} = @{whereParam}";
 
         return query;
