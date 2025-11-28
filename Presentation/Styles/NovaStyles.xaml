@@ -1,70 +1,94 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ResourceDictionary
-    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:common="using:Rok.Commons" >
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:common="using:Rok.Commons">
 
-    <SolidColorBrush x:Key="PrimaryThemeBrush" Color="#154587" />
-    <SolidColorBrush x:Key="PrimaryHoverThemeBrush" Color="#0D2A54" />
-    <SolidColorBrush x:Key="PrimaryPressedThemeBrush" Color="#123D7A" />
+    <SolidColorBrush x:Key="PrimaryThemeBrush"
+                     Color="#154587" />
+    <SolidColorBrush x:Key="PrimaryHoverThemeBrush"
+                     Color="#0D2A54" />
+    <SolidColorBrush x:Key="PrimaryPressedThemeBrush"
+                     Color="#123D7A" />
 
-    <SolidColorBrush x:Key="DefaultThemeBrush" Color="#257EF9" />
-    <SolidColorBrush x:Key="HoverThemeBrush" Color="#154587" />
-    <SolidColorBrush x:Key="PressedThemeBrush" Color="#123D7A" />
-    
+    <SolidColorBrush x:Key="DefaultThemeBrush"
+                     Color="#257EF9" />
+    <SolidColorBrush x:Key="HoverThemeBrush"
+                     Color="#154587" />
+    <SolidColorBrush x:Key="PressedThemeBrush"
+                     Color="#123D7A" />
+
     <!--<SolidColorBrush x:Key="HoverThemeBrush" Color="#3ABC2C" />
     <SolidColorBrush x:Key="PressedThemeBrush" Color="#33732C" />-->
-        
-    <SolidColorBrush x:Key="NavigationViewExpandedPaneBackground1" Color="#F1F1F1"/>
-    <SolidColorBrush x:Key="NavigationViewDefaultPaneBackground1" Color="#313131"/>
+
+    <SolidColorBrush x:Key="NavigationViewExpandedPaneBackground1"
+                     Color="#F1F1F1" />
+    <SolidColorBrush x:Key="NavigationViewDefaultPaneBackground1"
+                     Color="#313131" />
     <CornerRadius x:Key="NavigationViewContentGridCornerRadius">0</CornerRadius>
 
-    <Style x:Key="HeaderStyle" TargetType="TextBlock">
-        <Setter Property="FontFamily" Value="Arial"></Setter>
-        <Setter Property="FontWeight" Value="Bold"></Setter>
-        <Setter Property="FontSize" Value="24"></Setter>
+    <Style x:Key="HeaderStyle"
+           TargetType="TextBlock">
+        <Setter Property="FontFamily"
+                Value="Arial"></Setter>
+        <Setter Property="FontWeight"
+                Value="Bold"></Setter>
+        <Setter Property="FontSize"
+                Value="24"></Setter>
     </Style>
 
-    <Style x:Key="ButtonTextBlockStyle" TargetType="Button" BasedOn="{StaticResource TextBlockButtonStyle}">
-        <Setter Property="Padding" Value="0"/>
+    <Style x:Key="ButtonTextBlockStyle"
+           TargetType="Button"
+           BasedOn="{StaticResource TextBlockButtonStyle}">
+        <Setter Property="Padding"
+                Value="0" />
     </Style>
 
-    <Style x:Key="ButtonHighContrastStyle" TargetType="Button" BasedOn="{StaticResource TextBlockButtonStyle}">
-        <Setter Property="Padding" Value="0"/>
-        <Setter Property="Foreground" Value="{ThemeResource SystemColorHotlightColor}"/>
+    <Style x:Key="ButtonHighContrastStyle"
+           TargetType="Button"
+           BasedOn="{StaticResource TextBlockButtonStyle}">
+        <Setter Property="Padding"
+                Value="0" />
+        <Setter Property="Foreground"
+                Value="{ThemeResource SystemColorHotlightColor}" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="Button">
                     <Grid Background="Transparent">
                         <VisualStateManager.VisualStateGroups>
                             <VisualStateGroup x:Name="CommonStates">
-                                <VisualState x:Name="Normal"/>
+                                <VisualState x:Name="Normal" />
                                 <VisualState x:Name="PointerOver">
                                     <Storyboard>
-                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="ContentPresenter" Storyboard.TargetProperty="Foreground">
-                                            <DiscreteObjectKeyFrame KeyTime="0" Value="{ThemeResource SystemColorHighlightColor}"/>
+                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="ContentPresenter"
+                                                                       Storyboard.TargetProperty="Foreground">
+                                            <DiscreteObjectKeyFrame KeyTime="0"
+                                                                    Value="{ThemeResource SystemColorHighlightColor}" />
                                         </ObjectAnimationUsingKeyFrames>
                                     </Storyboard>
                                 </VisualState>
                                 <VisualState x:Name="Pressed">
                                     <Storyboard>
-                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="ContentPresenter" Storyboard.TargetProperty="Foreground">
-                                            <DiscreteObjectKeyFrame KeyTime="0" Value="{ThemeResource SystemColorHotlightColor}"/>
+                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="ContentPresenter"
+                                                                       Storyboard.TargetProperty="Foreground">
+                                            <DiscreteObjectKeyFrame KeyTime="0"
+                                                                    Value="{ThemeResource SystemColorHotlightColor}" />
                                         </ObjectAnimationUsingKeyFrames>
                                     </Storyboard>
                                 </VisualState>
                                 <VisualState x:Name="Disabled">
                                     <Storyboard>
-                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="ContentPresenter" Storyboard.TargetProperty="Foreground">
-                                            <DiscreteObjectKeyFrame KeyTime="0" Value="{ThemeResource SystemColorGreyTextColor}"/>
+                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="ContentPresenter"
+                                                                       Storyboard.TargetProperty="Foreground">
+                                            <DiscreteObjectKeyFrame KeyTime="0"
+                                                                    Value="{ThemeResource SystemColorGreyTextColor}" />
                                         </ObjectAnimationUsingKeyFrames>
                                     </Storyboard>
                                 </VisualState>
                             </VisualStateGroup>
                             <VisualStateGroup x:Name="FocusStates">
-                                <VisualState x:Name="Focused"/>
-                                <VisualState x:Name="PointerFocused"/>
-                                <VisualState x:Name="Unfocused"/>
+                                <VisualState x:Name="Focused" />
+                                <VisualState x:Name="PointerFocused" />
+                                <VisualState x:Name="Unfocused" />
                             </VisualStateGroup>
                         </VisualStateManager.VisualStateGroups>
 
@@ -74,110 +98,143 @@
                                           HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
                                           VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
                                           Foreground="{TemplateBinding Foreground}"
-                                          Margin="{TemplateBinding Padding}"/>
+                                          Margin="{TemplateBinding Padding}" />
                     </Grid>
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
     </Style>
 
-    <Style x:Key="HyperLinkHighContrastStyle" TargetType="HyperlinkButton">
-        <Setter Property="Padding" Value="0"/>
-        <Setter Property="Foreground" Value="{ThemeResource SystemColorHotlightColor}"/>
+    <Style x:Key="HyperLinkHighContrastStyle"
+           TargetType="HyperlinkButton">
+        <Setter Property="Padding"
+                Value="0" />
+        <Setter Property="Foreground"
+                Value="{ThemeResource SystemColorHotlightColor}" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="HyperlinkButton">
                     <Grid Background="Transparent">
                         <VisualStateManager.VisualStateGroups>
                             <VisualStateGroup x:Name="CommonStates">
-                                <VisualState x:Name="Normal"/>
+                                <VisualState x:Name="Normal" />
                                 <VisualState x:Name="PointerOver">
                                     <Storyboard>
-                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="ContentPresenter" Storyboard.TargetProperty="Foreground">
-                                            <DiscreteObjectKeyFrame KeyTime="0" Value="{ThemeResource SystemColorHighlightColor}"/>
+                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="ContentPresenter"
+                                                                       Storyboard.TargetProperty="Foreground">
+                                            <DiscreteObjectKeyFrame KeyTime="0"
+                                                                    Value="{ThemeResource SystemColorHighlightColor}" />
                                         </ObjectAnimationUsingKeyFrames>
                                     </Storyboard>
                                 </VisualState>
                                 <VisualState x:Name="Pressed">
                                     <Storyboard>
-                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="ContentPresenter" Storyboard.TargetProperty="Foreground">
-                                            <DiscreteObjectKeyFrame KeyTime="0" Value="{ThemeResource SystemColorHotlightColor}"/>
+                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="ContentPresenter"
+                                                                       Storyboard.TargetProperty="Foreground">
+                                            <DiscreteObjectKeyFrame KeyTime="0"
+                                                                    Value="{ThemeResource SystemColorHotlightColor}" />
                                         </ObjectAnimationUsingKeyFrames>
                                     </Storyboard>
                                 </VisualState>
                                 <VisualState x:Name="Disabled">
                                     <Storyboard>
-                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="ContentPresenter" Storyboard.TargetProperty="Foreground">
-                                            <DiscreteObjectKeyFrame KeyTime="0" Value="{ThemeResource SystemColorGreyTextColor}"/>
+                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="ContentPresenter"
+                                                                       Storyboard.TargetProperty="Foreground">
+                                            <DiscreteObjectKeyFrame KeyTime="0"
+                                                                    Value="{ThemeResource SystemColorGreyTextColor}" />
                                         </ObjectAnimationUsingKeyFrames>
                                     </Storyboard>
                                 </VisualState>
                             </VisualStateGroup>
                             <VisualStateGroup x:Name="FocusStates">
-                                <VisualState x:Name="Focused"/>
-                                <VisualState x:Name="PointerFocused"/>
-                                <VisualState x:Name="Unfocused"/>
+                                <VisualState x:Name="Focused" />
+                                <VisualState x:Name="PointerFocused" />
+                                <VisualState x:Name="Unfocused" />
                             </VisualStateGroup>
                         </VisualStateManager.VisualStateGroups>
 
                         <ContentPresenter x:Name="ContentPresenter"
-                                      Content="{TemplateBinding Content}"
-                                      ContentTemplate="{TemplateBinding ContentTemplate}"
-                                      HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
-                                      VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
-                                      Foreground="{TemplateBinding Foreground}"                                          
-                                      Margin="{TemplateBinding Padding}"/>
+                                          Content="{TemplateBinding Content}"
+                                          ContentTemplate="{TemplateBinding ContentTemplate}"
+                                          HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                          VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                                          Foreground="{TemplateBinding Foreground}"
+                                          Margin="{TemplateBinding Padding}" />
                     </Grid>
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
     </Style>
 
-    <Style x:Key="IconOnlyButtonStyle" TargetType="Button">
-        <Setter Property="Background" Value="Transparent"/>
-        <Setter Property="BorderBrush" Value="Transparent"/>
-        <Setter Property="BorderThickness" Value="0"/>
-        <Setter Property="Padding" Value="6"/>
-        <Setter Property="MinWidth" Value="0"/>
-        <Setter Property="MinHeight" Value="0"/>
+    <Style x:Key="IconOnlyButtonStyle"
+           TargetType="Button">
+        <Setter Property="Background"
+                Value="Transparent" />
+        <Setter Property="BorderBrush"
+                Value="Transparent" />
+        <Setter Property="BorderThickness"
+                Value="0" />
+        <Setter Property="Padding"
+                Value="6" />
+        <Setter Property="MinWidth"
+                Value="0" />
+        <Setter Property="MinHeight"
+                Value="0" />
     </Style>
 
-    <Style x:Key="HyperlinkSmallButtonStyle" TargetType="HyperlinkButton">
-        <Setter Property="Foreground" Value="{ThemeResource HyperlinkButtonForeground}"/>
-        <Setter Property="Background" Value="{ThemeResource HyperlinkButtonBackgroundThemeBrush}"/>
-        <Setter Property="BorderBrush" Value="{ThemeResource HyperlinkButtonBorderThemeBrush}"/>
-        <Setter Property="BorderThickness" Value="{ThemeResource HyperlinkButtonBorderThemeThickness}"/>
-        <Setter Property="Padding" Value="0,0,0,0"/>
-        <Setter Property="HorizontalAlignment" Value="Left"/>
-        <Setter Property="VerticalAlignment" Value="Center"/>
-        <Setter Property="FontFamily" Value="{ThemeResource ContentControlThemeFontFamily}"/>
-        <Setter Property="FontWeight" Value="Bold"/>
-        <Setter Property="FontSize" Value="{ThemeResource ControlContentThemeFontSize}"/>
+    <Style x:Key="HyperlinkSmallButtonStyle"
+           TargetType="HyperlinkButton">
+        <Setter Property="Foreground"
+                Value="{ThemeResource HyperlinkButtonForeground}" />
+        <Setter Property="Background"
+                Value="{ThemeResource HyperlinkButtonBackgroundThemeBrush}" />
+        <Setter Property="BorderBrush"
+                Value="{ThemeResource HyperlinkButtonBorderThemeBrush}" />
+        <Setter Property="BorderThickness"
+                Value="{ThemeResource HyperlinkButtonBorderThemeThickness}" />
+        <Setter Property="Padding"
+                Value="0,0,0,0" />
+        <Setter Property="HorizontalAlignment"
+                Value="Left" />
+        <Setter Property="VerticalAlignment"
+                Value="Center" />
+        <Setter Property="FontFamily"
+                Value="{ThemeResource ContentControlThemeFontFamily}" />
+        <Setter Property="FontWeight"
+                Value="Bold" />
+        <Setter Property="FontSize"
+                Value="{ThemeResource ControlContentThemeFontSize}" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="HyperlinkButton">
                     <Grid>
                         <VisualStateManager.VisualStateGroups>
                             <VisualStateGroup x:Name="CommonStates">
-                                <VisualState x:Name="Normal"/>
+                                <VisualState x:Name="Normal" />
                                 <VisualState x:Name="PointerOver">
                                     <Storyboard>
-                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="Foreground" Storyboard.TargetName="TextElement">
-                                            <DiscreteObjectKeyFrame KeyTime="0" Value="{ThemeResource HoverThemeBrush}"/>
+                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="Foreground"
+                                                                       Storyboard.TargetName="TextElement">
+                                            <DiscreteObjectKeyFrame KeyTime="0"
+                                                                    Value="{ThemeResource HoverThemeBrush}" />
                                         </ObjectAnimationUsingKeyFrames>
                                     </Storyboard>
                                 </VisualState>
                                 <VisualState x:Name="Pressed">
                                     <Storyboard>
-                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="Foreground" Storyboard.TargetName="TextElement">
-                                            <DiscreteObjectKeyFrame KeyTime="0" Value="{ThemeResource PressedThemeBrush}"/>
+                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="Foreground"
+                                                                       Storyboard.TargetName="TextElement">
+                                            <DiscreteObjectKeyFrame KeyTime="0"
+                                                                    Value="{ThemeResource PressedThemeBrush}" />
                                         </ObjectAnimationUsingKeyFrames>
                                     </Storyboard>
                                 </VisualState>
                                 <VisualState x:Name="Disabled">
                                     <Storyboard>
-                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="Foreground" Storyboard.TargetName="TextElement">
-                                            <DiscreteObjectKeyFrame KeyTime="0" Value="{ThemeResource HyperlinkDisabledThemeBrush}"/>
+                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="Foreground"
+                                                                       Storyboard.TargetName="TextElement">
+                                            <DiscreteObjectKeyFrame KeyTime="0"
+                                                                    Value="{ThemeResource HyperlinkDisabledThemeBrush}" />
                                         </ObjectAnimationUsingKeyFrames>
                                     </Storyboard>
                                 </VisualState>
@@ -185,16 +242,23 @@
                             <VisualStateGroup x:Name="FocusStates">
                                 <VisualState x:Name="Focused">
                                     <Storyboard>
-                                        <DoubleAnimation Duration="0" To="1" Storyboard.TargetProperty="Opacity" Storyboard.TargetName="FocusVisualWhite"/>
-                                        <DoubleAnimation Duration="0" To="1" Storyboard.TargetProperty="Opacity" Storyboard.TargetName="FocusVisualBlack"/>
+                                        <DoubleAnimation Duration="0"
+                                                         To="1"
+                                                         Storyboard.TargetProperty="Opacity"
+                                                         Storyboard.TargetName="FocusVisualWhite" />
+                                        <DoubleAnimation Duration="0"
+                                                         To="1"
+                                                         Storyboard.TargetProperty="Opacity"
+                                                         Storyboard.TargetName="FocusVisualBlack" />
                                     </Storyboard>
                                 </VisualState>
-                                <VisualState x:Name="Unfocused"/>
-                                <VisualState x:Name="PointerFocused"/>
+                                <VisualState x:Name="Unfocused" />
+                                <VisualState x:Name="PointerFocused" />
                             </VisualStateGroup>
                         </VisualStateManager.VisualStateGroups>
 
-                        <Border Background="{TemplateBinding Background}" Padding="{TemplateBinding Padding}" >
+                        <Border Background="{TemplateBinding Background}"
+                                Padding="{TemplateBinding Padding}">
                             <TextBlock x:Name="TextElement"
                                        Foreground="{TemplateBinding Foreground}"
                                        Text="{TemplateBinding Content}"
@@ -208,38 +272,66 @@
                             </TextBlock>
                         </Border>
 
-                        <Rectangle x:Name="FocusVisualWhite" IsHitTestVisible="False" Opacity="0" StrokeDashOffset="1.5" StrokeEndLineCap="Square" Stroke="{ThemeResource FocusVisualWhiteStrokeThemeBrush}" StrokeDashArray="1,1"/>
-                        <Rectangle x:Name="FocusVisualBlack" IsHitTestVisible="False" Opacity="0" StrokeDashOffset="0.5" StrokeEndLineCap="Square" Stroke="{ThemeResource FocusVisualBlackStrokeThemeBrush}" StrokeDashArray="1,1"/>
+                        <Rectangle x:Name="FocusVisualWhite"
+                                   IsHitTestVisible="False"
+                                   Opacity="0"
+                                   StrokeDashOffset="1.5"
+                                   StrokeEndLineCap="Square"
+                                   Stroke="{ThemeResource FocusVisualWhiteStrokeThemeBrush}"
+                                   StrokeDashArray="1,1" />
+                        <Rectangle x:Name="FocusVisualBlack"
+                                   IsHitTestVisible="False"
+                                   Opacity="0"
+                                   StrokeDashOffset="0.5"
+                                   StrokeEndLineCap="Square"
+                                   Stroke="{ThemeResource FocusVisualBlackStrokeThemeBrush}"
+                                   StrokeDashArray="1,1" />
                     </Grid>
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
     </Style>
 
-    <Style x:Key="HyperlinkGroupButtonStyle" TargetType="HyperlinkButton">
-        <Setter Property="FontWeight" Value="SemiBold"/>
-        <Setter Property="FontSize" Value="22"/>
-        <Setter Property="Padding" Value="8,4,8,4"/>
-        <Setter Property="HorizontalAlignment" Value="Left"/>
-        <Setter Property="VerticalAlignment" Value="Center"/>
-        <Setter Property="CornerRadius" Value="6"></Setter>
+    <Style x:Key="HyperlinkGroupButtonStyle"
+           TargetType="HyperlinkButton">
+        <Setter Property="FontWeight"
+                Value="SemiBold" />
+        <Setter Property="FontSize"
+                Value="22" />
+        <Setter Property="Padding"
+                Value="8,4,8,4" />
+        <Setter Property="HorizontalAlignment"
+                Value="Left" />
+        <Setter Property="VerticalAlignment"
+                Value="Center" />
+        <Setter Property="CornerRadius"
+                Value="6"></Setter>
     </Style>
 
-    <Style x:Key="coverPlayButtonCircle" TargetType="AppBarButton">
-        <Setter Property="Background" Value="Transparent"/>
-        <Setter Property="Foreground" Value="White"/>
-        <Setter Property="FontFamily" Value="{ThemeResource ContentControlThemeFontFamily}"/>
-        <Setter Property="FontWeight" Value="Bold"/>
-        <Setter Property="FontSize" Value="50"></Setter>
-        <Setter Property="Width" Value="64"/>
-        <Setter Property="UseSystemFocusVisuals" Value="False"/>
+    <Style x:Key="coverPlayButtonCircle"
+           TargetType="AppBarButton">
+        <Setter Property="Background"
+                Value="Transparent" />
+        <Setter Property="Foreground"
+                Value="White" />
+        <Setter Property="FontFamily"
+                Value="{ThemeResource ContentControlThemeFontFamily}" />
+        <Setter Property="FontWeight"
+                Value="Bold" />
+        <Setter Property="FontSize"
+                Value="50"></Setter>
+        <Setter Property="Width"
+                Value="64" />
+        <Setter Property="UseSystemFocusVisuals"
+                Value="False" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="AppBarButton">
-                    <Grid x:Name="Root" Background="Transparent">
+                    <Grid x:Name="Root"
+                          Background="Transparent">
                         <VisualStateManager.VisualStateGroups>
                             <VisualStateGroup x:Name="ApplicationViewStates">
-                                <VisualState x:Name="FullSize"/>
+                                <VisualState x:Name="FullSize" />
                                 <VisualState x:Name="Compact">
 
                                 </VisualState>
@@ -251,8 +343,10 @@
                                 </VisualState>
                                 <VisualState x:Name="Pressed">
                                     <Storyboard>
-                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="Opacity" Storyboard.TargetName="BackgroundEllipse">
-                                            <DiscreteObjectKeyFrame KeyTime="0" Value="0.4"/>
+                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="Opacity"
+                                                                       Storyboard.TargetName="BackgroundEllipse">
+                                            <DiscreteObjectKeyFrame KeyTime="0"
+                                                                    Value="0.4" />
                                         </ObjectAnimationUsingKeyFrames>
                                     </Storyboard>
                                 </VisualState>
@@ -260,43 +354,64 @@
                         </VisualStateManager.VisualStateGroups>
                         <StackPanel x:Name="ContentRoot">
                             <ContentPresenter x:Name="Content"
-                  Content="{TemplateBinding Icon}"
-                  FontSize="19"
-                  HorizontalAlignment="Stretch"
-                  Height="96"
-                  Margin="0,0,0,0"/>
+                                              Content="{TemplateBinding Icon}"
+                                              FontSize="19"
+                                              HorizontalAlignment="Stretch"
+                                              Height="96"
+                                              Margin="0,0,0,0" />
                         </StackPanel>
-                        <Ellipse x:Name="BackgroundEllipse" Fill="White" Opacity="0"  Height="48" UseLayoutRounding="False" Width="48"/>
-                        <Ellipse x:Name="OutlineEllipse" Height="48" Stroke="White" StrokeThickness="3" UseLayoutRounding="False" Width="48"/>
+                        <Ellipse x:Name="BackgroundEllipse"
+                                 Fill="White"
+                                 Opacity="0"
+                                 Height="48"
+                                 UseLayoutRounding="False"
+                                 Width="48" />
+                        <Ellipse x:Name="OutlineEllipse"
+                                 Height="48"
+                                 Stroke="White"
+                                 StrokeThickness="3"
+                                 UseLayoutRounding="False"
+                                 Width="48" />
                     </Grid>
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
     </Style>
 
-    <Style TargetType="Slider" x:Key="CustomrThumbSlider">
-        <Setter Property="Background" Value="{ThemeResource SystemControlForegroundBaseMediumLowBrush}" />
-        <Setter Property="BorderThickness" Value="{ThemeResource SliderBorderThemeThickness}" />
-        <Setter Property="Foreground" Value="{ThemeResource SystemControlHighlightAccentBrush}" />
-        <Setter Property="FontFamily" Value="{ThemeResource ContentControlThemeFontFamily}" />
-        <Setter Property="FontSize" Value="{ThemeResource ControlContentThemeFontSize}" />
-        <Setter Property="ManipulationMode" Value="None" />
-        <Setter Property="UseSystemFocusVisuals" Value="True" />
+    <Style TargetType="Slider"
+           x:Key="CustomrThumbSlider">
+        <Setter Property="Background"
+                Value="{ThemeResource SystemControlForegroundBaseMediumLowBrush}" />
+        <Setter Property="BorderThickness"
+                Value="{ThemeResource SliderBorderThemeThickness}" />
+        <Setter Property="Foreground"
+                Value="{ThemeResource SystemControlHighlightAccentBrush}" />
+        <Setter Property="FontFamily"
+                Value="{ThemeResource ContentControlThemeFontFamily}" />
+        <Setter Property="FontSize"
+                Value="{ThemeResource ControlContentThemeFontSize}" />
+        <Setter Property="ManipulationMode"
+                Value="None" />
+        <Setter Property="UseSystemFocusVisuals"
+                Value="True" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="Slider">
                     <Grid Margin="{TemplateBinding Padding}">
                         <Grid.Resources>
-                            <Style TargetType="Thumb" x:Key="SliderThumbStyle">
-                                <Setter Property="BorderThickness" Value="0" />
-                                <Setter Property="Background" Value="{ThemeResource SystemControlForegroundAccentBrush}" />
+                            <Style TargetType="Thumb"
+                                   x:Key="SliderThumbStyle">
+                                <Setter Property="BorderThickness"
+                                        Value="0" />
+                                <Setter Property="Background"
+                                        Value="{ThemeResource SystemControlForegroundAccentBrush}" />
                                 <Setter Property="Template">
                                     <Setter.Value>
                                         <ControlTemplate TargetType="Thumb">
                                             <Border Background="{TemplateBinding Background}"
-                                                  BorderBrush="{TemplateBinding BorderBrush}"
-                                                  BorderThickness="{TemplateBinding BorderThickness}"
-                                                  CornerRadius="30" />
+                                                    BorderBrush="{TemplateBinding BorderBrush}"
+                                                    BorderThickness="{TemplateBinding BorderThickness}"
+                                                    CornerRadius="30" />
                                         </ControlTemplate>
                                     </Setter.Value>
                                 </Setter>
@@ -311,80 +426,118 @@
                                 <VisualState x:Name="Normal" />
                                 <VisualState x:Name="Pressed">
                                     <Storyboard>
-                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="HorizontalThumb" Storyboard.TargetProperty="Background">
-                                            <DiscreteObjectKeyFrame KeyTime="0" Value="{ThemeResource SystemControlForegroundBaseMediumBrush}" />
+                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="HorizontalThumb"
+                                                                       Storyboard.TargetProperty="Background">
+                                            <DiscreteObjectKeyFrame KeyTime="0"
+                                                                    Value="{ThemeResource SystemControlForegroundBaseMediumBrush}" />
                                         </ObjectAnimationUsingKeyFrames>
-                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="VerticalThumb" Storyboard.TargetProperty="Background">
-                                            <DiscreteObjectKeyFrame KeyTime="0" Value="{ThemeResource SystemControlHighlightChromeHighBrush}" />
+                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="VerticalThumb"
+                                                                       Storyboard.TargetProperty="Background">
+                                            <DiscreteObjectKeyFrame KeyTime="0"
+                                                                    Value="{ThemeResource SystemControlHighlightChromeHighBrush}" />
                                         </ObjectAnimationUsingKeyFrames>
                                     </Storyboard>
                                 </VisualState>
                                 <VisualState x:Name="Disabled">
                                     <Storyboard>
-                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="HeaderContentPresenter" Storyboard.TargetProperty="Foreground">
-                                            <DiscreteObjectKeyFrame KeyTime="0" Value="{ThemeResource SystemControlDisabledBaseMediumLowBrush}" />
+                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="HeaderContentPresenter"
+                                                                       Storyboard.TargetProperty="Foreground">
+                                            <DiscreteObjectKeyFrame KeyTime="0"
+                                                                    Value="{ThemeResource SystemControlDisabledBaseMediumLowBrush}" />
                                         </ObjectAnimationUsingKeyFrames>
-                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="HorizontalDecreaseRect" Storyboard.TargetProperty="Fill">
-                                            <DiscreteObjectKeyFrame KeyTime="0" Value="{ThemeResource SystemControlDisabledChromeDisabledHighBrush}" />
+                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="HorizontalDecreaseRect"
+                                                                       Storyboard.TargetProperty="Fill">
+                                            <DiscreteObjectKeyFrame KeyTime="0"
+                                                                    Value="{ThemeResource SystemControlDisabledChromeDisabledHighBrush}" />
                                         </ObjectAnimationUsingKeyFrames>
-                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="HorizontalTrackRect" Storyboard.TargetProperty="Fill">
-                                            <DiscreteObjectKeyFrame KeyTime="0" Value="{ThemeResource SystemControlDisabledChromeDisabledHighBrush}" />
+                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="HorizontalTrackRect"
+                                                                       Storyboard.TargetProperty="Fill">
+                                            <DiscreteObjectKeyFrame KeyTime="0"
+                                                                    Value="{ThemeResource SystemControlDisabledChromeDisabledHighBrush}" />
                                         </ObjectAnimationUsingKeyFrames>
-                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="VerticalDecreaseRect" Storyboard.TargetProperty="Fill">
-                                            <DiscreteObjectKeyFrame KeyTime="0" Value="{ThemeResource SystemControlDisabledChromeDisabledHighBrush}" />
+                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="VerticalDecreaseRect"
+                                                                       Storyboard.TargetProperty="Fill">
+                                            <DiscreteObjectKeyFrame KeyTime="0"
+                                                                    Value="{ThemeResource SystemControlDisabledChromeDisabledHighBrush}" />
                                         </ObjectAnimationUsingKeyFrames>
-                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="VerticalTrackRect" Storyboard.TargetProperty="Fill">
-                                            <DiscreteObjectKeyFrame KeyTime="0" Value="{ThemeResource SystemControlDisabledChromeDisabledHighBrush}" />
+                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="VerticalTrackRect"
+                                                                       Storyboard.TargetProperty="Fill">
+                                            <DiscreteObjectKeyFrame KeyTime="0"
+                                                                    Value="{ThemeResource SystemControlDisabledChromeDisabledHighBrush}" />
                                         </ObjectAnimationUsingKeyFrames>
-                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="HorizontalThumb" Storyboard.TargetProperty="Background">
-                                            <DiscreteObjectKeyFrame KeyTime="0" Value="{ThemeResource SystemControlDisabledChromeDisabledHighBrush}" />
+                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="HorizontalThumb"
+                                                                       Storyboard.TargetProperty="Background">
+                                            <DiscreteObjectKeyFrame KeyTime="0"
+                                                                    Value="{ThemeResource SystemControlDisabledChromeDisabledHighBrush}" />
                                         </ObjectAnimationUsingKeyFrames>
-                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="VerticalThumb" Storyboard.TargetProperty="Background">
-                                            <DiscreteObjectKeyFrame KeyTime="0" Value="{ThemeResource SystemControlDisabledChromeDisabledHighBrush}" />
+                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="VerticalThumb"
+                                                                       Storyboard.TargetProperty="Background">
+                                            <DiscreteObjectKeyFrame KeyTime="0"
+                                                                    Value="{ThemeResource SystemControlDisabledChromeDisabledHighBrush}" />
                                         </ObjectAnimationUsingKeyFrames>
-                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="TopTickBar" Storyboard.TargetProperty="Fill">
-                                            <DiscreteObjectKeyFrame KeyTime="0" Value="{ThemeResource SystemControlDisabledBaseMediumLowBrush}" />
+                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="TopTickBar"
+                                                                       Storyboard.TargetProperty="Fill">
+                                            <DiscreteObjectKeyFrame KeyTime="0"
+                                                                    Value="{ThemeResource SystemControlDisabledBaseMediumLowBrush}" />
                                         </ObjectAnimationUsingKeyFrames>
-                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="BottomTickBar" Storyboard.TargetProperty="Fill">
-                                            <DiscreteObjectKeyFrame KeyTime="0" Value="{ThemeResource SystemControlDisabledBaseMediumLowBrush}" />
+                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="BottomTickBar"
+                                                                       Storyboard.TargetProperty="Fill">
+                                            <DiscreteObjectKeyFrame KeyTime="0"
+                                                                    Value="{ThemeResource SystemControlDisabledBaseMediumLowBrush}" />
                                         </ObjectAnimationUsingKeyFrames>
-                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="LeftTickBar" Storyboard.TargetProperty="Fill">
-                                            <DiscreteObjectKeyFrame KeyTime="0" Value="{ThemeResource SystemControlDisabledBaseMediumLowBrush}" />
+                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="LeftTickBar"
+                                                                       Storyboard.TargetProperty="Fill">
+                                            <DiscreteObjectKeyFrame KeyTime="0"
+                                                                    Value="{ThemeResource SystemControlDisabledBaseMediumLowBrush}" />
                                         </ObjectAnimationUsingKeyFrames>
-                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="RightTickBar" Storyboard.TargetProperty="Fill">
-                                            <DiscreteObjectKeyFrame KeyTime="0" Value="{ThemeResource SystemControlDisabledBaseMediumLowBrush}" />
+                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="RightTickBar"
+                                                                       Storyboard.TargetProperty="Fill">
+                                            <DiscreteObjectKeyFrame KeyTime="0"
+                                                                    Value="{ThemeResource SystemControlDisabledBaseMediumLowBrush}" />
                                         </ObjectAnimationUsingKeyFrames>
                                     </Storyboard>
                                 </VisualState>
                                 <VisualState x:Name="PointerOver">
                                     <Storyboard>
-                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="HorizontalTrackRect" Storyboard.TargetProperty="Fill">
-                                            <DiscreteObjectKeyFrame KeyTime="0" Value="{ThemeResource SystemControlForegroundBaseMediumBrush}" />
+                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="HorizontalTrackRect"
+                                                                       Storyboard.TargetProperty="Fill">
+                                            <DiscreteObjectKeyFrame KeyTime="0"
+                                                                    Value="{ThemeResource SystemControlForegroundBaseMediumBrush}" />
                                         </ObjectAnimationUsingKeyFrames>
-                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="VerticalTrackRect" Storyboard.TargetProperty="Fill">
-                                            <DiscreteObjectKeyFrame KeyTime="0" Value="{ThemeResource SystemControlForegroundBaseMediumBrush}" />
+                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="VerticalTrackRect"
+                                                                       Storyboard.TargetProperty="Fill">
+                                            <DiscreteObjectKeyFrame KeyTime="0"
+                                                                    Value="{ThemeResource SystemControlForegroundBaseMediumBrush}" />
                                         </ObjectAnimationUsingKeyFrames>
-                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="HorizontalThumb" Storyboard.TargetProperty="Background">
-                                            <DiscreteObjectKeyFrame KeyTime="0" Value="{ThemeResource SystemControlForegroundBaseMediumBrush}" />
+                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="HorizontalThumb"
+                                                                       Storyboard.TargetProperty="Background">
+                                            <DiscreteObjectKeyFrame KeyTime="0"
+                                                                    Value="{ThemeResource SystemControlForegroundBaseMediumBrush}" />
                                         </ObjectAnimationUsingKeyFrames>
-                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="VerticalThumb" Storyboard.TargetProperty="Background">
-                                            <DiscreteObjectKeyFrame KeyTime="0" Value="{ThemeResource SystemControlHighlightChromeAltLowBrush}" />
+                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="VerticalThumb"
+                                                                       Storyboard.TargetProperty="Background">
+                                            <DiscreteObjectKeyFrame KeyTime="0"
+                                                                    Value="{ThemeResource SystemControlHighlightChromeAltLowBrush}" />
                                         </ObjectAnimationUsingKeyFrames>
                                     </Storyboard>
                                 </VisualState>
                             </VisualStateGroup>
                         </VisualStateManager.VisualStateGroups>
                         <ContentPresenter x:Name="HeaderContentPresenter"
-                  x:DeferLoadStrategy="Lazy"
-                  Visibility="Collapsed"
-                  Foreground="{ThemeResource SystemControlForegroundBaseHighBrush}"
-                  Margin="{ThemeResource SliderHeaderThemeMargin}"
-                  Content="{TemplateBinding Header}"
-                  ContentTemplate="{TemplateBinding HeaderTemplate}"
-                  FontWeight="{ThemeResource SliderHeaderThemeFontWeight}"
-                  TextWrapping="Wrap" />
-                        <Grid x:Name="SliderContainer" Background="Transparent" Grid.Row="1" Control.IsTemplateFocusTarget="True">
-                            <Grid x:Name="HorizontalTemplate" MinHeight="44">
+                                          x:DeferLoadStrategy="Lazy"
+                                          Visibility="Collapsed"
+                                          Foreground="{ThemeResource SystemControlForegroundBaseHighBrush}"
+                                          Margin="{ThemeResource SliderHeaderThemeMargin}"
+                                          Content="{TemplateBinding Header}"
+                                          ContentTemplate="{TemplateBinding HeaderTemplate}"
+                                          FontWeight="{ThemeResource SliderHeaderThemeFontWeight}"
+                                          TextWrapping="Wrap" />
+                        <Grid x:Name="SliderContainer"
+                              Background="Transparent"
+                              Grid.Row="1"
+                              Control.IsTemplateFocusTarget="True">
+                            <Grid x:Name="HorizontalTemplate"
+                                  MinHeight="44">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="Auto" />
                                     <ColumnDefinition Width="Auto" />
@@ -396,46 +549,48 @@
                                     <RowDefinition Height="18" />
                                 </Grid.RowDefinitions>
                                 <Rectangle x:Name="HorizontalTrackRect"
-          Fill="{TemplateBinding Background}"
-          Height="{ThemeResource SliderTrackThemeHeight}"
-          Grid.Row="1"
-          Grid.ColumnSpan="3" />
+                                           Fill="{TemplateBinding Background}"
+                                           Height="{ThemeResource SliderTrackThemeHeight}"
+                                           Grid.Row="1"
+                                           Grid.ColumnSpan="3" />
                                 <Rectangle x:Name="HorizontalDecreaseRect"
-  Fill="{TemplateBinding Foreground}"
-  Grid.Row="1" />
+                                           Fill="{TemplateBinding Foreground}"
+                                           Grid.Row="1" />
                                 <TickBar x:Name="TopTickBar"
-Visibility="Collapsed"
-Fill="{ThemeResource SystemControlForegroundBaseMediumLowBrush}"
-Height="{ThemeResource SliderOutsideTickBarThemeHeight}"
-VerticalAlignment="Bottom"
-Margin="0,0,0,4"
-Grid.ColumnSpan="3" />
+                                         Visibility="Collapsed"
+                                         Fill="{ThemeResource SystemControlForegroundBaseMediumLowBrush}"
+                                         Height="{ThemeResource SliderOutsideTickBarThemeHeight}"
+                                         VerticalAlignment="Bottom"
+                                         Margin="0,0,0,4"
+                                         Grid.ColumnSpan="3" />
                                 <TickBar x:Name="HorizontalInlineTickBar"
-Visibility="Collapsed"
-Fill="{ThemeResource SystemControlBackgroundAltHighBrush}"
-Height="{ThemeResource SliderTrackThemeHeight}"
-Grid.Row="1"
-Grid.ColumnSpan="3" />
+                                         Visibility="Collapsed"
+                                         Fill="{ThemeResource SystemControlBackgroundAltHighBrush}"
+                                         Height="{ThemeResource SliderTrackThemeHeight}"
+                                         Grid.Row="1"
+                                         Grid.ColumnSpan="3" />
                                 <TickBar x:Name="BottomTickBar"
-Visibility="Collapsed"
-Fill="{ThemeResource SystemControlForegroundBaseMediumLowBrush}"
-Height="{ThemeResource SliderOutsideTickBarThemeHeight}"
-VerticalAlignment="Top"
-Margin="0,4,0,0"
-Grid.Row="2"
-Grid.ColumnSpan="3" />
+                                         Visibility="Collapsed"
+                                         Fill="{ThemeResource SystemControlForegroundBaseMediumLowBrush}"
+                                         Height="{ThemeResource SliderOutsideTickBarThemeHeight}"
+                                         VerticalAlignment="Top"
+                                         Margin="0,4,0,0"
+                                         Grid.Row="2"
+                                         Grid.ColumnSpan="3" />
                                 <Thumb x:Name="HorizontalThumb"
-                  Background="White"
-                  Style="{StaticResource SliderThumbStyle}"
-                  DataContext="{TemplateBinding Value}"
-                  Height="12"
-                  Width="12"
-                  Grid.Row="0"
-                  Grid.RowSpan="3"
-                  Grid.Column="1"
-                  AutomationProperties.AccessibilityView="Raw" />
+                                       Background="White"
+                                       Style="{StaticResource SliderThumbStyle}"
+                                       DataContext="{TemplateBinding Value}"
+                                       Height="12"
+                                       Width="12"
+                                       Grid.Row="0"
+                                       Grid.RowSpan="3"
+                                       Grid.Column="1"
+                                       AutomationProperties.AccessibilityView="Raw" />
                             </Grid>
-                            <Grid x:Name="VerticalTemplate" MinWidth="44" Visibility="Collapsed">
+                            <Grid x:Name="VerticalTemplate"
+                                  MinWidth="44"
+                                  Visibility="Collapsed">
                                 <Grid.RowDefinitions>
                                     <RowDefinition Height="*" />
                                     <RowDefinition Height="Auto" />
@@ -447,45 +602,45 @@ Grid.ColumnSpan="3" />
                                     <ColumnDefinition Width="18" />
                                 </Grid.ColumnDefinitions>
                                 <Rectangle x:Name="VerticalTrackRect"
-  Fill="White"
-  Width="{ThemeResource SliderTrackThemeHeight}"
-  Grid.Column="1"
-  Grid.RowSpan="3" />
+                                           Fill="White"
+                                           Width="{ThemeResource SliderTrackThemeHeight}"
+                                           Grid.Column="1"
+                                           Grid.RowSpan="3" />
                                 <Rectangle x:Name="VerticalDecreaseRect"
-  Fill="{TemplateBinding Foreground}"
-  Grid.Column="1"
-  Grid.Row="2" />
+                                           Fill="{TemplateBinding Foreground}"
+                                           Grid.Column="1"
+                                           Grid.Row="2" />
                                 <TickBar x:Name="LeftTickBar"
-Visibility="Collapsed"
-Fill="{ThemeResource SystemControlForegroundBaseMediumLowBrush}"
-Width="{ThemeResource SliderOutsideTickBarThemeHeight}"
-HorizontalAlignment="Right"
-Margin="0,0,4,0"
-Grid.RowSpan="3" />
+                                         Visibility="Collapsed"
+                                         Fill="{ThemeResource SystemControlForegroundBaseMediumLowBrush}"
+                                         Width="{ThemeResource SliderOutsideTickBarThemeHeight}"
+                                         HorizontalAlignment="Right"
+                                         Margin="0,0,4,0"
+                                         Grid.RowSpan="3" />
                                 <TickBar x:Name="VerticalInlineTickBar"
-Visibility="Collapsed"
-Fill="{ThemeResource SystemControlBackgroundAltHighBrush}"
-Width="{ThemeResource SliderTrackThemeHeight}"
-Grid.Column="1"
-Grid.RowSpan="3" />
+                                         Visibility="Collapsed"
+                                         Fill="{ThemeResource SystemControlBackgroundAltHighBrush}"
+                                         Width="{ThemeResource SliderTrackThemeHeight}"
+                                         Grid.Column="1"
+                                         Grid.RowSpan="3" />
                                 <TickBar x:Name="RightTickBar"
-Visibility="Collapsed"
-Fill="{ThemeResource SystemControlForegroundBaseMediumLowBrush}"
-Width="{ThemeResource SliderOutsideTickBarThemeHeight}"
-HorizontalAlignment="Left"
-Margin="4,0,0,0"
-Grid.Column="2"
-Grid.RowSpan="3" />
+                                         Visibility="Collapsed"
+                                         Fill="{ThemeResource SystemControlForegroundBaseMediumLowBrush}"
+                                         Width="{ThemeResource SliderOutsideTickBarThemeHeight}"
+                                         HorizontalAlignment="Left"
+                                         Margin="4,0,0,0"
+                                         Grid.Column="2"
+                                         Grid.RowSpan="3" />
                                 <Thumb x:Name="VerticalThumb"
-                  Background="{ThemeResource SystemControlForegroundAccentBrush}"
-                  Style="{StaticResource SliderThumbStyle}"
-                  DataContext="{TemplateBinding Value}"
-                  Width="24"
-                  Height="8"
-                  Grid.Row="1"
-                  Grid.Column="0"
-                  Grid.ColumnSpan="3"
-                  AutomationProperties.AccessibilityView="Raw"/>
+                                       Background="{ThemeResource SystemControlForegroundAccentBrush}"
+                                       Style="{StaticResource SliderThumbStyle}"
+                                       DataContext="{TemplateBinding Value}"
+                                       Width="24"
+                                       Height="8"
+                                       Grid.Row="1"
+                                       Grid.Column="0"
+                                       Grid.ColumnSpan="3"
+                                       AutomationProperties.AccessibilityView="Raw" />
                             </Grid>
                         </Grid>
                     </Grid>
@@ -498,65 +653,124 @@ Grid.RowSpan="3" />
 
     <!-- Grid with cover -->
 
-    <Style x:Key="MainGridCoverStyle" TargetType="Grid">
-        <Setter Property="HorizontalAlignment" Value="Left"/>
-        <Setter Property="Width" Value="300" />
-        <Setter Property="Height" Value="300" />
-        <Setter Property="Padding"  Value="0" />
-        <Setter Property="Margin" Value="0" />
-        <Setter Property="BorderBrush" Value="Gray" />
-        <Setter Property="BorderThickness" Value="0" />
-        <Setter Property="CornerRadius" Value="10" />
+    <Style x:Key="MainGridCoverStyle"
+           TargetType="Grid">
+        <Setter Property="HorizontalAlignment"
+                Value="Left" />
+        <Setter Property="Width"
+                Value="300" />
+        <Setter Property="Height"
+                Value="300" />
+        <Setter Property="Padding"
+                Value="0" />
+        <Setter Property="Margin"
+                Value="0" />
+        <Setter Property="BorderBrush"
+                Value="Gray" />
+        <Setter Property="BorderThickness"
+                Value="0" />
+        <Setter Property="CornerRadius"
+                Value="10" />
     </Style>
 
-    <Style x:Key="PictureCoverStyle" TargetType="common:PictureControl">
-        <Setter Property="Icon" Value="&#xE8D4;"></Setter>
-        <Setter Property="Padding" Value="0" />
-        <Setter Property="Margin" Value="0" />
-        <Setter Property="VerticalAlignment" Value="Center" />
-        <Setter Property="HorizontalAlignment" Value="Center" />
+    <Style x:Key="PictureCoverStyle"
+           TargetType="common:PictureControl">
+        <Setter Property="Icon"
+                Value="&#xE8D4;"></Setter>
+        <Setter Property="Padding"
+                Value="0" />
+        <Setter Property="Margin"
+                Value="0" />
+        <Setter Property="VerticalAlignment"
+                Value="Center" />
+        <Setter Property="HorizontalAlignment"
+                Value="Center" />
     </Style>
 
-    <Style x:Key="GridCoverBottomStyle" TargetType="Grid">
-        <Setter Property="VerticalAlignment" Value="Bottom"/>
-        <Setter Property="Background" Value="#AA000000"/>
-        <Setter Property="Height" Value="60"/>
-        <Setter Property="Margin" Value="0,0,0,0"/>
+    <Style x:Key="GridCoverBottomStyle"
+           TargetType="Grid">
+        <Setter Property="VerticalAlignment"
+                Value="Bottom" />
+        <Setter Property="Background"
+                Value="#AA000000" />
+        <Setter Property="Height"
+                Value="60" />
+        <Setter Property="Margin"
+                Value="0,0,0,0" />
     </Style>
 
-    <Style x:Key="GridCoverBottomFirstLineStyle" TargetType="HyperlinkButton" BasedOn="{StaticResource HyperlinkSmallButtonStyle}">
-        <Setter Property="Foreground" Value="{StaticResource DefaultThemeBrush}"></Setter>
-        <Setter Property="Margin" Value="4,0,0,0"></Setter>
-        <Setter Property="FontSize" Value="18"></Setter>
-        <Setter Property="Width" Value="300"></Setter>
-        <Setter Property="HorizontalAlignment" Value="Left"></Setter>
-        <Setter Property="HorizontalContentAlignment" Value="Left"></Setter>
+    <Style x:Key="GridCoverBottomFirstLineStyle"
+           TargetType="HyperlinkButton"
+           BasedOn="{StaticResource HyperlinkSmallButtonStyle}">
+        <Setter Property="Foreground"
+                Value="{StaticResource DefaultThemeBrush}"></Setter>
+        <Setter Property="Margin"
+                Value="4,0,0,0"></Setter>
+        <Setter Property="FontSize"
+                Value="18"></Setter>
+        <Setter Property="Width"
+                Value="300"></Setter>
+        <Setter Property="HorizontalAlignment"
+                Value="Left"></Setter>
+        <Setter Property="HorizontalContentAlignment"
+                Value="Left"></Setter>
     </Style>
 
-    <Style x:Key="GridCoverBottomSecondLineStyle" TargetType="TextBlock">
-        <Setter Property="Margin" Value="4,6,0,0"></Setter>
-        <Setter Property="Foreground" Value="LightGray"></Setter>
-        <Setter Property="Width" Value="250"></Setter>
+    <Style x:Key="GridCoverBottomSecondLineStyle"
+           TargetType="TextBlock">
+        <Setter Property="Margin"
+                Value="4,6,0,0"></Setter>
+        <Setter Property="Foreground"
+                Value="LightGray"></Setter>
+        <Setter Property="Width"
+                Value="250"></Setter>
+    </Style>
+
+    <Style x:Key="GridCoverBottomArtistLineStyle"
+           TargetType="HyperlinkButton"
+           BasedOn="{StaticResource HyperlinkSmallButtonStyle}">
+        <Setter Property="Foreground"
+                Value="{StaticResource AccentTextFillColorPrimaryBrush}"></Setter>
+        <Setter Property="Margin"
+                Value="4,0,0,0"></Setter>
+        <Setter Property="FontSize"
+                Value="18"></Setter>
+        <Setter Property="Width"
+                Value="300"></Setter>
+        <Setter Property="HorizontalAlignment"
+                Value="Left"></Setter>
+        <Setter Property="HorizontalContentAlignment"
+                Value="Left"></Setter>
     </Style>
 
 
-
-
-    <Style x:Key="RoundAppBarButtonStyle" TargetType="AppBarButton">
-        <Setter Property="Width" Value="42"/>
-        <Setter Property="Height" Value="42"/>
-        <Setter Property="Background" Value="#33000000"/>
-        <Setter Property="Foreground" Value="White"/>
-        <Setter Property="BorderBrush" Value="Transparent"/>
-        <Setter Property="BorderThickness" Value="0"/>
-        <Setter Property="HorizontalAlignment" Value="Center"/>
-        <Setter Property="VerticalAlignment" Value="Center"/>
-        <Setter Property="Padding" Value="0"/>
-        <Setter Property="UseSystemFocusVisuals" Value="False"/>
+    <Style x:Key="RoundAppBarButtonStyle"
+           TargetType="AppBarButton">
+        <Setter Property="Width"
+                Value="42" />
+        <Setter Property="Height"
+                Value="42" />
+        <Setter Property="Background"
+                Value="#33000000" />
+        <Setter Property="Foreground"
+                Value="White" />
+        <Setter Property="BorderBrush"
+                Value="Transparent" />
+        <Setter Property="BorderThickness"
+                Value="0" />
+        <Setter Property="HorizontalAlignment"
+                Value="Center" />
+        <Setter Property="VerticalAlignment"
+                Value="Center" />
+        <Setter Property="Padding"
+                Value="0" />
+        <Setter Property="UseSystemFocusVisuals"
+                Value="False" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="AppBarButton">
-                    <Grid x:Name="Root" Background="Transparent">
+                    <Grid x:Name="Root"
+                          Background="Transparent">
                         <Border x:Name="Circle"
                                 Width="{TemplateBinding Width}"
                                 Height="{TemplateBinding Height}"
@@ -566,14 +780,16 @@ Grid.RowSpan="3" />
                                 BorderThickness="{TemplateBinding BorderThickness}">
                             <Grid RenderTransformOrigin="0.5,0.5">
                                 <Grid.RenderTransform>
-                                    <ScaleTransform x:Name="ScaleT" ScaleX="1" ScaleY="1"/>
+                                    <ScaleTransform x:Name="ScaleT"
+                                                    ScaleX="1"
+                                                    ScaleY="1" />
                                 </Grid.RenderTransform>
 
                                 <ContentPresenter x:Name="IconPresenter"
                                                   Content="{TemplateBinding Icon}"
                                                   HorizontalAlignment="Center"
-                                                  VerticalAlignment="Center"                                                  
-                                                  Foreground="{TemplateBinding Foreground}"/>
+                                                  VerticalAlignment="Center"
+                                                  Foreground="{TemplateBinding Foreground}" />
 
                                 <TextBlock x:Name="LabelText"
                                            Text="{TemplateBinding Label}"
@@ -583,7 +799,7 @@ Grid.RowSpan="3" />
                                            VerticalAlignment="Bottom"
                                            Margin="0,0,0,4"
                                            Opacity="0"
-                                           IsHitTestVisible="False"/>
+                                           IsHitTestVisible="False" />
                             </Grid>
                         </Border>
 
@@ -594,18 +810,19 @@ Grid.RowSpan="3" />
                                 BorderBrush="White"
                                 BorderThickness="2"
                                 Opacity="0"
-                                IsHitTestVisible="False"/>
+                                IsHitTestVisible="False" />
 
                         <VisualStateManager.VisualStateGroups>
 
                             <VisualStateGroup x:Name="CommonStates">
-                                <VisualState x:Name="Normal"/>
+                                <VisualState x:Name="Normal" />
 
                                 <VisualState x:Name="PointerOver">
                                     <Storyboard>
                                         <ObjectAnimationUsingKeyFrames Storyboard.TargetName="Circle"
                                                                        Storyboard.TargetProperty="Background">
-                                            <DiscreteObjectKeyFrame KeyTime="0" Value="{ThemeResource ButtonBackgroundPointerOver}"/>
+                                            <DiscreteObjectKeyFrame KeyTime="0"
+                                                                    Value="{ThemeResource ButtonBackgroundPointerOver}" />
                                         </ObjectAnimationUsingKeyFrames>
                                     </Storyboard>
                                 </VisualState>
@@ -614,14 +831,17 @@ Grid.RowSpan="3" />
                                     <Storyboard>
                                         <ObjectAnimationUsingKeyFrames Storyboard.TargetName="Circle"
                                                                        Storyboard.TargetProperty="Background">
-                                            <DiscreteObjectKeyFrame KeyTime="0" Value="{ThemeResource ButtonBackgroundPressed}"/>
+                                            <DiscreteObjectKeyFrame KeyTime="0"
+                                                                    Value="{ThemeResource ButtonBackgroundPressed}" />
                                         </ObjectAnimationUsingKeyFrames>
                                         <DoubleAnimation Storyboard.TargetName="ScaleT"
                                                          Storyboard.TargetProperty="ScaleX"
-                                                         To="0.90" Duration="0:0:0.08"/>
+                                                         To="0.90"
+                                                         Duration="0:0:0.08" />
                                         <DoubleAnimation Storyboard.TargetName="ScaleT"
                                                          Storyboard.TargetProperty="ScaleY"
-                                                         To="0.90" Duration="0:0:0.08"/>
+                                                         To="0.90"
+                                                         Duration="0:0:0.08" />
                                     </Storyboard>
                                 </VisualState>
 
@@ -629,7 +849,8 @@ Grid.RowSpan="3" />
                                     <Storyboard>
                                         <DoubleAnimation Storyboard.TargetName="Root"
                                                          Storyboard.TargetProperty="Opacity"
-                                                         To="0.4" Duration="0:0:0"/>
+                                                         To="0.4"
+                                                         Duration="0:0:0" />
                                     </Storyboard>
                                 </VisualState>
                             </VisualStateGroup>
@@ -639,20 +860,22 @@ Grid.RowSpan="3" />
                                     <Storyboard>
                                         <DoubleAnimation Storyboard.TargetName="FocusRing"
                                                          Storyboard.TargetProperty="Opacity"
-                                                         To="1" Duration="0:0:0.1"/>
+                                                         To="1"
+                                                         Duration="0:0:0.1" />
                                     </Storyboard>
                                 </VisualState>
-                                <VisualState x:Name="PointerFocused"/>
-                                <VisualState x:Name="Unfocused"/>
+                                <VisualState x:Name="PointerFocused" />
+                                <VisualState x:Name="Unfocused" />
                             </VisualStateGroup>
 
                             <VisualStateGroup x:Name="DisplayModeStates">
-                                <VisualState x:Name="Compact"/>
+                                <VisualState x:Name="Compact" />
                                 <VisualState x:Name="FullSize">
                                     <Storyboard>
                                         <DoubleAnimation Storyboard.TargetName="LabelText"
                                                          Storyboard.TargetProperty="Opacity"
-                                                         To="1" Duration="0:0:0.15"/>
+                                                         To="1"
+                                                         Duration="0:0:0.15" />
                                     </Storyboard>
                                 </VisualState>
                             </VisualStateGroup>
@@ -665,6 +888,6 @@ Grid.RowSpan="3" />
     </Style>
 
 
-   
+
 
 </ResourceDictionary>
