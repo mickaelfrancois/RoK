@@ -107,15 +107,31 @@ public sealed partial class PictureControl : UserControl
 
     private void Image_ImageFailed(object sender, ExceptionRoutedEventArgs e)
     {
-        // gestion d'erreur si besoin
     }
 
-    private void img_Loaded(object sender, RoutedEventArgs e)
+    private void ImgLoaded(object sender, RoutedEventArgs e)
     {
         VisualStateManager.GoToState(this, "imgLoaded", true);
 
         // appliquer les valeurs DP (au cas où elles ont été définies avant l'initialisation visuelle)
         btPlay.Visibility = PlayButtonVisibility;
         btAddPlaylist.Visibility = AddPlaylistButtonVisibility;
+
+        CalculateScale(sender);
+    }
+
+    private void ImgSizeChanged(object sender, SizeChangedEventArgs e)
+    {
+        CalculateScale(sender);
+    }
+
+    private static void CalculateScale(object sender)
+    {
+        Image? img = sender as Image;
+        if (img?.RenderTransform is ScaleTransform scale)
+        {
+            scale.CenterX = img.ActualWidth / 2;
+            scale.CenterY = img.ActualHeight / 2;
+        }
     }
 }
