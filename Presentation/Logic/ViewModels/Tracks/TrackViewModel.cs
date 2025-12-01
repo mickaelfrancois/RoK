@@ -167,18 +167,12 @@ public partial class TrackViewModel : ObservableObject, IDisposable
     public bool Listened { get; set; }
 
     private readonly NavigationService _navigationService;
-
     private readonly IMediator _mediator;
-
     private readonly IPlayerService _playerService;
-
     private readonly ILyricsService _lyricsService;
-
     private readonly INovaApiService _novaApiService;
-
     private readonly IDialogService _dialogService;
-
-    private readonly BackdropPicture _backdropPicture;
+    private readonly IBackdropLoader _backdropLoader;
 
     public RelayCommand AlbumOpenCommand { get; init; }
     public RelayCommand ArtistOpenCommand { get; init; }
@@ -187,9 +181,9 @@ public partial class TrackViewModel : ObservableObject, IDisposable
     public RelayCommand ListenCommand { get; init; }
 
 
-    public TrackViewModel(BackdropPicture backdropPicture, IPlaylistMenuService playlistMenuService, IMediator mediator, NavigationService navigationService, ResourceLoader resourceLoader, IDialogService dialogService, IPlayerService playerService, INovaApiService novaApiService, ILyricsService lyricsService, ILogger<TrackViewModel> logger)
+    public TrackViewModel(IBackdropLoader backdropLoader, IPlaylistMenuService playlistMenuService, IMediator mediator, NavigationService navigationService, ResourceLoader resourceLoader, IDialogService dialogService, IPlayerService playerService, INovaApiService novaApiService, ILyricsService lyricsService, ILogger<TrackViewModel> logger)
     {
-        _backdropPicture = Guard.Against.Null(backdropPicture);
+        _backdropLoader = Guard.Against.Null(backdropLoader);
         PlaylistMenuService = Guard.Against.Null(playlistMenuService);
         _mediator = Guard.Against.Null(mediator);
         _navigationService = Guard.Against.Null(navigationService);
@@ -335,27 +329,11 @@ public partial class TrackViewModel : ObservableObject, IDisposable
         if (Track.Id <= 0)
             return;
 
-        try
-        {
-            string filePath;
 
-            List<string> backdrops = _backdropPicture.GetBackdrops(Track.ArtistName);
-            if (backdrops.Count > 0)
-            {
-                int index = Random.Shared.Next(backdrops.Count);
-                filePath = backdrops[index];
-            }
-            else
-            {
-                filePath = _backdropPicture.GetRandomGenericBackdrop();
-            }
-
-            Backdrop = new BitmapImage(new Uri(filePath, UriKind.Absolute));
-        }
-        catch (Exception ex)
+        _backdropLoader.LoadBackdrop(Track.ArtistName, (BitmapImage? backdropImage) =>
         {
-            _logger.LogError(ex, "Failed to load backdrop for artist: {ArtistName}", Track.ArtistName);
-        }
+            Backdrop = backdropImage;
+        });
     }
 
 

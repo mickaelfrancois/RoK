@@ -114,21 +114,21 @@ public partial class PlaylistViewModel : ObservableObject
     private readonly IMediator _mediator;
     private readonly NavigationService _navigationService;
     private readonly IArtistPicture _artistPicture;
-    private readonly BackdropPicture _backdropPicture;
     private readonly ResourceLoader _resourceLoader;
     private readonly IPlayerService _playerService;
     private readonly ILogger<PlaylistViewModel> _logger;
     private readonly IPlaylistService _playlistService;
+    private readonly IBackdropLoader _backdropLoader;
 
 
-    public PlaylistViewModel(IPlaylistService playlistService, IMediator mediator, NavigationService navigationService, IPlayerService playerService, IArtistPicture artistPicture, BackdropPicture backdropPicture, ResourceLoader resourceLoader, ILogger<PlaylistViewModel> logger)
+    public PlaylistViewModel(IBackdropLoader backdropLoader, IPlaylistService playlistService, IMediator mediator, NavigationService navigationService, IPlayerService playerService, IArtistPicture artistPicture, ResourceLoader resourceLoader, ILogger<PlaylistViewModel> logger)
     {
+        _backdropLoader = Guard.Against.Null(backdropLoader);
         _playlistService = Guard.Against.Null(playlistService);
         _mediator = Guard.Against.Null(mediator);
         _navigationService = Guard.Against.Null(navigationService);
         _playerService = Guard.Against.Null(playerService);
         _artistPicture = Guard.Against.Null(artistPicture);
-        _backdropPicture = Guard.Against.Null(backdropPicture);
         _resourceLoader = Guard.Against.Null(resourceLoader);
         _logger = Guard.Against.Null(logger);
 
@@ -199,22 +199,11 @@ public partial class PlaylistViewModel : ObservableObject
 
     private void LoadBackrop()
     {
-        try
+        _backdropLoader.LoadBackdrop(Playlist.Picture, (BitmapImage? backdropImage) =>
         {
-            if (string.IsNullOrEmpty(Playlist.Picture) == false)
-            {
-                List<string> backdrops = _backdropPicture.GetBackdrops(Playlist.Picture);
-                if (backdrops.Count == 0)
-                    return;
+            Backdrop = backdropImage;
+        });
 
-                string filePath = backdrops[0];
-                Backdrop = new BitmapImage(new Uri(filePath, UriKind.Absolute));
-            }
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Failed to load backdrop for playlist: {Name}", Playlist.Name);
-        }
     }
 
 
