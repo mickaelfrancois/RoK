@@ -131,12 +131,12 @@ public partial class AlbumViewModel : ObservableObject
     private readonly IMediator _mediator;
     private readonly NavigationService _navigationService;
     private readonly IAlbumPicture _albumPicture;
-    private readonly BackdropPicture _backdropPicture;
     private readonly ResourceLoader _resourceLoader;
     private readonly IPlayerService _playerService;
     private readonly ILogger<AlbumViewModel> _logger;
     private readonly INovaApiService _novaApiService;
     private readonly ILastFmClient _lastFmClient;
+    private readonly IBackdropLoader _backdropLoader;
 
     public override string ToString()
     {
@@ -146,15 +146,15 @@ public partial class AlbumViewModel : ObservableObject
     }
 
 
-    public AlbumViewModel(ILastFmClient lastFmClient, INovaApiService novaApiService, IMediator mediator, NavigationService navigationService, IPlayerService playerService, IAlbumPicture albumPicture, BackdropPicture backdropPicture, ResourceLoader resourceLoader, ILogger<AlbumViewModel> logger)
+    public AlbumViewModel(IBackdropLoader backdropLoader, ILastFmClient lastFmClient, INovaApiService novaApiService, IMediator mediator, NavigationService navigationService, IPlayerService playerService, IAlbumPicture albumPicture, ResourceLoader resourceLoader, ILogger<AlbumViewModel> logger)
     {
+        _backdropLoader = Guard.Against.Null(backdropLoader);
         _lastFmClient = Guard.Against.Null(lastFmClient);
         _novaApiService = Guard.Against.Null(novaApiService);
         _mediator = Guard.Against.Null(mediator);
         _navigationService = Guard.Against.Null(navigationService);
         _playerService = Guard.Against.Null(playerService);
         _albumPicture = Guard.Against.Null(albumPicture);
-        _backdropPicture = Guard.Against.Null(backdropPicture);
         _resourceLoader = Guard.Against.Null(resourceLoader);
         _logger = Guard.Against.Null(logger);
 
@@ -238,19 +238,10 @@ public partial class AlbumViewModel : ObservableObject
 
     public void LoadBackrop()
     {
-        try
+        _backdropLoader.LoadBackdrop(Album.ArtistName, (BitmapImage? backdropImage) =>
         {
-            List<string> backdrops = _backdropPicture.GetBackdrops(Album.ArtistName);
-            if (backdrops.Count == 0)
-                return;
-
-            string filePath = backdrops[0];
-            Backdrop = new BitmapImage(new Uri(filePath, UriKind.Absolute));
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Failed to load backdrop for album: {AlbumName}", Album.Name);
-        }
+            Backdrop = backdropImage;
+        });
     }
 
 

@@ -211,26 +211,28 @@ public partial class ArtistViewModel : ObservableObject
 
     private readonly IMediator _mediator;
     private readonly IArtistPicture _artistPicture;
-    private readonly BackdropPicture _backdropPicture;
     private readonly NavigationService _navigationService;
     private readonly ResourceLoader _resourceLoader;
     private readonly ILogger<ArtistViewModel> _logger;
     private readonly IPlayerService _playerService;
     private readonly INovaApiService _novaApiService;
     private readonly ILastFmClient _lastFmClient;
+    private readonly IBackdropLoader _backdropLoader;
+    private readonly BackdropPicture _backdropPicture;
 
     public override string ToString() => Artist?.Name ?? string.Empty;
 
 
 
-    public ArtistViewModel(ILastFmClient lastFmClient, INovaApiService novaApiService, IMediator mediator, IPlayerService playerService, IArtistPicture artistPicture, BackdropPicture backdropPicture, NavigationService navigationService, ResourceLoader resourceLoader, ILogger<ArtistViewModel> logger)
+    public ArtistViewModel(BackdropPicture backdropPicture, IBackdropLoader backdropLoader, ILastFmClient lastFmClient, INovaApiService novaApiService, IMediator mediator, IPlayerService playerService, IArtistPicture artistPicture, NavigationService navigationService, ResourceLoader resourceLoader, ILogger<ArtistViewModel> logger)
     {
+        _backdropPicture = Guard.Against.Null(backdropPicture);
+        _backdropLoader = Guard.Against.Null(backdropLoader);
         _lastFmClient = Guard.Against.Null(lastFmClient);
         _novaApiService = Guard.Against.Null(novaApiService);
         _mediator = Guard.Against.Null(mediator);
         _playerService = Guard.Against.Null(playerService);
         _artistPicture = Guard.Against.Null(artistPicture);
-        _backdropPicture = Guard.Against.Null(backdropPicture);
         _navigationService = Guard.Against.Null(navigationService);
         _resourceLoader = Guard.Against.Null(resourceLoader);
         _logger = Guard.Against.Null(logger);
@@ -320,27 +322,10 @@ public partial class ArtistViewModel : ObservableObject
 
     public void LoadBackdrop()
     {
-        try
+        _backdropLoader.LoadBackdrop(Artist.Name, (BitmapImage? backdropImage) =>
         {
-            string filePath;
-
-            List<string> backdrops = _backdropPicture.GetBackdrops(Artist.Name);
-            if (backdrops.Count > 0)
-            {
-                int index = Random.Shared.Next(backdrops.Count);
-                filePath = backdrops[index];
-            }
-            else
-            {
-                filePath = _backdropPicture.GetRandomGenericBackdrop();
-            }
-
-            Backdrop = new BitmapImage(new Uri(filePath, UriKind.Absolute));
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Failed to load backdrop for artist: {ArtistName}", Artist.Name);
-        }
+            Backdrop = backdropImage;
+        });
     }
 
 

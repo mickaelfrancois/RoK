@@ -23,6 +23,7 @@ public static class DependencyInjection
         services.AddSingleton<IDialogService, DialogService>();
         services.AddSingleton<IPlaylistMenuService, PlaylistMenuService>();
         services.AddSingleton<IFolderResolver, FolderResolver>();
+        services.AddSingleton<IBackdropLoader, BackdropLoader>();
 
         services.AddSingleton<MainViewModel>();
         services.AddSingleton<PlayerViewModel>();
