@@ -14,6 +14,8 @@ public interface IPlayerEngine
 
     double Length { get; set; }
 
+    int CrossfadeDelay { get; }
+
     void Pause();
 
     void Play();
