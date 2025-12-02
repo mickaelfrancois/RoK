@@ -211,7 +211,11 @@ namespace Rok
 
         private void LibraryRefreshHandle(LibraryRefreshMessage msg)
         {
-            _navigationService.MainFrame.DispatcherQueue.TryEnqueue(() =>
+            DispatcherQueue? dispatcherQueue = _navigationService?.MainFrame?.DispatcherQueue;
+            if (dispatcherQueue == null || libraryRefreshButton == null || IconRotation == null || _resourceLoader == null)
+                return;
+
+            dispatcherQueue.TryEnqueue(() =>
             {
                 if (msg.ProcessState == LibraryRefreshMessage.EState.Running)
                 {
