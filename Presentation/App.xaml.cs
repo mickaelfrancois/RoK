@@ -4,7 +4,6 @@ using Rok.Import;
 using Rok.Infrastructure;
 using Serilog;
 using System.IO;
-using System.Threading;
 using Windows.Storage;
 using Windows.Storage.AccessCache;
 using WinRT.Interop;
@@ -140,8 +139,16 @@ namespace Rok
 
             if (options.LibraryTokens.Count == 0)
             {
-                string token = StorageApplicationPermissions.FutureAccessList.Add(KnownFolders.MusicLibrary);
-                options.LibraryTokens.Add(token);
+                try
+                {
+                    string token = StorageApplicationPermissions.FutureAccessList.Add(KnownFolders.MusicLibrary);
+                    options.LibraryTokens.Add(token);
+                }
+                catch (Exception ex)
+                {
+                    ITelemetryClient telemetry = ServiceProvider.GetRequiredService<ITelemetryClient>();
+                    _ = telemetry.CaptureExceptionAsync(ex);
+                }
             }
 
             return options;
