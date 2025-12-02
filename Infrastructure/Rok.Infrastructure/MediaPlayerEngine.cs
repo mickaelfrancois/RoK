@@ -17,8 +17,10 @@ public class WinUIMediaPlayer : IPlayerEngine, IDisposable
 
     private readonly System.Timers.Timer _positionTimer;
 
-    private readonly int _crossfaceDelay = 5;
+    private readonly int _crossfadeDelay = 5;
     private readonly int _aboutToEndDelay = 15;
+
+    public int CrossfadeDelay => _crossfadeDelay;
 
     private double _length;
     private bool _aboutToEndRaised;
@@ -175,9 +177,11 @@ public class WinUIMediaPlayer : IPlayerEngine, IDisposable
         if (len <= 0)
             return;
 
-        if (pos >= len - _aboutToEndDelay &&
-            pos < len - _crossfaceDelay &&
-            !_aboutToEndRaised)
+        bool isAboutToEnd = pos >= len - _aboutToEndDelay &&
+                    pos < len - _crossfadeDelay &&
+                    !_aboutToEndRaised;
+
+        if (isAboutToEnd)
         {
             _aboutToEndRaised = true;
             OnMediaAboutToEnd?.Invoke(this, EventArgs.Empty);

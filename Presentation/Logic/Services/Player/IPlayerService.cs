@@ -10,7 +10,7 @@ public interface IPlayerService
 
     bool CanSeek { get; set; }
 
-    TrackDto CurrentTrack { get; }
+    TrackDto? CurrentTrack { get; }
 
     bool IsLoopingEnabled { get; set; }
 

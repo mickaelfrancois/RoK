@@ -292,9 +292,11 @@ public partial class TrackViewModel : ObservableObject, IDisposable
         if (!NovaApiService.IsApiRetryAllowed(Track.GetLyricsLastAttempt))
             return;
 
+        _logger.LogTrace("Fetching lyrics for {Artist} - {Title} from API", Track.ArtistName, Track.Title);
+
         await _mediator.SendMessageAsync(new UpdateTrackGetLyricsLastAttemptCommand(Track.Id));
 
-        _logger.LogTrace("Fetching lyrics for {Artist} - {Title} from API", Track.ArtistName, Track.Title);
+        Track.GetLyricsLastAttempt = DateTime.UtcNow;
 
         ApiLyricsModel? lyrics = await _novaApiService.GetLyricsAsync(ArtistName, Title);
         if (lyrics != null)
