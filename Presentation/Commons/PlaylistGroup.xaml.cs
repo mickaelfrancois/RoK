@@ -63,6 +63,9 @@ public sealed partial class PlaylistGroup : UserControl
         {
             List<PlaylistFilterDto> filters = [];
 
+            if (listFilters?.Items == null)
+                return filters;
+
             foreach (PlaylistGroupFilter filter in listFilters.Items.Cast<PlaylistGroupFilter>())
             {
                 filters.Add(filter.Filter);
