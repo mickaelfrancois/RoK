@@ -208,7 +208,7 @@ namespace Rok
                 {
                     ITelemetryClient telemetry = ServiceProvider.GetRequiredService<ITelemetryClient>();
                     telemetry.CaptureExceptionAsync(ex);
-                    Thread.Sleep(500); // Give some time to send the telemetry before exiting
+                    System.Threading.Thread.Sleep(500); // Give some time to send the telemetry before exiting
                 }
 #endif
             };
