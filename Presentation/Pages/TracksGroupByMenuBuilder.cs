@@ -12,8 +12,6 @@ internal class TracksGroupByMenuBuilder
     [
         "CREATDATE",
         "TITLE",
-        "YEAR",
-        "DECADE",
         "COUNTRY",
         "ARTISTNAME",
         "ALBUMNAME",

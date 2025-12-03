@@ -52,7 +52,7 @@ public class TracksGroupCategory(ResourceLoader _resourceLoader)
 
     private static IEnumerable<TracksGroupCategoryViewModel> GroupByAlbum(List<TrackViewModel> tracks)
     {
-        IEnumerable<TracksGroupCategoryViewModel> selectedItems = tracks.GroupBy(x => string.IsNullOrEmpty(x.Track.AlbumName) ? "#123" : x.Track.AlbumName)
+        IEnumerable<TracksGroupCategoryViewModel> selectedItems = tracks.GroupBy(x => StringExtensions.GetNameFirstLetter(x.Track.AlbumName))
                      .Select(x => new TracksGroupCategoryViewModel { Title = x.Key, Items = x.OrderBy(c => c.Track.AlbumName).ThenBy(c => c.TrackNumber).ToList() });
 
         return BuildGroupedCollection(selectedItems, orderByDescending: false);
@@ -61,7 +61,7 @@ public class TracksGroupCategory(ResourceLoader _resourceLoader)
 
     private static IEnumerable<TracksGroupCategoryViewModel> GroupByArtist(List<TrackViewModel> tracks)
     {
-        IEnumerable<TracksGroupCategoryViewModel> selectedItems = tracks.GroupBy(x => string.IsNullOrEmpty(x.Track.ArtistName) ? "#123" : x.Track.ArtistName)
+        IEnumerable<TracksGroupCategoryViewModel> selectedItems = tracks.GroupBy(x => StringExtensions.GetNameFirstLetter(x.Track.ArtistName))
                      .Select(x => new TracksGroupCategoryViewModel { Title = x.Key, Items = x.OrderBy(c => c.Track.ArtistName).ThenBy(c => c.AlbumName).ThenBy(c => c.TrackNumber).ToList() });
 
         return BuildGroupedCollection(selectedItems, orderByDescending: false);
