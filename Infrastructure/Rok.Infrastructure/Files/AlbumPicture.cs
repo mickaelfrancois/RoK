@@ -6,7 +6,7 @@ public class AlbumPicture(IFileSystem _fileSystem) : IAlbumPicture
 {
     public const string KCompilationFolderName = "Compilations";
 
-    private readonly string[] _files = { "cover.jpg", "cover.png", "folder.jpg" };
+    private readonly string[] _files = { "cover.jpg", "cover.png", "folder.jpg", "cover.webp", "folder.webp" };
 
     public bool PictureFileExists(string albumPath)
     {
