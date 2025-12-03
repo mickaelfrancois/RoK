@@ -153,20 +153,24 @@
                                         Command="{x:Bind ViewModel.AlbumFavoriteCommand}" />
 
                     <AppBarButton x:Uid="albumViewLastFm"
-                                  Style="{StaticResource headerLastFmButton}"
+                                  Style="{StaticResource headerGenericButton}"
+                                  Icon="MusicInfo"
                                   Command="{x:Bind ViewModel.OpenLastFmPageCommand, Mode=OneWay}"
                                   Visibility="{x:Bind ViewModel.LastFmPageAvailable, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" />
 
                     <AppBarButton x:Uid="albumViewBiography"
-                                  Style="{StaticResource headerBiographyButton}"
+                                  Style="{StaticResource headerGenericButton}"
+                                  Icon="Library"
                                   Visibility="Collapsed" />
 
                     <AppBarButton x:Uid="albumViewPlaylist"
-                                  Style="{StaticResource headerAddPlaylistButton}"
+                                  Style="{StaticResource headerGenericButton}"
+                                  Icon="Add"
                                   Visibility="Collapsed" />
 
                     <AppBarButton x:Uid="albumViewEdit"
-                                  Style="{StaticResource headerEditButton}"
+                                  Style="{StaticResource headerGenericButton}"
+                                  Icon="Edit"
                                   Command="{x:Bind ViewModel.EditAlbumCommand}" />
 
                 </CommandBar>

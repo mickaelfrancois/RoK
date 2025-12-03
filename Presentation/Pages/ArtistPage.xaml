@@ -92,27 +92,32 @@
                                         Command="{x:Bind ViewModel.ArtistFavoriteCommand}" />
 
                     <AppBarButton x:Uid="artistViewWebSite"
-                                  Style="{StaticResource headerWebsiteButton}"
+                                  Style="{StaticResource headerGenericButton}"
+                                  Icon="World"
                                   Command="{x:Bind ViewModel.OpenOfficielSiteCommand}"
                                   Visibility="{x:Bind ViewModel.Artist.OfficialSiteUrl, Converter={StaticResource StringToVisibilityConverter}}" />
 
-                    <AppBarButton x:Uid="artistViewLastFm"
-                                  Style="{StaticResource headerLastFmButton}"
-                                  Command="{x:Bind ViewModel.OpenLastFmPageCommand, Mode=OneWay}"
-                                  Visibility="{x:Bind ViewModel.LastFmPageAvailable, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" />
-
-                    <AppBarButton x:Uid="artistViewBiography" 
-                                  Style="{StaticResource headerBiographyButton}"
+                    <AppBarButton x:Uid="artistViewBiography"
+                                  Style="{StaticResource headerGenericButton}"
+                                  Icon="Library"
                                   Click="ArtistViewBiography_Click"
                                   Visibility="{x:Bind ViewModel.Artist.Biography, Converter={StaticResource StringToVisibilityConverter}}" />
 
-                    <AppBarButton x:Uid="artistViewPlaylist" 
-                                  Style="{StaticResource headerAddPlaylistButton}"
+                    <AppBarButton x:Uid="artistViewLastFm"
+                                  Style="{StaticResource headerGenericButton}"
+                                  Icon="MusicInfo"
+                                  Command="{x:Bind ViewModel.OpenLastFmPageCommand, Mode=OneWay}"
+                                  Visibility="{x:Bind ViewModel.LastFmPageAvailable, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" />
+
+                    <AppBarButton x:Uid="artistViewPlaylist"
+                                  Style="{StaticResource headerGenericButton}"
+                                  Icon="Add"
                                   Visibility="Collapsed"                                    
                                   IsEnabled="False"/>
 
                     <AppBarButton x:Uid="artistViewEdit"
-                                  Style="{StaticResource headerEditButton}"
+                                  Style="{StaticResource headerGenericButton}"
+                                  Icon="Edit"
                                   Visibility="Collapsed"
                                   IsEnabled="False" />
                 </CommandBar>

@@ -151,7 +151,15 @@
                     <common:ListViewExtended x:Name="tracksList"
                                              ItemsSource="{Binding Source={StaticResource groupedItemsViewSource}}"
                                              SelectionMode="Single"
-                                             IsItemClickEnabled="True">
+                                             IsItemClickEnabled="True"
+                                             IncrementalLoadingTrigger="Edge"
+                                             IncrementalLoadingThreshold="50">
+
+                        <ListView.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <ItemsStackPanel />
+                            </ItemsPanelTemplate>
+                        </ListView.ItemsPanel>
 
                         <ListView.ItemTemplate>
                             <DataTemplate x:DataType="tracks:TrackViewModel">
@@ -253,8 +261,7 @@
 
                                 <GroupStyle.Panel>
                                     <ItemsPanelTemplate>
-                                        <VariableSizedWrapGrid Orientation="Vertical"
-                                                               Margin="0,0,80,0" />
+                                        <ItemsStackPanel />
                                     </ItemsPanelTemplate>
                                 </GroupStyle.Panel>
                             </GroupStyle>

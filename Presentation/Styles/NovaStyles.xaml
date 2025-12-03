@@ -13,7 +13,7 @@
     <SolidColorBrush x:Key="DefaultThemeBrush"
                      Color="#257EF9" />
     <SolidColorBrush x:Key="HoverThemeBrush"
-                     Color="#154587" />
+                     Color="#257EF9" />
     <SolidColorBrush x:Key="PressedThemeBrush"
                      Color="#123D7A" />
 
@@ -216,7 +216,7 @@
                                         <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="Foreground"
                                                                        Storyboard.TargetName="TextElement">
                                             <DiscreteObjectKeyFrame KeyTime="0"
-                                                                    Value="{ThemeResource HoverThemeBrush}" />
+                                                                    Value="{ThemeResource HyperlinkButtonForegroundPointerOver}" />
                                         </ObjectAnimationUsingKeyFrames>
                                     </Storyboard>
                                 </VisualState>
@@ -730,7 +730,7 @@
            TargetType="HyperlinkButton"
            BasedOn="{StaticResource HyperlinkSmallButtonStyle}">
         <Setter Property="Foreground"
-                Value="{StaticResource AccentTextFillColorPrimaryBrush}"></Setter>
+                Value="#42A5FF" />
         <Setter Property="Margin"
                 Value="4,0,0,0"></Setter>
         <Setter Property="FontSize"
