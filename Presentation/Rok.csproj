@@ -14,22 +14,7 @@
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 		<WindowsAppSDKSelfContained>true</WindowsAppSDKSelfContained>
 	    <UserSecretsId>d0581b7b-fae8-471b-96ec-491f08740dcb</UserSecretsId>
-		<WindowsPackageType>MSIX</WindowsPackageType>
-		<AppxPackageAppxManifest>Package.appxmanifest</AppxPackageAppxManifest>
   </PropertyGroup>
-
-	<PropertyGroup Condition="'$(Configuration)'=='Debug'">
-		<AppxPackageAppxManifest>Package.Debug.appxmanifest</AppxPackageAppxManifest>
-	</PropertyGroup>
-
-	<PropertyGroup Condition="'$(Configuration)'=='Release'">
-		<AppxPackageAppxManifest>Package.Release.appxmanifest</AppxPackageAppxManifest>
-	</PropertyGroup>
-
-	<Target Name="DetectUnlocalizedXaml" AfterTargets="Build">
-		<Exec Command="powershell -ExecutionPolicy Bypass -File &quot;$(ProjectDir)find-unlocalized.ps1&quot;" StandardOutputImportance="High" />
-	</Target>
-
 
 	<ItemGroup>
 		<None Remove="Assets\BadgeLogo.scale-100.png" />
@@ -61,13 +46,6 @@
 		<None Remove="Pages\TrackPage.xaml" />
 		<None Remove="Pages\TracksPage.xaml" />
 		<None Remove="Pages\WelcomePage.xaml" />
-	</ItemGroup>
-
-
-	<ItemGroup>
-	  <AppxManifest Include="Package.Debug.appxmanifest">
-	    <SubType>Designer</SubType>
-	  </AppxManifest>
 	</ItemGroup>
 
 	<ItemGroup>
@@ -261,6 +239,9 @@
 	<ItemGroup>
 	  <None Update="appsettings.json">
 	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </None>
+	  <None Update="Package.appxmanifest">
+	    <SubType>Designer</SubType>
 	  </None>
 	  <Page Update="Dialogs\EditAlbumDialog.xaml">
 	    <Generator>MSBuild:Compile</Generator>
