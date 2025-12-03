@@ -9,8 +9,6 @@ using Rok.Logic.Services.Player;
 using Rok.Logic.ViewModels.Tracks;
 using System.IO;
 using Windows.Storage;
-using Windows.Storage.Pickers;
-using WinRT.Interop;
 
 namespace Rok.Logic.ViewModels.Albums;
 
@@ -415,18 +413,7 @@ public partial class AlbumViewModel : ObservableObject
 
     private async Task SelectPictureAsync()
     {
-        FileOpenPicker openPicker = new()
-        {
-            ViewMode = PickerViewMode.Thumbnail,
-            SuggestedStartLocation = PickerLocationId.Downloads
-        };
-        openPicker.FileTypeFilter.Add(".jpg");
-        openPicker.FileTypeFilter.Add(".jpeg");
-        openPicker.FileTypeFilter.Add(".png");
-
-        InitializeWithWindow.Initialize(openPicker, Rok.App.MainWindowHandle);
-
-        StorageFile? file = await openPicker.PickSingleFileAsync();
+        StorageFile? file = await ImagePickerService.PickAsync();
         if (file is null)
             return;
 
