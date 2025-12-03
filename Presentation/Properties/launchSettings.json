@@ -2,7 +2,7 @@
   "profiles": {
     "Rok (Package)": {
       "commandName": "MsixPackage",
-      "nativeDebugging": true
+      "nativeDebugging": false
     },
     "Rok (Unpackaged)": {
       "commandName": "Project"
