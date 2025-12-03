@@ -3,7 +3,7 @@ using Microsoft.Extensions.Options;
 using Rok.Application.Interfaces;
 using Rok.Application.Options;
 using System.Net.Http.Json;
-using System.Reflection;
+using Windows.ApplicationModel;
 
 namespace Rok.Infrastructure.Telemetry;
 
@@ -56,8 +56,8 @@ public class TelemetryClient : ITelemetryClient
 
     private static string GetAppVersion()
     {
-        Assembly assembly = Assembly.GetEntryAssembly() ?? Assembly.GetExecutingAssembly();
-        return assembly.GetName().Version?.ToString() ?? "0.0.0";
+        PackageVersion version = Package.Current.Id.Version;
+        return $"{version.Major}.{version.Minor}.{version.Build}.{version.Revision}";
     }
 
 
