@@ -111,6 +111,16 @@
         <Grid Grid.Row="1"
               Style="{StaticResource gridList}">
 
+            <Grid.Background>
+                <LinearGradientBrush StartPoint="0.5,0"
+                                     EndPoint="0.5,1">
+                    <GradientStop Color="{ThemeResource NavigationViewExpandedPaneBackground}"
+                                  Offset="0.8" />
+                    <GradientStop Color="{ThemeResource SystemChromeBlackMediumColor}"
+                                  Offset="1" />
+                </LinearGradientBrush>
+            </Grid.Background>
+
             <Grid.RowDefinitions>
                 <RowDefinition Height="{ThemeResource gridHeaderTracksHeight}" />
                 <RowDefinition />

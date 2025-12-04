@@ -103,6 +103,16 @@
 
         <!-- Main content-->
         <Grid Grid.Row="1" Style="{StaticResource gridList}">
+            <Grid.Background>
+                <LinearGradientBrush StartPoint="0.5,0"
+                                     EndPoint="0.5,1">
+                    <GradientStop Color="{ThemeResource NavigationViewExpandedPaneBackground}"
+                                  Offset="0.8" />
+                    <GradientStop Color="{ThemeResource SystemChromeBlackMediumColor}"
+                                  Offset="1" />
+                </LinearGradientBrush>
+            </Grid.Background>
+            
             <SemanticZoom x:Name="GridZoom" ScrollViewer.ZoomMode="Enabled" IsZoomOutButtonEnabled="True">
                 <SemanticZoom.ZoomedInView>
                     <common:GridViewExtended x:Name="grid" ContainerContentChanging="GridContainerContentChanging" 
