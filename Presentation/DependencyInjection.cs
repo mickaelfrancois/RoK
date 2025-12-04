@@ -1,5 +1,6 @@
 ﻿using Rok.Application.Features.Playlists.PlaylistMenu;
 using Rok.Logic.Services.Player;
+using Rok.Logic.ViewModels.Album.Services;
 using Rok.Logic.ViewModels.Albums;
 using Rok.Logic.ViewModels.Albums.Handlers;
 using Rok.Logic.ViewModels.Albums.Services;
@@ -42,6 +43,14 @@ public static class DependencyInjection
         services.AddSingleton<AlbumsGroupCategory>();
         services.AddSingleton<AlbumsFilter>();
 
+        // Album detail services (for AlbumViewModel - single album)
+        services.AddTransient<AlbumViewModel>();
+        services.AddTransient<AlbumDetailDataLoader>();
+        services.AddTransient<AlbumPictureService>();
+        services.AddTransient<AlbumApiService>();
+        services.AddTransient<AlbumStatisticsService>();
+        services.AddTransient<AlbumEditService>();
+
         // Artists ViewModel, services and handlers
         services.AddSingleton<ArtistsViewModel>();
         services.AddKeyedSingleton<ArtistsViewModel>("SearchArtists");
@@ -78,7 +87,7 @@ public static class DependencyInjection
         services.AddSingleton<PlaylistsViewModel>();
         services.AddTransient<PlaylistViewModel>();
         services.AddTransient<ArtistViewModel>();
-        services.AddTransient<AlbumViewModel>();
+
         services.AddTransient<TrackViewModel>();
 
 
