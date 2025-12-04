@@ -1,4 +1,4 @@
-﻿namespace Rok.Logic.ViewModels.Artists;
+﻿namespace Rok.Logic.ViewModels.Artist;
 
 internal class ArtistOpenArgs(long artistId)
 {

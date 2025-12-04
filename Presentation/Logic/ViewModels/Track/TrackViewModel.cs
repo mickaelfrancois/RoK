@@ -1,18 +1,23 @@
 ﻿using Microsoft.UI.Dispatching;
 using Rok.Application.Dto.Lyrics;
 using Rok.Application.Features.Playlists.PlaylistMenu;
-using Rok.Application.Features.Tracks.Command;
-using Rok.Application.Features.Tracks.Query;
-using Rok.Infrastructure.NovaApi;
 using Rok.Logic.Services.Player;
+using Rok.Logic.ViewModels.Track.Services;
 
 namespace Rok.Logic.ViewModels.Tracks;
 
 public partial class TrackViewModel : ObservableObject, IDisposable
 {
     private readonly ILogger<TrackViewModel> _logger;
-
     private readonly ResourceLoader _resourceLoader;
+    private readonly IPlayerService _playerService;
+    private readonly IDialogService _dialogService;
+    private readonly IBackdropLoader _backdropLoader;
+
+    private readonly TrackDetailDataLoader _dataLoader;
+    private readonly TrackLyricsService _lyricsService;
+    private readonly TrackScoreService _scoreService;
+    private readonly TrackNavigationService _navigationService;
 
     public TrackDto Track { get; private set; } = new();
 
@@ -59,13 +64,13 @@ public partial class TrackViewModel : ObservableObject, IDisposable
         }
     }
 
-    public int? TrackNumber { get { return Track.TrackNumber; } }
+    public int? TrackNumber => Track.TrackNumber;
 
     public string TrackNumberStr
     {
         get
         {
-            if (Track.TrackNumber.HasValue == false)
+            if (!Track.TrackNumber.HasValue)
                 return "00";
 
             return Track.TrackNumber.Value.ToString().PadLeft(2, '0') + ".";
@@ -110,24 +115,17 @@ public partial class TrackViewModel : ObservableObject, IDisposable
     }
 
     public string AlbumName => Track.AlbumName;
-
     public string ArtistName => Track.ArtistName;
 
     private LyricsModel? _lyrics;
 
-    public string PlainLyrics
-    {
-        get
-        {
-            return _lyrics?.PlainLyrics ?? string.Empty;
-        }
-    }
+    public string PlainLyrics => _lyrics?.PlainLyrics ?? string.Empty;
 
     public bool LyricsExists
     {
         get
         {
-            bool exists = _lyricsService.CheckLyricsFileExists(Track.MusicFile) != ELyricsType.None;
+            bool exists = _lyricsService.CheckLyricsExists(Track.MusicFile);
             if (!exists)
                 _ = GetLyricsFromAPIAsync();
 
@@ -153,7 +151,7 @@ public partial class TrackViewModel : ObservableObject, IDisposable
     private bool _listening = false;
     public bool Listening
     {
-        get { return _listening; }
+        get => _listening;
         set
         {
             if (_listening != value)
@@ -166,52 +164,60 @@ public partial class TrackViewModel : ObservableObject, IDisposable
 
     public bool Listened { get; set; }
 
-    private readonly NavigationService _navigationService;
-    private readonly IMediator _mediator;
-    private readonly IPlayerService _playerService;
-    private readonly ILyricsService _lyricsService;
-    private readonly INovaApiService _novaApiService;
-    private readonly IDialogService _dialogService;
-    private readonly IBackdropLoader _backdropLoader;
+    public RelayCommand AlbumOpenCommand { get; private set; }
+    public RelayCommand ArtistOpenCommand { get; private set; }
+    public RelayCommand TrackOpenCommand { get; private set; }
+    public AsyncRelayCommand LyricsOpenCommand { get; private set; }
+    public RelayCommand ListenCommand { get; private set; }
 
-    public RelayCommand AlbumOpenCommand { get; init; }
-    public RelayCommand ArtistOpenCommand { get; init; }
-    public RelayCommand TrackOpenCommand { get; init; }
-    public AsyncRelayCommand LyricsOpenCommand { get; init; }
-    public RelayCommand ListenCommand { get; init; }
-
-
-    public TrackViewModel(IBackdropLoader backdropLoader, IPlaylistMenuService playlistMenuService, IMediator mediator, NavigationService navigationService, ResourceLoader resourceLoader, IDialogService dialogService, IPlayerService playerService, INovaApiService novaApiService, ILyricsService lyricsService, ILogger<TrackViewModel> logger)
+    public TrackViewModel(
+        IBackdropLoader backdropLoader,
+        IPlaylistMenuService playlistMenuService,
+        ResourceLoader resourceLoader,
+        IDialogService dialogService,
+        IPlayerService playerService,
+        TrackDetailDataLoader dataLoader,
+        TrackLyricsService lyricsService,
+        TrackScoreService scoreService,
+        TrackNavigationService navigationService,
+        ILogger<TrackViewModel> logger)
     {
         _backdropLoader = Guard.Against.Null(backdropLoader);
         PlaylistMenuService = Guard.Against.Null(playlistMenuService);
-        _mediator = Guard.Against.Null(mediator);
-        _navigationService = Guard.Against.Null(navigationService);
         _resourceLoader = Guard.Against.Null(resourceLoader);
         _dialogService = Guard.Against.Null(dialogService);
         _playerService = Guard.Against.Null(playerService);
-        _novaApiService = Guard.Against.Null(novaApiService);
+        _dataLoader = Guard.Against.Null(dataLoader);
         _lyricsService = Guard.Against.Null(lyricsService);
+        _scoreService = Guard.Against.Null(scoreService);
+        _navigationService = Guard.Against.Null(navigationService);
         _logger = Guard.Against.Null(logger);
 
+        InitializeCommands();
+        SubscribeToMessages();
+    }
+
+    private void InitializeCommands()
+    {
         ArtistOpenCommand = new RelayCommand(ArtistOpen);
         AlbumOpenCommand = new RelayCommand(AlbumOpen);
         TrackOpenCommand = new RelayCommand(TrackOpen);
         LyricsOpenCommand = new AsyncRelayCommand(LyricsOpenAsync);
         ListenCommand = new RelayCommand(Listen);
-
-        Messenger.Subscribe<TrackScoreUpdateMessage>((message) => TrackScoreUpdateMessageHandle(message));
     }
 
+    private void SubscribeToMessages()
+    {
+        Messenger.Subscribe<TrackScoreUpdateMessage>(TrackScoreUpdateMessageHandle);
+    }
 
     public async Task LoadDataAsync(long trackId)
     {
-        Result<TrackDto> trackResult = await _mediator.SendMessageAsync(new GetTrackByIdQuery(trackId));
-        if (trackResult.IsError)
+        TrackDto? track = await _dataLoader.LoadTrackAsync(trackId);
+        if (track == null)
             return;
 
-        Track = trackResult.Value!;
-
+        Track = track;
         LoadBackdrop();
 
         OnPropertyChanged(string.Empty);
@@ -221,7 +227,6 @@ public partial class TrackViewModel : ObservableObject, IDisposable
     {
         Track = track;
     }
-
 
     private void TrackScoreUpdateMessageHandle(TrackScoreUpdateMessage message)
     {
@@ -234,27 +239,22 @@ public partial class TrackViewModel : ObservableObject, IDisposable
 
     private async Task SetScoreAsync(int score)
     {
-        await _mediator.SendMessageAsync(new UpdateScoreCommand(Track.Id, score));
-        Messenger.Send(new TrackScoreUpdateMessage(Track.Id, score));
+        await _scoreService.UpdateScoreAsync(Track.Id, score);
     }
-
 
     private void ArtistOpen()
     {
-        if (Track.ArtistId.HasValue)
-            _navigationService.NavigateToArtist(Track.ArtistId.Value);
+        _navigationService.NavigateToArtist(Track.ArtistId);
     }
 
     private void AlbumOpen()
     {
-        if (Track.AlbumId.HasValue)
-            _navigationService.NavigateToAlbum(Track.AlbumId.Value);
+        _navigationService.NavigateToAlbum(Track.AlbumId);
     }
 
     private void TrackOpen()
     {
-        if (Track.Id > 0)
-            _navigationService.NavigateToTrack(Track.Id);
+        _navigationService.NavigateToTrack(Track.Id);
     }
 
     private async Task LyricsOpenAsync()
@@ -265,17 +265,14 @@ public partial class TrackViewModel : ObservableObject, IDisposable
             await _dialogService.ShowTextAsync($"{ArtistName} - {Title}", PlainLyrics, _resourceLoader.GetString("Close"));
     }
 
-
     public async Task LoadLyricsAsync()
     {
         if (LyricsExists)
         {
             _lyrics = await _lyricsService.LoadLyricsAsync(Track.MusicFile);
-
             OnPropertyChanged(nameof(PlainLyrics));
         }
     }
-
 
     private void Listen()
     {
@@ -283,35 +280,13 @@ public partial class TrackViewModel : ObservableObject, IDisposable
             _playerService.LoadPlaylist([Track]);
     }
 
-
     private async Task GetLyricsFromAPIAsync()
     {
-        if (string.IsNullOrEmpty(Track.MusicFile) || string.IsNullOrEmpty(Track.ArtistName) || string.IsNullOrEmpty(Track.Title))
-            return;
+        bool success = await _lyricsService.GetAndSaveLyricsFromApiAsync(Track);
 
-        if (!NovaApiService.IsApiRetryAllowed(Track.GetLyricsLastAttempt))
-            return;
-
-        _logger.LogTrace("Fetching lyrics for {Artist} - {Title} from API", Track.ArtistName, Track.Title);
-
-        await _mediator.SendMessageAsync(new UpdateTrackGetLyricsLastAttemptCommand(Track.Id));
-
-        Track.GetLyricsLastAttempt = DateTime.UtcNow;
-
-        ApiLyricsModel? lyrics = await _novaApiService.GetLyricsAsync(ArtistName, Title);
-        if (lyrics != null)
+        if (success)
         {
-            string fileName = lyrics.IsSynchronized ? _lyricsService.GetSynchronizedLyricsFileName(Track.MusicFile) : _lyricsService.GetPlainLyricsFileName(Track.MusicFile);
-
-            await _lyricsService.SaveLyricsAsync(new LyricsModel
-            {
-                File = fileName,
-                PlainLyrics = lyrics.Lyrics,
-                LyricsType = lyrics.IsSynchronized ? ELyricsType.Synchronized : ELyricsType.Plain
-            });
-
-            _logger.LogTrace("Lyrics saved to {File}", fileName);
-
+            Track.GetLyricsLastAttempt = DateTime.UtcNow;
 
             DispatcherQueue dispatcher = DispatcherQueue.GetForCurrentThread();
             if (dispatcher != null)
@@ -325,19 +300,16 @@ public partial class TrackViewModel : ObservableObject, IDisposable
         }
     }
 
-
     public void LoadBackdrop()
     {
         if (Track.Id <= 0)
             return;
-
 
         _backdropLoader.LoadBackdrop(Track.ArtistName, (BitmapImage? backdropImage) =>
         {
             Backdrop = backdropImage;
         });
     }
-
 
     #region IDisposable Support
 
@@ -347,19 +319,13 @@ public partial class TrackViewModel : ObservableObject, IDisposable
     {
         if (!disposedValue)
         {
-            if (disposing)
-            {
-            }
-
             disposedValue = true;
         }
     }
 
-
     public void Dispose()
     {
         Dispose(true);
-
         GC.SuppressFinalize(this);
     }
 
