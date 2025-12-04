@@ -16,6 +16,18 @@
 	    <UserSecretsId>d0581b7b-fae8-471b-96ec-491f08740dcb</UserSecretsId>
   </PropertyGroup>
 
+	<PropertyGroup Condition="'$(Configuration)'=='Debug'">
+		<DebugType>embedded</DebugType>
+		<DebugSymbols>true</DebugSymbols>
+		<PathMap>$(MSBuildProjectDirectory)=.</PathMap>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)' == 'Release'">
+		<DebugType>embedded</DebugType>
+		<DebugSymbols>true</DebugSymbols>
+		<PathMap>$(MSBuildProjectDirectory)=.</PathMap>
+	</PropertyGroup>
+
 	<ItemGroup>
 		<None Remove="Assets\BadgeLogo.scale-100.png" />
 		<None Remove="Assets\BadgeLogo.scale-125.png" />

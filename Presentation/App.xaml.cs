@@ -171,8 +171,7 @@ namespace Rok
             try
             {
                 ILogger<App>? logger = ServiceProvider.GetService<Microsoft.Extensions.Logging.ILogger<App>>();
-                logger?.LogError(e.Exception, "Exception non gérée: {Message}", e.Exception.Message);
-
+                logger?.LogError(e.Exception, "Unhandler exception: {Message}", e.Exception.Message);
 
 #if DEBUG
                 // handle to avoid crash:
