@@ -247,7 +247,6 @@
 	</ItemGroup>
 	<ItemGroup>
 	  <Folder Include="Commons\Extensions\" />
-	  <Folder Include="Logic\ViewModels\NewFolder\" />
 	</ItemGroup>
 	<ItemGroup>
 	  <None Update="appsettings.json">

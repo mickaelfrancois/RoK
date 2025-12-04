@@ -1,4 +1,4 @@
-﻿namespace Rok.Logic.ViewModels.Tracks;
+﻿namespace Rok.Logic.ViewModels.Track;
 
 internal class TrackOpenArgs(long trackId)
 {

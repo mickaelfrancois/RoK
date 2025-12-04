@@ -1,4 +1,5 @@
-﻿using Rok.Application.Features.Playlists.PlaylistMenu;
+﻿using Microsoft.UI.Dispatching;
+using Rok.Application.Features.Playlists.PlaylistMenu;
 using Rok.Logic.Services.Player;
 using Rok.Logic.ViewModels.Album.Services;
 using Rok.Logic.ViewModels.Albums;
@@ -9,6 +10,7 @@ using Rok.Logic.ViewModels.Artists;
 using Rok.Logic.ViewModels.Artists.Handlers;
 using Rok.Logic.ViewModels.Artists.Services;
 using Rok.Logic.ViewModels.Listening;
+using Rok.Logic.ViewModels.Listening.Services;
 using Rok.Logic.ViewModels.Main;
 using Rok.Logic.ViewModels.Player;
 using Rok.Logic.ViewModels.Playlists;
@@ -90,6 +92,17 @@ public static class DependencyInjection
         services.AddTransient<TrackLyricsService>();
         services.AddTransient<TrackScoreService>();
         services.AddTransient<TrackNavigationService>();
+
+        // Listening ViewModel and services
+        services.AddSingleton<ListeningViewModel>();
+        services.AddSingleton<ListeningDataLoader>();
+        services.AddSingleton<ListeningPlaylistManager>((sp) =>
+        {
+            DispatcherQueue dispatcherQueue = DispatcherQueue.GetForCurrentThread();
+            ListeningDataLoader dataLoader = sp.GetRequiredService<ListeningDataLoader>();
+            return new ListeningPlaylistManager(dispatcherQueue, dataLoader);
+        });
+        services.AddSingleton<ListeningPlaybackService>();
 
         // Shared message handlers
         services.AddSingleton<LibraryRefreshMessageHandler>();
