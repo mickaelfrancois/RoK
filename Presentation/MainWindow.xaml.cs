@@ -45,7 +45,6 @@ namespace Rok
             { "Options", typeof(Pages.OptionsPage) },
         };
 
-        private MicaBackdrop _micaBackdrop;
 
 
         public MainWindow(NavigationService navigationService, ResourceLoader resourceLoader, IAppDbContext dbContext, IAppOptions appOptions)
@@ -82,8 +81,7 @@ namespace Rok
 #if WINDOWS
             if (OperatingSystem.IsWindowsVersionAtLeast(10, 0, 17763))
             {
-                _micaBackdrop = new MicaBackdrop();
-                SystemBackdrop = _micaBackdrop;
+                SystemBackdrop = new MicaBackdrop();
             }
 #endif
         }
@@ -138,7 +136,7 @@ namespace Rok
                 }
 
                 if (_appOptions.RefreshLibraryAtStartup)
-                    libraryRefreshButton_Tapped(this, new TappedRoutedEventArgs());
+                    LibraryRefreshButton_Tapped(this, new TappedRoutedEventArgs());
             }
         }
 
@@ -202,7 +200,7 @@ namespace Rok
         }
 
 
-        private void libraryRefreshButton_Tapped(object sender, TappedRoutedEventArgs e)
+        private void LibraryRefreshButton_Tapped(object sender, TappedRoutedEventArgs e)
         {
             if (ViewModel!.RefreshLibraryCommand.CanExecute(null))
                 ViewModel.RefreshLibraryCommand.Execute(null);

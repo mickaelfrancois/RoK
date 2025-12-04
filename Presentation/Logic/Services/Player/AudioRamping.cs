@@ -22,16 +22,12 @@ internal static class AudioRamping
     // minDb typically -80 dB (practically inaudible)
     public static double DbInterpolate(double t, double masterVolumePercent, double minDb = -80.0)
     {
-        // map percent -> linear gain [0..1]
-        double startGain = 1.0; // for fade-out start = 1.0
-        double endGain = 0.0;   // for fade-out end = 0.0
-
         // convert gains to dB: gainDb = 20*log10(gain) ; handle zero
         double startDb = 0.0; // 0 dB = full
         double endDb = minDb; // very low
 
         double curDb = (startDb * (1.0 - t)) + (endDb * t);
-        
+
         // convert back to linear gain
         double gain = Math.Pow(10.0, curDb / 20.0);
 

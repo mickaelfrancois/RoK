@@ -5,6 +5,7 @@ public class PlayerTimerManager : IDisposable
     private readonly DispatcherTimer _updateTimer;
     private readonly DispatcherTimer _lyricTimer;
     private readonly DispatcherTimer _backdropTimer;
+    private bool _disposed;
 
     public event EventHandler? UpdateTick;
     public event EventHandler? LyricTick;
@@ -48,10 +49,26 @@ public class PlayerTimerManager : IDisposable
         _backdropTimer.Start();
     }
 
+    protected virtual void Dispose(bool disposing)
+    {
+        if (_disposed)
+        {
+            return;
+        }
+
+        if (disposing)
+        {
+            _updateTimer?.Stop();
+            _lyricTimer?.Stop();
+            _backdropTimer?.Stop();
+        }
+
+        _disposed = true;
+    }
+
     public void Dispose()
     {
-        _updateTimer?.Stop();
-        _lyricTimer?.Stop();
-        _backdropTimer?.Stop();
+        Dispose(true);
+        GC.SuppressFinalize(this);
     }
 }

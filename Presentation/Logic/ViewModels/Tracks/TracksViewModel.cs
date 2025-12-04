@@ -93,19 +93,16 @@ public partial class TracksViewModel : ObservableObject, IDisposable
         _trackImportedHandler = trackImportedHandler;
         _logger = logger;
 
-        InitializeCommands();
-        SubscribeToMessages();
-        SubscribeToEvents();
-    }
-
-    private void InitializeCommands()
-    {
         GroupByCommand = new RelayCommand<string>(GroupBy);
         FilterByCommand = new RelayCommand<string>(FilterBy);
         FilterByGenreCommand = new RelayCommand<long?>(FilterByGenreId);
         ListenCommand = new RelayCommand(ListenTracks);
         ListenGroupCommand = new RelayCommand<TracksGroupCategoryViewModel>(ListenGroup);
+
+        SubscribeToMessages();
+        SubscribeToEvents();
     }
+
 
     private void SubscribeToMessages()
     {

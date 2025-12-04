@@ -10,7 +10,9 @@
                          UriSource='Assets/artistFallback.png' />
             <BitmapImage x:Key='albumCoverFallback'
                          UriSource='Assets/albumFallback.png' />
-
+            
+            <x:String x:Key="ArtistFallbackPictureUri">ms-appx:///Assets/artistFallback.png</x:String>
+            
             <x:Double x:Key="headerBackgroundOpacity">0.9</x:Double>
             <x:Double x:Key="largeHeaderHeight">280</x:Double>
             <x:Double x:Key="normalHeaderHeight">180</x:Double>

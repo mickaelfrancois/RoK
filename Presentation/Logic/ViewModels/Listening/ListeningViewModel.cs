@@ -33,18 +33,15 @@ public partial class ListeningViewModel : ObservableObject
         _playbackService = Guard.Against.Null(playbackService);
         _logger = Guard.Against.Null(logger);
 
-        InitializeCommands();
+        AddMoreFromArtistCommand = new AsyncRelayCommand<TrackViewModel>(AddMoreFromArtistAsync);
+        ShufflePlaylistCommand = new RelayCommand(ShuffleTracks);
+
         SubscribeToMessages();
         SubscribeToEvents();
 
         InitializeFromPlayerService();
     }
 
-    private void InitializeCommands()
-    {
-        AddMoreFromArtistCommand = new AsyncRelayCommand<TrackViewModel>(AddMoreFromArtistAsync);
-        ShufflePlaylistCommand = new RelayCommand(ShuffleTracks);
-    }
 
     private void SubscribeToMessages()
     {

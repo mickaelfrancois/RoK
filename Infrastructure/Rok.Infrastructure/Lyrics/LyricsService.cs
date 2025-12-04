@@ -53,6 +53,10 @@ public class LyricsService : ILyricsService
         Guard.Against.NullOrEmpty(musicFile, nameof(musicFile));
 
         string? folder = Path.GetDirectoryName(musicFile);
+
+        if (string.IsNullOrEmpty(folder))
+            return null;
+
         string fileNameWithoutExtension = Path.GetFileNameWithoutExtension(musicFile);
         string lyricsLrc = Path.Combine(folder, fileNameWithoutExtension + ".lrc");
         string lyricsTxt = Path.Combine(folder, fileNameWithoutExtension + ".txt");

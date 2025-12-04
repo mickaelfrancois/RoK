@@ -123,11 +123,6 @@ public partial class PlaylistViewModel : ObservableObject
         _generationService = Guard.Against.Null(generationService);
         _logger = Guard.Against.Null(logger);
 
-        InitializeCommands();
-    }
-
-    private void InitializeCommands()
-    {
         ListenCommand = new AsyncRelayCommand(ListenAsync);
         GenerateCommand = new AsyncRelayCommand(GenerateAsync);
         PlaylistOpenCommand = new RelayCommand(OpenPlaylist);
@@ -135,6 +130,7 @@ public partial class PlaylistViewModel : ObservableObject
         RemoveFromPlaylistCommand = new AsyncRelayCommand<long>(RemoveTrackAsync);
         SavePlaylistCommand = new AsyncRelayCommand<List<PlaylistGroupDto>>((c) => SavePlaylistAsync(forceUpdate: true, c));
     }
+
 
     public void SetData(PlaylistHeaderDto playlist)
     {

@@ -8,7 +8,8 @@ namespace Rok.Logic.ViewModels.Artists;
 
 public partial class ArtistViewModel : ObservableObject
 {
-    private static BitmapImage FallbackPicture => new(new Uri("ms-appx:///Assets/artistFallback.png"));
+    private static string FallbackPictureUri => App.Current.Resources["ArtistFallbackPictureUri"] as string ?? "ms-appx:///Assets/artistFallback.png";
+    private static BitmapImage FallbackPicture => new(new Uri(FallbackPictureUri));
 
     private readonly NavigationService _navigationService;
     private readonly ResourceLoader _resourceLoader;
@@ -239,11 +240,6 @@ public partial class ArtistViewModel : ObservableObject
         _editService = Guard.Against.Null(editService);
         _logger = Guard.Against.Null(logger);
 
-        InitializeCommands();
-    }
-
-    private void InitializeCommands()
-    {
         GenreOpenCommand = new RelayCommand(() => { });
         ListenCommand = new AsyncRelayCommand(ListenAsync);
         ArtistsByCountryOpenCommand = new RelayCommand(() => { });
@@ -253,6 +249,7 @@ public partial class ArtistViewModel : ObservableObject
         OpenOfficielSiteCommand = new AsyncRelayCommand(OpenOfficialSiteAsync);
         OpenLastFmPageCommand = new RelayCommand(OpenLastFmPage);
     }
+
 
     public void SetData(ArtistDto artist)
     {

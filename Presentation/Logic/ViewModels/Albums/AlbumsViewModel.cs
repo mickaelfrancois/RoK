@@ -95,18 +95,14 @@ public partial class AlbumsViewModel : ObservableObject, IDisposable
         _albumImportedHandler = albumImportedHandler;
         _logger = logger;
 
-        InitializeCommands();
-        SubscribeToMessages();
-        SubscribeToEvents();
-    }
-
-    private void InitializeCommands()
-    {
         GroupByCommand = new RelayCommand<string>(GroupBy);
         FilterByCommand = new RelayCommand<string>(FilterBy);
         FilterByGenreCommand = new RelayCommand<long?>(FilterByGenreId);
         ListenGroupCommand = new AsyncRelayCommand<AlbumsGroupCategoryViewModel>(ListenGroupAsync);
         ListenCommand = new AsyncRelayCommand(ListenAsync);
+
+        SubscribeToMessages();
+        SubscribeToEvents();
     }
 
     private void SubscribeToMessages()

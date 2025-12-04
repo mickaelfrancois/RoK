@@ -6,7 +6,7 @@ public sealed partial class GridViewExtended : GridView
 {
     public ObservableCollection<object> BindableSelectedItems
     {
-        get => GetValue(BindableSelectedItemsProperty) as ObservableCollection<object>;
+        get => GetValue(BindableSelectedItemsProperty) as ObservableCollection<object> ?? new ObservableCollection<object>();
         set => SetValue(BindableSelectedItemsProperty, value);
     }
 

@@ -2,7 +2,9 @@ namespace Rok.Logic.ViewModels.Playlist.Services;
 
 public class PlaylistPictureService(IArtistPicture artistPicture, ILogger<PlaylistPictureService> logger)
 {
-    private static BitmapImage FallbackPicture => new(new Uri("ms-appx:///Assets/artistFallback.png"));
+    private static string FallbackPictureUri => App.Current.Resources["ArtistFallbackPictureUri"] as string ?? "ms-appx:///Assets/artistFallback.png";
+    private static BitmapImage FallbackPicture => new(new Uri(FallbackPictureUri));
+
 
     public BitmapImage LoadPicture(string? pictureName)
     {

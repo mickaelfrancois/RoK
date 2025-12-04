@@ -6,6 +6,7 @@ using Rok.Logic.ViewModels.Albums;
 using Rok.Logic.ViewModels.Artists;
 using Rok.Logic.ViewModels.Player.Services;
 using Rok.Logic.ViewModels.Tracks;
+using System.ComponentModel;
 
 namespace Rok.Logic.ViewModels.Player;
 
@@ -15,6 +16,7 @@ public partial class PlayerViewModel : ObservableObject, IDisposable
     private readonly IMediator _mediator;
     private readonly NavigationService _navigationService;
     private readonly ILogger<PlayerViewModel> _logger;
+    private bool _disposed;
 
     private readonly PlayerDataLoader _dataLoader;
     private readonly PlayerLyricsService _lyricsService;
@@ -155,16 +157,6 @@ public partial class PlayerViewModel : ObservableObject, IDisposable
         _stateManager = Guard.Against.Null(stateManager);
         _logger = Guard.Against.Null(logger);
 
-        InitializeCommands();
-        SubscribeToMessages();
-        SubscribeToTimers();
-        SubscribeToStateManager();
-
-        _timerManager.Start();
-    }
-
-    private void InitializeCommands()
-    {
         SkipPreviousCommand = new RelayCommand(SkipPrevious);
         SkipNextCommand = new AsyncRelayCommand(SkipNextAsync);
         FullscreenCommand = new RelayCommand(Fullscreen);
@@ -172,7 +164,46 @@ public partial class PlayerViewModel : ObservableObject, IDisposable
         OpenListeningCommand = new RelayCommand(OpenListening);
         CompactModeCommand = new RelayCommand(ToggleCompactMode);
         TogglePlayPauseCommand = new RelayCommand(TogglePlayPause);
+
+        _stateManager.PropertyChanged += OnStateManagerPropertyChanged;
+
+        SubscribeToMessages();
+        SubscribeToTimers();
+
+        _timerManager.Start();
     }
+
+    private void OnStateManagerPropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        switch (e.PropertyName)
+        {
+            case nameof(PlayerStateManager.CurrentLyric):
+                OnPropertyChanged(nameof(CurrentLyric));
+                break;
+            case nameof(PlayerStateManager.CurrentTrack):
+                OnPropertyChanged(nameof(CurrentTrack));
+                break;
+            case nameof(PlayerStateManager.CurrentArtist):
+                OnPropertyChanged(nameof(CurrentArtist));
+                break;
+            case nameof(PlayerStateManager.CurrentAlbum):
+                OnPropertyChanged(nameof(CurrentAlbum));
+                break;
+            case nameof(PlayerStateManager.LyricsExist):
+                OnPropertyChanged(nameof(LyricsExist));
+                break;
+            case nameof(PlayerStateManager.LyricsLines):
+                OnPropertyChanged(nameof(Lyrics));
+                break;
+            case nameof(PlayerStateManager.IsSynchronizedLyrics):
+                OnPropertyChanged(nameof(IsSynchronizedLyrics));
+                break;
+            case nameof(PlayerStateManager.PlainLyrics):
+                OnPropertyChanged(nameof(PlainLyrics));
+                break;
+        }
+    }
+
 
     private void SubscribeToMessages()
     {
@@ -189,11 +220,6 @@ public partial class PlayerViewModel : ObservableObject, IDisposable
         _timerManager.UpdateTick += OnUpdateTimerTick;
         _timerManager.LyricTick += OnLyricTimerTick;
         _timerManager.BackdropTick += OnBackdropTimerTick;
-    }
-
-    private void SubscribeToStateManager()
-    {
-        _stateManager.StateChanged += (s, e) => OnPropertyChanged(string.Empty);
     }
 
     public void SetPosition(double position)
@@ -441,7 +467,7 @@ public partial class PlayerViewModel : ObservableObject, IDisposable
         Messenger.Send(new FullScreenMessage(_isFullScreen));
     }
 
-    private void ToggleCompactMode()
+    private static void ToggleCompactMode()
     {
         Messenger.Send(new CompactModeMessage());
     }
@@ -453,6 +479,23 @@ public partial class PlayerViewModel : ObservableObject, IDisposable
 
     public void Dispose()
     {
-        _timerManager?.Dispose();
+        Dispose(true);
+        GC.SuppressFinalize(this);
+    }
+
+    protected virtual void Dispose(bool disposing)
+    {
+        if (_disposed)
+            return;
+
+        if (disposing)
+        {
+            if (_stateManager != null)
+                _stateManager.PropertyChanged -= OnStateManagerPropertyChanged;
+
+            _timerManager?.Dispose();
+        }
+
+        _disposed = true;
     }
 }

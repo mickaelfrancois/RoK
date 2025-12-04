@@ -8,7 +8,6 @@ namespace Rok.Logic.ViewModels.Tracks;
 
 public partial class TrackViewModel : ObservableObject, IDisposable
 {
-    private readonly ILogger<TrackViewModel> _logger;
     private readonly ResourceLoader _resourceLoader;
     private readonly IPlayerService _playerService;
     private readonly IDialogService _dialogService;
@@ -191,19 +190,14 @@ public partial class TrackViewModel : ObservableObject, IDisposable
         _lyricsService = Guard.Against.Null(lyricsService);
         _scoreService = Guard.Against.Null(scoreService);
         _navigationService = Guard.Against.Null(navigationService);
-        _logger = Guard.Against.Null(logger);
 
-        InitializeCommands();
-        SubscribeToMessages();
-    }
-
-    private void InitializeCommands()
-    {
         ArtistOpenCommand = new RelayCommand(ArtistOpen);
         AlbumOpenCommand = new RelayCommand(AlbumOpen);
         TrackOpenCommand = new RelayCommand(TrackOpen);
         LyricsOpenCommand = new AsyncRelayCommand(LyricsOpenAsync);
         ListenCommand = new RelayCommand(Listen);
+
+        SubscribeToMessages();
     }
 
     private void SubscribeToMessages()

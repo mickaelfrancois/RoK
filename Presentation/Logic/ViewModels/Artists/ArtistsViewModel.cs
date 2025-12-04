@@ -99,19 +99,16 @@ public partial class ArtistsViewModel : ObservableObject, IDisposable
         _appOptions = appOptions;
         _logger = logger;
 
-        InitializeCommands();
-        SubscribeToMessages();
-        SubscribeToEvents();
-    }
-
-    private void InitializeCommands()
-    {
         GroupByCommand = new RelayCommand<string>(GroupBy);
         FilterByCommand = new RelayCommand<string>(FilterBy);
         FilterByGenreCommand = new RelayCommand<long?>(FilterByGenreId);
         ListenGroupCommand = new AsyncRelayCommand<ArtistsGroupCategoryViewModel>(ListenGroupAsync);
         ListenCommand = new AsyncRelayCommand(ListenAsync);
+
+        SubscribeToMessages();
+        SubscribeToEvents();
     }
+
 
     private void SubscribeToMessages()
     {

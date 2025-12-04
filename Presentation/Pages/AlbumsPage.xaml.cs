@@ -78,16 +78,22 @@ public sealed partial class AlbumsPage : Page, IDisposable
     private void gridBottom_PointerEntered(object sender, PointerRoutedEventArgs e)
     {
         Grid? gridItem = sender as Grid;
-        Storyboard? showArtistStoryboard = gridItem.Resources["ShowArtistNameStoryboard"] as Storyboard;
-        showArtistStoryboard?.Begin();
+        if (gridItem != null)
+        {
+            Storyboard? showArtistStoryboard = gridItem.Resources["ShowArtistNameStoryboard"] as Storyboard;
+            showArtistStoryboard?.Begin();
+        }
     }
 
 
     private void gridBottom_PointerExited(object sender, PointerRoutedEventArgs e)
     {
         Grid? gridItem = sender as Grid;
-        Storyboard? showSubTitleStoryboard = gridItem.Resources["ShowSubTitleStoryboard"] as Storyboard;
-        showSubTitleStoryboard?.Begin();
+        if (gridItem != null)
+        {
+            Storyboard? showSubTitleStoryboard = gridItem.Resources["ShowSubTitleStoryboard"] as Storyboard;
+            showSubTitleStoryboard?.Begin();
+        }
     }
 
 

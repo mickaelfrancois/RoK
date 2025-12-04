@@ -118,7 +118,7 @@
                                             SelectsOnInvoked="False"
                                             AutomationProperties.Name="refresh"
                                             Visibility="Visible"
-                                            Tapped="libraryRefreshButton_Tapped">
+                                            Tapped="LibraryRefreshButton_Tapped">
                             <NavigationViewItem.Icon>
                                 <FontIcon Glyph="&#xE72C;"
                                           RenderTransformOrigin="0.5,0.5"

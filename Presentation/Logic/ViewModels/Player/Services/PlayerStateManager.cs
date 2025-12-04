@@ -109,7 +109,6 @@ public partial class PlayerStateManager : ObservableObject
 
     public string? PlainLyrics => _lyrics?.PlainLyrics;
 
-    public event EventHandler? StateChanged;
 
     public PlayerStateManager(DispatcherQueue dispatcherQueue)
     {

@@ -109,7 +109,7 @@ public partial class AlbumViewModel : ObservableObject
         }
     }
 
-    public BitmapImage? _backdrop = null;
+    private BitmapImage? _backdrop = null;
     public BitmapImage? Backdrop
     {
         get => _backdrop;
@@ -162,11 +162,6 @@ public partial class AlbumViewModel : ObservableObject
         _editService = Guard.Against.Null(editService);
         _logger = Guard.Against.Null(logger);
 
-        InitializeCommands();
-    }
-
-    private void InitializeCommands()
-    {
         ListenCommand = new AsyncRelayCommand(ListenAsync);
         AlbumFavoriteCommand = new AsyncRelayCommand(UpdateFavoriteStateAsync);
         AlbumOpenCommand = new RelayCommand(AlbumOpen);
@@ -177,6 +172,7 @@ public partial class AlbumViewModel : ObservableObject
         EditAlbumCommand = new AsyncRelayCommand(EditAlbumAsync);
         OpenLastFmPageCommand = new RelayCommand(OpenLastFmPage);
     }
+
 
     public void SetData(AlbumDto album)
     {

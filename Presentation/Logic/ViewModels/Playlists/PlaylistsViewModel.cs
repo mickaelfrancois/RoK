@@ -27,16 +27,13 @@ public partial class PlaylistsViewModel : ObservableObject, IDisposable
         _updateHandler = Guard.Against.Null(updateHandler);
         _logger = Guard.Against.Null(logger);
 
-        InitializeCommands();
+        NewSmartPlaylistCommand = new RelayCommand(async () => await NewSmartPlaylistAsync());
+        NewPlaylistCommand = new RelayCommand(async () => await NewPlaylistAsync());
+
         SubscribeToMessages();
         SubscribeToEvents();
     }
 
-    private void InitializeCommands()
-    {
-        NewSmartPlaylistCommand = new RelayCommand(async () => await NewSmartPlaylistAsync());
-        NewPlaylistCommand = new RelayCommand(async () => await NewPlaylistAsync());
-    }
 
     private void SubscribeToMessages()
     {
