@@ -1,4 +1,4 @@
-﻿namespace Rok.Logic.ViewModels.Playlists;
+﻿namespace Rok.Logic.ViewModels.Playlist;
 
 public class PlaylistOpenArgs
 {

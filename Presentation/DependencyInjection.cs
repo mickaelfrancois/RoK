@@ -13,7 +13,10 @@ using Rok.Logic.ViewModels.Listening;
 using Rok.Logic.ViewModels.Listening.Services;
 using Rok.Logic.ViewModels.Main;
 using Rok.Logic.ViewModels.Player;
+using Rok.Logic.ViewModels.Playlist.Services;
 using Rok.Logic.ViewModels.Playlists;
+using Rok.Logic.ViewModels.Playlists.Handlers;
+using Rok.Logic.ViewModels.Playlists.Services;
 using Rok.Logic.ViewModels.Search;
 using Rok.Logic.ViewModels.Start;
 using Rok.Logic.ViewModels.Track.Services;
@@ -104,17 +107,27 @@ public static class DependencyInjection
         });
         services.AddSingleton<ListeningPlaybackService>();
 
+        // Playlists ViewModel, services and handlers
+        services.AddSingleton<PlaylistsViewModel>();
+        services.AddSingleton<PlaylistsDataLoader>();
+        services.AddSingleton<PlaylistCreationService>();
+        services.AddSingleton<PlaylistUpdateMessageHandler>();
+
+        // Playlist detail (for PlaylistViewModel - single playlist)
+        services.AddTransient<PlaylistViewModel>();
+        services.AddTransient<PlaylistDataLoader>();
+        services.AddTransient<PlaylistPictureService>();
+        services.AddTransient<PlaylistUpdateService>();
+        services.AddTransient<PlaylistGenerationService>();
+
         // Shared message handlers
         services.AddSingleton<LibraryRefreshMessageHandler>();
         services.AddSingleton<AlbumImportedMessageHandler>();
 
         services.AddSingleton<MainViewModel>();
         services.AddSingleton<PlayerViewModel>();
-        services.AddSingleton<ListeningViewModel>();
         services.AddTransient<SearchViewModel>();
         services.AddTransient<StartViewModel>();
-        services.AddSingleton<PlaylistsViewModel>();
-        services.AddTransient<PlaylistViewModel>();
 
 
         return services;

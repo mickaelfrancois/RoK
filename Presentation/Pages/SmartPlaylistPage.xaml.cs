@@ -1,6 +1,7 @@
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Navigation;
 using Rok.Commons;
+using Rok.Logic.ViewModels.Playlist;
 using Rok.Logic.ViewModels.Playlists;
 
 namespace Rok.Pages;
