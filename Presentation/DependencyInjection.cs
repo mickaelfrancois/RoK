@@ -4,6 +4,8 @@ using Rok.Logic.ViewModels.Albums;
 using Rok.Logic.ViewModels.Albums.Handlers;
 using Rok.Logic.ViewModels.Albums.Services;
 using Rok.Logic.ViewModels.Artists;
+using Rok.Logic.ViewModels.Artists.Handlers;
+using Rok.Logic.ViewModels.Artists.Services;
 using Rok.Logic.ViewModels.Listening;
 using Rok.Logic.ViewModels.Main;
 using Rok.Logic.ViewModels.Player;
@@ -11,6 +13,8 @@ using Rok.Logic.ViewModels.Playlists;
 using Rok.Logic.ViewModels.Search;
 using Rok.Logic.ViewModels.Start;
 using Rok.Logic.ViewModels.Tracks;
+using Rok.Logic.ViewModels.Tracks.Handlers;
+using Rok.Logic.ViewModels.Tracks.Services;
 
 namespace Rok;
 
@@ -35,10 +39,35 @@ public static class DependencyInjection
         services.AddSingleton<AlbumsStateManager>();
         services.AddSingleton<AlbumsPlaybackService>();
         services.AddSingleton<AlbumUpdateMessageHandler>();
-        services.AddSingleton<LibraryRefreshMessageHandler>();
-        services.AddSingleton<AlbumImportedMessageHandler>();
         services.AddSingleton<AlbumsGroupCategory>();
         services.AddSingleton<AlbumsFilter>();
+
+        // Artists ViewModel, services and handlers
+        services.AddSingleton<ArtistsViewModel>();
+        services.AddKeyedSingleton<ArtistsViewModel>("SearchArtists");
+        services.AddSingleton<ArtistsDataLoader>();
+        services.AddSingleton<ArtistsSelectionManager>();
+        services.AddSingleton<ArtistsStateManager>();
+        services.AddSingleton<ArtistsPlaybackService>();
+        services.AddSingleton<ArtistUpdateMessageHandler>();
+        services.AddSingleton<ArtistImportedMessageHandler>();
+        services.AddSingleton<ArtistsGroupCategory>();
+        services.AddSingleton<ArtistsFilter>();
+
+        // Tracks ViewModel, services and handlers
+        services.AddSingleton<TracksViewModel>();
+        services.AddKeyedSingleton<TracksViewModel>("SearchTracks");
+        services.AddSingleton<TracksDataLoader>();
+        services.AddSingleton<TracksSelectionManager>();
+        services.AddSingleton<TracksStateManager>();
+        services.AddSingleton<TracksPlaybackService>();
+        services.AddSingleton<TrackImportedMessageHandler>();
+        services.AddSingleton<TracksGroupCategory>();
+        services.AddSingleton<TracksFilter>();
+
+        // Shared message handlers
+        services.AddSingleton<LibraryRefreshMessageHandler>();
+        services.AddSingleton<AlbumImportedMessageHandler>();
 
         services.AddSingleton<MainViewModel>();
         services.AddSingleton<PlayerViewModel>();
@@ -46,26 +75,11 @@ public static class DependencyInjection
         services.AddTransient<SearchViewModel>();
         services.AddTransient<StartViewModel>();
 
-        services.AddKeyedSingleton<ArtistsViewModel>("SearchArtists");
-
-        services.AddKeyedSingleton<TracksViewModel>("SearchTracks");
-
-        services.AddSingleton<ArtistsViewModel>();
-
-        services.AddSingleton<TracksViewModel>();
         services.AddSingleton<PlaylistsViewModel>();
-
         services.AddTransient<PlaylistViewModel>();
         services.AddTransient<ArtistViewModel>();
         services.AddTransient<AlbumViewModel>();
-
         services.AddTransient<TrackViewModel>();
-
-        services.AddSingleton<ArtistsGroupCategory>();
-        services.AddSingleton<ArtistsFilter>();
-
-        services.AddSingleton<TracksGroupCategory>();
-        services.AddSingleton<TracksFilter>();
 
 
         return services;
