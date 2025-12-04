@@ -13,6 +13,7 @@ using Rok.Logic.ViewModels.Listening;
 using Rok.Logic.ViewModels.Listening.Services;
 using Rok.Logic.ViewModels.Main;
 using Rok.Logic.ViewModels.Player;
+using Rok.Logic.ViewModels.Player.Services;
 using Rok.Logic.ViewModels.Playlist.Services;
 using Rok.Logic.ViewModels.Playlists;
 using Rok.Logic.ViewModels.Playlists.Handlers;
@@ -120,12 +121,23 @@ public static class DependencyInjection
         services.AddTransient<PlaylistUpdateService>();
         services.AddTransient<PlaylistGenerationService>();
 
+        // Player ViewModel and services
+        services.AddSingleton<PlayerViewModel>();
+        services.AddSingleton<PlayerDataLoader>();
+        services.AddSingleton<PlayerLyricsService>();
+        services.AddSingleton<PlayerListenTracker>();
+        services.AddSingleton<PlayerTimerManager>();
+        services.AddSingleton<PlayerStateManager>((sp) =>
+        {
+            DispatcherQueue dispatcherQueue = Microsoft.UI.Dispatching.DispatcherQueue.GetForCurrentThread();
+            return new PlayerStateManager(dispatcherQueue);
+        });
+
         // Shared message handlers
         services.AddSingleton<LibraryRefreshMessageHandler>();
         services.AddSingleton<AlbumImportedMessageHandler>();
 
         services.AddSingleton<MainViewModel>();
-        services.AddSingleton<PlayerViewModel>();
         services.AddTransient<SearchViewModel>();
         services.AddTransient<StartViewModel>();
 
