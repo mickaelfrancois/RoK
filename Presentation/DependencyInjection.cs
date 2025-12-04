@@ -1,6 +1,8 @@
 ﻿using Rok.Application.Features.Playlists.PlaylistMenu;
 using Rok.Logic.Services.Player;
 using Rok.Logic.ViewModels.Albums;
+using Rok.Logic.ViewModels.Albums.Handlers;
+using Rok.Logic.ViewModels.Albums.Services;
 using Rok.Logic.ViewModels.Artists;
 using Rok.Logic.ViewModels.Listening;
 using Rok.Logic.ViewModels.Main;
@@ -25,6 +27,19 @@ public static class DependencyInjection
         services.AddSingleton<IFolderResolver, FolderResolver>();
         services.AddSingleton<IBackdropLoader, BackdropLoader>();
 
+        // Albums ViewModel, services and handlers
+        services.AddSingleton<AlbumsViewModel>();
+        services.AddKeyedSingleton<AlbumsViewModel>("SearchAlbums");
+        services.AddSingleton<AlbumsDataLoader>();
+        services.AddSingleton<AlbumsSelectionManager>();
+        services.AddSingleton<AlbumsStateManager>();
+        services.AddSingleton<AlbumsPlaybackService>();
+        services.AddSingleton<AlbumUpdateMessageHandler>();
+        services.AddSingleton<LibraryRefreshMessageHandler>();
+        services.AddSingleton<AlbumImportedMessageHandler>();
+        services.AddSingleton<AlbumsGroupCategory>();
+        services.AddSingleton<AlbumsFilter>();
+
         services.AddSingleton<MainViewModel>();
         services.AddSingleton<PlayerViewModel>();
         services.AddSingleton<ListeningViewModel>();
@@ -32,17 +47,18 @@ public static class DependencyInjection
         services.AddTransient<StartViewModel>();
 
         services.AddKeyedSingleton<ArtistsViewModel>("SearchArtists");
-        services.AddKeyedSingleton<AlbumsViewModel>("SearchAlbums");
+
         services.AddKeyedSingleton<TracksViewModel>("SearchTracks");
 
         services.AddSingleton<ArtistsViewModel>();
-        services.AddSingleton<AlbumsViewModel>();
+
         services.AddSingleton<TracksViewModel>();
         services.AddSingleton<PlaylistsViewModel>();
 
         services.AddTransient<PlaylistViewModel>();
         services.AddTransient<ArtistViewModel>();
         services.AddTransient<AlbumViewModel>();
+
         services.AddTransient<TrackViewModel>();
 
         services.AddSingleton<ArtistsGroupCategory>();
@@ -51,8 +67,6 @@ public static class DependencyInjection
         services.AddSingleton<TracksGroupCategory>();
         services.AddSingleton<TracksFilter>();
 
-        services.AddSingleton<AlbumsGroupCategory>();
-        services.AddSingleton<AlbumsFilter>();
 
         return services;
     }
