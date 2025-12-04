@@ -4,6 +4,7 @@ using Rok.Logic.ViewModels.Album.Services;
 using Rok.Logic.ViewModels.Albums;
 using Rok.Logic.ViewModels.Albums.Handlers;
 using Rok.Logic.ViewModels.Albums.Services;
+using Rok.Logic.ViewModels.Artist.Services;
 using Rok.Logic.ViewModels.Artists;
 using Rok.Logic.ViewModels.Artists.Handlers;
 using Rok.Logic.ViewModels.Artists.Services;
@@ -13,6 +14,7 @@ using Rok.Logic.ViewModels.Player;
 using Rok.Logic.ViewModels.Playlists;
 using Rok.Logic.ViewModels.Search;
 using Rok.Logic.ViewModels.Start;
+using Rok.Logic.ViewModels.Track.Services;
 using Rok.Logic.ViewModels.Tracks;
 using Rok.Logic.ViewModels.Tracks.Handlers;
 using Rok.Logic.ViewModels.Tracks.Services;
@@ -45,7 +47,7 @@ public static class DependencyInjection
 
         // Album detail services (for AlbumViewModel - single album)
         services.AddTransient<AlbumViewModel>();
-        services.AddTransient<AlbumDetailDataLoader>();
+        services.AddTransient<AlbumDataLoader>();
         services.AddTransient<AlbumPictureService>();
         services.AddTransient<AlbumApiService>();
         services.AddTransient<AlbumStatisticsService>();
@@ -63,6 +65,14 @@ public static class DependencyInjection
         services.AddSingleton<ArtistsGroupCategory>();
         services.AddSingleton<ArtistsFilter>();
 
+        // Artist detail services (for ArtistViewModel - single artist)
+        services.AddTransient<ArtistViewModel>();
+        services.AddTransient<ArtistDataLoader>();
+        services.AddTransient<ArtistPictureService>();
+        services.AddTransient<ArtistApiService>();
+        services.AddTransient<ArtistStatisticsService>();
+        services.AddTransient<ArtistEditService>();
+
         // Tracks ViewModel, services and handlers
         services.AddSingleton<TracksViewModel>();
         services.AddKeyedSingleton<TracksViewModel>("SearchTracks");
@@ -74,6 +84,13 @@ public static class DependencyInjection
         services.AddSingleton<TracksGroupCategory>();
         services.AddSingleton<TracksFilter>();
 
+        // Track detail services (for TrackViewModel - single track)
+        services.AddTransient<TrackViewModel>();
+        services.AddTransient<TrackDetailDataLoader>();
+        services.AddTransient<TrackLyricsService>();
+        services.AddTransient<TrackScoreService>();
+        services.AddTransient<TrackNavigationService>();
+
         // Shared message handlers
         services.AddSingleton<LibraryRefreshMessageHandler>();
         services.AddSingleton<AlbumImportedMessageHandler>();
@@ -83,12 +100,8 @@ public static class DependencyInjection
         services.AddSingleton<ListeningViewModel>();
         services.AddTransient<SearchViewModel>();
         services.AddTransient<StartViewModel>();
-
         services.AddSingleton<PlaylistsViewModel>();
         services.AddTransient<PlaylistViewModel>();
-        services.AddTransient<ArtistViewModel>();
-
-        services.AddTransient<TrackViewModel>();
 
 
         return services;

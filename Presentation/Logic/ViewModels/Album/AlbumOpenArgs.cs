@@ -1,4 +1,4 @@
-﻿namespace Rok.Logic.ViewModels.Albums;
+﻿namespace Rok.Logic.ViewModels.Album;
 
 internal class AlbumOpenArgs(long albumId)
 {

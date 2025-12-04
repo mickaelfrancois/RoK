@@ -13,7 +13,7 @@ public partial class AlbumViewModel : ObservableObject
     private readonly ILastFmClient _lastFmClient;
     private readonly IBackdropLoader _backdropLoader;
 
-    private readonly AlbumDetailDataLoader _dataLoader;
+    private readonly AlbumDataLoader _dataLoader;
     private readonly AlbumPictureService _pictureService;
     private readonly AlbumApiService _apiService;
     private readonly AlbumStatisticsService _statisticsService;
@@ -143,7 +143,7 @@ public partial class AlbumViewModel : ObservableObject
         NavigationService navigationService,
         IPlayerService playerService,
         ResourceLoader resourceLoader,
-        AlbumDetailDataLoader dataLoader,
+        AlbumDataLoader dataLoader,
         AlbumPictureService pictureService,
         AlbumApiService apiService,
         AlbumStatisticsService statisticsService,

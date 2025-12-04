@@ -4,7 +4,7 @@ using Rok.Logic.ViewModels.Tracks;
 
 namespace Rok.Logic.ViewModels.Album.Services;
 
-public class AlbumDetailDataLoader(IMediator mediator, ILogger<AlbumDetailDataLoader> logger)
+public class AlbumDataLoader(IMediator mediator, ILogger<AlbumDataLoader> logger)
 {
     public async Task<AlbumDto?> LoadAlbumAsync(long albumId)
     {

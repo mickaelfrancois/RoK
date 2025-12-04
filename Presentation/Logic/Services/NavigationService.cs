@@ -1,6 +1,6 @@
 ﻿using Microsoft.UI.Xaml.Controls;
-using Rok.Logic.ViewModels.Albums;
-using Rok.Logic.ViewModels.Artists;
+using Rok.Logic.ViewModels.Album;
+using Rok.Logic.ViewModels.Artist;
 using Rok.Logic.ViewModels.Playlists;
 using Rok.Logic.ViewModels.Search;
 using Rok.Logic.ViewModels.Tracks;
