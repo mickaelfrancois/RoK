@@ -4,7 +4,6 @@ using Microsoft.Extensions.Options;
 using Rok.Application.Dto.NovaApi;
 using Rok.Application.Interfaces;
 using Rok.Application.Options;
-using System.Net.Http.Json;
 using System.Reflection;
 using System.Text.Json;
 
@@ -176,9 +175,9 @@ public class NovaApiService : INovaApiService, IDisposable
         ApiAlbumModel? album;
         string key = $"{artistName}_{albumName}";
 
-        if (_albumCache.TryGetValue(key, out album) == false)
+        if (!_albumCache.TryGetValue(key, out album))
         {
-            string url = $"albums/" + Uri.EscapeDataString(albumName) + "/" + Uri.EscapeDataString(artistName);
+            string url = $"albums/{Uri.EscapeDataString(albumName)}/{Uri.EscapeDataString(artistName)}";
             album = await GetASync<ApiAlbumModel>(url);
 
             SaveAlbumToCache(key, album);
@@ -220,12 +219,12 @@ public class NovaApiService : INovaApiService, IDisposable
         if (string.IsNullOrEmpty(title))
             return null;
 
-        ApiLyricsModel lyrics;
+        ApiLyricsModel? lyrics;
         string key = $"{artistName}_{title}";
 
-        if (_lyricsCache.TryGetValue(key, out lyrics) == false)
+        if (!_lyricsCache.TryGetValue(key, out lyrics))
         {
-            string url = $"lyrics/" + Uri.EscapeDataString(artistName) + "/" + Uri.EscapeDataString(title);
+            string url = $"lyrics/{Uri.EscapeDataString(artistName)}/{Uri.EscapeDataString(title)}";
             lyrics = await GetASync<ApiLyricsModel>(url);
 
             SaveLyricsToCache(key, lyrics);
@@ -273,16 +272,16 @@ public class NovaApiService : INovaApiService, IDisposable
 
     private async Task<T?> GetASync<T>(string url, CancellationToken cancellationToken = default)
     {
-        T result = default!;
+        T? result = default;
         bool acquired;
 
         try
         {
             acquired = await _concurrencyLimiter.WaitAsync(_concurrencyLimiterTimeout, cancellationToken);
         }
-        catch (OperationCanceledException)
+        catch (OperationCanceledException ex)
         {
-            _logger.LogWarning("Request cancelled before entering limiter {Url}", url);
+            _logger.LogWarning(ex, "Request cancelled before entering limiter {Url}", url);
             return result;
         }
 
@@ -294,7 +293,7 @@ public class NovaApiService : INovaApiService, IDisposable
 
                 if (response.IsSuccessStatusCode)
                 {
-                    using var stream = await response.Content.ReadAsStreamAsync(cancellationToken);
+                    using Stream stream = await response.Content.ReadAsStreamAsync(cancellationToken);
                     result = await JsonSerializer.DeserializeAsync<T>(stream, _jsonOptions, cancellationToken);
                 }
                 else
@@ -302,9 +301,9 @@ public class NovaApiService : INovaApiService, IDisposable
                     _logger.LogError("Nova API response {Error} {Url}", response.StatusCode, url);
                 }
             }
-            catch (OperationCanceledException)
+            catch (OperationCanceledException ex)
             {
-                _logger.LogWarning("Request cancelled {Url}", url);
+                _logger.LogWarning(ex, "Request cancelled {Url}", url);
             }
             catch (Exception ex)
             {
@@ -316,9 +315,9 @@ public class NovaApiService : INovaApiService, IDisposable
                 {
                     _concurrencyLimiter.Release();
                 }
-                catch (SemaphoreFullException)
+                catch (SemaphoreFullException ex)
                 {
-                    _logger.LogWarning("Semaphore release called when full for {Url}", url);
+                    _logger.LogWarning(ex, "Semaphore release called when full for {Url}", url);
                 }
             }
         }
@@ -330,7 +329,14 @@ public class NovaApiService : INovaApiService, IDisposable
 
     private async Task DownloadFileAsync(Uri uri, string path, CancellationToken cancellationToken = default)
     {
-        Directory.CreateDirectory(Path.GetDirectoryName(path));
+        if (string.IsNullOrEmpty(path))
+            return;
+
+        string? directoryName = Path.GetDirectoryName(path);
+        if (string.IsNullOrEmpty(directoryName))
+            return;
+
+        Directory.CreateDirectory(directoryName);
 
         bool acquired;
 
@@ -338,9 +344,9 @@ public class NovaApiService : INovaApiService, IDisposable
         {
             acquired = await _concurrencyLimiter.WaitAsync(_concurrencyLimiterTimeout, cancellationToken);
         }
-        catch (OperationCanceledException)
+        catch (OperationCanceledException ex)
         {
-            _logger.LogWarning("Request cancelled before entering limiter {Url}", uri);
+            _logger.LogWarning(ex, "Request cancelled before entering limiter {Url}", uri);
             return;
         }
 
@@ -361,9 +367,9 @@ public class NovaApiService : INovaApiService, IDisposable
 
             await inputStream.CopyToAsync(writer, cancellationToken);
         }
-        catch (OperationCanceledException)
+        catch (OperationCanceledException ex)
         {
-            _logger.LogWarning("Request cancelled {Url}", uri);
+            _logger.LogWarning(ex, "Request cancelled {Url}", uri);
         }
         catch (Exception ex)
         {
@@ -375,9 +381,9 @@ public class NovaApiService : INovaApiService, IDisposable
             {
                 _concurrencyLimiter.Release();
             }
-            catch (SemaphoreFullException)
+            catch (SemaphoreFullException ex)
             {
-                _logger.LogWarning("Semaphore release called when full for {Url}", uri);
+                _logger.LogWarning(ex, "Semaphore release called when full for {Url}", uri);
             }
         }
     }

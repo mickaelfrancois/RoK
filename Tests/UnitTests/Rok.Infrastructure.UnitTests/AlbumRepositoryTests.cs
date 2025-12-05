@@ -70,7 +70,7 @@ public class AlbumRepositoryTests(SqliteDatabaseFixture fixture) : IClassFixture
         Assert.True(ok);
 
         AlbumEntity? album = await repo.GetByIdAsync(1);
-        Assert.True(album.IsFavorite);
+        Assert.True(album?.IsFavorite);
     }
 
     [Fact]

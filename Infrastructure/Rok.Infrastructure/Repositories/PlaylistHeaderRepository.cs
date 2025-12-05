@@ -4,8 +4,13 @@ using Rok.Application.Interfaces;
 
 namespace Rok.Infrastructure.Repositories;
 
-public class PlaylistHeaderRepository(IDbConnection connection, [FromKeyedServices("BackgroundConnection")] IDbConnection backgroundConnection, ILogger<PlaylistHeaderRepository> logger) : GenericRepository<PlaylistHeaderEntity>(connection, backgroundConnection, null, logger), IPlaylistHeaderRepository
+public class PlaylistHeaderRepository : GenericRepository<PlaylistHeaderEntity>, IPlaylistHeaderRepository
 {
+    public PlaylistHeaderRepository(IDbConnection connection, [FromKeyedServices("BackgroundConnection")] IDbConnection backgroundConnection, ILogger<PlaylistHeaderRepository> logger) : base(connection, backgroundConnection, null, logger)
+    {
+    }
+
+
     public async Task<bool> UpdatePictureAsync(long id, string picture, RepositoryConnectionKind kind = RepositoryConnectionKind.Foreground)
     {
         string sql = $"UPDATE playlists SET picture = @picture WHERE Id = @id";
@@ -21,7 +26,7 @@ public class PlaylistHeaderRepository(IDbConnection connection, [FromKeyedServic
         IDbConnection localConnection = ResolveConnection(kind);
 
         if (localConnection.State == ConnectionState.Closed)
-            connection.Open();
+            localConnection.Open();
 
         using IDbTransaction transaction = localConnection.BeginTransaction();
 
@@ -47,7 +52,7 @@ public class PlaylistHeaderRepository(IDbConnection connection, [FromKeyedServic
                     FROM playlists                                  
                 """;
 
-        if (string.IsNullOrEmpty(whereParam) == false)
+        if (!string.IsNullOrEmpty(whereParam))
             query += $" WHERE playlists.{whereParam} = @{whereParam}";
 
         return query;

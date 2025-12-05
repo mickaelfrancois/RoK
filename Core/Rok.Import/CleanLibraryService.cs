@@ -1,24 +1,15 @@
 ﻿using Microsoft.Extensions.Logging;
-using MiF.Guard;
 using Rok.Application.Dto;
 using Rok.Application.Interfaces;
 using Rok.Domain.Entities;
-using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.Transactions;
 
 namespace Rok.Import;
 
-public class CleanLibraryService(ITrackRepository trackRepository, IArtistRepository artistRepository, IAlbumRepository albumRepository, IGenreRepository genreRepository, ILogger<CleanLibraryService> logger) : ICleanLibrary
+public class CleanLibraryService(ITrackRepository _trackRepository, IArtistRepository _artistRepository, IAlbumRepository _albumRepository, IGenreRepository _genreRepository, ILogger<CleanLibraryService> _logger) : ICleanLibrary
 {
-    private readonly ITrackRepository _trackRepository = Guard.Against.Null(trackRepository);
-    private readonly IArtistRepository _artistRepository = Guard.Against.Null(artistRepository);
-    private readonly IAlbumRepository _albumRepository = Guard.Against.Null(albumRepository);
-    private readonly IGenreRepository _genreRepository = Guard.Against.Null(genreRepository);
-    private readonly ILogger<CleanLibraryService> _logger = Guard.Against.Null(logger);
-
-
-    public async Task CleanAsync(ConcurrentBag<long> trackIDReaded, ImportStatisticsDto statistics, CancellationToken cancellationToken)
+    public async Task CleanAsync(IEnumerable<long> trackIDReaded, ImportStatisticsDto statistics, CancellationToken cancellationToken)
     {
         statistics.TracksDeleted += await RemoveTracksNotInLibraryAsync(trackIDReaded, cancellationToken);
         statistics.AlbumsDeleted += await CleanAlbumsWithoutTrackAsync();
@@ -26,7 +17,7 @@ public class CleanLibraryService(ITrackRepository trackRepository, IArtistReposi
         statistics.GenresDeleted += await CleanGenresWithoutTrackAsync();
     }
 
-    private async Task<int> RemoveTracksNotInLibraryAsync(ConcurrentBag<long> trackIDReaded, CancellationToken cancellationToken)
+    private async Task<int> RemoveTracksNotInLibraryAsync(IEnumerable<long> trackIDReaded, CancellationToken cancellationToken)
     {
         int count = 0;
 

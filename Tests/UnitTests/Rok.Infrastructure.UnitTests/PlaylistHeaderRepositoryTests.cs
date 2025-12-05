@@ -18,7 +18,7 @@ public class PlaylistHeaderRepositoryTests(SqliteDatabaseFixture fixture) : ICla
         // Arrange
         PlaylistHeaderRepository repo = CreateRepository();
         DateTime now = DateTime.UtcNow;
-        var entity = new PlaylistHeaderEntity
+        PlaylistHeaderEntity entity = new()
         {
             Name = "My Playlist",
             Picture = "/p.png",
@@ -26,7 +26,7 @@ public class PlaylistHeaderRepositoryTests(SqliteDatabaseFixture fixture) : ICla
             Duration = 0,
             TrackMaximum = 100,
             DurationMaximum = 0,
-            GroupsJson = null,
+            GroupsJson = "",
             Type = 1,
             CreatDate = now
         };
@@ -48,7 +48,7 @@ public class PlaylistHeaderRepositoryTests(SqliteDatabaseFixture fixture) : ICla
         // Arrange
         PlaylistHeaderRepository repo = CreateRepository();
         DateTime now = DateTime.UtcNow;
-        var entity = new PlaylistHeaderEntity
+        PlaylistHeaderEntity entity = new()
         {
             Name = "Pic Playlist",
             Picture = "/old.png",
@@ -56,7 +56,7 @@ public class PlaylistHeaderRepositoryTests(SqliteDatabaseFixture fixture) : ICla
             Duration = 0,
             TrackMaximum = 10,
             DurationMaximum = 0,
-            GroupsJson = null,
+            GroupsJson = "",
             Type = 1,
             CreatDate = now
         };
@@ -79,15 +79,15 @@ public class PlaylistHeaderRepositoryTests(SqliteDatabaseFixture fixture) : ICla
         // Arrange
         PlaylistHeaderRepository repo = CreateRepository();
         DateTime now = DateTime.UtcNow;
-        var entity = new PlaylistHeaderEntity
+        PlaylistHeaderEntity entity = new()
         {
             Name = "ToDelete",
-            Picture = null,
+            Picture = "",
             TrackCount = 0,
             Duration = 0,
             TrackMaximum = 10,
             DurationMaximum = 0,
-            GroupsJson = null,
+            GroupsJson = "",
             Type = 1,
             CreatDate = now
         };
@@ -97,13 +97,13 @@ public class PlaylistHeaderRepositoryTests(SqliteDatabaseFixture fixture) : ICla
         // Add two playlist tracks linked to this playlist
         long pt1 = 9001;
         long pt2 = 9002;
-        fixture.Connection.Execute("INSERT INTO PlaylistTracks(id, playlistId, trackId, position, listened, creatDate) VALUES (@id, @playlistId, @trackId, @pos, @listened, @now)",
+        await fixture.Connection.ExecuteAsync("INSERT INTO PlaylistTracks(id, playlistId, trackId, position, listened, creatDate) VALUES (@id, @playlistId, @trackId, @pos, @listened, @now)",
             new { id = pt1, playlistId, trackId = 1, pos = 0, listened = 0, now });
-        fixture.Connection.Execute("INSERT INTO PlaylistTracks(id, playlistId, trackId, position, listened, creatDate) VALUES (@id, @playlistId, @trackId, @pos, @listened, @now)",
+        await fixture.Connection.ExecuteAsync("INSERT INTO PlaylistTracks(id, playlistId, trackId, position, listened, creatDate) VALUES (@id, @playlistId, @trackId, @pos, @listened, @now)",
             new { id = pt2, playlistId, trackId = 2, pos = 1, listened = 0, now });
 
         // Verify they exist
-        int beforeCount = fixture.Connection.ExecuteScalar<int>("SELECT COUNT(1) FROM PlaylistTracks WHERE playlistId = @playlistId", new { playlistId });
+        int beforeCount = await fixture.Connection.ExecuteScalarAsync<int>("SELECT COUNT(1) FROM PlaylistTracks WHERE playlistId = @playlistId", new { playlistId });
         Assert.Equal(2, beforeCount);
 
         // Act
@@ -114,7 +114,7 @@ public class PlaylistHeaderRepositoryTests(SqliteDatabaseFixture fixture) : ICla
         PlaylistHeaderEntity? remainingPlaylist = await repo.GetByIdAsync(playlistId);
         Assert.Null(remainingPlaylist);
 
-        int afterCount = fixture.Connection.ExecuteScalar<int>("SELECT COUNT(1) FROM PlaylistTracks WHERE playlistId = @playlistId", new { playlistId });
+        int afterCount = await fixture.Connection.ExecuteScalarAsync<int>("SELECT COUNT(1) FROM PlaylistTracks WHERE playlistId = @playlistId", new { playlistId });
         Assert.Equal(0, afterCount);
     }
 
@@ -124,15 +124,15 @@ public class PlaylistHeaderRepositoryTests(SqliteDatabaseFixture fixture) : ICla
         // Arrange
         PlaylistHeaderRepository repo = CreateRepository();
         DateTime now = DateTime.UtcNow;
-        var entity = new PlaylistHeaderEntity
+        PlaylistHeaderEntity entity = new()
         {
             Name = "LookupPlaylist",
-            Picture = null,
+            Picture = "",
             TrackCount = 0,
             Duration = 0,
             TrackMaximum = 5,
             DurationMaximum = 0,
-            GroupsJson = null,
+            GroupsJson = "",
             Type = 2,
             CreatDate = now
         };
@@ -140,7 +140,7 @@ public class PlaylistHeaderRepositoryTests(SqliteDatabaseFixture fixture) : ICla
         long id = await repo.AddAsync(entity);
 
         // Act
-        var all = (await repo.GetAllAsync()).ToList();
+        List<PlaylistHeaderEntity> all = (await repo.GetAllAsync()).ToList();
         PlaylistHeaderEntity? byId = await repo.GetByIdAsync(id);
         PlaylistHeaderEntity? byName = await repo.GetByNameAsync("LookupPlaylist");
 

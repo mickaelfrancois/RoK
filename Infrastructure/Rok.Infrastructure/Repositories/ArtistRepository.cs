@@ -44,7 +44,7 @@ public class ArtistRepository(IDbConnection connection, [FromKeyedServices("Back
             "WHERE Id = @Id";
 
         IDbConnection connectiondb = ResolveConnection(kind);
-        int rowsAffected = await connection.ExecuteAsync(sql, new
+        int rowsAffected = await connectiondb.ExecuteAsync(sql, new
         {
             entity.WikipediaUrl,
             entity.OfficialSiteUrl,
@@ -127,7 +127,7 @@ public class ArtistRepository(IDbConnection connection, [FromKeyedServices("Back
                      LEFT JOIN countries ON countries.Id = artists.countryId 
                 """;
 
-        if (string.IsNullOrEmpty(whereParam) == false)
+        if (!string.IsNullOrEmpty(whereParam))
             query += $" WHERE artists.{whereParam} = @{whereParam}";
 
         return query;
