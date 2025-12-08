@@ -2,59 +2,76 @@ namespace Rok.Import.Services;
 
 public class ImportTrackingService
 {
-    private readonly List<long> _trackIdsRead = new();
-    private readonly List<long> _artistsUpdated = new();
-    private readonly List<long> _genresUpdated = new();
-    private readonly List<long> _albumsUpdated = new();
+    private readonly Dictionary<EntityType, HashSet<long>> _updatedEntities = new();
+
+    public enum EntityType
+    {
+        Track,
+        Artist,
+        Genre,
+        Album
+    }
 
     public void TrackRead(long trackId)
     {
-        _trackIdsRead.Add(trackId);
+        MarkAsUpdated(EntityType.Track, trackId);
     }
 
     public void ArtistUpdated(long? artistId)
     {
         if (artistId.HasValue)
-            _artistsUpdated.Add(artistId.Value);
+            MarkAsUpdated(EntityType.Artist, artistId.Value);
     }
 
     public void GenreUpdated(long? genreId)
     {
         if (genreId.HasValue)
-            _genresUpdated.Add(genreId.Value);
+            MarkAsUpdated(EntityType.Genre, genreId.Value);
     }
 
     public void AlbumUpdated(long? albumId)
     {
         if (albumId.HasValue)
-            _albumsUpdated.Add(albumId.Value);
+            MarkAsUpdated(EntityType.Album, albumId.Value);
     }
 
     public IEnumerable<long> GetTrackedIds()
     {
-        return _trackIdsRead.ToList();
+        return GetUpdatedEntities(EntityType.Track);
     }
 
     public IEnumerable<long> GetUpdatedArtists()
     {
-        return _artistsUpdated.Distinct();
+        return GetUpdatedEntities(EntityType.Artist);
     }
 
     public IEnumerable<long> GetUpdatedGenres()
     {
-        return _genresUpdated.Distinct();
+        return GetUpdatedEntities(EntityType.Genre);
     }
 
     public IEnumerable<long> GetUpdatedAlbums()
     {
-        return _albumsUpdated.Distinct();
+        return GetUpdatedEntities(EntityType.Album);
     }
 
     public void Clear()
     {
-        _trackIdsRead.Clear();
-        _artistsUpdated.Clear();
-        _genresUpdated.Clear();
-        _albumsUpdated.Clear();
+        _updatedEntities.Clear();
+    }
+
+    private void MarkAsUpdated(EntityType entityType, long entityId)
+    {
+        if (!_updatedEntities.ContainsKey(entityType))
+            _updatedEntities[entityType] = [];
+
+        _updatedEntities[entityType].Add(entityId);
+    }
+
+    private IEnumerable<long> GetUpdatedEntities(EntityType entityType)
+    {
+        return _updatedEntities.TryGetValue(entityType, out HashSet<long>? ids)
+            ? ids
+            : [];
     }
 }
