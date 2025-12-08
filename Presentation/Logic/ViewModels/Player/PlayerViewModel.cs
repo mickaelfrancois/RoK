@@ -122,7 +122,7 @@ public partial class PlayerViewModel : ObservableObject, IDisposable
 
     // Lyrics
     public bool LyricsExist => _stateManager.LyricsExist;
-    public ObservableCollection<LyricLine> Lyrics => _stateManager.LyricsLines;
+    public ObservableCollection<LyricLine> LyricsLines => _stateManager.LyricsLines;
     public LyricLine CurrentLyric => _stateManager.CurrentLyric;
     public bool IsSynchronizedLyrics => _stateManager.IsSynchronizedLyrics;
     public string? PlainLyrics => _stateManager.PlainLyrics;
@@ -173,35 +173,13 @@ public partial class PlayerViewModel : ObservableObject, IDisposable
         _timerManager.Start();
     }
 
+
     private void OnStateManagerPropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
-        switch (e.PropertyName)
-        {
-            case nameof(PlayerStateManager.CurrentLyric):
-                OnPropertyChanged(nameof(CurrentLyric));
-                break;
-            case nameof(PlayerStateManager.CurrentTrack):
-                OnPropertyChanged(nameof(CurrentTrack));
-                break;
-            case nameof(PlayerStateManager.CurrentArtist):
-                OnPropertyChanged(nameof(CurrentArtist));
-                break;
-            case nameof(PlayerStateManager.CurrentAlbum):
-                OnPropertyChanged(nameof(CurrentAlbum));
-                break;
-            case nameof(PlayerStateManager.LyricsExist):
-                OnPropertyChanged(nameof(LyricsExist));
-                break;
-            case nameof(PlayerStateManager.LyricsLines):
-                OnPropertyChanged(nameof(Lyrics));
-                break;
-            case nameof(PlayerStateManager.IsSynchronizedLyrics):
-                OnPropertyChanged(nameof(IsSynchronizedLyrics));
-                break;
-            case nameof(PlayerStateManager.PlainLyrics):
-                OnPropertyChanged(nameof(PlainLyrics));
-                break;
-        }
+        if (string.IsNullOrEmpty(e.PropertyName))
+            return;
+
+        OnPropertyChanged(e.PropertyName);
     }
 
 
@@ -405,7 +383,7 @@ public partial class PlayerViewModel : ObservableObject, IDisposable
             }
         }
 
-        OnPropertyChanged(nameof(Lyrics));
+        OnPropertyChanged(nameof(LyricsLines));
         OnPropertyChanged(nameof(LyricsExist));
         OnPropertyChanged(nameof(IsSynchronizedLyrics));
         OnPropertyChanged(nameof(PlainLyrics));
