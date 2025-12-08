@@ -210,10 +210,10 @@ public partial class TracksViewModel : ObservableObject, IDisposable
         IEnumerable<TrackViewModel> filteredTracks = ViewModels;
 
         foreach (string filterby in _stateManager.SelectedFilters)
-            filteredTracks = TracksFilter.Filter(filterby, filteredTracks);
+            filteredTracks = _filterService.Filter(filterby, filteredTracks);
 
         foreach (long genreId in _stateManager.SelectedGenreFilters)
-            filteredTracks = TracksFilter.FilterByGenreId(genreId, filteredTracks);
+            filteredTracks = _filterService.FilterByGenreId(genreId, filteredTracks);
 
         _filteredTracks = filteredTracks.ToList();
 

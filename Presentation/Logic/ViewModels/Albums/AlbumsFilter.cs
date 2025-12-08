@@ -1,73 +1,65 @@
 ﻿namespace Rok.Logic.ViewModels.Albums;
 
-public class AlbumsFilter(ResourceLoader _resourceLoader)
+public class AlbumsFilter : FilterService<AlbumViewModel>
 {
-    public static IEnumerable<AlbumViewModel> FilterByGenreId(long genreId, IEnumerable<AlbumViewModel> albums)
+    public const string KFilterByAlbumFavorite = "ALBUMFAVORITE";
+    public const string KFilterByArtistFavorite = "ARTISTFAVORITE";
+    public const string KFilterByGenreFavorite = "GENREFAVORITE";
+    public const string KFilterByNeverListened = "NEVERLISTENED";
+    public const string KFilterByLive = "LIVE";
+    public const string KFilterByBestOf = "BESTOF";
+    public const string KFilterByCompilation = "COMPILATION";
+    public const string KFilterByAlbum = "ALBUM";
+
+    public AlbumsFilter(ResourceLoader resourceLoader) : base(resourceLoader)
     {
-        if (genreId == 0)
-            return albums;
-
-        albums = albums.Where(album => album.Album.GenreId == genreId);
-
-        return albums;
     }
 
-
-    public static IEnumerable<AlbumViewModel> Filter(string filterBy, IEnumerable<AlbumViewModel> albums)
+    public IEnumerable<AlbumViewModel> FilterByGenreId(long genreId, IEnumerable<AlbumViewModel> albums)
     {
-        switch (filterBy)
-        {
-            case "ALBUMFAVORITE":
-                albums = albums.Where(album => album.Album.IsFavorite);
-                break;
-
-            case "ARTISTFAVORITE":
-                albums = albums.Where(album => album.Album.IsArtistFavorite);
-                break;
-
-            case "GENREFAVORITE":
-                albums = albums.Where(album => album.Album.IsGenreFavorite);
-                break;
-
-            case "NEVERLISTENED":
-                albums = albums.Where(album => album.Album.ListenCount == 0);
-                break;
-
-            case "LIVE":
-                albums = albums.Where(album => album.Album.IsLive);
-                break;
-
-            case "BESTOF":
-                albums = albums.Where(album => album.Album.IsBestOf);
-                break;
-
-            case "COMPILATION":
-                albums = albums.Where(album => album.Album.IsCompilation);
-                break;
-
-            case "ALBUM":
-                albums = albums.Where(album => !album.Album.IsCompilation && !album.Album.IsLive && !album.Album.IsCompilation);
-                break;
-        }
-
-        return albums;
+        return FilterByGenreId(genreId, albums, a => a.Album.GenreId);
     }
 
-    public string GetLabel(string filterBy)
+    protected override void RegisterFilterStrategies()
     {
-        string label = filterBy switch
+        RegisterFilter(KFilterByAlbumFavorite,
+            albums => FilterByFavorite(albums, a => a.Album.IsFavorite));
+
+        RegisterFilter(KFilterByArtistFavorite,
+            albums => FilterByFavorite(albums, a => a.Album.IsArtistFavorite));
+
+        RegisterFilter(KFilterByGenreFavorite,
+            albums => FilterByFavorite(albums, a => a.Album.IsGenreFavorite));
+
+        RegisterFilter(KFilterByNeverListened,
+            albums => FilterByNeverListened(albums, a => a.Album.ListenCount));
+
+        RegisterFilter(KFilterByLive,
+            albums => FilterByCondition(albums, a => a.Album.IsLive));
+
+        RegisterFilter(KFilterByBestOf,
+            albums => FilterByCondition(albums, a => a.Album.IsBestOf));
+
+        RegisterFilter(KFilterByCompilation,
+            albums => FilterByCondition(albums, a => a.Album.IsCompilation));
+
+        RegisterFilter(KFilterByAlbum,
+            albums => FilterByCondition(albums, a => !a.Album.IsCompilation && !a.Album.IsLive && !a.Album.IsBestOf));
+    }
+
+    public override string GetLabel(string filterBy)
+    {
+        return filterBy switch
         {
-            "ARTISTFAVORITE" => _resourceLoader.GetString("albumsViewFilterByFavoriteArtist"),
-            "ALBUMFAVORITE" => _resourceLoader.GetString("albumsViewFilterByFavoriteAlbum"),
-            "GENREFAVORITE" => _resourceLoader.GetString("albumsViewFilterByFavoriteGenre"),
-            "NEVERLISTENED" => _resourceLoader.GetString("albumsViewFilterByNeverListened"),
-            "LIVE" => _resourceLoader.GetString("albumsViewFilterByLive"),
-            "BESTOF" => _resourceLoader.GetString("albumsViewFilterByBestof"),
-            "COMPILATION" => _resourceLoader.GetString("albumsViewFilterByCompilation"),
-            "ALBUM" => _resourceLoader.GetString("albumsViewFilterByAlbum"),
-            _ => _resourceLoader.GetString("albumsViewFilterNone"),
+            KFilterByArtistFavorite => ResourceLoader.GetString("albumsViewFilterByFavoriteArtist"),
+            KFilterByAlbumFavorite => ResourceLoader.GetString("albumsViewFilterByFavoriteAlbum"),
+            KFilterByGenreFavorite => ResourceLoader.GetString("albumsViewFilterByFavoriteGenre"),
+            KFilterByNeverListened => ResourceLoader.GetString("albumsViewFilterByNeverListened"),
+            KFilterByLive => ResourceLoader.GetString("albumsViewFilterByLive"),
+            KFilterByBestOf => ResourceLoader.GetString("albumsViewFilterByBestof"),
+            KFilterByCompilation => ResourceLoader.GetString("albumsViewFilterByCompilation"),
+            KFilterByAlbum => ResourceLoader.GetString("albumsViewFilterByAlbum"),
+            _ => ResourceLoader.GetString("albumsViewFilterNone"),
         };
-
-        return label;
     }
 }

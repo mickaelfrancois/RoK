@@ -49,7 +49,7 @@ public static class DependencyInjection
         services.AddSingleton<AlbumsPlaybackService>();
         services.AddSingleton<AlbumUpdateMessageHandler>();
         services.AddTransient<AlbumsGroupCategory>();
-        services.AddSingleton<AlbumsFilter>();
+        services.AddTransient<AlbumsFilter>();
 
         // Album detail services (for AlbumViewModel - single album)
         services.AddTransient<AlbumViewModel>();
@@ -69,7 +69,7 @@ public static class DependencyInjection
         services.AddSingleton<ArtistUpdateMessageHandler>();
         services.AddSingleton<ArtistImportedMessageHandler>();
         services.AddTransient<ArtistsGroupCategory>();
-        services.AddSingleton<ArtistsFilter>();
+        services.AddTransient<ArtistsFilter>();
 
         // Artist detail services (for ArtistViewModel - single artist)
         services.AddTransient<ArtistViewModel>();
@@ -88,7 +88,7 @@ public static class DependencyInjection
         services.AddSingleton<TracksPlaybackService>();
         services.AddSingleton<TrackImportedMessageHandler>();
         services.AddTransient<TracksGroupCategory>();
-        services.AddSingleton<TracksFilter>();
+        services.AddTransient<TracksFilter>();
 
         // Track detail services (for TrackViewModel - single track)
         services.AddTransient<TrackViewModel>();

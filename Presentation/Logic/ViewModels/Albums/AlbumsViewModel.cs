@@ -219,10 +219,10 @@ public partial class AlbumsViewModel : ObservableObject, IDisposable
         IEnumerable<AlbumViewModel> filteredAlbums = ViewModels;
 
         foreach (string filterby in _stateManager.SelectedFilters)
-            filteredAlbums = AlbumsFilter.Filter(filterby, filteredAlbums);
+            filteredAlbums = _filterService.Filter(filterby, filteredAlbums);
 
         foreach (long genreId in _stateManager.SelectedGenreFilters)
-            filteredAlbums = AlbumsFilter.FilterByGenreId(genreId, filteredAlbums);
+            filteredAlbums = _filterService.FilterByGenreId(genreId, filteredAlbums);
 
         _filteredAlbums = filteredAlbums.ToList();
 

@@ -224,10 +224,10 @@ public partial class ArtistsViewModel : ObservableObject, IDisposable
         IEnumerable<ArtistViewModel> filteredArtists = ViewModels;
 
         foreach (string filterby in _stateManager.SelectedFilters)
-            filteredArtists = ArtistsFilter.Filter(filterby, filteredArtists);
+            filteredArtists = _filterService.Filter(filterby, filteredArtists);
 
         foreach (long genreId in _stateManager.SelectedGenreFilters)
-            filteredArtists = ArtistsFilter.FilterByGenreId(genreId, filteredArtists);
+            filteredArtists = _filterService.FilterByGenreId(genreId, filteredArtists);
 
         _filteredArtists = filteredArtists.ToList();
 
