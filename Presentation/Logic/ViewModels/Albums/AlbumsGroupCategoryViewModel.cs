@@ -1,6 +1,7 @@
 ﻿namespace Rok.Logic.ViewModels.Albums;
 
-public class AlbumsGroupCategoryViewModel
+
+public class AlbumsGroupCategoryViewModel : IGroupCategoryViewModel<AlbumViewModel>
 {
     public string Title { get; set; } = string.Empty;
 

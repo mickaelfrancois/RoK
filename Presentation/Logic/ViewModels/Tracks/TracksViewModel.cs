@@ -217,7 +217,7 @@ public partial class TracksViewModel : ObservableObject, IDisposable
 
         _filteredTracks = filteredTracks.ToList();
 
-        IEnumerable<TracksGroupCategoryViewModel> tracks = TracksGroupCategory.GetGroupedItems(_stateManager.GroupBy, _filteredTracks);
+        IEnumerable<TracksGroupCategoryViewModel> tracks = _groupService.GetGroupedItems(_stateManager.GroupBy, _filteredTracks);
         GroupedItems.InitWithAddRange(tracks);
 
         TotalCount = _filteredTracks.Count;

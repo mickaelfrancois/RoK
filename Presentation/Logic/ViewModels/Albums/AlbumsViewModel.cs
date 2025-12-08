@@ -226,7 +226,7 @@ public partial class AlbumsViewModel : ObservableObject, IDisposable
 
         _filteredAlbums = filteredAlbums.ToList();
 
-        IEnumerable<AlbumsGroupCategoryViewModel> albums = AlbumsGroupCategory.GetGroupedItems(_stateManager.GroupBy, _filteredAlbums);
+        IEnumerable<AlbumsGroupCategoryViewModel> albums = _groupService.GetGroupedItems(_stateManager.GroupBy, _filteredAlbums);
         GroupedItems.InitWithAddRange(albums);
 
         TotalCount = _filteredAlbums.Count;
