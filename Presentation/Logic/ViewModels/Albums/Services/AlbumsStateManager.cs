@@ -1,27 +1,19 @@
 ﻿namespace Rok.Logic.ViewModels.Albums.Services;
 
-public class AlbumsStateManager(IAppOptions appOptions)
+
+public class AlbumsStateManager(IAppOptions appOptions) : ViewStateManager(appOptions)
 {
-    public string GroupBy { get; set; } = AlbumsGroupCategory.KGroupByAlbum;
+    protected override string GetDefaultGroupBy() => AlbumsGroupCategory.KGroupByAlbum;
 
-    public List<string> SelectedFilters { get; set; } = [];
+    protected override string? GetStoredGroupBy() => AppOptions.AlbumsGroupBy;
 
-    public List<long> SelectedGenreFilters { get; set; } = [];
+    protected override void SaveGroupBy(string value) => AppOptions.AlbumsGroupBy = value;
 
-    public void Load()
-    {
-        GroupBy = string.IsNullOrEmpty(appOptions.AlbumsGroupBy)
-            ? AlbumsGroupCategory.KGroupByAlbum
-            : appOptions.AlbumsGroupBy;
+    protected override List<string> GetStoredFilters() => AppOptions.AlbumsFilterBy;
 
-        SelectedFilters = appOptions.AlbumsFilterBy;
-        SelectedGenreFilters = appOptions.AlbumsFilterByGenresId;
-    }
+    protected override void SaveFilters(List<string> filters) => AppOptions.AlbumsFilterBy = filters;
 
-    public void Save()
-    {
-        appOptions.AlbumsGroupBy = GroupBy;
-        appOptions.AlbumsFilterBy = SelectedFilters;
-        appOptions.AlbumsFilterByGenresId = SelectedGenreFilters;
-    }
+    protected override List<long> GetStoredGenreFilters() => AppOptions.AlbumsFilterByGenresId;
+
+    protected override void SaveGenreFilters(List<long> filters) => AppOptions.AlbumsFilterByGenresId = filters;
 }

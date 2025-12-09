@@ -1,27 +1,18 @@
 ﻿namespace Rok.Logic.ViewModels.Artists.Services;
 
-public class ArtistsStateManager(IAppOptions appOptions)
+public class ArtistsStateManager(IAppOptions appOptions) : ViewStateManager(appOptions)
 {
-    public string GroupBy { get; set; } = ArtistsGroupCategory.KGroupByArtist;
+    protected override string GetDefaultGroupBy() => ArtistsGroupCategory.KGroupByArtist;
 
-    public List<string> SelectedFilters { get; set; } = [];
+    protected override string? GetStoredGroupBy() => AppOptions.ArtistsGroupBy;
 
-    public List<long> SelectedGenreFilters { get; set; } = [];
+    protected override void SaveGroupBy(string value) => AppOptions.ArtistsGroupBy = value;
 
-    public void Load()
-    {
-        GroupBy = string.IsNullOrEmpty(appOptions.ArtistsGroupBy)
-            ? ArtistsGroupCategory.KGroupByArtist
-            : appOptions.ArtistsGroupBy;
+    protected override List<string> GetStoredFilters() => AppOptions.ArtistsFilterBy;
 
-        SelectedFilters = appOptions.ArtistsFilterBy;
-        SelectedGenreFilters = appOptions.ArtistsFilterByGenresId;
-    }
+    protected override void SaveFilters(List<string> filters) => AppOptions.ArtistsFilterBy = filters;
 
-    public void Save()
-    {
-        appOptions.ArtistsGroupBy = GroupBy;
-        appOptions.ArtistsFilterBy = SelectedFilters;
-        appOptions.ArtistsFilterByGenresId = SelectedGenreFilters;
-    }
+    protected override List<long> GetStoredGenreFilters() => AppOptions.ArtistsFilterByGenresId;
+
+    protected override void SaveGenreFilters(List<long> filters) => AppOptions.ArtistsFilterByGenresId = filters;
 }

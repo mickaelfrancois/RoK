@@ -1,27 +1,19 @@
 ﻿namespace Rok.Logic.ViewModels.Tracks.Services;
 
-public class TracksStateManager(IAppOptions appOptions)
+
+public class TracksStateManager(IAppOptions appOptions) : ViewStateManager(appOptions)
 {
-    public string GroupBy { get; set; } = TracksGroupCategory.KGroupByTitle;
+    protected override string GetDefaultGroupBy() => TracksGroupCategory.KGroupByTitle;
 
-    public List<string> SelectedFilters { get; set; } = [];
+    protected override string? GetStoredGroupBy() => AppOptions.TracksGroupBy;
 
-    public List<long> SelectedGenreFilters { get; set; } = [];
+    protected override void SaveGroupBy(string value) => AppOptions.TracksGroupBy = value;
 
-    public void Load()
-    {
-        GroupBy = string.IsNullOrEmpty(appOptions.TracksGroupBy)
-            ? TracksGroupCategory.KGroupByAlbum
-            : appOptions.TracksGroupBy;
+    protected override List<string> GetStoredFilters() => AppOptions.TracksFilterBy;
 
-        SelectedFilters = appOptions.TracksFilterBy;
-        SelectedGenreFilters = appOptions.TracksFilterByGenresId;
-    }
+    protected override void SaveFilters(List<string> filters) => AppOptions.TracksFilterBy = filters;
 
-    public void Save()
-    {
-        appOptions.TracksGroupBy = GroupBy;
-        appOptions.TracksFilterBy = SelectedFilters;
-        appOptions.TracksFilterByGenresId = SelectedGenreFilters;
-    }
+    protected override List<long> GetStoredGenreFilters() => AppOptions.TracksFilterByGenresId;
+
+    protected override void SaveGenreFilters(List<long> filters) => AppOptions.TracksFilterByGenresId = filters;
 }
