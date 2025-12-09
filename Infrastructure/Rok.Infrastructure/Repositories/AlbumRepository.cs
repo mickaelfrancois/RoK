@@ -119,6 +119,12 @@ public class AlbumRepository(IDbConnection connection, [FromKeyedServices("Backg
     }
 
 
+    public override string GetTableName()
+    {
+        return "albums";
+    }
+
+
     private static void ApplyPatch<T>(PatchField<T>? wrapper, Action<T?> setter)
     {
         if (wrapper?.IsSet == true)

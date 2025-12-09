@@ -34,6 +34,15 @@ public class TrackRepository(IDbConnection db, [FromKeyedServices("BackgroundCon
         return await ExecuteQueryAsync(sql, kind, new { playlistId });
     }
 
+
+
+    public new async Task<TrackEntity?> GetByNameAsync(string name, RepositoryConnectionKind kind = RepositoryConnectionKind.Foreground)
+    {
+        string sql = GetSelectQuery("title");
+        return await QuerySingleOrDefaultAsync(sql, kind, new { title = name });
+    }
+
+
     public async Task<IEnumerable<TrackEntity>> GetByGenreIdAsync(long genreId, RepositoryConnectionKind kind = RepositoryConnectionKind.Foreground)
     {
         string sql = GetSelectQuery() +

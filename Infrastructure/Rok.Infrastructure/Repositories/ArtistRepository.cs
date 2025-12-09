@@ -113,6 +113,12 @@ public class ArtistRepository(IDbConnection connection, [FromKeyedServices("Back
     }
 
 
+    public override string GetTableName()
+    {
+        return "artists";
+    }
+
+
     private static void ApplyPatch<T>(PatchField<T>? wrapper, Action<T?> setter)
     {
         if (wrapper?.IsSet == true)

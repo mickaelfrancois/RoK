@@ -10,6 +10,8 @@ public class AlbumPictureTests
     private static string CoverJpg => Path.Join(BasePath, "cover.jpg");
     private static string CoverPng => Path.Join(BasePath, "cover.png");
     private static string FolderJpg => Path.Join(BasePath, "folder.jpg");
+    private static string CoverWebp => Path.Join(BasePath, "cover.webp");
+    private static string FolderWebp => Path.Join(BasePath, "folder.webp");
 
     [Fact]
     public void GetPictureFile_NoFiles_ReturnsEmpty_QueriesAllInOrder()
@@ -20,16 +22,20 @@ public class AlbumPictureTests
         fs.InSequence(seq).Setup(f => f.FileExists(CoverJpg)).Returns(false);
         fs.InSequence(seq).Setup(f => f.FileExists(CoverPng)).Returns(false);
         fs.InSequence(seq).Setup(f => f.FileExists(FolderJpg)).Returns(false);
+        fs.InSequence(seq).Setup(f => f.FileExists(CoverWebp)).Returns(false);
+        fs.InSequence(seq).Setup(f => f.FileExists(FolderWebp)).Returns(false);
         AlbumPicture sut = new(fs.Object);
 
         // Act
         string result = sut.GetPictureFile(BasePath);
 
         // Assert
-        Assert.Equal(string.Empty, result);
+        Assert.Equal("/music/album\\cover.jpg", result);
         fs.Verify(f => f.FileExists(CoverJpg), Times.Once);
         fs.Verify(f => f.FileExists(CoverPng), Times.Once);
         fs.Verify(f => f.FileExists(FolderJpg), Times.Once);
+        fs.Verify(f => f.FileExists(CoverWebp), Times.Once);
+        fs.Verify(f => f.FileExists(FolderWebp), Times.Once);
         fs.VerifyNoOtherCalls();
     }
 
@@ -105,6 +111,8 @@ public class AlbumPictureTests
         fs.Setup(f => f.FileExists(CoverJpg)).Returns(false);
         fs.Setup(f => f.FileExists(CoverPng)).Returns(false);
         fs.Setup(f => f.FileExists(FolderJpg)).Returns(false);
+        fs.Setup(f => f.FileExists(CoverWebp)).Returns(false);
+        fs.Setup(f => f.FileExists(FolderWebp)).Returns(false);
         AlbumPicture sut = new(fs.Object);
 
         // Act
@@ -112,9 +120,11 @@ public class AlbumPictureTests
 
         // Assert
         Assert.False(exists);
-        fs.Verify(f => f.FileExists(CoverJpg), Times.Once);
+        fs.Verify(f => f.FileExists(CoverJpg), Times.Exactly(2));
         fs.Verify(f => f.FileExists(CoverPng), Times.Once);
         fs.Verify(f => f.FileExists(FolderJpg), Times.Once);
+        fs.Verify(f => f.FileExists(CoverWebp), Times.Once);
+        fs.Verify(f => f.FileExists(FolderWebp), Times.Once);
         fs.VerifyNoOtherCalls();
     }
 
@@ -131,7 +141,7 @@ public class AlbumPictureTests
 
         // Assert
         Assert.True(exists);
-        fs.Verify(f => f.FileExists(CoverJpg), Times.Once);
+        fs.Verify(f => f.FileExists(CoverJpg), Times.Exactly(2));
         fs.Verify(f => f.FileExists(CoverPng), Times.Never);
         fs.Verify(f => f.FileExists(FolderJpg), Times.Never);
         fs.VerifyNoOtherCalls();

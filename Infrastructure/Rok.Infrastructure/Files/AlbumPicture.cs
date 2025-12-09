@@ -12,7 +12,7 @@ public class AlbumPicture(IFileSystem _fileSystem) : IAlbumPicture
     {
         Guard.Against.NullOrEmpty(albumPath);
 
-        return GetPictureFile(albumPath) != string.Empty;
+        return _fileSystem.FileExists(GetPictureFile(albumPath));
     }
 
     public string GetPictureFile(string albumPath)
