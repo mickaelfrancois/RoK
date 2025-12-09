@@ -2,55 +2,39 @@
 
 public class TracksGroupCategory(ResourceLoader resourceLoader) : GroupCategoryService<TrackViewModel, TracksGroupCategoryViewModel>(resourceLoader)
 {
-    public const string KGroupByYear = "YEAR";
-    public const string KGroupByTitle = "TITLE";
-    public const string KGroupByCreatDate = "CREATDATE";
-    public const string KGroupByDecade = "DECADE";
-    public const string KGroupByCountry = "COUNTRY";
-    public const string KGroupByAlbum = "ALBUMNAME";
-    public const string KGroupByArtist = "ARTISTNAME";
-    public const string KGroupByGenre = "GENRENAME";
-    public const string KGroupByLastListen = "LASTLISTEN";
-    public const string KGroupByListenCount = "LISTENCOUNT";
-
     public override string GetGroupByLabel(string groupBy)
     {
         return groupBy switch
         {
-            KGroupByTitle => ResourceLoader.GetString("tracksViewGroupByTitle"),
-            KGroupByCountry => ResourceLoader.GetString("tracksViewGroupByCountry"),
-            KGroupByCreatDate => ResourceLoader.GetString("tracksViewGroupByCreatDate"),
-            KGroupByLastListen => ResourceLoader.GetString("tracksViewGroupByLastListen"),
-            KGroupByListenCount => ResourceLoader.GetString("tracksViewGroupByListenCount"),
-            KGroupByArtist => ResourceLoader.GetString("tracksViewGroupByArtist"),
-            KGroupByAlbum => ResourceLoader.GetString("tracksViewGroupByAlbum"),
-            KGroupByGenre => ResourceLoader.GetString("tracksViewGroupByGenre"),
+            GroupingConstants.Title => ResourceLoader.GetString("tracksViewGroupByTitle"),
+            GroupingConstants.Country => ResourceLoader.GetString("tracksViewGroupByCountry"),
+            GroupingConstants.CreatDate => ResourceLoader.GetString("tracksViewGroupByCreatDate"),
+            GroupingConstants.LastListen => ResourceLoader.GetString("tracksViewGroupByLastListen"),
+            GroupingConstants.ListenCount => ResourceLoader.GetString("tracksViewGroupByListenCount"),
+            GroupingConstants.Artist => ResourceLoader.GetString("tracksViewGroupByArtist"),
+            GroupingConstants.Album => ResourceLoader.GetString("tracksViewGroupByAlbum"),
+            GroupingConstants.Genre => ResourceLoader.GetString("tracksViewGroupByGenre"),
             _ => groupBy,
         };
     }
 
     protected override void RegisterGroupingStrategies()
     {
-        RegisterStrategy(KGroupByTitle, tracks =>
-            GroupByName(tracks, t => t.Track.Title, t => t.Track.Title));
+        RegisterStrategy(GroupingConstants.Title, tracks => GroupByName(tracks, t => t.Track.Title, t => t.Track.Title));
 
-        RegisterStrategy(KGroupByArtist, GroupByArtist);
+        RegisterStrategy(GroupingConstants.Artist, GroupByArtist);
 
-        RegisterStrategy(KGroupByAlbum, GroupByAlbum);
+        RegisterStrategy(GroupingConstants.Album, GroupByAlbum);
 
-        RegisterStrategy(KGroupByGenre, GroupByGenre);
+        RegisterStrategy(GroupingConstants.Genre, GroupByGenre);
 
-        RegisterStrategy(KGroupByCreatDate, tracks =>
-            GroupByCreatDate(tracks, t => t.Track.CreatDate));
+        RegisterStrategy(GroupingConstants.CreatDate, tracks => GroupByCreatDate(tracks, t => t.Track.CreatDate));
 
-        RegisterStrategy(KGroupByLastListen, tracks =>
-            GroupByLastListen(tracks, t => t.Track.LastListen));
+        RegisterStrategy(GroupingConstants.LastListen, tracks => GroupByLastListen(tracks, t => t.Track.LastListen));
 
-        RegisterStrategy(KGroupByListenCount, tracks =>
-            GroupByListenCount(tracks, t => t.Track.ListenCount));
+        RegisterStrategy(GroupingConstants.ListenCount, tracks => GroupByListenCount(tracks, t => t.Track.ListenCount));
 
-        RegisterStrategy(KGroupByCountry, tracks =>
-            GroupByCountry(tracks, t => t.Track.CountryCode, t => t.Track.Title));
+        RegisterStrategy(GroupingConstants.Country, tracks => GroupByCountry(tracks, t => t.Track.CountryCode, t => t.Track.Title));
     }
 
 
@@ -68,6 +52,7 @@ public class TracksGroupCategory(ResourceLoader resourceLoader) : GroupCategoryS
 
         return BuildGroupedCollection(selectedItems, orderByDescending: false);
     }
+
 
     private IEnumerable<TracksGroupCategoryViewModel> GroupByArtist(List<TrackViewModel> tracks)
     {

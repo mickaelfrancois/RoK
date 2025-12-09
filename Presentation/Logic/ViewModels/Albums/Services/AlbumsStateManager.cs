@@ -3,7 +3,7 @@
 
 public class AlbumsStateManager(IAppOptions appOptions) : ViewStateManager(appOptions)
 {
-    protected override string GetDefaultGroupBy() => AlbumsGroupCategory.KGroupByAlbum;
+    protected override string GetDefaultGroupBy() => GroupingConstants.Album;
 
     protected override string? GetStoredGroupBy() => AppOptions.AlbumsGroupBy;
 

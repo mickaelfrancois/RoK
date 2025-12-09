@@ -3,7 +3,7 @@
 
 public class TracksStateManager(IAppOptions appOptions) : ViewStateManager(appOptions)
 {
-    protected override string GetDefaultGroupBy() => TracksGroupCategory.KGroupByTitle;
+    protected override string GetDefaultGroupBy() => GroupingConstants.Title;
 
     protected override string? GetStoredGroupBy() => AppOptions.TracksGroupBy;
 

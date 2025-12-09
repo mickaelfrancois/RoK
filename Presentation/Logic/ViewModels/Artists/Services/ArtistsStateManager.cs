@@ -2,7 +2,7 @@
 
 public class ArtistsStateManager(IAppOptions appOptions) : ViewStateManager(appOptions)
 {
-    protected override string GetDefaultGroupBy() => ArtistsGroupCategory.KGroupByArtist;
+    protected override string GetDefaultGroupBy() => GroupingConstants.Artist;
 
     protected override string? GetStoredGroupBy() => AppOptions.ArtistsGroupBy;
 
