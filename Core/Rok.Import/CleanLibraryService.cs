@@ -64,7 +64,7 @@ public class CleanLibraryService(ITrackRepository _trackRepository, IArtistRepos
     {
         Stopwatch stopwatch = Stopwatch.StartNew();
 
-        int count = await _albumRepository.DeleteAlbumsWithoutTracks(RepositoryConnectionKind.Background);
+        int count = await _albumRepository.DeleteOrphansAsync(RepositoryConnectionKind.Background);
 
         if (count > 0)
             _logger.LogTrace("{Count} albums without track were deleted from database in {ElapsedMilliseconds} ms", count, stopwatch.ElapsedMilliseconds);
@@ -75,7 +75,7 @@ public class CleanLibraryService(ITrackRepository _trackRepository, IArtistRepos
     private async Task<int> CleanArtistsWithoutTrackAsync()
     {
         Stopwatch stopwatch = Stopwatch.StartNew();
-        int count = await _artistRepository.DeleteArtistsWithoutTracks(RepositoryConnectionKind.Background);
+        int count = await _artistRepository.DeleteOrphansAsync(RepositoryConnectionKind.Background);
 
         if (count > 0)
             _logger.LogTrace("{Count} artists without track were deleted from database in {ElapsedMilliseconds} ms", count, stopwatch.ElapsedMilliseconds);
@@ -86,7 +86,7 @@ public class CleanLibraryService(ITrackRepository _trackRepository, IArtistRepos
     private async Task<int> CleanGenresWithoutTrackAsync()
     {
         Stopwatch stopwatch = Stopwatch.StartNew();
-        int count = await _genreRepository.DeleteGenresWithoutTracks(RepositoryConnectionKind.Background);
+        int count = await _genreRepository.DeleteOrphansAsync(RepositoryConnectionKind.Background);
 
         if (count > 0)
             _logger.LogTrace("{Count} genres without track were deleted from database in {ElapsedMilliseconds} ms", count, stopwatch.ElapsedMilliseconds);

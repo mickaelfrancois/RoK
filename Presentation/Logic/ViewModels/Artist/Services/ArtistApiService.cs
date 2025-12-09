@@ -66,20 +66,20 @@ public class ArtistApiService(
         PatchArtistCommand patchArtistCommand = new()
         {
             Id = artist.Id,
-            WikipediaUrl = artistApi.Wikipedia,
-            OfficialSiteUrl = artistApi.Website,
-            FacebookUrl = artistApi.Facebook,
-            TwitterUrl = artistApi.Twitter,
-            MusicBrainzID = artistApi.MusicBrainzID,
-            Disbanded = artistApi.IsDisbanded,
-            BornYear = artistApi.BornYear,
-            DiedYear = artistApi.DiedYear,
-            FormedYear = artistApi.FormedYear,
-            Gender = artistApi.Gender,
-            Mood = artistApi.Mood,
-            Style = artistApi.Style,
-            Biography = artistApi.GetBiography(LanguageHelpers.GetCurrentLanguage()),
-            NovaUid = artistApi.ID?.ToString()
+            WikipediaUrl = new PatchField<string>(artistApi.Wikipedia),
+            OfficialSiteUrl = new PatchField<string>(artistApi.Website),
+            FacebookUrl = new PatchField<string>(artistApi.Facebook),
+            TwitterUrl = new PatchField<string>(artistApi.Twitter),
+            MusicBrainzID = new PatchField<string>(artistApi.MusicBrainzID),
+            Disbanded = new PatchField<bool>(artistApi.IsDisbanded),
+            BornYear = new PatchField<int>(artistApi.BornYear.GetValueOrDefault()),
+            DiedYear = new PatchField<int>(artistApi.DiedYear.GetValueOrDefault()),
+            FormedYear = new PatchField<int>(artistApi.FormedYear.GetValueOrDefault()),
+            Gender = new PatchField<string>(artistApi.Gender),
+            Mood = new PatchField<string>(artistApi.Mood),
+            Style = new PatchField<string>(artistApi.Style),
+            Biography = new PatchField<string>(artistApi.GetBiography(LanguageHelpers.GetCurrentLanguage())),
+            NovaUid = new PatchField<string>(artistApi.ID?.ToString())
         };
 
         await mediator.SendMessageAsync(patchArtistCommand);

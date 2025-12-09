@@ -4,21 +4,18 @@ using Rok.Application.Interfaces;
 
 namespace Rok.Infrastructure.Repositories;
 
-public class PlaylistHeaderRepository : GenericRepository<PlaylistHeaderEntity>, IPlaylistHeaderRepository
+public class PlaylistHeaderRepository(IDbConnection connection, [FromKeyedServices("BackgroundConnection")] IDbConnection backgroundConnection, ILogger<PlaylistHeaderRepository> logger) : GenericRepository<PlaylistHeaderEntity>(connection, backgroundConnection, null, logger), IPlaylistHeaderRepository
 {
-    public PlaylistHeaderRepository(IDbConnection connection, [FromKeyedServices("BackgroundConnection")] IDbConnection backgroundConnection, ILogger<PlaylistHeaderRepository> logger) : base(connection, backgroundConnection, null, logger)
-    {
-    }
+    private const string UpdatePictureSql = "UPDATE playlists SET picture = @picture WHERE Id = @id";
+    private const string DeletePlaylistSql = "DELETE FROM playlists WHERE id = @id";
+    private const string DeletePlaylistTracksSql = "DELETE FROM playlisttracks WHERE playlistid = @id";
 
 
     public async Task<bool> UpdatePictureAsync(long id, string picture, RepositoryConnectionKind kind = RepositoryConnectionKind.Foreground)
     {
-        string sql = $"UPDATE playlists SET picture = @picture WHERE Id = @id";
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(id);
 
-        IDbConnection localConnection = ResolveConnection(kind);
-        int rowsAffected = await localConnection.ExecuteAsync(sql, new { picture, id }, _transaction);
-
-        return rowsAffected > 0;
+        return await ExecuteUpdateAsync(UpdatePictureSql, new { picture, id }, kind);
     }
 
     public async Task<int> DeleteAsync(long id, RepositoryConnectionKind kind = RepositoryConnectionKind.Foreground)
@@ -32,8 +29,8 @@ public class PlaylistHeaderRepository : GenericRepository<PlaylistHeaderEntity>,
 
         try
         {
-            await localConnection.ExecuteAsync("DELETE FROM playlisttracks WHERE playlistid = @id", new { id });
-            int affected = await localConnection.ExecuteAsync("DELETE FROM playlists WHERE id = @id", new { id });
+            await localConnection.ExecuteAsync(DeletePlaylistTracksSql, new { id });
+            int affected = await localConnection.ExecuteAsync(DeletePlaylistSql, new { id });
 
             transaction.Commit();
             return affected;

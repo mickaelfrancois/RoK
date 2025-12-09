@@ -81,7 +81,7 @@ public class GenreRepositoryTests(SqliteDatabaseFixture fixture) : IClassFixture
         fixture.Connection.Execute("UPDATE Tracks SET genreId = @g WHERE id = @id", new { g = 1, id = 1 });
 
         // Act
-        int deleted = await repo.DeleteGenresWithoutTracks();
+        int deleted = await repo.DeleteOrphansAsync();
 
         // Assert
         Assert.Equal(1, deleted);

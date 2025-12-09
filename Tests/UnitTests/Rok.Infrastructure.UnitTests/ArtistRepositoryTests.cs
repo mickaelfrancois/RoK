@@ -132,7 +132,7 @@ public class ArtistRepositoryTests(SqliteDatabaseFixture fixture) : IClassFixtur
                             )", new { id = 9999, name = "Orphan Artist", now });
 
         // Act
-        int deleted = await repo.DeleteArtistsWithoutTracks();
+        int deleted = await repo.DeleteOrphansAsync();
 
         // Assert
         Assert.True(deleted >= 1);

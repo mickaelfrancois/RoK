@@ -6,8 +6,18 @@ namespace Rok.Infrastructure.Repositories;
 
 public class TrackRepository(IDbConnection db, [FromKeyedServices("BackgroundConnection")] IDbConnection backgroundDb, ILogger<TrackRepository> logger) : GenericRepository<TrackEntity>(db, backgroundDb, null, logger), ITrackRepository
 {
+    private const string UpdateScoreSql = "UPDATE tracks SET score = @score WHERE Id = @id";
+    private const string UpdateLastListenSql = "UPDATE tracks SET listenCount = listenCount + 1, lastListen = @lastListen WHERE Id = @id";
+    private const string UpdateSkipCountSql = "UPDATE tracks SET skipCount = skipCount + 1, lastSkip = @lastSkip WHERE Id = @id";
+    private const string UpdateFileDateSql = "UPDATE tracks SET fileDate = @fileDate WHERE id = @id";
+    private const string UpdateGetLyricsLastAttemptSql = "UPDATE tracks SET getLyricsLastAttempt = @lastAttemptDate WHERE id = @id";
+
+
     public async Task<IEnumerable<TrackEntity>> SearchAsync(string name, RepositoryConnectionKind kind = RepositoryConnectionKind.Foreground)
     {
+        if (string.IsNullOrWhiteSpace(name))
+            return [];
+
         name = $"%{name}%";
         string sql = GetSelectQuery() + " WHERE tracks.title LIKE @name";
 
@@ -16,6 +26,8 @@ public class TrackRepository(IDbConnection db, [FromKeyedServices("BackgroundCon
 
     public async Task<IEnumerable<TrackEntity>> GetByPlaylistIdAsync(long playlistId, RepositoryConnectionKind kind = RepositoryConnectionKind.Foreground)
     {
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(playlistId);
+
         string sql = GetSelectQuery() +
                      "INNER JOIN playlisttracks AS pt ON pt.trackId = tracks.id AND pt.playlistId = @playlistId";
 
@@ -54,6 +66,8 @@ public class TrackRepository(IDbConnection db, [FromKeyedServices("BackgroundCon
 
     public async Task<IEnumerable<TrackEntity>> GetByAlbumIdAsync(long albumId, RepositoryConnectionKind kind = RepositoryConnectionKind.Foreground)
     {
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(albumId);
+
         string sql = GetSelectQuery() +
                      "WHERE tracks.albumId = @albumId";
 
@@ -75,53 +89,38 @@ public class TrackRepository(IDbConnection db, [FromKeyedServices("BackgroundCon
 
     public async Task<bool> UpdateScoreAsync(long id, int score, RepositoryConnectionKind kind = RepositoryConnectionKind.Foreground)
     {
-        string sql = "UPDATE tracks SET score = @score WHERE Id = @id";
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(id);
 
-        IDbConnection localConnection = ResolveConnection(kind);
-        int rowsAffected = await localConnection.ExecuteAsync(sql, new { score, id });
-
-        return rowsAffected > 0;
+        return await ExecuteUpdateAsync(UpdateScoreSql, new { score, id }, kind);
     }
 
     public async Task<bool> UpdateLastListenAsync(long id, RepositoryConnectionKind kind = RepositoryConnectionKind.Foreground)
     {
-        string sql = "UPDATE tracks SET listenCount = listenCount + 1, lastListen = @lastListen WHERE Id = @id";
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(id);
 
-        IDbConnection localConnection = ResolveConnection(kind);
-        int rowsAffected = await localConnection.ExecuteAsync(sql, new { lastListen = DateTime.UtcNow, id });
-
-        return rowsAffected > 0;
+        return await ExecuteUpdateAsync(UpdateLastListenSql, new { lastListen = DateTime.UtcNow, id }, kind);
     }
 
     public async Task<bool> UpdateSkipCountAsync(long id, RepositoryConnectionKind kind = RepositoryConnectionKind.Foreground)
     {
-        string sql = "UPDATE tracks SET skipCount = skipCount + 1, lastSkip = @lastSkip WHERE Id = @id";
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(id);
 
-        IDbConnection localConnection = ResolveConnection(kind);
-        int rowsAffected = await localConnection.ExecuteAsync(sql, new { lastSkip = DateTime.UtcNow, id });
-
-        return rowsAffected > 0;
+        return await ExecuteUpdateAsync(UpdateSkipCountSql, new { lastSkip = DateTime.UtcNow, id }, kind);
     }
 
 
     public async Task<bool> UpdateFileDateAsync(long id, DateTime fileDate, RepositoryConnectionKind kind = RepositoryConnectionKind.Foreground)
     {
-        string sql = "UPDATE tracks SET fileDate = @fileDate WHERE id = @id";
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(id);
 
-        IDbConnection localConnection = ResolveConnection(kind);
-        int rowsAffected = await localConnection.ExecuteAsync(sql, new { fileDate, id });
-
-        return rowsAffected > 0;
+        return await ExecuteUpdateAsync(UpdateFileDateSql, new { fileDate, id }, kind);
     }
 
     public async Task<bool> UpdateGetLyricsLastAttemptAsync(long id, RepositoryConnectionKind kind = RepositoryConnectionKind.Foreground)
     {
-        string sql = "UPDATE tracks SET getLyricsLastAttempt = @lastAttemptDate WHERE id = @id";
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(id);
 
-        IDbConnection localConnection = ResolveConnection(kind);
-        int rowsAffected = await localConnection.ExecuteAsync(sql, new { lastAttemptDate = DateTime.UtcNow, id });
-
-        return rowsAffected > 0;
+        return await ExecuteUpdateAsync(UpdateGetLyricsLastAttemptSql, new { lastAttemptDate = DateTime.UtcNow, id }, kind);
     }
 
     public override string GetSelectQuery(string? whereParam = null)

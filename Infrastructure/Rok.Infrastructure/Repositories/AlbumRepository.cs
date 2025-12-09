@@ -2,22 +2,34 @@
 using Microsoft.Extensions.Logging;
 using Rok.Application.Interfaces;
 using Rok.Domain.Interfaces.Entities;
+using Rok.Shared;
 
 namespace Rok.Infrastructure.Repositories;
 
 public class AlbumRepository(IDbConnection connection, [FromKeyedServices("BackgroundConnection")] IDbConnection backgroundConnection, ILogger<AlbumRepository> logger) : GenericRepository<AlbumEntity>(connection, backgroundConnection, null, logger), IAlbumRepository
 {
+    private const string UpdateFavoriteSql = "UPDATE albums SET isFavorite = @isFavorite WHERE Id = @id";
+    private const string UpdateLastListenSql = "UPDATE albums SET listenCount = listenCount + 1, lastListen = @lastListen WHERE Id = @id";
+    private const string UpdateStatisticsSql = "UPDATE albums SET trackCount = @trackCount, duration = @duration WHERE id = @id";
+    private const string UpdateMetadataAttemptSql = "UPDATE albums SET getMetaDataLastAttempt = @lastAttemptDate WHERE id = @id";
+    private const string DeleteOrphansSql = "DELETE FROM albums WHERE id NOT IN (SELECT DISTINCT albumId FROM tracks WHERE albumId IS NOT NULL)";
+
+
     public async Task<IEnumerable<IAlbumEntity>> SearchAsync(string name, RepositoryConnectionKind kind = RepositoryConnectionKind.Foreground)
     {
+        if (string.IsNullOrWhiteSpace(name))
+            return [];
+
         name = $"%{name}%";
         string sql = GetSelectQuery() + " WHERE albums.name LIKE @name";
 
         return await ExecuteQueryAsync(sql, kind, new { name });
     }
 
-
     public async Task<IEnumerable<IAlbumEntity>> GetByGenreIdAsync(long genreId, RepositoryConnectionKind kind = RepositoryConnectionKind.Foreground)
     {
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(genreId);
+
         string sql = GetSelectQuery("genreId");
 
         return await ExecuteQueryAsync(sql, kind, new { genreId });
@@ -25,6 +37,8 @@ public class AlbumRepository(IDbConnection connection, [FromKeyedServices("Backg
 
     public async Task<IEnumerable<IAlbumEntity>> GetByArtistIdAsync(long artistId, RepositoryConnectionKind kind = RepositoryConnectionKind.Foreground)
     {
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(artistId);
+
         string sql = GetSelectQuery("artistId") + " ORDER BY albums.year DESC";
 
         return await ExecuteQueryAsync(sql, kind, new { artistId });
@@ -35,69 +49,53 @@ public class AlbumRepository(IDbConnection connection, [FromKeyedServices("Backg
         AlbumEntity? album = await GetByIdAsync(entity.Id, kind);
         if (album == null) return false;
 
-        if (entity.Label?.IsSet == true) album.Label = entity.Label.Value;
-        if (entity.Mood?.IsSet == true) album.Mood = entity.Mood.Value;
-        if (entity.MusicBrainzID?.IsSet == true) album.MusicBrainzID = entity.MusicBrainzID.Value;
-        if (entity.ReleaseDate?.IsSet == true) album.ReleaseDate = entity.ReleaseDate.Value;
-        if (entity.ReleaseFormat?.IsSet == true) album.ReleaseFormat = entity.ReleaseFormat.Value;
-        if (entity.Sales?.IsSet == true) album.Sales = entity.Sales.Value;
-        if (entity.Speed?.IsSet == true) album.Speed = entity.Speed.Value;
-        if (entity.Theme?.IsSet == true) album.Theme = entity.Theme.Value;
-        if (entity.Wikipedia?.IsSet == true) album.Wikipedia = entity.Wikipedia.Value;
-        if (entity.IsLive?.IsSet == true) album.IsLive = entity.IsLive.Value;
-        if (entity.IsBestOf?.IsSet == true) album.IsBestOf = entity.IsBestOf.Value;
-        if (entity.IsCompilation?.IsSet == true) album.IsCompilation = entity.IsCompilation.Value;
+        ApplyPatch(entity.Label, value => album.Label = value);
+        ApplyPatch(entity.Mood, value => album.Mood = value);
+        ApplyPatch(entity.MusicBrainzID, value => album.MusicBrainzID = value);
+        ApplyPatch(entity.ReleaseDate, value => album.ReleaseDate = value);
+        ApplyPatch(entity.ReleaseFormat, value => album.ReleaseFormat = value);
+        ApplyPatch(entity.Sales, value => album.Sales = value);
+        ApplyPatch(entity.Speed, value => album.Speed = value);
+        ApplyPatch(entity.Theme, value => album.Theme = value);
+        ApplyPatch(entity.Wikipedia, value => album.Wikipedia = value);
+        ApplyPatch(entity.IsLive, value => album.IsLive = value);
+        ApplyPatch(entity.IsBestOf, value => album.IsBestOf = value);
+        ApplyPatch(entity.IsCompilation, value => album.IsCompilation = value);
 
         return await UpdateAsync(album, kind);
     }
 
     public async Task<bool> UpdateFavoriteAsync(long id, bool isFavorite, RepositoryConnectionKind kind = RepositoryConnectionKind.Foreground)
     {
-        string sql = $"UPDATE albums SET isFavorite = @isFavorite WHERE Id = @id";
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(id);
 
-        IDbConnection localConnection = ResolveConnection(kind);
-        int rowsAffected = await localConnection.ExecuteAsync(sql, new { isFavorite, id });
-
-        return rowsAffected > 0;
+        return await ExecuteUpdateAsync(UpdateFavoriteSql, new { isFavorite, id }, kind);
     }
 
     public async Task<bool> UpdateLastListenAsync(long id, RepositoryConnectionKind kind = RepositoryConnectionKind.Foreground)
     {
-        string sql = $"UPDATE albums SET listenCount = listenCount + 1, lastListen = @lastListen WHERE Id = @id";
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(id);
 
-        IDbConnection localConnection = ResolveConnection(kind);
-        int rowsAffected = await localConnection.ExecuteAsync(sql, new { lastListen = DateTime.UtcNow, id });
-
-        return rowsAffected > 0;
+        return await ExecuteUpdateAsync(UpdateLastListenSql, new { lastListen = DateTime.UtcNow, id }, kind);
     }
 
     public async Task<bool> UpdateStatisticsAsync(long id, int trackCount, long duration, RepositoryConnectionKind kind = RepositoryConnectionKind.Foreground)
     {
-        string sql = "UPDATE albums SET trackCount = @trackCount, duration = @duration WHERE id = @id";
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(id);
 
-        IDbConnection localConnection = ResolveConnection(kind);
-        int rowsAffected = await localConnection.ExecuteAsync(sql, new { trackCount, duration, id });
-
-        return rowsAffected > 0;
+        return await ExecuteUpdateAsync(UpdateStatisticsSql, new { trackCount, duration, id });
     }
 
     public async Task<bool> UpdateGetMetaDataLastAttemptAsync(long id, RepositoryConnectionKind kind = RepositoryConnectionKind.Foreground)
     {
-        string sql = "UPDATE albums SET getMetaDataLastAttempt = @lastAttemptDate WHERE id = @id";
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(id);
 
-        IDbConnection localConnection = ResolveConnection(kind);
-        int rowsAffected = await localConnection.ExecuteAsync(sql, new { lastAttemptDate = DateTime.UtcNow, id });
-
-        return rowsAffected > 0;
+        return await ExecuteUpdateAsync(UpdateMetadataAttemptSql, new { lastAttemptDate = DateTime.UtcNow, id });
     }
 
-
-    public async Task<int> DeleteAlbumsWithoutTracks(RepositoryConnectionKind kind = RepositoryConnectionKind.Foreground)
+    public async Task<int> DeleteOrphansAsync(RepositoryConnectionKind kind = RepositoryConnectionKind.Foreground)
     {
-        string sql = "DELETE FROM albums WHERE id NOT IN (SELECT DISTINCT albumId FROM tracks WHERE albumId IS NOT NULL)";
-
-        IDbConnection localConnection = ResolveConnection(kind);
-        return await localConnection.ExecuteAsync(sql);
+        return await ExecuteNonQueryAsync(DeleteOrphansSql);
     }
 
 
@@ -118,5 +116,14 @@ public class AlbumRepository(IDbConnection connection, [FromKeyedServices("Backg
             query += $" WHERE albums.{whereParam} = @{whereParam}";
 
         return query;
+    }
+
+
+    private static void ApplyPatch<T>(PatchField<T>? wrapper, Action<T?> setter)
+    {
+        if (wrapper?.IsSet == true)
+        {
+            setter(wrapper.Value);
+        }
     }
 }

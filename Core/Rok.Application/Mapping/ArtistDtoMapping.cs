@@ -73,6 +73,7 @@ internal static class ArtistDtoMapping
         };
     }
 
+
     public static UpdateArtistEntity Map(PatchArtistCommand artist)
     {
         return new UpdateArtistEntity
@@ -99,25 +100,25 @@ internal static class ArtistDtoMapping
     {
         PatchArtistCommand to = new()
         {
-            FacebookUrl = from.Facebook,
-            TwitterUrl = from.Twitter,
-            Disbanded = from.Disbanded == "Yes",
-            Gender = from.Gender,
-            MusicBrainzID = from.MusicBrainzID,
-            Mood = from.Mood,
-            BornYear = from.BornYear,
-            DiedYear = from.DiedYear,
-            FormedYear = from.FormedYear,
-            OfficialSiteUrl = from.Website,
-            WikipediaUrl = from.Wikipedia,
-            Style = from.Style
+            FacebookUrl = new PatchField<string>(from.Facebook),
+            TwitterUrl = new PatchField<string>(from.Twitter),
+            Disbanded = new PatchField<bool>(from.Disbanded == "Yes"),
+            Gender = new PatchField<string>(from.Gender),
+            MusicBrainzID = new PatchField<string>(from.MusicBrainzID),
+            Mood = new PatchField<string>(from.Mood),
+            BornYear = from.BornYear.HasValue ? new PatchField<int>(from.BornYear.Value) : default,
+            DiedYear = from.DiedYear.HasValue ? new PatchField<int>(from.DiedYear.Value) : default,
+            FormedYear = from.FormedYear.HasValue ? new PatchField<int>(from.FormedYear.Value) : default,
+            OfficialSiteUrl = new PatchField<string>(from.Website),
+            WikipediaUrl = new PatchField<string>(from.Wikipedia),
+            Style = new PatchField<string>(from.Style)
         };
 
         string language = LanguageHelpers.GetCurrentLanguage().ToLower();
-        if (language == "fr" && string.IsNullOrEmpty(from.BiographyFR) == false)
-            to.Biography = from.BiographyFR;
+        if (language == "fr" && !string.IsNullOrEmpty(from.BiographyFR))
+            to.Biography = new PatchField<string>(from.BiographyFR);
         else
-            to.Biography = from.Biography;
+            to.Biography = new PatchField<string>(from.Biography);
 
         return to;
     }

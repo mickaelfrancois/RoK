@@ -16,7 +16,7 @@ public interface IAlbumRepository : IRepository<AlbumEntity>
 
     Task<bool> UpdateLastListenAsync(long id, RepositoryConnectionKind kind = RepositoryConnectionKind.Foreground);
 
-    Task<int> DeleteAlbumsWithoutTracks(RepositoryConnectionKind kind = RepositoryConnectionKind.Foreground);
+    Task<int> DeleteOrphansAsync(RepositoryConnectionKind kind = RepositoryConnectionKind.Foreground);
 
     Task<bool> UpdateStatisticsAsync(long id, int trackCount, long duration, RepositoryConnectionKind kind = RepositoryConnectionKind.Foreground);
 

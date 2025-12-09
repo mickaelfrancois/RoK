@@ -80,7 +80,7 @@ public class AlbumRepositoryTests(SqliteDatabaseFixture fixture) : IClassFixture
         AlbumRepository repo = CreateRepository();
 
         // Act
-        int deleted = await repo.DeleteAlbumsWithoutTracks();
+        int deleted = await repo.DeleteOrphansAsync();
 
         // Assert
         Assert.Equal(1, deleted);
