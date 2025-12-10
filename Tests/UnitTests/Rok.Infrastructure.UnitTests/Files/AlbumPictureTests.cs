@@ -2,7 +2,7 @@
 using Rok.Application.Interfaces;
 using Rok.Infrastructure.Files;
 
-namespace Rok.Infrastructure.UnitTests;
+namespace Rok.Infrastructure.UnitTests.Files;
 
 public class AlbumPictureTests
 {

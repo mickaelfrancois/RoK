@@ -33,7 +33,7 @@ public static class DependencyInjection
         services.AddKeyedSingleton<IDbConnection>("BackgroundConnection", new SqliteConnection(connectionString));
 
         services.AddSingleton<IFileSystem, DefaultFileSystem>();
-        services.AddSingleton<ISettingsFile>(c => new SettingsFileService(applicationLocalPath, c.GetRequiredService<IFolderResolver>()));
+        services.AddSingleton<ISettingsFile>(c => new SettingsFileService(applicationLocalPath, c.GetRequiredService<IFolderResolver>(), c.GetRequiredService<IFileSystem>()));
         services.AddSingleton<IArtistPicture, ArtistPicture>();
         services.AddSingleton<IAlbumPicture, AlbumPicture>();
         services.AddSingleton<BackdropPicture>();

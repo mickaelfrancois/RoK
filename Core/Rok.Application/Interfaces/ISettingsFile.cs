@@ -4,9 +4,9 @@ public interface ISettingsFile
 {
     bool Exists();
 
-    IAppOptions? Load<T>() where T : IAppOptions;
+    Task<IAppOptions?> LoadAsync<T>() where T : IAppOptions;
 
-    void Save(IAppOptions options);
+    Task SaveAsync(IAppOptions options);
 
     Task RemoveInvalidLibraryTokensAsync(IAppOptions options);
 }

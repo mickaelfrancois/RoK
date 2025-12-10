@@ -1,6 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
 using Rok.Application.Interfaces;
-using System.Reflection;
 
 namespace Rok.Infrastructure.LastFm;
 
@@ -85,17 +84,8 @@ internal class LastFmClient : ILastFmClient
 
     private void ConfigureHttpClient()
     {
-        string appVersion = GetAppVersion();
-
         _httpClient.BaseAddress = new Uri(UriString);
-        //        _httpClient.DefaultRequestHeaders.Add("User-Agent", $"Rok/{appVersion}");
         _httpClient.DefaultRequestHeaders.Add("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36");
         _httpClient.Timeout = TimeSpan.FromSeconds(5);
-    }
-
-    private static string GetAppVersion()
-    {
-        Assembly assembly = Assembly.GetEntryAssembly() ?? Assembly.GetExecutingAssembly();
-        return assembly.GetName().Version?.ToString() ?? "0.0.0";
     }
 }

@@ -6,7 +6,7 @@ using Rok.Domain.Interfaces.Entities;
 using Rok.Infrastructure.Repositories;
 using Rok.Shared;
 
-namespace Rok.Infrastructure.UnitTests;
+namespace Rok.Infrastructure.UnitTests.Repositories;
 
 public class ArtistRepositoryTests
 {

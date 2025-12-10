@@ -1,13 +1,12 @@
 ﻿using Rok.Application.Interfaces;
-using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization.Metadata;
 
 namespace Rok.Infrastructure.Files;
 
-public class SettingsFileService(string applicationPath, IFolderResolver folderResolver) : ISettingsFile
+public class SettingsFileService(string applicationPath, IFolderResolver folderResolver, IFileSystem fileSystem) : ISettingsFile
 {
-    private readonly string _path = Path.Combine(applicationPath, "settings.json");
+    private readonly string _path = fileSystem.Combine(applicationPath, "settings.json");
 
     private readonly JsonSerializerOptions _jsonOptions = new()
     {
@@ -17,31 +16,45 @@ public class SettingsFileService(string applicationPath, IFolderResolver folderR
 
     public bool Exists()
     {
-        return Path.Exists(_path);
+        return fileSystem.FileExists(_path);
     }
 
-
-    public IAppOptions? Load<T>() where T : IAppOptions
+    public async Task<IAppOptions?> LoadAsync<T>() where T : IAppOptions
     {
-        if (Path.Exists(_path))
-            return JsonSerializer.Deserialize<T>(File.ReadAllText(_path), _jsonOptions);
-        else
+        if (!fileSystem.FileExists(_path))
             return null;
+
+        try
+        {
+            string content = await fileSystem.ReadAllTextAsync(_path);
+
+            return JsonSerializer.Deserialize<T>(content, _jsonOptions);
+        }
+        catch
+        {
+            return null;
+        }
     }
 
-
-    public void Save(IAppOptions options)
+    public async Task SaveAsync(IAppOptions options)
     {
-        string jsonString = JsonSerializer.Serialize(options, _jsonOptions);
-        File.WriteAllText(_path, jsonString, Encoding.UTF8);
-    }
+        Guard.Against.Null(options, nameof(options));
 
+        string jsonString = JsonSerializer.Serialize(options, _jsonOptions);
+
+        await fileSystem.WriteAllTextAsync(_path, jsonString);
+    }
 
     public async Task RemoveInvalidLibraryTokensAsync(IAppOptions options)
     {
+        Guard.Against.Null(options, nameof(options));
+
+        if (options.LibraryTokens is null || options.LibraryTokens.Count == 0)
+            return;
+
         List<string> tokensToRemove = [];
 
-        foreach (string token in options.LibraryTokens ?? Enumerable.Empty<string>())
+        foreach (string token in options.LibraryTokens)
         {
             string? path = await folderResolver.GetDisplayNameFromTokenAsync(token);
             if (path is null)
@@ -49,6 +62,8 @@ public class SettingsFileService(string applicationPath, IFolderResolver folderR
         }
 
         if (tokensToRemove.Count > 0)
-            options.LibraryTokens!.RemoveAll(t => tokensToRemove.Contains(t));
+        {
+            options.LibraryTokens.RemoveAll(token => tokensToRemove.Contains(token));
+        }
     }
 }

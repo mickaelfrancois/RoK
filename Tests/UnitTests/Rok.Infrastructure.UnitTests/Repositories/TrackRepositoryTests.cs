@@ -4,7 +4,7 @@ using Rok.Application.Interfaces;
 using Rok.Domain.Entities;
 using Rok.Infrastructure.Repositories;
 
-namespace Rok.Infrastructure.UnitTests;
+namespace Rok.Infrastructure.UnitTests.Repositories;
 
 public class TrackRepositoryTests
 {
