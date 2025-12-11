@@ -21,19 +21,12 @@ public class AlbumsGroupCategory(ResourceLoader resourceLoader) : GroupCategoryS
     protected override void RegisterGroupingStrategies()
     {
         RegisterStrategy(GroupingConstants.Decade, albums => GroupByDecade(albums, a => a.Album.Year, a => a.Album.Name));
-
         RegisterStrategy(GroupingConstants.Year, albums => GroupByYear(albums, a => a.Album.Year, a => a.Album.Name));
-
         RegisterStrategy(GroupingConstants.Artist, albums => GroupByName(albums, a => a.Album.ArtistName, a => a.Album.ArtistName));
-
         RegisterStrategy(GroupingConstants.Album, albums => GroupByName(albums, a => a.Album.Name, a => a.Album.Name));
-
         RegisterStrategy(GroupingConstants.CreatDate, albums => GroupByCreatDate(albums, a => a.Album.CreatDate));
-
-        RegisterStrategy(GroupingConstants.LastListen, albums => GroupByLastListen(albums, a => a.Album.LastListen));
-
-        RegisterStrategy(GroupingConstants.ListenCount, albums => GroupByListenCount(albums, a => a.Album.ListenCount));
-
+        RegisterStrategy(GroupingConstants.LastListen, albums => SortByLastListen(albums, a => a.Album.LastListen));
+        RegisterStrategy(GroupingConstants.ListenCount, albums => SortByListenCount(albums, a => a.Album.ListenCount));
         RegisterStrategy(GroupingConstants.Country, albums => GroupByCountry(albums, a => a.Album.CountryCode, a => a.Album.Name));
     }
 }

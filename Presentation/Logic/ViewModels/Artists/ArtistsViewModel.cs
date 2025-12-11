@@ -20,6 +20,17 @@ public partial class ArtistsViewModel : ObservableObject, IDisposable
     private readonly LibraryRefreshMessageHandler _libraryRefreshHandler;
     private readonly ArtistImportedMessageHandler _artistImportedHandler;
 
+    private bool _isGroupingEnabled;
+    public bool IsGroupingEnabled
+    {
+        get => _isGroupingEnabled;
+        set
+        {
+            _isGroupingEnabled = value;
+            OnPropertyChanged(nameof(IsGroupingEnabled));
+        }
+    }
+
     private bool _stateLoaded = false;
     private bool _libraryUpdated = false;
     private List<ArtistViewModel> _filteredArtists = [];
@@ -233,6 +244,8 @@ public partial class ArtistsViewModel : ObservableObject, IDisposable
 
         IEnumerable<ArtistsGroupCategoryViewModel> artists = _groupService.GetGroupedItems(_stateManager.GroupBy, _filteredArtists);
         GroupedItems.InitWithAddRange(artists);
+
+        IsGroupingEnabled = GroupedItems.Count > 1 || !string.IsNullOrEmpty(GroupedItems.FirstOrDefault()?.Title ?? string.Empty);
 
         TotalCount = _filteredArtists.Count;
     }

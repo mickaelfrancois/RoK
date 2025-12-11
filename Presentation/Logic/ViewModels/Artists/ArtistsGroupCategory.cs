@@ -20,17 +20,11 @@ public class ArtistsGroupCategory(ResourceLoader resourceLoader) : GroupCategory
     protected override void RegisterGroupingStrategies()
     {
         RegisterStrategy(GroupingConstants.Decade, artists => GroupByDecade(artists, a => a.Artist.YearMini, a => a.Artist.Name));
-
         RegisterStrategy(GroupingConstants.Year, artists => GroupByDecade(artists, a => a.Artist.YearMini, a => a.Artist.Name));
-
         RegisterStrategy(GroupingConstants.Artist, artists => GroupByName(artists, a => a.Artist.Name, a => a.Artist.Name));
-
         RegisterStrategy(GroupingConstants.CreatDate, artists => GroupByCreatDate(artists, a => a.Artist.CreatDate));
-
-        RegisterStrategy(GroupingConstants.LastListen, artists => GroupByLastListen(artists, a => a.Artist.LastListen));
-
-        RegisterStrategy(GroupingConstants.ListenCount, artists => GroupByListenCount(artists, a => a.Artist.ListenCount));
-
+        RegisterStrategy(GroupingConstants.LastListen, artists => SortByLastListen(artists, a => a.Artist.LastListen));
+        RegisterStrategy(GroupingConstants.ListenCount, artists => SortByListenCount(artists, a => a.Artist.ListenCount));
         RegisterStrategy(GroupingConstants.Country, artists => GroupByCountry(artists, a => a.Artist.CountryCode, a => a.Artist.Name));
     }
 }

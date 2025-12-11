@@ -301,9 +301,9 @@ public class NovaApiService : INovaApiService, IDisposable
                     _logger.LogError("Nova API response {Error} {Url}", response.StatusCode, url);
                 }
             }
-            catch (OperationCanceledException ex)
+            catch (OperationCanceledException)
             {
-                _logger.LogWarning(ex, "Request cancelled {Url}", url);
+                // Ignore errors
             }
             catch (Exception ex)
             {
@@ -344,9 +344,9 @@ public class NovaApiService : INovaApiService, IDisposable
         {
             acquired = await _concurrencyLimiter.WaitAsync(_concurrencyLimiterTimeout, cancellationToken);
         }
-        catch (OperationCanceledException ex)
+        catch (OperationCanceledException)
         {
-            _logger.LogWarning(ex, "Request cancelled before entering limiter {Url}", uri);
+            // Ignore errors
             return;
         }
 

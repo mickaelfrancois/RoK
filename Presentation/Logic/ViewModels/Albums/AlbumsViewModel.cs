@@ -22,6 +22,17 @@ public partial class AlbumsViewModel : ObservableObject, IDisposable
     private bool _libraryUpdated = false;
     private List<AlbumViewModel> _filteredAlbums = [];
 
+    private bool _isGroupingEnabled;
+    public bool IsGroupingEnabled
+    {
+        get => _isGroupingEnabled;
+        set
+        {
+            _isGroupingEnabled = value;
+            OnPropertyChanged(nameof(IsGroupingEnabled));
+        }
+    }
+
     public List<AlbumViewModel> ViewModels => _dataLoader.ViewModels;
     public List<GenreDto> Genres => _dataLoader.Genres;
     public ObservableCollection<object> Selected => _selectionManager.Selected;
@@ -228,6 +239,8 @@ public partial class AlbumsViewModel : ObservableObject, IDisposable
 
         IEnumerable<AlbumsGroupCategoryViewModel> albums = _groupService.GetGroupedItems(_stateManager.GroupBy, _filteredAlbums);
         GroupedItems.InitWithAddRange(albums);
+
+        IsGroupingEnabled = GroupedItems.Count > 1 || !string.IsNullOrEmpty(GroupedItems.FirstOrDefault()?.Title ?? string.Empty);
 
         TotalCount = _filteredAlbums.Count;
     }

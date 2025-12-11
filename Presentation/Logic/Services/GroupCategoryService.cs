@@ -1,16 +1,10 @@
 ﻿namespace Rok.Logic.Services;
 
-public abstract class GroupCategoryService<TViewModel, TGroupCategory>
+public abstract class GroupCategoryService<TViewModel, TGroupCategory>(ResourceLoader resourceLoader)
     where TGroupCategory : IGroupCategoryViewModel<TViewModel>, new()
 {
-    protected readonly ResourceLoader ResourceLoader;
-    private readonly Dictionary<string, Func<List<TViewModel>, IEnumerable<TGroupCategory>>> _groupStrategies;
-
-    protected GroupCategoryService(ResourceLoader resourceLoader)
-    {
-        ResourceLoader = resourceLoader;
-        _groupStrategies = new Dictionary<string, Func<List<TViewModel>, IEnumerable<TGroupCategory>>>();
-    }
+    protected readonly ResourceLoader ResourceLoader = resourceLoader;
+    private readonly Dictionary<string, Func<List<TViewModel>, IEnumerable<TGroupCategory>>> _groupStrategies = new();
 
     protected abstract void RegisterGroupingStrategies();
 
@@ -55,30 +49,31 @@ public abstract class GroupCategoryService<TViewModel, TGroupCategory>
     }
 
 
-    protected IEnumerable<TGroupCategory> GroupByLastListen(List<TViewModel> items, Func<TViewModel, DateTime?> lastListenSelector)
+    protected IEnumerable<TGroupCategory> SortByLastListen(List<TViewModel> items, Func<TViewModel, DateTime?> lastListenSelector)
     {
-        DateTime minDate = DateTime.Now.AddDays(-15);
+        List<TViewModel> sortedItems = items.OrderByDescending(lastListenSelector).ToList();
 
-        IEnumerable<TGroupCategory> selectedItems = items
-            .OrderByDescending(lastListenSelector)
-            .GroupBy(x =>
-            {
-                DateTime? lastListen = lastListenSelector(x);
-                return lastListen > minDate ? lastListen.Value.ToString("m") : $"< {minDate:m}";
-            })
-            .Select(x => new TGroupCategory { Title = x.Key, Items = x.OrderByDescending(lastListenSelector).ToList() });
-
-        return BuildGroupedCollection(selectedItems, orderByDescending: true);
+        return new List<TGroupCategory>
+        {
+            new() {
+                Title = string.Empty,
+                Items = sortedItems
+            }
+        };
     }
 
 
-    protected IEnumerable<TGroupCategory> GroupByListenCount(List<TViewModel> items, Func<TViewModel, int> listenCountSelector)
+    protected IEnumerable<TGroupCategory> SortByListenCount(List<TViewModel> items, Func<TViewModel, int> listenCountSelector)
     {
-        IEnumerable<TGroupCategory> selectedItems = items
-            .GroupBy(x => listenCountSelector(x).ToString())
-            .Select(x => new TGroupCategory { Title = x.Key, Items = x.ToList() });
+        List<TViewModel> sortedItems = items.OrderByDescending(listenCountSelector).ToList();
 
-        return BuildGroupedCollection(selectedItems.OrderByDescending(c => int.Parse(c.Title)));
+        return new List<TGroupCategory>
+        {
+            new() {
+                Title = string.Empty,
+                Items = sortedItems
+            }
+        };
     }
 
 

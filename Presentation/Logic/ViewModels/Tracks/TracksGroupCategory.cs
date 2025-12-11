@@ -21,19 +21,12 @@ public class TracksGroupCategory(ResourceLoader resourceLoader) : GroupCategoryS
     protected override void RegisterGroupingStrategies()
     {
         RegisterStrategy(GroupingConstants.Title, tracks => GroupByName(tracks, t => t.Track.Title, t => t.Track.Title));
-
         RegisterStrategy(GroupingConstants.Artist, GroupByArtist);
-
         RegisterStrategy(GroupingConstants.Album, GroupByAlbum);
-
         RegisterStrategy(GroupingConstants.Genre, GroupByGenre);
-
         RegisterStrategy(GroupingConstants.CreatDate, tracks => GroupByCreatDate(tracks, t => t.Track.CreatDate));
-
-        RegisterStrategy(GroupingConstants.LastListen, tracks => GroupByLastListen(tracks, t => t.Track.LastListen));
-
-        RegisterStrategy(GroupingConstants.ListenCount, tracks => GroupByListenCount(tracks, t => t.Track.ListenCount));
-
+        RegisterStrategy(GroupingConstants.LastListen, tracks => SortByLastListen(tracks, t => t.Track.LastListen));
+        RegisterStrategy(GroupingConstants.ListenCount, tracks => SortByListenCount(tracks, t => t.Track.ListenCount));
         RegisterStrategy(GroupingConstants.Country, tracks => GroupByCountry(tracks, t => t.Track.CountryCode, t => t.Track.Title));
     }
 

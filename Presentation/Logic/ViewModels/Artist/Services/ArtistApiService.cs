@@ -79,7 +79,7 @@ public class ArtistApiService(
             Mood = new PatchField<string>(artistApi.Mood),
             Style = new PatchField<string>(artistApi.Style),
             Biography = new PatchField<string>(artistApi.GetBiography(LanguageHelpers.GetCurrentLanguage())),
-            NovaUid = new PatchField<string>(artistApi.ID?.ToString())
+            NovaUid = new PatchField<string>(artistApi.ID?.ToString() ?? "")
         };
 
         await mediator.SendMessageAsync(patchArtistCommand);

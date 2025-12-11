@@ -13,7 +13,6 @@
     <Page.Resources>
         <CollectionViewSource x:Name="groupedItemsViewSource"
                               IsSourceGrouped="true"
-                              Source="{x:Bind ViewModel.GroupedItems}"
                               ItemsPath="Items" />
     </Page.Resources>
 
@@ -159,8 +158,7 @@
                           IsZoomOutButtonEnabled="True">
                 <SemanticZoom.ZoomedInView>
                     <common:ListViewExtended x:Name="tracksList"
-                                             ItemsSource="{Binding Source={StaticResource groupedItemsViewSource}}"
-                                             SelectionMode="Single"
+                                             SelectionMode="Single"                                             
                                              IsItemClickEnabled="True"
                                              IncrementalLoadingTrigger="Edge"
                                              IncrementalLoadingThreshold="50">
@@ -281,7 +279,6 @@
 
                 <SemanticZoom.ZoomedOutView>
                     <GridView x:Name="tracksZoomoutCollectionList"
-                              ItemsSource="{x:Bind groupedItemsViewSource.View.CollectionGroups}"
                               VerticalAlignment="Center">
 
                         <GridView.ItemTemplate>

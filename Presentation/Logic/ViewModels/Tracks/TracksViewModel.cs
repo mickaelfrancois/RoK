@@ -22,6 +22,17 @@ public partial class TracksViewModel : ObservableObject, IDisposable
     private bool _libraryUpdated = false;
     private List<TrackViewModel> _filteredTracks = [];
 
+    private bool _isGroupingEnabled;
+    public bool IsGroupingEnabled
+    {
+        get => _isGroupingEnabled;
+        set
+        {
+            _isGroupingEnabled = value;
+            OnPropertyChanged(nameof(IsGroupingEnabled));
+        }
+    }
+
     public List<TrackViewModel> ViewModels => _dataLoader.ViewModels;
     public List<GenreDto> Genres => _dataLoader.Genres;
     public ObservableCollection<object> Selected => _selectionManager.Selected;
@@ -219,6 +230,8 @@ public partial class TracksViewModel : ObservableObject, IDisposable
 
         IEnumerable<TracksGroupCategoryViewModel> tracks = _groupService.GetGroupedItems(_stateManager.GroupBy, _filteredTracks);
         GroupedItems.InitWithAddRange(tracks);
+
+        IsGroupingEnabled = GroupedItems.Count > 1 || !string.IsNullOrEmpty(GroupedItems.FirstOrDefault()?.Title ?? string.Empty);
 
         TotalCount = _filteredTracks.Count;
     }
