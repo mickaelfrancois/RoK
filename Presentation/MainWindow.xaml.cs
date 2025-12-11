@@ -293,5 +293,18 @@ namespace Rok
         {
             ThemeManager.Toggle();
         }
+
+
+        private void AppLogo_PointerEntered(object sender, PointerRoutedEventArgs e)
+        {
+            Storyboard storyboard = (Storyboard)navMenu.Resources["AppLogoHoverStoryboard"];
+            storyboard.Begin();
+        }
+
+        private void AppLogo_PointerExited(object sender, PointerRoutedEventArgs e)
+        {
+            Storyboard storyboard = (Storyboard)navMenu.Resources["AppLogoExitStoryboard"];
+            storyboard.Begin();
+        }
     }
 }
