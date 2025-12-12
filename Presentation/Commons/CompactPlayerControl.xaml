@@ -1,54 +1,144 @@
 <?xml version="1.0" encoding="utf-8"?>
-<UserControl
-    x:Class="Rok.Commons.CompactPlayerControl"
-    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:local="using:Rok.Commons"
-    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    mc:Ignorable="d">
+<UserControl x:Class="Rok.Commons.CompactPlayerControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="using:Rok.Commons"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d">
 
-    <Grid Margin="0" Padding="0">
+    <Grid Margin="0"
+          Padding="0">
+        <Image Source="{x:Bind PlayerViewModel.CurrentArtist.Picture, Mode=OneWay, TargetNullValue={Binding PlayerViewModel.MediaList.CurrentItem.Cover}}"
+               Stretch="UniformToFill"
+               Opacity="0.55" />
 
-        <Image Source="{x:Bind PlayerViewModel.CurrentArtist.Picture, Mode=OneWay, TargetNullValue={Binding PlayerViewModel.MediaList.CurrentItem.Cover}}" Stretch="UniformToFill" Opacity="0.6"/>
-
-        <CommandBar Background="Transparent" VerticalAlignment="Bottom" HorizontalAlignment="Center" Margin="0,0,0,60"  OverflowButtonVisibility="Collapsed">
-            <AppBarButton RequestedTheme="Dark" Style="{StaticResource AppBarButtonRevealStyle}" 
-                       Icon="Previous" 
-                       VerticalAlignment="Center" 
-                       Command="{x:Bind PlayerViewModel.SkipPreviousCommand}" IsEnabled="{x:Bind PlayerViewModel.CanSkipPrevious, Mode=OneWay}" />
-
-            <AppBarButton RequestedTheme="Dark" Style="{StaticResource AppBarButtonRevealStyle}" 
-                       VerticalAlignment="Center" 
-                       Command="{x:Bind PlayerViewModel.TogglePlayPauseCommand}">
-                        <SymbolIcon Symbol="{x:Bind PlayerViewModel.PlaybackState, Mode=OneWay, Converter={StaticResource PlaybackStateToButtonIconConverter}}"></SymbolIcon>
-            </AppBarButton>
-
-            <AppBarButton RequestedTheme="Dark" Style="{StaticResource AppBarButtonRevealStyle}" 
-                       Icon="Next" 
-                       VerticalAlignment="Center" 
-                       Command="{x:Bind PlayerViewModel.SkipNextCommand}" IsEnabled="{x:Bind PlayerViewModel.CanSkipNext, Mode=OneWay}" />
-        </CommandBar>
-
-        <!-- Bottom line -->
-        <Grid Margin="0,0,0,10" VerticalAlignment="Bottom" Height="40">
+        <Grid VerticalAlignment="Bottom"
+              Height="130">
             <Grid.Background>
-                <SolidColorBrush Color="Black" Opacity="0.7"></SolidColorBrush>
+                <LinearGradientBrush StartPoint="0,0"
+                                     EndPoint="0,1">
+                    <GradientStop Color="#00000000"
+                                  Offset="0.0" />
+                    <GradientStop Color="#DD000000"
+                                  Offset="0.6" />
+                    <GradientStop Color="#FF000000"
+                                  Offset="1.0" />
+                </LinearGradientBrush>
             </Grid.Background>
+
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+
+                <!-- Track info with shadowed text -->
+                <StackPanel Grid.Row="0"
+                            Orientation="Vertical"
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Top"
+                            Margin="10,6,10,4">
+
+                    <!-- Title shadow + text -->
+                    <Grid>
+                        <TextBlock Text="{x:Bind PlayerViewModel.CurrentTrack.Title, Mode=OneWay}"
+                                   Foreground="#AA000000"
+                                   FontWeight="Bold"
+                                   FontSize="24"
+                                   TextWrapping="NoWrap"
+                                   TextTrimming="CharacterEllipsis"
+                                   MaxWidth="260"
+                                   HorizontalAlignment="Center"
+                                   Margin="8,2,8,0" />
+                        <TextBlock x:Name="title"
+                                   Text="{x:Bind PlayerViewModel.CurrentTrack.Title, Mode=OneWay}"
+                                   Foreground="#FFFFFFFF"
+                                   FontWeight="Bold"
+                                   FontSize="24"
+                                   TextWrapping="NoWrap"
+                                   TextTrimming="CharacterEllipsis"
+                                   MaxWidth="260"
+                                   HorizontalAlignment="Center"
+                                   Margin="6,0,6,0" />
+                    </Grid>
+
+                    <!-- Artist shadow + text -->
+                    <Grid Margin="0,2,0,0">
+                        <TextBlock Text="{x:Bind PlayerViewModel.CurrentTrack.ArtistName, Mode=OneWay}"
+                                   Foreground="#AA000000"
+                                   FontSize="20"
+                                   TextWrapping="NoWrap"
+                                   TextTrimming="CharacterEllipsis"
+                                   MaxWidth="260"
+                                   HorizontalAlignment="Center"
+                                   Margin="8,2,8,0" />
+                        <TextBlock x:Name="artist"
+                                   Text="{x:Bind PlayerViewModel.CurrentTrack.ArtistName, Mode=OneWay}"
+                                   Foreground="#FFFFFFFF"
+                                   FontSize="20"
+                                   TextWrapping="NoWrap"
+                                   TextTrimming="CharacterEllipsis"
+                                   MaxWidth="260"
+                                   HorizontalAlignment="Center"
+                                   Margin="6,0,6,0" />
+                    </Grid>
+                </StackPanel>
+
+                <!-- Progress -->
+                <ProgressBar Grid.Row="1"
+                             Margin="12,4,12,8"
+                             Minimum="0"
+                             Maximum="{x:Bind PlayerViewModel.DurationTotal.TotalSeconds, Mode=OneWay}"
+                             Value="{x:Bind PlayerViewModel.ListenDuration.TotalSeconds, Mode=OneWay}"
+                             IsIndeterminate="False"
+                             Height="2"
+                             Foreground="{ThemeResource AccentFillColorDefaultBrush}"
+                             Background="{ThemeResource ControlStrokeColorDefaultBrush}" />
+
+                <!-- Controls -->
+                <CommandBar Grid.Row="2"
+                            Background="Transparent"
+                            VerticalAlignment="Bottom"
+                            HorizontalAlignment="Center"
+                            Margin="0,0,0,2"
+                            DefaultLabelPosition="Collapsed"
+                            IsDynamicOverflowEnabled="False"
+                            OverflowButtonVisibility="Collapsed">
+
+                    <AppBarButton RequestedTheme="Dark"
+                                  Style="{StaticResource AppBarButtonRevealStyle}"
+                                  Icon="Previous"
+                                  Command="{x:Bind PlayerViewModel.SkipPreviousCommand}"
+                                  IsEnabled="{x:Bind PlayerViewModel.CanSkipPrevious, Mode=OneWay}" />
+
+                    <AppBarButton RequestedTheme="Dark"
+                                  Style="{StaticResource AppBarButtonRevealStyle}"
+                                  Command="{x:Bind PlayerViewModel.TogglePlayPauseCommand}">
+                        <SymbolIcon Symbol="{x:Bind PlayerViewModel.PlaybackState, Mode=OneWay, Converter={StaticResource PlaybackStateToButtonIconConverter}}" />
+                    </AppBarButton>
+
+                    <AppBarButton RequestedTheme="Dark"
+                                  Style="{StaticResource AppBarButtonRevealStyle}"
+                                  Icon="Next"
+                                  Command="{x:Bind PlayerViewModel.SkipNextCommand}"
+                                  IsEnabled="{x:Bind PlayerViewModel.CanSkipNext, Mode=OneWay}" />
+                </CommandBar>
+            </Grid>
         </Grid>
 
-        <Grid x:Name="trackInfo">
-            <TextBlock x:Name="title" Text="{x:Bind PlayerViewModel.CurrentTrack.Title, Mode=OneWay}" VerticalAlignment="Bottom" Margin="6,0,0,30" Foreground="#FF42CB0F" HorizontalAlignment="Center" TextWrapping="NoWrap" FontWeight="Bold" />
-            <TextBlock x:Name="artist" Text="{x:Bind PlayerViewModel.CurrentTrack.ArtistName, Mode=OneWay}" VerticalAlignment="Bottom" Margin="6,0,0,10" Foreground="White" HorizontalAlignment="Center" TextWrapping="NoWrap" FontWeight="Bold" />
-        </Grid>
-
-        <Button x:Name="btCompactMode" Background="Transparent"
-             HorizontalAlignment="Right" VerticalAlignment="Bottom" 
-             RequestedTheme="Dark" 
-             Command="{x:Bind PlayerViewModel.CompactModeCommand}" 
-             Margin="0,0,4,10" Padding="0"
-             FontFamily="Segoe MLD2 Asset"  FontSize="10" >
-            <SymbolIcon Symbol="StopSlideShow"/>
+        <!-- Compact mode toggle -->
+        <Button x:Name="btCompactMode"
+                Background="Transparent"
+                HorizontalAlignment="Right"
+                VerticalAlignment="Top"
+                RequestedTheme="Dark"
+                Command="{x:Bind PlayerViewModel.CompactModeCommand}"
+                Margin="0,6,6,0"
+                Padding="6"
+                ToolTipService.ToolTip="Exit compact mode">
+            <SymbolIcon Symbol="StopSlideShow" />
         </Button>
     </Grid>
 </UserControl>

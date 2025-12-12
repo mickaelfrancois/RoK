@@ -3,19 +3,20 @@ using Microsoft.Data.Sqlite;
 using Microsoft.Extensions.Logging.Abstractions;
 using Rok.Infrastructure.Migration;
 using System.Data;
-using Windows.ApplicationModel;
 
 namespace Rok.Infrastructure.UnitTests;
 
 public class SqliteDatabaseFixture : IDisposable
 {
     public IDbConnection Connection { get; }
+    private readonly SqliteConnection _sqliteConnection;
 
     public SqliteDatabaseFixture()
     {
-        SqliteConnection sqlite = new("Data Source=InMemoryDb;Mode=Memory;Cache=Shared");
-        sqlite.Open();
-        Connection = sqlite;
+        string connectionString = $"Data Source=InMemoryDb_{Guid.NewGuid():N};Mode=Memory;Cache=Shared";
+        _sqliteConnection = new SqliteConnection(connectionString);
+        _sqliteConnection.Open();
+        Connection = _sqliteConnection;
 
         IMigration[] migrations = new IMigration[] { new Migration2() };
         MigrationService migrationService = new(Connection, migrations, NullLogger<MigrationService>.Instance);
@@ -27,7 +28,7 @@ public class SqliteDatabaseFixture : IDisposable
 
     private void SeedData()
     {
-        var now = DateTime.UtcNow;
+        DateTime now = DateTime.UtcNow;
 
         Connection.Execute(
             "INSERT INTO Countries(id, code, creatDate) VALUES (@id, @code, @creatDate)",

@@ -1,6 +1,5 @@
 ﻿using Rok.Application.Interfaces;
 using Rok.Domain.Entities;
-using System.Collections.Concurrent;
 
 namespace Rok.Import;
 
@@ -41,9 +40,9 @@ public class Statistics(ITrackRepository trackRepository, IAlbumRepository album
     }
 
 
-    public async Task UpdateAlbumsAsync(ConcurrentBag<long> albumsId)
+    public async Task UpdateAlbumsAsync(IEnumerable<long> albumsId)
     {
-        if (albumsId.IsEmpty)
+        if (!albumsId.Any())
             return;
 
         IEnumerable<TrackEntity> tracks = await GetTracksCacheAsync();
@@ -64,9 +63,9 @@ public class Statistics(ITrackRepository trackRepository, IAlbumRepository album
         }
     }
 
-    public async Task UpdateArtistsAsync(ConcurrentBag<long> artistsId)
+    public async Task UpdateArtistsAsync(IEnumerable<long> artistsId)
     {
-        if (artistsId.IsEmpty)
+        if (!artistsId.Any())
             return;
 
         IEnumerable<TrackEntity> tracks = await GetTracksCacheAsync();
@@ -130,9 +129,9 @@ public class Statistics(ITrackRepository trackRepository, IAlbumRepository album
         }
     }
 
-    public async Task UpdateGenresAsync(ConcurrentBag<long> genresId)
+    public async Task UpdateGenresAsync(IEnumerable<long> genresId)
     {
-        if (genresId.IsEmpty)
+        if (!genresId.Any())
             return;
 
         IEnumerable<TrackEntity> tracks = await GetTracksCacheAsync();

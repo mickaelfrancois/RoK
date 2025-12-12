@@ -27,7 +27,7 @@ public class StartViewModel : ObservableObject
 
     public bool ErrorOccurred { get; set; } = false;
 
-    public RelayCommand<StorageFolder> AddLibraryFolderCommand { get; private set; }
+    public AsyncRelayCommand<StorageFolder> AddLibraryFolderCommand { get; private set; }
 
 
     public StartViewModel(IAlbumPicture albumPicture, ISettingsFile settingsFile, NavigationService navigationService, IMediator mediator, IImport importService, IAppOptions appOptions)
@@ -39,7 +39,7 @@ public class StartViewModel : ObservableObject
         _importService = importService;
         _appOptions = appOptions;
 
-        AddLibraryFolderCommand = new RelayCommand<StorageFolder>(AddLibraryFolder);
+        AddLibraryFolderCommand = new AsyncRelayCommand<StorageFolder>(AddLibraryFolderAsync);
 
         Messenger.Subscribe<LibraryRefreshMessage>(async (message) => await LibraryRefreshChange(message));
         Messenger.Subscribe<AlbumImportedMessage>(AlbumImported);
@@ -124,7 +124,7 @@ public class StartViewModel : ObservableObject
     }
 
 
-    private void AddLibraryFolder(StorageFolder folder)
+    private async Task AddLibraryFolderAsync(StorageFolder folder)
     {
         string token = Guid.NewGuid().ToString();
         StorageApplicationPermissions.FutureAccessList.AddOrReplace(token, folder);
@@ -133,7 +133,7 @@ public class StartViewModel : ObservableObject
         {
             _appOptions.LibraryTokens.Clear(); // In start process, we clear all library path as we haven't found music in.
             _appOptions.LibraryTokens.Add(token);
-            _settingsFile.Save(_appOptions);
+            await _settingsFile.SaveAsync(_appOptions);
 
             ErrorOccurred = false;
             LibraryRefreshRunning = true;

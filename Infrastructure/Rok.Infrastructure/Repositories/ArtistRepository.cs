@@ -2,13 +2,24 @@
 using Microsoft.Extensions.Logging;
 using Rok.Application.Interfaces;
 using Rok.Domain.Interfaces.Entities;
+using Rok.Shared;
 
 namespace Rok.Infrastructure.Repositories;
 
 public class ArtistRepository(IDbConnection connection, [FromKeyedServices("BackgroundConnection")] IDbConnection backgroundConnection, ILogger<ArtistRepository> logger) : GenericRepository<ArtistEntity>(connection, backgroundConnection, null, logger), IArtistRepository
 {
+    private const string UpdateFavoriteSql = "UPDATE artists SET isFavorite = @isFavorite WHERE Id = @id";
+    private const string UpdateLastListenSql = "UPDATE artists SET listenCount = listenCount + 1, lastListen = @lastListen WHERE Id = @id";
+    private const string UpdateStatisticsSql = "UPDATE artists SET trackCount = @trackCount, totalDurationSeconds = @totalDurationSeconds, albumCount = @albumCount, bestOfCount = @bestOfCount, liveCount = @liveCount, compilationCount = @compilationCount, yearMini = @yearMini, yearMaxi = @yearMaxi WHERE id = @id";
+    private const string UpdateMetadataAttemptSql = "UPDATE artists SET getMetaDataLastAttempt = @lastAttemptDate WHERE id = @id";
+    private const string DeleteOrphansSql = "DELETE FROM artists WHERE id NOT IN (SELECT DISTINCT artistId FROM tracks WHERE artistId IS NOT NULL)";
+
+
     public async Task<IEnumerable<IArtistEntity>> SearchAsync(string name, RepositoryConnectionKind kind = RepositoryConnectionKind.Foreground)
     {
+        if (string.IsNullOrWhiteSpace(name))
+            return [];
+
         name = $"%{name}%";
         string sql = GetSelectQuery() + " WHERE artists.name LIKE @name";
 
@@ -17,6 +28,8 @@ public class ArtistRepository(IDbConnection connection, [FromKeyedServices("Back
 
     public async Task<IEnumerable<IArtistEntity>> GetByGenreIdAsync(long genreId, RepositoryConnectionKind kind = RepositoryConnectionKind.Foreground)
     {
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(genreId);
+
         string sql = GetSelectQuery() +
                      "WHERE artists.genreId = @genreId";
 
@@ -26,92 +39,58 @@ public class ArtistRepository(IDbConnection connection, [FromKeyedServices("Back
 
     public async Task<bool> PatchAsync(IUpdateArtistEntity entity, RepositoryConnectionKind kind = RepositoryConnectionKind.Foreground)
     {
-        string sql = $"UPDATE artists SET " +
-            "WikipediaUrl = @WikipediaUrl," +
-            "OfficialSiteUrl = @OfficialSiteUrl, " +
-            "FacebookUrl = @FacebookUrl, " +
-            "TwitterUrl = @TwitterUrl, " +
-            "NovaUid = @NovaUid, " +
-            "MusicBrainzID = @MusicBrainzID, " +
-            "FormedYear = @FormedYear, " +
-            "BornYear = @BornYear, " +
-            "DiedYear = @DiedYear, " +
-            "Disbanded = @Disbanded, " +
-            "Style = @Style, " +
-            "Gender = @Gender, " +
-            "Mood = @Mood, " +
-            "Biography = @Biography " +
-            "WHERE Id = @Id";
+        ArtistEntity? artist = await GetByIdAsync(entity.Id, kind);
+        if (artist == null) return false;
 
-        IDbConnection connectiondb = ResolveConnection(kind);
-        int rowsAffected = await connection.ExecuteAsync(sql, new
-        {
-            entity.WikipediaUrl,
-            entity.OfficialSiteUrl,
-            entity.FacebookUrl,
-            entity.TwitterUrl,
-            entity.NovaUid,
-            entity.MusicBrainzID,
-            entity.FormedYear,
-            entity.BornYear,
-            entity.DiedYear,
-            entity.Disbanded,
-            entity.Style,
-            entity.Gender,
-            entity.Mood,
-            entity.Biography,
-            entity.Id
-        }, _transaction);
+        ApplyPatch(entity.WikipediaUrl, value => artist.WikipediaUrl = value);
+        ApplyPatch(entity.OfficialSiteUrl, value => artist.OfficialSiteUrl = value);
+        ApplyPatch(entity.FacebookUrl, value => artist.FacebookUrl = value);
+        ApplyPatch(entity.TwitterUrl, value => artist.TwitterUrl = value);
+        ApplyPatch(entity.NovaUid, value => artist.NovaUid = value);
+        ApplyPatch(entity.MusicBrainzID, value => artist.MusicBrainzID = value);
+        ApplyPatch(entity.FormedYear, value => artist.FormedYear = value);
+        ApplyPatch(entity.BornYear, value => artist.BornYear = value);
+        ApplyPatch(entity.DiedYear, value => artist.DiedYear = value);
+        ApplyPatch(entity.Disbanded, value => artist.Disbanded = value);
+        ApplyPatch(entity.Style, value => artist.Style = value);
+        ApplyPatch(entity.Gender, value => artist.Gender = value);
+        ApplyPatch(entity.Mood, value => artist.Mood = value);
+        ApplyPatch(entity.Biography, value => artist.Biography = value);
 
-        return rowsAffected > 0;
+        return await UpdateAsync(artist, kind);
     }
 
     public async Task<bool> UpdateFavoriteAsync(long id, bool isFavorite, RepositoryConnectionKind kind = RepositoryConnectionKind.Foreground)
     {
-        string sql = $"UPDATE artists SET isFavorite = @isFavorite WHERE Id = @id";
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(id);
 
-        IDbConnection localConnection = ResolveConnection(kind);
-        int rowsAffected = await localConnection.ExecuteAsync(sql, new { isFavorite, id }, _transaction);
-
-        return rowsAffected > 0;
+        return await ExecuteUpdateAsync(UpdateFavoriteSql, new { isFavorite, id }, kind);
     }
 
     public async Task<bool> UpdateLastListenAsync(long id, RepositoryConnectionKind kind = RepositoryConnectionKind.Foreground)
     {
-        string sql = $"UPDATE artists SET listenCount = listenCount + 1, lastListen = @lastListen WHERE Id = @id";
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(id);
 
-        IDbConnection localConnection = ResolveConnection(kind);
-        int rowsAffected = await localConnection.ExecuteAsync(sql, new { lastListen = DateTime.UtcNow, id }, _transaction);
-
-        return rowsAffected > 0;
+        return await ExecuteUpdateAsync(UpdateLastListenSql, new { lastListen = DateTime.UtcNow, id }, kind);
     }
 
     public async Task<bool> UpdateStatisticsAsync(long id, int trackCount, long totalDurationSeconds, int albumCount, int bestOfCount, int liveCount, int compilationCount, int? yearMini, int? yearMaxi, RepositoryConnectionKind kind = RepositoryConnectionKind.Foreground)
     {
-        string sql = "UPDATE artists SET trackCount = @trackCount, totalDurationSeconds = @totalDurationSeconds, albumCount = @albumCount, bestOfCount = @bestOfCount, liveCount = @liveCount, compilationCount = @compilationCount, yearMini = @yearMini, yearMaxi = @yearMaxi WHERE id = @id";
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(id);
 
-        IDbConnection localConnection = ResolveConnection(kind);
-        int rowsAffected = await localConnection.ExecuteAsync(sql, new { trackCount, totalDurationSeconds, albumCount, bestOfCount, liveCount, compilationCount, yearMini, yearMaxi, id }, _transaction);
-
-        return rowsAffected > 0;
+        return await ExecuteUpdateAsync(UpdateStatisticsSql, new { trackCount, totalDurationSeconds, albumCount, bestOfCount, liveCount, compilationCount, yearMini, yearMaxi, id });
     }
 
     public async Task<bool> UpdateGetMetaDataLastAttemptAsync(long id, RepositoryConnectionKind kind = RepositoryConnectionKind.Foreground)
     {
-        string sql = "UPDATE artists SET getMetaDataLastAttempt = @lastAttemptDate WHERE id = @id";
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(id);
 
-        IDbConnection localConnection = ResolveConnection(kind);
-        int rowsAffected = await localConnection.ExecuteAsync(sql, new { lastAttemptDate = DateTime.UtcNow, id });
-
-        return rowsAffected > 0;
+        return await ExecuteUpdateAsync(UpdateMetadataAttemptSql, new { lastAttemptDate = DateTime.UtcNow, id });
     }
 
-    public async Task<int> DeleteArtistsWithoutTracks(RepositoryConnectionKind kind = RepositoryConnectionKind.Foreground)
+    public async Task<int> DeleteOrphansAsync(RepositoryConnectionKind kind = RepositoryConnectionKind.Foreground)
     {
-        string sql = "DELETE FROM artists WHERE id NOT IN (SELECT DISTINCT artistId FROM tracks WHERE artistId IS NOT NULL)";
-
-        IDbConnection localConnection = ResolveConnection(kind);
-        return await localConnection.ExecuteAsync(sql);
+        return await ExecuteNonQueryAsync(DeleteOrphansSql);
     }
 
 
@@ -127,9 +106,24 @@ public class ArtistRepository(IDbConnection connection, [FromKeyedServices("Back
                      LEFT JOIN countries ON countries.Id = artists.countryId 
                 """;
 
-        if (string.IsNullOrEmpty(whereParam) == false)
+        if (!string.IsNullOrEmpty(whereParam))
             query += $" WHERE artists.{whereParam} = @{whereParam}";
 
         return query;
+    }
+
+
+    public override string GetTableName()
+    {
+        return "artists";
+    }
+
+
+    private static void ApplyPatch<T>(PatchField<T>? wrapper, Action<T?> setter)
+    {
+        if (wrapper?.IsSet == true)
+        {
+            setter(wrapper.Value);
+        }
     }
 }

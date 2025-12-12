@@ -13,7 +13,7 @@ public class CountryRepository(IDbConnection db, [FromKeyedServices("BackgroundC
                      FROM countries                     
                 """;
 
-        if (string.IsNullOrEmpty(whereParam) == false)
+        if (!string.IsNullOrEmpty(whereParam))
             query += $" WHERE countries.{whereParam} = @{whereParam}";
 
         return query;

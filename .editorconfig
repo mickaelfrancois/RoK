@@ -2,3 +2,9 @@
 
 # IDE0305: Simplifier l'initialisation des collections
 dotnet_style_prefer_collection_expression = never
+
+# S2325: Methods should not have identical implementations
+dotnet_diagnostic.S2325.severity = suggestion
+
+# CA1822: Methods should not have identical implementations
+dotnet_diagnostic.CA1822.severity = suggestion

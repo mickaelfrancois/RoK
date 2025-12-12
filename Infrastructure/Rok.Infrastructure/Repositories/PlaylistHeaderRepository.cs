@@ -6,14 +6,16 @@ namespace Rok.Infrastructure.Repositories;
 
 public class PlaylistHeaderRepository(IDbConnection connection, [FromKeyedServices("BackgroundConnection")] IDbConnection backgroundConnection, ILogger<PlaylistHeaderRepository> logger) : GenericRepository<PlaylistHeaderEntity>(connection, backgroundConnection, null, logger), IPlaylistHeaderRepository
 {
+    private const string UpdatePictureSql = "UPDATE playlists SET picture = @picture WHERE Id = @id";
+    private const string DeletePlaylistSql = "DELETE FROM playlists WHERE id = @id";
+    private const string DeletePlaylistTracksSql = "DELETE FROM playlisttracks WHERE playlistid = @id";
+
+
     public async Task<bool> UpdatePictureAsync(long id, string picture, RepositoryConnectionKind kind = RepositoryConnectionKind.Foreground)
     {
-        string sql = $"UPDATE playlists SET picture = @picture WHERE Id = @id";
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(id);
 
-        IDbConnection localConnection = ResolveConnection(kind);
-        int rowsAffected = await localConnection.ExecuteAsync(sql, new { picture, id }, _transaction);
-
-        return rowsAffected > 0;
+        return await ExecuteUpdateAsync(UpdatePictureSql, new { picture, id }, kind);
     }
 
     public async Task<int> DeleteAsync(long id, RepositoryConnectionKind kind = RepositoryConnectionKind.Foreground)
@@ -21,14 +23,14 @@ public class PlaylistHeaderRepository(IDbConnection connection, [FromKeyedServic
         IDbConnection localConnection = ResolveConnection(kind);
 
         if (localConnection.State == ConnectionState.Closed)
-            connection.Open();
+            localConnection.Open();
 
         using IDbTransaction transaction = localConnection.BeginTransaction();
 
         try
         {
-            await localConnection.ExecuteAsync("DELETE FROM playlisttracks WHERE playlistid = @id", new { id });
-            int affected = await localConnection.ExecuteAsync("DELETE FROM playlists WHERE id = @id", new { id });
+            await localConnection.ExecuteAsync(DeletePlaylistTracksSql, new { id });
+            int affected = await localConnection.ExecuteAsync(DeletePlaylistSql, new { id });
 
             transaction.Commit();
             return affected;
@@ -47,7 +49,7 @@ public class PlaylistHeaderRepository(IDbConnection connection, [FromKeyedServic
                     FROM playlists                                  
                 """;
 
-        if (string.IsNullOrEmpty(whereParam) == false)
+        if (!string.IsNullOrEmpty(whereParam))
             query += $" WHERE playlists.{whereParam} = @{whereParam}";
 
         return query;

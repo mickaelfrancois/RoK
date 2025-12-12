@@ -1,51 +1,40 @@
 ﻿namespace Rok.Logic.ViewModels.Artists;
 
-public class ArtistsFilter(ResourceLoader _resourceLoader)
+public class ArtistsFilter : FilterService<ArtistViewModel>
 {
     public const string KFilterByFavoriteArtist = "ARTISTFAVORITE";
-    public const string KFilterByGenreArtist = "GENREFAVORITE";
+    public const string KFilterByGenreFavorite = "GENREFAVORITE";
     public const string KFilterByNeverListened = "NEVERLISTENED";
 
-    public static IEnumerable<ArtistViewModel> FilterByGenreId(long genreId, IEnumerable<ArtistViewModel> artists)
+    public ArtistsFilter(ResourceLoader resourceLoader) : base(resourceLoader)
     {
-        if (genreId == 0)
-            return artists;
-
-        artists = artists.Where(artist => artist.Artist.GenreId == genreId);
-
-        return artists;
     }
 
-    public static IEnumerable<ArtistViewModel> Filter(string filterBy, IEnumerable<ArtistViewModel> artists)
+    public IEnumerable<ArtistViewModel> FilterByGenreId(long genreId, IEnumerable<ArtistViewModel> artists)
     {
-        switch (filterBy)
-        {
-            case KFilterByFavoriteArtist:
-                artists = artists.Where(artist => artist.Artist.IsFavorite);
-                break;
-
-            case KFilterByGenreArtist:
-                artists = artists.Where(artist => artist.Artist.IsGenreFavorite);
-                break;
-
-            case KFilterByNeverListened:
-                artists = artists.Where(artist => artist.Artist.ListenCount == 0);
-                break;
-        }
-
-        return artists;
+        return FilterByGenreId(genreId, artists, a => a.Artist.GenreId);
     }
 
-    public string GetLabel(string filterBy)
+    protected override void RegisterFilterStrategies()
     {
-        string label = filterBy switch
+        RegisterFilter(KFilterByFavoriteArtist,
+            artists => FilterByFavorite(artists, a => a.Artist.IsFavorite));
+
+        RegisterFilter(KFilterByGenreFavorite,
+            artists => FilterByFavorite(artists, a => a.Artist.IsGenreFavorite));
+
+        RegisterFilter(KFilterByNeverListened,
+            artists => FilterByNeverListened(artists, a => a.Artist.ListenCount));
+    }
+
+    public override string GetLabel(string filterBy)
+    {
+        return filterBy switch
         {
-            KFilterByFavoriteArtist => _resourceLoader.GetString("artistsViewFilterByFavoriteArtist"),
-            KFilterByGenreArtist => _resourceLoader.GetString("artistsViewFilterByFavoriteGenre"),
-            KFilterByNeverListened => _resourceLoader.GetString("artistsViewFilterByNeverListened"),
-            _ => _resourceLoader.GetString("artistsViewFilterNone"),
+            KFilterByFavoriteArtist => ResourceLoader.GetString("artistsViewFilterByFavoriteArtist"),
+            KFilterByGenreFavorite => ResourceLoader.GetString("artistsViewFilterByFavoriteGenre"),
+            KFilterByNeverListened => ResourceLoader.GetString("artistsViewFilterByNeverListened"),
+            _ => ResourceLoader.GetString("artistsViewFilterNone"),
         };
-
-        return label;
     }
 }

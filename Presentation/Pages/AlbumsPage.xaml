@@ -1,92 +1,99 @@
 <?xml version="1.0" encoding="utf-8"?>
-<Page
-    x:Class="Rok.Pages.AlbumsPage"
-    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:local="using:Rok.Pages"
-    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"    
-    xmlns:common="using:Rok.Commons" 
-    xmlns:albums="using:Rok.Logic.ViewModels.Albums"
-      xmlns:genres="using:Rok.Logic.ViewModels.Genres"
+<Page x:Class="Rok.Pages.AlbumsPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:local="using:Rok.Pages"
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+      xmlns:common="using:Rok.Commons"
+      xmlns:albums="using:Rok.Logic.ViewModels.Albums"
       xmlns:genre="using:Rok.Application.Dto"
       x:Name="albumsView"
-    mc:Ignorable="d">
+      mc:Ignorable="d">
 
     <Page.Resources>
-        <CollectionViewSource x:Name="groupedItemsViewSource" IsSourceGrouped="True" Source="{x:Bind ViewModel.GroupedItems}" ItemsPath="Items" />
+        <CollectionViewSource x:Name="groupedItemsViewSource"
+                              IsSourceGrouped="True"
+                              ItemsPath="Items" />
     </Page.Resources>
 
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="{ThemeResource headerListRowHeight}"></RowDefinition>
-            <RowDefinition Height="*"/>
+            <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
         <!-- Actions menu -->
-        <CommandBar Grid.Row="0" Style="{StaticResource headerListCommandBar}">
+        <CommandBar Grid.Row="0"
+                    Style="{StaticResource headerListCommandBar}">
             <CommandBar.Content>
-                <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Spacing="8">
+                <StackPanel Orientation="Horizontal"
+                            HorizontalAlignment="Left"
+                            Spacing="8">
 
-                    <AppBarButton x:Uid="artistViewListen"                                   
-                                  Style="{StaticResource listenAppBarButtonCompactStyle}" 
-                                  Command="{x:Bind ViewModel.ListenCommand}"/>
+                    <AppBarButton x:Uid="artistViewListen"
+                                  Style="{StaticResource listenAppBarButtonCompactStyle}"
+                                  Command="{x:Bind ViewModel.ListenCommand}" />
 
                     <!-- Sort -->
                     <SplitButton VerticalAlignment="Center">
                         <SplitButton.Content>
-                            <StackPanel Orientation="Horizontal" 
-                                        Spacing="6" 
-                                        VerticalAlignment="Center" 
-                                        AutomationProperties.Name="{x:Bind ViewModel.GroupByText, Mode=OneWay}" 
+                            <StackPanel Orientation="Horizontal"
+                                        Spacing="6"
+                                        VerticalAlignment="Center"
+                                        AutomationProperties.Name="{x:Bind ViewModel.GroupByText, Mode=OneWay}"
                                         ToolTipService.ToolTip="{x:Bind ViewModel.GroupByText, Mode=OneWay}">
 
-                                <FontIcon Glyph="&#xE8CB;" 
-                                          FontSize="{ThemeResource ControlContentThemeFontSize}" 
-                                          VerticalAlignment="Center"/>
+                                <FontIcon Glyph="&#xE8CB;"
+                                          FontSize="{ThemeResource ControlContentThemeFontSize}"
+                                          VerticalAlignment="Center" />
 
-                                <TextBlock x:Uid="artistsViewGroupBy" 
-                                           Style="{StaticResource BodyTextBlockStyle}" 
-                                           VerticalAlignment="Center" 
-                                           Margin="0,0,2,0" 
-                                           TextTrimming="CharacterEllipsis"/>
+                                <TextBlock x:Uid="artistsViewGroupBy"
+                                           Style="{StaticResource BodyTextBlockStyle}"
+                                           VerticalAlignment="Center"
+                                           Margin="0,0,2,0"
+                                           TextTrimming="CharacterEllipsis" />
 
-                                <TextBlock Text="{x:Bind ViewModel.GroupByText, Mode=OneWay}" 
-                                           Style="{StaticResource BodyTextBlockStyle}" 
-                                           VerticalAlignment="Center" 
+                                <TextBlock Text="{x:Bind ViewModel.GroupByText, Mode=OneWay}"
+                                           Style="{StaticResource BodyTextBlockStyle}"
+                                           VerticalAlignment="Center"
                                            MaxWidth="140"
-                                           TextTrimming="CharacterEllipsis"/>
+                                           TextTrimming="CharacterEllipsis" />
                             </StackPanel>
                         </SplitButton.Content>
                         <SplitButton.Flyout>
-                            <MenuFlyout x:Name="groupByMenu" ShowMode="TransientWithDismissOnPointerMoveAway" Placement="RightEdgeAlignedBottom" Opened="GroupByFlyout_Opened" />
+                            <MenuFlyout x:Name="groupByMenu"
+                                        ShowMode="TransientWithDismissOnPointerMoveAway"
+                                        Placement="RightEdgeAlignedBottom"
+                                        Opened="GroupByFlyout_Opened" />
                         </SplitButton.Flyout>
                     </SplitButton>
 
                     <!-- Filter -->
-                    <SplitButton x:Name="buttonFilter" VerticalAlignment="Center">
+                    <SplitButton x:Name="buttonFilter"
+                                 VerticalAlignment="Center">
                         <SplitButton.Content>
                             <StackPanel Orientation="Horizontal"
-                                       Spacing="6"
-                                       VerticalAlignment="Center"
-                                       AutomationProperties.Name="{x:Bind ViewModel.FilterByText, Mode=OneWay}"
-                                       ToolTipService.ToolTip="{x:Bind ViewModel.FilterByText, Mode=OneWay}">
-                                
+                                        Spacing="6"
+                                        VerticalAlignment="Center"
+                                        AutomationProperties.Name="{x:Bind ViewModel.FilterByText, Mode=OneWay}"
+                                        ToolTipService.ToolTip="{x:Bind ViewModel.FilterByText, Mode=OneWay}">
+
                                 <FontIcon Glyph="&#xE71C;"
-                                         FontSize="{ThemeResource ControlContentThemeFontSize}"
-                                         VerticalAlignment="Center"/>
-                                
+                                          FontSize="{ThemeResource ControlContentThemeFontSize}"
+                                          VerticalAlignment="Center" />
+
                                 <TextBlock x:Uid="artistsViewFilterBy"
-                                          Style="{StaticResource BodyTextBlockStyle}"
-                                          VerticalAlignment="Center"
-                                          Margin="0,0,2,0"
-                                          TextTrimming="CharacterEllipsis"/>
-                                
+                                           Style="{StaticResource BodyTextBlockStyle}"
+                                           VerticalAlignment="Center"
+                                           Margin="0,0,2,0"
+                                           TextTrimming="CharacterEllipsis" />
+
                                 <TextBlock Text="{x:Bind ViewModel.FilterByText, Mode=OneWay}"
-                                          Style="{StaticResource BodyTextBlockStyle}"
-                                          VerticalAlignment="Center"
-                                          TextTrimming="CharacterEllipsis"
-                                          MaxWidth="140"/>
+                                           Style="{StaticResource BodyTextBlockStyle}"
+                                           VerticalAlignment="Center"
+                                           TextTrimming="CharacterEllipsis"
+                                           MaxWidth="140" />
                             </StackPanel>
                         </SplitButton.Content>
                         <SplitButton.Flyout>
@@ -102,26 +109,32 @@
         </CommandBar>
 
         <!-- Main content-->
-        <Grid Grid.Row="1" Style="{StaticResource gridList}">
+        <Grid Grid.Row="1"
+              Style="{StaticResource gridList}">
             <Grid.Background>
-                <LinearGradientBrush StartPoint="0.5,0" EndPoint="0.5,1">
-                    <GradientStop Color="{ThemeResource NavigationViewExpandedPaneBackground}" Offset="0.8"/>
-                    <GradientStop Color="{ThemeResource SystemChromeBlackMediumColor}" Offset="1"/>
+                <LinearGradientBrush StartPoint="0.5,0"
+                                     EndPoint="0.5,1">
+                    <GradientStop Color="{ThemeResource NavigationViewExpandedPaneBackground}"
+                                  Offset="0.8" />
+                    <GradientStop Color="{ThemeResource SystemChromeBlackMediumColor}"
+                                  Offset="1" />
                 </LinearGradientBrush>
             </Grid.Background>
-            
-            <SemanticZoom x:Name="GridZoom" ScrollViewer.ZoomMode="Enabled" IsZoomOutButtonEnabled="True">
+
+            <SemanticZoom x:Name="GridZoom"
+                          ScrollViewer.ZoomMode="Enabled"
+                          IsZoomOutButtonEnabled="True">
                 <SemanticZoom.ZoomedInView>
-                    <common:GridViewExtended x:Name="grid" ContainerContentChanging="GridContainerContentChanging" 
-                              ItemsSource="{Binding Source={StaticResource groupedItemsViewSource}}"                                         
-                              BindableSelectedItems="{x:Bind ViewModel.Selected, Mode=OneWay}"                                 
-                              SelectionMode="Multiple" 
-                              IsMultiSelectCheckBoxEnabled="{x:Bind ViewModel.IsSelectedItems, Mode=OneWay}" 
-                              IsItemClickEnabled="True"
-                              Margin="0" 
-                              ScrollViewer.VerticalScrollMode="Enabled" 
-                              ScrollViewer.VerticalScrollBarVisibility="Auto">
-                       
+                    <common:GridViewExtended x:Name="grid"
+                                             ContainerContentChanging="GridContainerContentChanging"
+                                             BindableSelectedItems="{x:Bind ViewModel.Selected, Mode=OneWay}"
+                                             SelectionMode="Multiple"
+                                             IsMultiSelectCheckBoxEnabled="{x:Bind ViewModel.IsSelectedItems, Mode=OneWay}"
+                                             IsItemClickEnabled="True"
+                                             Margin="0"
+                                             ScrollViewer.VerticalScrollMode="Enabled"
+                                             ScrollViewer.VerticalScrollBarVisibility="Auto">
+
                         <GridView.ItemTemplate>
                             <DataTemplate x:DataType="albums:AlbumViewModel">
                                 <Grid Style="{StaticResource MainGridCoverStyle}"
@@ -159,7 +172,8 @@
                                                                Command="{x:Bind ListenCommand}" />
                                     </Border>
 
-                                    <Grid x:Name="gridBottom" Style="{StaticResource GridCoverBottomStyle}">
+                                    <Grid x:Name="gridBottom"
+                                          Style="{StaticResource GridCoverBottomStyle}">
                                         <Grid.RowDefinitions>
                                             <RowDefinition Height="{ThemeResource gridListFirstRowHeight}" />
                                             <RowDefinition Height="{ThemeResource gridListSecondRowHeight}" />
@@ -170,18 +184,18 @@
                                             <ColumnDefinition Width="50"></ColumnDefinition>
                                         </Grid.ColumnDefinitions>
 
-                                        <HyperlinkButton Grid.ColumnSpan="2" 
-                                                         Content="{x:Bind Album.Name}" 
-                                                         x:Phase="0" 
-                                                         Command="{x:Bind AlbumOpenCommand}"  
+                                        <HyperlinkButton Grid.ColumnSpan="2"
+                                                         Content="{x:Bind Album.Name}"
+                                                         x:Phase="0"
+                                                         Command="{x:Bind AlbumOpenCommand}"
                                                          Style="{StaticResource GridCoverBottomFirstLineStyle}" />
-                                        
-                                        <TextBlock x:Name="subTitle" 
-                                                   Grid.Row="1" 
-                                                   Style="{StaticResource GridCoverBottomSecondLineStyle}" 
+
+                                        <TextBlock x:Name="subTitle"
+                                                   Grid.Row="1"
+                                                   Style="{StaticResource GridCoverBottomSecondLineStyle}"
                                                    Text="{x:Bind SubTitle, Mode=OneWay}"
                                                    Opacity="1"
-                                                   x:Phase="1"/>
+                                                   x:Phase="1" />
 
                                         <HyperlinkButton x:Name="artistName"
                                                          Grid.Row="1"
@@ -207,7 +221,10 @@
 
                         <GridView.ItemsPanel>
                             <ItemsPanelTemplate>
-                                <ItemsWrapGrid Orientation="Horizontal" ItemHeight="310" ItemWidth="310" Margin="0,0,2,2"></ItemsWrapGrid>
+                                <ItemsWrapGrid Orientation="Horizontal"
+                                               ItemHeight="310"
+                                               ItemWidth="310"
+                                               Margin="0,0,2,2"></ItemsWrapGrid>
                             </ItemsPanelTemplate>
                         </GridView.ItemsPanel>
 
@@ -215,19 +232,22 @@
                             <GroupStyle HidesIfEmpty="True">
                                 <GroupStyle.HeaderTemplate>
                                     <DataTemplate x:DataType="albums:AlbumsGroupCategoryViewModel">
-                                        <StackPanel Orientation="Horizontal" Visibility="Visible">
-                                            <HyperlinkButton Content="{x:Bind Title}" Style="{StaticResource HyperlinkGroupButtonStyle}"></HyperlinkButton>
-                                            <Button Margin="10,0,0,0" 
-                                                Command="{Binding ElementName=albumsView, Path=DataContext.ListenGroupCommand}" 
-                                                CommandParameter="{x:Bind}" 
-                                                VerticalAlignment="Center"
-                                                Tapped="GroupButton_Tapped" >
+                                        <StackPanel Orientation="Horizontal"
+                                                    Visibility="Visible">
+                                            <HyperlinkButton Content="{x:Bind Title}"
+                                                             Style="{StaticResource HyperlinkGroupButtonStyle}"></HyperlinkButton>
+                                            <Button Margin="10,0,0,0"
+                                                    Command="{Binding ElementName=albumsView, Path=DataContext.ListenGroupCommand}"
+                                                    CommandParameter="{x:Bind}"
+                                                    VerticalAlignment="Center"
+                                                    Tapped="GroupButton_Tapped">
 
-                                                <StackPanel Orientation="Horizontal" VerticalAlignment="Top" >
-                                                    <FontIcon Glyph="&#xEE4A;" 
-                                                              Margin="0,0,6,0" 
-                                                              FontSize="{ThemeResource ControlContentThemeFontSize}" 
-                                                              VerticalAlignment="Center"/>
+                                                <StackPanel Orientation="Horizontal"
+                                                            VerticalAlignment="Top">
+                                                    <FontIcon Glyph="&#xEE4A;"
+                                                              Margin="0,0,6,0"
+                                                              FontSize="{ThemeResource ControlContentThemeFontSize}"
+                                                              VerticalAlignment="Center" />
                                                     <TextBlock x:Uid="artistsViewListenListGroup" />
                                                 </StackPanel>
                                             </Button>
@@ -237,7 +257,8 @@
 
                                 <GroupStyle.Panel>
                                     <ItemsPanelTemplate>
-                                        <VariableSizedWrapGrid Orientation="Vertical" Margin="0,0,80,0"/>
+                                        <VariableSizedWrapGrid Orientation="Vertical"
+                                                               Margin="0,0,80,0" />
                                     </ItemsPanelTemplate>
                                 </GroupStyle.Panel>
                             </GroupStyle>
@@ -246,19 +267,22 @@
                 </SemanticZoom.ZoomedInView>
 
                 <SemanticZoom.ZoomedOutView>
-                    <GridView x:Name="ZoomoutCollectionGrid"  
-                           ItemsSource="{x:Bind groupedItemsViewSource.View.CollectionGroups}"
-                           VerticalAlignment="Center">
+                    <GridView x:Name="ZoomoutCollectionGrid"
+                              VerticalAlignment="Center">
 
                         <GridView.ItemTemplate>
                             <DataTemplate>
-                                <TextBlock HorizontalAlignment="Center" Width="200" Text="{Binding Group.Title}"/>
+                                <TextBlock HorizontalAlignment="Center"
+                                           Width="200"
+                                           Text="{Binding Group.Title}" />
                             </DataTemplate>
                         </GridView.ItemTemplate>
 
                         <GridView.ItemsPanel>
                             <ItemsPanelTemplate>
-                                <WrapGrid Orientation="Horizontal" VerticalChildrenAlignment="Center" MaximumRowsOrColumns="4" ></WrapGrid>
+                                <WrapGrid Orientation="Horizontal"
+                                          VerticalChildrenAlignment="Center"
+                                          MaximumRowsOrColumns="4"></WrapGrid>
                             </ItemsPanelTemplate>
                         </GridView.ItemsPanel>
                     </GridView>

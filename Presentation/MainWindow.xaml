@@ -7,7 +7,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:v="using:Rok.Pages"
         xmlns:c="using:Rok.Commons"
-        mc:Ignorable="d"        
+        mc:Ignorable="d"
         Title="">
 
     <Window.SystemBackdrop>
@@ -47,6 +47,68 @@
                                              To="360"
                                              Storyboard.TargetProperty="(UIElement.RenderTransform).(RotateTransform.Angle)"
                                              Storyboard.TargetName="libraryRefresh" />
+                        </Storyboard>
+
+                        <!-- AppLogo hover animations: full spin + slight zoom -->
+                        <Storyboard x:Key="AppLogoHoverStoryboard">
+                            <DoubleAnimation Duration="0:0:0.15"
+                                             To="1.1"
+                                             EnableDependentAnimation="True"
+                                             Storyboard.TargetName="AppLogo"
+                                             Storyboard.TargetProperty="(UIElement.RenderTransform).(TransformGroup.Children)[0].(ScaleTransform.ScaleX)">
+                                <DoubleAnimation.EasingFunction>
+                                    <QuadraticEase EasingMode="EaseOut" />
+                                </DoubleAnimation.EasingFunction>
+                            </DoubleAnimation>
+                            <DoubleAnimation Duration="0:0:0.15"
+                                             To="1.1"
+                                             EnableDependentAnimation="True"
+                                             Storyboard.TargetName="AppLogo"
+                                             Storyboard.TargetProperty="(UIElement.RenderTransform).(TransformGroup.Children)[0].(ScaleTransform.ScaleY)">
+                                <DoubleAnimation.EasingFunction>
+                                    <QuadraticEase EasingMode="EaseOut" />
+                                </DoubleAnimation.EasingFunction>
+                            </DoubleAnimation>
+                            <DoubleAnimation Duration="0:0:0.35"
+                                             From="0"
+                                             To="360"
+                                             EnableDependentAnimation="True"
+                                             Storyboard.TargetName="AppLogo"
+                                             Storyboard.TargetProperty="(UIElement.RenderTransform).(TransformGroup.Children)[1].(RotateTransform.Angle)">
+                                <DoubleAnimation.EasingFunction>
+                                    <CubicEase EasingMode="EaseOut" />
+                                </DoubleAnimation.EasingFunction>
+                            </DoubleAnimation>
+                        </Storyboard>
+
+                        <Storyboard x:Key="AppLogoExitStoryboard">
+                            <DoubleAnimation Duration="0:0:0.15"
+                                             To="1"
+                                             EnableDependentAnimation="True"
+                                             Storyboard.TargetName="AppLogo"
+                                             Storyboard.TargetProperty="(UIElement.RenderTransform).(TransformGroup.Children)[0].(ScaleTransform.ScaleX)">
+                                <DoubleAnimation.EasingFunction>
+                                    <QuadraticEase EasingMode="EaseOut" />
+                                </DoubleAnimation.EasingFunction>
+                            </DoubleAnimation>
+                            <DoubleAnimation Duration="0:0:0.15"
+                                             To="1"
+                                             EnableDependentAnimation="True"
+                                             Storyboard.TargetName="AppLogo"
+                                             Storyboard.TargetProperty="(UIElement.RenderTransform).(TransformGroup.Children)[0].(ScaleTransform.ScaleY)">
+                                <DoubleAnimation.EasingFunction>
+                                    <QuadraticEase EasingMode="EaseOut" />
+                                </DoubleAnimation.EasingFunction>
+                            </DoubleAnimation>
+                            <DoubleAnimation Duration="0:0:0.2"
+                                             To="0"
+                                             EnableDependentAnimation="True"
+                                             Storyboard.TargetName="AppLogo"
+                                             Storyboard.TargetProperty="(UIElement.RenderTransform).(TransformGroup.Children)[1].(RotateTransform.Angle)">
+                                <DoubleAnimation.EasingFunction>
+                                    <QuadraticEase EasingMode="EaseOut" />
+                                </DoubleAnimation.EasingFunction>
+                            </DoubleAnimation>
                         </Storyboard>
                     </NavigationView.Resources>
 
@@ -91,15 +153,35 @@
 
                     <NavigationView.PaneHeader>
                         <StackPanel Orientation="Horizontal">
-                            <ImageIcon Source="/Assets/logo.png"
+                            <ImageIcon x:Name="AppLogo"
+                                       Source="/Assets/logo.png"
                                        Margin="0,0,4,0"
                                        Height="25"
-                                       Width="25" />
-                            <TextBlock FontFamily="Consolas"
+                                       Width="25"
+                                       RenderTransformOrigin="0.5,0.5"
+                                       PointerEntered="AppLogo_PointerEntered"
+                                       PointerExited="AppLogo_PointerExited">
+                                <ImageIcon.RenderTransform>
+                                    <TransformGroup>
+                                        <ScaleTransform ScaleX="1"
+                                                        ScaleY="1" />
+                                        <RotateTransform Angle="0" />
+                                    </TransformGroup>
+                                </ImageIcon.RenderTransform>
+                            </ImageIcon>
+                            <TextBlock x:Name="applicationName"
+                                       FontFamily="Consolas"
                                        FontWeight="Bold"
                                        FontSize="24"
                                        Text="RoK"
                                        VerticalAlignment="Center" />
+
+                            <Border Width="1"
+                                    Height="25"
+                                    Margin="8,0,8,0"
+                                    VerticalAlignment="Center"
+                                    Background="{ThemeResource ControlStrokeColorDefaultBrush}"
+                                    Opacity="0.6" />
                         </StackPanel>
                     </NavigationView.PaneHeader>
 
@@ -118,7 +200,7 @@
                                             SelectsOnInvoked="False"
                                             AutomationProperties.Name="refresh"
                                             Visibility="Visible"
-                                            Tapped="libraryRefreshButton_Tapped">
+                                            Tapped="LibraryRefreshButton_Tapped">
                             <NavigationViewItem.Icon>
                                 <FontIcon Glyph="&#xE72C;"
                                           RenderTransformOrigin="0.5,0.5"

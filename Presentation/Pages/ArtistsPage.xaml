@@ -12,7 +12,8 @@
     mc:Ignorable="d">
 
     <Page.Resources>
-        <CollectionViewSource x:Name="groupedItemsViewSource" IsSourceGrouped="True" Source="{x:Bind ViewModel.GroupedItems}" ItemsPath="Items" />
+        <CollectionViewSource x:Name="groupedItemsViewSource" IsSourceGrouped="True" 
+                              ItemsPath="Items" />
     </Page.Resources>
 
     <Grid>
@@ -116,7 +117,6 @@
             <SemanticZoom x:Name="GridZoom" ScrollViewer.ZoomMode="Enabled" IsZoomOutButtonEnabled="True">
                 <SemanticZoom.ZoomedInView>
                     <common:GridViewExtended x:Name="grid" ContainerContentChanging="GridContainerContentChanging" 
-                                 ItemsSource="{Binding Source={StaticResource groupedItemsViewSource}}"                                         
                                  BindableSelectedItems="{x:Bind ViewModel.Selected, Mode=OneWay}"                                 
                                  SelectionMode="Multiple" 
                                  IsMultiSelectCheckBoxEnabled="{x:Bind ViewModel.IsSelectedItems, Mode=OneWay}" 
@@ -216,7 +216,6 @@
 
                 <SemanticZoom.ZoomedOutView>
                     <GridView x:Name="ZoomoutCollectionGrid"  
-                              ItemsSource="{x:Bind groupedItemsViewSource.View.CollectionGroups}"                              
                               VerticalAlignment="Center">
 
                         <GridView.ItemTemplate>

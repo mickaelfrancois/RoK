@@ -314,7 +314,7 @@
 
         <!-- Lyrics -->
         <Grid Margin="0,0,0,140" VerticalAlignment="Bottom" Height="110" Visibility="{x:Bind PlayerViewModel.IsSynchronizedLyrics, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">
-            <ListBox ItemsSource="{x:Bind PlayerViewModel.Lyrics, Mode=OneWay}"  SelectedItem="{x:Bind PlayerViewModel.CurrentLyric, Mode=OneWay}" Foreground="White" FontSize="26" ScrollViewer.VerticalScrollBarVisibility="Hidden" ScrollViewer.HorizontalScrollBarVisibility="Hidden" SelectionChanged="ListBox_SelectionChanged" >
+            <ListBox ItemsSource="{x:Bind PlayerViewModel.LyricsLines, Mode=OneWay}"  SelectedItem="{x:Bind PlayerViewModel.CurrentLyric, Mode=OneWay}" Foreground="White" FontSize="26" ScrollViewer.VerticalScrollBarVisibility="Hidden" ScrollViewer.HorizontalScrollBarVisibility="Hidden" SelectionChanged="ListBox_SelectionChanged" >
                 <ListBox.Background>
                     <SolidColorBrush Color="Black" Opacity="0.7"></SolidColorBrush>
                 </ListBox.Background>

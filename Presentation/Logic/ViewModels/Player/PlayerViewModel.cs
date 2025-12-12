@@ -1,109 +1,48 @@
-﻿using Microsoft.UI.Dispatching;
-using Rok.Application.Dto.Lyrics;
-using Rok.Application.Features.Albums.Command;
-using Rok.Application.Features.Albums.Query;
-using Rok.Application.Features.Artists.Command;
+﻿using Rok.Application.Dto.Lyrics;
 using Rok.Application.Features.Tracks.Command;
 using Rok.Application.Player;
-using Rok.Infrastructure.Lyrics;
 using Rok.Logic.Services.Player;
 using Rok.Logic.ViewModels.Albums;
 using Rok.Logic.ViewModels.Artists;
+using Rok.Logic.ViewModels.Player.Services;
 using Rok.Logic.ViewModels.Tracks;
+using System.ComponentModel;
 
 namespace Rok.Logic.ViewModels.Player;
 
-public partial class PlayerViewModel : ObservableObject
+public partial class PlayerViewModel : ObservableObject, IDisposable
 {
     private readonly IPlayerService _player;
-
     private readonly IMediator _mediator;
-
     private readonly NavigationService _navigationService;
-
     private readonly ILogger<PlayerViewModel> _logger;
+    private bool _disposed;
 
-    private readonly ILyricsService _lyricsService;
-
-    private readonly DispatcherTimer _updateTimer;
-
-    private readonly DispatcherTimer _lyricTimer;
-
-    private readonly DispatcherTimer _backdropTimer;
-
-    private readonly DispatcherQueue _dispatcherQueue = DispatcherQueue.GetForCurrentThread();
+    private readonly PlayerDataLoader _dataLoader;
+    private readonly PlayerLyricsService _lyricsService;
+    private readonly PlayerListenTracker _listenTracker;
+    private readonly PlayerTimerManager _timerManager;
+    private readonly PlayerStateManager _stateManager;
 
     private bool _isFullScreen;
 
-    private TrackViewModel? _currentTrack;
-    public TrackViewModel? CurrentTrack
-    {
-        get
-        {
-            return _currentTrack;
-        }
-        set
-        {
-            _currentTrack = value;
-
-            if (_player != null)
-            {
-                CanSkipNext = _player.CanNext;
-                CanSkipPrevious = _player.CanPrevious;
-            }
-
-            OnPropertyChanged(string.Empty);
-        }
-    }
-
-    private ArtistViewModel? _currentArtist;
-    public ArtistViewModel? CurrentArtist
-    {
-        get => _currentArtist;
-        set
-        {
-            _currentArtist = value;
-            OnPropertyChanged();
-        }
-    }
-
-    private AlbumViewModel? _currentAlbum;
-    public AlbumViewModel? CurrentAlbum
-    {
-        get => _currentAlbum;
-        set
-        {
-            _currentAlbum = value;
-            OnPropertyChanged();
-        }
-    }
-
-    private bool _canSkipNext;
+    public TrackViewModel? CurrentTrack => _stateManager.CurrentTrack;
+    public ArtistViewModel? CurrentArtist => _stateManager.CurrentArtist;
+    public AlbumViewModel? CurrentAlbum => _stateManager.CurrentAlbum;
     public bool CanSkipNext
     {
-        get => _canSkipNext;
-        set
-        {
-            if (_canSkipNext != value)
-            {
-                _canSkipNext = value;
-                OnPropertyChanged();
-            }
-        }
+        get => _stateManager.CanSkipNext;
+        set => _stateManager.CanSkipNext = value;
     }
-
-    private bool _canSkipPrevious;
     public bool CanSkipPrevious
     {
-        get => _canSkipPrevious;
-        set
-        {
-            if (_canSkipPrevious != value)
-            {
-                _canSkipPrevious = value;
-                OnPropertyChanged();
-            }
-        }
+        get => _stateManager.CanSkipPrevious;
+        set => _stateManager.CanSkipPrevious = value;
+    }
+    public EPlaybackState PlaybackState
+    {
+        get => _stateManager.PlaybackState;
+        set => _stateManager.PlaybackState = value;
     }
 
     public bool RepeatAll
@@ -112,18 +51,6 @@ public partial class PlayerViewModel : ObservableObject
         set
         {
             _player.IsLoopingEnabled = value;
-            OnPropertyChanged();
-        }
-    }
-
-    private EPlaybackState _playbackState = EPlaybackState.Stopped;
-
-    public EPlaybackState PlaybackState
-    {
-        get => _playbackState;
-        set
-        {
-            _playbackState = value;
             OnPropertyChanged();
         }
     }
@@ -139,28 +66,9 @@ public partial class PlayerViewModel : ObservableObject
         }
     }
 
-    public string DurationTotalStr
-    {
-        get => DurationTotal.ToString(@"mm\:ss");
-    }
+    public string DurationTotalStr => DurationTotal.ToString(@"mm\:ss");
 
-    public TimeSpan ListenDuration
-    {
-        get => TimeSpan.FromSeconds(_player.Position);
-    }
-
-    public void SetPosition(double position)
-    {
-        if (_player.CanSeek)
-        {
-            _updateTimer.Stop();
-
-            _player.Position = position;
-
-            _updateTimer.Start();
-            OnPropertyChanged();
-        }
-    }
+    public TimeSpan ListenDuration => TimeSpan.FromSeconds(_player.Position);
 
     public string ListenDurationStr => ListenDuration.ToString(@"mm\:ss");
 
@@ -195,7 +103,6 @@ public partial class PlayerViewModel : ObservableObject
                 value = 100;
 
             _player.Volume = (float)value;
-
             OnPropertyChanged();
         }
     }
@@ -206,7 +113,6 @@ public partial class PlayerViewModel : ObservableObject
         set
         {
             _player.IsMuted = value;
-
             OnPropertyChanged();
             OnPropertyChanged(nameof(Volume));
         }
@@ -214,32 +120,14 @@ public partial class PlayerViewModel : ObservableObject
 
     private bool IsPlaying => _player.PlaybackState == EPlaybackState.Playing;
 
-    private readonly HashSet<long> _artistUpdatedCache = [];
+    // Lyrics
+    public bool LyricsExist => _stateManager.LyricsExist;
+    public ObservableCollection<LyricLine> LyricsLines => _stateManager.LyricsLines;
+    public LyricLine CurrentLyric => _stateManager.CurrentLyric;
+    public bool IsSynchronizedLyrics => _stateManager.IsSynchronizedLyrics;
+    public string? PlainLyrics => _stateManager.PlainLyrics;
 
-    private readonly HashSet<long> _albumUpdatedCache = [];
-
-    private readonly HashSet<long> _trackUpdatedCache = [];
-
-    #region Lyrics
-
-    private LyricsModel? _lyrics = new();
-
-    private int _lyricsCurrentIndex = 0;
-
-    public bool LyricsExist { get; set; } = false;
-
-    public SyncLyricsModel SyncLyrics { get; set; } = new();
-
-    public LyricLine CurrentLyric { get; private set; } = new();
-
-    public ObservableCollection<LyricLine> Lyrics => SyncLyrics.Lyrics;
-
-    public bool IsSynchronizedLyrics => _lyrics?.LyricsType == ELyricsType.Synchronized;
-
-    public string? PlainLyrics => _lyrics?.PlainLyrics;
-
-    #endregion
-
+    // Commands
     public RelayCommand FullscreenCommand { get; private set; }
     public RelayCommand MuteCommand { get; private set; }
     public RelayCommand SkipPreviousCommand { get; private set; }
@@ -248,13 +136,25 @@ public partial class PlayerViewModel : ObservableObject
     public RelayCommand CompactModeCommand { get; private set; }
     public RelayCommand TogglePlayPauseCommand { get; private set; }
 
-
-    public PlayerViewModel(IPlayerService player, NavigationService navigationService, IMediator mediator, ILyricsService lyricsService, ILogger<PlayerViewModel> logger)
+    public PlayerViewModel(
+        IPlayerService player,
+        NavigationService navigationService,
+        IMediator mediator,
+        PlayerDataLoader dataLoader,
+        PlayerLyricsService lyricsService,
+        PlayerListenTracker listenTracker,
+        PlayerTimerManager timerManager,
+        PlayerStateManager stateManager,
+        ILogger<PlayerViewModel> logger)
     {
         _player = Guard.Against.Null(player);
         _navigationService = Guard.Against.Null(navigationService);
         _mediator = Guard.Against.Null(mediator);
+        _dataLoader = Guard.Against.Null(dataLoader);
         _lyricsService = Guard.Against.Null(lyricsService);
+        _listenTracker = Guard.Against.Null(listenTracker);
+        _timerManager = Guard.Against.Null(timerManager);
+        _stateManager = Guard.Against.Null(stateManager);
         _logger = Guard.Against.Null(logger);
 
         SkipPreviousCommand = new RelayCommand(SkipPrevious);
@@ -265,56 +165,59 @@ public partial class PlayerViewModel : ObservableObject
         CompactModeCommand = new RelayCommand(ToggleCompactMode);
         TogglePlayPauseCommand = new RelayCommand(TogglePlayPause);
 
-        Messenger.Subscribe<MediaChangedMessage>(async (message) => await OnMediaChangedAsync(message));
-        Messenger.Subscribe<MediaStateChanged>((message) => OnMediaStateChanged(message));
-        Messenger.Subscribe<MediaEndedEvent>((message) => OnMediaEnded(message));
-        Messenger.Subscribe<MediaAboutToEndEvent>((message) => OnMediaAboutToEnd(message));
-        Messenger.Subscribe<TrackScoreUpdateMessage>((message) => OnTrackScoreUpdated(message));
-        Messenger.Subscribe<PlaylistChanged>((message) => OnPlaylistChanged(message));
+        _stateManager.PropertyChanged += OnStateManagerPropertyChanged;
 
-        _updateTimer = new DispatcherTimer()
-        {
-            Interval = TimeSpan.FromSeconds(1)
-        };
+        SubscribeToMessages();
+        SubscribeToTimers();
 
-        _updateTimer.Tick += UpdateTimer_Tick;
-        _updateTimer.Start();
-
-        _backdropTimer = new DispatcherTimer()
-        {
-            Interval = TimeSpan.FromSeconds(45)
-        };
-
-        _backdropTimer.Tick += BackdropTimer_Tick;
-        _backdropTimer.Start();
-
-        _lyricTimer = new DispatcherTimer()
-        {
-            Interval = TimeSpan.FromSeconds(0.2)
-        };
-
-        _lyricTimer.Tick += LyricTimer_Tick;
-        _lyricTimer.Start();
+        _timerManager.Start();
     }
 
 
-    private void InitializeListenedCache()
+    private void OnStateManagerPropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
-        _artistUpdatedCache.Clear();
-        _albumUpdatedCache.Clear();
-        _trackUpdatedCache.Clear();
+        if (string.IsNullOrEmpty(e.PropertyName))
+            return;
+
+        OnPropertyChanged(e.PropertyName);
     }
 
 
-    #region Timers
+    private void SubscribeToMessages()
+    {
+        Messenger.Subscribe<MediaChangedMessage>(async (message) => await OnMediaChangedAsync(message));
+        Messenger.Subscribe<MediaStateChanged>(OnMediaStateChanged);
+        Messenger.Subscribe<MediaEndedEvent>(OnMediaEnded);
+        Messenger.Subscribe<MediaAboutToEndEvent>(OnMediaAboutToEnd);
+        Messenger.Subscribe<TrackScoreUpdateMessage>(OnTrackScoreUpdated);
+        Messenger.Subscribe<PlaylistChanged>(OnPlaylistChanged);
+    }
 
-    private void BackdropTimer_Tick(object? sender, object e)
+    private void SubscribeToTimers()
+    {
+        _timerManager.UpdateTick += OnUpdateTimerTick;
+        _timerManager.LyricTick += OnLyricTimerTick;
+        _timerManager.BackdropTick += OnBackdropTimerTick;
+    }
+
+    public void SetPosition(double position)
+    {
+        if (_player.CanSeek)
+        {
+            _player.Position = position;
+            OnPropertyChanged();
+        }
+    }
+
+    #region Timer Events
+
+    private void OnBackdropTimerTick(object? sender, EventArgs e)
     {
         if (CurrentTrack != null)
             OnPropertyChanged(nameof(CurrentArtist));
     }
 
-    private void UpdateTimer_Tick(object? sender, object e)
+    private void OnUpdateTimerTick(object? sender, EventArgs e)
     {
         if (IsPlaying)
         {
@@ -326,19 +229,17 @@ public partial class PlayerViewModel : ObservableObject
         }
     }
 
-
-    private void LyricTimer_Tick(object? sender, object e)
+    private void OnLyricTimerTick(object? sender, EventArgs e)
     {
         if (CurrentTrack != null && IsPlaying)
         {
-            SetLyricsTime(ListenDuration);
+            _stateManager.UpdateLyricsTime(ListenDuration);
         }
     }
 
     #endregion
 
-
-    #region Messages
+    #region Message Handlers
 
     private void OnTrackScoreUpdated(TrackScoreUpdateMessage message)
     {
@@ -359,7 +260,7 @@ public partial class PlayerViewModel : ObservableObject
     {
         _logger.LogDebug("Player VM handle media end");
 
-        _dispatcherQueue.TryEnqueue(() =>
+        _stateManager.ExecuteOnUIThread(() =>
         {
             message.Track.Listening = false;
         });
@@ -369,22 +270,22 @@ public partial class PlayerViewModel : ObservableObject
     {
         _logger.LogDebug("Player VM handle media changed: title {Title}.", message.NewTrack.Title);
 
-        TrackViewModel trackViewModel = App.ServiceProvider.GetRequiredService<TrackViewModel>();
-        trackViewModel.SetData(message.NewTrack);
+        TrackViewModel trackViewModel = _dataLoader.CreateTrackViewModel(message.NewTrack);
 
         AlbumViewModel? albumViewModel = null;
         if (trackViewModel.Track.AlbumId.HasValue)
-            albumViewModel = await GetAlbumFromIdAsync(trackViewModel.Track.AlbumId.Value);
+            albumViewModel = await _dataLoader.GetAlbumByIdAsync(trackViewModel.Track.AlbumId.Value);
 
         ArtistViewModel? artistViewModel = null;
         if (trackViewModel.Track.ArtistId.HasValue)
-            artistViewModel = await GetArtistFromIdAsync(trackViewModel.Track.ArtistId.Value);
+            artistViewModel = await _dataLoader.GetArtistByIdAsync(trackViewModel.Track.ArtistId.Value);
 
-        _dispatcherQueue.TryEnqueue(async () =>
+        _stateManager.ExecuteOnUIThread(async () =>
         {
             albumViewModel?.LoadPicture();
 
             TrackViewModel? previousTrack = CurrentTrack;
+            ArtistViewModel? previousArtist = CurrentArtist;
 
             CanSkipNext = _player.CanNext;
             CanSkipPrevious = _player.CanPrevious;
@@ -397,31 +298,31 @@ public partial class PlayerViewModel : ObservableObject
 
             if (message.NewTrack != null)
             {
-                ArtistViewModel? previousArtist = _currentArtist;
-
-                CurrentTrack = trackViewModel;
-                CurrentAlbum = albumViewModel;
-                CurrentArtist = artistViewModel;
+                _stateManager.CurrentTrack = trackViewModel;
+                _stateManager.CurrentAlbum = albumViewModel;
+                _stateManager.CurrentArtist = artistViewModel;
 
                 await UpdateListenCountAsync();
-                CurrentTrack.Listening = true;
+                trackViewModel.Listening = true;
 
-                ResetLyrics();
+                _stateManager.ResetLyrics();
                 await LoadLyricsAsync();
 
                 if (CurrentArtist != null && CurrentArtist != previousArtist)
-                    GetBackdrop();
+                    LoadBackdrop();
             }
             else
             {
                 _logger.LogDebug("Media changed to nothing.");
 
-                CurrentTrack = null;
-                CurrentArtist = null;
-                CurrentAlbum = null;
+                _stateManager.CurrentTrack = null;
+                _stateManager.CurrentArtist = null;
+                _stateManager.CurrentAlbum = null;
 
-                ResetLyrics();
+                _stateManager.ResetLyrics();
             }
+
+            OnPropertyChanged(string.Empty);
         });
     }
 
@@ -429,10 +330,9 @@ public partial class PlayerViewModel : ObservableObject
     {
         _logger.LogDebug("Player VM handle media state changed: {State}.", message.State);
 
-        _dispatcherQueue.TryEnqueue(() =>
+        _stateManager.ExecuteOnUIThread(() =>
         {
             PlaybackState = message.State;
-
             CanSkipNext = _player.CanNext;
             CanSkipPrevious = _player.CanPrevious;
         });
@@ -440,165 +340,54 @@ public partial class PlayerViewModel : ObservableObject
 
     private void OnPlaylistChanged(PlaylistChanged message)
     {
-        InitializeListenedCache();
-
-        // TO COMPLETE
+        _listenTracker.ClearCache();
     }
 
     #endregion
 
-
-    private async Task<AlbumViewModel?> GetAlbumFromIdAsync(long albumId)
+    private void LoadBackdrop()
     {
-        Result<AlbumDto> albumResult = await _mediator.SendMessageAsync(new GetAlbumByIdQuery(albumId));
-        if (albumResult.IsError)
-        {
-            _logger.LogError("Failed to get album by ID {AlbumId}: {ErrorMessage}", albumId, albumResult.Error);
-            return null;
-        }
-
-        AlbumViewModel albumViewModel = App.ServiceProvider.GetRequiredService<AlbumViewModel>();
-        albumViewModel.SetData(albumResult.Value!);
-
-        return albumViewModel;
+        _timerManager.StopBackdropTimer();
+        CurrentArtist?.LoadBackdrop();
+        _timerManager.StartBackdropTimer();
     }
-
-
-    private async Task<ArtistViewModel?> GetArtistFromIdAsync(long artistId)
-    {
-        Result<ArtistDto> artistResult = await _mediator.SendMessageAsync(new GetArtistByIdQuery(artistId));
-        if (artistResult.IsError)
-        {
-            _logger.LogError("Failed to get artist by ID {ArtistId}: {ErrorMessage}", artistId, artistResult.Error);
-            return null;
-        }
-
-        ArtistViewModel artistViewModel = App.ServiceProvider.GetRequiredService<ArtistViewModel>();
-        artistViewModel.SetData(artistResult.Value!);
-
-        return artistViewModel;
-    }
-
-
-    private void GetBackdrop()
-    {
-        _backdropTimer.Stop();
-
-        _currentArtist?.LoadBackdrop();
-
-        _backdropTimer.Start();
-    }
-
 
     private async Task UpdateListenCountAsync()
     {
-        await UpdateTrackListenAsync();
-        await UpdateAlbumListenAsync();
-        await UpdateArtistListenAsync();
+        if (CurrentTrack != null)
+            await _listenTracker.UpdateTrackListenAsync(CurrentTrack.Track.Id);
+
+        if (CurrentAlbum != null)
+            await _listenTracker.UpdateAlbumListenAsync(CurrentAlbum.Album.Id);
+
+        if (CurrentArtist != null)
+            await _listenTracker.UpdateArtistListenAsync(CurrentArtist.Artist.Id);
     }
 
-
-    private async Task UpdateTrackListenAsync()
+    private async Task LoadLyricsAsync()
     {
         if (CurrentTrack == null)
             return;
 
-        if (_trackUpdatedCache.TryGetValue(CurrentTrack.Track.Id, out _))
-            return;
+        _stateManager.LyricsExist = _lyricsService.CheckLyricsExists(CurrentTrack.Track.MusicFile);
 
-        await _mediator.SendMessageAsync(new UpdateTrackLastListenCommand(CurrentTrack.Track.Id));
-        _trackUpdatedCache.Add(CurrentTrack.Track.Id);
-    }
-
-
-    private async Task UpdateArtistListenAsync()
-    {
-        if (CurrentArtist == null)
-            return;
-
-        if (_artistUpdatedCache.TryGetValue(CurrentArtist.Artist.Id, out _))
-            return;
-
-        await _mediator.SendMessageAsync(new UpdateArtistLastListenCommand(CurrentArtist.Artist.Id));
-        _artistUpdatedCache.Add(CurrentArtist.Artist.Id);
-    }
-
-
-    private async Task UpdateAlbumListenAsync()
-    {
-        if (CurrentAlbum == null)
-            return;
-
-        if (_albumUpdatedCache.TryGetValue(CurrentAlbum.Album.Id, out _))
-            return;
-
-        await _mediator.SendMessageAsync(new UpdateAlbumLastListenCommand(CurrentAlbum.Album.Id));
-        _albumUpdatedCache.Add(CurrentAlbum.Album.Id);
-    }
-
-
-    private async Task LoadLyricsAsync()
-    {
-        if (CurrentTrack != null)
+        if (_stateManager.LyricsExist)
         {
-            LyricsExist = _lyricsService.CheckLyricsFileExists(CurrentTrack.Track.MusicFile) != ELyricsType.None;
+            LyricsModel? lyrics = await _lyricsService.LoadLyricsAsync(CurrentTrack.Track.MusicFile);
+            _stateManager.SetLyrics(lyrics);
 
-            if (LyricsExist)
+            if (lyrics != null && lyrics.LyricsType == ELyricsType.Synchronized && !string.IsNullOrEmpty(lyrics.SynchronizedLyrics))
             {
-                _lyrics = await _lyricsService.LoadLyricsAsync(CurrentTrack.Track.MusicFile);
-                if (_lyrics != null && _lyrics.LyricsType == ELyricsType.Synchronized && !string.IsNullOrEmpty(_lyrics.SynchronizedLyrics))
-                {
-                    LyricsParser parser = new();
-                    SyncLyricsModel syncLyrics = parser.Parse(_lyrics.SynchronizedLyrics);
-                    SyncLyrics = syncLyrics;
-                }
+                SyncLyricsModel syncLyrics = _lyricsService.ParseSynchronizedLyrics(lyrics.SynchronizedLyrics);
+                _stateManager.SetSyncLyrics(syncLyrics);
             }
         }
 
-        OnPropertyChanged(nameof(Lyrics));
+        OnPropertyChanged(nameof(LyricsLines));
         OnPropertyChanged(nameof(LyricsExist));
         OnPropertyChanged(nameof(IsSynchronizedLyrics));
         OnPropertyChanged(nameof(PlainLyrics));
     }
-
-
-    public void SetLyricsTime(TimeSpan time)
-    {
-        if (SyncLyrics == null)
-            return;
-
-        int start = _lyricsCurrentIndex + 1;
-
-        // Search current lyric
-        for (int i = start; i < SyncLyrics.Time.Count; i++)
-        {
-            if (SyncLyrics.Time[i] > time)
-            {
-                _lyricsCurrentIndex = i - 1;
-                break;
-            }
-        }
-
-        if (_lyricsCurrentIndex < 0 || _lyricsCurrentIndex >= Lyrics.Count)
-            CurrentLyric = new();
-        else
-            CurrentLyric = Lyrics[_lyricsCurrentIndex];
-
-        OnPropertyChanged(nameof(CurrentLyric));
-    }
-
-
-    private void ResetLyrics()
-    {
-        _lyrics = new();
-        SyncLyrics = new();
-        Lyrics.Clear();
-        _lyricsCurrentIndex = -1;
-        CurrentLyric = new();
-
-        OnPropertyChanged(nameof(CurrentLyric));
-    }
-
 
     public void TogglePlayPause()
     {
@@ -608,13 +397,9 @@ public partial class PlayerViewModel : ObservableObject
             _player.Pause();
     }
 
-
     public async Task SkipNextAsync()
     {
-        if (!CanSkipNext)
-            return;
-
-        if (CurrentTrack == null)
+        if (!CanSkipNext || CurrentTrack == null)
             return;
 
         CanSkipNext = false;
@@ -623,17 +408,14 @@ public partial class PlayerViewModel : ObservableObject
         _player.Skip();
     }
 
-
     public void SkipPrevious()
     {
         if (!CanSkipPrevious)
             return;
 
         _player.Previous();
-
         CanSkipPrevious = false;
     }
-
 
     private void OpenListening()
     {
@@ -643,7 +425,6 @@ public partial class PlayerViewModel : ObservableObject
             DisableFullScreen();
     }
 
-
     private void Fullscreen()
     {
         if (_isFullScreen)
@@ -652,13 +433,11 @@ public partial class PlayerViewModel : ObservableObject
             EnableFullScreen();
     }
 
-
     private void EnableFullScreen()
     {
         _isFullScreen = true;
         Messenger.Send(new FullScreenMessage(_isFullScreen));
     }
-
 
     private void DisableFullScreen()
     {
@@ -666,16 +445,35 @@ public partial class PlayerViewModel : ObservableObject
         Messenger.Send(new FullScreenMessage(_isFullScreen));
     }
 
-
-    private void ToggleCompactMode()
+    private static void ToggleCompactMode()
     {
         Messenger.Send(new CompactModeMessage());
     }
 
-
     private void Mute()
     {
-        bool isMuted = IsMuted;
-        IsMuted = !isMuted;
+        IsMuted = !IsMuted;
+    }
+
+    public void Dispose()
+    {
+        Dispose(true);
+        GC.SuppressFinalize(this);
+    }
+
+    protected virtual void Dispose(bool disposing)
+    {
+        if (_disposed)
+            return;
+
+        if (disposing)
+        {
+            if (_stateManager != null)
+                _stateManager.PropertyChanged -= OnStateManagerPropertyChanged;
+
+            _timerManager?.Dispose();
+        }
+
+        _disposed = true;
     }
 }

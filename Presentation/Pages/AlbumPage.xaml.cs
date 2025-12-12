@@ -1,5 +1,6 @@
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Navigation;
+using Rok.Logic.ViewModels.Album;
 using Rok.Logic.ViewModels.Albums;
 
 // To learn more about WinUI, the WinUI project structure,

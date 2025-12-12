@@ -1,24 +1,15 @@
 ﻿using Microsoft.Extensions.Logging;
-using MiF.Guard;
 using Rok.Application.Dto;
 using Rok.Application.Interfaces;
 using Rok.Domain.Entities;
-using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.Transactions;
 
 namespace Rok.Import;
 
-public class CleanLibraryService(ITrackRepository trackRepository, IArtistRepository artistRepository, IAlbumRepository albumRepository, IGenreRepository genreRepository, ILogger<CleanLibraryService> logger) : ICleanLibrary
+public class CleanLibraryService(ITrackRepository _trackRepository, IArtistRepository _artistRepository, IAlbumRepository _albumRepository, IGenreRepository _genreRepository, ILogger<CleanLibraryService> _logger) : ICleanLibrary
 {
-    private readonly ITrackRepository _trackRepository = Guard.Against.Null(trackRepository);
-    private readonly IArtistRepository _artistRepository = Guard.Against.Null(artistRepository);
-    private readonly IAlbumRepository _albumRepository = Guard.Against.Null(albumRepository);
-    private readonly IGenreRepository _genreRepository = Guard.Against.Null(genreRepository);
-    private readonly ILogger<CleanLibraryService> _logger = Guard.Against.Null(logger);
-
-
-    public async Task CleanAsync(ConcurrentBag<long> trackIDReaded, ImportStatisticsDto statistics, CancellationToken cancellationToken)
+    public async Task CleanAsync(IEnumerable<long> trackIDReaded, ImportStatisticsDto statistics, CancellationToken cancellationToken)
     {
         statistics.TracksDeleted += await RemoveTracksNotInLibraryAsync(trackIDReaded, cancellationToken);
         statistics.AlbumsDeleted += await CleanAlbumsWithoutTrackAsync();
@@ -26,7 +17,7 @@ public class CleanLibraryService(ITrackRepository trackRepository, IArtistReposi
         statistics.GenresDeleted += await CleanGenresWithoutTrackAsync();
     }
 
-    private async Task<int> RemoveTracksNotInLibraryAsync(ConcurrentBag<long> trackIDReaded, CancellationToken cancellationToken)
+    private async Task<int> RemoveTracksNotInLibraryAsync(IEnumerable<long> trackIDReaded, CancellationToken cancellationToken)
     {
         int count = 0;
 
@@ -73,7 +64,7 @@ public class CleanLibraryService(ITrackRepository trackRepository, IArtistReposi
     {
         Stopwatch stopwatch = Stopwatch.StartNew();
 
-        int count = await _albumRepository.DeleteAlbumsWithoutTracks(RepositoryConnectionKind.Background);
+        int count = await _albumRepository.DeleteOrphansAsync(RepositoryConnectionKind.Background);
 
         if (count > 0)
             _logger.LogTrace("{Count} albums without track were deleted from database in {ElapsedMilliseconds} ms", count, stopwatch.ElapsedMilliseconds);
@@ -84,7 +75,7 @@ public class CleanLibraryService(ITrackRepository trackRepository, IArtistReposi
     private async Task<int> CleanArtistsWithoutTrackAsync()
     {
         Stopwatch stopwatch = Stopwatch.StartNew();
-        int count = await _artistRepository.DeleteArtistsWithoutTracks(RepositoryConnectionKind.Background);
+        int count = await _artistRepository.DeleteOrphansAsync(RepositoryConnectionKind.Background);
 
         if (count > 0)
             _logger.LogTrace("{Count} artists without track were deleted from database in {ElapsedMilliseconds} ms", count, stopwatch.ElapsedMilliseconds);
@@ -95,7 +86,7 @@ public class CleanLibraryService(ITrackRepository trackRepository, IArtistReposi
     private async Task<int> CleanGenresWithoutTrackAsync()
     {
         Stopwatch stopwatch = Stopwatch.StartNew();
-        int count = await _genreRepository.DeleteGenresWithoutTracks(RepositoryConnectionKind.Background);
+        int count = await _genreRepository.DeleteOrphansAsync(RepositoryConnectionKind.Background);
 
         if (count > 0)
             _logger.LogTrace("{Count} genres without track were deleted from database in {ElapsedMilliseconds} ms", count, stopwatch.ElapsedMilliseconds);

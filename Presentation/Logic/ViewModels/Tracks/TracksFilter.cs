@@ -1,63 +1,55 @@
 ﻿namespace Rok.Logic.ViewModels.Tracks;
 
-public class TracksFilter(ResourceLoader _resourceLoader)
+public class TracksFilter : FilterService<TrackViewModel>
 {
-    public static IEnumerable<TrackViewModel> FilterByGenreId(long genreId, IEnumerable<TrackViewModel> tracks)
+    public const string KFilterByArtistFavorite = "ARTISTFAVORITE";
+    public const string KFilterByGenreFavorite = "GENREFAVORITE";
+    public const string KFilterByAlbumFavorite = "ALBUMFAVORITE";
+    public const string KFilterByTrackFavorite = "TRACKFAVORITE";
+    public const string KFilterByNeverListened = "NEVERLISTENED";
+    public const string KFilterByLive = "LIVE";
+
+    public TracksFilter(ResourceLoader resourceLoader) : base(resourceLoader)
     {
-        if (genreId == 0)
-            return tracks;
-
-        tracks = tracks.Where(track => track.Track.GenreId == genreId);
-
-        return tracks;
     }
 
-
-    public static IEnumerable<TrackViewModel> Filter(string filterBy, IEnumerable<TrackViewModel> tracks)
+    public IEnumerable<TrackViewModel> FilterByGenreId(long genreId, IEnumerable<TrackViewModel> tracks)
     {
-        switch (filterBy)
-        {
-            case "ARTISTFAVORITE":
-                tracks = tracks.Where(track => track.Track.IsArtistFavorite);
-                break;
-
-            case "GENREFAVORITE":
-                tracks = tracks.Where(track => track.Track.IsGenreFavorite);
-                break;
-
-            case "ALBUMFAVORITE":
-                tracks = tracks.Where(track => track.Track.IsAlbumFavorite);
-                break;
-
-            case "TRACKFAVORITE":
-                tracks = tracks.Where(track => track.Track.Score > 0);
-                break;
-
-            case "NEVERLISTENED":
-                tracks = tracks.Where(track => track.Track.ListenCount == 0);
-                break;
-
-            case "LIVE":
-                tracks = tracks.Where(track => track.Track.IsLive);
-                break;
-        }
-
-        return tracks;
+        return FilterByGenreId(genreId, tracks, t => t.Track.GenreId);
     }
 
-    public string GetLabel(string filterBy)
+    protected override void RegisterFilterStrategies()
     {
-        string label = filterBy switch
+        RegisterFilter(KFilterByArtistFavorite,
+            tracks => FilterByFavorite(tracks, t => t.Track.IsArtistFavorite));
+
+        RegisterFilter(KFilterByGenreFavorite,
+            tracks => FilterByFavorite(tracks, t => t.Track.IsGenreFavorite));
+
+        RegisterFilter(KFilterByAlbumFavorite,
+            tracks => FilterByFavorite(tracks, t => t.Track.IsAlbumFavorite));
+
+        RegisterFilter(KFilterByTrackFavorite,
+            tracks => FilterByCondition(tracks, t => t.Track.Score > 0));
+
+        RegisterFilter(KFilterByNeverListened,
+            tracks => FilterByNeverListened(tracks, t => t.Track.ListenCount));
+
+        RegisterFilter(KFilterByLive,
+            tracks => FilterByCondition(tracks, t => t.Track.IsLive));
+    }
+
+    public override string GetLabel(string filterBy)
+    {
+        return filterBy switch
         {
-            "ARTISTFAVORITE" => _resourceLoader.GetString("tracksViewFilterByFavoriteArtist"),
-            "GENREFAVORITE" => _resourceLoader.GetString("tracksViewFilterByFavoriteGenre"),
-            "ALBUMFAVORITE" => _resourceLoader.GetString("tracksViewFilterByFavoriteAlbum"),
-            "TRACKFAVORITE" => _resourceLoader.GetString("tracksViewFilterByFavoriteTrack"),
-            "NEVERLISTENED" => _resourceLoader.GetString("tracksViewFilterByNeverListened"),
-            "LIVE" => _resourceLoader.GetString("tracksViewFilterByLive"),
-            _ => _resourceLoader.GetString("tracksViewFilterNone"),
+            KFilterByArtistFavorite => ResourceLoader.GetString("tracksViewFilterByFavoriteArtist"),
+            KFilterByGenreFavorite => ResourceLoader.GetString("tracksViewFilterByFavoriteGenre"),
+            KFilterByAlbumFavorite => ResourceLoader.GetString("tracksViewFilterByFavoriteAlbum"),
+            KFilterByTrackFavorite => ResourceLoader.GetString("tracksViewFilterByFavoriteTrack"),
+            KFilterByNeverListened => ResourceLoader.GetString("tracksViewFilterByNeverListened"),
+            KFilterByLive => ResourceLoader.GetString("tracksViewFilterByLive"),
+            _ => ResourceLoader.GetString("tracksViewFilterNone"),
         };
-
-        return label;
     }
 }

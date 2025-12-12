@@ -5,70 +5,100 @@ using System.Text.RegularExpressions;
 
 namespace Rok.Infrastructure.Lyrics;
 
-public class LyricsParser : ILyricsParser
+public partial class LyricsParser : ILyricsParser
 {
-    private readonly Regex _lineRegex;
+    private static readonly string[] LineSeparators = ["\r\n", "\n", "\r"];
+    private static readonly string[] TimeFormats = [@"mm\:ss\.ff", @"mm\:ss"];
 
-
-    public LyricsParser()
-    {
-        _lineRegex = new Regex(string.Format("\\{0}.*?\\{1}", '[', ']'), RegexOptions.Compiled, TimeSpan.FromSeconds(10));
-    }
-
+    [GeneratedRegex(@"\[.*?\]", RegexOptions.None, matchTimeoutMilliseconds: 1000)]
+    private static partial Regex TimestampPattern();
 
     public SyncLyricsModel Parse(string lyrics)
     {
         Guard.Against.NullOrEmpty(lyrics);
 
         SyncLyricsModel result = new();
+        SortedDictionary<TimeSpan, string> sortedLyrics = new();
 
-        try
+        string[] lines = lyrics.Split(LineSeparators, StringSplitOptions.None);
+
+        foreach (string line in lines)
         {
-            SortedDictionary<TimeSpan, string> sortedLyrics = [];
+            if (string.IsNullOrWhiteSpace(line))
+                continue;
 
-            foreach (string line in lyrics.Split(["\r\n", "\n", "\r"], StringSplitOptions.None))
-            {
-                string lyric = line.Substring(line.LastIndexOf(']') + 1);
-                Match match = _lineRegex.Match(line);
-
-                while (match.Success)
-                {
-                    TimeSpan time;
-                    string item = match.Value;
-                    item = item.Substring(1, item.Length - 2);
-
-                    try
-                    {
-                        if (TimeSpan.TryParseExact(item, @"mm\:ss\.ff", CultureInfo.InvariantCulture, out time) == false)
-                            TimeSpan.TryParseExact(item, @"mm\:ss", CultureInfo.InvariantCulture, out time);
-
-                        if (time != TimeSpan.MinValue && lyric.Length > 0)
-                        {
-                            time = new TimeSpan(time.Hours, time.Minutes, time.Seconds);
-
-                            sortedLyrics.Add(time, lyric);
-                        }
-                    }
-                    catch
-                    {
-                        // Ignore
-                    }
-
-                    match = match.NextMatch();
-                }
-            }
-
-            foreach (KeyValuePair<TimeSpan, string> item in sortedLyrics)
-            {
-                result.Time.Add(item.Key);
-                result.Lyrics.Add(new LyricLine { Lyric = item.Value, Time = item.Key });
-            }
+            ProcessLine(line, sortedLyrics);
         }
-        catch
-        {
-            // Ignore
-        }
+
+        PopulateResult(sortedLyrics, result);
 
         return result;
+    }
+
+    private static void ProcessLine(string line, SortedDictionary<TimeSpan, string> sortedLyrics)
+    {
+        int lastBracketIndex = line.LastIndexOf(']');
+        if (lastBracketIndex < 0)
+            return;
+
+        string lyric = line[(lastBracketIndex + 1)..];
+
+        if (string.IsNullOrWhiteSpace(lyric))
+            return;
+
+        MatchCollection matches = TimestampPattern().Matches(line);
+        bool hasValidTimestamp = false;
+
+        foreach (Match match in matches)
+        {
+            if (TryParseTimestamp(match.Value, out TimeSpan time))
+            {
+                hasValidTimestamp = true;
+                TimeSpan normalizedTime = new(0, time.Minutes, time.Seconds);
+
+                if (!sortedLyrics.ContainsKey(normalizedTime))
+                {
+                    sortedLyrics.Add(normalizedTime, lyric);
+                }
+            }
+        }
+
+        if (!hasValidTimestamp && matches.Count > 0 && !sortedLyrics.ContainsKey(TimeSpan.Zero))
+        {
+            sortedLyrics.Add(TimeSpan.Zero, lyric);
+        }
+    }
+
+    private static bool TryParseTimestamp(string timestampWithBrackets, out TimeSpan time)
+    {
+        time = TimeSpan.Zero;
+
+        if (timestampWithBrackets.Length < 3)
+            return false;
+
+        string timestamp = timestampWithBrackets.Substring(1, timestampWithBrackets.Length - 2);
+
+        foreach (string format in TimeFormats)
+        {
+            if (TimeSpan.TryParseExact(timestamp, format, CultureInfo.InvariantCulture, out time))
+            {
+                return time != TimeSpan.Zero;
+            }
+        }
+
+        return false;
+    }
+
+    private static void PopulateResult(SortedDictionary<TimeSpan, string> sortedLyrics, SyncLyricsModel result)
+    {
+        foreach (KeyValuePair<TimeSpan, string> item in sortedLyrics)
+        {
+            result.Time.Add(item.Key);
+            result.Lyrics.Add(new LyricLine
+            {
+                Lyric = item.Value,
+                Time = item.Key
+            });
+        }
     }
 }

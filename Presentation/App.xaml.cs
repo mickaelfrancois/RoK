@@ -126,7 +126,7 @@ namespace Rok
 
             if (settingFileService.Exists())
             {
-                IAppOptions? newOptions = settingFileService.Load<AppOptions>();
+                IAppOptions? newOptions = await settingFileService.LoadAsync<AppOptions>();
                 if (newOptions != null)
                     options.CopyFrom(newOptions);
 
@@ -155,14 +155,14 @@ namespace Rok
         }
 
 
-        private void MainWindow_Closed(object sender, WindowEventArgs args)
+        private async void MainWindow_Closed(object sender, WindowEventArgs args)
         {
             IAppOptions options = ServiceProvider.GetRequiredService<IAppOptions>();
             ISettingsFile settingFileService = ServiceProvider.GetRequiredService<ISettingsFile>();
 
-            settingFileService.Save(options);
+            await settingFileService.SaveAsync(options);
 
-            Log.CloseAndFlush();
+            await Log.CloseAndFlushAsync();
         }
 
 

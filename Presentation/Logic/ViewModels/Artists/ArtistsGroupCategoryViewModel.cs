@@ -1,6 +1,6 @@
 ﻿namespace Rok.Logic.ViewModels.Artists;
 
-public class ArtistsGroupCategoryViewModel
+public class ArtistsGroupCategoryViewModel : IGroupCategoryViewModel<ArtistViewModel>
 {
     public string Title { get; set; } = string.Empty;
 

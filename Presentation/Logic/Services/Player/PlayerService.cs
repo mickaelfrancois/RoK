@@ -72,11 +72,8 @@ public class PlayerService : IPlayerService
 
             _currentTrack = value;
 
-            if (previousTrack == null || previousTrack.Id != _currentTrack?.Id)
-            {
-                if (_currentTrack != null)
-                    Messenger.Send(new MediaChangedMessage(_currentTrack, previousTrack));
-            }
+            if ((previousTrack == null || previousTrack.Id != _currentTrack?.Id) && _currentTrack != null)
+                Messenger.Send(new MediaChangedMessage(_currentTrack, previousTrack));
         }
     }
 
@@ -166,7 +163,7 @@ public class PlayerService : IPlayerService
 
     private void OnMediaStateChanged(object? sender, EventArgs e)
     {
-        // _logger.LogDebug("Event Media state changed fired.");
+        // Not used currently        
     }
 
 
@@ -177,7 +174,8 @@ public class PlayerService : IPlayerService
         if (_isCrossfadeEnabled)
             return;
 
-        Messenger.Send(new MediaEvent(EPlaybackState.Stopped, CurrentTrack));
+        if (CurrentTrack != null)
+            Messenger.Send(new MediaEvent(EPlaybackState.Stopped, CurrentTrack));
 
         Next();
     }
@@ -185,7 +183,7 @@ public class PlayerService : IPlayerService
 
     private void OnMediaChanged(object? sender, EventArgs e)
     {
-        // _logger.LogDebug("Event Media changed fired.");
+        // Not used currently
     }
 
 
@@ -193,7 +191,8 @@ public class PlayerService : IPlayerService
     {
         _logger.LogDebug("Event Media about to end fired.");
 
-        Messenger.Send(new MediaAboutToEndEvent(CurrentTrack));
+        if (CurrentTrack != null)
+            Messenger.Send(new MediaAboutToEndEvent(CurrentTrack));
 
         if (_isCrossfadeEnabled)
             _ = Task.Run(() => CrossfadeToNextTrackAsync());
@@ -239,11 +238,7 @@ public class PlayerService : IPlayerService
             return;
 
         List<TrackDto> itemsToInsert = new(tracks.Count);
-        foreach (TrackDto? t in tracks)
-        {
-            if (t is not null)
-                itemsToInsert.Add(t);
-        }
+        itemsToInsert.AddRange(tracks);
 
         if (itemsToInsert.Count == 0)
             return;
@@ -383,7 +378,7 @@ public class PlayerService : IPlayerService
 
     #region Engine
 
-    private bool LoadFile(TrackDto track)
+    private void LoadFile(TrackDto track)
     {
         _player.Stop();
 
@@ -395,8 +390,6 @@ public class PlayerService : IPlayerService
 
             UpdateDiscordPresence(track, isPlaying: false);
         }
-
-        return res;
     }
 
     private void UpdateDiscordPresence(TrackDto track, bool isPlaying)
@@ -462,7 +455,7 @@ public class PlayerService : IPlayerService
             double trackLength = _player.Length;
             double currentPosition = _player.Position;
 
-            if (_isMuted || (CurrentTrack.IsAlbumLive && nextTrack.IsAlbumLive))
+            if (_isMuted || CurrentTrack == null || (CurrentTrack.IsAlbumLive && nextTrack.IsAlbumLive))
             {
                 _logger.LogDebug("No crossfade between two live albums");
 
