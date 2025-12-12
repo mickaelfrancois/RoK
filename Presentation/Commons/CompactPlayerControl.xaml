@@ -9,14 +9,12 @@
 
     <Grid Margin="0"
           Padding="0">
-        <!-- Background -->
         <Image Source="{x:Bind PlayerViewModel.CurrentArtist.Picture, Mode=OneWay, TargetNullValue={Binding PlayerViewModel.MediaList.CurrentItem.Cover}}"
                Stretch="UniformToFill"
                Opacity="0.55" />
 
-        <!-- Bottom gradient for readability -->
         <Grid VerticalAlignment="Bottom"
-              Height="110">
+              Height="130">
             <Grid.Background>
                 <LinearGradientBrush StartPoint="0,0"
                                      EndPoint="0,1">
@@ -29,7 +27,6 @@
                 </LinearGradientBrush>
             </Grid.Background>
 
-            <!-- Layout rows: 0=info, 1=progress, 2=controls -->
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto" />
@@ -37,33 +34,56 @@
                     <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
 
-                <!-- Track info -->
+                <!-- Track info with shadowed text -->
                 <StackPanel Grid.Row="0"
                             Orientation="Vertical"
                             HorizontalAlignment="Center"
                             VerticalAlignment="Top"
                             Margin="10,6,10,4">
-                    
-                    <TextBlock x:Name="title"
-                               Text="{x:Bind PlayerViewModel.CurrentTrack.Title, Mode=OneWay}"
-                               Foreground="#FFFFFFFF"
-                               FontWeight="Bold"
-                               FontSize="16"
-                               TextWrapping="NoWrap"
-                               TextTrimming="CharacterEllipsis"
-                               MaxWidth="260"
-                               HorizontalAlignment="Center"
-                               Margin="6,0,6,2" />
-                    
-                    <TextBlock x:Name="artist"
-                               Text="{x:Bind PlayerViewModel.CurrentTrack.ArtistName, Mode=OneWay}"
-                               Foreground="#FFEFEFEF"
-                               FontSize="12"
-                               TextWrapping="NoWrap"
-                               TextTrimming="CharacterEllipsis"
-                               MaxWidth="260"
-                               HorizontalAlignment="Center"
-                               Margin="6,0,6,0" />
+
+                    <!-- Title shadow + text -->
+                    <Grid>
+                        <TextBlock Text="{x:Bind PlayerViewModel.CurrentTrack.Title, Mode=OneWay}"
+                                   Foreground="#AA000000"
+                                   FontWeight="Bold"
+                                   FontSize="24"
+                                   TextWrapping="NoWrap"
+                                   TextTrimming="CharacterEllipsis"
+                                   MaxWidth="260"
+                                   HorizontalAlignment="Center"
+                                   Margin="8,2,8,0" />
+                        <TextBlock x:Name="title"
+                                   Text="{x:Bind PlayerViewModel.CurrentTrack.Title, Mode=OneWay}"
+                                   Foreground="#FFFFFFFF"
+                                   FontWeight="Bold"
+                                   FontSize="24"
+                                   TextWrapping="NoWrap"
+                                   TextTrimming="CharacterEllipsis"
+                                   MaxWidth="260"
+                                   HorizontalAlignment="Center"
+                                   Margin="6,0,6,0" />
+                    </Grid>
+
+                    <!-- Artist shadow + text -->
+                    <Grid Margin="0,2,0,0">
+                        <TextBlock Text="{x:Bind PlayerViewModel.CurrentTrack.ArtistName, Mode=OneWay}"
+                                   Foreground="#AA000000"
+                                   FontSize="20"
+                                   TextWrapping="NoWrap"
+                                   TextTrimming="CharacterEllipsis"
+                                   MaxWidth="260"
+                                   HorizontalAlignment="Center"
+                                   Margin="8,2,8,0" />
+                        <TextBlock x:Name="artist"
+                                   Text="{x:Bind PlayerViewModel.CurrentTrack.ArtistName, Mode=OneWay}"
+                                   Foreground="#FFFFFFFF"
+                                   FontSize="20"
+                                   TextWrapping="NoWrap"
+                                   TextTrimming="CharacterEllipsis"
+                                   MaxWidth="260"
+                                   HorizontalAlignment="Center"
+                                   Margin="6,0,6,0" />
+                    </Grid>
                 </StackPanel>
 
                 <!-- Progress -->
@@ -82,26 +102,26 @@
                             Background="Transparent"
                             VerticalAlignment="Bottom"
                             HorizontalAlignment="Center"
-                            Margin="0,0,0,6"
+                            Margin="0,0,0,2"
                             DefaultLabelPosition="Collapsed"
                             IsDynamicOverflowEnabled="False"
                             OverflowButtonVisibility="Collapsed">
-                    
+
                     <AppBarButton RequestedTheme="Dark"
                                   Style="{StaticResource AppBarButtonRevealStyle}"
                                   Icon="Previous"
                                   Command="{x:Bind PlayerViewModel.SkipPreviousCommand}"
                                   IsEnabled="{x:Bind PlayerViewModel.CanSkipPrevious, Mode=OneWay}" />
-                    
+
                     <AppBarButton RequestedTheme="Dark"
                                   Style="{StaticResource AppBarButtonRevealStyle}"
                                   Command="{x:Bind PlayerViewModel.TogglePlayPauseCommand}">
                         <SymbolIcon Symbol="{x:Bind PlayerViewModel.PlaybackState, Mode=OneWay, Converter={StaticResource PlaybackStateToButtonIconConverter}}" />
                     </AppBarButton>
-                    
+
                     <AppBarButton RequestedTheme="Dark"
                                   Style="{StaticResource AppBarButtonRevealStyle}"
-                                  Icon="Next"                                  
+                                  Icon="Next"
                                   Command="{x:Bind PlayerViewModel.SkipNextCommand}"
                                   IsEnabled="{x:Bind PlayerViewModel.CanSkipNext, Mode=OneWay}" />
                 </CommandBar>

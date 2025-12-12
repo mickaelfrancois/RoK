@@ -183,7 +183,7 @@ namespace Rok
             else
             {
                 AppWindow.SetPresenter(AppWindowPresenterKind.CompactOverlay);
-                AppWindow.Resize(new Windows.Graphics.SizeInt32 { Width = 300, Height = 300 });
+                AppWindow.Resize(new Windows.Graphics.SizeInt32 { Width = 360, Height = 420 });
                 gridCompactScreen.Visibility = Visibility.Visible;
                 MainGrid.Visibility = Visibility.Collapsed;
                 _compactModeEnabled = true;
