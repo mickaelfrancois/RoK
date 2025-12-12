@@ -9,7 +9,7 @@
 	<Identity
 	  Name="dev-Rokapp.Rokmusicplayer"
 	  Publisher="CN=C9A55691-54ED-46EA-9D4F-F3CD41C04242"
-	  Version="1.0.86.0" />
+	  Version="1.0.87.0" />
 
 	<Properties>
 		<DisplayName>Rok musicplayer (dev)</DisplayName>
