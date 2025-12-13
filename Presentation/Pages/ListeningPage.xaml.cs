@@ -1,5 +1,4 @@
 using Microsoft.UI.Xaml.Controls;
-using Rok.Commons;
 using Rok.Logic.ViewModels.Listening;
 
 
@@ -30,7 +29,6 @@ public sealed partial class ListeningPage : Page, IDisposable
             tb.Text = (args.ItemIndex + 1).ToString() + ".";
         }
     }
-
 
     public void Dispose()
     {

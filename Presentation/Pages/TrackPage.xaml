@@ -24,11 +24,12 @@
         <Image x:Name="backdrop"
                Grid.RowSpan="2"
                Source="{x:Bind ViewModel.Backdrop,Mode=OneWay}"
-               Opacity="0.20"
+               Opacity="{StaticResource headerBackdropOpacity}"
                Style="{StaticResource headerBackdrop}"
                Stretch="UniformToFill"
                IsHitTestVisible="False" />
 
+        <!-- Header -->
         <StackPanel Grid.Row="0" Orientation="Vertical" Padding="6" Spacing="4">
             <TextBlock Text="{x:Bind ViewModel.Track.Title}"
                        FontSize="32"
@@ -52,6 +53,7 @@
             </StackPanel>
         </StackPanel>
 
+        <!-- Content -->
         <Border Grid.Row="2"
                 Background="{ThemeResource CardBackgroundFillColorDefault}"
                 Padding="24"

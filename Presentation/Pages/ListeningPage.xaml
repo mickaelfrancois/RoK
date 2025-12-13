@@ -20,6 +20,19 @@
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
+        <Grid.Background>
+            <SolidColorBrush Color="{ThemeResource CardBackgroundFillColorDefault}"
+                             Opacity="{StaticResource headerBackgroundOpacity}" />
+        </Grid.Background>
+
+        <Image x:Name="backdrop"
+               Grid.RowSpan="4"
+               Source="{x:Bind ViewModel.Artist.Backdrop,Mode=OneWay}"
+               Opacity="0.20"
+               Style="{StaticResource headerBackdrop}"
+               Stretch="UniformToFill"
+               IsHitTestVisible="False" />
+
         <!-- Title -->
         <StackPanel Orientation="Horizontal"
                     Margin="4,6,0,6">
@@ -56,26 +69,13 @@
               X2="100"></Line>
 
         <!-- Header -->
-        <Grid Grid.Row="1">
-
-            <Grid.Background>
-                <SolidColorBrush Color="{ThemeResource CardBackgroundFillColorDefault}"
-                                 Opacity="{StaticResource headerBackgroundOpacity}" />
-            </Grid.Background>
+        <Grid Grid.Row="1" Padding="2">
 
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="100"
                                   x:Name="pictureColumn"></ColumnDefinition>
                 <ColumnDefinition Width="*"></ColumnDefinition>
             </Grid.ColumnDefinitions>
-
-            <Image x:Name="backdrop"
-                   Source="{x:Bind ViewModel.Artist.Backdrop, Mode=OneWay}"
-                   Stretch="UniformToFill"
-                   VerticalAlignment="Center"
-                   HorizontalAlignment="Center"
-                   Opacity="0.1"
-                   Grid.ColumnSpan="2" />
 
             <Grid Margin="6"
                   Padding="0"
@@ -100,15 +100,23 @@
 
             <RelativePanel Grid.Column="1"
                            Margin="6,0,0,0">
-                <Button x:Name="headerTitle"
-                        Content="{x:Bind ViewModel.Artist.Artist.Name, Mode=OneWay}"
-                        Style="{StaticResource ButtonHighContrastStyle}"
-                        FontSize="20"
-                        Command="{x:Bind ViewModel.Artist.ArtistOpenCommand}" />
+                
+                <HyperlinkButton x:Name="trackTitle"
+                                 Content="{x:Bind ViewModel.CurrentTrack.Title}"
+                                 Command="{x:Bind ViewModel.CurrentTrack.TrackOpenCommand}"
+                                 FontSize="24" Padding="0" Margin="0"
+                                 Style="{StaticResource headerGenreHyperlink}" />
+
+                <HyperlinkButton x:Name="artistName"
+                                 RelativePanel.Below="trackTitle"
+                                 Content="{x:Bind ViewModel.CurrentTrack.ArtistName}"
+                                 Command="{x:Bind ViewModel.CurrentTrack.ArtistOpenCommand}"
+                                 FontSize="16"
+                                 Style="{StaticResource headerGenreHyperlink}" />
 
                 <Button x:Name="buttonCountry"
-                        RelativePanel.RightOf="headerTitle"
-                        RelativePanel.AlignVerticalCenterWith="headerTitle"
+                        RelativePanel.RightOf="artistName"
+                        RelativePanel.AlignVerticalCenterWith="artistName"
                         Margin="4,0,0,0"
                         Style="{StaticResource ButtonTextBlockStyle}"
                         Visibility="{x:Bind ViewModel.Artist.Artist.CountryCode, Converter={StaticResource StringToVisibilityConverter}}"
@@ -119,51 +127,12 @@
                            Height="10"></Image>
                 </Button>
 
-                <Button x:Name="headerGenre"
-                        RelativePanel.Below="headerTitle"
-                        Content="{x:Bind ViewModel.Artist.Artist.GenreName, Mode=OneWay}"
-                        Style="{StaticResource ButtonHighContrastStyle}"
-                        Command="{Binding Artist.GenreOpenCommand}"
-                        Margin="0,0,10,0" />
-
-                <HyperlinkButton x:Uid="artistOfficialSite"
-                                 x:Name="officialSite"
-                                 RelativePanel.RightOf="headerGenre"
-                                 RelativePanel.Below="headerTitle"
-                                 Visibility="{x:Bind ViewModel.Artist.Artist.OfficialSiteUrl, Converter={StaticResource StringToVisibilityConverter}}"
-                                 NavigateUri="{x:Bind ViewModel.Artist.Artist.OfficialSiteUrl, Converter={StaticResource StringToUriConverter}}"
-                                 Style="{StaticResource HyperLinkHighContrastStyle}"
-                                 Margin="0,0,10,0" />
-
-                <HyperlinkButton x:Uid="artistWikipedia"
-                                 x:Name="wikipedia"
-                                 RelativePanel.RightOf="officialSite"
-                                 RelativePanel.Below="headerTitle"
-                                 Visibility="{x:Bind ViewModel.Artist.Artist.WikipediaUrl, Converter={StaticResource StringToVisibilityConverter}}"
-                                 NavigateUri="{x:Bind ViewModel.Artist.Artist.WikipediaUrl, Converter={StaticResource StringToUriConverter}}"
-                                 Style="{StaticResource HyperLinkHighContrastStyle}" />
-
-                <ScrollViewer RelativePanel.Below="headerGenre"
-                              Margin="0,5,0,0"
-                              RelativePanel.AlignLeftWithPanel="True"
-                              RelativePanel.AlignRightWithPanel="True"
-                              VerticalScrollBarVisibility="Auto"
-                              HorizontalScrollBarVisibility="Auto"
-                              x:Name="panelBiography"
-                              Visibility="Collapsed"
-                              Height="120">
-                    <TextBlock Padding="0"
-                               ScrollViewer.HorizontalScrollBarVisibility="Auto"
-                               ScrollViewer.VerticalScrollBarVisibility="Visible"
-                               Text="{x:Bind ViewModel.Artist.Artist.Biography, Mode=OneWay}"
-                               FontSize="11"
-                               TextWrapping="WrapWholeWords"
-                               Style="{StaticResource BodyTextBlockStyle}"
-                               VerticalAlignment="Top"
-                               HorizontalAlignment="Stretch"
-                               Width="{Binding ElementName=panelBiography, Path=ViewportWidth}"
-                               TextTrimming="Clip" />
-                </ScrollViewer>
+                <HyperlinkButton x:Name="albumName"
+                                 RelativePanel.Below="artistName"
+                                 Content="{x:Bind ViewModel.CurrentTrack.AlbumName}"
+                                 Command="{x:Bind ViewModel.CurrentTrack.AlbumOpenCommand}"
+                                 FontSize="16"
+                                 Style="{StaticResource headerGenreHyperlink}" />
             </RelativePanel>
         </Grid>
 
@@ -174,15 +143,31 @@
                         Style="{StaticResource headerCommandBar}">
                 <AppBarButton x:Uid="shuffleButton"
                               Style="{StaticResource AppBarButtonCompactStyle}"
-                              Icon="Shuffle"
-                              Label="Mélanger"
+                              Icon="Shuffle"                              
                               Command="{x:Bind ViewModel.ShufflePlaylistCommand}" />
+
+                <AppBarSeparator />
+
+                <AppBarButton x:Uid="artistViewWebSite"
+                              Style="{StaticResource headerGenericButton}"
+                              Icon="World"
+                              Command="{x:Bind ViewModel.Artist.OpenOfficielSiteCommand}"
+                              Visibility="{x:Bind ViewModel.Artist.Artist.OfficialSiteUrl, Converter={StaticResource StringToVisibilityConverter}}" />
+
+                <AppBarButton x:Uid="artistViewLastFm"
+                              Style="{StaticResource headerGenericButton}"
+                              Icon="MusicInfo"
+                              Command="{x:Bind ViewModel.Artist.OpenLastFmPageCommand, Mode=OneWay}"
+                              Visibility="{x:Bind ViewModel.Artist.LastFmPageAvailable, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" />
             </CommandBar>
         </RelativePanel>
 
         <!-- Tracks -->
-
         <Grid x:Name="tracks"
+              CornerRadius="12,12,0,0"
+              Padding="24"
+              Background="{ThemeResource CardBackgroundFillColorDefault}"              
+              Margin="4,0,4,4"
               Grid.Row="3">
 
             <Grid.RowDefinitions>
