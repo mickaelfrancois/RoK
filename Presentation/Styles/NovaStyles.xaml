@@ -216,7 +216,7 @@
                                         <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="Foreground"
                                                                        Storyboard.TargetName="TextElement">
                                             <DiscreteObjectKeyFrame KeyTime="0"
-                                                                    Value="{ThemeResource HyperlinkButtonForegroundPointerOver}" />
+                                                                    Value="{ThemeResource SystemAccentColorLight2}" />
                                         </ObjectAnimationUsingKeyFrames>
                                     </Storyboard>
                                 </VisualState>
