@@ -13,24 +13,32 @@
 
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition x:Name="headerRow" Height="{ThemeResource headerRowHeight}" />
+            <RowDefinition x:Name="headerRow" 
+                           Height="{ThemeResource headerRowHeight}" />
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
-        <Grid>
-            <Grid.Background>
-                <SolidColorBrush Color="{ThemeResource CardBackgroundFillColorDefault}" Opacity="{StaticResource headerBackgroundOpacity}" />
-            </Grid.Background>
+        <Grid.Background>
+            <SolidColorBrush Color="{ThemeResource CardBackgroundFillColorDefault}"
+                             Opacity="{StaticResource headerBackgroundOpacity}" />
+        </Grid.Background>
+
+        <Image x:Name="backdrop"
+               Grid.RowSpan="2"
+               Source="{x:Bind ViewModel.Backdrop,Mode=OneWay}"
+               Opacity="0.20"
+               Style="{StaticResource headerBackdrop}"
+               Stretch="UniformToFill"
+               IsHitTestVisible="False" />
+
+        <!-- Header -->
+        <Grid Padding="2">
 
             <Grid.ColumnDefinitions>
-                <ColumnDefinition x:Name="pictureColumn" Width="{ThemeResource headerPictureColumnWidth}"/>
+                <ColumnDefinition x:Name="pictureColumn" 
+                                  Width="{ThemeResource headerPictureColumnWidth}"/>
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
-
-            <Image x:Name="backdrop" 
-                   Source="{x:Bind ViewModel.Backdrop,Mode=OneWay}" 
-                   Style="{StaticResource headerBackdrop}"                    
-                   Grid.ColumnSpan="2"/>
 
             <Grid Style="{StaticResource headerPictureGrid}">
                 <common:PictureControl x:Name="artistPicture" 
@@ -160,8 +168,14 @@
 
         </Grid>
 
-        <Pivot Grid.Row="1">
-            <PivotItem x:Uid="artistViewTabAlbums">
+        <!-- Content -->
+        <Border Grid.Row="1"
+                CornerRadius="12,12,0,0"
+                Background="{ThemeResource CardBackgroundFillColorDefault}"
+                Padding="24"
+                Margin="4,0,4,4">
+            <Pivot>
+                <PivotItem x:Uid="artistViewTabAlbums">
                 <common:GridViewExtended x:Name="grid" 
                                          ItemsSource="{x:Bind ViewModel.Albums}" 
                                          ContainerContentChanging="grid_ContainerContentChanging"  
@@ -318,5 +332,6 @@
                 </Grid>
             </PivotItem>
         </Pivot>
+        </Border>
     </Grid>
 </Page>
