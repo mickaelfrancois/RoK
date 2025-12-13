@@ -7,8 +7,8 @@
   <Folder Name="/Core/" Id="146195df-61ee-4287-9e47-7cba0e9ff0f2">
     <Project Path="Core/Rok.Application/Rok.Application.csproj" Id="34286433-1d42-40c0-bdb5-e5250ee1641b" />
     <Project Path="Core/Rok.Domain/Rok.Domain.csproj" Id="9bbba40e-f027-4e67-88a0-9cac176ed986" />
-    <Project Path="Core/Rok.Shared/Rok.Shared.csproj" Id="ed68b8fa-0ff7-4c55-8fa6-ed5241eb3aab" />
     <Project Path="Core/Rok.Import/Rok.Import.csproj" Id="60b6b0db-da95-4e34-8575-ecc901ce61fe" />
+    <Project Path="Core/Rok.Shared/Rok.Shared.csproj" Id="ed68b8fa-0ff7-4c55-8fa6-ed5241eb3aab" />
   </Folder>
   <Folder Name="/Infrastructure/" Id="09bfb4d1-9799-4702-baea-b6c2bf04daec">
     <Project Path="Infrastructure/Rok.Infrastructure/Rok.Infrastructure.csproj" Id="4e901456-0119-4ead-a5a9-aa09f5a2e145" />
@@ -23,6 +23,7 @@
   </Folder>
   <Folder Name="/Solution Items/">
     <File Path=".editorconfig" />
+    <File Path="README.md" />
   </Folder>
   <Folder Name="/Tests/" />
   <Folder Name="/Tests/PerfTests/" />
