@@ -20,6 +20,8 @@ public class TracksGroupCategory(ResourceLoader resourceLoader) : GroupCategoryS
 
     protected override void RegisterGroupingStrategies()
     {
+        RegisterStrategy(GroupingConstants.None, tracks => GroupByName(tracks, t => t.Track.Title, t => t.Track.Title));
+
         RegisterStrategy(GroupingConstants.Title, tracks => GroupByName(tracks, t => t.Track.Title, t => t.Track.Title));
         RegisterStrategy(GroupingConstants.Artist, GroupByArtist);
         RegisterStrategy(GroupingConstants.Album, GroupByAlbum);

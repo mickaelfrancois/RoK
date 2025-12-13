@@ -20,6 +20,8 @@ public class AlbumsGroupCategory(ResourceLoader resourceLoader) : GroupCategoryS
 
     protected override void RegisterGroupingStrategies()
     {
+        RegisterStrategy(GroupingConstants.None, albums => GroupByName(albums, a => a.Album.Name, a => a.Album.Name));
+
         RegisterStrategy(GroupingConstants.Decade, albums => GroupByDecade(albums, a => a.Album.Year, a => a.Album.Name));
         RegisterStrategy(GroupingConstants.Year, albums => GroupByYear(albums, a => a.Album.Year, a => a.Album.Name));
         RegisterStrategy(GroupingConstants.Artist, albums => GroupByName(albums, a => a.Album.ArtistName, a => a.Album.ArtistName));

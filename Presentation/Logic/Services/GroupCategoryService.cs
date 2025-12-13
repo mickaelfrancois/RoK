@@ -1,4 +1,6 @@
-﻿namespace Rok.Logic.Services;
+﻿using Rok.Logic.ViewModels;
+
+namespace Rok.Logic.Services;
 
 public abstract class GroupCategoryService<TViewModel, TGroupCategory>(ResourceLoader resourceLoader)
     where TGroupCategory : IGroupCategoryViewModel<TViewModel>, new()
@@ -15,6 +17,9 @@ public abstract class GroupCategoryService<TViewModel, TGroupCategory>(ResourceL
     {
         if (_groupStrategies.Count == 0)
             RegisterGroupingStrategies();
+
+        if (string.IsNullOrEmpty(groupBy))
+            groupBy = GroupingConstants.None;
 
         if (_groupStrategies.TryGetValue(groupBy, out Func<List<TViewModel>, IEnumerable<TGroupCategory>>? strategy))
             return strategy(items);

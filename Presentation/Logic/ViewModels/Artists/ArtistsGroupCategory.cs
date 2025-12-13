@@ -19,6 +19,8 @@ public class ArtistsGroupCategory(ResourceLoader resourceLoader) : GroupCategory
 
     protected override void RegisterGroupingStrategies()
     {
+        RegisterStrategy(GroupingConstants.None, artists => GroupByName(artists, a => a.Artist.Name, a => a.Artist.Name));
+
         RegisterStrategy(GroupingConstants.Decade, artists => GroupByDecade(artists, a => a.Artist.YearMini, a => a.Artist.Name));
         RegisterStrategy(GroupingConstants.Year, artists => GroupByDecade(artists, a => a.Artist.YearMini, a => a.Artist.Name));
         RegisterStrategy(GroupingConstants.Artist, artists => GroupByName(artists, a => a.Artist.Name, a => a.Artist.Name));
