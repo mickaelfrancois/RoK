@@ -26,7 +26,7 @@
         <Image x:Name="backdrop"
                Grid.RowSpan="2"
                Source="{x:Bind ViewModel.Backdrop,Mode=OneWay}"
-               Opacity="0.20"
+               Opacity="{StaticResource headerBackdropOpacity}"
                Style="{StaticResource headerBackdrop}"
                Stretch="UniformToFill"
                IsHitTestVisible="False" />
@@ -171,8 +171,7 @@
         <!-- Content -->
         <Border Grid.Row="1"
                 CornerRadius="12,12,0,0"
-                Background="{ThemeResource CardBackgroundFillColorDefault}"
-                Padding="24"
+                Background="{ThemeResource CardBackgroundFillColorDefault}"                
                 Margin="4,0,4,4">
             <Pivot>
                 <PivotItem x:Uid="artistViewTabAlbums">
