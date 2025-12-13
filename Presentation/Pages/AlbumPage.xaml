@@ -17,22 +17,27 @@
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
-        <Grid>
-            <Grid.Background>
-                <SolidColorBrush Color="{ThemeResource CardBackgroundFillColorDefault}"
-                                 Opacity="{StaticResource headerBackgroundOpacity}" />
-            </Grid.Background>
+        <Grid.Background>
+            <SolidColorBrush Color="{ThemeResource CardBackgroundFillColorDefault}"
+                             Opacity="{StaticResource headerBackgroundOpacity}" />
+        </Grid.Background>
+
+        <Image x:Name="backdrop"
+               Grid.RowSpan="2"
+               Source="{x:Bind ViewModel.Backdrop,Mode=OneWay}"
+               Opacity="0.20"
+               Style="{StaticResource headerBackdrop}"
+               Stretch="UniformToFill"
+               IsHitTestVisible="False" />
+
+        <!-- Header -->
+        <Grid Padding="2">
 
             <Grid.ColumnDefinitions>
                 <ColumnDefinition x:Name="pictureColumn"
                                   Width="{ThemeResource headerPictureColumnWidth}" />
                 <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
-
-            <Image x:Name="backdrop"
-                   Source="{x:Bind ViewModel.Backdrop,Mode=OneWay}"
-                   Style="{StaticResource headerBackdrop}"
-                   Grid.ColumnSpan="2" />
 
             <Grid Style="{StaticResource headerPictureGrid}">
                 <common:PictureControl x:Name="artistPicture"
@@ -178,9 +183,13 @@
             </RelativePanel>
         </Grid>
 
+        <!-- Tracks grid -->
         <Grid x:Name="tracks"
+              CornerRadius="12,12,0,0"
+              Padding="24"
+              Background="{ThemeResource CardBackgroundFillColorDefault}"
               Grid.Row="1"
-              Margin="4,0,0,0"
+              Margin="4,0,4,4"
               ScrollViewer.VerticalScrollBarVisibility="Auto">
 
             <Grid.RowDefinitions>

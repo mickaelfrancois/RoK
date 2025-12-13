@@ -16,10 +16,9 @@
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
-
         <Grid.Background>
             <SolidColorBrush Color="{ThemeResource CardBackgroundFillColorDefault}"
-                             Opacity="0.7" />
+                             Opacity="{StaticResource headerBackgroundOpacity}" />
         </Grid.Background>
 
         <Image x:Name="backdrop"
