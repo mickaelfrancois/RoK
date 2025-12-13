@@ -100,15 +100,15 @@
 
             <RelativePanel Grid.Column="1"
                            Margin="6,0,0,0">
-                
-                <HyperlinkButton x:Name="trackTitle"
+
+                <HyperlinkButton x:Name="currentTrackTitle"
                                  Content="{x:Bind ViewModel.CurrentTrack.Title}"
                                  Command="{x:Bind ViewModel.CurrentTrack.TrackOpenCommand}"
                                  FontSize="24" Padding="0" Margin="0"
                                  Style="{StaticResource headerGenreHyperlink}" />
 
                 <HyperlinkButton x:Name="artistName"
-                                 RelativePanel.Below="trackTitle"
+                                 RelativePanel.Below="currentTrackTitle"
                                  Content="{x:Bind ViewModel.CurrentTrack.ArtistName}"
                                  Command="{x:Bind ViewModel.CurrentTrack.ArtistOpenCommand}"
                                  FontSize="16"
