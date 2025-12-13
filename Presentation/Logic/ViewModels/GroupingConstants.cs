@@ -2,6 +2,8 @@ namespace Rok.Logic.ViewModels;
 
 public static class GroupingConstants
 {
+    public const string None = "";
+
     public const string Year = "YEAR";
     public const string Decade = "DECADE";
 
