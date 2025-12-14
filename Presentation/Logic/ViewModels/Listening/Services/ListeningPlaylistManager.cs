@@ -60,7 +60,11 @@ public partial class ListeningPlaylistManager : ObservableObject
         });
 
         await LoadArtistIfNeededAsync(track);
-        CurrentTrackChanged?.Invoke(this, EventArgs.Empty);
+
+        _dispatcherQueue.TryEnqueue(() =>
+        {
+            CurrentTrackChanged?.Invoke(this, EventArgs.Empty);
+        });
     }
 
     private async Task LoadArtistIfNeededAsync(TrackDto track)
