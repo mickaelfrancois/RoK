@@ -23,21 +23,55 @@
                    TextTrimming="CharacterEllipsis"
                    VerticalAlignment="Center"/>
         </DataTemplate>
+
     </UserControl.Resources>
 
     <Grid HorizontalAlignment="Stretch"
-          Padding="4,4,4,4"           
+          Padding="4,4,4,4"
           ColumnSpacing="12"
           Background="{ThemeResource SystemControlBackgroundAccentBrush}">
-                        
+
+        <Grid Translation="0,0,10">
+            <Grid.Shadow>
+                <ThemeShadow />
+            </Grid.Shadow>
+        </Grid>
+
         <!-- Current track info -->
         <Grid x:Name="currentTrack" Width="500" HorizontalAlignment="Left">
             <VisualStateManager.VisualStateGroups>
                 <VisualStateGroup x:Name="visualChangeGroup">
-                    <VisualState x:Name="changeTrackAnimation">
+                    <VisualState x:Name="changeTrackTitleAnimation">
                         <Storyboard>
-                            <RepositionThemeAnimation  Storyboard.TargetName="currentTrackInfo" FromHorizontalOffset="-400"></RepositionThemeAnimation>
-                            <RepositionThemeAnimation  Storyboard.TargetName="currentTrackCover" FromHorizontalOffset="-400"></RepositionThemeAnimation>
+                            <DoubleAnimation Storyboard.TargetName="trackTitleLine"
+                                             From="0"
+                                             To="1"
+                                             Storyboard.TargetProperty="Opacity"
+                                             Duration="0:0:2" />
+                        </Storyboard>
+                    </VisualState>
+                    <VisualState x:Name="changeTrackArtistAnimation">
+                        <Storyboard>
+                            <DoubleAnimation Storyboard.TargetName="trackArtist"
+                                             From="0"
+                                             To="1"
+                                             Storyboard.TargetProperty="Opacity"
+                                             Duration="0:0:2" />
+                        </Storyboard>
+                    </VisualState>
+                    <VisualState x:Name="changeTrackAlbumAnimation">
+                        <Storyboard>
+                            <DoubleAnimation Storyboard.TargetName="trackAlbum"
+                                             From="0"
+                                             To="1"
+                                             Storyboard.TargetProperty="Opacity"
+                                             Duration="0:0:2" />
+
+                            <DoubleAnimation Storyboard.TargetName="currentTrackCover"
+                                             From="0"
+                                             To="1"
+                                             Storyboard.TargetProperty="Opacity"
+                                             Duration="0:0:2" />
                         </Storyboard>
                     </VisualState>
                 </VisualStateGroup>
@@ -48,9 +82,28 @@
                 <ColumnDefinition Width="430" x:Name="trackColumn"></ColumnDefinition>
             </Grid.ColumnDefinitions>
 
-            <Border x:Name="currentTrackCover" Grid.Column="0" Padding="1" Width="70" Height="70" BorderThickness="1" Background="White">
-                <Grid>
-                    <Image Width="68" Height="68" HorizontalAlignment="Center" VerticalAlignment="Center" Source="{x:Bind ViewModel.CurrentAlbum.Picture, Mode=OneWay}" />
+            <Border x:Name="currentTrackCover"
+                    Grid.Column="0"
+                    CornerRadius="4"
+                    Padding="1" 
+                    Width="70" 
+                    Height="70" 
+                    BorderThickness="0"
+                    Background="{ThemeResource CardBackgroundFillColorDefaultBrush}">
+                <Grid CornerRadius="4"
+                      Background="{ThemeResource LayerFillColorDefaultBrush}">
+                    <Image Width="70"
+                           Height="70"
+                           Stretch="UniformToFill"
+                           HorizontalAlignment="Center"
+                           VerticalAlignment="Center"
+                           Source="{x:Bind ViewModel.CurrentAlbum.Picture, Mode=OneWay}">
+                        <Image.Transitions>
+                            <TransitionCollection>
+                                <EntranceThemeTransition />
+                            </TransitionCollection>
+                        </Image.Transitions>
+                    </Image>
                 </Grid>
             </Border>
 
@@ -63,8 +116,9 @@
 
 
                 <!--Title line-->
-                <StackPanel Grid.Column="1" Grid.Row="0" Orientation="Horizontal" Margin="6,0,0,0">
+                <StackPanel x:Name="trackTitleLine" Grid.Column="1" Grid.Row="0" Orientation="Horizontal" Margin="6,0,0,0">
                     <HyperlinkButton Grid.Column="0"
+                                     x:Name="trackTitle"
                                      MaxWidth="200"
                                      Style="{StaticResource MiniLinkStyle}"
                                      Command="{x:Bind ViewModel.CurrentTrack.TrackOpenCommand, Mode=OneWay}"
@@ -85,15 +139,20 @@
                 <!--Track info line-->
                 <StackPanel Grid.Column="1" Grid.Row="1" Orientation="Horizontal" Margin="6,0,0,0">
                     <HyperlinkButton Style="{StaticResource MiniLinkStyle}"
+                                     x:Name="trackArtist"
                                      MaxWidth="200"
                                      Command="{x:Bind ViewModel.CurrentTrack.ArtistOpenCommand, Mode=OneWay}"
                                      Content="{x:Bind ViewModel.CurrentTrack.ArtistName, Mode=OneWay}"
                                      ContentTemplate="{StaticResource EllipsisTemplate}"
                                      ToolTipService.ToolTip="{x:Bind ViewModel.CurrentTrack.ArtistName, Mode=OneWay}" />
 
-                    <TextBlock Text=" - " Foreground="White" VerticalAlignment="Center" Margin="6,0,6,0" />
+                    <TextBlock Text="•" 
+                               Foreground="White" 
+                               FontSize="12"
+                               VerticalAlignment="Center" Margin="6,0,6,0" />
 
-                    <HyperlinkButton Style="{StaticResource MiniLinkStyle}"   
+                    <HyperlinkButton Style="{StaticResource MiniLinkStyle}"
+                                     x:Name="trackAlbum"
                                      MaxWidth="200"
                                      Command="{x:Bind ViewModel.CurrentTrack.AlbumOpenCommand, Mode=OneWay}"
                                      Content="{x:Bind ViewModel.CurrentTrack.AlbumName, Mode=OneWay}"
