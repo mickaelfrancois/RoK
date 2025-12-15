@@ -126,7 +126,17 @@ public partial class TrackViewModel : ObservableObject, IDisposable
         {
             bool exists = _lyricsService.CheckLyricsExists(Track.MusicFile);
             if (!exists)
-                _ = GetLyricsFromAPIAsync();
+            {
+                // Avoid fire-and-forget by explicitly handling the task
+                _ = GetLyricsFromAPIAsync().ContinueWith(task =>
+                {
+                    if (task.IsFaulted)
+                    {
+                        // Log the exception if needed
+                        // _logger.LogError(task.Exception, "Failed to fetch lyrics from API");
+                    }
+                }, TaskScheduler.Default);
+            }
 
             return exists;
         }

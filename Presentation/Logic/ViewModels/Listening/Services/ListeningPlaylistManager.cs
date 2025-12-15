@@ -37,6 +37,7 @@ public partial class ListeningPlaylistManager : ObservableObject
         PlaylistChanged?.Invoke(this, EventArgs.Empty);
     }
 
+
     public async Task SetCurrentTrackAsync(TrackDto? track)
     {
         if (track == null)
@@ -69,21 +70,25 @@ public partial class ListeningPlaylistManager : ObservableObject
 
     private async Task LoadArtistIfNeededAsync(TrackDto track)
     {
-        if (Artist?.Artist.Id != track.ArtistId && track.ArtistId.HasValue)
+        if (!track.ArtistId.HasValue)
+            return;
+
+        if (Artist?.Artist.Id == track.ArtistId)
+            return;
+
+        ArtistViewModel? newArtist = await _dataLoader.LoadArtistAsync(track.ArtistId.Value);
+
+        if (newArtist == null)
+            return;
+
+        Artist = newArtist;
+
+        _dispatcherQueue.TryEnqueue(() =>
         {
-            ArtistViewModel? newArtist = await _dataLoader.LoadArtistAsync(track.ArtistId.Value);
-
-            if (newArtist != null)
-            {
-                Artist = newArtist;
-
-                _dispatcherQueue.TryEnqueue(() =>
-                {
-                    OnPropertyChanged(nameof(Artist));
-                });
-            }
-        }
+            OnPropertyChanged(nameof(Artist));
+        });
     }
+
 
     private void ClearData()
     {

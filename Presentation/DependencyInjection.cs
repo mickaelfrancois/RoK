@@ -42,14 +42,30 @@ public static class DependencyInjection
 
         // Albums ViewModel, services and handlers
         services.AddSingleton<AlbumsViewModel>();
-        services.AddKeyedSingleton<AlbumsViewModel>("SearchAlbums");
         services.AddSingleton<AlbumsDataLoader>();
         services.AddSingleton<AlbumsSelectionManager>();
         services.AddSingleton<AlbumsStateManager>();
         services.AddSingleton<AlbumsPlaybackService>();
         services.AddSingleton<AlbumUpdateMessageHandler>();
+        services.AddSingleton<AlbumImportedMessageHandler>();
         services.AddTransient<AlbumsGroupCategory>();
         services.AddTransient<AlbumsFilter>();
+
+        services.AddKeyedTransient<AlbumsViewModel>("SearchAlbums", (sp, _) =>
+        {
+            return new AlbumsViewModel(
+                        ActivatorUtilities.CreateInstance<AlbumsFilter>(sp),
+                        ActivatorUtilities.CreateInstance<AlbumsGroupCategory>(sp),
+                        ActivatorUtilities.CreateInstance<AlbumsDataLoader>(sp),
+                        ActivatorUtilities.CreateInstance<AlbumsSelectionManager>(sp),
+                        ActivatorUtilities.CreateInstance<AlbumsStateManager>(sp),
+                        ActivatorUtilities.CreateInstance<AlbumsPlaybackService>(sp),
+                        ActivatorUtilities.CreateInstance<AlbumUpdateMessageHandler>(sp),
+                        ActivatorUtilities.CreateInstance<LibraryRefreshMessageHandler>(sp),
+                        ActivatorUtilities.CreateInstance<AlbumImportedMessageHandler>(sp),
+                        sp.GetRequiredService<ILogger<AlbumsViewModel>>()
+                       );
+        });
 
         // Album detail services (for AlbumViewModel - single album)
         services.AddTransient<AlbumViewModel>();
@@ -61,7 +77,6 @@ public static class DependencyInjection
 
         // Artists ViewModel, services and handlers
         services.AddSingleton<ArtistsViewModel>();
-        services.AddKeyedSingleton<ArtistsViewModel>("SearchArtists");
         services.AddSingleton<ArtistsDataLoader>();
         services.AddSingleton<ArtistsSelectionManager>();
         services.AddSingleton<ArtistsStateManager>();
@@ -70,6 +85,23 @@ public static class DependencyInjection
         services.AddSingleton<ArtistImportedMessageHandler>();
         services.AddTransient<ArtistsGroupCategory>();
         services.AddTransient<ArtistsFilter>();
+
+        services.AddKeyedTransient<ArtistsViewModel>("SearchArtists", (sp, _) =>
+        {
+            return new ArtistsViewModel(
+                        ActivatorUtilities.CreateInstance<ArtistsFilter>(sp),
+                        ActivatorUtilities.CreateInstance<ArtistsGroupCategory>(sp),
+                        ActivatorUtilities.CreateInstance<ArtistsDataLoader>(sp),
+                        ActivatorUtilities.CreateInstance<ArtistsSelectionManager>(sp),
+                        ActivatorUtilities.CreateInstance<ArtistsStateManager>(sp),
+                        ActivatorUtilities.CreateInstance<ArtistsPlaybackService>(sp),
+                        ActivatorUtilities.CreateInstance<ArtistUpdateMessageHandler>(sp),
+                        ActivatorUtilities.CreateInstance<LibraryRefreshMessageHandler>(sp),
+                        ActivatorUtilities.CreateInstance<ArtistImportedMessageHandler>(sp),
+                        sp.GetRequiredService<IAppOptions>(),
+                        sp.GetRequiredService<ILogger<ArtistsViewModel>>()
+                       );
+        });
 
         // Artist detail services (for ArtistViewModel - single artist)
         services.AddTransient<ArtistViewModel>();
@@ -81,7 +113,6 @@ public static class DependencyInjection
 
         // Tracks ViewModel, services and handlers
         services.AddSingleton<TracksViewModel>();
-        services.AddKeyedSingleton<TracksViewModel>("SearchTracks");
         services.AddSingleton<TracksDataLoader>();
         services.AddSingleton<TracksSelectionManager>();
         services.AddSingleton<TracksStateManager>();
@@ -89,6 +120,21 @@ public static class DependencyInjection
         services.AddSingleton<TrackImportedMessageHandler>();
         services.AddTransient<TracksGroupCategory>();
         services.AddTransient<TracksFilter>();
+
+        services.AddKeyedTransient<TracksViewModel>("SearchTracks", (sp, _) =>
+        {
+            return new TracksViewModel(
+                        ActivatorUtilities.CreateInstance<TracksFilter>(sp),
+                        ActivatorUtilities.CreateInstance<TracksGroupCategory>(sp),
+                        ActivatorUtilities.CreateInstance<TracksDataLoader>(sp),
+                        ActivatorUtilities.CreateInstance<TracksSelectionManager>(sp),
+                        ActivatorUtilities.CreateInstance<TracksStateManager>(sp),
+                        ActivatorUtilities.CreateInstance<TracksPlaybackService>(sp),
+                        ActivatorUtilities.CreateInstance<LibraryRefreshMessageHandler>(sp),
+                        ActivatorUtilities.CreateInstance<TrackImportedMessageHandler>(sp),
+                        sp.GetRequiredService<ILogger<TracksViewModel>>()
+                       );
+        });
 
         // Track detail services (for TrackViewModel - single track)
         services.AddTransient<TrackViewModel>();
@@ -136,7 +182,6 @@ public static class DependencyInjection
 
         // Shared message handlers
         services.AddSingleton<LibraryRefreshMessageHandler>();
-        services.AddSingleton<AlbumImportedMessageHandler>();
 
         // Other ViewModels
         services.AddSingleton<MainViewModel>();
