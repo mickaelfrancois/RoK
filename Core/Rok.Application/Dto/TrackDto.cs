@@ -1,7 +1,4 @@
-﻿using Dapper.Contrib.Extensions;
-using System.Xml.Linq;
-
-namespace Rok.Application.Dto;
+﻿namespace Rok.Application.Dto;
 
 public class TrackDto
 {

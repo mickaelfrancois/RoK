@@ -39,8 +39,6 @@ public sealed partial class SearchPage : Page
     {
         SearchOpenArgs openArgs = e.Parameter as SearchOpenArgs ?? new SearchOpenArgs();
 
-        ViewModel.LoadData(openArgs);
-
         TrackCount = openArgs.SearchResult.Tracks.Count;
         ArtistCount = openArgs.SearchResult.Artists.Count;
         AlbumCount = openArgs.SearchResult.Albums.Count;
