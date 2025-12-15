@@ -66,7 +66,7 @@ namespace Rok
             SplashScreen.Start();
 
             Messenger.Subscribe<FullScreenMessage>((message) => FullScreenHandle(message));
-            Messenger.Subscribe<MediaChangedMessage>((message) => MediaChanged());
+            Messenger.Subscribe<MediaChangedMessage>((message) => MediaChanged(message));
             Messenger.Subscribe<LibraryRefreshMessage>((message) => LibraryRefreshHandle(message));
             Messenger.Subscribe<SearchNoResultMessage>(async (message) => await SearchNoResultHandleAsync());
             Messenger.Subscribe<CompactModeMessage>((message) => ToggleCompactMode());
@@ -191,11 +191,11 @@ namespace Rok
         }
 
 
-        private void MediaChanged()
+        private void MediaChanged(MediaChangedMessage message)
         {
             _dispatcherQueue.TryEnqueue(async () =>
             {
-                await fullscreen.TrackChangedAsync();
+                await fullscreen.TrackChangedAsync(message.NewTrack, message.PreviousTrack);
             });
         }
 

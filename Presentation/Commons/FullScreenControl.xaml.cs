@@ -1,6 +1,7 @@
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media.Animation;
 using Rok.Logic.ViewModels.Player;
+using System.Threading;
 
 namespace Rok.Commons;
 
@@ -17,12 +18,14 @@ public sealed partial class FullScreenControl : UserControl
     private Storyboard? _backdropFadeOut;
     private Storyboard? _coverEntrance;
     private DispatcherTimer? _backdropTimer;
-    private List<string> _backdrops = [];
+    private List<string> _backdrops = new();
     private int _currentBackdropIndex;
-    private string _lastArtistName = string.Empty;
+    private readonly object _backdropsLock = new();
     private BackdropPicture? _backdropService;
     private readonly ILogger<FullScreenControl> _logger = App.ServiceProvider.GetRequiredService<ILogger<FullScreenControl>>();
 
+    private readonly object _trackChangeLock = new();
+    private CancellationTokenSource? _trackChangeCts;
 
 
     public FullScreenControl()
@@ -45,39 +48,54 @@ public sealed partial class FullScreenControl : UserControl
             list.ScrollIntoView(e.AddedItems[0]);
     }
 
-
-    public async Task TrackChangedAsync()
+    public async Task TrackChangedAsync(TrackDto newTrack, TrackDto? previousTrack)
     {
         _logger.LogDebug("Track changed - updating full screen view.");
 
-        _backdropTimer?.Stop();
-        _trackAnimationIndex++;
-
-        if (_trackAnimationIndex > _maxTrackAnimation)
-            _trackAnimationIndex = 1;
-
-        switch (_trackAnimationIndex)
+        CancellationToken ct;
+        lock (_trackChangeLock)
         {
-            case 1:
-                changeTrackAnimation1?.Storyboard.Begin();
-                break;
-
-            case 2:
-                changeTrackAnimation2?.Storyboard.Begin();
-                break;
-
-            case 3:
-                changeTrackAnimation3?.Storyboard.Begin();
-                break;
+            _trackChangeCts?.Cancel();
+            _trackChangeCts?.Dispose();
+            _trackChangeCts = new CancellationTokenSource();
+            ct = _trackChangeCts.Token;
         }
 
-        string? artistName = PlayerViewModel?.CurrentTrack?.ArtistName;
-        if (!string.IsNullOrEmpty(artistName) && artistName != _lastArtistName)
+        try
         {
-            _lastArtistName = artistName;
-            await LoadBackdropsForCurrentArtistAsync();
+            _backdropTimer?.Stop();
+            _trackAnimationIndex++;
 
-            _coverEntrance?.Begin();
+            if (_trackAnimationIndex > _maxTrackAnimation)
+                _trackAnimationIndex = 1;
+
+            switch (_trackAnimationIndex)
+            {
+                case 1:
+                    changeTrackAnimation1?.Storyboard.Begin();
+                    break;
+
+                case 2:
+                    changeTrackAnimation2?.Storyboard.Begin();
+                    break;
+
+                case 3:
+                    changeTrackAnimation3?.Storyboard.Begin();
+                    break;
+            }
+
+            if (newTrack.ArtistId != previousTrack?.ArtistId)
+            {
+                await LoadBackdropsForCurrentArtistAsync(newTrack.ArtistName, ct);
+                if (ct.IsCancellationRequested)
+                    return;
+
+                _coverEntrance?.Begin();
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error while handling track change.");
         }
 
         _backdropTimer?.Start();
@@ -111,25 +129,42 @@ public sealed partial class FullScreenControl : UserControl
         _backdropTimer = null;
 
         _kenBurnsStoryboard?.Stop();
+
+        lock (_trackChangeLock)
+        {
+            _trackChangeCts?.Cancel();
+            _trackChangeCts?.Dispose();
+            _trackChangeCts = null;
+        }
     }
 
 
-    private async Task LoadBackdropsForCurrentArtistAsync()
+    private async Task LoadBackdropsForCurrentArtistAsync(string artistName, CancellationToken ct = default)
     {
         try
         {
-            var artistName = PlayerViewModel?.CurrentArtist?.Artist.Name;
-
-            if (string.IsNullOrEmpty(artistName) || _backdropService == null)
+            if (string.IsNullOrEmpty(artistName) || _backdropService == null || ct.IsCancellationRequested)
                 return;
 
-            _backdrops = _backdropService.GetBackdrops(artistName);
-            _currentBackdropIndex = 0;
+            List<string> newBackdrops = _backdropService.GetBackdrops(artistName);
+
+            lock (_backdropsLock)
+            {
+                _backdrops = newBackdrops ?? new List<string>();
+                _currentBackdropIndex = 0;
+            }
+
+            if (ct.IsCancellationRequested)
+                return;
 
             if (_backdrops.Count > 0)
-                await ShowNextBackdropAsync();
+                await ShowNextBackdropAsync(ct);
             else
-                await ShowGenericBackdropAsync();
+                await ShowGenericBackdropAsync(ct);
+        }
+        catch (OperationCanceledException)
+        {
+            // Operation was canceled, no action needed.
         }
         catch (Exception ex)
         {
@@ -151,27 +186,50 @@ public sealed partial class FullScreenControl : UserControl
     }
 
 
-    private async Task ShowNextBackdropAsync()
+    private async Task ShowNextBackdropAsync(CancellationToken ct = default)
     {
-        if (_backdrops.Count == 0)
+        string? backdropPath = null;
+
+        lock (_backdropsLock)
         {
-            await ShowGenericBackdropAsync();
+            if (_backdrops.Count == 0)
+            {
+                backdropPath = null;
+            }
+            else
+            {
+                if (_currentBackdropIndex < 0 || _currentBackdropIndex >= _backdrops.Count)
+                    _currentBackdropIndex = 0;
+
+                backdropPath = _backdrops[_currentBackdropIndex];
+
+                _currentBackdropIndex = (_currentBackdropIndex + 1) % _backdrops.Count;
+            }
+        }
+
+        if (backdropPath == null)
+        {
+            await ShowGenericBackdropAsync(ct);
             return;
         }
 
         try
         {
             _backdropFadeOut?.Begin();
-            await Task.Delay(1000);
+            await Task.Delay(1000, ct);
 
-            string backdropPath = _backdrops[_currentBackdropIndex];
+            if (ct.IsCancellationRequested)
+                return;
+
             BackdropImage.Source = new BitmapImage(new Uri($"file:///{backdropPath}"));
-
-            _currentBackdropIndex = (_currentBackdropIndex + 1) % _backdrops.Count;
 
             _backdropFadeIn?.Begin();
             _kenBurnsStoryboard?.Stop();
             _kenBurnsStoryboard?.Begin();
+        }
+        catch (OperationCanceledException)
+        {
+            // Operation was canceled, no action needed.
         }
         catch (Exception ex)
         {
@@ -179,23 +237,30 @@ public sealed partial class FullScreenControl : UserControl
         }
     }
 
-    private async Task ShowGenericBackdropAsync()
+    private async Task ShowGenericBackdropAsync(CancellationToken ct = default)
     {
         try
         {
-            if (_backdropService == null)
+            if (_backdropService == null || ct.IsCancellationRequested)
                 return;
 
             string genericBackdrop = _backdropService.GetRandomGenericBackdrop();
 
             _backdropFadeOut?.Begin();
-            await Task.Delay(1000);
+            await Task.Delay(1000, ct);
+
+            if (ct.IsCancellationRequested)
+                return;
 
             BackdropImage.Source = new BitmapImage(new Uri(genericBackdrop));
 
             _backdropFadeIn?.Begin();
             _kenBurnsStoryboard?.Stop();
             _kenBurnsStoryboard?.Begin();
+        }
+        catch (OperationCanceledException)
+        {
+            // Operation was canceled, no action needed.
         }
         catch (Exception ex)
         {
