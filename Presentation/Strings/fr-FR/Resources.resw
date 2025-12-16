@@ -1059,4 +1059,10 @@
   <data name="albumViewPlaylist.Label" xml:space="preserve">
     <value>Playlists</value>
   </data>
+  <data name="groupByscore" xml:space="preserve">
+    <value>score</value>
+  </data>
+  <data name="tracksViewGroupByScore" xml:space="preserve">
+    <value>score</value>
+  </data>
 </root>

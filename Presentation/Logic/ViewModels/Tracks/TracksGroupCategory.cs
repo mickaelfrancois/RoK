@@ -14,6 +14,7 @@ public class TracksGroupCategory(ResourceLoader resourceLoader) : GroupCategoryS
             GroupingConstants.Artist => ResourceLoader.GetString("tracksViewGroupByArtist"),
             GroupingConstants.Album => ResourceLoader.GetString("tracksViewGroupByAlbum"),
             GroupingConstants.Genre => ResourceLoader.GetString("tracksViewGroupByGenre"),
+            GroupingConstants.Score => ResourceLoader.GetString("tracksViewGroupByScore"),
             _ => groupBy,
         };
     }
@@ -26,6 +27,7 @@ public class TracksGroupCategory(ResourceLoader resourceLoader) : GroupCategoryS
         RegisterStrategy(GroupingConstants.Artist, GroupByArtist);
         RegisterStrategy(GroupingConstants.Album, GroupByAlbum);
         RegisterStrategy(GroupingConstants.Genre, GroupByGenre);
+        RegisterStrategy(GroupingConstants.Score, GroupByScore);
         RegisterStrategy(GroupingConstants.CreatDate, tracks => GroupByCreatDate(tracks, t => t.Track.CreatDate));
         RegisterStrategy(GroupingConstants.LastListen, tracks => SortByLastListen(tracks, t => t.Track.LastListen));
         RegisterStrategy(GroupingConstants.ListenCount, tracks => SortByListenCount(tracks, t => t.Track.ListenCount));
@@ -47,7 +49,6 @@ public class TracksGroupCategory(ResourceLoader resourceLoader) : GroupCategoryS
 
         return BuildGroupedCollection(selectedItems, orderByDescending: false);
     }
-
 
     private IEnumerable<TracksGroupCategoryViewModel> GroupByArtist(List<TrackViewModel> tracks)
     {
@@ -80,5 +81,22 @@ public class TracksGroupCategory(ResourceLoader resourceLoader) : GroupCategoryS
             });
 
         return BuildGroupedCollection(selectedItems, orderByDescending: false);
+    }
+
+    private IEnumerable<TracksGroupCategoryViewModel> GroupByScore(List<TrackViewModel> tracks)
+    {
+        IEnumerable<TracksGroupCategoryViewModel> selectedItems = tracks
+            .GroupBy(x => x.Track.Score.ToString())
+            .Select(x => new TracksGroupCategoryViewModel
+            {
+                Title = x.Key,
+                Items = x.OrderByDescending(c => c.Track.Score)
+                         .ThenBy(c => c.Track.ArtistName)
+                         .ThenBy(c => c.AlbumName)
+                         .ThenBy(c => c.TrackNumber)
+                         .ToList()
+            });
+
+        return BuildGroupedCollection(selectedItems, orderByDescending: true);
     }
 }
