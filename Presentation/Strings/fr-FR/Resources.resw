@@ -817,7 +817,7 @@
     <value>{sans titre}</value>
   </data>
   <data name="ListeningViewTitle.Text" xml:space="preserve">
-    <value>En cours de</value>
+    <value>En cours d'écoute</value>
   </data>
   <data name="ListeningViewTitleCount.Text" xml:space="preserve">
     <value>chansons, </value>

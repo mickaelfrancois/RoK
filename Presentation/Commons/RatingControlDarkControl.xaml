@@ -15,6 +15,7 @@
     </UserControl.Resources>
 
     <RatingControl x:Name="InnerRating"
+                       Opacity="{x:Bind Opacity, Mode=OneWay}"
                        MaxRating="{x:Bind MaxRating, Mode=OneWay}"
                        IsClearEnabled="{x:Bind IsClearEnabled, Mode=OneWay}"
                        InitialSetValue="{x:Bind InitialValue, Mode=OneWay}"

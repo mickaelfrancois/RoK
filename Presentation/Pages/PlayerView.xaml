@@ -43,7 +43,16 @@
                 <VisualStateGroup x:Name="visualChangeGroup">
                     <VisualState x:Name="changeTrackTitleAnimation">
                         <Storyboard>
-                            <DoubleAnimation Storyboard.TargetName="trackTitleLine"
+                            <DoubleAnimation Storyboard.TargetName="trackTitle"
+                                             From="0"
+                                             To="1"
+                                             Storyboard.TargetProperty="Opacity"
+                                             Duration="0:0:2" />
+                        </Storyboard>
+                    </VisualState>
+                    <VisualState x:Name="changeTrackScoreAnimation">
+                        <Storyboard>
+                            <DoubleAnimation Storyboard.TargetName="trackScore"
                                              From="0"
                                              To="1"
                                              Storyboard.TargetProperty="Opacity"
@@ -119,6 +128,9 @@
                 <StackPanel x:Name="trackTitleLine" Grid.Column="1" Grid.Row="0" Orientation="Horizontal" Margin="6,0,0,0">
                     <HyperlinkButton Grid.Column="0"
                                      x:Name="trackTitle"
+                                     HorizontalAlignment="Left"
+                                     HorizontalContentAlignment="Left"
+                                     MinWidth="100"
                                      MaxWidth="200"
                                      Style="{StaticResource MiniLinkStyle}"
                                      Command="{x:Bind ViewModel.CurrentTrack.TrackOpenCommand, Mode=OneWay}"
@@ -126,7 +138,7 @@
                                      ContentTemplate="{StaticResource EllipsisTemplate}"
                                      ToolTipService.ToolTip="{x:Bind ViewModel.CurrentTrack.Title, Mode=OneWay}"/>
 
-                    <commons:RatingControlDarkControl x:Name="score"
+                    <commons:RatingControlDarkControl x:Name="trackScore"
                                    Margin="30,0,0,0" 
                                    HorizontalAlignment="Right"                                                       
                                    InitialValue="{x:Bind ViewModel.CurrentTrack.Score, Mode=OneWay}" 
