@@ -18,4 +18,6 @@ public static class GroupingConstants
 
     public const string Title = "TITLE";
     public const string Genre = "GENRENAME";
+
+    public const string Score = "SCORE";
 }

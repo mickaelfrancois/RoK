@@ -18,6 +18,7 @@ internal class TracksGroupByMenuBuilder
         "GENRENAME",
         "LASTLISTEN",
         "LISTENCOUNT",
+        "SCORE"
     ];
 
 
