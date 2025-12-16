@@ -102,14 +102,14 @@
                            Margin="6,0,0,0">
 
                 <HyperlinkButton x:Name="currentTrackTitle"
-                                 Content="{x:Bind ViewModel.CurrentTrack.Title}"
+                                 Content="{x:Bind ViewModel.CurrentTrack.Title, Mode=OneWay}"
                                  Command="{x:Bind ViewModel.CurrentTrack.TrackOpenCommand}"
                                  FontSize="24" Padding="0" Margin="0"
                                  Style="{StaticResource headerGenreHyperlink}" />
 
                 <HyperlinkButton x:Name="artistName"
                                  RelativePanel.Below="currentTrackTitle"
-                                 Content="{x:Bind ViewModel.CurrentTrack.ArtistName}"
+                                 Content="{x:Bind ViewModel.CurrentTrack.ArtistName, Mode=OneWay}"
                                  Command="{x:Bind ViewModel.CurrentTrack.ArtistOpenCommand}"
                                  FontSize="16"
                                  Style="{StaticResource headerGenreHyperlink}" />
@@ -119,17 +119,17 @@
                         RelativePanel.AlignVerticalCenterWith="artistName"
                         Margin="4,0,0,0"
                         Style="{StaticResource ButtonTextBlockStyle}"
-                        Visibility="{x:Bind ViewModel.Artist.Artist.CountryCode, Converter={StaticResource StringToVisibilityConverter}}"
+                        Visibility="{x:Bind ViewModel.Artist.Artist.CountryCode, Mode=OneWay, Converter={StaticResource StringToVisibilityConverter}}"
                         BorderBrush="Transparent"
                         Background="Transparent"
-                        ToolTipService.ToolTip="{x:Bind ViewModel.Artist.Artist.CountryName}">
-                    <Image Source="{x:Bind ViewModel.Artist.Artist.CountryCode, Converter={StaticResource CountryCodeToImageSourceConverter}}"
+                        ToolTipService.ToolTip="{x:Bind ViewModel.Artist.Artist.CountryName, Mode=OneWay}">
+                    <Image Source="{x:Bind ViewModel.Artist.Artist.CountryCode, Mode=OneWay, Converter={StaticResource CountryCodeToImageSourceConverter}}"
                            Height="10"></Image>
                 </Button>
 
                 <HyperlinkButton x:Name="albumName"
                                  RelativePanel.Below="artistName"
-                                 Content="{x:Bind ViewModel.CurrentTrack.AlbumName}"
+                                 Content="{x:Bind ViewModel.CurrentTrack.AlbumName, Mode=OneWay}"
                                  Command="{x:Bind ViewModel.CurrentTrack.AlbumOpenCommand}"
                                  FontSize="16"
                                  Style="{StaticResource headerGenreHyperlink}" />

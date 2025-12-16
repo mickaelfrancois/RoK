@@ -93,5 +93,8 @@ public sealed partial class PlayerView : UserControl
 
         if (previousTrack.AlbumId != newTrack.AlbumId)
             this.changeTrackAlbumAnimation?.Storyboard.Begin();
+
+        if (previousTrack.Score != newTrack.Score)
+            this.changeTrackScoreAnimation?.Storyboard.Begin();
     }
 }
