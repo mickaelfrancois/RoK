@@ -12,6 +12,7 @@ public partial class ListeningViewModel : ObservableObject
 
     private readonly ListeningPlaylistManager _playlistManager;
     private readonly ListeningPlaybackService _playbackService;
+    private readonly NavigationService _navigationService;
 
     public int TrackCount => _playlistManager.TrackCount;
     public long Duration => _playlistManager.Duration;
@@ -21,20 +22,28 @@ public partial class ListeningViewModel : ObservableObject
 
     public AsyncRelayCommand<TrackViewModel> AddMoreFromArtistCommand { get; private set; }
     public RelayCommand ShufflePlaylistCommand { get; private set; }
+    public RelayCommand AlbumOpenCommand { get; private set; }
+    public RelayCommand ArtistOpenCommand { get; private set; }
+    public RelayCommand TrackOpenCommand { get; private set; }
 
     public ListeningViewModel(
         IPlayerService playerService,
         ListeningPlaylistManager playlistManager,
         ListeningPlaybackService playbackService,
+        NavigationService navigationService,
         ILogger<ListeningViewModel> logger)
     {
         _playerService = Guard.Against.Null(playerService);
         _playlistManager = Guard.Against.Null(playlistManager);
         _playbackService = Guard.Against.Null(playbackService);
+        _navigationService = Guard.Against.Null(navigationService);
         _logger = Guard.Against.Null(logger);
 
         AddMoreFromArtistCommand = new AsyncRelayCommand<TrackViewModel>(AddMoreFromArtistAsync);
         ShufflePlaylistCommand = new RelayCommand(ShuffleTracks);
+        ArtistOpenCommand = new RelayCommand(ArtistOpen);
+        AlbumOpenCommand = new RelayCommand(AlbumOpen);
+        TrackOpenCommand = new RelayCommand(TrackOpen);
 
         SubscribeToMessages();
         SubscribeToEvents();
@@ -100,5 +109,32 @@ public partial class ListeningViewModel : ObservableObject
     public void ShuffleTracks()
     {
         _playbackService.ShuffleTracks();
+    }
+
+    private void ArtistOpen()
+    {
+        long? artistId = CurrentTrack?.Track.ArtistId;
+        if (!artistId.HasValue)
+            return;
+
+        _navigationService.NavigateToArtist(artistId.Value);
+    }
+
+    private void AlbumOpen()
+    {
+        long? albumId = CurrentTrack?.Track.AlbumId;
+        if (!albumId.HasValue)
+            return;
+
+        _navigationService.NavigateToAlbum(albumId.Value);
+    }
+
+    private void TrackOpen()
+    {
+        long? trackId = CurrentTrack?.Track.Id;
+        if (!trackId.HasValue)
+            return;
+
+        _navigationService.NavigateToTrack(trackId.Value);
     }
 }
