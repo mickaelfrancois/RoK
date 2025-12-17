@@ -248,12 +248,14 @@ public partial class TrackViewModel : ObservableObject, IDisposable
 
     private void ArtistOpen()
     {
-        _navigationService.NavigateToArtist(Track.ArtistId);
+        if (Track.ArtistId.HasValue)
+            _navigationService.NavigateToArtist(Track.ArtistId);
     }
 
     private void AlbumOpen()
     {
-        _navigationService.NavigateToAlbum(Track.AlbumId);
+        if (Track.AlbumId.HasValue)
+            _navigationService.NavigateToAlbum(Track.AlbumId);
     }
 
     private void TrackOpen()

@@ -101,17 +101,12 @@
             <RelativePanel Grid.Column="1"
                            Margin="6,0,0,0">
 
-                <HyperlinkButton x:Name="currentTrackTitle"
-                                 Content="{x:Bind ViewModel.CurrentTrack.Title, Mode=OneWay}"
-                                 Command="{x:Bind ViewModel.CurrentTrack.TrackOpenCommand}"
-                                 FontSize="24" Padding="0" Margin="0"
-                                 Style="{StaticResource headerGenreHyperlink}" />
-
                 <HyperlinkButton x:Name="artistName"
-                                 RelativePanel.Below="currentTrackTitle"
                                  Content="{x:Bind ViewModel.CurrentTrack.ArtistName, Mode=OneWay}"
-                                 Command="{x:Bind ViewModel.CurrentTrack.ArtistOpenCommand}"
-                                 FontSize="16"
+                                 Command="{x:Bind ViewModel.ArtistOpenCommand}"
+                                 FontSize="30"
+                                 Padding="0"
+                                 Margin="0"
                                  Style="{StaticResource headerGenreHyperlink}" />
 
                 <Button x:Name="buttonCountry"
@@ -130,7 +125,7 @@
                 <HyperlinkButton x:Name="albumName"
                                  RelativePanel.Below="artistName"
                                  Content="{x:Bind ViewModel.CurrentTrack.AlbumName, Mode=OneWay}"
-                                 Command="{x:Bind ViewModel.CurrentTrack.AlbumOpenCommand}"
+                                 Command="{x:Bind ViewModel.AlbumOpenCommand}"
                                  FontSize="16"
                                  Style="{StaticResource headerGenreHyperlink}" />
             </RelativePanel>
@@ -177,7 +172,7 @@
 
             <Grid Style="{StaticResource gridTracks}">
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="28" />
+                    <ColumnDefinition Width="38" />
                     <ColumnDefinition Width="{ThemeResource gridHeaderTracksTitleColumnWidth}"
                                       x:Name="trackTitle" />
                     <ColumnDefinition Width="{ThemeResource gridHeaderTracksArtistColumnWidth}"
@@ -205,18 +200,19 @@
             <common:ListViewExtended x:Name="tracksList"
                                      ItemsSource="{x:Bind ViewModel.Tracks}"
                                      ContainerContentChanging="tracksList_ContainerContentChanging"
-                                     Grid.Row="3"
-                                     BorderThickness="0"
+                                     Grid.Row="1"
+                                     BorderThickness="0"                                     
                                      ItemContainerStyle="{StaticResource tracksListViewItem}"
-                                     Margin="0">
+                                     Margin="0" >
 
                 <ListView.ItemTemplate>
                     <DataTemplate x:DataType="track:TrackViewModel">
                         <Grid HorizontalAlignment="Stretch"
+                              VerticalAlignment="Center"
                               Background="Transparent"
-                              Margin="0,0,20,10">
+                              Margin="0,0,20,0">
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="28"
+                                <ColumnDefinition Width="38"
                                                   x:Name="listened" />
                                 <ColumnDefinition Width="{ThemeResource gridHeaderTracksTitleColumnWidth}" />
                                 <ColumnDefinition Width="{ThemeResource gridHeaderTracksArtistColumnWidth}" />
@@ -246,8 +242,8 @@
                                         </MenuFlyoutItem.Icon>
                                     </MenuFlyoutItem>
                                     <MenuFlyoutItem x:Uid="trackFlyoutTrack"
-                                        Icon="Audio"
-                                        Command="{x:Bind TrackOpenCommand}" />
+                                                    Icon="Audio"
+                                                    Command="{x:Bind TrackOpenCommand}" />
                                     <MenuFlyoutSeparator />
                                     <MenuFlyoutItem x:Uid="trackFlyoutLyrics"
                                                     Command="{x:Bind LyricsOpenCommand}"
@@ -260,10 +256,10 @@
                             </Grid.ContextFlyout>
 
                             <!-- Listening -->
-                            <Grid>
+                            <Grid VerticalAlignment="Center">
                                 <Image Margin="0,0,2,0"
                                        HorizontalAlignment="Left"
-                                       VerticalAlignment="Bottom"
+                                       VerticalAlignment="Center"
                                        Stretch="None"
                                        Visibility="{x:Bind Listening, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">
                                     <Image.Source>
@@ -275,34 +271,41 @@
                                 </Image>
 
                                 <TextBlock x:Name="RowIndexText"
+                                           VerticalAlignment="Center"
                                            Visibility="{x:Bind Listening, Mode=OneWay, Converter={StaticResource BoolToInvertVisibilityConverter}}"
                                            Style="{StaticResource gridTracksRowIndexText}" />
                             </Grid>
 
                             <StackPanel Grid.Column="1"
-                                        Orientation="Horizontal">
+                                        Orientation="Horizontal"
+                                        VerticalAlignment="Center">
 
                                 <HyperlinkButton Style="{StaticResource gridTracksTitleText}"
                                                  Command="{x:Bind ListenCommand}"
-                                                 CommandParameter="{x:Bind}" />
+                                                 CommandParameter="{x:Bind}"
+                                                 VerticalAlignment="Center" />
 
                                 <HyperlinkButton x:Uid="lyricsTag"
                                                  Visibility="{x:Bind LyricsExists, Converter={StaticResource BoolToVisibilityConverter}}"
                                                  Style="{StaticResource gridTracksLyricsText}"
-                                                 Command="{x:Bind LyricsOpenCommand}" />
+                                                 Command="{x:Bind LyricsOpenCommand}"
+                                                 VerticalAlignment="Center" />
                             </StackPanel>
 
                             <HyperlinkButton Grid.Column="2"
                                              Style="{StaticResource gridTracksArtistText}"
-                                             Command="{Binding ArtistOpenCommand}" />
+                                             Command="{Binding ArtistOpenCommand}"
+                                             VerticalAlignment="Center" />
 
                             <HyperlinkButton Grid.Column="3"
                                              Style="{StaticResource gridTracksAlbumText}"
-                                             Command="{x:Bind AlbumOpenCommand}" />
+                                             Command="{x:Bind AlbumOpenCommand}"
+                                             VerticalAlignment="Center" />
 
                             <common:RatingControlLightControl Grid.Column="4"
                                                               Style="{StaticResource gridTracksScore}"
-                                                              RatingValue="{x:Bind Score, Mode=TwoWay}" />
+                                                              RatingValue="{x:Bind Score, Mode=TwoWay}"
+                                                              VerticalAlignment="Center" />
                         </Grid>
                     </DataTemplate>
                 </ListView.ItemTemplate>
