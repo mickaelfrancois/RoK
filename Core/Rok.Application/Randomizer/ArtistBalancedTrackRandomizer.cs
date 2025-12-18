@@ -8,9 +8,9 @@ public static class ArtistBalancedTrackRandomizer
 
         List<TrackDto> output = input switch
         {
-            List<TrackDto> list => new List<TrackDto>(list), // Copy to not mutate the source
+            List<TrackDto> list => new List<TrackDto>(list),
             ICollection<TrackDto> coll => new List<TrackDto>(coll),
-            _ => [.. input]
+            _ => input.ToList()
         };
 
         if (output.Count <= 1)
@@ -18,59 +18,68 @@ public static class ArtistBalancedTrackRandomizer
 
         Random rand = Random.Shared;
 
-        // Group and shuffle tracks per artist
         List<(string Artist, Queue<TrackDto> Queue)> artistQueues = output
             .GroupBy(t => t.ArtistName ?? string.Empty)
             .Select(g =>
             {
-                // Shuffle using OrderBy with random key
-                List<TrackDto> shuffled = g.OrderBy(_ => rand.Next()).ToList();
+                List<TrackDto> shuffled = g.ToList();
+                FisherYatesShuffle(shuffled, rand);
                 return (Artist: g.Key, Queue: new Queue<TrackDto>(shuffled));
             })
             .ToList();
 
-        // PriorityQueue: element = (Artist, Queue, RemainingCount)
-        // .NET PriorityQueue is min-heap; use negative remaining count to simulate max-heap
-        PriorityQueue<(string Artist, Queue<TrackDto> Queue), int> queue = new();
-        foreach ((string Artist, Queue<TrackDto> Queue) in artistQueues)
-            queue.Enqueue((Artist, Queue), -Queue.Count);
+        // PriorityQueue where priority is negative remaining count to simulate max-heap
+        PriorityQueue<(string Artist, Queue<TrackDto> Queue), int> pq = new();
+        foreach ((string Artist, Queue<TrackDto> Queue) pair in artistQueues)
+        {
+            if (pair.Queue.Count > 0)
+                pq.Enqueue(pair, -pair.Queue.Count);
+        }
 
         List<TrackDto> result = new(output.Count);
         string? lastArtist = null;
 
-        while (queue.Count > 0)
+        while (pq.Count > 0)
         {
-            // Take top
-            if (!queue.TryDequeue(out (string Artist, Queue<TrackDto> Queue) current, out int currentPriority))
-                break;
+            (string Artist, Queue<TrackDto> Queue) first = pq.Dequeue();
 
-            // If same artist as last and alternative exists, swap
-            if (current.Artist == lastArtist && queue.Count > 0)
+            if (first.Artist == lastArtist && pq.Count > 0)
             {
-                // Hold current, get next
-                (string Artist, Queue<TrackDto> Queue) held = current;
-                int heldPriority = currentPriority;
+                (string Artist, Queue<TrackDto> Queue) second = pq.Dequeue();
 
-                queue.TryDequeue(out current, out currentPriority); // use second
-                // Requeue held for later
-                queue.Enqueue(held, heldPriority);
-            }
-
-            // Consume one track
-            if (current.Queue.Count > 0)
-            {
-                TrackDto track = current.Queue.Dequeue();
+                TrackDto track = second.Queue.Dequeue();
                 result.Add(track);
-                lastArtist = current.Artist;
+                lastArtist = second.Artist;
 
-                if (current.Queue.Count > 0)
-                {
-                    // Re-enqueue with updated remaining (max-heap via negative)
-                    queue.Enqueue((current.Artist, current.Queue), -current.Queue.Count);
-                }
+                if (second.Queue.Count > 0)
+                    pq.Enqueue(second, -second.Queue.Count);
+
+                if (first.Queue.Count > 0)
+                    pq.Enqueue(first, -first.Queue.Count);
+            }
+            else
+            {
+                TrackDto track = first.Queue.Dequeue();
+                result.Add(track);
+                lastArtist = first.Artist;
+
+                if (first.Queue.Count > 0)
+                    pq.Enqueue(first, -first.Queue.Count);
             }
         }
 
         return result;
+    }
+
+
+    private static void FisherYatesShuffle<T>(List<T> list, Random rnd)
+    {
+        for (int i = list.Count - 1; i > 0; i--)
+        {
+            int j = rnd.Next(i + 1);
+            T tmp = list[i];
+            list[i] = list[j];
+            list[j] = tmp;
+        }
     }
 }
