@@ -1,6 +1,4 @@
-﻿using Dapper.Contrib.Extensions;
-
-namespace Rok.Application.Dto;
+﻿namespace Rok.Application.Dto;
 
 public class ArtistDto
 {

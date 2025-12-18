@@ -18,7 +18,7 @@ public class DiscordRichPresenceService : IDisposable
     {
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
-        var applicationId = discordOptions?.Value?.ApplicationId;
+        string? applicationId = discordOptions?.Value?.ApplicationId;
 
         if (string.IsNullOrWhiteSpace(applicationId))
         {

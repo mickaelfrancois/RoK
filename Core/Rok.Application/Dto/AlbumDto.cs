@@ -1,6 +1,4 @@
-﻿using Dapper.Contrib.Extensions;
-
-namespace Rok.Application.Dto;
+﻿namespace Rok.Application.Dto;
 
 public class AlbumDto
 {
@@ -11,7 +9,7 @@ public class AlbumDto
     public DateTime CreatDate { get; set; }
 
     public DateTime? EditDate { get; set; }
-    
+
     public string Name { get; set; } = string.Empty;
 
     public int? Year { get; set; }

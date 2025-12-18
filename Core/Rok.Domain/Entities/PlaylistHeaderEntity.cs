@@ -1,6 +1,4 @@
-﻿using System.Text.Json.Serialization;
-
-namespace Rok.Domain.Entities;
+﻿namespace Rok.Domain.Entities;
 
 [Table("Playlists")]
 public class PlaylistHeaderEntity : BaseEntity
