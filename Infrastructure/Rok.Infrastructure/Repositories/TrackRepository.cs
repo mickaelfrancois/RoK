@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Rok.Application.Interfaces;
+using Rok.Application.Randomizer;
 
 namespace Rok.Infrastructure.Repositories;
 
@@ -62,15 +63,22 @@ public class TrackRepository(IDbConnection db, [FromKeyedServices("BackgroundCon
 
     public async Task<IEnumerable<TrackEntity>> GetByArtistIdAsync(IEnumerable<long> artistIds, int limit, RepositoryConnectionKind kind = RepositoryConnectionKind.Foreground)
     {
-        if (artistIds == null || !artistIds.Any())
+        if (artistIds == null)
             return Enumerable.Empty<TrackEntity>();
 
+        List<long> idsList = artistIds.ToList();
+        if (idsList.Count == 0)
+            return Enumerable.Empty<TrackEntity>();
+
+        int sampleCount = Math.Min(idsList.Count, Math.Max(limit * 5, 500));
+        List<long> sampledArtistsIds = SamplingHelper.SamplePartialFisherYates(idsList, sampleCount);
+
         string sql = GetSelectQuery() +
-                     "WHERE tracks.artistId IN @artistIds " +
+                     "WHERE tracks.artistId IN @sampledArtistsIds " +
                      "ORDER BY RANDOM() " +
                      "LIMIT @limit";
 
-        return await ExecuteQueryAsync(sql, kind, new { artistIds, limit });
+        return await ExecuteQueryAsync(sql, kind, new { sampledArtistsIds, limit });
     }
 
     public async Task<IEnumerable<TrackEntity>> GetByAlbumIdAsync(long albumId, RepositoryConnectionKind kind = RepositoryConnectionKind.Foreground)
@@ -85,15 +93,22 @@ public class TrackRepository(IDbConnection db, [FromKeyedServices("BackgroundCon
 
     public async Task<IEnumerable<TrackEntity>> GetByAlbumIdAsync(IEnumerable<long> albumIds, int limit, RepositoryConnectionKind kind = RepositoryConnectionKind.Foreground)
     {
-        if (albumIds == null || !albumIds.Any())
+        if (albumIds == null)
             return Enumerable.Empty<TrackEntity>();
 
+        List<long> idsList = albumIds.ToList();
+        if (idsList.Count == 0)
+            return Enumerable.Empty<TrackEntity>();
+
+        int sampleCount = Math.Min(idsList.Count, Math.Max(limit * 5, 500));
+        List<long> sampledAlbumIds = SamplingHelper.SamplePartialFisherYates(idsList, sampleCount);
+
         string sql = GetSelectQuery() +
-                     "WHERE tracks.albumId IN @albumIds " +
+                     "WHERE tracks.albumId IN @sampledAlbumIds " +
                      "ORDER BY RANDOM() " +
                      "LIMIT @limit";
 
-        return await ExecuteQueryAsync(sql, kind, new { albumIds, limit });
+        return await ExecuteQueryAsync(sql, kind, new { sampledAlbumIds, limit });
     }
 
     public async Task<bool> UpdateScoreAsync(long id, int score, RepositoryConnectionKind kind = RepositoryConnectionKind.Foreground)
