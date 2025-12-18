@@ -1,6 +1,6 @@
 ﻿using Rok.Application.Interfaces;
 
-namespace Rok.Application.Features.Tracks.Command;
+namespace Rok.Application.Features.Artists.Command;
 
 public class UpdateArtistGetMetaDataLastAttemptCommand(long id) : ICommand<Result<bool>>
 {
