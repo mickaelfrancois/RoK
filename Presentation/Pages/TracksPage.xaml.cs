@@ -8,14 +8,19 @@ namespace Rok.Pages;
 
 public sealed partial class TracksPage : Page, IDisposable
 {
+    private readonly ILogger<TracksPage> _logger;
     public TracksViewModel ViewModel { get; set; }
 
     private readonly TracksFilterMenuBuilder _filterMenuBuilder = new();
     private readonly TracksGroupByMenuBuilder _groupByMenuBuilder = new();
 
+    private bool _disposed;
+
     public TracksPage()
     {
         this.InitializeComponent();
+
+        _logger = App.ServiceProvider.GetRequiredService<ILogger<TracksPage>>();
 
         ViewModel = App.ServiceProvider.GetRequiredService<TracksViewModel>();
         DataContext = ViewModel;
@@ -34,6 +39,10 @@ public sealed partial class TracksPage : Page, IDisposable
     {
         ScrollStateHelper.SaveScrollOffset(tracksList);
         ViewModel.SaveState();
+
+        // Cleanup bindings and handlers to avoid keeping generated binding tracking objects alive
+        Dispose();
+
         base.OnNavigatingFrom(e);
     }
 
@@ -94,7 +103,35 @@ public sealed partial class TracksPage : Page, IDisposable
 
     public void Dispose()
     {
-        Loaded -= Page_Loaded;
-        ViewModel.PropertyChanged -= ViewModel_PropertyChanged;
+        if (_disposed)
+            return;
+
+        try
+        {
+            Loaded -= Page_Loaded;
+
+            if (ViewModel != null)
+                ViewModel.PropertyChanged -= ViewModel_PropertyChanged;
+
+            if (tracksList is not null)
+                tracksList.ItemsSource = null;
+
+            if (tracksZoomoutCollectionList is not null)
+                tracksZoomoutCollectionList.ItemsSource = null;
+
+            if (groupedItemsViewSource is not null)
+            {
+                groupedItemsViewSource.Source = null;
+                groupedItemsViewSource.IsSourceGrouped = false;
+            }
+
+            DataContext = null;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error during Dispose in TracksPage");
+        }
+
+        _disposed = true;
     }
 }

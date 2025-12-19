@@ -3,19 +3,26 @@ using Microsoft.UI.Xaml.Navigation;
 using Rok.Commons;
 using Rok.Logic.ViewModels.Artists;
 using System.ComponentModel;
+using System.Threading;
 
 namespace Rok.Pages;
 
 public sealed partial class ArtistsPage : Page, IDisposable
 {
+    private readonly ILogger<ArtistsPage> _logger;
+
     public ArtistsViewModel ViewModel { get; set; }
 
     private readonly ArtistsFilterMenuBuilder _filterMenuBuilder = new();
     private readonly ArtistsGroupByMenuBuilder _groupByMenuBuilder = new();
 
+    private bool _disposed;
+
     public ArtistsPage()
     {
         this.InitializeComponent();
+
+        _logger = App.ServiceProvider.GetRequiredService<ILogger<ArtistsPage>>();
 
         ViewModel = App.ServiceProvider.GetRequiredService<ArtistsViewModel>();
         DataContext = ViewModel;
@@ -36,6 +43,10 @@ public sealed partial class ArtistsPage : Page, IDisposable
     {
         ScrollStateHelper.SaveScrollOffset(grid);
         ViewModel.SaveState();
+
+        // Cleanup bindings and handlers to avoid keeping generated binding tracking objects alive
+        Dispose();
+
         base.OnNavigatingFrom(e);
     }
 
@@ -102,10 +113,43 @@ public sealed partial class ArtistsPage : Page, IDisposable
         _groupByMenuBuilder.PopulateGroupByMenu(groupByMenu, ViewModel);
     }
 
-
     public void Dispose()
     {
-        Loaded -= Page_Loaded;
-        ViewModel.PropertyChanged -= ViewModel_PropertyChanged;
+        if (!this.DispatcherQueue.HasThreadAccess)
+        {
+            this.DispatcherQueue.TryEnqueue(() => Dispose());
+            return;
+        }
+
+        if (Interlocked.Exchange(ref _disposed, true))
+            return;
+
+        try
+        {
+            Loaded -= Page_Loaded;
+
+            if (ViewModel != null)
+                ViewModel.PropertyChanged -= ViewModel_PropertyChanged;
+
+            if (grid is not null)
+                grid.ItemsSource = null;
+
+            if (ZoomoutCollectionGrid is not null)
+                ZoomoutCollectionGrid.ItemsSource = null;
+
+            if (groupedItemsViewSource is not null)
+            {
+                groupedItemsViewSource.Source = null;
+                groupedItemsViewSource.IsSourceGrouped = false;
+            }
+
+            DataContext = null;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error during Dispose in ArtistsPage");
+        }
+
+        _disposed = true;
     }
 }
