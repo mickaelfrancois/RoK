@@ -9,15 +9,11 @@ public sealed partial class FullScreenControl : UserControl
 {
     public PlayerViewModel PlayerViewModel { get; set; }
 
-    private const int BackdropRotationDelaySeconds = 15;
     private int _trackAnimationIndex = 1;
     private readonly int _maxTrackAnimation = 3;
 
     private Storyboard? _kenBurnsStoryboard;
-    private Storyboard? _backdropFadeIn;
-    private Storyboard? _backdropFadeOut;
     private Storyboard? _coverEntrance;
-    private DispatcherTimer? _backdropTimer;
     private List<string> _backdrops = new();
     private int _currentBackdropIndex;
     private readonly object _backdropsLock = new();
@@ -63,7 +59,6 @@ public sealed partial class FullScreenControl : UserControl
 
         try
         {
-            _backdropTimer?.Stop();
             _trackAnimationIndex++;
 
             if (_trackAnimationIndex > _maxTrackAnimation)
@@ -97,26 +92,15 @@ public sealed partial class FullScreenControl : UserControl
         {
             _logger.LogError(ex, "Error while handling track change.");
         }
-
-        _backdropTimer?.Start();
     }
 
 
     private void OnLoaded(object sender, RoutedEventArgs e)
     {
         _kenBurnsStoryboard = (Storyboard)Resources["KenBurnsAnimation"];
-        _backdropFadeIn = (Storyboard)Resources["BackdropFadeIn"];
-        _backdropFadeOut = (Storyboard)Resources["BackdropFadeOut"];
         _coverEntrance = (Storyboard)Resources["CoverEntranceAnimation"];
 
         _backdropService = App.ServiceProvider.GetRequiredService<BackdropPicture>();
-
-        _backdropTimer = new DispatcherTimer
-        {
-            Interval = TimeSpan.FromSeconds(BackdropRotationDelaySeconds)
-        };
-        _backdropTimer.Tick += OnBackdropTimerTick;
-        _backdropTimer.Start();
 
         _kenBurnsStoryboard?.Begin();
         _coverEntrance?.Begin();
@@ -125,10 +109,8 @@ public sealed partial class FullScreenControl : UserControl
 
     private void OnUnloaded(object sender, RoutedEventArgs e)
     {
-        _backdropTimer?.Stop();
-        _backdropTimer = null;
-
         _kenBurnsStoryboard?.Stop();
+        _coverEntrance?.Stop();
 
         lock (_trackChangeLock)
         {
@@ -157,10 +139,7 @@ public sealed partial class FullScreenControl : UserControl
             if (ct.IsCancellationRequested)
                 return;
 
-            if (_backdrops.Count > 0)
-                await ShowNextBackdropAsync(ct);
-            else
-                await ShowGenericBackdropAsync(ct);
+            await ShowNextBackdropAsync(ct);
         }
         catch (OperationCanceledException)
         {
@@ -169,19 +148,6 @@ public sealed partial class FullScreenControl : UserControl
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error loading backdrops for artist.");
-        }
-    }
-
-
-    private async void OnBackdropTimerTick(object? sender, object e)
-    {
-        try
-        {
-            await ShowNextBackdropAsync();
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error during backdrop timer tick.");
         }
     }
 
@@ -198,32 +164,29 @@ public sealed partial class FullScreenControl : UserControl
             }
             else
             {
-                if (_currentBackdropIndex < 0 || _currentBackdropIndex >= _backdrops.Count)
-                    _currentBackdropIndex = 0;
+                if (_backdrops.Count == 1)
+                {
+                    backdropPath = _backdrops[0];
 
-                backdropPath = _backdrops[_currentBackdropIndex];
-
-                _currentBackdropIndex = (_currentBackdropIndex + 1) % _backdrops.Count;
+                }
+                else
+                {
+                    _currentBackdropIndex = Random.Shared.Next(0, _backdrops.Count);
+                    backdropPath = _backdrops[_currentBackdropIndex];
+                }
             }
         }
 
-        if (backdropPath == null)
-        {
-            await ShowGenericBackdropAsync(ct);
-            return;
-        }
+        if (backdropPath == null && _backdropService != null && !ct.IsCancellationRequested)
+            backdropPath = _backdropService.GetRandomGenericBackdrop();
 
         try
         {
-            _backdropFadeOut?.Begin();
-            await Task.Delay(1000, ct);
-
             if (ct.IsCancellationRequested)
                 return;
 
             BackdropImage.Source = new BitmapImage(new Uri($"file:///{backdropPath}"));
 
-            _backdropFadeIn?.Begin();
             _kenBurnsStoryboard?.Stop();
             _kenBurnsStoryboard?.Begin();
         }
@@ -234,37 +197,6 @@ public sealed partial class FullScreenControl : UserControl
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error showing next backdrop.");
-        }
-    }
-
-    private async Task ShowGenericBackdropAsync(CancellationToken ct = default)
-    {
-        try
-        {
-            if (_backdropService == null || ct.IsCancellationRequested)
-                return;
-
-            string genericBackdrop = _backdropService.GetRandomGenericBackdrop();
-
-            _backdropFadeOut?.Begin();
-            await Task.Delay(1000, ct);
-
-            if (ct.IsCancellationRequested)
-                return;
-
-            BackdropImage.Source = new BitmapImage(new Uri(genericBackdrop));
-
-            _backdropFadeIn?.Begin();
-            _kenBurnsStoryboard?.Stop();
-            _kenBurnsStoryboard?.Begin();
-        }
-        catch (OperationCanceledException)
-        {
-            // Operation was canceled, no action needed.
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error showing generic backdrop.");
         }
     }
 }

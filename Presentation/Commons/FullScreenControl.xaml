@@ -43,32 +43,6 @@
             </DoubleAnimation>
         </Storyboard>
 
-        <!-- Fade in for new backdrop -->
-        <Storyboard x:Key="BackdropFadeIn">
-            <DoubleAnimation
-               Storyboard.TargetName="BackdropImage"
-               Storyboard.TargetProperty="Opacity"
-               From="0" To="1"
-               Duration="0:0:1.5">
-                <DoubleAnimation.EasingFunction>
-                    <QuadraticEase EasingMode="EaseOut"/>
-                </DoubleAnimation.EasingFunction>
-            </DoubleAnimation>
-        </Storyboard>
-
-        <!-- Fade out for old backdrop -->
-        <Storyboard x:Key="BackdropFadeOut">
-            <DoubleAnimation
-               Storyboard.TargetName="BackdropImage"
-               Storyboard.TargetProperty="Opacity"
-               From="1" To="0"
-               Duration="0:0:1">
-                <DoubleAnimation.EasingFunction>
-                    <QuadraticEase EasingMode="EaseIn"/>
-                </DoubleAnimation.EasingFunction>
-            </DoubleAnimation>
-        </Storyboard>
-
         <!-- Cover entrance animation -->
         <Storyboard x:Key="CoverEntranceAnimation">
             <DoubleAnimation
@@ -384,6 +358,9 @@
             </Border>
 
             <Grid x:Name="trackInfo">
+
+                <Grid>
+
                 <TextBlock x:Name="title" 
                        Text="{x:Bind PlayerViewModel.CurrentTrack.Title, Mode=OneWay}" 
                        VerticalAlignment="Bottom" 

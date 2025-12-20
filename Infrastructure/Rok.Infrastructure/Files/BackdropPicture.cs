@@ -91,8 +91,7 @@ public class BackdropPicture
 
     public string GetRandomGenericBackdrop()
     {
-        Random random = new();
-        int index = random.Next(1, 12);
+        int index = Random.Shared.Next(1, 12);
 
         return $"ms-appx:///Assets/Backdrop/wallpaper{index}.jpg";
     }
