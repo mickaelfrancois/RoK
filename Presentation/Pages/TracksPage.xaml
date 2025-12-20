@@ -171,9 +171,7 @@
 
                         <ListView.ItemTemplate>
                             <DataTemplate x:DataType="tracks:TrackViewModel">
-                                <Grid HorizontalAlignment="Stretch"
-                                      Background="Transparent"
-                                      Margin="0,0,20,10">
+                                <Grid Background="Transparent">
 
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="{ThemeResource gridHeaderTracksTitleColumnWidth}" />
@@ -215,6 +213,7 @@
 
                                     <StackPanel Grid.Column="0"
                                                 Orientation="Horizontal">
+
                                         <HyperlinkButton Style="{StaticResource gridTracksTitleText}"
                                                          Command="{x:Bind ListenCommand}"
                                                          CommandParameter="{x:Bind}" />

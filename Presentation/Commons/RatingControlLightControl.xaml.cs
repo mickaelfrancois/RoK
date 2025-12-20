@@ -11,7 +11,7 @@ public sealed partial class RatingControlLightControl : UserControl
     public RatingControlLightControl()
     {
         InitializeComponent();
-        Loaded += (_, _) => ApplyRatingToVisuals(); // assure l’état initial
+        Loaded += (_, _) => ApplyRatingToVisuals();
     }
 
     private const int DefaultMaxRating = 5;
