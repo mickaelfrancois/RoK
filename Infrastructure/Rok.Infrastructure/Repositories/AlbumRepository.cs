@@ -10,6 +10,7 @@ public class AlbumRepository(IDbConnection connection, [FromKeyedServices("Backg
 {
     private const string UpdateFavoriteSql = "UPDATE albums SET isFavorite = @isFavorite WHERE Id = @id";
     private const string UpdateLastListenSql = "UPDATE albums SET listenCount = listenCount + 1, lastListen = @lastListen WHERE Id = @id";
+    private const string ResetListenCountSql = "UPDATE albums SET listenCount = 0";
     private const string UpdateStatisticsSql = "UPDATE albums SET trackCount = @trackCount, duration = @duration WHERE id = @id";
     private const string UpdateMetadataAttemptSql = "UPDATE albums SET getMetaDataLastAttempt = @lastAttemptDate WHERE id = @id";
     private const string DeleteOrphansSql = "DELETE FROM albums WHERE id NOT IN (SELECT DISTINCT albumId FROM tracks WHERE albumId IS NOT NULL)";
@@ -77,6 +78,11 @@ public class AlbumRepository(IDbConnection connection, [FromKeyedServices("Backg
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(id);
 
         return await ExecuteUpdateAsync(UpdateLastListenSql, new { lastListen = DateTime.UtcNow, id }, kind);
+    }
+
+    public async Task<bool> ResetListenCountAsync(RepositoryConnectionKind kind = RepositoryConnectionKind.Foreground)
+    {
+        return await ExecuteUpdateAsync(ResetListenCountSql, kind);
     }
 
     public async Task<bool> UpdateStatisticsAsync(long id, int trackCount, long duration, RepositoryConnectionKind kind = RepositoryConnectionKind.Foreground)

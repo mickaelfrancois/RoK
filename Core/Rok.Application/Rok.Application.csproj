@@ -20,8 +20,4 @@
     <ProjectReference Include="..\Rok.Shared\Rok.Shared.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Features\Genres\Command\" />
-  </ItemGroup>
-
 </Project>

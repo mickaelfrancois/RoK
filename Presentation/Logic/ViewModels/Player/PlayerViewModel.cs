@@ -355,7 +355,12 @@ public partial class PlayerViewModel : ObservableObject, IDisposable
     private async Task UpdateListenCountAsync()
     {
         if (CurrentTrack != null)
+        {
             await _listenTracker.UpdateTrackListenAsync(CurrentTrack.Track.Id);
+
+            if (CurrentTrack.Track.GenreId.HasValue)
+                await _listenTracker.UpdateGenreListenAsync(CurrentTrack.Track.GenreId.Value);
+        }
 
         if (CurrentAlbum != null)
             await _listenTracker.UpdateAlbumListenAsync(CurrentAlbum.Album.Id);

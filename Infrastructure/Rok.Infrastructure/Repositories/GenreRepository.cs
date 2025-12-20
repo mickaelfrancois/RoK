@@ -7,7 +7,8 @@ namespace Rok.Infrastructure.Repositories;
 public class GenreRepository(IDbConnection connection, [FromKeyedServices("BackgroundConnection")] IDbConnection backgroundConnection, ILogger<GenreRepository> logger) : GenericRepository<GenreEntity>(connection, backgroundConnection, null, logger), IGenreRepository
 {
     private const string UpdateFavoriteSql = "UPDATE genres SET isFavorite = @isFavorite WHERE Id = @id";
-    private const string UpdateLastListenSql = "UPDATE albums SET listenCount = listenCount + 1, lastListen = @lastListen WHERE Id = @id";
+    private const string UpdateLastListenSql = "UPDATE genres SET listenCount = listenCount + 1, lastListen = @lastListen WHERE Id = @id";
+    private const string ResetListenCountSql = "UPDATE genres SET listenCount = 0";
     private const string UpdateStatisticsSql = "UPDATE genres SET trackCount = @trackCount, artistCount = @artistCount, albumCount = @albumCount, bestOfCount = @bestOfCount, liveCount = @liveCount, compilationCount = @compilationCount, totalDurationSeconds = @totalDurationSeconds WHERE id = @id";
     private const string DeleteOrphansSql = "DELETE FROM genres WHERE id NOT IN (SELECT DISTINCT genreId FROM tracks WHERE genreId IS NOT NULL)";
 
@@ -24,6 +25,11 @@ public class GenreRepository(IDbConnection connection, [FromKeyedServices("Backg
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(id);
 
         return await ExecuteUpdateAsync(UpdateLastListenSql, new { lastListen = DateTime.UtcNow, id }, kind);
+    }
+
+    public async Task<bool> ResetListenCountAsync(RepositoryConnectionKind kind = RepositoryConnectionKind.Foreground)
+    {
+        return await ExecuteUpdateAsync(ResetListenCountSql, kind);
     }
 
     public async Task<int> DeleteOrphansAsync(RepositoryConnectionKind kind = RepositoryConnectionKind.Foreground)

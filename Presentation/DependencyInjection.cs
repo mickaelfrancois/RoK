@@ -20,6 +20,7 @@ using Rok.Logic.ViewModels.Playlists.Handlers;
 using Rok.Logic.ViewModels.Playlists.Services;
 using Rok.Logic.ViewModels.Search;
 using Rok.Logic.ViewModels.Start;
+using Rok.Logic.ViewModels.Statistics;
 using Rok.Logic.ViewModels.Track.Services;
 using Rok.Logic.ViewModels.Tracks;
 using Rok.Logic.ViewModels.Tracks.Handlers;
@@ -187,6 +188,7 @@ public static class DependencyInjection
         services.AddSingleton<MainViewModel>();
         services.AddTransient<SearchViewModel>();
         services.AddTransient<StartViewModel>();
+        services.AddTransient<StatisticsViewModel>();
 
 
         return services;

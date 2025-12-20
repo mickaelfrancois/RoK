@@ -9,6 +9,7 @@ public class TrackRepository(IDbConnection db, [FromKeyedServices("BackgroundCon
 {
     private const string UpdateScoreSql = "UPDATE tracks SET score = @score WHERE Id = @id";
     private const string UpdateLastListenSql = "UPDATE tracks SET listenCount = listenCount + 1, lastListen = @lastListen WHERE Id = @id";
+    private const string ResetListenCountSql = "UPDATE tracks SET listenCount = 0";
     private const string UpdateSkipCountSql = "UPDATE tracks SET skipCount = skipCount + 1, lastSkip = @lastSkip WHERE Id = @id";
     private const string UpdateFileDateSql = "UPDATE tracks SET fileDate = @fileDate WHERE id = @id";
     private const string UpdateGetLyricsLastAttemptSql = "UPDATE tracks SET getLyricsLastAttempt = @lastAttemptDate WHERE id = @id";
@@ -34,8 +35,6 @@ public class TrackRepository(IDbConnection db, [FromKeyedServices("BackgroundCon
 
         return await ExecuteQueryAsync(sql, kind, new { playlistId });
     }
-
-
 
     public new async Task<TrackEntity?> GetByNameAsync(string name, RepositoryConnectionKind kind = RepositoryConnectionKind.Foreground)
     {
@@ -123,6 +122,11 @@ public class TrackRepository(IDbConnection db, [FromKeyedServices("BackgroundCon
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(id);
 
         return await ExecuteUpdateAsync(UpdateLastListenSql, new { lastListen = DateTime.UtcNow, id }, kind);
+    }
+
+    public async Task<bool> ResetListenCountAsync(RepositoryConnectionKind kind = RepositoryConnectionKind.Foreground)
+    {
+        return await ExecuteUpdateAsync(ResetListenCountSql, kind);
     }
 
     public async Task<bool> UpdateSkipCountAsync(long id, RepositoryConnectionKind kind = RepositoryConnectionKind.Foreground)
