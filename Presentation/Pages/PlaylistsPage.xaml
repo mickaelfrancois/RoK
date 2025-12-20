@@ -47,10 +47,27 @@
                 </LinearGradientBrush>
             </Grid.Background>
 
-            <common:GridViewExtended Grid.Row="2"
-                                     x:Name="grid"
+            <ScrollViewer>
+                <StackPanel>
+
+                
+                
+                <GridViewHeaderItem FontSize="24"
+                                    FontWeight="Bold"
+                                    HorizontalAlignment="Left">
+                    <GridViewHeaderItem.Content>
+                        <StackPanel Orientation="Horizontal">
+                            <SymbolIcon Symbol="OutlineStar"
+                                        Margin="4,0,4,0" />
+                            <TextBlock x:Uid="smartPlaylistHeader"></TextBlock>
+                        </StackPanel>
+                    </GridViewHeaderItem.Content>
+                </GridViewHeaderItem>
+
+                <common:GridViewExtended Grid.Row="2"
+                                     x:Name="gridSmartPlaylist"
                                      ContainerContentChanging="grid_ContainerContentChanging"
-                                     ItemsSource="{x:Bind ViewModel.Playlists}"
+                                     ItemsSource="{x:Bind ViewModel.SmartPlaylists}"
                                      Margin="0"
                                      ScrollViewer.VerticalScrollMode="Enabled"
                                      ScrollViewer.VerticalScrollBarVisibility="Auto">
@@ -65,14 +82,7 @@
                                                        PlayButtonVisibility="Visible"
                                                        Command="{x:Bind ListenCommand}" />
                             </Border>
-
-                            <SymbolIcon Symbol="OutlineStar"
-                                        Foreground="Yellow"
-                                        VerticalAlignment="Top"
-                                        HorizontalAlignment="Right"
-                                        Margin="0,5,5,0"
-                                        Visibility="{x:Bind Playlist.IsSmart, Converter={StaticResource BoolToVisibilityConverter}}" />
-
+                           
                             <Grid Style="{StaticResource GridCoverBottomStyle}">
                                 <Grid.RowDefinitions>
                                     <RowDefinition Height="30" />
@@ -105,6 +115,73 @@
                     </ItemsPanelTemplate>
                 </GridView.ItemsPanel>
             </common:GridViewExtended>
+
+                <GridViewHeaderItem FontSize="24"
+                                    FontWeight="Bold"
+                                    HorizontalAlignment="Left">
+                    <GridViewHeaderItem.Content>
+                        <StackPanel Orientation="Horizontal">
+                            <SymbolIcon Symbol="Shop"
+                                        Margin="4,0,4,0" />
+                            <TextBlock x:Uid="playlistHeader"></TextBlock>
+                        </StackPanel>
+                    </GridViewHeaderItem.Content>
+                </GridViewHeaderItem>
+
+                <common:GridViewExtended Grid.Row="2"
+                                     x:Name="gridPlaylist"
+                                     ContainerContentChanging="grid_ContainerContentChanging"
+                                     ItemsSource="{x:Bind ViewModel.Playlists}"
+                                     Margin="0"
+                                     ScrollViewer.VerticalScrollMode="Enabled"
+                                     ScrollViewer.VerticalScrollBarVisibility="Auto">
+
+                <GridView.ItemTemplate>
+                    <DataTemplate x:DataType="a:PlaylistViewModel">
+
+                        <Grid Style="{StaticResource MainGridCoverStyle}">
+                            <Border CornerRadius="10">
+                                <common:PictureControl Style="{StaticResource PictureCoverStyle}"
+                                                       Cover="{x:Bind Picture, Mode=OneWay}"
+                                                       PlayButtonVisibility="Visible"
+                                                       Command="{x:Bind ListenCommand}" />
+                            </Border>
+
+                            <Grid Style="{StaticResource GridCoverBottomStyle}">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="30" />
+                                    <RowDefinition Height="30" />
+                                </Grid.RowDefinitions>
+
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="2*" />
+                                    <ColumnDefinition />
+                                </Grid.ColumnDefinitions>
+
+                                <HyperlinkButton Grid.ColumnSpan="2"
+                                                 Content="{x:Bind Playlist.Name}"
+                                                 Command="{x:Bind PlaylistOpenCommand}"
+                                                 Style="{StaticResource GridCoverBottomFirstLineStyle}" />
+                                <TextBlock Grid.Row="1"
+                                           Style="{StaticResource GridCoverBottomSecondLineStyle}"
+                                           Text="{x:Bind SubTitle, Mode=OneWay}" />
+                            </Grid>
+                        </Grid>
+                    </DataTemplate>
+                </GridView.ItemTemplate>
+
+                <GridView.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <ItemsWrapGrid Orientation="Horizontal"
+                                       ItemHeight="320"
+                                       ItemWidth="320"
+                                       Margin="0,0,2,2" />
+                    </ItemsPanelTemplate>
+                </GridView.ItemsPanel>
+            </common:GridViewExtended>
+                
+            </StackPanel>
+            </ScrollViewer>
         </Grid>
     </Grid>
 </Page>
