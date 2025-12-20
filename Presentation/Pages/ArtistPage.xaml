@@ -107,8 +107,8 @@
 
                     <AppBarButton x:Uid="artistViewBiography"
                                   Style="{StaticResource headerGenericButton}"
-                                  Icon="Library"
-                                  Click="ArtistViewBiography_Click"
+                                  Icon="Library"                                  
+                                  Command="{x:Bind ViewModel.OpenBiographyCommand}"
                                   Visibility="{x:Bind ViewModel.Artist.Biography, Converter={StaticResource StringToVisibilityConverter}}" />
 
                     <AppBarButton x:Uid="artistViewLastFm"
@@ -130,41 +130,6 @@
                                   IsEnabled="False" />
                 </CommandBar>
             </RelativePanel>
-
-            <Grid x:Name="biography" 
-                  Grid.Column="1"                   
-                  Visibility="Collapsed" 
-                  Opacity="1"
-                  Background="{ThemeResource CardBackgroundFillColorDefault}"
-                  HorizontalAlignment="Stretch"
-                  VerticalAlignment="Stretch">
-
-                <Border Background="{ThemeResource CardBackgroundFillColorDefault}"                        
-                        Margin="6,0,0,0"
-                        HorizontalAlignment="Stretch"
-                        VerticalAlignment="Stretch">
-                    <Grid>
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="auto"/>
-                            <RowDefinition Height="*"/>
-                            <RowDefinition Height="auto"/>
-                        </Grid.RowDefinitions>
-
-                        <TextBlock Text="{x:Bind ViewModel.Artist.Name, Mode=OneWay}"
-                                   Style="{StaticResource headerTitleText}"/>
-
-                        <ScrollViewer Grid.Row="1" Margin="0,0,0,6">
-                            <TextBlock Text="{x:Bind ViewModel.Artist.Biography}" FontSize="12" TextWrapping="Wrap"/>
-                        </ScrollViewer>
-
-                        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Left" Margin="0,0,0,4">
-                            <Button x:Uid="commonClose" 
-                                    x:Name="hideBiography"                                    
-                                    Click="HideBiography_Click"/>
-                        </StackPanel>
-                    </Grid>
-                </Border>
-            </Grid>
 
         </Grid>
 

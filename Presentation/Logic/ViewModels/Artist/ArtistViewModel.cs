@@ -17,6 +17,7 @@ public partial class ArtistViewModel : ObservableObject
     private readonly IPlayerService _playerService;
     private readonly ILastFmClient _lastFmClient;
     private readonly IBackdropLoader _backdropLoader;
+    private readonly IDialogService _dialogService;
 
     private readonly ArtistDataLoader _dataLoader;
     private readonly ArtistPictureService _pictureService;
@@ -212,6 +213,7 @@ public partial class ArtistViewModel : ObservableObject
     public AsyncRelayCommand SelectPictureCommand { get; private set; }
     public AsyncRelayCommand OpenOfficielSiteCommand { get; private set; }
     public RelayCommand OpenLastFmPageCommand { get; private set; }
+    public AsyncRelayCommand OpenBiographyCommand { get; private set; }
 
     public override string ToString() => Artist?.Name ?? string.Empty;
 
@@ -220,6 +222,7 @@ public partial class ArtistViewModel : ObservableObject
         ILastFmClient lastFmClient,
         NavigationService navigationService,
         IPlayerService playerService,
+        IDialogService dialogService,
         ResourceLoader resourceLoader,
         ArtistDataLoader dataLoader,
         ArtistPictureService pictureService,
@@ -232,6 +235,7 @@ public partial class ArtistViewModel : ObservableObject
         _lastFmClient = Guard.Against.Null(lastFmClient);
         _navigationService = Guard.Against.Null(navigationService);
         _playerService = Guard.Against.Null(playerService);
+        _dialogService = Guard.Against.Null(dialogService);
         _resourceLoader = Guard.Against.Null(resourceLoader);
         _dataLoader = Guard.Against.Null(dataLoader);
         _pictureService = Guard.Against.Null(pictureService);
@@ -248,6 +252,7 @@ public partial class ArtistViewModel : ObservableObject
         SelectPictureCommand = new AsyncRelayCommand(SelectPictureAsync);
         OpenOfficielSiteCommand = new AsyncRelayCommand(OpenOfficialSiteAsync);
         OpenLastFmPageCommand = new RelayCommand(OpenLastFmPage);
+        OpenBiographyCommand = new AsyncRelayCommand(OpenBiographyAsync);
     }
 
 
@@ -412,5 +417,11 @@ public partial class ArtistViewModel : ObservableObject
             Uri uri = new(artistPageUrl);
             _ = Windows.System.Launcher.LaunchUriAsync(uri);
         }
+    }
+
+    private async Task OpenBiographyAsync()
+    {
+        if (!string.IsNullOrEmpty(Artist.Biography))
+            await _dialogService.ShowTextAsync(Artist.Name, Artist.Biography, _resourceLoader.GetString("Close"));
     }
 }
