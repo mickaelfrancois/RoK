@@ -1,6 +1,5 @@
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Navigation;
-using Rok.Commons;
 using Rok.Logic.ViewModels.Playlists;
 
 namespace Rok.Pages;
@@ -26,22 +25,8 @@ public sealed partial class PlaylistsPage : Page, IDisposable
     }
 
 
-    protected override void OnNavigatingFrom(NavigatingCancelEventArgs e)
-    {
-        ScrollStateHelper.SaveScrollOffset(grid);
-
-        base.OnNavigatingFrom(e);
-    }
-
-
-    private void Page_Loaded(object sender, RoutedEventArgs e)
-    {
-        ScrollStateHelper.RestoreScrollOffset(grid);
-    }
-
     public void Dispose()
     {
-        Loaded -= Page_Loaded;
     }
 
     private void grid_ContainerContentChanging(ListViewBase sender, ContainerContentChangingEventArgs args)

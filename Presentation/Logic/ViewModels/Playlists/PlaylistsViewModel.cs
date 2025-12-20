@@ -13,6 +13,8 @@ public partial class PlaylistsViewModel : ObservableObject, IDisposable
 
     public RangeObservableCollection<PlaylistViewModel> Playlists { get; private set; } = [];
 
+    public RangeObservableCollection<PlaylistViewModel> SmartPlaylists { get; private set; } = [];
+
     public RelayCommand NewSmartPlaylistCommand { get; private set; }
     public RelayCommand NewPlaylistCommand { get; private set; }
 
@@ -66,7 +68,10 @@ public partial class PlaylistsViewModel : ObservableObject, IDisposable
     private void RefreshPlaylists()
     {
         Playlists.Clear();
-        Playlists.AddRange(_dataLoader.ViewModels);
+        Playlists.AddRange(_dataLoader.ViewModels.Where(c => !c.Playlist.IsSmart));
+
+        SmartPlaylists.Clear();
+        SmartPlaylists.AddRange(_dataLoader.ViewModels.Where(c => c.Playlist.IsSmart));
     }
 
     private async Task NewSmartPlaylistAsync()

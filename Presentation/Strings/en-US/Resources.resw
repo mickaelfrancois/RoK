@@ -1122,4 +1122,10 @@
   <data name="resetListenCount.Label" xml:space="preserve">
     <value>Reset listen count</value>
   </data>
+  <data name="playlistHeader.Text" xml:space="preserve">
+    <value>Playlists</value>
+  </data>
+  <data name="smartPlaylistHeader.Text" xml:space="preserve">
+    <value>Smart playlists</value>
+  </data>
 </root>
