@@ -40,6 +40,7 @@
 		<None Remove="Commons\InlineEditableText.xaml" />
 		<None Remove="Commons\NotificationControl.xaml" />
 		<None Remove="Commons\NotificationItemControl.xaml" />
+		<None Remove="Commons\PieChart.xaml" />
 		<None Remove="Commons\PlaylistGroup.xaml" />
 		<None Remove="Commons\PlaylistGroupFilter.xaml" />
 		<None Remove="Commons\RatingControlLightControl.xaml" />
@@ -252,6 +253,9 @@
 	  <None Update="appsettings.json">
 	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 	  </None>
+	  <Page Update="Commons\PieChart.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </Page>
 	  <None Update="Package.appxmanifest">
 	    <SubType>Designer</SubType>
 	  </None>

@@ -1065,4 +1065,61 @@
   <data name="tracksViewGroupByScore" xml:space="preserve">
     <value>score</value>
   </data>
+  <data name="OptionTabStatistics.Header" xml:space="preserve">
+    <value>Statistics</value>
+  </data>
+  <data name="StatGenres.Text" xml:space="preserve">
+    <value>🔹Genres: </value>
+  </data>
+  <data name="StatArtists.Text" xml:space="preserve">
+    <value>🔹Artists: </value>
+  </data>
+  <data name="StatAlbums.Text" xml:space="preserve">
+    <value>🔹Albums: </value>
+  </data>
+  <data name="StatSongs.Text" xml:space="preserve">
+    <value>🔹Songs: </value>
+  </data>
+  <data name="StatTotalDurations.Text" xml:space="preserve">
+    <value>🔹Total durations: </value>
+  </data>
+  <data name="StatTotalSize.Text" xml:space="preserve">
+    <value>🔹Total size: </value>
+  </data>
+  <data name="StatTopGenres.Text" xml:space="preserve">
+    <value>🏅 Top Genres</value>
+  </data>
+  <data name="StatTopArtists.Text" xml:space="preserve">
+    <value>🏅 Top Artists</value>
+  </data>
+  <data name="StatTopAlbums.Text" xml:space="preserve">
+    <value>🏅 Top Albums</value>
+  </data>
+  <data name="StatTopSongs.Text" xml:space="preserve">
+    <value>🏅 Top Songs</value>
+  </data>
+  <data name="StartTracksByFileType.Title" xml:space="preserve">
+    <value>Tracks by file type</value>
+  </data>
+  <data name="StartAlbumsByType.Title" xml:space="preserve">
+    <value>Albums by type</value>
+  </data>
+  <data name="StartArtistsByGenre.Title" xml:space="preserve">
+    <value>Artists by genre</value>
+  </data>
+  <data name="StatListened.Text" xml:space="preserve">
+    <value>🔹Listened:</value>
+  </data>
+  <data name="ResetListenCountConfirmationTitle" xml:space="preserve">
+    <value>Confirmation</value>
+  </data>
+  <data name="ResetListenCountTitleConfirmation" xml:space="preserve">
+    <value>Do you want to reset listen count?</value>
+  </data>
+  <data name="resetListenCountToolTip.Text" xml:space="preserve">
+    <value>Reset listen count</value>
+  </data>
+  <data name="resetListenCount.Label" xml:space="preserve">
+    <value>Reset listen count</value>
+  </data>
 </root>

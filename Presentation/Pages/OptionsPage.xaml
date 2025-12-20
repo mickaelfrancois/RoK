@@ -8,6 +8,8 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:enums="using:Rok.Shared.Enums" 
     xmlns:generic="using:System.Collections.Generic"
+    xmlns:statistics="using:Rok.Logic.ViewModels.Statistics"
+    xmlns:controls="using:Rok.Commons"
     mc:Ignorable="d"
     x:Name="OptionsView">
 
@@ -100,6 +102,298 @@
                             </ListView.ItemTemplate>
                         </ListView>
                     </StackPanel>
+                </Border>
+            </PivotItem>
+
+            <PivotItem x:Uid="OptionTabStatistics">
+
+                <Border Background="{ThemeResource CardBackgroundFillColorDefault}"
+                        Padding="4"
+                        CornerRadius="12"
+                        Margin="8">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="*" />
+                        </Grid.RowDefinitions>
+
+                        <CommandBar Style="{StaticResource headerCommandBar}" HorizontalAlignment="Left">
+                            <AppBarButton x:Uid="resetListenCount"                                          
+                                          Style="{StaticResource headerGenericButton}"
+                                          Icon="Refresh"
+                                          Click="ResetListenCount_Click">
+                                <ToolTipService.ToolTip>
+                                    <TextBlock x:Uid="resetListenCountToolTip" />
+                                </ToolTipService.ToolTip>
+                            </AppBarButton>
+                        </CommandBar>
+
+                        <ScrollViewer Height="auto"
+                                  Grid.Row="1"
+                                  VerticalScrollBarVisibility="Auto">
+
+                        <StackPanel Spacing="16"
+                                    Margin="24,18,24,18">
+
+
+                            <ItemsControl>
+                                <ItemsControl.Items>
+                                    <TextBlock>
+                                    <Run x:Uid="StatGenres"
+                                         FontWeight="Bold" />
+                                    <Run Text="{x:Bind StatisticsViewModel.FormatWithThousands(StatisticsViewModel.Current.TotalGenres), Mode=OneWay}" />
+                                    </TextBlock>
+
+                                    <TextBlock>
+                                    <Run x:Uid="StatArtists"
+                                         FontWeight="Bold" />
+                                    <Run Text="{x:Bind StatisticsViewModel.FormatWithThousands(StatisticsViewModel.Current.TotalArtists), Mode=OneWay}" />
+                                    </TextBlock>
+
+                                    <TextBlock>
+                                    <Run x:Uid="StatAlbums"
+                                         FontWeight="Bold" />
+                                    <Run Text="{x:Bind StatisticsViewModel.FormatWithThousands(StatisticsViewModel.Current.TotalAlbums), Mode=OneWay}" />
+                                    </TextBlock>
+
+                                    <TextBlock>
+                                    <Run x:Uid="StatSongs"
+                                         FontWeight="Bold" />
+                                    <Run Text="{x:Bind StatisticsViewModel.FormatWithThousands(StatisticsViewModel.Current.TotalTracks), Mode=OneWay}" />
+                                    </TextBlock>
+
+                                    <TextBlock>
+                                    <Run x:Uid="StatListened"
+                                         FontWeight="Bold" />
+                                    <Run Text="{x:Bind StatisticsViewModel.FormatWithThousands(StatisticsViewModel.Current.TracksListenedCount), Mode=OneWay}" />
+                                    </TextBlock>
+
+                                    <TextBlock>
+                                    <Run x:Uid="StatTotalDurations"
+                                         FontWeight="Bold" />
+                                    <Run Text="{x:Bind StatisticsViewModel.TotalDuration, Mode=OneWay}" />
+                                    </TextBlock>
+
+                                    <TextBlock>
+                                    <Run x:Uid="StatTotalSize"
+                                         FontWeight="Bold" />
+                                    <Run Text="{x:Bind StatisticsViewModel.TotalSize, Mode=OneWay}" />
+                                    </TextBlock>
+                                </ItemsControl.Items>
+                            </ItemsControl>
+
+                            <!-- Top lists: three columns side by side -->
+                            <StackPanel Orientation="Horizontal"
+                                        Spacing="12">
+
+                                <!-- Top Genres -->
+                                <Border Background="{ThemeResource ContentDialogBackground}"
+                                        Padding="8"
+                                        CornerRadius="8"
+                                        Width="300">
+                                    <StackPanel>
+                                        <TextBlock x:Uid="StatTopGenres"
+                                                   FontWeight="SemiBold"
+                                                   FontSize="14" />
+                                        <ScrollViewer Height="550"
+                                                      VerticalScrollBarVisibility="Auto">
+                                            <ItemsControl ItemsSource="{x:Bind StatisticsViewModel.TopGenres, Mode=OneWay}">
+                                                <ItemsControl.ItemTemplate>
+                                                    <DataTemplate x:DataType="statistics:RankedTopItem">
+                                                        <Grid Margin="4">
+                                                            <Grid.ColumnDefinitions>
+                                                                <ColumnDefinition Width="32" />
+                                                                <ColumnDefinition Width="160" />
+                                                                <ColumnDefinition Width="60" />
+                                                            </Grid.ColumnDefinitions>
+                                                            <TextBlock Grid.Column="0"
+                                                                       Text="{x:Bind Rank}"
+                                                                       HorizontalAlignment="Center"
+                                                                       VerticalAlignment="Center"
+                                                                       Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                                                            <TextBlock Grid.Column="1"
+                                                                       Text="{x:Bind Name}"
+                                                                       TextTrimming="CharacterEllipsis"
+                                                                       VerticalAlignment="Center" />
+                                                            <TextBlock Grid.Column="2"
+                                                                       Text="{x:Bind ListenCount}"
+                                                                       HorizontalAlignment="Right"
+                                                                       VerticalAlignment="Center" />
+                                                        </Grid>
+                                                    </DataTemplate>
+                                                </ItemsControl.ItemTemplate>
+                                            </ItemsControl>
+                                        </ScrollViewer>
+                                    </StackPanel>
+                                </Border>
+
+                                <!-- Top Artists -->
+                                <Border Background="{ThemeResource ContentDialogBackground}"
+                                        Padding="8"
+                                        CornerRadius="8"
+                                        Width="300">
+                                    <StackPanel>
+                                        <TextBlock x:Uid="StatTopArtists"
+                                                   FontWeight="SemiBold"
+                                                   FontSize="14" />
+                                        <ScrollViewer Height="550"
+                                                      VerticalScrollBarVisibility="Auto">
+                                            <ItemsControl ItemsSource="{x:Bind StatisticsViewModel.TopArtists, Mode=OneWay}">
+                                                <ItemsControl.ItemTemplate>
+                                                    <DataTemplate x:DataType="statistics:RankedTopItem">
+                                                        <Grid Margin="4">
+                                                            <Grid.ColumnDefinitions>
+                                                                <ColumnDefinition Width="32" />
+                                                                <ColumnDefinition Width="160" />
+                                                                <ColumnDefinition Width="60" />
+                                                            </Grid.ColumnDefinitions>
+                                                            <TextBlock Grid.Column="0"
+                                                                       Text="{x:Bind Rank}"
+                                                                       HorizontalAlignment="Center"
+                                                                       VerticalAlignment="Center"
+                                                                       Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                                                            <TextBlock Grid.Column="1"
+                                                                       Text="{x:Bind Name}"
+                                                                       TextTrimming="CharacterEllipsis"
+                                                                       VerticalAlignment="Center" />
+                                                            <TextBlock Grid.Column="2"
+                                                                       Text="{x:Bind ListenCount}"
+                                                                       HorizontalAlignment="Right"
+                                                                       VerticalAlignment="Center" />
+                                                        </Grid>
+                                                    </DataTemplate>
+                                                </ItemsControl.ItemTemplate>
+                                            </ItemsControl>
+                                        </ScrollViewer>
+                                    </StackPanel>
+                                </Border>
+
+                                <!-- Top Albums -->
+                                <Border Background="{ThemeResource ContentDialogBackground}"
+                                        Padding="8"
+                                        CornerRadius="8"
+                                        Width="300">
+                                    <StackPanel>
+                                        <TextBlock x:Uid="StatTopAlbums"
+                                                   FontWeight="SemiBold"
+                                                   FontSize="14" />
+                                        <ScrollViewer Height="550"
+                                                      VerticalScrollBarVisibility="Auto">
+                                            <ItemsControl ItemsSource="{x:Bind StatisticsViewModel.TopAlbums, Mode=OneWay}">
+                                                <ItemsControl.ItemTemplate>
+                                                    <DataTemplate x:DataType="statistics:RankedTopItem">
+                                                        <Grid Margin="4">
+                                                            <Grid.ColumnDefinitions>
+                                                                <ColumnDefinition Width="32" />
+                                                                <ColumnDefinition Width="160" />
+                                                                <ColumnDefinition Width="60" />
+                                                            </Grid.ColumnDefinitions>
+                                                            <TextBlock Grid.Column="0"
+                                                                       Text="{x:Bind Rank}"
+                                                                       HorizontalAlignment="Center"
+                                                                       VerticalAlignment="Center"
+                                                                       Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                                                            <TextBlock Grid.Column="1"
+                                                                       Text="{x:Bind Name}"
+                                                                       TextTrimming="CharacterEllipsis"
+                                                                       VerticalAlignment="Center" />
+                                                            <TextBlock Grid.Column="2"
+                                                                       HorizontalAlignment="Right"
+                                                                       Text="{x:Bind ListenCount}"
+                                                                       VerticalAlignment="Center" />
+                                                        </Grid>
+                                                    </DataTemplate>
+                                                </ItemsControl.ItemTemplate>
+                                            </ItemsControl>
+                                        </ScrollViewer>
+                                    </StackPanel>
+                                </Border>
+
+                                <!-- Top Tracks -->
+                                <Border Background="{ThemeResource ContentDialogBackground}"
+                                        Padding="8"
+                                        CornerRadius="8"
+                                        Width="300">
+                                    <StackPanel>
+                                        <TextBlock x:Uid="StatTopSongs"
+                                                   FontWeight="SemiBold"
+                                                   FontSize="14" />
+                                        <ScrollViewer Height="550"
+                                                      VerticalScrollBarVisibility="Auto">
+                                            <ItemsControl ItemsSource="{x:Bind StatisticsViewModel.TopTracks, Mode=OneWay}">
+                                                <ItemsControl.ItemTemplate>
+                                                    <DataTemplate x:DataType="statistics:RankedTopItem">
+                                                        <Grid Margin="4">
+                                                            <Grid.ColumnDefinitions>
+                                                                <ColumnDefinition Width="32" />
+                                                                <ColumnDefinition Width="160" />
+                                                                <ColumnDefinition Width="60" />
+                                                            </Grid.ColumnDefinitions>
+                                                            <TextBlock Grid.Column="0"
+                                                                       Text="{x:Bind Rank}"
+                                                                       HorizontalAlignment="Center"
+                                                                       VerticalAlignment="Center"
+                                                                       Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                                                            <TextBlock Grid.Column="1"
+                                                                       Text="{x:Bind Name}"
+                                                                       TextTrimming="CharacterEllipsis"
+                                                                       VerticalAlignment="Center" />
+                                                            <TextBlock Grid.Column="2"
+                                                                       Text="{x:Bind ListenCount}"
+                                                                       HorizontalAlignment="Right"
+                                                                       VerticalAlignment="Center" />
+                                                        </Grid>
+                                                    </DataTemplate>
+                                                </ItemsControl.ItemTemplate>
+                                            </ItemsControl>
+                                        </ScrollViewer>
+                                    </StackPanel>
+                                </Border>
+                            </StackPanel>
+
+
+                            <!-- Charts -->
+                            <StackPanel Orientation="Horizontal"
+                                        Spacing="12">
+
+                                <Border Background="{ThemeResource ContentDialogBackground}"
+                                        Padding="8"
+                                        CornerRadius="8"
+                                        Width="300">
+                                    <ScrollViewer Height="500"
+                                                  VerticalScrollBarVisibility="Auto">
+                                        <controls:PieChart x:Uid="StartTracksByFileType"
+                                                           Items="{x:Bind StatisticsViewModel.Current.TracksByFileType, Mode=OneWay}" />
+                                    </ScrollViewer>
+                                </Border>
+
+                                <Border Background="{ThemeResource ContentDialogBackground}"
+                                        Padding="8"
+                                        CornerRadius="8"
+                                        Width="300">
+                                    <ScrollViewer Height="500"
+                                                  VerticalScrollBarVisibility="Auto">
+                                        <controls:PieChart x:Uid="StartAlbumsByType"
+                                                           Items="{x:Bind StatisticsViewModel.Current.AlbumsByType, Mode=OneWay}" />
+                                    </ScrollViewer>
+                                </Border>
+
+                                <Border Background="{ThemeResource ContentDialogBackground}"
+                                        Padding="8"
+                                        CornerRadius="8"
+                                        Width="300">
+                                    <ScrollViewer Height="500"
+                                                  VerticalScrollBarVisibility="Auto">
+                                        <controls:PieChart x:Uid="StartArtistsByGenre"
+                                                           Items="{x:Bind StatisticsViewModel.Current.ArtistsByGenre, Mode=OneWay}" />
+                                    </ScrollViewer>
+                                </Border>
+                            </StackPanel>
+
+                        </StackPanel>
+
+                    </ScrollViewer>
+                    </Grid>
                 </Border>
             </PivotItem>
 

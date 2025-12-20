@@ -1,4 +1,5 @@
 using Microsoft.UI.Xaml.Controls;
+using Rok.Logic.ViewModels.Statistics;
 using Windows.ApplicationModel;
 using Windows.Storage;
 using Windows.Storage.AccessCache;
@@ -27,6 +28,10 @@ public sealed partial class OptionsPage : Page
 
     private readonly IFolderResolver _folderResolver;
 
+    private readonly ResourceLoader _resourceLoader;
+
+    private StatisticsViewModel StatisticsViewModel { get; }
+
     public string AppVersionString
     {
         get
@@ -43,6 +48,9 @@ public sealed partial class OptionsPage : Page
 
         Options = App.ServiceProvider.GetRequiredService<IAppOptions>();
         _folderResolver = App.ServiceProvider.GetRequiredService<IFolderResolver>();
+        _resourceLoader = App.ServiceProvider.GetRequiredService<ResourceLoader>();
+
+        StatisticsViewModel = App.ServiceProvider.GetRequiredService<StatisticsViewModel>();
     }
 
     protected override async void OnNavigatedTo(Microsoft.UI.Xaml.Navigation.NavigationEventArgs e)
@@ -59,6 +67,8 @@ public sealed partial class OptionsPage : Page
                 _paths.Add(new PathItem(token, path));
             }
         }
+
+        await StatisticsViewModel.LoadAsync();
     }
 
     private void StorePageButton_Click(object sender, RoutedEventArgs e)
@@ -157,6 +167,23 @@ public sealed partial class OptionsPage : Page
         }
     }
 
+    private async void ResetListenCount_Click(object sender, RoutedEventArgs e)
+    {
+        ContentDialog dialog = new()
+        {
+            XamlRoot = XamlRoot,
+            Title = _resourceLoader.GetString("ResetListenCountConfirmationTitle"),
+            Content = _resourceLoader.GetString("ResetListenCountTitleConfirmation"),
+            PrimaryButtonText = _resourceLoader.GetString("YesButton"),
+            CloseButtonText = _resourceLoader.GetString("CancelButton"),
+            DefaultButton = ContentDialogButton.Close
+        };
+
+        ContentDialogResult result = await dialog.ShowAsync();
+
+        if (result == ContentDialogResult.Primary && StatisticsViewModel.ResetListenCountCommand.CanExecute(null))
+            StatisticsViewModel.ResetListenCountCommand.Execute(null);
+    }
 }
 
 public class PathItem(string key, string value)
