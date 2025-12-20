@@ -412,7 +412,7 @@
                                        FontWeight="Bold"
                                        Text="RoK music player"
                                        VerticalAlignment="Bottom"
-                                       Foreground="{StaticResource AccentTextFillColorPrimaryBrush}" />
+                                       Foreground="{ThemeResource AccentAAFillColorTertiaryBrush}" />
                             <TextBlock FontSize="18"
                                        FontStyle="Italic"
                                        VerticalAlignment="Bottom"

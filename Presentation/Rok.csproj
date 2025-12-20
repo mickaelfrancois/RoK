@@ -59,6 +59,7 @@
 		<None Remove="Pages\TrackPage.xaml" />
 		<None Remove="Pages\TracksPage.xaml" />
 		<None Remove="Pages\WelcomePage.xaml" />
+		<None Remove="Styles\RatingControlStyles.xaml" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -253,6 +254,9 @@
 	  <None Update="appsettings.json">
 	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 	  </None>
+	  <Page Update="Styles\RatingControlStyles.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </Page>
 	  <Page Update="Commons\PieChart.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </Page>

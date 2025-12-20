@@ -59,6 +59,7 @@
                 <ResourceDictionary Source="ms-appx:///Styles/NovaStyles.xaml" />
                 <ResourceDictionary Source="ms-appx:///Styles/ButtonStyles.xaml" />
                 <ResourceDictionary Source="ms-appx:///Styles/ControlsStyles.xaml" />
+                <ResourceDictionary Source="ms-appx:///Styles/RatingControlStyles.xaml" />
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Application.Resources>

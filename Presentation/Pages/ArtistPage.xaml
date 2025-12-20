@@ -271,6 +271,7 @@
                         <ListView.ItemTemplate>
                             <DataTemplate x:DataType="tracks:TrackViewModel">
                                 <Grid Background="Transparent">
+                                    
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="{ThemeResource gridHeaderTracksTitleColumnWidth}" />
                                         <ColumnDefinition Width="{ThemeResource gridHeaderTracksAlbumColumnWidth}" />
@@ -304,6 +305,7 @@
 
                                     <StackPanel Grid.Column="0"
                                                 Orientation="Horizontal">
+                                        
                                         <TextBlock x:Name="RowIndexText"
                                                    Style="{StaticResource gridTracksRowIndexText}" />
 
