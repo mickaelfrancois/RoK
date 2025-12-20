@@ -50,16 +50,4 @@ public sealed partial class ArtistPage : Page
             tb.Text = (args.ItemIndex + 1).ToString() + ".";
         }
     }
-
-    private void ArtistViewBiography_Click(object sender, RoutedEventArgs e)
-    {
-        biography.Visibility = Visibility.Visible;
-        headerPanel.Visibility = Visibility.Collapsed;
-    }
-
-    private void HideBiography_Click(object sender, RoutedEventArgs e)
-    {
-        biography.Visibility = Visibility.Collapsed;
-        headerPanel.Visibility = Visibility.Visible;
-    }
 }

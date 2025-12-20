@@ -359,8 +359,6 @@
 
             <Grid x:Name="trackInfo">
 
-                <Grid>
-
                 <TextBlock x:Name="title" 
                        Text="{x:Bind PlayerViewModel.CurrentTrack.Title, Mode=OneWay}" 
                        VerticalAlignment="Bottom" 
