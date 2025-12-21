@@ -124,6 +124,8 @@ public partial class PlayerViewModel : ObservableObject, IDisposable
     public bool LyricsExist => _stateManager.LyricsExist;
     public ObservableCollection<LyricLine> LyricsLines => _stateManager.LyricsLines;
     public LyricLine CurrentLyric => _stateManager.CurrentLyric;
+    public string PreviousLyric => _stateManager.PreviousLyric;
+    public string NextLyric => _stateManager.NextLyric;
     public bool IsSynchronizedLyrics => _stateManager.IsSynchronizedLyrics;
     public string? PlainLyrics => _stateManager.PlainLyrics;
 

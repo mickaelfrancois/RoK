@@ -4,22 +4,19 @@ using Rok.Infrastructure.NovaApi;
 
 namespace Rok.Logic.ViewModels.Track.Services;
 
-public class TrackLyricsService(
-    IMediator mediator,
-    ILyricsService lyricsService,
-    INovaApiService novaApiService,
-    ITranslateService translateService,
-    ILogger<TrackLyricsService> logger)
+public class TrackLyricsService(IMediator mediator, ILyricsService lyricsService, INovaApiService novaApiService, ILogger<TrackLyricsService> logger)
 {
     public bool CheckLyricsExists(string musicFile)
     {
         return lyricsService.CheckLyricsFileExists(musicFile) != ELyricsType.None;
     }
 
+
     public async Task<LyricsModel?> LoadLyricsAsync(string musicFile)
     {
         return await lyricsService.LoadLyricsAsync(musicFile);
     }
+
 
     public async Task<bool> GetAndSaveLyricsFromApiAsync(TrackDto track)
     {

@@ -103,6 +103,28 @@ public partial class PlayerStateManager : ObservableObject
         }
     }
 
+    private string _previousLyrics = string.Empty;
+    public string PreviousLyrics
+    {
+        get => _previousLyrics;
+        set
+        {
+            _previousLyrics = value;
+            OnPropertyChanged();
+        }
+    }
+
+    private string _nextLyrics = string.Empty;
+    public string NextLyrics
+    {
+        get => _nextLyrics;
+        set
+        {
+            _nextLyrics = value;
+            OnPropertyChanged();
+        }
+    }
+
     public ObservableCollection<LyricLine> LyricsLines => SyncLyrics.Lyrics;
 
     public bool IsSynchronizedLyrics => _lyrics?.LyricsType == ELyricsType.Synchronized;
@@ -137,6 +159,8 @@ public partial class PlayerStateManager : ObservableObject
         SyncLyrics.Lyrics.Clear();
         _lyricsCurrentIndex = -1;
         CurrentLyric = new();
+        PreviousLyrics = string.Empty;
+        NextLyrics = string.Empty;
 
         OnPropertyChanged(nameof(CurrentLyric));
         OnPropertyChanged(nameof(LyricsLines));
@@ -162,7 +186,11 @@ public partial class PlayerStateManager : ObservableObject
         if (_lyricsCurrentIndex < 0 || _lyricsCurrentIndex >= LyricsLines.Count)
             CurrentLyric = new();
         else
+        {
+            PreviousLyrics = _lyricsCurrentIndex - 1 >= 0 ? LyricsLines[_lyricsCurrentIndex - 1].Lyric : string.Empty;
             CurrentLyric = LyricsLines[_lyricsCurrentIndex];
+            NextLyrics = _lyricsCurrentIndex + 1 < LyricsLines.Count ? LyricsLines[_lyricsCurrentIndex + 1].Lyric : string.Empty;
+        }
     }
 
     public void ExecuteOnUIThread(Action action)
