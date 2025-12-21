@@ -8,6 +8,7 @@ public class TrackLyricsService(
     IMediator mediator,
     ILyricsService lyricsService,
     INovaApiService novaApiService,
+    ITranslateService translateService,
     ILogger<TrackLyricsService> logger)
 {
     public bool CheckLyricsExists(string musicFile)

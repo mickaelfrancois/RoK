@@ -1,6 +1,7 @@
 ﻿using Microsoft.UI.Dispatching;
 using Rok.Application.Dto.Lyrics;
 using Rok.Application.Features.Playlists.PlaylistMenu;
+using Rok.Infrastructure.Translate;
 using Rok.Logic.Services.Player;
 using Rok.Logic.ViewModels.Track.Services;
 
@@ -12,7 +13,7 @@ public partial class TrackViewModel : ObservableObject, IDisposable
     private readonly IPlayerService _playerService;
     private readonly IDialogService _dialogService;
     private readonly IBackdropLoader _backdropLoader;
-
+    private readonly IAppOptions _appOptions;
     private readonly TrackDetailDataLoader _dataLoader;
     private readonly TrackLyricsService _lyricsService;
     private readonly TrackScoreService _scoreService;
@@ -189,6 +190,7 @@ public partial class TrackViewModel : ObservableObject, IDisposable
         TrackLyricsService lyricsService,
         TrackScoreService scoreService,
         TrackNavigationService navigationService,
+        IAppOptions appOptions,
         ILogger<TrackViewModel> logger)
     {
         _backdropLoader = Guard.Against.Null(backdropLoader);
@@ -200,6 +202,7 @@ public partial class TrackViewModel : ObservableObject, IDisposable
         _lyricsService = Guard.Against.Null(lyricsService);
         _scoreService = Guard.Against.Null(scoreService);
         _navigationService = Guard.Against.Null(navigationService);
+        _appOptions = Guard.Against.Null(appOptions);
 
         ArtistOpenCommand = new RelayCommand(ArtistOpen);
         AlbumOpenCommand = new RelayCommand(AlbumOpen);
@@ -268,8 +271,15 @@ public partial class TrackViewModel : ObservableObject, IDisposable
         await LoadLyricsAsync();
 
         if (!string.IsNullOrEmpty(PlainLyrics))
-            await _dialogService.ShowTextAsync($"{ArtistName} - {Title}", PlainLyrics, _resourceLoader.GetString("Close"));
+        {
+            string? rawLanguage = Windows.Globalization.ApplicationLanguages.Languages.FirstOrDefault();
+            string language = TranslateService.NormalizeLanguageForLibreTranslate(rawLanguage, "fr");
+
+            await _dialogService.ShowTextAsync($"{ArtistName} - {Title}", PlainLyrics, showTranslateButton: _appOptions.NovaApiEnabled, language);
+        }
     }
+
+
 
     public async Task LoadLyricsAsync()
     {

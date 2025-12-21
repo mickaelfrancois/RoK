@@ -1128,4 +1128,10 @@
   <data name="smartPlaylistHeader.Text" xml:space="preserve">
     <value>Smart playlists</value>
   </data>
+  <data name="Translate" xml:space="preserve">
+    <value>Translate</value>
+  </data>
+  <data name="Original" xml:space="preserve">
+    <value>Original</value>
+  </data>
 </root>
