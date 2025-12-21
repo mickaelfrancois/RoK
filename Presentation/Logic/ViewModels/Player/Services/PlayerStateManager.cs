@@ -103,24 +103,24 @@ public partial class PlayerStateManager : ObservableObject
         }
     }
 
-    private string _previousLyrics = string.Empty;
-    public string PreviousLyrics
+    private string _previousLyric = string.Empty;
+    public string PreviousLyric
     {
-        get => _previousLyrics;
+        get => _previousLyric;
         set
         {
-            _previousLyrics = value;
+            _previousLyric = value;
             OnPropertyChanged();
         }
     }
 
-    private string _nextLyrics = string.Empty;
-    public string NextLyrics
+    private string _nextLyric = string.Empty;
+    public string NextLyric
     {
-        get => _nextLyrics;
+        get => _nextLyric;
         set
         {
-            _nextLyrics = value;
+            _nextLyric = value;
             OnPropertyChanged();
         }
     }
@@ -159,8 +159,8 @@ public partial class PlayerStateManager : ObservableObject
         SyncLyrics.Lyrics.Clear();
         _lyricsCurrentIndex = -1;
         CurrentLyric = new();
-        PreviousLyrics = string.Empty;
-        NextLyrics = string.Empty;
+        PreviousLyric = string.Empty;
+        NextLyric = string.Empty;
 
         OnPropertyChanged(nameof(CurrentLyric));
         OnPropertyChanged(nameof(LyricsLines));
@@ -187,9 +187,9 @@ public partial class PlayerStateManager : ObservableObject
             CurrentLyric = new();
         else
         {
-            PreviousLyrics = _lyricsCurrentIndex - 1 >= 0 ? LyricsLines[_lyricsCurrentIndex - 1].Lyric : string.Empty;
+            PreviousLyric = _lyricsCurrentIndex - 1 >= 0 ? LyricsLines[_lyricsCurrentIndex - 1].Lyric : string.Empty;
             CurrentLyric = LyricsLines[_lyricsCurrentIndex];
-            NextLyrics = _lyricsCurrentIndex + 1 < LyricsLines.Count ? LyricsLines[_lyricsCurrentIndex + 1].Lyric : string.Empty;
+            NextLyric = _lyricsCurrentIndex + 1 < LyricsLines.Count ? LyricsLines[_lyricsCurrentIndex + 1].Lyric : string.Empty;
         }
     }
 

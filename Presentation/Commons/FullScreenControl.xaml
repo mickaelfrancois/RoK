@@ -132,7 +132,7 @@
                 </VisualState>
             </VisualStateGroup>
         </VisualStateManager.VisualStateGroups>
-        
+
         <Grid x:Name="BackdropContainer">
             <Image x:Name="BackdropImage"
                    Source="{x:Bind PlayerViewModel.CurrentArtist.Backdrop, Mode=OneWay}"
@@ -347,28 +347,63 @@
                     Padding="28"
                     CornerRadius="14"
                     MaxWidth="1400">
-                <ContentControl x:Name="CenteredLyricContent"
-                                Visibility="{x:Bind PlayerViewModel.CurrentLyric.Lyric, Mode=OneWay, Converter={StaticResource StringToVisibilityConverter}}"
-                                Content="{x:Bind PlayerViewModel.CurrentLyric.Lyric, Mode=OneWay}">
-                    <ContentControl.Transitions>
-                        <TransitionCollection>
-                            <ContentThemeTransition />
-                        </TransitionCollection>
-                    </ContentControl.Transitions>
+                <StackPanel Orientation="Vertical"
+                            HorizontalAlignment="Center"
+                            Width="Auto"
+                            MaxWidth="1200">
 
-                    <ContentControl.ContentTemplate>
-                        <DataTemplate>
-                            <TextBlock Text="{Binding}"
-                                       Foreground="White"
-                                       FontSize="52"
-                                       FontFamily="Segoe UI Variable"
-                                       FontWeight="SemiBold"
-                                       TextAlignment="Center"
-                                       TextWrapping="Wrap"
-                                       MaxWidth="1200" />
-                        </DataTemplate>
-                    </ContentControl.ContentTemplate>
-                </ContentControl>
+                    <!-- Previous lyric (smaller, italic, subtle) -->
+                    <ContentControl x:Name="PrevLyricControl"
+                                    Visibility="{x:Bind PlayerViewModel.PreviousLyric, Mode=OneWay, Converter={StaticResource StringToVisibilityConverter}}"
+                                    Content="{x:Bind PlayerViewModel.PreviousLyric, Mode=OneWay}"
+                                    HorizontalAlignment="Center"
+                                    Margin="0,0,0,12">
+                        <ContentControl.Transitions>
+                            <TransitionCollection>
+                                <ContentThemeTransition />
+                                <EntranceThemeTransition FromVerticalOffset="-12" />
+                            </TransitionCollection>
+                        </ContentControl.Transitions>
+                        <ContentControl.ContentTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding}"
+                                           Foreground="#CCFFFFFF"
+                                           FontSize="28"
+                                           FontStyle="Italic"
+                                           FontWeight="Normal"
+                                           TextAlignment="Center"
+                                           TextWrapping="Wrap"
+                                           MaxWidth="1100" />
+                            </DataTemplate>
+                        </ContentControl.ContentTemplate>
+                    </ContentControl>
+
+                    <!-- Current centered lyric (large, bold) -->
+                    <ContentControl x:Name="CenteredLyricContent"
+                                    Visibility="{x:Bind PlayerViewModel.CurrentLyric.Lyric, Mode=OneWay, Converter={StaticResource StringToVisibilityConverter}}"
+                                    Content="{x:Bind PlayerViewModel.CurrentLyric.Lyric, Mode=OneWay}"
+                                    HorizontalAlignment="Center"
+                                    Margin="0">
+                        <ContentControl.Transitions>
+                            <TransitionCollection>
+                                <ContentThemeTransition />
+                            </TransitionCollection>
+                        </ContentControl.Transitions>
+
+                        <ContentControl.ContentTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding}"
+                                           Foreground="White"
+                                           FontSize="52"
+                                           FontFamily="Segoe UI Variable"
+                                           FontWeight="SemiBold"
+                                           TextAlignment="Center"
+                                           TextWrapping="Wrap"
+                                           MaxWidth="1200" />
+                            </DataTemplate>
+                        </ContentControl.ContentTemplate>
+                    </ContentControl>
+                </StackPanel>
             </Border>
         </Grid>
 
