@@ -350,7 +350,7 @@
                     CornerRadius="14"
                     MaxWidth="1400">
                 <ContentControl x:Name="CenteredLyricContent"
-                                Visibility="{x:Bind PlayerViewModel.CurrentLyric.Lyric, Mode=OneWay, Converter={StaticResource NullToVisibilityConverter}}"
+                                Visibility="{x:Bind PlayerViewModel.CurrentLyric.Lyric, Mode=OneWay, Converter={StaticResource StringToVisibilityConverter}}"
                                 Content="{x:Bind PlayerViewModel.CurrentLyric.Lyric, Mode=OneWay}">
                     <ContentControl.Transitions>
                         <TransitionCollection>
@@ -372,86 +372,6 @@
                     </ContentControl.ContentTemplate>
                 </ContentControl>
             </Border>
-        </Grid>
-
-        <!-- Lyrics (legacy bottom bar) -->
-        <Grid Margin="0,0,0,140"
-              VerticalAlignment="Bottom"
-              Height="110"
-              Visibility="{x:Bind PlayerViewModel.IsSynchronizedLyrics, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">
-            <ListBox ItemsSource="{x:Bind PlayerViewModel.LyricsLines, Mode=OneWay}"
-                     SelectedItem="{x:Bind PlayerViewModel.CurrentLyric, Mode=OneWay}"
-                     Foreground="White"
-                     FontSize="26"
-                     ScrollViewer.VerticalScrollBarVisibility="Hidden"
-                     ScrollViewer.HorizontalScrollBarVisibility="Hidden"
-                     SelectionChanged="ListBox_SelectionChanged">
-                <ListBox.Background>
-                    <SolidColorBrush Color="Black"
-                                     Opacity="0.7"></SolidColorBrush>
-                </ListBox.Background>
-
-                <ListBox.ItemTemplate>
-                    <DataTemplate>
-                        <TextBlock x:Name="ContentItem"
-                                   Text="{Binding Lyric, Mode=OneWay}"
-                                   TextWrapping="Wrap"
-                                   Foreground="Gray" />
-                    </DataTemplate>
-                </ListBox.ItemTemplate>
-
-                <ListBox.ItemContainerStyle>
-                    <Style TargetType="ListBoxItem">
-                        <Setter Property="Template">
-                            <Setter.Value>
-                                <ControlTemplate TargetType="ListBoxItem">
-                                    <Grid>
-                                        <VisualStateManager.VisualStateGroups>
-                                            <VisualStateGroup x:Name="CommonStates">
-                                                <VisualState x:Name="Normal" />
-                                            </VisualStateGroup>
-                                            <VisualStateGroup x:Name="SelectionStates">
-                                                <VisualState x:Name="Unselected">
-                                                    <Storyboard>
-                                                        <ColorAnimation Duration="0:0:1"
-                                                                        Storyboard.TargetName="ContentItem"
-                                                                        Storyboard.TargetProperty="(Foreground).(SolidColorBrush.Color)"
-                                                                        To="#595959" />
-                                                        <DoubleAnimation Duration="0:0:1"
-                                                                         Storyboard.TargetName="ContentItem"
-                                                                         EnableDependentAnimation="True"
-                                                                         To="25"
-                                                                         Storyboard.TargetProperty="FontSize" />
-                                                    </Storyboard>
-                                                </VisualState>
-                                                <VisualState x:Name="SelectedUnfocused">
-                                                    <Storyboard>
-                                                        <ColorAnimation Duration="0:0:1"
-                                                                        Storyboard.TargetName="ContentItem"
-                                                                        Storyboard.TargetProperty="(Foreground).(SolidColorBrush.Color)"
-                                                                        To="White" />
-                                                        <DoubleAnimation Duration="0:0:1"
-                                                                         Storyboard.TargetName="ContentItem"
-                                                                         EnableDependentAnimation="True"
-                                                                         To="30"
-                                                                         Storyboard.TargetProperty="FontSize" />
-                                                    </Storyboard>
-                                                </VisualState>
-                                            </VisualStateGroup>
-                                        </VisualStateManager.VisualStateGroups>
-                                        <TextBlock x:Name="ContentItem"
-                                                   HorizontalAlignment="Center"
-                                                   Text="{Binding Lyric, Mode=OneWay}"
-                                                   FontSize="25"
-                                                   TextWrapping="Wrap"
-                                                   Foreground="Gray" />
-                                    </Grid>
-                                </ControlTemplate>
-                            </Setter.Value>
-                        </Setter>
-                    </Style>
-                </ListBox.ItemContainerStyle>
-            </ListBox>
         </Grid>
 
         <!-- Album cover with animation -->
