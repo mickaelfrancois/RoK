@@ -1,7 +1,9 @@
 ﻿using Rok.Application.Randomizer;
+using Rok.Infrastructure.Translate;
 using Rok.Logic.Services.Player;
 using Rok.Logic.ViewModels.Albums;
 using Rok.Logic.ViewModels.Artist.Services;
+using Rok.Logic.ViewModels.Track.Services;
 using Rok.Logic.ViewModels.Tracks;
 
 namespace Rok.Logic.ViewModels.Artists;
@@ -18,6 +20,7 @@ public partial class ArtistViewModel : ObservableObject
     private readonly ILastFmClient _lastFmClient;
     private readonly IBackdropLoader _backdropLoader;
     private readonly IDialogService _dialogService;
+    private readonly IAppOptions _appOptions;
 
     private readonly ArtistDataLoader _dataLoader;
     private readonly ArtistPictureService _pictureService;
@@ -229,6 +232,7 @@ public partial class ArtistViewModel : ObservableObject
         ArtistApiService apiService,
         ArtistStatisticsService statisticsService,
         ArtistEditService editService,
+        IAppOptions appOptions,
         ILogger<ArtistViewModel> logger)
     {
         _backdropLoader = Guard.Against.Null(backdropLoader);
@@ -242,6 +246,7 @@ public partial class ArtistViewModel : ObservableObject
         _apiService = Guard.Against.Null(apiService);
         _statisticsService = Guard.Against.Null(statisticsService);
         _editService = Guard.Against.Null(editService);
+        _appOptions = Guard.Against.Null(appOptions);
         _logger = Guard.Against.Null(logger);
 
         GenreOpenCommand = new RelayCommand(() => { });
@@ -422,6 +427,11 @@ public partial class ArtistViewModel : ObservableObject
     private async Task OpenBiographyAsync()
     {
         if (!string.IsNullOrEmpty(Artist.Biography))
-            await _dialogService.ShowTextAsync(Artist.Name, Artist.Biography, _resourceLoader.GetString("Close"));
+        {
+            string? rawLanguage = Windows.Globalization.ApplicationLanguages.Languages.FirstOrDefault();
+            string language = TranslateService.NormalizeLanguageForLibreTranslate(rawLanguage, "fr");
+
+            await _dialogService.ShowTextAsync(Artist.Name, Artist.Biography, showTranslateButton: _appOptions.NovaApiEnabled, language);
+        }
     }
 }

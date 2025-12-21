@@ -25,7 +25,7 @@ namespace Rok
             this.InitializeComponent();
 
 #if DEBUG
-            Windows.Globalization.ApplicationLanguages.PrimaryLanguageOverride = "en";
+            Windows.Globalization.ApplicationLanguages.PrimaryLanguageOverride = "fr";
 #endif
         }
 
@@ -105,6 +105,7 @@ namespace Rok
             services.AddSingleton<IConfiguration>(config);
             services.Configure<TelemetryOptions>(config.GetSection("Telemetry"));
             services.Configure<NovaApiOptions>(config.GetSection("NovaApi"));
+            services.Configure<TranslateApiOptions>(config.GetSection("TranslateApi"));
             services.Configure<DiscordOptions>(config.GetSection("Discord"));
 
             services.AddHttpClient();

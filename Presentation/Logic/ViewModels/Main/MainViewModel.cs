@@ -71,7 +71,7 @@ public partial class MainViewModel : ObservableObject
         {
             string message = _resourceLoader.GetString("NoLibraryFoldersMessage");
             string title = _resourceLoader.GetString("NoLibraryFoldersTitleMessage");
-            _dialogService.ShowTextAsync(title, message, "OK");
+            _dialogService.ShowTextAsync(title, message);
             return false;
         }
 

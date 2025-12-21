@@ -13,6 +13,7 @@ using Rok.Infrastructure.Repositories;
 using Rok.Infrastructure.Social;
 using Rok.Infrastructure.Tag;
 using Rok.Infrastructure.Telemetry;
+using Rok.Infrastructure.Translate;
 using Serilog;
 using Serilog.Events;
 using Windows.Storage;
@@ -58,6 +59,7 @@ public static class DependencyInjection
 
         services.AddSingleton<ITagService, TagService>();
         services.AddSingleton<INovaApiService, NovaApiService>();
+        services.AddSingleton<ITranslateService, TranslateService>();
         services.AddSingleton<ILastFmClient, LastFmClient>();
         services.AddSingleton<ITelemetryClient, TelemetryClient>();
         services.AddSingleton<DiscordRichPresenceService>();
