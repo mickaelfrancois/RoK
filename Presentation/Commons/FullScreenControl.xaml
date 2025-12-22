@@ -1,77 +1,78 @@
 <?xml version="1.0" encoding="utf-8"?>
-<UserControl
-    x:Class="Rok.Commons.FullScreenControl"
-    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:local="using:Rok.Commons"
-    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    mc:Ignorable="d">
+<UserControl x:Class="Rok.Commons.FullScreenControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="using:Rok.Commons"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d">
 
     <UserControl.Resources>
         <!-- Ken Burns animation (zoom + pan effect) -->
-        <Storyboard x:Key="KenBurnsAnimation" RepeatBehavior="Forever" AutoReverse="True">
-            <DoubleAnimation
-               Storyboard.TargetName="BackdropImage"
-               Storyboard.TargetProperty="(UIElement.RenderTransform).(CompositeTransform.ScaleX)"
-               From="1.0" To="1.12"
-               Duration="0:0:20"
-               EnableDependentAnimation="True">
+        <Storyboard x:Key="KenBurnsAnimation"
+                    RepeatBehavior="Forever"
+                    AutoReverse="True">
+            <DoubleAnimation Storyboard.TargetName="BackdropImage"
+                             Storyboard.TargetProperty="(UIElement.RenderTransform).(CompositeTransform.ScaleX)"
+                             From="1.0"
+                             To="1.12"
+                             Duration="0:0:20"
+                             EnableDependentAnimation="True">
                 <DoubleAnimation.EasingFunction>
-                    <SineEase EasingMode="EaseInOut"/>
+                    <SineEase EasingMode="EaseInOut" />
                 </DoubleAnimation.EasingFunction>
             </DoubleAnimation>
-            <DoubleAnimation
-               Storyboard.TargetName="BackdropImage"
-               Storyboard.TargetProperty="(UIElement.RenderTransform).(CompositeTransform.ScaleY)"
-               From="1.0" To="1.12"
-               Duration="0:0:20"
-               EnableDependentAnimation="True">
+            <DoubleAnimation Storyboard.TargetName="BackdropImage"
+                             Storyboard.TargetProperty="(UIElement.RenderTransform).(CompositeTransform.ScaleY)"
+                             From="1.0"
+                             To="1.12"
+                             Duration="0:0:20"
+                             EnableDependentAnimation="True">
                 <DoubleAnimation.EasingFunction>
-                    <SineEase EasingMode="EaseInOut"/>
+                    <SineEase EasingMode="EaseInOut" />
                 </DoubleAnimation.EasingFunction>
             </DoubleAnimation>
-            <DoubleAnimation
-               Storyboard.TargetName="BackdropImage"
-               Storyboard.TargetProperty="(UIElement.RenderTransform).(CompositeTransform.TranslateX)"
-               From="0" To="-40"
-               Duration="0:0:20"
-               EnableDependentAnimation="True">
+            <DoubleAnimation Storyboard.TargetName="BackdropImage"
+                             Storyboard.TargetProperty="(UIElement.RenderTransform).(CompositeTransform.TranslateX)"
+                             From="0"
+                             To="-40"
+                             Duration="0:0:20"
+                             EnableDependentAnimation="True">
                 <DoubleAnimation.EasingFunction>
-                    <SineEase EasingMode="EaseInOut"/>
+                    <SineEase EasingMode="EaseInOut" />
                 </DoubleAnimation.EasingFunction>
             </DoubleAnimation>
         </Storyboard>
 
         <!-- Cover entrance animation -->
         <Storyboard x:Key="CoverEntranceAnimation">
-            <DoubleAnimation
-               Storyboard.TargetName="cover"
-               Storyboard.TargetProperty="Opacity"
-               From="0" To="1"
-               Duration="0:0:0.8">
+            <DoubleAnimation Storyboard.TargetName="cover"
+                             Storyboard.TargetProperty="Opacity"
+                             From="0"
+                             To="1"
+                             Duration="0:0:0.8">
                 <DoubleAnimation.EasingFunction>
-                    <BackEase EasingMode="EaseOut"/>
+                    <BackEase EasingMode="EaseOut" />
                 </DoubleAnimation.EasingFunction>
             </DoubleAnimation>
-            <DoubleAnimation
-               Storyboard.TargetName="coverTransform"
-               Storyboard.TargetProperty="ScaleX"
-               From="0.8" To="1"
-               Duration="0:0:0.8"
-               EnableDependentAnimation="True">
+            <DoubleAnimation Storyboard.TargetName="coverTransform"
+                             Storyboard.TargetProperty="ScaleX"
+                             From="0.8"
+                             To="1"
+                             Duration="0:0:0.8"
+                             EnableDependentAnimation="True">
                 <DoubleAnimation.EasingFunction>
-                    <BackEase EasingMode="EaseOut"/>
+                    <BackEase EasingMode="EaseOut" />
                 </DoubleAnimation.EasingFunction>
             </DoubleAnimation>
-            <DoubleAnimation
-               Storyboard.TargetName="coverTransform"
-               Storyboard.TargetProperty="ScaleY"
-               From="0.8" To="1"
-               Duration="0:0:0.8"
-               EnableDependentAnimation="True">
+            <DoubleAnimation Storyboard.TargetName="coverTransform"
+                             Storyboard.TargetProperty="ScaleY"
+                             From="0.8"
+                             To="1"
+                             Duration="0:0:0.8"
+                             EnableDependentAnimation="True">
                 <DoubleAnimation.EasingFunction>
-                    <BackEase EasingMode="EaseOut"/>
+                    <BackEase EasingMode="EaseOut" />
                 </DoubleAnimation.EasingFunction>
             </DoubleAnimation>
         </Storyboard>
@@ -83,59 +84,87 @@
             <VisualStateGroup x:Name="visualChangeGroup">
                 <VisualState x:Name="changeTrackAnimation1">
                     <Storyboard>
-                        <RepositionThemeAnimation  Storyboard.TargetName="title" FromHorizontalOffset="-400"></RepositionThemeAnimation>
-                        <RepositionThemeAnimation  Storyboard.TargetName="artist" FromHorizontalOffset="-400"></RepositionThemeAnimation>
-                        <RepositionThemeAnimation  Storyboard.TargetName="cover" FromHorizontalOffset="-400"></RepositionThemeAnimation>
-                        <RepositionThemeAnimation  Storyboard.TargetName="score" FromHorizontalOffset="400"></RepositionThemeAnimation>
+                        <RepositionThemeAnimation  Storyboard.TargetName="title"
+                                                   FromHorizontalOffset="-400"></RepositionThemeAnimation>
+                        <RepositionThemeAnimation  Storyboard.TargetName="artist"
+                                                   FromHorizontalOffset="-400"></RepositionThemeAnimation>
+                        <RepositionThemeAnimation  Storyboard.TargetName="cover"
+                                                   FromHorizontalOffset="-400"></RepositionThemeAnimation>
+                        <RepositionThemeAnimation  Storyboard.TargetName="score"
+                                                   FromHorizontalOffset="400"></RepositionThemeAnimation>
                     </Storyboard>
                 </VisualState>
                 <VisualState x:Name="changeTrackAnimation2">
                     <Storyboard>
-                        <RepositionThemeAnimation  Storyboard.TargetName="title" FromVerticalOffset="400"></RepositionThemeAnimation>
-                        <RepositionThemeAnimation  Storyboard.TargetName="artist" FromVerticalOffset="-400"></RepositionThemeAnimation>
-                        <RepositionThemeAnimation  Storyboard.TargetName="cover" FromVerticalOffset="-400"></RepositionThemeAnimation>
-                        <RepositionThemeAnimation  Storyboard.TargetName="score" FromVerticalOffset="-400"></RepositionThemeAnimation>
+                        <RepositionThemeAnimation  Storyboard.TargetName="title"
+                                                   FromVerticalOffset="400"></RepositionThemeAnimation>
+                        <RepositionThemeAnimation  Storyboard.TargetName="artist"
+                                                   FromVerticalOffset="-400"></RepositionThemeAnimation>
+                        <RepositionThemeAnimation  Storyboard.TargetName="cover"
+                                                   FromVerticalOffset="-400"></RepositionThemeAnimation>
+                        <RepositionThemeAnimation  Storyboard.TargetName="score"
+                                                   FromVerticalOffset="-400"></RepositionThemeAnimation>
                     </Storyboard>
                 </VisualState>
                 <VisualState x:Name="changeTrackAnimation3">
                     <Storyboard>
-                        <DoubleAnimation Storyboard.TargetName="title" From="0" To="1" Storyboard.TargetProperty="Opacity" Duration="0:0:3"></DoubleAnimation>
-                        <DoubleAnimation Storyboard.TargetName="artist" From="0" To="1" Storyboard.TargetProperty="Opacity" Duration="0:0:3"></DoubleAnimation>
-                        <DoubleAnimation Storyboard.TargetName="cover" From="0" To="1" Storyboard.TargetProperty="Opacity" Duration="0:0:3"></DoubleAnimation>
-                        <DoubleAnimation Storyboard.TargetName="score" From="0" To="1" Storyboard.TargetProperty="Opacity" Duration="0:0:3"></DoubleAnimation>
+                        <DoubleAnimation Storyboard.TargetName="title"
+                                         From="0"
+                                         To="1"
+                                         Storyboard.TargetProperty="Opacity"
+                                         Duration="0:0:3"></DoubleAnimation>
+                        <DoubleAnimation Storyboard.TargetName="artist"
+                                         From="0"
+                                         To="1"
+                                         Storyboard.TargetProperty="Opacity"
+                                         Duration="0:0:3"></DoubleAnimation>
+                        <DoubleAnimation Storyboard.TargetName="cover"
+                                         From="0"
+                                         To="1"
+                                         Storyboard.TargetProperty="Opacity"
+                                         Duration="0:0:3"></DoubleAnimation>
+                        <DoubleAnimation Storyboard.TargetName="score"
+                                         From="0"
+                                         To="1"
+                                         Storyboard.TargetProperty="Opacity"
+                                         Duration="0:0:3"></DoubleAnimation>
                     </Storyboard>
                 </VisualState>
             </VisualStateGroup>
         </VisualStateManager.VisualStateGroups>
 
-        <!-- Animated backdrop replacing BackdropControl -->
         <Grid x:Name="BackdropContainer">
             <Image x:Name="BackdropImage"
-           Source="{x:Bind PlayerViewModel.CurrentArtist.Backdrop, Mode=OneWay}"
-           Stretch="UniformToFill"
-           HorizontalAlignment="Center"
-           VerticalAlignment="Center">
+                   Source="{x:Bind PlayerViewModel.CurrentArtist.Backdrop, Mode=OneWay}"
+                   Stretch="UniformToFill"
+                   HorizontalAlignment="Center"
+                   VerticalAlignment="Center">
                 <Image.RenderTransform>
                     <CompositeTransform x:Name="BackdropTransform"
-                                CenterX="0.5"
-                                CenterY="0.5"/>
+                                        CenterX="0.5"
+                                        CenterY="0.5" />
                 </Image.RenderTransform>
             </Image>
 
-            <!-- Gradient overlay for better text readability -->
             <Grid>
                 <Grid.Background>
-                    <LinearGradientBrush StartPoint="0.5,0" EndPoint="0.5,1">
-                        <GradientStop Color="Transparent" Offset="0"/>
-                        <GradientStop Color="#33000000" Offset="0.5"/>
-                        <GradientStop Color="#66000000" Offset="1"/>
+                    <LinearGradientBrush StartPoint="0.5,0"
+                                         EndPoint="0.5,1">
+                        <GradientStop Color="Transparent"
+                                      Offset="0" />
+                        <GradientStop Color="#33000000"
+                                      Offset="0.5" />
+                        <GradientStop Color="#66000000"
+                                      Offset="1" />
                     </LinearGradientBrush>
                 </Grid.Background>
             </Grid>
         </Grid>
 
         <!-- Lyrics raw -->
-        <Grid Margin="0,85,00,130" Opacity="0.7" Visibility="{x:Bind PlayerViewModel.CurrentTrack.LyricsExists, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">
+        <Grid Margin="0,85,00,130"
+              Opacity="0.7"
+              Visibility="{x:Bind PlayerViewModel.CurrentTrack.LyricsExists, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">
             <ScrollViewer Background="Black"
                           Visibility="{Binding ElementName=displayLyricsToggle, Mode=OneWay, Path=IsChecked}"
                           HorizontalContentAlignment="Stretch">
@@ -153,9 +182,12 @@
         </Grid>
 
         <!-- Top line -->
-        <Grid Margin="0,10,0,0" VerticalAlignment="Top" Height="75">
+        <Grid Margin="0,10,0,0"
+              VerticalAlignment="Top"
+              Height="75">
             <Grid.Background>
-                <SolidColorBrush Color="Black" Opacity="0.3"></SolidColorBrush>
+                <SolidColorBrush Color="Black"
+                                 Opacity="0.3"></SolidColorBrush>
             </Grid.Background>
 
             <Grid.RowDefinitions>
@@ -163,7 +195,9 @@
                 <RowDefinition Height="20"></RowDefinition>
             </Grid.RowDefinitions>
 
-            <Grid VerticalAlignment="Top" HorizontalAlignment="Stretch" Padding="4">
+            <Grid VerticalAlignment="Top"
+                  HorizontalAlignment="Stretch"
+                  Padding="4">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" />
                     <ColumnDefinition Width="Auto" />
@@ -271,121 +305,160 @@
             </Grid>
 
 
-            <Grid Grid.Row="1" Height="18" VerticalAlignment="Bottom" HorizontalAlignment="Center" Width="500" Margin="0">
-                <TextBlock Text="{x:Bind PlayerViewModel.ListenDurationStr, Mode=OneWay}" FontSize="14" Foreground="White"></TextBlock>
-                <ProgressBar Margin="6,0,6,0" Width="400" VerticalAlignment="Center" Foreground="Green" RequestedTheme="Dark" Minimum="0" Maximum="100"  Value="{x:Bind PlayerViewModel.Progression, Mode=OneWay}"></ProgressBar>
-                <TextBlock Text="{x:Bind PlayerViewModel.DurationTotalStr, Mode=OneWay}" FontSize="14" HorizontalAlignment="Right" Foreground="White"></TextBlock>
+            <Grid Grid.Row="1"
+                  Height="18"
+                  VerticalAlignment="Bottom"
+                  HorizontalAlignment="Center"
+                  Width="500"
+                  Margin="0">
+                <TextBlock Text="{x:Bind PlayerViewModel.ListenDurationStr, Mode=OneWay}"
+                           FontSize="14"
+                           Foreground="White"></TextBlock>
+                <ProgressBar Margin="6,0,6,0"
+                             Width="400"
+                             VerticalAlignment="Center"
+                             Foreground="Green"
+                             RequestedTheme="Dark"
+                             Minimum="0"
+                             Maximum="100"
+                             Value="{x:Bind PlayerViewModel.Progression, Mode=OneWay}"></ProgressBar>
+                <TextBlock Text="{x:Bind PlayerViewModel.DurationTotalStr, Mode=OneWay}"
+                           FontSize="14"
+                           HorizontalAlignment="Right"
+                           Foreground="White"></TextBlock>
             </Grid>
         </Grid>
 
         <!-- Bottom line -->
-        <Grid Margin="0,0,0,30" VerticalAlignment="Bottom" Height="100">
+        <Grid Margin="0,0,0,30"
+              VerticalAlignment="Bottom"
+              Height="100">
             <Grid.Background>
-                <SolidColorBrush Color="Black" Opacity="0.7"></SolidColorBrush>
+                <SolidColorBrush Color="Black"
+                                 Opacity="0.7"></SolidColorBrush>
             </Grid.Background>
         </Grid>
 
+        <!-- Modern centered synchronized lyrics -->
+        <Grid VerticalAlignment="Center"
+              HorizontalAlignment="Center"
+              Visibility="{x:Bind PlayerViewModel.IsSynchronizedLyrics, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">
+            <Border Background="#80000000"
+                    Padding="28"
+                    CornerRadius="14"
+                    MaxWidth="1400">
+                <StackPanel Orientation="Vertical"
+                            HorizontalAlignment="Center"
+                            Width="Auto"
+                            MaxWidth="1200">
 
-        <!-- Lyrics -->
-        <Grid Margin="0,0,0,140" VerticalAlignment="Bottom" Height="110" Visibility="{x:Bind PlayerViewModel.IsSynchronizedLyrics, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">
-            <ListBox ItemsSource="{x:Bind PlayerViewModel.LyricsLines, Mode=OneWay}"  SelectedItem="{x:Bind PlayerViewModel.CurrentLyric, Mode=OneWay}" Foreground="White" FontSize="26" ScrollViewer.VerticalScrollBarVisibility="Hidden" ScrollViewer.HorizontalScrollBarVisibility="Hidden" SelectionChanged="ListBox_SelectionChanged" >
-                <ListBox.Background>
-                    <SolidColorBrush Color="Black" Opacity="0.7"></SolidColorBrush>
-                </ListBox.Background>
+                    <!-- Previous lyric (smaller, italic, subtle) -->
+                    <ContentControl x:Name="PrevLyricControl"
+                                    Visibility="{x:Bind PlayerViewModel.PreviousLyric, Mode=OneWay, Converter={StaticResource StringToVisibilityConverter}}"
+                                    Content="{x:Bind PlayerViewModel.PreviousLyric, Mode=OneWay}"
+                                    HorizontalAlignment="Center"
+                                    Margin="0,0,0,12">
+                        <ContentControl.Transitions>
+                            <TransitionCollection>
+                                <ContentThemeTransition />
+                                <EntranceThemeTransition FromVerticalOffset="-12" />
+                            </TransitionCollection>
+                        </ContentControl.Transitions>
+                        <ContentControl.ContentTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding}"
+                                           Foreground="#CCFFFFFF"
+                                           FontSize="28"
+                                           FontStyle="Italic"
+                                           FontWeight="Normal"
+                                           TextAlignment="Center"
+                                           TextWrapping="Wrap"
+                                           MaxWidth="1100" />
+                            </DataTemplate>
+                        </ContentControl.ContentTemplate>
+                    </ContentControl>
 
-                <ListBox.ItemTemplate>
-                    <DataTemplate>
-                        <TextBlock x:Name="ContentItem" Text="{Binding Lyric, Mode=OneWay}" TextWrapping="Wrap" Foreground="Gray"/>
-                    </DataTemplate>
-                </ListBox.ItemTemplate>
+                    <!-- Current centered lyric (large, bold) -->
+                    <ContentControl x:Name="CenteredLyricContent"
+                                    Visibility="{x:Bind PlayerViewModel.CurrentLyric.Lyric, Mode=OneWay, Converter={StaticResource StringToVisibilityConverter}}"
+                                    Content="{x:Bind PlayerViewModel.CurrentLyric.Lyric, Mode=OneWay}"
+                                    HorizontalAlignment="Center"
+                                    Margin="0">
+                        <ContentControl.Transitions>
+                            <TransitionCollection>
+                                <ContentThemeTransition />
+                            </TransitionCollection>
+                        </ContentControl.Transitions>
 
-                <ListBox.ItemContainerStyle>
-                    <Style TargetType="ListBoxItem">
-                        <Setter Property="Template">
-                            <Setter.Value>
-                                <ControlTemplate TargetType="ListBoxItem">
-                                    <Grid>
-                                        <VisualStateManager.VisualStateGroups>
-                                            <VisualStateGroup x:Name="CommonStates">
-                                                <VisualState x:Name="Normal"/>
-                                            </VisualStateGroup>
-                                            <VisualStateGroup x:Name="SelectionStates">
-                                                <VisualState x:Name="Unselected">
-                                                    <Storyboard>
-                                                        <ColorAnimation Duration="0:0:1" Storyboard.TargetName="ContentItem" Storyboard.TargetProperty="(Foreground).(SolidColorBrush.Color)" To="#595959"/>
-                                                        <DoubleAnimation Duration="0:0:1" Storyboard.TargetName="ContentItem" EnableDependentAnimation="True"  To="25" Storyboard.TargetProperty="FontSize"/>
-                                                    </Storyboard>
-                                                </VisualState>
-                                                <VisualState x:Name="SelectedUnfocused">
-                                                    <Storyboard>
-                                                        <ColorAnimation Duration="0:0:1" Storyboard.TargetName="ContentItem" Storyboard.TargetProperty="(Foreground).(SolidColorBrush.Color)" To="White"/>
-                                                        <DoubleAnimation Duration="0:0:1" Storyboard.TargetName="ContentItem" EnableDependentAnimation="True"  To="30" Storyboard.TargetProperty="FontSize"/>
-                                                    </Storyboard>
-                                                </VisualState>
-                                            </VisualStateGroup>
-                                        </VisualStateManager.VisualStateGroups>
-                                        <TextBlock x:Name="ContentItem" HorizontalAlignment="Center" Text="{Binding Lyric, Mode=OneWay}" FontSize="25" TextWrapping="Wrap" Foreground="Gray"/>
-                                    </Grid>
-                                </ControlTemplate>
-                            </Setter.Value>
-                        </Setter>
-                    </Style>
-                </ListBox.ItemContainerStyle>
-            </ListBox>
+                        <ContentControl.ContentTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding}"
+                                           Foreground="White"
+                                           FontSize="52"
+                                           FontFamily="Segoe UI Variable"
+                                           FontWeight="SemiBold"
+                                           TextAlignment="Center"
+                                           TextWrapping="Wrap"
+                                           MaxWidth="1200" />
+                            </DataTemplate>
+                        </ContentControl.ContentTemplate>
+                    </ContentControl>
+                </StackPanel>
+            </Border>
         </Grid>
 
         <!-- Album cover with animation -->
         <Grid>
-            <Border x:Name="cover" 
-                HorizontalAlignment="Left" 
-                Margin="60,0,0,10" 
-                VerticalAlignment="Bottom" 
-                Height="256" 
-                Width="256" 
-                Padding="6" 
-                BorderBrush="LightGray" 
-                BorderThickness="1" 
-                Background="White"
-                RenderTransformOrigin="0.5,0.5">
+            <Border x:Name="cover"
+                    HorizontalAlignment="Left"
+                    Margin="60,0,0,10"
+                    VerticalAlignment="Bottom"
+                    Height="256"
+                    Width="256"
+                    Padding="6"
+                    BorderBrush="LightGray"
+                    BorderThickness="1"
+                    Background="White"
+                    RenderTransformOrigin="0.5,0.5">
                 <Border.RenderTransform>
-                    <CompositeTransform x:Name="coverTransform"/>
+                    <CompositeTransform x:Name="coverTransform" />
                 </Border.RenderTransform>
-                <Image Width="240" 
-                   Height="240" 
-                   Source="{x:Bind PlayerViewModel.CurrentAlbum.Picture, Mode=OneWay}" 
-                   Stretch="UniformToFill" 
-                   VerticalAlignment="Top"/>
+                <Image Width="240"
+                       Height="240"
+                       Source="{x:Bind PlayerViewModel.CurrentAlbum.Picture, Mode=OneWay}"
+                       Stretch="UniformToFill"
+                       VerticalAlignment="Top" />
             </Border>
 
             <Grid x:Name="trackInfo">
 
-                <TextBlock x:Name="title" 
-                       Text="{x:Bind PlayerViewModel.CurrentTrack.Title, Mode=OneWay}" 
-                       VerticalAlignment="Bottom" 
-                       Margin="340,0,0,80" 
-                       FontSize="30" 
-                       Foreground="White" 
-                       HorizontalAlignment="Left" 
-                       TextWrapping="NoWrap" 
-                       Width="auto" 
-                       FontWeight="Bold"/>
-                <TextBlock x:Name="artist" 
-                       Text="{x:Bind PlayerViewModel.CurrentTrack.ArtistName, Mode=OneWay}" 
-                       VerticalAlignment="Bottom" 
-                       Margin="340,0,0,40" 
-                       FontSize="30" 
-                       Foreground="White" 
-                       HorizontalAlignment="Left" 
-                       TextWrapping="NoWrap" 
-                       Width="600" 
-                       FontWeight="Bold"/>
-                <local:RatingControlDarkControl x:Name="score" 
-                                            Value="{x:Bind PlayerViewModel.CurrentTrack.Score, Mode=TwoWay}" 
-                                            VerticalAlignment="Bottom" 
-                                            Margin="0,0,20,50" 
-                                            Height="30" 
-                                            BorderThickness="0" 
-                                            HorizontalAlignment="Right"/>
+                <TextBlock x:Name="title"
+                           Text="{x:Bind PlayerViewModel.CurrentTrack.Title, Mode=OneWay}"
+                           VerticalAlignment="Bottom"
+                           Margin="340,0,0,80"
+                           FontSize="30"
+                           Foreground="White"
+                           HorizontalAlignment="Left"
+                           TextWrapping="NoWrap"
+                           Width="auto"
+                           FontWeight="Bold" />
+                <TextBlock x:Name="artist"
+                           Text="{x:Bind PlayerViewModel.CurrentTrack.ArtistName, Mode=OneWay}"
+                           VerticalAlignment="Bottom"
+                           Margin="340,0,0,40"
+                           FontSize="30"
+                           Foreground="White"
+                           HorizontalAlignment="Left"
+                           TextWrapping="NoWrap"
+                           Width="600"
+                           FontWeight="Bold" />
+                <local:RatingControlDarkControl x:Name="score"
+                                                Value="{x:Bind PlayerViewModel.CurrentTrack.Score, Mode=TwoWay}"
+                                                VerticalAlignment="Bottom"
+                                                Margin="0,0,20,50"
+                                                Height="30"
+                                                BorderThickness="0"
+                                                HorizontalAlignment="Right" />
             </Grid>
         </Grid>
     </Grid>
