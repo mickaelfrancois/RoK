@@ -47,6 +47,7 @@ public static class DependencyInjection
 
         services.AddSingleton<IMigrationService, MigrationService>();
         services.AddSingleton<IMigration, Migration2>();
+        services.AddSingleton<IMigration, Migration3>();
 
         services.AddScoped<IArtistRepository, ArtistRepository>();
         services.AddScoped<IAlbumRepository, AlbumRepository>();
@@ -59,6 +60,7 @@ public static class DependencyInjection
 
         services.AddSingleton<ITagService, TagService>();
         services.AddSingleton<INovaApiService, NovaApiService>();
+        services.AddSingleton<IMusicDataApiService, MusicDataApiService>();
         services.AddSingleton<ITranslateService, TranslateService>();
         services.AddSingleton<ILastFmClient, LastFmClient>();
         services.AddSingleton<ITelemetryClient, TelemetryClient>();
