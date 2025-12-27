@@ -3,6 +3,7 @@ using System.Text.Json;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Rok.Application.Dto.MusicDataApi;
 using Rok.Application.Interfaces;
 using Rok.Application.Options;
 
@@ -68,6 +69,7 @@ public class MusicDataApiService : IMusicDataApiService, IDisposable
         _httpClient.BaseAddress = new Uri(_musicDataApiOptions.BaseAddress);
         _httpClient.DefaultRequestHeaders.Add("User-Agent", $"Rok/{appVersion}");
         _httpClient.Timeout = TimeSpan.FromSeconds(10);
+        _httpClient.DefaultRequestHeaders.Add("X-Api-Key", "73407c42-ba4d-54da-8131-1b8ce0b1e6f1");
     }
 
 
@@ -94,7 +96,7 @@ public class MusicDataApiService : IMusicDataApiService, IDisposable
             if (string.IsNullOrEmpty(musicBrainzId))
                 url = $"v1/artists/byname/{Uri.EscapeDataString(artistName)}";
             else
-                url = $"v1/artists/bymbid{Uri.EscapeDataString(artistName)}";
+                url = $"v1/artists/bymbid/{Uri.EscapeDataString(musicBrainzId)}";
 
             artist = await GetASync<MusicDataArtistDto>(url);
 
@@ -159,6 +161,75 @@ public class MusicDataApiService : IMusicDataApiService, IDisposable
         return lyrics;
     }
 
+
+    public async Task GetArtistPictureAsync(MusicDataArtistDto artist, string artistFile, CancellationToken cancellationToken)
+    {
+        if (!IsEnable)
+            return;
+
+        try
+        {
+            using HttpClient client = new();
+            using HttpResponseMessage response = await client.GetAsync(artist.PictureUrl, HttpCompletionOption.ResponseHeadersRead, cancellationToken);
+
+            if (!response.IsSuccessStatusCode)
+                return;
+
+            using Stream responseStream = await response.Content.ReadAsStreamAsync(cancellationToken);
+            using FileStream fileStream = new(artistFile, FileMode.Create, FileAccess.Write, FileShare.None, bufferSize: 81920, useAsync: true);
+
+            await responseStream.CopyToAsync(fileStream, cancellationToken);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error downloading artist picture {Url}", artistFile);
+        }
+    }
+
+
+    public async Task GetArtistBackdropsAsync(MusicDataArtistDto artist, string artistFolder, CancellationToken cancellationToken)
+    {
+        if (!IsEnable)
+            return;
+
+        List<string> urls = new();
+        if (!string.IsNullOrWhiteSpace(artist.FanartUrl))
+            urls.Add(artist.FanartUrl);
+        if (!string.IsNullOrWhiteSpace(artist.Fanart2Url))
+            urls.Add(artist.Fanart2Url);
+        if (!string.IsNullOrWhiteSpace(artist.Fanart3Url))
+            urls.Add(artist.Fanart3Url);
+        if (!string.IsNullOrWhiteSpace(artist.Fanart4Url))
+            urls.Add(artist.Fanart4Url);
+        if (!string.IsNullOrWhiteSpace(artist.Fanart5Url))
+            urls.Add(artist.Fanart5Url);
+
+        if (urls.Count == 0)
+            return;
+
+        foreach (string pictureUrl in urls)
+        {
+            string fileName = Path.Combine(artistFolder, "backdrop" + Guid.NewGuid().ToString("d") + ".jpg");
+
+            try
+            {
+                using HttpClient client = new();
+                using HttpResponseMessage response = await client.GetAsync(pictureUrl, HttpCompletionOption.ResponseHeadersRead, cancellationToken);
+
+                if (!response.IsSuccessStatusCode)
+                    return;
+
+                using Stream responseStream = await response.Content.ReadAsStreamAsync(cancellationToken);
+                using FileStream fileStream = new(fileName, FileMode.Create, FileAccess.Write, FileShare.None, bufferSize: 81920, useAsync: true);
+
+                await responseStream.CopyToAsync(fileStream, cancellationToken);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error downloading artist backdrop {Url}", fileName);
+            }
+        }
+    }
 
 
     public static bool IsApiRetryAllowed(DateTime? lastAttempt)
