@@ -497,6 +497,7 @@
                                 <TextBlock Text="🔹TagLibSharp (Brian Nickel, Gabriel Burt, Stephen Shaw, etc.)" />
                                 <TextBlock Text="🔹Moq (Daniel Cazzulino, kzu)" />
                                 <TextBlock Text="🔹Serilog" />
+                                <TextBlock Text="🔹Simpleicons" />
                             </ItemsControl.Items>
                         </ItemsControl>
                     </StackPanel>

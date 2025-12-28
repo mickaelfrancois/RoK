@@ -213,7 +213,7 @@ public partial class ArtistViewModel : ObservableObject
     public AsyncRelayCommand ArtistFavoriteCommand { get; private set; }
     public AsyncRelayCommand SelectPictureCommand { get; private set; }
     public AsyncRelayCommand OpenOfficielSiteCommand { get; private set; }
-    public RelayCommand OpenLastFmPageCommand { get; private set; }
+    public RelayCommand<string> OpenUrlCommand { get; private set; }
     public AsyncRelayCommand OpenBiographyCommand { get; private set; }
 
     public override string ToString() => Artist?.Name ?? string.Empty;
@@ -252,7 +252,7 @@ public partial class ArtistViewModel : ObservableObject
         ArtistOpenCommand = new RelayCommand(ArtistOpen);
         SelectPictureCommand = new AsyncRelayCommand(SelectPictureAsync);
         OpenOfficielSiteCommand = new AsyncRelayCommand(OpenOfficialSiteAsync);
-        OpenLastFmPageCommand = new RelayCommand(OpenLastFmPage);
+        OpenUrlCommand = new RelayCommand<string>(OpenUrl);
         OpenBiographyCommand = new AsyncRelayCommand(OpenBiographyAsync);
     }
 
@@ -393,19 +393,24 @@ public partial class ArtistViewModel : ObservableObject
             if (refreshedArtist != null)
                 Artist = refreshedArtist;
 
-            OnPropertyChanged(nameof(Backdrop));
+            OnPropertyChanged("");
             Messenger.Send(new ArtistUpdateMessage(Artist.Id, ActionType.Update));
         }
     }
 
 
-    private void OpenLastFmPage()
+    private void OpenUrl(string url)
     {
-        if (!LastFmPageAvailable)
+        if (string.IsNullOrEmpty(url))
             return;
 
-        Uri uri = new(Artist.LastFmUrl!);
-        _ = Windows.System.Launcher.LaunchUriAsync(uri);
+        if (url.StartsWith("www.", StringComparison.OrdinalIgnoreCase))
+            url = "https://" + url;
+        if (url.StartsWith("http://", StringComparison.OrdinalIgnoreCase))
+            url = url.Replace("http://", "https://");
+
+        if (Uri.TryCreate(url, UriKind.Absolute, out Uri? uri))
+            _ = Windows.System.Launcher.LaunchUriAsync(uri);
     }
 
 
