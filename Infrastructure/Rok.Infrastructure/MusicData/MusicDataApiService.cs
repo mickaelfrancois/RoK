@@ -62,7 +62,7 @@ public class MusicDataApiService : IMusicDataApiService, IDisposable
 
     private void ConfigureHttpClient()
     {
-        if (!_appOptions.NovaApiEnabled || _musicDataApiOptions.BaseAddress is null)
+        if (!_appOptions.NovaApiEnabled || _musicDataApiOptions.BaseAddress is null || _musicDataApiOptions.ApiKey is null)
         {
             _logger.LogInformation("RoK Music API is disabled.");
 
@@ -77,7 +77,7 @@ public class MusicDataApiService : IMusicDataApiService, IDisposable
         _httpClient.BaseAddress = new Uri(_musicDataApiOptions.BaseAddress);
         _httpClient.DefaultRequestHeaders.Add("User-Agent", $"Rok/{appVersion}");
         _httpClient.Timeout = TimeSpan.FromSeconds(10);
-        _httpClient.DefaultRequestHeaders.Add("X-Api-Key", "73407c42-ba4d-54da-8131-1b8ce0b1e6f1");
+        _httpClient.DefaultRequestHeaders.Add("X-Api-Key", _musicDataApiOptions.ApiKey);
     }
 
 
