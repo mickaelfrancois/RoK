@@ -19,8 +19,8 @@ public class SearchQueryHandler(IAlbumRepository albumRepository, IArtistReposit
 
         return new SearchDto
         {
-            Albums = albums.Select(a => AlbumDtoMapping.Map(a)).ToList(),
-            Artists = artists.Select(a => ArtistDtoMapping.Map(a)).ToList(),
+            Albums = albums.Select(a => AlbumMapping.ToDto(a)).ToList(),
+            Artists = artists.Select(a => ArtistMapping.ToDto(a)).ToList(),
             Tracks = tracks.Select(t => TrackDtoMapping.Map(t)).ToList()
         };
     }

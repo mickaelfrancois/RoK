@@ -17,6 +17,6 @@ public class GetArtistByNameQueryHandler(IArtistRepository artistRepository) : I
         if (artist == null)
             return Result<ArtistDto>.Fail("NotFound", "Artist not found");
         else
-            return Result<ArtistDto>.Success(ArtistDtoMapping.Map(artist));
+            return Result<ArtistDto>.Success(ArtistMapping.ToDto(artist));
     }
 }

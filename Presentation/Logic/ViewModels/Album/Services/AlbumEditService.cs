@@ -21,15 +21,33 @@ public class AlbumEditService(IMediator mediator)
         if (result != ContentDialogResult.Primary)
             return false;
 
-        PatchAlbumCommand patchAlbumCommand = new()
+        UpdateAlbumCommand command = new()
         {
             Id = album.Id,
-            IsBestOf = new PatchField<bool>(dialog.IsBestOf),
-            IsLive = new PatchField<bool>(dialog.IsLive),
-            IsCompilation = new PatchField<bool>(dialog.IsCompilation)
+            IsBestOf = dialog.IsBestOf,
+            IsLive = dialog.IsLive,
+            IsCompilation = dialog.IsCompilation,
+
+            AllMusicID = album.AllMusicID,
+            AmazonID = album.AmazonID,
+            AudioDbArtistID = album.AudioDbArtistID,
+            AudioDbID = album.AudioDbID,
+            Biography = album.Biography,
+            DiscogsID = album.DiscogsID,
+            GeniusID = album.GeniusID,
+            Label = album.Label,
+            LyricWikiID = album.LyricWikiID,
+            MusicBrainzID = album.MusicBrainzID,
+            MusicMozID = album.MusicMozID,
+            ReleaseDate = album.ReleaseDate,
+            ReleaseGroupMusicBrainzID = album.ReleaseGroupMusicBrainzID,
+            Sales = album.Sales,
+            Wikipedia = album.Wikipedia,
+            WikipediaID = album.WikipediaID,
+            WikidataID = album.WikidataID
         };
 
-        await mediator.SendMessageAsync(patchAlbumCommand);
+        await mediator.SendMessageAsync(command);
 
         album.IsBestOf = dialog.IsBestOf;
         album.IsLive = dialog.IsLive;

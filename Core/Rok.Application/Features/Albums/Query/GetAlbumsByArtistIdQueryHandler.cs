@@ -16,6 +16,6 @@ public class GetAlbumsByArtistIdQueryHandler(IAlbumRepository _albumRepository) 
     {
         IEnumerable<IAlbumEntity> albums = await _albumRepository.GetByArtistIdAsync(query.ArtistId);
 
-        return albums.Select(a => AlbumDtoMapping.Map(a));
+        return albums.Select(a => AlbumMapping.ToDto(a));
     }
 }

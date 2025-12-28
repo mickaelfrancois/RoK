@@ -7,6 +7,10 @@ public class ArtistEntity : BaseEntity, IArtistEntity
 
     public string Name { get; set; } = string.Empty;
 
+    public string? MusicBrainzID { get; set; }
+
+    /* Social networks and external links */
+
     public string? WikipediaUrl { get; set; }
 
     public string? OfficialSiteUrl { get; set; }
@@ -15,9 +19,33 @@ public class ArtistEntity : BaseEntity, IArtistEntity
 
     public string? TwitterUrl { get; set; }
 
-    public string? NovaUid { get; set; }
+    public string? FlickrUrl { get; set; }
 
-    public string? MusicBrainzID { get; set; }
+    public string? InstagramUrl { get; set; }
+
+    public string? TiktokUrl { get; set; }
+
+    public string? ThreadsUrl { get; set; }
+
+    public string? SongkickUrl { get; set; }
+
+    public string? SoundcloundUrl { get; set; }
+
+    public string? ImdbUrl { get; set; }
+
+    public string? LastFmUrl { get; set; }
+
+    public string? DiscogsUrl { get; set; }
+
+    public string? BandsintownUrl { get; set; }
+
+    public string? YoutubeUrl { get; set; }
+
+    public string? AudioDbID { get; set; }
+
+    public string? AllMusicUrl { get; set; }
+
+    /* Additional info */
 
     public int? YearMini { get; set; }
 
@@ -52,12 +80,6 @@ public class ArtistEntity : BaseEntity, IArtistEntity
     public int? DiedYear { get; set; }
 
     public bool Disbanded { get; set; }
-
-    public string? Style { get; set; }
-
-    public string? Gender { get; set; }
-
-    public string? Mood { get; set; }
 
     public string? Members { get; set; }
 

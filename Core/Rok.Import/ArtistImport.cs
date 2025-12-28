@@ -1,14 +1,12 @@
-﻿using Rok.Application.Dto.NovaApi;
-using Rok.Application.Interfaces;
+﻿using Rok.Application.Interfaces;
 using Rok.Application.Tag;
 using Rok.Domain.Entities;
 using Rok.Import.Models;
-using Rok.Shared;
 using Rok.Shared.Extensions;
 
 namespace Rok.Import;
 
-public class ArtistImport(IArtistRepository _artistRepository, CountryCache _countryCache, INovaApiService _novaApi, IArtistPicture _artistPicture)
+public class ArtistImport(IArtistRepository _artistRepository)
 {
     public int CreatedCount { get; private set; } = 0;
 
@@ -90,8 +88,6 @@ public class ArtistImport(IArtistRepository _artistRepository, CountryCache _cou
             CompilationCount = track.IsCompilation ? 1 : 0,
         };
 
-        await CompleteDataFromApiAsync(artist);
-
         long id = await _artistRepository.AddAsync(artist, RepositoryConnectionKind.Background);
 
         string key = GetKey(artist.Name);
@@ -111,36 +107,5 @@ public class ArtistImport(IArtistRepository _artistRepository, CountryCache _cou
     private static string GetKey(string artistName)
     {
         return artistName.ToUpperInvariant();
-    }
-
-    private async Task CompleteDataFromApiAsync(ArtistEntity artist)
-    {
-        ApiArtistModel? apiArtist = await _novaApi.GetArtistAsync(artist.Name);
-
-        if (apiArtist == null)
-            return;
-
-        artist.WikipediaUrl = apiArtist.Wikipedia;
-        artist.OfficialSiteUrl = apiArtist.Website;
-        artist.FacebookUrl = apiArtist.Facebook;
-        artist.TwitterUrl = apiArtist.Twitter;
-        artist.MusicBrainzID = apiArtist.MusicBrainzID;
-        artist.FormedYear = apiArtist.FormedYear;
-        artist.BornYear = apiArtist.BornYear;
-        artist.DiedYear = apiArtist.DiedYear;
-        artist.Disbanded = apiArtist.IsDisbanded;
-        artist.Style = apiArtist.Style;
-        artist.Gender = apiArtist.Gender;
-        artist.Mood = apiArtist.Mood;
-        artist.NovaUid = apiArtist.ID.ToString();
-        artist.Biography = apiArtist.GetBiography(LanguageHelpers.GetCurrentLanguage());
-        artist.CountryId = _countryCache.GetCountryIdFromCode(apiArtist.CountryCode);
-
-        if (string.IsNullOrEmpty(artist.MusicBrainzID))
-        {
-            string artistPictureFolder = _artistPicture.GetArtistFolder(artist.Name);
-            await _novaApi.GetArtistPictureAsync(artist.MusicBrainzID, "artists", artistPictureFolder);
-            await _novaApi.GetArtistBackdropsAsync(apiArtist.MusicBrainzID, apiArtist.FanartsCount, artistPictureFolder);
-        }
     }
 }

@@ -12,6 +12,6 @@ public class GetAllAlbumsQueryHandler(IAlbumRepository _albumRepository) : IQuer
     {
         IEnumerable<AlbumEntity> albums = await _albumRepository.GetAllAsync();
 
-        return albums.Select(a => AlbumDtoMapping.Map(a));
+        return albums.Select(a => AlbumMapping.ToDto(a));
     }
 }

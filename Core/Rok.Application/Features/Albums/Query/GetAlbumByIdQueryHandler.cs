@@ -17,6 +17,6 @@ public class GetAlbumByIdQueryHandler(IAlbumRepository albumRepository) : IQuery
         if (album == null)
             return Result<AlbumDto>.Fail("NotFound", "Album not found");
         else
-            return Result<AlbumDto>.Success(AlbumDtoMapping.Map(album));
+            return Result<AlbumDto>.Success(AlbumMapping.ToDto(album));
     }
 }

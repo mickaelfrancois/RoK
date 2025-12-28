@@ -16,6 +16,6 @@ public class GetAllArtistsQueryHandler(IArtistRepository _artistRepository) : IQ
         if (request.ExcludeArtistsWithoutAlbum)
             artists = artists.Where(a => a.AlbumCount + a.LiveCount + a.BestofCount > 0);
 
-        return artists.Select(a => ArtistDtoMapping.Map(a));
+        return artists.Select(a => ArtistMapping.ToDto(a));
     }
 }

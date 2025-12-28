@@ -1,36 +1,31 @@
-﻿using Rok.Shared;
-
-namespace Rok.Domain.Interfaces.Entities;
+﻿namespace Rok.Domain.Interfaces.Entities;
 
 public interface IUpdateArtistEntity
 {
     long Id { get; set; }
-
-    PatchField<string>? Biography { get; set; }
-
-    PatchField<int>? BornYear { get; set; }
-
-    PatchField<int>? DiedYear { get; set; }
-
-    PatchField<bool>? Disbanded { get; set; }
-
-    PatchField<string>? FacebookUrl { get; set; }
-
-    PatchField<int>? FormedYear { get; set; }
-
-    PatchField<string>? Gender { get; set; }
-
-    PatchField<string>? Mood { get; set; }
-
-    PatchField<string>? MusicBrainzID { get; set; }
-
-    PatchField<string>? NovaUid { get; set; }
-
-    PatchField<string>? OfficialSiteUrl { get; set; }
-
-    PatchField<string>? Style { get; set; }
-
-    PatchField<string>? TwitterUrl { get; set; }
-
-    PatchField<string>? WikipediaUrl { get; set; }
+    string? AllMusicUrl { get; set; }
+    string? AudioDbID { get; set; }
+    string? BandsintownUrl { get; set; }
+    string? Biography { get; set; }
+    int? BornYear { get; set; }
+    int? DiedYear { get; set; }
+    bool Disbanded { get; set; }
+    string? DiscogsUrl { get; set; }
+    string? FacebookUrl { get; set; }
+    string? FlickrUrl { get; set; }
+    int? FormedYear { get; set; }
+    string? ImdbUrl { get; set; }
+    string? InstagramUrl { get; set; }
+    string? LastFmUrl { get; set; }
+    string? Members { get; set; }
+    string? MusicBrainzID { get; set; }
+    string? OfficialSiteUrl { get; set; }
+    string? SimilarArtists { get; set; }
+    string? SongkickUrl { get; set; }
+    string? SoundcloundUrl { get; set; }
+    string? ThreadsUrl { get; set; }
+    string? TiktokUrl { get; set; }
+    string? TwitterUrl { get; set; }
+    string? WikipediaUrl { get; set; }
+    string? YoutubeUrl { get; set; }
 }

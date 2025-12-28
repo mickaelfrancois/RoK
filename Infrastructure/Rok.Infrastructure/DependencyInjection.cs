@@ -8,7 +8,7 @@ using Rok.Infrastructure.FileSystem;
 using Rok.Infrastructure.LastFm;
 using Rok.Infrastructure.Lyrics;
 using Rok.Infrastructure.Migration;
-using Rok.Infrastructure.NovaApi;
+using Rok.Infrastructure.MusicData;
 using Rok.Infrastructure.Repositories;
 using Rok.Infrastructure.Social;
 using Rok.Infrastructure.Tag;
@@ -47,6 +47,7 @@ public static class DependencyInjection
 
         services.AddSingleton<IMigrationService, MigrationService>();
         services.AddSingleton<IMigration, Migration2>();
+        services.AddSingleton<IMigration, Migration3>();
 
         services.AddScoped<IArtistRepository, ArtistRepository>();
         services.AddScoped<IAlbumRepository, AlbumRepository>();
@@ -58,7 +59,7 @@ public static class DependencyInjection
         services.AddScoped<IPlaylistTrackGenerateRepository, PlaylistTrackGenerateRepository>();
 
         services.AddSingleton<ITagService, TagService>();
-        services.AddSingleton<INovaApiService, NovaApiService>();
+        services.AddSingleton<IMusicDataApiService, MusicDataApiService>();
         services.AddSingleton<ITranslateService, TranslateService>();
         services.AddSingleton<ILastFmClient, LastFmClient>();
         services.AddSingleton<ITelemetryClient, TelemetryClient>();

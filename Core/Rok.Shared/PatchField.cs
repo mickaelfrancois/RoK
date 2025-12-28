@@ -13,7 +13,7 @@ public class PatchField<T>
         Value = default;
     }
 
-    public PatchField(T value)
+    public PatchField(T? value)
     {
         IsSet = true;
         Value = value;

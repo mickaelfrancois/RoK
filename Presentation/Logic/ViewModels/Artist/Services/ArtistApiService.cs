@@ -1,105 +1,126 @@
-﻿using Rok.Application.Features.Artists.Command;
-using Rok.Infrastructure.NovaApi;
+﻿using System.Threading;
+using Rok.Application.Dto.MusicDataApi;
+using Rok.Application.Features.Artists.Command;
+using Rok.Infrastructure.MusicData;
 
 namespace Rok.Logic.ViewModels.Artist.Services;
 
-public class ArtistApiService(
-    IMediator mediator,
-    INovaApiService novaApiService,
-    ArtistPictureService pictureService,
-    BackdropPicture backdropPicture,
-    ILogger<ArtistApiService> logger)
+public class ArtistApiService(IMediator mediator, IMusicDataApiService musicDataApiService, ArtistPictureService pictureService, BackdropPicture backdropPicture, ILogger<ArtistApiService> logger)
 {
     public async Task<bool> GetAndUpdateArtistDataAsync(ArtistDto artist)
     {
         if (string.IsNullOrEmpty(artist.Name))
             return false;
 
-        if (!NovaApiService.IsApiRetryAllowed(artist.GetMetaDataLastAttempt))
+        if (!MusicDataApiService.IsApiRetryAllowed(artist.GetMetaDataLastAttempt))
             return false;
 
         await mediator.SendMessageAsync(new UpdateArtistGetMetaDataLastAttemptCommand(artist.Id));
+        artist.GetMetaDataLastAttempt = DateTime.UtcNow;
 
-        ApiArtistModel? artistApi = await novaApiService.GetArtistAsync(artist.Name);
+        MusicDataArtistDto? artistApi = await musicDataApiService.GetArtistAsync(artist.Name, artist.MusicBrainzID);
         if (artistApi == null)
             return false;
 
-        bool anyUpdate = false;
-
         if (!string.IsNullOrEmpty(artistApi.MusicBrainzID))
         {
-            await DownloadPictureIfNeededAsync(artist, artistApi);
-            await DownloadBackdropsIfNeededAsync(artist, artistApi);
+            await DownloadPictureIfNeededAsync(artist, artistApi, CancellationToken.None);
+            await DownloadBackdropsIfNeededAsync(artist, artistApi, CancellationToken.None);
+
+            if (CompareArtistFromApi(artist, artistApi))
+                return await UpdateArtistDataIfNeededAsync(artist, artistApi);
         }
 
-        anyUpdate |= await UpdateArtistDataIfNeededAsync(artist, artistApi);
-
-        return anyUpdate;
+        return false;
     }
 
-    private async Task DownloadPictureIfNeededAsync(ArtistDto artist, ApiArtistModel artistApi)
+
+    private async Task DownloadPictureIfNeededAsync(ArtistDto artist, MusicDataArtistDto artistApi, CancellationToken cancellationToken)
     {
         if (pictureService.PictureExists(artist.Name))
             return;
 
+        if (string.IsNullOrWhiteSpace(artistApi.PictureUrl))
+            return;
+
         string picturePath = pictureService.GetPictureFilePath(artist.Name);
-        await novaApiService.GetArtistPictureAsync(artistApi.MusicBrainzID!, "artists", picturePath);
+
+        await musicDataApiService.DownloadArtistPictureAsync(artistApi, picturePath, cancellationToken);
     }
 
-    private async Task DownloadBackdropsIfNeededAsync(ArtistDto artist, ApiArtistModel artistApi)
+
+    private async Task DownloadBackdropsIfNeededAsync(ArtistDto artist, MusicDataArtistDto artistApi, CancellationToken cancellationToken)
     {
         if (backdropPicture.HasBackdrops(artist.Name))
             return;
 
         string backdropFolder = backdropPicture.GetArtistPictureFolder(artist.Name);
-        await novaApiService.GetArtistBackdropsAsync(artistApi.MusicBrainzID!, artistApi.FanartsCount, backdropFolder);
+
+        await musicDataApiService.DownloadArtistBackdropsAsync(artistApi, backdropFolder, cancellationToken);
     }
 
-    private async Task<bool> UpdateArtistDataIfNeededAsync(ArtistDto artist, ApiArtistModel artistApi)
+
+    private async Task<bool> UpdateArtistDataIfNeededAsync(ArtistDto artist, MusicDataArtistDto artistApi)
     {
-        if (!CompareArtistFromApi(artist, artistApi))
-            return false;
+        logger.LogTrace("Patch artist '{Name}' with API data.", artist.Name);
 
-        logger.LogTrace("Patch artist '{Name}' from API response.", artist.Name);
-
-        PatchArtistCommand patchArtistCommand = new()
+        UpdateArtistCommand command = new()
         {
             Id = artist.Id,
-            WikipediaUrl = new PatchField<string>(artistApi.Wikipedia),
-            OfficialSiteUrl = new PatchField<string>(artistApi.Website),
-            FacebookUrl = new PatchField<string>(artistApi.Facebook),
-            TwitterUrl = new PatchField<string>(artistApi.Twitter),
-            MusicBrainzID = new PatchField<string>(artistApi.MusicBrainzID),
-            Disbanded = new PatchField<bool>(artistApi.IsDisbanded),
-            BornYear = new PatchField<int>(artistApi.BornYear.GetValueOrDefault()),
-            DiedYear = new PatchField<int>(artistApi.DiedYear.GetValueOrDefault()),
-            FormedYear = new PatchField<int>(artistApi.FormedYear.GetValueOrDefault()),
-            Gender = new PatchField<string>(artistApi.Gender),
-            Mood = new PatchField<string>(artistApi.Mood),
-            Style = new PatchField<string>(artistApi.Style),
-            Biography = new PatchField<string>(artistApi.GetBiography(LanguageHelpers.GetCurrentLanguage())),
-            NovaUid = new PatchField<string>(artistApi.ID?.ToString() ?? "")
+            MusicBrainzID = artistApi.MusicBrainzID ?? artist.MusicBrainzID,
+            AllMusicUrl = artistApi.AllMusic ?? artist.AllMusicUrl,
+            WikipediaUrl = artistApi.Wikipedia ?? artist.WikipediaUrl,
+            OfficialSiteUrl = artistApi.Website ?? artist.OfficialSiteUrl,
+            FacebookUrl = artistApi.Facebook ?? artist.FacebookUrl,
+            TwitterUrl = artistApi.Twitter ?? artist.TwitterUrl,
+            FlickrUrl = artistApi.Flickr ?? artist.FlickrUrl,
+            InstagramUrl = artistApi.Instagram ?? artist.InstagramUrl,
+            TiktokUrl = artistApi.TikTok ?? artist.TiktokUrl,
+            ThreadsUrl = artistApi.Threads ?? artist.ThreadsUrl,
+            SongkickUrl = artistApi.SongKick ?? artist.SongkickUrl,
+            SoundcloundUrl = artistApi.SoundCloud ?? artist.SoundcloundUrl,
+            ImdbUrl = artistApi.Imdb ?? artist.ImdbUrl,
+            LastFmUrl = artistApi.LastFM ?? artist.LastFmUrl,
+            DiscogsUrl = artistApi.Discogs ?? artist.DiscogsUrl,
+            BandsintownUrl = artistApi.Bandsintown ?? artist.BandsintownUrl,
+            YoutubeUrl = artistApi.Youtube ?? artist.YoutubeUrl,
+            AudioDbID = artistApi.AudioDbID ?? artist.AudioDbID,
+            BornYear = artistApi.BeginYear ?? artist.BornYear,
+            DiedYear = artistApi.EndYear ?? artist.DiedYear,
         };
 
-        await mediator.SendMessageAsync(patchArtistCommand);
+        if (string.IsNullOrEmpty(artist.Biography))
+            command.Biography = artistApi.Biography;
+
+        await mediator.SendMessageAsync(command);
 
         return true;
     }
 
-    private static bool CompareArtistFromApi(ArtistDto artist, ApiArtistModel artistApi)
+
+    private static bool CompareArtistFromApi(ArtistDto artist, MusicDataArtistDto artistApi)
     {
+        if (artist.FlickrUrl.AreDifferents(artistApi.Flickr)) return true;
+        if (artist.InstagramUrl.AreDifferents(artistApi.Instagram)) return true;
+        if (artist.TiktokUrl.AreDifferents(artistApi.TikTok)) return true;
+        if (artist.ThreadsUrl.AreDifferents(artistApi.Threads)) return true;
+        if (artist.SongkickUrl.AreDifferents(artistApi.SongKick)) return true;
+        if (artist.SoundcloundUrl.AreDifferents(artistApi.SoundCloud)) return true;
+        if (artist.ImdbUrl.AreDifferents(artistApi.Imdb)) return true;
+        if (artist.LastFmUrl.AreDifferents(artistApi.LastFM)) return true;
+        if (artist.DiscogsUrl.AreDifferents(artistApi.Discogs)) return true;
+        if (artist.BandsintownUrl.AreDifferents(artistApi.Bandsintown)) return true;
+        if (artist.YoutubeUrl.AreDifferents(artistApi.Youtube)) return true;
+        if (artist.AudioDbID.AreDifferents(artistApi.AudioDbID)) return true;
+        if (artist.AllMusicUrl.AreDifferents(artistApi.AllMusic)) return true;
         if (artist.TwitterUrl.AreDifferents(artistApi.Twitter)) return true;
         if (artist.OfficialSiteUrl.AreDifferents(artistApi.Website)) return true;
         if (artist.FacebookUrl.AreDifferents(artistApi.Facebook)) return true;
-        if (artist.BornYear.AreDifferents(artistApi.BornYear)) return true;
-        if (artist.Disbanded != artistApi.IsDisbanded) return true;
-        if (artist.DiedYear.AreDifferents(artistApi.DiedYear)) return true;
-        if (artist.FormedYear.AreDifferents(artistApi.FormedYear)) return true;
-        if (artist.Gender.AreDifferents(artistApi.Gender)) return true;
-        if (artist.Mood.AreDifferents(artistApi.Mood)) return true;
-        if (artist.Style.AreDifferents(artistApi.Style)) return true;
-        if (artist.Biography.AreDifferents(artistApi.GetBiography(LanguageHelpers.GetCurrentLanguage()))) return true;
+        if (artist.ThreadsUrl.AreDifferents(artistApi.Threads)) return true;
+        if (artist.BornYear.AreDifferents(artistApi.BeginYear)) return true;
+        if (artist.DiedYear.AreDifferents(artistApi.EndYear)) return true;
+        if (artist.Disbanded != artistApi.Disbanded) return true;
 
-        return false;
+        return string.IsNullOrWhiteSpace(artist.Biography) && !string.IsNullOrWhiteSpace(artistApi.Biography);
     }
 }

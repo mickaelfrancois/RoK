@@ -24,7 +24,7 @@ public partial class AlbumViewModel : ObservableObject
 
     private IEnumerable<TrackDto>? _tracks = null;
 
-    public bool LastFmPageAvailable { get; set; }
+    public bool LastFmPageAvailable { get => !string.IsNullOrWhiteSpace(Album.LastFmUrl); }
 
     public bool IsFavorite
     {
@@ -191,8 +191,6 @@ public partial class AlbumViewModel : ObservableObject
 
         stopwatch.Stop();
         _logger.LogInformation("Album {AlbumId} loaded in {ElapsedMilliseconds} ms", albumId, stopwatch.ElapsedMilliseconds);
-
-        await CheckLastFmUrlAsync();
     }
 
     private async Task LoadTracksAsync(long albumId)
@@ -304,12 +302,6 @@ public partial class AlbumViewModel : ObservableObject
 
             Messenger.Send(new AlbumUpdateMessage(Album.Id, ActionType.Picture));
         }
-    }
-
-    private async Task CheckLastFmUrlAsync()
-    {
-        LastFmPageAvailable = await _lastFmClient.IsAlbumPageAvailableAsync(Album.ArtistName, Album.Name);
-        OnPropertyChanged(nameof(LastFmPageAvailable));
     }
 
     private void OpenLastFmPage()
