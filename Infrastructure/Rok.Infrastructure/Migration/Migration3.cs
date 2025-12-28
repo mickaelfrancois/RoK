@@ -19,6 +19,7 @@ public class Migration3 : IMigration
         connection.Execute("ALTER TABLE Artists ADD COLUMN youtubeUrl TEXT NULL;");
         connection.Execute("ALTER TABLE Artists ADD COLUMN audioDbID TEXT NULL;");
         connection.Execute("ALTER TABLE Artists ADD COLUMN allMusicUrl TEXT NULL;");
+        connection.Execute("ALTER TABLE Artists ADD COLUMN isLock INTEGER NOT NULL DEFAULT 0;");
 
         connection.Execute("ALTER TABLE Albums ADD COLUMN biography TEXT NULL;");
         connection.Execute("ALTER TABLE Albums ADD COLUMN lastFmUrl TEXT NULL;");
@@ -33,6 +34,7 @@ public class Migration3 : IMigration
         connection.Execute("ALTER TABLE Albums ADD COLUMN WikipediaID TEXT NULL;");
         connection.Execute("ALTER TABLE Albums ADD COLUMN WikidataID TEXT NULL;");
         connection.Execute("ALTER TABLE Albums ADD COLUMN AmazonID TEXT NULL;");
+        connection.Execute("ALTER TABLE Albums ADD COLUMN isLock INTEGER NOT NULL DEFAULT 0;");
 
         connection.Execute("UPDATE Albums SET getMetaDataLastAttempt = NULL WHERE getMetaDataLastAttempt IS NOT NULL;");
         connection.Execute("UPDATE Artists SET getMetaDataLastAttempt = NULL WHERE getMetaDataLastAttempt IS NOT NULL;");

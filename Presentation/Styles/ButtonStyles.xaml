@@ -299,30 +299,18 @@
     </Style>
 
 
-    <Style x:Key="headerBrandButton"
-           TargetType="AppBarButton">
-        <Setter Property="Foreground"
-                Value="{ThemeResource SystemControlForegroundBaseHighBrush}" />
-        <Setter Property="BorderBrush"
-                Value="Transparent" />
-        <Setter Property="BorderThickness"
-                Value="0" />
-        <Setter Property="Padding"
-                Value="8,4" />
-        <Setter Property="CornerRadius"
-                Value="4" />
-        <Setter Property="FontSize"
-                Value="14" />
-        <Setter Property="FontWeight"
-                Value="SemiBold" />
-        <Setter Property="Height"
-                Value="36" />
-        <Setter Property="MinHeight"
-                Value="36" />
-        <Setter Property="VerticalAlignment"
-                Value="Center" />
-        <Setter Property="UseSystemFocusVisuals"
-                Value="False" />
+    <Style x:Key="headerBrandButton" TargetType="AppBarButton">
+        <Setter Property="Foreground" Value="{ThemeResource SystemControlForegroundBaseHighBrush}" />
+        <Setter Property="BorderBrush" Value="Transparent" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="Padding" Value="2,2" />
+        <Setter Property="CornerRadius" Value="4" />
+        <Setter Property="FontSize" Value="14" />
+        <Setter Property="FontWeight" Value="SemiBold" />
+        <Setter Property="Height" Value="36" />
+        <Setter Property="MinHeight" Value="36" />
+        <Setter Property="VerticalAlignment" Value="Center" />
+        <Setter Property="UseSystemFocusVisuals" Value="False" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="AppBarButton">

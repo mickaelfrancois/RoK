@@ -67,51 +67,45 @@
                            Margin="10,-1,0,0" 
                            VerticalAlignment="Center"/>
 
-                <HyperlinkButton x:Name="genreName" 
-                                 Content="{x:Bind ViewModel.Artist.GenreName}" 
-                                 RelativePanel.Below="artistName" 
-                                 Command="{x:Bind ViewModel.GenreOpenCommand}"
-                                 Style="{StaticResource headerGenreHyperlink}"                                 
-                                 />
+                <TextBlock x:Name="genreName"
+                           Text="{x:Bind ViewModel.Artist.GenreName}"
+                           RelativePanel.Below="artistName"
+                           FontSize="16"
+                           Style="{StaticResource headerText}" />
 
-                <TextBlock x:Name="panelExtendedInfo" 
+                <TextBlock x:Name="panelExtendedInfo"
                            RelativePanel.Below="genreName"
                            Text="{x:Bind ViewModel.SubTitle}"
-                           Style="{StaticResource headerText}"
-                           />
+                           FontSize="16"
+                           Style="{StaticResource headerText}" />
 
-                <TextBlock x:Name="panelStatsInfo" 
+                <TextBlock x:Name="panelStatsInfo"
                            RelativePanel.Below="panelExtendedInfo"
                            Text="{x:Bind ViewModel.ListenStats}"
                            Style="{StaticResource headerText}"
                            />
 
-                <CommandBar  RelativePanel.AlignBottomWithPanel="True" 
-                             Style="{StaticResource headerCommandBar}">
-
-                    <AppBarButton x:Uid="artistViewListen"
-                                  Style="{StaticResource listenAppBarButtonStyle}"
-                                  Command="{x:Bind ViewModel.ListenCommand}"/>
-
-                    <AppBarToggleButton x:Uid="artistViewLike" 
-                                        x:Name="artistAppBarLike" 
-                                        Style="{StaticResource headerLikeButton}"                                        
-                                        IsChecked="{x:Bind ViewModel.IsFavorite, Mode=OneWay}" 
-                                        Command="{x:Bind ViewModel.ArtistFavoriteCommand}" />
+                <CommandBar x:Name="panelNetwork"
+                            RelativePanel.Below="panelStatsInfo"
+                            Margin="-10,-5,0,0"                            
+                            Style="{StaticResource headerCommandBar}">
 
                     <AppBarButton x:Uid="artistViewWebSite"
-                                  Style="{StaticResource headerGenericButton}"
-                                  Icon="World"
-                                  Command="{x:Bind ViewModel.OpenOfficielSiteCommand}"
-                                  Visibility="{x:Bind ViewModel.Artist.OfficialSiteUrl, Converter={StaticResource StringToVisibilityConverter}}" />
+                                  Style="{StaticResource headerBrandButton}"                                  
+                                  Command="{x:Bind ViewModel.OpenOfficielSiteCommand, Mode=OneWay}"
+                                  Visibility="{x:Bind ViewModel.Artist.OfficialSiteUrl, Mode=OneWay, Converter={StaticResource StringToVisibilityConverter}}">
+                        <Viewbox Width="24"
+                                 Height="24"
+                                 Stretch="Uniform">
+                            <Canvas Width="24"
+                                    Height="24">
+                                <Path Stroke="{ThemeResource SystemControlForegroundBaseHighBrush}"
+                                      StrokeThickness="0.8"                                                                            
+                                      Data="M12 2 A10 10 0 1 0 12 22 A10 10 0 1 0 12 2 M2 12 H22 M12 2 C14 8 14 16 12 22 M12 2 C10 8 10 16 12 22 M3.5 8 C7 9 17 9 20.5 8 M3.5 16 C7 15 17 15 20.5 16 M8.5 13.5 C9 12 10.5 11.5 11.5 12.2 12.5 12.9 13 13.5 13 14.5 12 15 10 15 9 14.5 8.2 14 8 13.5 8.5 13.5 Z" />
+                            </Canvas>
+                        </Viewbox>
+                    </AppBarButton>
 
-                    <AppBarButton x:Uid="artistViewBiography"
-                                  Style="{StaticResource headerGenericButton}"
-                                  Icon="Library"                                  
-                                  Command="{x:Bind ViewModel.OpenBiographyCommand}"
-                                  Visibility="{x:Bind ViewModel.Artist.Biography, Converter={StaticResource StringToVisibilityConverter}}" />
-
-                    
                     <AppBarButton x:Uid="artistViewLastFm"
                                   Style="{StaticResource headerBrandButton}"
                                   ToolTipService.ToolTip="Last.FM"
@@ -129,15 +123,36 @@
                         </Viewbox>
                     </AppBarButton>
 
+                    <AppBarButton x:Uid="artistViewWikipedia"
+                                  Style="{StaticResource headerBrandButton}"
+                                  ToolTipService.ToolTip="Wikipedia"
+                                  Command="{x:Bind ViewModel.OpenUrlCommand, Mode=OneWay}"
+                                  CommandParameter="{x:Bind ViewModel.Artist.WikipediaUrl, Mode=OneWay}"
+                                  Visibility="{x:Bind ViewModel.Artist.WikipediaUrl, Mode=OneWay, Converter={StaticResource StringToVisibilityConverter}}">
+                        <Viewbox Width="20"
+                                 Height="20"
+                                 Stretch="Uniform">
+                            <Canvas Width="24"
+                                    Height="24">
+                                <Path Fill="#000000"
+                                      Data="M12.09 13.119c-.936 1.932-2.217 4.548-2.853 5.728-.616 1.074-1.127.931-1.532.029-1.406-3.321-4.293-9.144-5.651-12.409-.251-.601-.441-.987-.619-1.139-.181-.15-.554-.24-1.122-.271C.103 5.033 0 4.982 0 4.898v-.455l.052-.045c.924-.005 5.401 0 5.401 0l.051.045v.434c0 .119-.075.176-.225.176l-.564.031c-.485.029-.727.164-.727.436 0 .135.053.33.166.601 1.082 2.646 4.818 10.521 4.818 10.521l.136.046 2.411-4.81-.482-1.067-1.658-3.264s-.318-.654-.428-.872c-.728-1.443-.712-1.518-1.447-1.617-.207-.023-.313-.05-.313-.149v-.468l.06-.045h4.292l.113.037v.451c0 .105-.076.15-.227.15l-.308.047c-.792.061-.661.381-.136 1.422l1.582 3.252 1.758-3.504c.293-.64.233-.801.111-.947-.07-.084-.305-.22-.812-.24l-.201-.021c-.052 0-.098-.015-.145-.051-.045-.031-.067-.076-.067-.129v-.427l.061-.045c1.247-.008 4.043 0 4.043 0l.059.045v.436c0 .121-.059.178-.193.178-.646.03-.782.095-1.023.439-.12.186-.375.589-.646 1.039l-2.301 4.273-.065.135 2.792 5.712.17.048 4.396-10.438c.154-.422.129-.722-.064-.895-.197-.172-.346-.273-.857-.295l-.42-.016c-.061 0-.105-.014-.152-.045-.043-.029-.072-.075-.072-.119v-.436l.059-.045h4.961l.041.045v.437c0 .119-.074.18-.209.18-.648.03-1.127.18-1.443.421-.314.255-.557.616-.736 1.067 0 0-4.043 9.258-5.426 12.339-.525 1.007-1.053.917-1.503-.031-.571-1.171-1.773-3.786-2.646-5.71l.053-.036z" />
+                            </Canvas>
+                        </Viewbox>
+                    </AppBarButton>
+
                     <AppBarButton x:Uid="artistViewFacebook"
                                   Style="{StaticResource headerBrandButton}"
                                   ToolTipService.ToolTip="Facebook"
                                   Command="{x:Bind ViewModel.OpenUrlCommand, Mode=OneWay}"
                                   CommandParameter="{x:Bind ViewModel.Artist.FacebookUrl, Mode=OneWay}"
                                   Visibility="{x:Bind ViewModel.Artist.FacebookUrl, Mode=OneWay, Converter={StaticResource StringToVisibilityConverter}}">
-                        <Viewbox Width="20" Height="20" Stretch="Uniform">
-                            <Canvas Width="24" Height="24">
-                                <Path Fill="#0866FF" Data="M22,12 C22,6.48 17.52,2 12,2 C6.48,2 2,6.48 2,12 C2,17.02 5.66,21.13 10.44,21.88 L10.44,14.89 L7.9,14.89 L7.9,12 L10.44,12 L10.44,9.8 C10.44,7.3 11.93,5.94 14.2,5.94 C15.27,5.94 16.39,6.12 16.39,6.12 L16.39,8.6 L15.01,8.6 C13.65,8.6 13.27,9.45 13.27,10.33 L13.27,12 L16.26,12 L15.77,14.89 L13.27,14.89 L13.27,21.88 C18.04,21.13 22,17.02 22,12 Z" />
+                        <Viewbox Width="20"
+                                 Height="20"
+                                 Stretch="Uniform">
+                            <Canvas Width="24"
+                                    Height="24">
+                                <Path Fill="#0866FF"
+                                      Data="M22,12 C22,6.48 17.52,2 12,2 C6.48,2 2,6.48 2,12 C2,17.02 5.66,21.13 10.44,21.88 L10.44,14.89 L7.9,14.89 L7.9,12 L10.44,12 L10.44,9.8 C10.44,7.3 11.93,5.94 14.2,5.94 C15.27,5.94 16.39,6.12 16.39,6.12 L16.39,8.6 L15.01,8.6 C13.65,8.6 13.27,9.45 13.27,10.33 L13.27,12 L16.26,12 L15.77,14.89 L13.27,14.89 L13.27,21.88 C18.04,21.13 22,17.02 22,12 Z" />
                             </Canvas>
                         </Viewbox>
                     </AppBarButton>
@@ -227,6 +242,26 @@
                         </Viewbox>
                     </AppBarButton>
 
+                </CommandBar>
+                
+                <CommandBar  RelativePanel.AlignBottomWithPanel="True" 
+                             Style="{StaticResource headerCommandBar}">
+
+                    <AppBarButton x:Uid="artistViewListen"
+                                  Style="{StaticResource listenAppBarButtonStyle}"
+                                  Command="{x:Bind ViewModel.ListenCommand}"/>
+
+                    <AppBarToggleButton x:Uid="artistViewLike"
+                                        x:Name="artistAppBarLike"
+                                        Style="{StaticResource headerLikeButton}"
+                                        IsChecked="{x:Bind ViewModel.IsFavorite, Mode=OneWay}"
+                                        Command="{x:Bind ViewModel.ArtistFavoriteCommand}" />
+
+                    <AppBarButton x:Uid="artistViewBiography"
+                                  Style="{StaticResource headerGenericButton}"
+                                  Icon="Library"                                  
+                                  Command="{x:Bind ViewModel.OpenBiographyCommand}"
+                                  Visibility="{x:Bind ViewModel.Artist.Biography, Converter={StaticResource StringToVisibilityConverter}}" />
 
                     <AppBarButton x:Uid="artistViewPlaylist"
                                   Style="{StaticResource headerGenericButton}"

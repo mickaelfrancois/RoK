@@ -404,6 +404,11 @@ public partial class ArtistViewModel : ObservableObject
         if (string.IsNullOrEmpty(url))
             return;
 
+        if (url.StartsWith("www.", StringComparison.OrdinalIgnoreCase))
+            url = "https://" + url;
+        if (url.StartsWith("http://", StringComparison.OrdinalIgnoreCase))
+            url = url.Replace("http://", "https://");
+
         if (Uri.TryCreate(url, UriKind.Absolute, out Uri? uri))
             _ = Windows.System.Launcher.LaunchUriAsync(uri);
     }
