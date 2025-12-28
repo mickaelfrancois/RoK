@@ -6,7 +6,8 @@ using Rok.Shared;
 
 namespace Rok.Infrastructure.Repositories;
 
-public class ArtistRepository(IDbConnection connection, [FromKeyedServices("BackgroundConnection")] IDbConnection backgroundConnection, ILogger<ArtistRepository> logger) : GenericRepository<ArtistEntity>(connection, backgroundConnection, null, logger), IArtistRepository
+public class ArtistRepository(IDbConnection connection, [FromKeyedServices("BackgroundConnection")] IDbConnection backgroundConnection, ILogger<ArtistRepository> logger)
+    : GenericRepository<ArtistEntity>(connection, backgroundConnection, null, logger), IArtistRepository
 {
     private const string UpdateFavoriteSql = "UPDATE artists SET isFavorite = @isFavorite WHERE Id = @id";
     private const string UpdateLastListenSql = "UPDATE artists SET listenCount = listenCount + 1, lastListen = @lastListen WHERE Id = @id";
@@ -37,29 +38,6 @@ public class ArtistRepository(IDbConnection connection, [FromKeyedServices("Back
         return await ExecuteQueryAsync(sql, kind, new { genreId });
     }
 
-
-    public async Task<bool> PatchAsync(IUpdateArtistEntity entity, RepositoryConnectionKind kind = RepositoryConnectionKind.Foreground)
-    {
-        ArtistEntity? artist = await GetByIdAsync(entity.Id, kind);
-        if (artist == null) return false;
-
-        ApplyPatch(entity.WikipediaUrl, value => artist.WikipediaUrl = value);
-        ApplyPatch(entity.OfficialSiteUrl, value => artist.OfficialSiteUrl = value);
-        ApplyPatch(entity.FacebookUrl, value => artist.FacebookUrl = value);
-        ApplyPatch(entity.TwitterUrl, value => artist.TwitterUrl = value);
-        ApplyPatch(entity.NovaUid, value => artist.NovaUid = value);
-        ApplyPatch(entity.MusicBrainzID, value => artist.MusicBrainzID = value);
-        ApplyPatch(entity.FormedYear, value => artist.FormedYear = value);
-        ApplyPatch(entity.BornYear, value => artist.BornYear = value);
-        ApplyPatch(entity.DiedYear, value => artist.DiedYear = value);
-        ApplyPatch(entity.Disbanded, value => artist.Disbanded = value);
-        ApplyPatch(entity.Style, value => artist.Style = value);
-        ApplyPatch(entity.Gender, value => artist.Gender = value);
-        ApplyPatch(entity.Mood, value => artist.Mood = value);
-        ApplyPatch(entity.Biography, value => artist.Biography = value);
-
-        return await UpdateAsync(artist, kind);
-    }
 
     public async Task<bool> UpdateFavoriteAsync(long id, bool isFavorite, RepositoryConnectionKind kind = RepositoryConnectionKind.Foreground)
     {

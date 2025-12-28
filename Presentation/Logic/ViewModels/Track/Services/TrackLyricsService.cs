@@ -1,10 +1,11 @@
 ﻿using Rok.Application.Dto.Lyrics;
+using Rok.Application.Dto.MusicDataApi;
 using Rok.Application.Features.Tracks.Command;
-using Rok.Infrastructure.NovaApi;
+using Rok.Infrastructure.MusicData;
 
 namespace Rok.Logic.ViewModels.Track.Services;
 
-public class TrackLyricsService(IMediator mediator, ILyricsService lyricsService, INovaApiService novaApiService, ILogger<TrackLyricsService> logger)
+public class TrackLyricsService(IMediator mediator, ILyricsService lyricsService, IMusicDataApiService musicDataService, ILogger<TrackLyricsService> logger)
 {
     public bool CheckLyricsExists(string musicFile)
     {
@@ -20,18 +21,21 @@ public class TrackLyricsService(IMediator mediator, ILyricsService lyricsService
 
     public async Task<bool> GetAndSaveLyricsFromApiAsync(TrackDto track)
     {
-        if (string.IsNullOrEmpty(track.MusicFile) || string.IsNullOrEmpty(track.ArtistName) || string.IsNullOrEmpty(track.Title))
+        if (string.IsNullOrEmpty(track.MusicFile) || string.IsNullOrEmpty(track.ArtistName) || string.IsNullOrEmpty(track.AlbumName) || string.IsNullOrEmpty(track.Title) || track.Duration <= 0)
             return false;
 
-        if (!NovaApiService.IsApiRetryAllowed(track.GetLyricsLastAttempt))
+        if (!MusicDataApiService.IsApiRetryAllowed(track.GetLyricsLastAttempt))
             return false;
 
         logger.LogTrace("Fetching lyrics for {Artist} - {Title} from API", track.ArtistName, track.Title);
 
         await mediator.SendMessageAsync(new UpdateTrackGetLyricsLastAttemptCommand(track.Id));
 
-        ApiLyricsModel? lyrics = await novaApiService.GetLyricsAsync(track.ArtistName, track.Title);
-        if (lyrics == null)
+        MusicDataLyricsDto? lyrics = await musicDataService.GetLyricsAsync(track.ArtistName, track.AlbumName, track.Title, track.Duration);
+        if (lyrics is null)
+            return false;
+
+        if (lyrics.SyncLyrics is null && lyrics.PlainLyrics is null)
             return false;
 
         string fileName = lyrics.IsSynchronized
@@ -41,7 +45,7 @@ public class TrackLyricsService(IMediator mediator, ILyricsService lyricsService
         await lyricsService.SaveLyricsAsync(new LyricsModel
         {
             File = fileName,
-            PlainLyrics = lyrics.Lyrics,
+            PlainLyrics = lyrics.Lyrics!,
             LyricsType = lyrics.IsSynchronized ? ELyricsType.Synchronized : ELyricsType.Plain
         });
 

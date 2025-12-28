@@ -1,5 +1,4 @@
-﻿using Rok.Application.Dto.NovaApi;
-using Rok.Application.Interfaces;
+﻿using Rok.Application.Interfaces;
 using Rok.Application.Tag;
 using Rok.Domain.Entities;
 using Rok.Import.Models;
@@ -7,7 +6,7 @@ using Rok.Shared.Extensions;
 
 namespace Rok.Import;
 
-public class AlbumImport(IAlbumRepository _albumRepository, INovaApiService _novaApi, IAlbumPicture _albumPicture)
+public class AlbumImport(IAlbumRepository _albumRepository)
 {
     public int CreatedCount { get; private set; } = 0;
 
@@ -99,8 +98,6 @@ public class AlbumImport(IAlbumRepository _albumRepository, INovaApiService _nov
             CreatDate = DateTime.Now
         };
 
-        await CompleteDataFromApiAsync(album);
-
         long id = await _albumRepository.AddAsync(album, RepositoryConnectionKind.Background);
 
         string key = GetKey(album.Name, album.IsCompilation, artistId);
@@ -120,41 +117,9 @@ public class AlbumImport(IAlbumRepository _albumRepository, INovaApiService _nov
 
     private static string GetKey(string albumName, bool isCompilation, long? artistId)
     {
-        if (isCompilation || artistId.HasValue == false)
+        if (isCompilation || !artistId.HasValue)
             return albumName;
         else
             return $"{artistId}___{albumName}";
-    }
-
-
-    private async Task CompleteDataFromApiAsync(AlbumEntity album)
-    {
-        ApiAlbumModel? apiAlbum = await _novaApi.GetAlbumAsync(album.Name, album.ArtistName);
-
-        if (apiAlbum == null)
-            return;
-
-        album.Sales = apiAlbum.Sales;
-        album.Label = apiAlbum.Label;
-        album.Mood = apiAlbum.Mood;
-        album.MusicBrainzID = apiAlbum.MusicBrainzID;
-        album.Speed = apiAlbum.Speed;
-        album.ReleaseDate = apiAlbum.ReleaseDate;
-        album.ReleaseFormat = apiAlbum.ReleaseFormat;
-        album.Wikipedia = apiAlbum.Wikipedia;
-        album.Theme = apiAlbum.Theme;
-        // TODO : biography
-
-        if (album.Year.HasValue == false && apiAlbum.ReleaseDate.HasValue)
-            album.Year = apiAlbum.ReleaseDate.Value.Year;
-
-        if (string.IsNullOrEmpty(album.MusicBrainzID))
-        {
-            if (_albumPicture.PictureFileExists(album.AlbumPath) == false)
-            {
-                string pictureFile = _albumPicture.GetPictureFile(album.AlbumPath);
-                await _novaApi.GetAlbumPicturesAsync(album.MusicBrainzID, pictureFile);
-            }
-        }
     }
 }

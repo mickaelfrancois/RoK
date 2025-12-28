@@ -1,11 +1,36 @@
 ﻿namespace Rok.Domain.Entities;
 
+
 [Table("Albums")]
 public class AlbumEntity : BaseEntity, IAlbumEntity
 {
     public override string ToString() => Name;
 
     public string Name { get; set; } = string.Empty;
+
+    public string? MusicBrainzID { get; set; }
+
+    public string? ReleaseGroupMusicBrainzID { get; set; }
+
+    public string? AudioDbID { get; set; }
+
+    public string? AudioDbArtistID { get; set; }
+
+    public string? AllMusicID { get; set; }
+
+    public string? DiscogsID { get; set; }
+
+    public string? MusicMozID { get; set; }
+
+    public string? LyricWikiID { get; set; }
+
+    public string? GeniusID { get; set; }
+
+    public string? WikipediaID { get; set; }
+
+    public string? WikidataID { get; set; }
+
+    public string? AmazonID { get; set; }
 
     public int? Year { get; set; }
 
@@ -17,8 +42,6 @@ public class AlbumEntity : BaseEntity, IAlbumEntity
 
     public string? Wikipedia { get; set; }
 
-    public string? NovaUid { get; set; }
-
     public int TrackCount { get; set; } = 0;
 
     public long Duration { get; set; } = 0;
@@ -27,17 +50,9 @@ public class AlbumEntity : BaseEntity, IAlbumEntity
 
     public string? Label { get; set; }
 
-    public string? Speed { get; set; }
-
-    public string? Theme { get; set; }
-
-    public string? Mood { get; set; }
-
     public string? Sales { get; set; }
 
     public string? ReleaseFormat { get; set; }
-
-    public string? MusicBrainzID { get; set; }
 
     public string AlbumPath { get; set; } = string.Empty;
 
@@ -52,6 +67,8 @@ public class AlbumEntity : BaseEntity, IAlbumEntity
     public DateTime? LastListen { get; set; }
 
     public DateTime? GetMetaDataLastAttempt { get; set; }
+
+    public string? Biography { get; set; }
 
 
     [Write(false)]

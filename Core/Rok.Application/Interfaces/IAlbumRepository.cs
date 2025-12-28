@@ -10,8 +10,6 @@ public interface IAlbumRepository : IRepository<AlbumEntity>
 
     Task<IEnumerable<IAlbumEntity>> GetByArtistIdAsync(long artistId, RepositoryConnectionKind kind = RepositoryConnectionKind.Foreground);
 
-    Task<bool> PatchAsync(IUpdateAlbumEntity entity, RepositoryConnectionKind kind = RepositoryConnectionKind.Foreground);
-
     Task<bool> UpdateFavoriteAsync(long id, bool isFavorite, RepositoryConnectionKind kind = RepositoryConnectionKind.Foreground);
 
     Task<bool> UpdateLastListenAsync(long id, RepositoryConnectionKind kind = RepositoryConnectionKind.Foreground);

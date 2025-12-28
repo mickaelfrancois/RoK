@@ -1,4 +1,4 @@
-﻿namespace Rok.Infrastructure.NovaApi;
+﻿namespace Rok.Application.Dto.MusicDataApi;
 
 public class MusicDataAlbumDto
 {

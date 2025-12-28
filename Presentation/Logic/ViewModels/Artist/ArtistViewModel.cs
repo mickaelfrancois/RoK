@@ -3,7 +3,6 @@ using Rok.Infrastructure.Translate;
 using Rok.Logic.Services.Player;
 using Rok.Logic.ViewModels.Albums;
 using Rok.Logic.ViewModels.Artist.Services;
-using Rok.Logic.ViewModels.Track.Services;
 using Rok.Logic.ViewModels.Tracks;
 
 namespace Rok.Logic.ViewModels.Artists;
@@ -17,7 +16,6 @@ public partial class ArtistViewModel : ObservableObject
     private readonly ResourceLoader _resourceLoader;
     private readonly ILogger<ArtistViewModel> _logger;
     private readonly IPlayerService _playerService;
-    private readonly ILastFmClient _lastFmClient;
     private readonly IBackdropLoader _backdropLoader;
     private readonly IDialogService _dialogService;
     private readonly IAppOptions _appOptions;
@@ -34,7 +32,7 @@ public partial class ArtistViewModel : ObservableObject
 
     private IEnumerable<TrackDto>? _tracks = null;
 
-    public bool LastFmPageAvailable { get; set; }
+    public bool LastFmPageAvailable { get => !string.IsNullOrWhiteSpace(Artist.LastFmUrl); }
 
     public bool IsFavorite
     {
@@ -222,7 +220,6 @@ public partial class ArtistViewModel : ObservableObject
 
     public ArtistViewModel(
         IBackdropLoader backdropLoader,
-        ILastFmClient lastFmClient,
         NavigationService navigationService,
         IPlayerService playerService,
         IDialogService dialogService,
@@ -236,7 +233,6 @@ public partial class ArtistViewModel : ObservableObject
         ILogger<ArtistViewModel> logger)
     {
         _backdropLoader = Guard.Against.Null(backdropLoader);
-        _lastFmClient = Guard.Against.Null(lastFmClient);
         _navigationService = Guard.Against.Null(navigationService);
         _playerService = Guard.Against.Null(playerService);
         _dialogService = Guard.Against.Null(dialogService);
@@ -288,13 +284,7 @@ public partial class ArtistViewModel : ObservableObject
         stopwatch.Stop();
 
         _logger.LogInformation("Artist {ArtistId} loaded in {ElapsedMilliseconds} ms (albums: {LoadAlbums}, tracks: {LoadTracks}, api: {FetchApi})",
-                                artistId,
-                                stopwatch.ElapsedMilliseconds,
-                                loadAlbums,
-                                loadTracks,
-                                fetchApi);
-
-        await CheckLastFmUrlAsync();
+                                artistId, stopwatch.ElapsedMilliseconds, loadAlbums, loadTracks, fetchApi);
     }
 
     private async Task LoadArtistAsync(long artistId)
@@ -408,21 +398,16 @@ public partial class ArtistViewModel : ObservableObject
         }
     }
 
-    private async Task CheckLastFmUrlAsync()
-    {
-        LastFmPageAvailable = await _lastFmClient.IsArtistPageAvailableAsync(Artist.Name);
-        OnPropertyChanged(nameof(LastFmPageAvailable));
-    }
 
     private void OpenLastFmPage()
     {
-        if (LastFmPageAvailable)
-        {
-            string artistPageUrl = _lastFmClient.GetArtistPageUrl(Artist.Name);
-            Uri uri = new(artistPageUrl);
-            _ = Windows.System.Launcher.LaunchUriAsync(uri);
-        }
+        if (!LastFmPageAvailable)
+            return;
+
+        Uri uri = new(Artist.LastFmUrl!);
+        _ = Windows.System.Launcher.LaunchUriAsync(uri);
     }
+
 
     private async Task OpenBiographyAsync()
     {

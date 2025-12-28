@@ -7,7 +7,7 @@ using Rok.Application.Dto.MusicDataApi;
 using Rok.Application.Interfaces;
 using Rok.Application.Options;
 
-namespace Rok.Infrastructure.NovaApi;
+namespace Rok.Infrastructure.MusicData;
 
 public class MusicDataApiService : IMusicDataApiService, IDisposable
 {
@@ -20,6 +20,8 @@ public class MusicDataApiService : IMusicDataApiService, IDisposable
     private readonly IAppOptions _appOptions;
 
     private readonly HttpClient _httpClient;
+
+    private readonly HttpClient _downloadHttpClient;
 
     private readonly ILogger<MusicDataApiService> _logger;
 
@@ -35,6 +37,10 @@ public class MusicDataApiService : IMusicDataApiService, IDisposable
 
     private bool _disposedValue;
 
+    private DateTime? _ignoreRequestsUntil;
+    private readonly object _rateLimitLock = new();
+    public int RateLimitIgnoreSeconds { get; set; } = 60;
+
     private static readonly JsonSerializerOptions _jsonOptions = new()
     {
         PropertyNameCaseInsensitive = true
@@ -47,6 +53,8 @@ public class MusicDataApiService : IMusicDataApiService, IDisposable
         _appOptions = appOptions;
         _musicDataApiOptions = musicDataApiOptions.Value;
         _logger = logger;
+
+        _downloadHttpClient = new HttpClient();
 
         ConfigureHttpClient();
     }
@@ -136,7 +144,7 @@ public class MusicDataApiService : IMusicDataApiService, IDisposable
     }
 
 
-    public async Task<MusicDataLyricsDto?> GetLyricsAsync(string artistName, string albumName, string title, int duration)
+    public async Task<MusicDataLyricsDto?> GetLyricsAsync(string artistName, string albumName, string title, long duration)
     {
         if (!IsEnable)
             return null;
@@ -152,7 +160,7 @@ public class MusicDataApiService : IMusicDataApiService, IDisposable
 
         if (!_lyricsCache.TryGetValue(key, out lyrics))
         {
-            string url = $"v1/lyrics/artistName={Uri.EscapeDataString(artistName)}&albumName={albumName}&title={Uri.EscapeDataString(title)}&duration={duration}";
+            string url = $"v1/lyrics/artistName={Uri.EscapeDataString(artistName)}&albumName={Uri.EscapeDataString(albumName)}&title={Uri.EscapeDataString(title)}&duration={duration}";
             lyrics = await GetASync<MusicDataLyricsDto>(url);
 
             SaveLyricsToCache(key, lyrics);
@@ -162,23 +170,17 @@ public class MusicDataApiService : IMusicDataApiService, IDisposable
     }
 
 
-    public async Task GetArtistPictureAsync(MusicDataArtistDto artist, string artistFile, CancellationToken cancellationToken)
+    public async Task DownloadArtistPictureAsync(MusicDataArtistDto artist, string artistFile, CancellationToken cancellationToken)
     {
         if (!IsEnable)
             return;
 
+        if (string.IsNullOrEmpty(artist.PictureUrl))
+            return;
+
         try
         {
-            using HttpClient client = new();
-            using HttpResponseMessage response = await client.GetAsync(artist.PictureUrl, HttpCompletionOption.ResponseHeadersRead, cancellationToken);
-
-            if (!response.IsSuccessStatusCode)
-                return;
-
-            using Stream responseStream = await response.Content.ReadAsStreamAsync(cancellationToken);
-            using FileStream fileStream = new(artistFile, FileMode.Create, FileAccess.Write, FileShare.None, bufferSize: 81920, useAsync: true);
-
-            await responseStream.CopyToAsync(fileStream, cancellationToken);
+            await DownloadFileAsync(artist.PictureUrl, artistFile, cancellationToken);
         }
         catch (Exception ex)
         {
@@ -187,7 +189,7 @@ public class MusicDataApiService : IMusicDataApiService, IDisposable
     }
 
 
-    public async Task GetArtistBackdropsAsync(MusicDataArtistDto artist, string artistFolder, CancellationToken cancellationToken)
+    public async Task DownloadArtistBackdropsAsync(MusicDataArtistDto artist, string artistFolder, CancellationToken cancellationToken)
     {
         if (!IsEnable)
             return;
@@ -207,27 +209,38 @@ public class MusicDataApiService : IMusicDataApiService, IDisposable
         if (urls.Count == 0)
             return;
 
+
         foreach (string pictureUrl in urls)
         {
             string fileName = Path.Combine(artistFolder, "backdrop" + Guid.NewGuid().ToString("d") + ".jpg");
 
             try
             {
-                using HttpClient client = new();
-                using HttpResponseMessage response = await client.GetAsync(pictureUrl, HttpCompletionOption.ResponseHeadersRead, cancellationToken);
-
-                if (!response.IsSuccessStatusCode)
-                    return;
-
-                using Stream responseStream = await response.Content.ReadAsStreamAsync(cancellationToken);
-                using FileStream fileStream = new(fileName, FileMode.Create, FileAccess.Write, FileShare.None, bufferSize: 81920, useAsync: true);
-
-                await responseStream.CopyToAsync(fileStream, cancellationToken);
+                await DownloadFileAsync(pictureUrl, fileName, cancellationToken);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error downloading artist backdrop {Url}", fileName);
             }
+        }
+    }
+
+
+    public async Task DownloadCoverAsync(MusicDataAlbumDto album, string coverFile, CancellationToken cancellationToken)
+    {
+        if (!IsEnable)
+            return;
+
+        if (string.IsNullOrEmpty(album.PictureUrl))
+            return;
+
+        try
+        {
+            await DownloadFileAsync(album.PictureUrl, coverFile, cancellationToken);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error downloading album cover {Url}", coverFile);
         }
     }
 
@@ -239,6 +252,20 @@ public class MusicDataApiService : IMusicDataApiService, IDisposable
 
         DateTime threshold = lastAttempt.Value.AddDays(KMinApiDelayDays);
         return DateTime.UtcNow >= threshold;
+    }
+
+
+    private async Task DownloadFileAsync(string url, string targetFile, CancellationToken cancellationToken)
+    {
+        using HttpResponseMessage response = await _downloadHttpClient.GetAsync(url, HttpCompletionOption.ResponseHeadersRead, cancellationToken);
+
+        if (!response.IsSuccessStatusCode)
+            return;
+
+        using Stream responseStream = await response.Content.ReadAsStreamAsync(cancellationToken);
+        using FileStream fileStream = new(targetFile, FileMode.Create, FileAccess.Write, FileShare.None, bufferSize: 81920, useAsync: true);
+
+        await responseStream.CopyToAsync(fileStream, cancellationToken);
     }
 
 
@@ -272,6 +299,13 @@ public class MusicDataApiService : IMusicDataApiService, IDisposable
     private async Task<T?> GetASync<T>(string url, CancellationToken cancellationToken = default)
     {
         T? result = default;
+
+        if (IsRateLimitActive(out DateTime ignoreUntilSnapshot))
+        {
+            _logger.LogDebug("Skipping request due to active rate-limit window until {Until} for {Url}", ignoreUntilSnapshot, url);
+            return result;
+        }
+
         bool acquired;
 
         try
@@ -297,7 +331,19 @@ public class MusicDataApiService : IMusicDataApiService, IDisposable
                 }
                 else
                 {
-                    _logger.LogError("Nova API response {Error} {Url}", response.StatusCode, url);
+                    _logger.LogError("RoK API response {Error} {Url}", response.StatusCode, url);
+
+                    if (response.StatusCode == System.Net.HttpStatusCode.ServiceUnavailable)
+                    {
+                        _logger.LogInformation("RoK API will be disabled because RoK API response with error 503: Service unavailable");
+                        IsEnable = false;
+                    }
+
+                    if (response.StatusCode == System.Net.HttpStatusCode.TooManyRequests)
+                    {
+                        _logger.LogInformation("RoK API rate limit exceeded.");
+                        DeterminateRateLimitReset(response);
+                    }
                 }
             }
             catch (OperationCanceledException)
@@ -324,6 +370,53 @@ public class MusicDataApiService : IMusicDataApiService, IDisposable
         return result;
     }
 
+
+    private bool IsRateLimitActive(out DateTime until)
+    {
+        DateTime? snapshot;
+        lock (_rateLimitLock)
+        {
+            snapshot = _ignoreRequestsUntil;
+        }
+
+        if (snapshot.HasValue && DateTime.UtcNow < snapshot.Value)
+        {
+            until = snapshot.Value;
+            return true;
+        }
+
+        until = default;
+        return false;
+    }
+
+
+    private void DeterminateRateLimitReset(HttpResponseMessage response)
+    {
+        TimeSpan ignoreDuration = TimeSpan.FromSeconds(RateLimitIgnoreSeconds);
+
+        if (response.Headers.RetryAfter != null)
+        {
+            if (response.Headers.RetryAfter.Delta.HasValue)
+            {
+                ignoreDuration = response.Headers.RetryAfter.Delta.Value;
+            }
+            else if (response.Headers.RetryAfter.Date.HasValue)
+            {
+                DateTimeOffset date = response.Headers.RetryAfter.Date.Value;
+
+                TimeSpan delta = date - DateTimeOffset.UtcNow;
+                if (delta > TimeSpan.Zero)
+                    ignoreDuration = delta;
+            }
+        }
+
+        DateTime until = DateTime.UtcNow.Add(ignoreDuration);
+
+        lock (_rateLimitLock)
+        {
+            _ignoreRequestsUntil = until;
+        }
+    }
 
 
     protected virtual void Dispose(bool disposing)

@@ -34,7 +34,6 @@
             <converters:BoolToInvertBoolConverter x:Key="BoolToInvertBoolConverter" />
             <converters:CountryCodeToImageSourceConverter x:Key="CountryCodeToImageSourceConverter" />
             <converters:StringToVisibilityConverter x:Key="StringToVisibilityConverter" />
-            <converters:StringToUriConverter x:Key="StringToUriConverter" />
             <converters:IntToVisibilityConverter x:Key="IntToVisibilityConverter" />
             <converters:IntToBoolConverter x:Key="IntToBoolConverter" />
             <converters:LongToTimespanConverter x:Key="LongToTimespanConverter" />

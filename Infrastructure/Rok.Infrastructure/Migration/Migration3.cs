@@ -33,5 +33,8 @@ public class Migration3 : IMigration
         connection.Execute("ALTER TABLE Albums ADD COLUMN WikipediaID TEXT NULL;");
         connection.Execute("ALTER TABLE Albums ADD COLUMN WikidataID TEXT NULL;");
         connection.Execute("ALTER TABLE Albums ADD COLUMN AmazonID TEXT NULL;");
+
+        connection.Execute("UPDATE Albums SET getMetaDataLastAttempt = NULL WHERE getMetaDataLastAttempt IS NOT NULL;");
+        connection.Execute("UPDATE Artists SET getMetaDataLastAttempt = NULL WHERE getMetaDataLastAttempt IS NOT NULL;");
     }
 }

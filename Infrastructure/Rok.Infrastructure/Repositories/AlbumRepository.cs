@@ -45,26 +45,6 @@ public class AlbumRepository(IDbConnection connection, [FromKeyedServices("Backg
         return await ExecuteQueryAsync(sql, kind, new { artistId });
     }
 
-    public async Task<bool> PatchAsync(IUpdateAlbumEntity entity, RepositoryConnectionKind kind = RepositoryConnectionKind.Foreground)
-    {
-        AlbumEntity? album = await GetByIdAsync(entity.Id, kind);
-        if (album == null) return false;
-
-        ApplyPatch(entity.Label, value => album.Label = value);
-        ApplyPatch(entity.Mood, value => album.Mood = value);
-        ApplyPatch(entity.MusicBrainzID, value => album.MusicBrainzID = value);
-        ApplyPatch(entity.ReleaseDate, value => album.ReleaseDate = value);
-        ApplyPatch(entity.ReleaseFormat, value => album.ReleaseFormat = value);
-        ApplyPatch(entity.Sales, value => album.Sales = value);
-        ApplyPatch(entity.Speed, value => album.Speed = value);
-        ApplyPatch(entity.Theme, value => album.Theme = value);
-        ApplyPatch(entity.Wikipedia, value => album.Wikipedia = value);
-        ApplyPatch(entity.IsLive, value => album.IsLive = value);
-        ApplyPatch(entity.IsBestOf, value => album.IsBestOf = value);
-        ApplyPatch(entity.IsCompilation, value => album.IsCompilation = value);
-
-        return await UpdateAsync(album, kind);
-    }
 
     public async Task<bool> UpdateFavoriteAsync(long id, bool isFavorite, RepositoryConnectionKind kind = RepositoryConnectionKind.Foreground)
     {

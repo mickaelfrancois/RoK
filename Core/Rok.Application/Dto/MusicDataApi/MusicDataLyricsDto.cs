@@ -1,4 +1,4 @@
-﻿namespace Rok.Infrastructure.NovaApi;
+﻿namespace Rok.Application.Dto.MusicDataApi;
 
 public class MusicDataLyricsDto
 {
@@ -15,4 +15,15 @@ public class MusicDataLyricsDto
     public string? SyncLyrics { get; set; }
 
     public int Duration { get; set; }
+
+
+    public bool IsSynchronized => !string.IsNullOrEmpty(SyncLyrics);
+
+    public string? Lyrics
+    {
+        get
+        {
+            return IsSynchronized ? SyncLyrics : PlainLyrics;
+        }
+    }
 }

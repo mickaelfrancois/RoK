@@ -1,32 +1,50 @@
-﻿using Rok.Shared;
+﻿namespace Rok.Domain.Entities;
 
-namespace Rok.Domain.Entities;
+
 
 public class UpdateAlbumEntity : IUpdateAlbumEntity
 {
     public long Id { get; set; }
 
-    public PatchField<string>? Sales { get; set; }
+    public string? Sales { get; set; }
 
-    public PatchField<string>? Label { get; set; }
+    public string? MusicBrainzID { get; set; }
 
-    public PatchField<string>? Mood { get; set; }
+    public string? ReleaseGroupMusicBrainzID { get; set; }
 
-    public PatchField<string>? MusicBrainzID { get; set; }
+    public string? AudioDbID { get; set; }
 
-    public PatchField<string>? Speed { get; set; }
+    public string? AudioDbArtistID { get; set; }
 
-    public PatchField<DateTime?>? ReleaseDate { get; set; }
+    public string? AllMusicID { get; set; }
 
-    public PatchField<string>? ReleaseFormat { get; set; }
+    public string? DiscogsID { get; set; }
 
-    public PatchField<string>? Wikipedia { get; set; }
+    public string? MusicMozID { get; set; }
 
-    public PatchField<string>? Theme { get; set; }
+    public string? LyricWikiID { get; set; }
 
-    public PatchField<bool>? IsLive { get; set; }
+    public string? GeniusID { get; set; }
 
-    public PatchField<bool>? IsBestOf { get; set; }
+    public string? WikipediaID { get; set; }
 
-    public PatchField<bool>? IsCompilation { get; set; }
+    public string? WikidataID { get; set; }
+
+    public string? AmazonID { get; set; }
+
+    public string? Label { get; set; }
+
+    public DateTime? ReleaseDate { get; set; }
+
+    public string? Wikipedia { get; set; }
+
+    public string? Theme { get; set; }
+
+    public bool? IsLive { get; set; }
+
+    public bool? IsBestOf { get; set; }
+
+    public bool? IsCompilation { get; set; }
+
+    public string? Biography { get; set; }
 }
