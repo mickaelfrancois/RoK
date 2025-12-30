@@ -6,7 +6,7 @@ public interface IMusicDataApiService
 {
     Task<MusicDataArtistDto?> GetArtistAsync(string artistName, string? musicBrainzId);
 
-    Task<MusicDataAlbumDto?> GetAlbumAsync(string albumName, string artistName, string? musicBrainzId);
+    Task<MusicDataAlbumDto?> GetAlbumAsync(string albumName, string artistName, string? musicBrainzId, string? artistMusicBrainzId);
 
     Task<MusicDataLyricsDto?> GetLyricsAsync(string artistName, string albumName, string title, long duration);
 

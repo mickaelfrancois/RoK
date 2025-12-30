@@ -144,6 +144,29 @@
                                FontSize="12"></TextBlock>
                 </StackPanel>
 
+                <CommandBar x:Name="panelNetwork"
+                            RelativePanel.Below="panelStatsInfo"
+                            Margin="-10,-5,0,0"
+                            Style="{StaticResource headerCommandBar}">
+
+                    <AppBarButton x:Uid="albumViewLastFm"
+                                  Style="{StaticResource headerBrandButton}"
+                                  ToolTipService.ToolTip="Last.FM"
+                                  Command="{x:Bind ViewModel.OpenUrlCommand, Mode=OneWay}"
+                                  CommandParameter="{x:Bind ViewModel.Album.LastFmUrl, Mode=OneWay}"
+                                  Visibility="{x:Bind ViewModel.Album.LastFmUrl, Mode=OneWay, Converter={StaticResource StringToVisibilityConverter}}">
+                        <Viewbox Width="20"
+                                 Height="20"
+                                 Stretch="Uniform">
+                            <Canvas Width="24"
+                                    Height="24">
+                                <Path Fill="#D51007"
+                                      Data="M10.584 17.21l-.88-2.392s-1.43 1.594-3.573 1.594c-1.897 0-3.244-1.649-3.244-4.288 0-3.382 1.704-4.591 3.381-4.591 2.42 0 3.189 1.567 3.849 3.574l.88 2.749c.88 2.666 2.529 4.81 7.285 4.81 3.409 0 5.718-1.044 5.718-3.793 0-2.227-1.265-3.381-3.63-3.931l-1.758-.385c-1.21-.275-1.567-.77-1.567-1.595 0-.934.742-1.484 1.952-1.484 1.32 0 2.034.495 2.144 1.677l2.749-.33c-.22-2.474-1.924-3.492-4.729-3.492-2.474 0-4.893.935-4.893 3.932 0 1.87.907 3.051 3.189 3.601l1.87.44c1.402.33 1.869.907 1.869 1.704 0 1.017-.99 1.43-2.86 1.43-2.776 0-3.93-1.457-4.59-3.464l-.907-2.75c-1.155-3.573-2.997-4.893-6.653-4.893C2.144 5.333 0 7.89 0 12.233c0 4.18 2.144 6.434 5.993 6.434 3.106 0 4.591-1.457 4.591-1.457z" />
+                            </Canvas>
+                        </Viewbox>
+                    </AppBarButton>
+                </CommandBar>
+
                 <CommandBar  RelativePanel.AlignBottomWithPanel="True"
                              Style="{StaticResource headerCommandBar}">
 
@@ -156,17 +179,12 @@
                                         Style="{StaticResource headerLikeButton}"
                                         IsChecked="{x:Bind ViewModel.IsFavorite, Mode=OneWay}"
                                         Command="{x:Bind ViewModel.AlbumFavoriteCommand}" />
-
-                    <AppBarButton x:Uid="albumViewLastFm"
-                                  Style="{StaticResource headerGenericButton}"
-                                  Icon="MusicInfo"
-                                  Command="{x:Bind ViewModel.OpenLastFmPageCommand, Mode=OneWay}"
-                                  Visibility="{x:Bind ViewModel.LastFmPageAvailable, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" />
-
+                    
                     <AppBarButton x:Uid="albumViewBiography"
                                   Style="{StaticResource headerGenericButton}"
                                   Icon="Library"
-                                  Visibility="Collapsed" />
+                                  Command="{x:Bind ViewModel.OpenBiographyCommand}"
+                                  Visibility="{x:Bind ViewModel.Album.Biography, Converter={StaticResource StringToVisibilityConverter}}" />
 
                     <AppBarButton x:Uid="albumViewPlaylist"
                                   Style="{StaticResource headerGenericButton}"

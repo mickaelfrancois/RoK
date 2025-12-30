@@ -140,7 +140,7 @@
 
                     <AppBarButton x:Uid="artistViewWebSite"
                                   Style="{StaticResource headerBrandButton}"
-                                  Command="{x:Bind ViewModel.Artist.OpenOfficielSiteCommand, Mode=OneWay}"
+                                  Command="{x:Bind ViewModel.Artist.OpenOfficialSiteCommand, Mode=OneWay}"
                                   Visibility="{x:Bind ViewModel.Artist.Artist.OfficialSiteUrl, Mode=OneWay, Converter={StaticResource StringToVisibilityConverter}}">
                         <Viewbox Width="24"
                                  Height="24"

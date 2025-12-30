@@ -115,13 +115,19 @@ public class MusicDataApiService : IMusicDataApiService, IDisposable
     }
 
 
-    public async Task<MusicDataAlbumDto?> GetAlbumAsync(string albumName, string artistName, string? musicBrainzId)
+    public async Task<MusicDataAlbumDto?> GetAlbumAsync(string albumName, string artistName, string? albumMusicBrainzId, string? artistMusicBrainzId)
     {
         if (!IsEnable)
             return null;
 
         if (artistName is null || albumName is null)
             return null;
+
+        if (albumMusicBrainzId is not null && artistMusicBrainzId is null)
+            albumMusicBrainzId = null;
+
+        if (albumMusicBrainzId is null && artistMusicBrainzId is not null)
+            artistMusicBrainzId = null;
 
         MusicDataAlbumDto? album;
         string url;
@@ -130,10 +136,10 @@ public class MusicDataApiService : IMusicDataApiService, IDisposable
 
         if (!_albumCache.TryGetValue(key, out album!))
         {
-            if (string.IsNullOrEmpty(musicBrainzId))
+            if (string.IsNullOrEmpty(albumMusicBrainzId))
                 url = $"v1/albums/byname/{Uri.EscapeDataString(artistName)}/{Uri.EscapeDataString(albumName)}";
             else
-                url = $"v1/albums/bymbid{Uri.EscapeDataString(musicBrainzId)}";
+                url = $"v1/albums/bymbid/{Uri.EscapeDataString(artistMusicBrainzId!)}/{Uri.EscapeDataString(albumMusicBrainzId)}";
 
             album = await GetASync<MusicDataAlbumDto>(url);
 
@@ -322,28 +328,21 @@ public class MusicDataApiService : IMusicDataApiService, IDisposable
         {
             try
             {
+                _logger.LogDebug("Sending request to RoK API {Url}", url);
+
                 HttpResponseMessage response = await _httpClient.GetAsync(url, cancellationToken);
 
                 if (response.IsSuccessStatusCode)
                 {
+                    _logger.LogDebug("RoK API response successful {Url}", url);
+
                     using Stream stream = await response.Content.ReadAsStreamAsync(cancellationToken);
                     result = await JsonSerializer.DeserializeAsync<T>(stream, _jsonOptions, cancellationToken);
                 }
                 else
                 {
                     _logger.LogError("RoK API response {Error} {Url}", response.StatusCode, url);
-
-                    if (response.StatusCode == System.Net.HttpStatusCode.ServiceUnavailable)
-                    {
-                        _logger.LogInformation("RoK API will be disabled because RoK API response with error 503: Service unavailable");
-                        IsEnable = false;
-                    }
-
-                    if (response.StatusCode == System.Net.HttpStatusCode.TooManyRequests)
-                    {
-                        _logger.LogInformation("RoK API rate limit exceeded.");
-                        DeterminateRateLimitReset(response);
-                    }
+                    HandleErrorResponse(response);
                 }
             }
             catch (OperationCanceledException)
@@ -368,6 +367,28 @@ public class MusicDataApiService : IMusicDataApiService, IDisposable
         }
 
         return result;
+    }
+
+
+    private void HandleErrorResponse(HttpResponseMessage response)
+    {
+        if (response.StatusCode == System.Net.HttpStatusCode.Forbidden || response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+        {
+            _logger.LogInformation("RoK API will be disabled because RoK API response with error 401: unauthorized");
+            IsEnable = false;
+        }
+
+        if (response.StatusCode == System.Net.HttpStatusCode.ServiceUnavailable)
+        {
+            _logger.LogInformation("RoK API will be disabled because RoK API response with error 503: Service unavailable");
+            IsEnable = false;
+        }
+
+        if (response.StatusCode == System.Net.HttpStatusCode.TooManyRequests)
+        {
+            _logger.LogInformation("RoK API rate limit exceeded.");
+            DeterminateRateLimitReset(response);
+        }
     }
 
 
