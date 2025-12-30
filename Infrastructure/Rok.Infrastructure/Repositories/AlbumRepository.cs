@@ -2,7 +2,6 @@
 using Microsoft.Extensions.Logging;
 using Rok.Application.Interfaces;
 using Rok.Domain.Interfaces.Entities;
-using Rok.Shared;
 
 namespace Rok.Infrastructure.Repositories;
 
@@ -90,7 +89,7 @@ public class AlbumRepository(IDbConnection connection, [FromKeyedServices("Backg
         string query = """
                 SELECT albums.*,
                      genres.name AS genreName, genres.isFavorite AS isGenreFavorite,
-                     artists.name AS artistName, artists.isFavorite AS isArtistFavorite,
+                     artists.name AS artistName, artists.isFavorite AS isArtistFavorite, artists.musicBrainzID AS artistMusicBrainzID,
                      countries.code AS countryCode, countries.english AS countryName 
                      FROM albums 
                      LEFT JOIN genres ON genres.Id = albums.genreId                      
@@ -108,14 +107,5 @@ public class AlbumRepository(IDbConnection connection, [FromKeyedServices("Backg
     public override string GetTableName()
     {
         return "albums";
-    }
-
-
-    private static void ApplyPatch<T>(PatchField<T>? wrapper, Action<T?> setter)
-    {
-        if (wrapper?.IsSet == true)
-        {
-            setter(wrapper.Value);
-        }
     }
 }

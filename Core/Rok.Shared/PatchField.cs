@@ -3,9 +3,9 @@
 
 public class PatchField<T>
 {
-    public bool IsSet { get; set; }
+    public bool IsSet { get; private set; }
 
-    public T? Value { get; set; }
+    public T? Value { get; private set; }
 
     public PatchField()
     {
@@ -18,5 +18,27 @@ public class PatchField<T>
         IsSet = true;
         Value = value;
     }
-}
 
+    public bool TryGetValue(out T? value)
+    {
+        value = Value;
+        return IsSet;
+    }
+
+    public void Set(T? value)
+    {
+        IsSet = true;
+        Value = value;
+    }
+
+    public void Clear()
+    {
+        IsSet = false;
+        Value = default;
+    }
+
+    public override string? ToString()
+    {
+        return IsSet ? Value?.ToString() : "NotSet";
+    }
+}

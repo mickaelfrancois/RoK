@@ -8,7 +8,7 @@ public class UpdateAlbumGetMetaDataLastAttemptCommand(long id) : ICommand<Result
 }
 
 
-internal class UpdateAlbumGetMetaDataLastAttemptCommandHandler(IArtistRepository _repository) : ICommandHandler<UpdateAlbumGetMetaDataLastAttemptCommand, Result<bool>>
+internal class UpdateAlbumGetMetaDataLastAttemptCommandHandler(IAlbumRepository _repository) : ICommandHandler<UpdateAlbumGetMetaDataLastAttemptCommand, Result<bool>>
 {
     public async Task<Result<bool>> HandleAsync(UpdateAlbumGetMetaDataLastAttemptCommand request, CancellationToken cancellationToken)
     {

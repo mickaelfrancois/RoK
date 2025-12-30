@@ -1,4 +1,5 @@
-﻿using Rok.Logic.Services.Player;
+﻿using Rok.Infrastructure.Translate;
+using Rok.Logic.Services.Player;
 using Rok.Logic.ViewModels.Album.Services;
 using Rok.Logic.ViewModels.Tracks;
 
@@ -12,6 +13,8 @@ public partial class AlbumViewModel : ObservableObject
     private readonly ILogger<AlbumViewModel> _logger;
     private readonly ILastFmClient _lastFmClient;
     private readonly IBackdropLoader _backdropLoader;
+    private readonly IDialogService _dialogService;
+    private readonly IAppOptions _appOptions;
 
     private readonly AlbumDataLoader _dataLoader;
     private readonly AlbumPictureService _pictureService;
@@ -128,7 +131,8 @@ public partial class AlbumViewModel : ObservableObject
     public AsyncRelayCommand AlbumFavoriteCommand { get; private set; }
     public AsyncRelayCommand SelectPictureCommand { get; private set; }
     public AsyncRelayCommand EditAlbumCommand { get; private set; }
-    public RelayCommand OpenLastFmPageCommand { get; private set; }
+    public RelayCommand<string> OpenUrlCommand { get; private set; }
+    public AsyncRelayCommand OpenBiographyCommand { get; private set; }
 
     public override string ToString()
     {
@@ -148,6 +152,8 @@ public partial class AlbumViewModel : ObservableObject
         AlbumApiService apiService,
         AlbumStatisticsService statisticsService,
         AlbumEditService editService,
+        IAppOptions appOptions,
+        IDialogService dialogService,
         ILogger<AlbumViewModel> logger)
     {
         _backdropLoader = Guard.Against.Null(backdropLoader);
@@ -160,6 +166,8 @@ public partial class AlbumViewModel : ObservableObject
         _apiService = Guard.Against.Null(apiService);
         _statisticsService = Guard.Against.Null(statisticsService);
         _editService = Guard.Against.Null(editService);
+        _appOptions = Guard.Against.Null(appOptions);
+        _dialogService = Guard.Against.Null(dialogService);
         _logger = Guard.Against.Null(logger);
 
         ListenCommand = new AsyncRelayCommand(ListenAsync);
@@ -170,7 +178,8 @@ public partial class AlbumViewModel : ObservableObject
         OpenArtistsByCountryCommand = new RelayCommand(() => { });
         SelectPictureCommand = new AsyncRelayCommand(SelectPictureAsync);
         EditAlbumCommand = new AsyncRelayCommand(EditAlbumAsync);
-        OpenLastFmPageCommand = new RelayCommand(OpenLastFmPage);
+        OpenUrlCommand = new RelayCommand<string>(OpenUrl);
+        OpenBiographyCommand = new AsyncRelayCommand(OpenBiographyAsync);
     }
 
 
@@ -304,13 +313,30 @@ public partial class AlbumViewModel : ObservableObject
         }
     }
 
-    private void OpenLastFmPage()
+
+    private void OpenUrl(string url)
     {
-        if (LastFmPageAvailable)
-        {
-            string artistPageUrl = _lastFmClient.GetAlbumPageUrl(Album.ArtistName, Album.Name);
-            Uri uri = new(artistPageUrl);
+        if (string.IsNullOrEmpty(url))
+            return;
+
+        if (url.StartsWith("www.", StringComparison.OrdinalIgnoreCase))
+            url = "https://" + url;
+        if (url.StartsWith("http://", StringComparison.OrdinalIgnoreCase))
+            url = url.Replace("http://", "https://");
+
+        if (Uri.TryCreate(url, UriKind.Absolute, out Uri? uri))
             _ = Windows.System.Launcher.LaunchUriAsync(uri);
+    }
+
+
+    private async Task OpenBiographyAsync()
+    {
+        if (!string.IsNullOrEmpty(Album.Biography))
+        {
+            string? rawLanguage = Windows.Globalization.ApplicationLanguages.Languages.FirstOrDefault();
+            string language = TranslateService.NormalizeLanguageForLibreTranslate(rawLanguage, "fr");
+
+            await _dialogService.ShowTextAsync(Album.Name, Album.Biography, showTranslateButton: _appOptions.NovaApiEnabled, language);
         }
     }
 }

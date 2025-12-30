@@ -1,17 +1,58 @@
-<ContentDialog
-    x:Class="Rok.Dialogs.EditAlbumDialog"
-    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:local="using:Rok.Dialogs"
-    x:Uid="EditAlbumDialog"
-    Title=""
-    MinWidth="400"
-    PrimaryButtonText=""
-    CloseButtonText="">
+<ContentDialog x:Class="Rok.Dialogs.EditAlbumDialog"
+               xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+               xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+               xmlns:local="using:Rok.Dialogs"
+               x:Uid="EditAlbumDialog"
+               Title=""
+               MinWidth="900"
+               MaxWidth="900"
+               Width="900"
+               PrimaryButtonText=""
+               CloseButtonText="">
 
     <StackPanel>
-        <ToggleSwitch x:Uid="liveSwitch" IsOn="{x:Bind IsLive, Mode=TwoWay}"></ToggleSwitch>
-        <ToggleSwitch x:Uid="bestOfSwitch" IsOn="{x:Bind IsBestOf, Mode=TwoWay}"></ToggleSwitch>
-        <ToggleSwitch x:Uid="compilationSwitch" IsOn="{x:Bind IsCompilation, Mode=TwoWay}"></ToggleSwitch>
+        <StackPanel Orientation="Horizontal">
+            <ToggleSwitch x:Uid="liveSwitch"
+                          IsOn="{x:Bind IsLive, Mode=TwoWay}"></ToggleSwitch>
+            <ToggleSwitch x:Uid="bestOfSwitch"
+                          IsOn="{x:Bind IsBestOf, Mode=TwoWay}"></ToggleSwitch>
+            <ToggleSwitch x:Uid="compilationSwitch"
+                          IsOn="{x:Bind IsCompilation, Mode=TwoWay}"></ToggleSwitch>
+        </StackPanel>
+        <MenuFlyoutSeparator></MenuFlyoutSeparator>
+
+        <TextBlock x:Uid="musicBrainzId"
+                   Margin="0,8,0,0"
+                   Text="MusicBrainz ID"></TextBlock>
+        <TextBox x:Uid="musicBrainzIdInput"
+                 Text="{x:Bind MusicBrainzID, Mode=TwoWay}"
+                 Margin="0,4,0,0"></TextBox>
+
+        <TextBlock x:Uid="releaseGroupMusicBrainzId"
+                   Margin="0,8,0,0"
+                   Text="Release group MusicBrainz ID" />
+        <TextBox x:Uid="releaseGroupMusicBrainzIdInput"
+                 Text="{x:Bind ReleaseGroupMusicBrainzId, Mode=TwoWay}"
+                 Margin="0,4,0,0" />
+
+        <TextBlock x:Uid="lastFm"
+                   Margin="0,8,0,0"
+                   Text="LastFM URL" />
+        <TextBox x:Uid="lastFmInput"
+                 Text="{x:Bind LastFmUrl, Mode=TwoWay}"
+                 Margin="0,4,0,0"></TextBox>
+
+        <TextBlock x:Uid="biography"
+                   Margin="0,8,0,0"
+                   Text="Informations" />
+        <TextBox x:Uid="biogrpahyInput"
+                 Text="{x:Bind Biography, Mode=TwoWay}"
+                 TextWrapping="Wrap"
+                 AcceptsReturn="True"
+                 Height="200"
+                 Width="600"
+                 ScrollViewer.VerticalScrollBarVisibility="Auto"
+                 Margin="0,4,0,0"></TextBox>
+
     </StackPanel>
 </ContentDialog>

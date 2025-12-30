@@ -40,6 +40,9 @@ public interface IAlbumEntity : IEntity
     string? WikipediaID { get; set; }
     string? Biography { get; set; }
     int? Year { get; set; }
+    string? ArtistMusicBrainzID { get; set; }
+    string? LastFmUrl { get; set; }
+    bool IsLock { get; set; }
 
     string ToString();
 }

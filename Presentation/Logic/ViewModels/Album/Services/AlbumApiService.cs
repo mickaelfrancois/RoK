@@ -23,7 +23,7 @@ public class AlbumApiService(
         await mediator.SendMessageAsync(new UpdateAlbumGetMetaDataLastAttemptCommand(album.Id));
         album.GetMetaDataLastAttempt = DateTime.UtcNow;
 
-        MusicDataAlbumDto? albumApi = await musicDataApiService.GetAlbumAsync(album.Name, album.ArtistName, album.MusicBrainzID);
+        MusicDataAlbumDto? albumApi = await musicDataApiService.GetAlbumAsync(album.Name, album.ArtistName, album.MusicBrainzID, album.ArtistMusicBrainzID);
         if (albumApi == null)
             return false;
 
@@ -56,30 +56,43 @@ public class AlbumApiService(
 
         UpdateAlbumCommand command = new()
         {
-            Id = album.Id,
-            Label = albumApi.Label,
-            Sales = albumApi.Sales,
-            MusicBrainzID = albumApi.MusicBrainzID,
-            ReleaseDate = albumApi.ReleaseDate,
-            Wikipedia = albumApi.Wikipedia,
-            AllMusicID = album.AllMusicID,
-            IsLive = album.IsLive,
-            IsBestOf = album.IsBestOf,
-            IsCompilation = album.IsCompilation,
-            AmazonID = album.AmazonID,
-            AudioDbArtistID = album.AudioDbArtistID,
-            AudioDbID = album.AudioDbID,
-            DiscogsID = album.DiscogsID,
-            GeniusID = album.GeniusID,
-            LyricWikiID = album.LyricWikiID,
-            MusicMozID = album.MusicMozID,
-            ReleaseGroupMusicBrainzID = album.ReleaseGroupMusicBrainzID,
-            WikidataID = album.WikidataID,
-            WikipediaID = album.WikipediaID,
+            Id = album.Id
         };
 
+        if (!string.IsNullOrEmpty(albumApi.Label))
+            command.Label.Set(albumApi.Label);
+        if (!string.IsNullOrEmpty(albumApi.Sales))
+            command.Sales.Set(albumApi.Sales);
+        if (!string.IsNullOrEmpty(albumApi.MusicBrainzID))
+            command.MusicBrainzID.Set(albumApi.MusicBrainzID);
+        if (albumApi.ReleaseDate.HasValue)
+            command.ReleaseDate.Set(albumApi.ReleaseDate);
+        if (!string.IsNullOrEmpty(albumApi.Wikipedia))
+            command.Wikipedia.Set(albumApi.Wikipedia);
+        if (!string.IsNullOrEmpty(albumApi.AllMusicID))
+            command.AllMusicID.Set(albumApi.AllMusicID);
+        if (!string.IsNullOrEmpty(albumApi.AmazonID))
+            command.AmazonID.Set(albumApi.AmazonID);
+        if (!string.IsNullOrEmpty(albumApi.AudioDbArtistID))
+            command.AudioDbArtistID.Set(albumApi.AudioDbArtistID);
+        if (!string.IsNullOrEmpty(albumApi.AudioDbID))
+            command.AudioDbID.Set(albumApi.AudioDbID);
+        if (!string.IsNullOrEmpty(albumApi.DiscogsID))
+            command.DiscogsID.Set(albumApi.DiscogsID);
+        if (!string.IsNullOrEmpty(albumApi.GeniusID))
+            command.GeniusID.Set(albumApi.GeniusID);
+        if (!string.IsNullOrEmpty(albumApi.LyricWikiID))
+            command.LyricWikiID.Set(albumApi.LyricWikiID);
+        if (!string.IsNullOrEmpty(albumApi.MusicMozID))
+            command.MusicMozID.Set(albumApi.MusicMozID);
+        if (!string.IsNullOrEmpty(albumApi.ReleaseGroupMusicBrainzID))
+            command.ReleaseGroupMusicBrainzID.Set(albumApi.ReleaseGroupMusicBrainzID);
+        if (!string.IsNullOrEmpty(albumApi.WikidataID))
+            command.WikidataID.Set(albumApi.WikidataID);
+        if (!string.IsNullOrEmpty(albumApi.WikipediaID))
+            command.WikipediaID.Set(albumApi.WikipediaID);
         if (string.IsNullOrWhiteSpace(album.Biography) && !string.IsNullOrWhiteSpace(albumApi.Biography))
-            command.Biography = albumApi.Biography;
+            command.Biography.Set(albumApi.Biography);
 
         await mediator.SendMessageAsync(command);
 

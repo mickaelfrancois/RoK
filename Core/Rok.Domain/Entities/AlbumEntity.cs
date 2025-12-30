@@ -70,6 +70,14 @@ public class AlbumEntity : BaseEntity, IAlbumEntity
 
     public string? Biography { get; set; }
 
+    public string? LastFmUrl { get; set; }
+
+    public bool IsLock { get; set; }
+
+    /* -- */
+
+    [Write(false)]
+    public string? ArtistMusicBrainzID { get; set; }
 
     [Write(false)]
     public string GenreName { get; set; } = string.Empty;

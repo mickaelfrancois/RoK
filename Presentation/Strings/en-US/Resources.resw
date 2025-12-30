@@ -1044,9 +1044,6 @@
   <data name="OptionTabOptions.Header" xml:space="preserve">
     <value>Options</value>
   </data>
-  <data name="albumViewLastFm.Label" xml:space="preserve">
-    <value>Last FM</value>
-  </data>
   <data name="albumViewBiography.Label" xml:space="preserve">
     <value>Biography</value>
   </data>

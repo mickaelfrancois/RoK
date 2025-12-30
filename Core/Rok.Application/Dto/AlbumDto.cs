@@ -87,4 +87,8 @@ public class AlbumDto
     public string CountryCode { get; set; } = string.Empty;
 
     public string CountryName { get; set; } = string.Empty;
+
+    public string? ArtistMusicBrainzID { get; set; }
+
+    public bool IsLock { get; set; }
 }

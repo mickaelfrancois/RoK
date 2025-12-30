@@ -212,7 +212,7 @@ public partial class ArtistViewModel : ObservableObject
     public RelayCommand GenreOpenCommand { get; private set; }
     public AsyncRelayCommand ArtistFavoriteCommand { get; private set; }
     public AsyncRelayCommand SelectPictureCommand { get; private set; }
-    public AsyncRelayCommand OpenOfficielSiteCommand { get; private set; }
+    public AsyncRelayCommand OpenOfficialSiteCommand { get; private set; }
     public RelayCommand<string> OpenUrlCommand { get; private set; }
     public AsyncRelayCommand OpenBiographyCommand { get; private set; }
 
@@ -251,7 +251,7 @@ public partial class ArtistViewModel : ObservableObject
         ArtistFavoriteCommand = new AsyncRelayCommand(UpdateFavoriteStateAsync);
         ArtistOpenCommand = new RelayCommand(ArtistOpen);
         SelectPictureCommand = new AsyncRelayCommand(SelectPictureAsync);
-        OpenOfficielSiteCommand = new AsyncRelayCommand(OpenOfficialSiteAsync);
+        OpenOfficialSiteCommand = new AsyncRelayCommand(OpenOfficialSiteAsync);
         OpenUrlCommand = new RelayCommand<string>(OpenUrl);
         OpenBiographyCommand = new AsyncRelayCommand(OpenBiographyAsync);
     }

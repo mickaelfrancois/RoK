@@ -1,4 +1,5 @@
 ﻿using Rok.Application.Interfaces;
+using Rok.Shared;
 
 namespace Rok.Application.Features.Albums.Command;
 
@@ -7,45 +8,49 @@ public class UpdateAlbumCommand : ICommand<Result<bool>>
     [RequiredGreaterThanZero]
     public long Id { get; set; }
 
-    public string? MusicBrainzID { get; set; }
+    public PatchField<string?> MusicBrainzID { get; set; } = new();
 
-    public string? ReleaseGroupMusicBrainzID { get; set; }
+    public PatchField<string?> ReleaseGroupMusicBrainzID { get; set; } = new();
 
-    public string? Sales { get; set; }
+    public PatchField<string?> Sales { get; set; } = new();
 
-    public string? AudioDbID { get; set; }
+    public PatchField<string?> AudioDbID { get; set; } = new();
 
-    public string? AudioDbArtistID { get; set; }
+    public PatchField<string?> AudioDbArtistID { get; set; } = new();
 
-    public string? AllMusicID { get; set; }
+    public PatchField<string?> AllMusicID { get; set; } = new();
 
-    public string? DiscogsID { get; set; }
+    public PatchField<string?> DiscogsID { get; set; } = new();
 
-    public string? MusicMozID { get; set; }
+    public PatchField<string?> MusicMozID { get; set; } = new();
 
-    public string? LyricWikiID { get; set; }
+    public PatchField<string?> LyricWikiID { get; set; } = new();
 
-    public string? GeniusID { get; set; }
+    public PatchField<string?> GeniusID { get; set; } = new();
 
-    public string? WikipediaID { get; set; }
+    public PatchField<string?> WikipediaID { get; set; } = new();
 
-    public string? WikidataID { get; set; }
+    public PatchField<string?> WikidataID { get; set; } = new();
 
-    public string? AmazonID { get; set; }
+    public PatchField<string?> AmazonID { get; set; } = new();
 
-    public string? Label { get; set; }
+    public PatchField<string?> Label { get; set; } = new();
 
-    public DateTime? ReleaseDate { get; set; }
+    public PatchField<DateTime?> ReleaseDate { get; set; } = new();
 
-    public string? Wikipedia { get; set; }
+    public PatchField<string?> Wikipedia { get; set; } = new();
 
-    public bool? IsLive { get; set; }
+    public PatchField<bool> IsLive { get; set; } = new();
 
-    public bool? IsBestOf { get; set; }
+    public PatchField<bool> IsBestOf { get; set; } = new();
 
-    public bool? IsCompilation { get; set; }
+    public PatchField<bool> IsCompilation { get; set; } = new();
 
-    public string? Biography { get; set; }
+    public PatchField<string?> Biography { get; set; } = new();
+
+    public PatchField<bool> IsLock { get; set; } = new();
+
+    public PatchField<string?> LastFmUrl { get; set; } = new();
 }
 
 
@@ -57,34 +62,74 @@ public class UpdateAlbumCommandHandler(IAlbumRepository _albumRepository) : ICom
         if (entity is null)
             return Result<bool>.Fail("Album not found.");
 
-        entity.MusicBrainzID = command.MusicBrainzID;
-        entity.ReleaseGroupMusicBrainzID = command.ReleaseGroupMusicBrainzID;
-        entity.Sales = command.Sales;
-        entity.AudioDbID = command.AudioDbID;
-        entity.AudioDbArtistID = command.AudioDbArtistID;
-        entity.AllMusicID = command.AllMusicID;
-        entity.DiscogsID = command.DiscogsID;
-        entity.MusicMozID = command.MusicMozID;
-        entity.LyricWikiID = command.LyricWikiID;
-        entity.GeniusID = command.GeniusID;
-        entity.WikipediaID = command.WikipediaID;
-        entity.WikidataID = command.WikidataID;
-        entity.AmazonID = command.AmazonID;
-        entity.Label = command.Label;
-        entity.ReleaseDate = command.ReleaseDate;
-        entity.Wikipedia = command.Wikipedia;
+        if (command.MusicBrainzID.TryGetValue(out string? musicBrainzID))
+            entity.MusicBrainzID = musicBrainzID;
 
-        if (command.IsLive.HasValue)
-            entity.IsLive = command.IsLive.Value;
-        if (command.IsBestOf.HasValue)
-            entity.IsBestOf = command.IsBestOf.Value;
-        if (command.IsCompilation.HasValue)
-            entity.IsCompilation = command.IsCompilation.Value;
-        if (command.IsLive.HasValue)
-            entity.IsLive = command.IsLive.Value;
+        if (command.ReleaseGroupMusicBrainzID.TryGetValue(out string? releaseGroupMusicBrainzID))
+            entity.ReleaseGroupMusicBrainzID = releaseGroupMusicBrainzID;
 
-        if (!string.IsNullOrWhiteSpace(command.Biography))
-            entity.Biography = command.Biography;
+        if (command.Sales.TryGetValue(out string? sales))
+            entity.Sales = sales;
+
+        if (command.AudioDbID.TryGetValue(out string? audioDbID))
+            entity.AudioDbID = audioDbID;
+
+        if (command.AudioDbArtistID.TryGetValue(out string? audioDbArtistID))
+            entity.AudioDbArtistID = audioDbArtistID;
+
+        if (command.AllMusicID.TryGetValue(out string? allMusicID))
+            entity.AllMusicID = allMusicID;
+
+        if (command.DiscogsID.TryGetValue(out string? discogsID))
+            entity.DiscogsID = discogsID;
+
+        if (command.MusicMozID.TryGetValue(out string? musicMozID))
+            entity.MusicMozID = musicMozID;
+
+        if (command.LyricWikiID.TryGetValue(out string? lyricWikiID))
+            entity.LyricWikiID = lyricWikiID;
+
+        if (command.GeniusID.TryGetValue(out string? geniusID))
+            entity.GeniusID = geniusID;
+
+        if (command.WikipediaID.TryGetValue(out string? wikipediaID))
+            entity.WikipediaID = wikipediaID;
+
+        if (command.WikidataID.TryGetValue(out string? wikidataID))
+            entity.WikidataID = wikidataID;
+
+        if (command.AmazonID.TryGetValue(out string? amazonID))
+            entity.AmazonID = amazonID;
+
+        if (command.Label.TryGetValue(out string? label))
+            entity.Label = label;
+
+        if (command.Wikipedia.TryGetValue(out string? wikipedia))
+            entity.Wikipedia = wikipedia;
+
+        if (command.ReleaseDate.TryGetValue(out DateTime? releaseDate))
+            entity.ReleaseDate = releaseDate;
+
+        if (command.IsLive.TryGetValue(out bool isLive))
+            entity.IsLive = isLive;
+
+        if (command.IsBestOf.TryGetValue(out bool isBestOf))
+            entity.IsBestOf = isBestOf;
+
+        if (command.IsCompilation.TryGetValue(out bool isCompilation))
+            entity.IsCompilation = isCompilation;
+
+        if (command.IsLock.TryGetValue(out bool isLock))
+            entity.IsLock = isLock;
+
+        if (command.LastFmUrl.TryGetValue(out string? lastFmUrl))
+            entity.LastFmUrl = lastFmUrl;
+
+        if (command.Biography.TryGetValue(out string? biography))
+            entity.Biography = biography;
+
+        if (command.MusicBrainzID.IsSet || command.ReleaseGroupMusicBrainzID.IsSet)
+            entity.GetMetaDataLastAttempt = null;
 
         bool result = await _albumRepository.UpdateAsync(entity);
 

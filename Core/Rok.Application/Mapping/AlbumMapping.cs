@@ -1,5 +1,4 @@
-﻿using Rok.Application.Features.Albums.Command;
-using Rok.Domain.Interfaces.Entities;
+﻿using Rok.Domain.Interfaces.Entities;
 
 namespace Rok.Application.Mapping;
 
@@ -14,6 +13,7 @@ internal static class AlbumMapping
             EditDate = album.EditDate,
             Name = album.Name,
             MusicBrainzID = album.MusicBrainzID,
+            ReleaseGroupMusicBrainzID = album.ReleaseGroupMusicBrainzID,
 
             Year = album.Year,
             IsLive = album.IsLive,
@@ -38,36 +38,22 @@ internal static class AlbumMapping
             IsArtistFavorite = album.IsArtistFavorite,
             CountryCode = album.CountryCode,
             CountryName = album.CountryName,
+            ArtistMusicBrainzID = album.ArtistMusicBrainzID,
+            AllMusicID = album.AllMusicID,
+            AmazonID = album.AmazonID,
+            AudioDbArtistID = album.AudioDbArtistID,
+            AudioDbID = album.AudioDbID,
+            Biography = album.Biography,
+            DiscogsID = album.DiscogsID,
+            GeniusID = album.GeniusID,
+            LyricWikiID = album.LyricWikiID,
+            MusicMozID = album.MusicMozID,
+            WikidataID = album.WikidataID,
+            WikipediaID = album.WikipediaID,
+            LastFmUrl = album.LastFmUrl,
+            IsLock = album.IsLock,
 
             GetMetaDataLastAttempt = album.GetMetaDataLastAttempt
-        };
-    }
-
-    public static UpdateAlbumCommand ToCommand(this AlbumDto dto)
-    {
-        return new UpdateAlbumCommand
-        {
-            Id = dto.Id,
-            MusicBrainzID = dto.MusicBrainzID,
-            AllMusicID = dto.AllMusicID,
-            ReleaseGroupMusicBrainzID = dto.ReleaseGroupMusicBrainzID,
-            Sales = dto.Sales,
-            AudioDbID = dto.AudioDbID,
-            AudioDbArtistID = dto.AudioDbArtistID,
-            DiscogsID = dto.DiscogsID,
-            MusicMozID = dto.MusicMozID,
-            LyricWikiID = dto.LyricWikiID,
-            GeniusID = dto.GeniusID,
-            WikipediaID = dto.WikipediaID,
-            WikidataID = dto.WikidataID,
-            AmazonID = dto.AmazonID,
-            Label = dto.Label,
-            ReleaseDate = dto.ReleaseDate,
-            Wikipedia = dto.Wikipedia,
-            IsLive = dto.IsLive,
-            IsBestOf = dto.IsBestOf,
-            IsCompilation = dto.IsCompilation,
-            Biography = dto.Biography
         };
     }
 }
