@@ -98,4 +98,17 @@ public class PlaylistUpdateService(
         logger.LogError("Failed to delete playlist: {Name}. Error: {Error}", playlistName, result.Error);
         return false;
     }
+
+    public async Task<bool> SaveTracksPositionAsync(long playlistId, List<long> tracks)
+    {
+        Result<bool> result = await mediator.SendMessageAsync(new MovePlaylistTracksCommand { PlaylistId = playlistId, Tracks = tracks });
+        if (result.IsSuccess)
+        {
+            Messenger.Send(new PlaylistUpdatedMessage(playlistId, ActionType.Delete));
+            return true;
+        }
+
+        logger.LogError("Failed to update playlist: {PlaylistId}. Error: {Error}", playlistId, result.Error);
+        return false;
+    }
 }

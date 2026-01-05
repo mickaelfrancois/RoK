@@ -1,12 +1,8 @@
-﻿namespace Rok.Application.Interfaces;
+﻿using Rok.Application.Features.Playlists.Query;
 
-public interface IPlaylistTrackRepository
+namespace Rok.Application.Interfaces;
+
+public interface IPlaylistTrackGenerateRepository
 {
-    Task<long> AddAsync(PlaylistTrackEntity entity, RepositoryConnectionKind kind = RepositoryConnectionKind.Foreground);
-
-    Task<long> DeleteAsync(long playlistId, RepositoryConnectionKind kind = RepositoryConnectionKind.Foreground);
-
-    Task<long> DeleteAsync(long playlistId, long trackId, RepositoryConnectionKind kind = RepositoryConnectionKind.Foreground);
-
-    Task<long> GetAsync(long playlistId, long trackId, RepositoryConnectionKind kind = RepositoryConnectionKind.Foreground);
+    Task<List<TrackEntity>> GenerateAsync(GeneratePlaylistTracksQuery request, RepositoryConnectionKind kind = RepositoryConnectionKind.Foreground);
 }

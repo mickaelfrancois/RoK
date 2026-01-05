@@ -102,7 +102,11 @@
                                      Grid.Row="1"
                                      Margin="6,12,0,0"
                                      ItemsSource="{x:Bind ViewModel.Tracks}"    
-                                     IsItemClickEnabled="True">
+                                     IsItemClickEnabled="True"
+                                     CanDragItems="True"
+                                     CanReorderItems="True"  
+                                     DragItemsCompleted="tracksList_DragItemsCompleted"
+                                     AllowDrop="True" >
 
                 <ListView.ItemTemplate>
                     <DataTemplate x:DataType="track:TrackViewModel">
@@ -151,6 +155,7 @@
 
                             <StackPanel Grid.Column="0"
                                         Orientation="Horizontal">
+                                
                                 <HyperlinkButton Style="{StaticResource gridTracksTitleText}"
                                                  Command="{x:Bind ListenCommand}"
                                                  CommandParameter="{x:Bind}" />

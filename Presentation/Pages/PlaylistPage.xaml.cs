@@ -2,6 +2,7 @@ using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Navigation;
 using Rok.Logic.ViewModels.Playlist;
 using Rok.Logic.ViewModels.Playlists;
+using Rok.Logic.ViewModels.Tracks;
 
 namespace Rok.Pages;
 
@@ -9,6 +10,8 @@ public sealed partial class PlaylistPage : Page
 {
     public PlaylistViewModel ViewModel { get; set; }
     private readonly ResourceLoader _resourceLoader;
+    private readonly TrackViewModel? _draggedItem;
+    private readonly int _draggedIndex = -1;
 
     public PlaylistPage()
     {
@@ -46,5 +49,13 @@ public sealed partial class PlaylistPage : Page
 
         if (result == ContentDialogResult.Primary && ViewModel.DeleteCommand.CanExecute(null))
             ViewModel.DeleteCommand.Execute(null);
+    }
+
+    private void tracksList_DragItemsCompleted(ListViewBase sender, DragItemsCompletedEventArgs args)
+    {
+        if (args.DropResult == Windows.ApplicationModel.DataTransfer.DataPackageOperation.Move)
+        {
+            ViewModel.MoveTrackCommand.Execute(null);
+        }
     }
 }
