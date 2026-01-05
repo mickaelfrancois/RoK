@@ -1,4 +1,5 @@
-﻿using Rok.Infrastructure.Translate;
+﻿using Rok.Application.Features.Playlists.PlaylistMenu;
+using Rok.Infrastructure.Translate;
 using Rok.Logic.Services.Player;
 using Rok.Logic.ViewModels.Album.Services;
 using Rok.Logic.ViewModels.Tracks;
@@ -11,7 +12,6 @@ public partial class AlbumViewModel : ObservableObject
     private readonly ResourceLoader _resourceLoader;
     private readonly IPlayerService _playerService;
     private readonly ILogger<AlbumViewModel> _logger;
-    private readonly ILastFmClient _lastFmClient;
     private readonly IBackdropLoader _backdropLoader;
     private readonly IDialogService _dialogService;
     private readonly IAppOptions _appOptions;
@@ -27,7 +27,7 @@ public partial class AlbumViewModel : ObservableObject
 
     private IEnumerable<TrackDto>? _tracks = null;
 
-    public bool LastFmPageAvailable { get => !string.IsNullOrWhiteSpace(Album.LastFmUrl); }
+    public IPlaylistMenuService PlaylistMenuService { get; }
 
     public bool IsFavorite
     {
@@ -154,10 +154,10 @@ public partial class AlbumViewModel : ObservableObject
         AlbumEditService editService,
         IAppOptions appOptions,
         IDialogService dialogService,
+        IPlaylistMenuService playlistMenuService,
         ILogger<AlbumViewModel> logger)
     {
         _backdropLoader = Guard.Against.Null(backdropLoader);
-        _lastFmClient = Guard.Against.Null(lastFmClient);
         _navigationService = Guard.Against.Null(navigationService);
         _playerService = Guard.Against.Null(playerService);
         _resourceLoader = Guard.Against.Null(resourceLoader);
@@ -168,6 +168,7 @@ public partial class AlbumViewModel : ObservableObject
         _editService = Guard.Against.Null(editService);
         _appOptions = Guard.Against.Null(appOptions);
         _dialogService = Guard.Against.Null(dialogService);
+        PlaylistMenuService = Guard.Against.Null(playlistMenuService);
         _logger = Guard.Against.Null(logger);
 
         ListenCommand = new AsyncRelayCommand(ListenAsync);
