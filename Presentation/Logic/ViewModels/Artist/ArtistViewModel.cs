@@ -1,4 +1,5 @@
-﻿using Rok.Application.Randomizer;
+﻿using Rok.Application.Features.Playlists.PlaylistMenu;
+using Rok.Application.Randomizer;
 using Rok.Infrastructure.Translate;
 using Rok.Logic.Services.Player;
 using Rok.Logic.ViewModels.Albums;
@@ -32,8 +33,7 @@ public partial class ArtistViewModel : ObservableObject
 
     private IEnumerable<TrackDto>? _tracks = null;
 
-    public bool LastFmPageAvailable { get => !string.IsNullOrWhiteSpace(Artist.LastFmUrl); }
-
+    public IPlaylistMenuService PlaylistMenuService { get; }
     public bool IsFavorite
     {
         get => Artist.IsFavorite;
@@ -230,6 +230,7 @@ public partial class ArtistViewModel : ObservableObject
         ArtistStatisticsService statisticsService,
         ArtistEditService editService,
         IAppOptions appOptions,
+        IPlaylistMenuService playlistMenuService,
         ILogger<ArtistViewModel> logger)
     {
         _backdropLoader = Guard.Against.Null(backdropLoader);
@@ -243,6 +244,7 @@ public partial class ArtistViewModel : ObservableObject
         _statisticsService = Guard.Against.Null(statisticsService);
         _editService = Guard.Against.Null(editService);
         _appOptions = Guard.Against.Null(appOptions);
+        PlaylistMenuService = Guard.Against.Null(playlistMenuService);
         _logger = Guard.Against.Null(logger);
 
         GenreOpenCommand = new RelayCommand(() => { });

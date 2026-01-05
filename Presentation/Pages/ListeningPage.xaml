@@ -305,18 +305,6 @@
                               Command="{x:Bind ViewModel.ShufflePlaylistCommand}" />
 
                 <AppBarSeparator />
-
-                <!--<AppBarButton x:Uid="artistViewWebSite"
-                              Style="{StaticResource headerGenericButton}"
-                              Icon="World"
-                              Command="{x:Bind ViewModel.Artist.OpenOfficielSiteCommand}"
-                              Visibility="{x:Bind ViewModel.Artist.Artist.OfficialSiteUrl, Converter={StaticResource StringToVisibilityConverter}}" />-->
-
-                <!--<AppBarButton x:Uid="artistViewLastFm"
-                              Style="{StaticResource headerGenericButton}"
-                              Icon="MusicInfo"
-                              Command="{x:Bind ViewModel.Artist.OpenLastFmPageCommand, Mode=OneWay}"
-                              Visibility="{x:Bind ViewModel.Artist.LastFmPageAvailable, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" />-->
             </CommandBar>
         </RelativePanel>
 

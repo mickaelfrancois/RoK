@@ -269,6 +269,18 @@
                                   Visibility="Collapsed"                                    
                                   IsEnabled="False"/>
 
+                    <AppBarButton x:Uid="albumViewPlaylist"
+                                  Style="{StaticResource headerGenericButton}"
+                                  Icon="Add">
+                        <AppBarButton.Flyout>
+                            <MenuFlyout x:Name="albumPlaylistFlyout"
+                                        common:MenuFlyoutExtensions.PlaylistMenuService="{x:Bind ViewModel.PlaylistMenuService}"
+                                        common:MenuFlyoutExtensions.ArtistId="{x:Bind ViewModel.Artist.Id}"
+                                        common:MenuFlyoutExtensions.FlattenPlaylistMenu="True" />
+                        </AppBarButton.Flyout>
+                    </AppBarButton>
+
+
                     <AppBarButton x:Uid="artistViewEdit"
                                   Style="{StaticResource headerGenericButton}"
                                   Icon="Edit"

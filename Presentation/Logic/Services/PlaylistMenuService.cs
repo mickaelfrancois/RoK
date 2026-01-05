@@ -1,12 +1,12 @@
+using System.Threading;
 using Rok.Application.Features.Playlists.Command;
 using Rok.Application.Features.Playlists.PlaylistMenu;
 using Rok.Application.Features.Playlists.Query;
-using System.Threading;
 
 
 namespace Rok.Logic.Services;
 
-public class PlaylistMenuService : IPlaylistMenuService, IDisposable
+public partial class PlaylistMenuService : IPlaylistMenuService, IDisposable
 {
     private readonly IMediator _mediator;
     private readonly ResourceLoader _resourceLoader;
@@ -87,6 +87,66 @@ public class PlaylistMenuService : IPlaylistMenuService, IDisposable
     }
 
 
+    public async Task AddAlbumToPlaylistAsync(long playlistId, long albumId)
+    {
+        try
+        {
+            Result<long> result = await _mediator.SendMessageAsync(new AddAlbumToPlaylistCommand
+            {
+                PlaylistId = playlistId,
+                AlbumId = albumId
+            });
+
+            if (result.IsSuccess)
+            {
+                Messenger.Send(new PlaylistUpdatedMessage(playlistId, ActionType.Update));
+                Messenger.Send(new ShowNotificationMessage() { Message = _resourceLoader.GetString("notification_playlist_track_add")!, Type = NotificationType.Success });
+
+                _logger.LogInformation("Album '{AlbumId}' add to playlist '{PlaylistId}'", albumId, playlistId);
+            }
+            else
+            {
+                _logger.LogError("Failed to add track '{AlbumId}' to playlist '{PlaylistId}': {Error}", albumId, playlistId, result.Error);
+            }
+        }
+        catch (Exception ex)
+        {
+            Messenger.Send(new ShowNotificationMessage() { Message = _resourceLoader.GetString("notification_playlist_track_add_error")!, Type = NotificationType.Error });
+            _logger.LogError(ex, "Error while add tracks to playlist");
+        }
+    }
+
+
+    public async Task AddArtistToPlaylistAsync(long playlistId, long artistId)
+    {
+        try
+        {
+            Result<long> result = await _mediator.SendMessageAsync(new AddArtistToPlaylistCommand
+            {
+                PlaylistId = playlistId,
+                ArtistId = artistId
+            });
+
+            if (result.IsSuccess)
+            {
+                Messenger.Send(new PlaylistUpdatedMessage(playlistId, ActionType.Update));
+                Messenger.Send(new ShowNotificationMessage() { Message = _resourceLoader.GetString("notification_playlist_track_add")!, Type = NotificationType.Success });
+
+                _logger.LogInformation("Album '{ArtistId}' add to playlist '{PlaylistId}'", artistId, playlistId);
+            }
+            else
+            {
+                _logger.LogError("Failed to add track '{ArtistId}' to playlist '{PlaylistId}': {Error}", artistId, playlistId, result.Error);
+            }
+        }
+        catch (Exception ex)
+        {
+            Messenger.Send(new ShowNotificationMessage() { Message = _resourceLoader.GetString("notification_playlist_track_add_error")!, Type = NotificationType.Error });
+            _logger.LogError(ex, "Error while add tracks to playlist");
+        }
+    }
+
+
     public async Task CreateNewPlaylistWithTrackAsync(string playlistName, long trackId)
     {
         try
@@ -104,6 +164,39 @@ public class PlaylistMenuService : IPlaylistMenuService, IDisposable
         }
     }
 
+    public async Task CreateNewPlaylistWithAlbumAsync(string playlistName, long albumId)
+    {
+        try
+        {
+            Result<long> playlistResult = await _mediator.SendMessageAsync(new CreatePlaylistCommand() { Name = playlistName, Type = (int)PlaylistType.Classic });
+            long playlistId = playlistResult.Value;
+            Messenger.Send(new PlaylistUpdatedMessage(playlistId, ActionType.Add));
+
+            await AddAlbumToPlaylistAsync(playlistId, albumId);
+        }
+        catch (Exception ex)
+        {
+            Messenger.Send(new ShowNotificationMessage() { Message = _resourceLoader.GetString("notification_playlist_track_add_error")!, Type = NotificationType.Error });
+            _logger.LogError(ex, "Error while add tracks to playlist");
+        }
+    }
+
+    public async Task CreateNewPlaylistWithArtistAsync(string playlistName, long artistId)
+    {
+        try
+        {
+            Result<long> playlistResult = await _mediator.SendMessageAsync(new CreatePlaylistCommand() { Name = playlistName, Type = (int)PlaylistType.Classic });
+            long playlistId = playlistResult.Value;
+            Messenger.Send(new PlaylistUpdatedMessage(playlistId, ActionType.Add));
+
+            await AddAlbumToPlaylistAsync(playlistId, artistId);
+        }
+        catch (Exception ex)
+        {
+            Messenger.Send(new ShowNotificationMessage() { Message = _resourceLoader.GetString("notification_playlist_track_add_error")!, Type = NotificationType.Error });
+            _logger.LogError(ex, "Error while add tracks to playlist");
+        }
+    }
 
     private async Task<IEnumerable<PlaylistMenuItem>> RefreshCacheAsync()
     {

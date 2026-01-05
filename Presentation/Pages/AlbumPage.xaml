@@ -185,11 +185,17 @@
                                   Icon="Library"
                                   Command="{x:Bind ViewModel.OpenBiographyCommand}"
                                   Visibility="{x:Bind ViewModel.Album.Biography, Converter={StaticResource StringToVisibilityConverter}}" />
-
+                                        
                     <AppBarButton x:Uid="albumViewPlaylist"
                                   Style="{StaticResource headerGenericButton}"
-                                  Icon="Add"
-                                  Visibility="Collapsed" />
+                                  Icon="Add">
+                        <AppBarButton.Flyout>
+                            <MenuFlyout x:Name="albumPlaylistFlyout"
+                                        common:MenuFlyoutExtensions.PlaylistMenuService="{x:Bind ViewModel.PlaylistMenuService}"
+                                        common:MenuFlyoutExtensions.AlbumId="{x:Bind ViewModel.Album.Id}"
+                                        common:MenuFlyoutExtensions.FlattenPlaylistMenu="True" />
+                        </AppBarButton.Flyout>
+                    </AppBarButton>
 
                     <AppBarButton x:Uid="albumViewEdit"
                                   Style="{StaticResource headerGenericButton}"
