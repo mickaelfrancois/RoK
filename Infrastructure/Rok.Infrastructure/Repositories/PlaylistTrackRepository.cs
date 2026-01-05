@@ -10,7 +10,8 @@ public class PlaylistTrackRepository(IDbConnection connection, [FromKeyedService
     private const string DeleteSql = "DELETE FROM playlisttracks WHERE playlistid = @playlistId";
     private const string DeleteTrackSql = "DELETE FROM playlisttracks WHERE playlistid = @playlistId AND trackid = @trackId";
     private const string SelectSql = "SELECT id FROM playlisttracks WHERE playlistid = @playlistId AND trackid = @trackId";
-
+    private const string SelectTracksSql = "SELECT * FROM playlisttracks WHERE playlistid = @playlistId";
+    private const string UpdatePositionSql = "UPDATE playlisttracks SET position = @position WHERE id = @id";
 
     public async Task<long> AddAsync(PlaylistTrackEntity entity, RepositoryConnectionKind kind = RepositoryConnectionKind.Foreground)
     {
@@ -34,5 +35,17 @@ public class PlaylistTrackRepository(IDbConnection connection, [FromKeyedService
     {
         IDbConnection localConnection = ResolveConnection(kind);
         return await localConnection.ExecuteScalarAsync<int>(SelectSql, new { playlistId, trackId });
+    }
+
+    public async Task<IEnumerable<PlaylistTrackEntity>> GetAsync(long playlistId, RepositoryConnectionKind kind = RepositoryConnectionKind.Foreground)
+    {
+        IDbConnection localConnection = ResolveConnection(kind);
+        return await localConnection.QueryAsync<PlaylistTrackEntity>(SelectTracksSql, new { playlistId });
+    }
+
+    public async Task<long> UpdatePositionAsync(long id, int position, RepositoryConnectionKind kind = RepositoryConnectionKind.Foreground)
+    {
+        IDbConnection localConnection = ResolveConnection(kind);
+        return await localConnection.ExecuteAsync(UpdatePositionSql, new { id, position });
     }
 }

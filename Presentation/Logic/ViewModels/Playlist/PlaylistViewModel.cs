@@ -101,6 +101,8 @@ public partial class PlaylistViewModel : ObservableObject
     public AsyncRelayCommand DeleteCommand { get; private set; }
     public AsyncRelayCommand<long> RemoveFromPlaylistCommand { get; private set; }
     public AsyncRelayCommand<List<PlaylistGroupDto>> SavePlaylistCommand { get; private set; }
+    public AsyncRelayCommand MoveTrackCommand { get; private set; }
+
 
     public PlaylistViewModel(
         IBackdropLoader backdropLoader,
@@ -129,6 +131,7 @@ public partial class PlaylistViewModel : ObservableObject
         DeleteCommand = new AsyncRelayCommand(DeletePlaylistAsync);
         RemoveFromPlaylistCommand = new AsyncRelayCommand<long>(RemoveTrackAsync);
         SavePlaylistCommand = new AsyncRelayCommand<List<PlaylistGroupDto>>((c) => SavePlaylistAsync(forceUpdate: true, c));
+        MoveTrackCommand = new AsyncRelayCommand(async () => await MoveTrackAsync());
     }
 
 
@@ -211,6 +214,17 @@ public partial class PlaylistViewModel : ObservableObject
             LoadPicture();
             OnPropertyChanged();
         }
+    }
+
+    private async Task MoveTrackAsync()
+    {
+        if (Tracks.Count == 0)
+            return;
+
+        if (Playlist.Id == 0)
+            return;
+
+        await _updateService.SaveTracksPositionAsync(Playlist.Id, Tracks.Select(c => c.Track.Id).ToList());
     }
 
     private async Task ListenAsync()
