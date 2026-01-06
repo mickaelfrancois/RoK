@@ -58,4 +58,16 @@ public sealed partial class PlaylistPage : Page
             ViewModel.MoveTrackCommand.Execute(null);
         }
     }
+
+    private void TracksListContainerContentChanging(ListViewBase sender, ContainerContentChangingEventArgs args)
+    {
+        if (args.InRecycleQueue)
+            return;
+
+        if (args.ItemContainer?.ContentTemplateRoot is FrameworkElement root &&
+            root.FindName("RowIndexText") is TextBlock tb)
+        {
+            tb.Text = (args.ItemIndex + 1).ToString() + ".";
+        }
+    }
 }
