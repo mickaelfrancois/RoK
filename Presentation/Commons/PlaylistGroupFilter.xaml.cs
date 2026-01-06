@@ -190,7 +190,7 @@ public sealed partial class PlaylistGroupFilter : UserControl
                 fields.Add(new FieldOption(SmartPlaylistField.IsLive, SmartPlaylistFieldType.Bool, _resourceLoader.GetString("playlistGroupFieldLive")));
                 fields.Add(new FieldOption(SmartPlaylistField.CreatDate, SmartPlaylistFieldType.Day, _resourceLoader.GetString("playlistGroupFieldAddDate")));
                 fields.Add(new FieldOption(SmartPlaylistField.Bitrate, SmartPlaylistFieldType.Int, _resourceLoader.GetString("playlistGroupFieldBitrate")));
-                fields.Add(new FieldOption(SmartPlaylistField.LastListen, SmartPlaylistFieldType.Int, _resourceLoader.GetString("playlistGroupFieldLastListen")));
+                fields.Add(new FieldOption(SmartPlaylistField.LastListen, SmartPlaylistFieldType.Day, _resourceLoader.GetString("playlistGroupFieldLastListen")));
                 fields.Add(new FieldOption(SmartPlaylistField.SkipCount, SmartPlaylistFieldType.Int, _resourceLoader.GetString("playlistGroupFieldSkipCount")));
                 fields.Add(new FieldOption(SmartPlaylistField.Name, SmartPlaylistFieldType.String, _resourceLoader.GetString("playlistGroupFieldName")));
                 break;
@@ -203,7 +203,7 @@ public sealed partial class PlaylistGroupFilter : UserControl
                 fields.Add(new FieldOption(SmartPlaylistField.BestofCount, SmartPlaylistFieldType.Int, _resourceLoader.GetString("playlistGroupFieldBestofCount")));
                 fields.Add(new FieldOption(SmartPlaylistField.CompilationCount, SmartPlaylistFieldType.Int, _resourceLoader.GetString("playlistGroupFieldCompilationCount")));
                 fields.Add(new FieldOption(SmartPlaylistField.TrackCount, SmartPlaylistFieldType.Int, _resourceLoader.GetString("playlistGroupFieldTrackCount")));
-                fields.Add(new FieldOption(SmartPlaylistField.LastListen, SmartPlaylistFieldType.Int, _resourceLoader.GetString("playlistGroupFieldLastListen")));
+                fields.Add(new FieldOption(SmartPlaylistField.LastListen, SmartPlaylistFieldType.Day, _resourceLoader.GetString("playlistGroupFieldLastListen")));
                 fields.Add(new FieldOption(SmartPlaylistField.SkipCount, SmartPlaylistFieldType.Int, _resourceLoader.GetString("playlistGroupFieldSkipCount")));
                 fields.Add(new FieldOption(SmartPlaylistField.Name, SmartPlaylistFieldType.String, _resourceLoader.GetString("playlistGroupFieldName")));
                 break;
@@ -213,7 +213,7 @@ public sealed partial class PlaylistGroupFilter : UserControl
                 fields.Add(new FieldOption(SmartPlaylistField.ListenCount, SmartPlaylistFieldType.Int, _resourceLoader.GetString("playlistGroupFieldListenCount")));
                 fields.Add(new FieldOption(SmartPlaylistField.CreatDate, SmartPlaylistFieldType.Day, _resourceLoader.GetString("playlistGroupFieldAddDate")));
                 fields.Add(new FieldOption(SmartPlaylistField.TrackCount, SmartPlaylistFieldType.Int, _resourceLoader.GetString("playlistGroupFieldTrackCount")));
-                fields.Add(new FieldOption(SmartPlaylistField.LastListen, SmartPlaylistFieldType.Int, _resourceLoader.GetString("playlistGroupFieldLastListen")));
+                fields.Add(new FieldOption(SmartPlaylistField.LastListen, SmartPlaylistFieldType.Day, _resourceLoader.GetString("playlistGroupFieldLastListen")));
                 fields.Add(new FieldOption(SmartPlaylistField.SkipCount, SmartPlaylistFieldType.Int, _resourceLoader.GetString("playlistGroupFieldSkipCount")));
                 fields.Add(new FieldOption(SmartPlaylistField.Year, SmartPlaylistFieldType.Int, _resourceLoader.GetString("playlistGroupFieldYear")));
                 fields.Add(new FieldOption(SmartPlaylistField.ReleaseDate, SmartPlaylistFieldType.Day, _resourceLoader.GetString("playlistGroupFieldReleaseDate")));
