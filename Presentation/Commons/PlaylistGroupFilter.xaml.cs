@@ -1,5 +1,5 @@
-using Microsoft.UI.Xaml.Controls;
 using System.Globalization;
+using Microsoft.UI.Xaml.Controls;
 
 namespace Rok.Commons;
 
@@ -419,7 +419,7 @@ public sealed partial class PlaylistGroupFilter : UserControl
         nbValue2.Visibility = Visibility.Collapsed;
 
         cbValue.ItemsSource = LoadBoolValues();
-        cbValue.DisplayMemberPath = DisplayMemberValuePath;
+        cbValue.DisplayMemberPath = "Value";
         cbValue.SelectedValuePath = SelectedValuePath;
 
         cbValue.SelectedIndex = 0;
