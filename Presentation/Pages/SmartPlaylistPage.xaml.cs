@@ -120,4 +120,17 @@ public sealed partial class SmartPlaylistPage : Page
         if (result == ContentDialogResult.Primary && ViewModel.DeleteCommand.CanExecute(null))
             ViewModel.DeleteCommand.Execute(null);
     }
+
+
+    private void TracksListContainerContentChanging(ListViewBase sender, ContainerContentChangingEventArgs args)
+    {
+        if (args.InRecycleQueue)
+            return;
+
+        if (args.ItemContainer?.ContentTemplateRoot is FrameworkElement root &&
+            root.FindName("RowIndexText") is TextBlock tb)
+        {
+            tb.Text = (args.ItemIndex + 1).ToString() + ".";
+        }
+    }
 }

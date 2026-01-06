@@ -65,8 +65,12 @@
 
         <!-- Tracks -->
         <Grid Grid.Row="1"
-              Style="{StaticResource gridList}">
-            
+              Style="{StaticResource gridList}"
+              CornerRadius="12,12,0,0"
+              Padding="24"
+              Background="{ThemeResource CardBackgroundFillColorDefault}"
+              Margin="4,0,4,4">
+
             <Grid.RowDefinitions>
                 <RowDefinition Height="{ThemeResource gridHeaderTracksHeight}" />
                 <RowDefinition />
@@ -74,6 +78,7 @@
 
             <Grid Style="{StaticResource gridTracks}">
                 <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="30" />
                     <ColumnDefinition Width="{ThemeResource gridHeaderTracksTitleColumnWidth}"
                                       x:Name="trackTitle" />
                     <ColumnDefinition Width="{ThemeResource gridHeaderTracksArtistColumnWidth}"
@@ -84,24 +89,30 @@
                                       x:Name="trackScore" />
                 </Grid.ColumnDefinitions>
 
-                <TextBlock x:Uid="gridHeaderTitle"
+                <TextBlock Text="#"
                            Grid.Column="0"
                            Style="{StaticResource gridHeaderTracksText}" />
-                <TextBlock x:Uid="gridHeaderArtist"
+                <TextBlock x:Uid="gridHeaderTitle"
                            Grid.Column="1"
                            Style="{StaticResource gridHeaderTracksText}" />
-                <TextBlock x:Uid="gridHeaderAlbum"
+                <TextBlock x:Uid="gridHeaderArtist"
                            Grid.Column="2"
                            Style="{StaticResource gridHeaderTracksText}" />
-                <TextBlock x:Uid="gridHeaderScore"
+                <TextBlock x:Uid="gridHeaderAlbum"
                            Grid.Column="3"
+                           Style="{StaticResource gridHeaderTracksText}" />
+                <TextBlock x:Uid="gridHeaderScore"
+                           Grid.Column="4"
                            Style="{StaticResource gridHeaderTracksText}" />
             </Grid>
 
             <common:ListViewExtended x:Name="tracksList"
+                                     ItemsSource="{x:Bind ViewModel.Tracks}"
+                                     ContainerContentChanging="TracksListContainerContentChanging"
                                      Grid.Row="1"
-                                     Margin="6,12,0,0"
-                                     ItemsSource="{x:Bind ViewModel.Tracks}"    
+                                     Margin="0"
+                                     BorderThickness="0"
+                                     ItemContainerStyle="{StaticResource tracksListViewItem}"
                                      IsItemClickEnabled="True"
                                      CanDragItems="True"
                                      CanReorderItems="True"  
@@ -111,9 +122,11 @@
                 <ListView.ItemTemplate>
                     <DataTemplate x:DataType="track:TrackViewModel">
                         <Grid HorizontalAlignment="Stretch"
+                              VerticalAlignment="Center"
                               Background="Transparent"
                               Margin="0,0,20,10">
                             <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="30" />
                                 <ColumnDefinition Width="{ThemeResource gridHeaderTracksTitleColumnWidth}" />
                                 <ColumnDefinition Width="{ThemeResource gridHeaderTracksArtistColumnWidth}" />
                                 <ColumnDefinition Width="{ThemeResource gridHeaderTracksAlbumColumnWidth}" />
@@ -153,7 +166,12 @@
                                 </MenuFlyout>
                             </Grid.ContextFlyout>
 
-                            <StackPanel Grid.Column="0"
+                            <TextBlock x:Name="RowIndexText"
+                                       VerticalAlignment="Center"
+                                       Width="25"
+                                       Style="{StaticResource gridTracksRowIndexText}" />
+
+                            <StackPanel Grid.Column="1"
                                         Orientation="Horizontal">
                                 
                                 <HyperlinkButton Style="{StaticResource gridTracksTitleText}"
@@ -166,15 +184,15 @@
                                                  Command="{x:Bind LyricsOpenCommand}" />
                             </StackPanel>
                             
-                            <HyperlinkButton Grid.Column="1"
+                            <HyperlinkButton Grid.Column="2"
                                              Style="{StaticResource gridTracksArtistText}"
                                              Command="{x:Bind ArtistOpenCommand}" />
 
-                            <HyperlinkButton Grid.Column="2"
+                            <HyperlinkButton Grid.Column="3"
                                              Style="{StaticResource gridTracksAlbumText}"
                                              Command="{x:Bind AlbumOpenCommand}" />
 
-                            <common:RatingControlLightControl Grid.Column="3"
+                            <common:RatingControlLightControl Grid.Column="4"
                                                               Style="{StaticResource gridTracksScore}"
                                                               RatingValue="{x:Bind Score, Mode=TwoWay}" />
                         </Grid>
