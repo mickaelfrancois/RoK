@@ -235,6 +235,7 @@ public sealed partial class PlaylistGroupFilter : UserControl
                 break;
 
             case SmartPlaylistEntity.Countries:
+                fields.Add(new FieldOption(SmartPlaylistField.Code, SmartPlaylistFieldType.String, _resourceLoader.GetString("playlistGroupFieldCode")));
                 fields.Add(new FieldOption(SmartPlaylistField.Name, SmartPlaylistFieldType.String, _resourceLoader.GetString("playlistGroupFieldName")));
                 break;
         }

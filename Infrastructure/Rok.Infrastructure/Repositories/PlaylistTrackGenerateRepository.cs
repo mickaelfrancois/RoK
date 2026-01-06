@@ -22,7 +22,7 @@ public class PlaylistTrackGenerateRepository(IDbConnection db, [FromKeyedService
         HandleNameFilter(group.Filters.Where(c => c.Entity == SmartPlaylistEntity.Genres && c.Field == SmartPlaylistField.Name && !string.IsNullOrEmpty(c.Value)), query, parameters);
         HandleNameFilter(group.Filters.Where(c => c.Entity == SmartPlaylistEntity.Artists && c.Field == SmartPlaylistField.Name && !string.IsNullOrEmpty(c.Value)), query, parameters);
         HandleNameFilter(group.Filters.Where(c => c.Entity == SmartPlaylistEntity.Albums && c.Field == SmartPlaylistField.Name && !string.IsNullOrEmpty(c.Value)), query, parameters);
-        HandleNameFilter(group.Filters.Where(c => c.Entity == SmartPlaylistEntity.Countries && c.Field == SmartPlaylistField.Code && !string.IsNullOrEmpty(c.Value)), query, parameters);
+        HandleNameFilter(group.Filters.Where(c => c.Entity == SmartPlaylistEntity.Countries && (c.Field == SmartPlaylistField.Code || c.Field == SmartPlaylistField.Name) && !string.IsNullOrEmpty(c.Value)), query, parameters);
 
         HandleIntFilter(group.Filters.Where(c => c.FieldType == SmartPlaylistFieldType.Int && c.Operator != SmartPlaylistOperator.Between), query, parameters);
         HandleBoolFilter(group.Filters.Where(c => c.FieldType == SmartPlaylistFieldType.Bool && c.Operator != SmartPlaylistOperator.Between), query, parameters);
