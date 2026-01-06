@@ -35,7 +35,18 @@ public partial class PlaylistViewModel : ObservableObject
         }
     }
 
-    public int TrackMaximum => Playlist.TrackMaximum;
+    public int TrackMaximum
+    {
+        get
+        {
+            return Playlist.TrackMaximum;
+        }
+        set
+        {
+            Playlist.TrackMaximum = value;
+        }
+    }
+
     public int TrackCount => Playlist.TrackCount;
 
     public int ArtistCount

@@ -1,11 +1,10 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using System.Text;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Rok.Application.Dto;
 using Rok.Application.Features.Playlists.Query;
 using Rok.Application.Interfaces;
 using Rok.Shared.Enums;
-using Rok.Shared.Extensions;
-using System.Text;
 
 namespace Rok.Infrastructure.Repositories;
 
@@ -42,8 +41,8 @@ public class PlaylistTrackGenerateRepository(IDbConnection db, [FromKeyedService
 
         List<TrackEntity> rows = (await ExecuteQueryAsync(query.ToString(), kind, parameters)).ToList();
 
-        if (rows.Count > 0)
-            rows.Shuffle();
+        //if (rows.Count > 0)
+        //    rows.Shuffle();
 
         return rows;
     }
@@ -281,10 +280,10 @@ public class PlaylistTrackGenerateRepository(IDbConnection db, [FromKeyedService
                 query.Append(" ORDER BY RANDOM() ");
                 break;
             case SmartPlaylistSelectBy.Newest:
-                query.Append(" ORDER BY tracks.creatdate DESC, RANDOM() ");
+                query.Append(" ORDER BY tracks.creatdate DESC ");
                 break;
             case SmartPlaylistSelectBy.Oldest:
-                query.Append(" ORDER BY tracks.creatdate ASC, RANDOM() ");
+                query.Append(" ORDER BY tracks.creatdate ASC ");
                 break;
             case SmartPlaylistSelectBy.MostPlayed:
                 query.Append(" ORDER BY tracks.listencount DESC, RANDOM() ");
@@ -299,10 +298,10 @@ public class PlaylistTrackGenerateRepository(IDbConnection db, [FromKeyedService
                 query.Append(" ORDER BY tracks.score ASC, RANDOM() ");
                 break;
             case SmartPlaylistSelectBy.MostRecent:
-                query.Append(" ORDER BY tracks.lastlisten DESC, RANDOM() ");
+                query.Append(" ORDER BY tracks.lastlisten DESC ");
                 break;
             case SmartPlaylistSelectBy.LeastRecent:
-                query.Append(" ORDER BY tracks.lastlisten ASC, RANDOM() ");
+                query.Append(" ORDER BY tracks.lastlisten ASC ");
                 break;
             default:
                 query.Append(" ORDER BY RANDOM() ");

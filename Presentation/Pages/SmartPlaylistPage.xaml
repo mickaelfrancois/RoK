@@ -75,7 +75,7 @@
                     <StackPanel Orientation="Horizontal">
                         <TextBlock x:Uid="PlaylistTrackCount" VerticalAlignment="Center" Margin="0,0,8,0" Text="Nombre de titres :"></TextBlock>
                         <NumberBox VerticalAlignment="Center"
-                                   Text="{x:Bind ViewModel.TrackMaximum, Mode=OneWay}" Width="50" HorizontalAlignment="Left"></NumberBox>
+                                   Text="{x:Bind ViewModel.TrackMaximum, Mode=TwoWay}" Width="50" HorizontalAlignment="Left"></NumberBox>
                     </StackPanel>
 
                     <StackPanel Grid.Row="1" Orientation="Horizontal" VerticalAlignment="Top">
