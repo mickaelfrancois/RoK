@@ -526,13 +526,13 @@
     <value>Favorite</value>
   </data>
   <data name="playlistGroupFieldAlbumCount" xml:space="preserve">
-    <value>Album count</value>
+    <value>Studio album</value>
   </data>
   <data name="playlistGroupFieldBestofCount" xml:space="preserve">
-    <value>Best of count</value>
+    <value>Best of</value>
   </data>
   <data name="playlistGroupFieldCompilationCount" xml:space="preserve">
-    <value>Compilation count</value>
+    <value>Compilation</value>
   </data>
   <data name="playlistGroupFieldTrackCount" xml:space="preserve">
     <value>Track count</value>

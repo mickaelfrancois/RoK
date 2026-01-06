@@ -217,8 +217,8 @@ public sealed partial class PlaylistGroupFilter : UserControl
                 fields.Add(new FieldOption(SmartPlaylistField.SkipCount, SmartPlaylistFieldType.Int, _resourceLoader.GetString("playlistGroupFieldSkipCount")));
                 fields.Add(new FieldOption(SmartPlaylistField.Year, SmartPlaylistFieldType.Int, _resourceLoader.GetString("playlistGroupFieldYear")));
                 fields.Add(new FieldOption(SmartPlaylistField.ReleaseDate, SmartPlaylistFieldType.Day, _resourceLoader.GetString("playlistGroupFieldReleaseDate")));
-                fields.Add(new FieldOption(SmartPlaylistField.IsBestof, SmartPlaylistFieldType.Bool, _resourceLoader.GetString("playlistGroupFieldBestof")));
-                fields.Add(new FieldOption(SmartPlaylistField.IsCompilation, SmartPlaylistFieldType.Bool, _resourceLoader.GetString("playlistGroupFieldCompilation")));
+                fields.Add(new FieldOption(SmartPlaylistField.IsBestof, SmartPlaylistFieldType.Bool, _resourceLoader.GetString("playlistGroupFieldBestofCount")));
+                fields.Add(new FieldOption(SmartPlaylistField.IsCompilation, SmartPlaylistFieldType.Bool, _resourceLoader.GetString("playlistGroupFieldCompilationCount")));
                 fields.Add(new FieldOption(SmartPlaylistField.IsLive, SmartPlaylistFieldType.Bool, _resourceLoader.GetString("playlistGroupFieldLive")));
                 fields.Add(new FieldOption(SmartPlaylistField.Name, SmartPlaylistFieldType.String, _resourceLoader.GetString("playlistGroupFieldName")));
                 break;
