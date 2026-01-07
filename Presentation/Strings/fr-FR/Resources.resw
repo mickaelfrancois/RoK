@@ -1125,4 +1125,7 @@
   <data name="Original" xml:space="preserve">
     <value>Originale</value>
   </data>
+  <data name="playlistGroupFieldUnitDays" xml:space="preserve">
+    <value>jours</value>
+  </data>
 </root>

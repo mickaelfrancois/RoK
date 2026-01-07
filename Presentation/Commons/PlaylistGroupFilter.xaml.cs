@@ -42,10 +42,14 @@ public sealed partial class PlaylistGroupFilter : UserControl
             cbEntities.SelectedItem = ((IEnumerable<EntityOption>)cbEntities.ItemsSource).FirstOrDefault(f => f.Key == value.Entity);
 
             LoadFieldsList(value.Entity);
-            cbFields.SelectedItem = ((IEnumerable<FieldOption>)cbFields.ItemsSource).FirstOrDefault(f => f.Key == value.Field);
+            FieldOption field = ((IEnumerable<FieldOption>)cbFields.ItemsSource).FirstOrDefault(f => f.Key == value.Field)!;
+            cbFields.SelectedItem = field;
+            SetUnit(field);
 
             LoadOperatorList(value.Field);
             cbOperators.SelectedItem = ((IEnumerable<OperatorOption>)cbOperators.ItemsSource).FirstOrDefault(f => f.Key == value.Operator);
+
+
 
             Value = value.Value ?? string.Empty;
             Value2 = value.Value2 ?? string.Empty;
@@ -235,7 +239,6 @@ public sealed partial class PlaylistGroupFilter : UserControl
                 break;
 
             case SmartPlaylistEntity.Countries:
-                fields.Add(new FieldOption(SmartPlaylistField.Code, SmartPlaylistFieldType.String, _resourceLoader.GetString("playlistGroupFieldCode")));
                 fields.Add(new FieldOption(SmartPlaylistField.Name, SmartPlaylistFieldType.String, _resourceLoader.GetString("playlistGroupFieldName")));
                 break;
         }
@@ -258,9 +261,10 @@ public sealed partial class PlaylistGroupFilter : UserControl
         if (e.AddedItems.Count == 1 && e.RemovedItems.Count == 1 && ((FieldOption)e.AddedItems[0]).Key == ((FieldOption)e.RemovedItems[0]).Key)
             return;
 
-        SmartPlaylistField field = ((FieldOption)cbFields.SelectedItem).Key;
+        FieldOption fieldOption = (FieldOption)cbFields.SelectedItem;
 
-        LoadOperatorList(field);
+        LoadOperatorList(fieldOption.Key);
+        SetUnit(fieldOption);
     }
 
 
@@ -314,6 +318,22 @@ public sealed partial class PlaylistGroupFilter : UserControl
         cbOperators.DisplayMemberPath = DisplayMemberValuePath;
 
         cbOperators.SelectedIndex = 0;
+    }
+
+
+    private void SetUnit(FieldOption field)
+    {
+        switch (field.FieldType)
+        {
+            case SmartPlaylistFieldType.Day:
+                lbUnit.Text = _resourceLoader.GetString("playlistGroupFieldUnitDays");
+                lbUnit.Visibility = Visibility.Visible;
+                break;
+
+            default:
+                lbUnit.Visibility = Visibility.Collapsed;
+                break;
+        }
     }
 
 
