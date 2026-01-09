@@ -9,6 +9,8 @@ using Rok.Logic.ViewModels.Artist.Services;
 using Rok.Logic.ViewModels.Artists;
 using Rok.Logic.ViewModels.Artists.Handlers;
 using Rok.Logic.ViewModels.Artists.Services;
+using Rok.Logic.ViewModels.Genre;
+using Rok.Logic.ViewModels.Genre.Services;
 using Rok.Logic.ViewModels.Listening;
 using Rok.Logic.ViewModels.Listening.Services;
 using Rok.Logic.ViewModels.Main;
@@ -75,6 +77,11 @@ public static class DependencyInjection
         services.AddTransient<AlbumApiService>();
         services.AddTransient<AlbumStatisticsService>();
         services.AddTransient<AlbumEditService>();
+
+        // Genre ViewModel and services
+        services.AddTransient<GenreViewModel>();
+        services.AddTransient<GenreDataLoader>();
+        services.AddTransient<GenreEditService>();
 
         // Artists ViewModel, services and handlers
         services.AddSingleton<ArtistsViewModel>();

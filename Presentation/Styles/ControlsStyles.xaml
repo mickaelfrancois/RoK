@@ -107,6 +107,7 @@
     <x:Double x:Key="gridHeaderTracksTitleColumnWidth">350</x:Double>
     <x:Double x:Key="gridHeaderTracksAlbumColumnWidth">250</x:Double>
     <x:Double x:Key="gridHeaderTracksArtistColumnWidth">350</x:Double>
+    <x:Double x:Key="gridHeaderTracksGenreColumnWidth">250</x:Double>
     <x:Double x:Key="gridHeaderTracksScoreColumnWidth">150</x:Double>
 
     <x:Double x:Key="gridHeaderTracksHeight">25</x:Double>
@@ -158,6 +159,21 @@
                     <TextBlock Text="{Binding Track.AlbumName}"
                         TextTrimming="CharacterEllipsis"
                         ToolTipService.ToolTip="{Binding Track.AlbumName}"/>
+                </DataTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style x:Key="gridTracksGenreText"
+           TargetType="HyperlinkButton">
+        <Setter Property="Padding"
+                Value="0" />
+        <Setter Property="ContentTemplate">
+            <Setter.Value>
+                <DataTemplate>
+                    <TextBlock Text="{Binding Track.GenreName}"
+                               TextTrimming="CharacterEllipsis"
+                               ToolTipService.ToolTip="{Binding Track.GenreName}" />
                 </DataTemplate>
             </Setter.Value>
         </Setter>

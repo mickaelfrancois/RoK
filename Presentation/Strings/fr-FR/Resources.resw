@@ -1128,4 +1128,10 @@
   <data name="playlistGroupFieldUnitDays" xml:space="preserve">
     <value>jours</value>
   </data>
+  <data name="gridHeaderGenre.Text" xml:space="preserve">
+    <value>Genre</value>
+  </data>
+  <data name="compilations" xml:space="preserve">
+    <value>compilations</value>
+  </data>
 </root>

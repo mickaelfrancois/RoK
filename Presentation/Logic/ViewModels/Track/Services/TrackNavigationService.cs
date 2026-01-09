@@ -14,6 +14,12 @@ public class TrackNavigationService(NavigationService navigationService)
             navigationService.NavigateToAlbum(albumId.Value);
     }
 
+    public void NavigateToGenre(long? genreId)
+    {
+        if (genreId.HasValue)
+            navigationService.NavigateToGenre(genreId.Value);
+    }
+
     public void NavigateToTrack(long trackId)
     {
         if (trackId > 0)

@@ -1,18 +1,39 @@
 using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Navigation;
+using Rok.Logic.ViewModels.Albums;
+using Rok.Logic.ViewModels.Genre;
 
-// To learn more about WinUI, the WinUI project structure,
-// and more about our project templates, see: http://aka.ms/winui-project-info.
 
-namespace Rok.Pages
+namespace Rok.Pages;
+
+public sealed partial class GenrePage : Page
 {
-    /// <summary>
-    /// An empty page that can be used on its own or navigated to within a Frame.
-    /// </summary>
-    public sealed partial class GenrePage : Page
+    public GenreViewModel ViewModel { get; set; }
+
+    public GenrePage()
     {
-        public GenrePage()
+        this.InitializeComponent();
+
+        ViewModel = App.ServiceProvider.GetRequiredService<GenreViewModel>();
+        DataContext = ViewModel;
+    }
+
+
+    protected override async void OnNavigatedTo(NavigationEventArgs e)
+    {
+        if (e.Parameter is not GenreOpenArgs options)
+            throw new ArgumentNullException(nameof(options), "GenreOpenArgs cannot be null");
+
+        await ViewModel.LoadDataAsync(options.GenreId);
+
+        base.OnNavigatedTo(e);
+    }
+
+    private void grid_ContainerContentChanging(ListViewBase sender, ContainerContentChangingEventArgs args)
+    {
+        if (args.Item is AlbumViewModel item && item.Picture == null)
         {
-            this.InitializeComponent();
+            item.LoadPicture();
         }
     }
 }

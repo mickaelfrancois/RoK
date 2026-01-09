@@ -67,11 +67,12 @@
                            Margin="10,-1,0,0" 
                            VerticalAlignment="Center"/>
 
-                <TextBlock x:Name="genreName"
-                           Text="{x:Bind ViewModel.Artist.GenreName}"
-                           RelativePanel.Below="artistName"
-                           FontSize="16"
-                           Style="{StaticResource headerText}" />
+                <HyperlinkButton x:Name="genreName"
+                                 Content="{x:Bind ViewModel.Artist.GenreName}"
+                                 RelativePanel.Below="artistName"
+                                 FontSize="16"
+                                 Command="{x:Bind ViewModel.GenreOpenCommand}"
+                                 Style="{StaticResource headerGenreHyperlink}" />
 
                 <TextBlock x:Name="panelExtendedInfo"
                            RelativePanel.Below="genreName"

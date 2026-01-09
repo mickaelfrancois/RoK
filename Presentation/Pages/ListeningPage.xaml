@@ -132,9 +132,14 @@
                            Margin="10,-1,0,0"
                            VerticalAlignment="Center" />
 
+                <HyperlinkButton x:Name="genreName"
+                                 Content="{x:Bind ViewModel.Artist.Artist.GenreName}"
+                                 RelativePanel.Below="artistName"                                 
+                                 Command="{x:Bind ViewModel.Artist.GenreOpenCommand}"
+                                 Style="{StaticResource headerGenreHyperlink}" />
 
                 <CommandBar x:Name="panelNetwork"
-                            RelativePanel.Below="artistName"
+                            RelativePanel.Below="genreName"
                             Margin="-5,-5,0,0"
                             Style="{StaticResource headerCommandBar}">
 
@@ -330,6 +335,8 @@
                                       x:Name="trackArtist" />
                     <ColumnDefinition Width="{ThemeResource gridHeaderTracksAlbumColumnWidth}"
                                       x:Name="trackAlbum" />
+                    <ColumnDefinition Width="{ThemeResource gridHeaderTracksGenreColumnWidth}"
+                                      x:Name="trackGenre" />
                     <ColumnDefinition Width="{ThemeResource gridHeaderTracksScoreColumnWidth}"
                                       x:Name="trackScore" />
                 </Grid.ColumnDefinitions>
@@ -343,8 +350,11 @@
                 <TextBlock x:Uid="gridHeaderAlbum"
                            Grid.Column="3"
                            Style="{StaticResource gridHeaderTracksText}" />
-                <TextBlock x:Uid="gridHeaderScore"
+                <TextBlock x:Uid="gridHeaderGenre"
                            Grid.Column="4"
+                           Style="{StaticResource gridHeaderTracksText}" />
+                <TextBlock x:Uid="gridHeaderScore"
+                           Grid.Column="5"
                            Style="{StaticResource gridHeaderTracksText}" />
             </Grid>
 
@@ -368,6 +378,7 @@
                                 <ColumnDefinition Width="{ThemeResource gridHeaderTracksTitleColumnWidth}" />
                                 <ColumnDefinition Width="{ThemeResource gridHeaderTracksArtistColumnWidth}" />
                                 <ColumnDefinition Width="{ThemeResource gridHeaderTracksAlbumColumnWidth}" />
+                                <ColumnDefinition Width="{ThemeResource gridHeaderTracksGenreColumnWidth}" />
                                 <ColumnDefinition Width="{ThemeResource gridHeaderTracksScoreColumnWidth}" />
                             </Grid.ColumnDefinitions>
 
@@ -453,7 +464,11 @@
                                              Command="{x:Bind AlbumOpenCommand}"
                                              VerticalAlignment="Center" />
 
-                            <common:RatingControlLightControl Grid.Column="4"
+                            <HyperlinkButton Grid.Column="4"
+                                             Style="{StaticResource gridTracksGenreText}"
+                                             Command="{x:Bind GenreOpenCommand}" />
+
+                            <common:RatingControlLightControl Grid.Column="5"
                                                               Style="{StaticResource gridTracksScore}"
                                                               RatingValue="{x:Bind Score, Mode=TwoWay}"
                                                               VerticalAlignment="Center" />

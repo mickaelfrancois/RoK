@@ -2,10 +2,10 @@
 
 namespace Rok.Application.Features.Tracks.Query;
 
-public class GetTracksByGenreIdQuery(int genreId) : IQuery<IEnumerable<TrackDto>>
+public class GetTracksByGenreIdQuery(long genreId) : IQuery<IEnumerable<TrackDto>>
 {
     [RequiredGreaterThanZero]
-    public int GenreId { get; } = genreId;
+    public long GenreId { get; } = genreId;
 }
 
 

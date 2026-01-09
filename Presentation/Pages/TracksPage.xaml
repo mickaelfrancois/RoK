@@ -133,6 +133,8 @@
                                       x:Name="trackArtist" />
                     <ColumnDefinition Width="{ThemeResource gridHeaderTracksAlbumColumnWidth}"
                                       x:Name="trackAlbum" />
+                    <ColumnDefinition Width="{ThemeResource gridHeaderTracksGenreColumnWidth}"
+                                      x:Name="trackGenre" />
                     <ColumnDefinition Width="{ThemeResource gridHeaderTracksScoreColumnWidth}"
                                       x:Name="trackScore" />
                 </Grid.ColumnDefinitions>
@@ -146,8 +148,11 @@
                 <TextBlock x:Uid="gridHeaderAlbum"
                            Grid.Column="2"
                            Style="{StaticResource gridHeaderTracksText}" />
-                <TextBlock x:Uid="gridHeaderScore"
+                <TextBlock x:Uid="gridHeaderGenre"
                            Grid.Column="3"
+                           Style="{StaticResource gridHeaderTracksText}" />
+                <TextBlock x:Uid="gridHeaderScore"
+                           Grid.Column="4"
                            Style="{StaticResource gridHeaderTracksText}" />
             </Grid>
 
@@ -177,6 +182,7 @@
                                         <ColumnDefinition Width="{ThemeResource gridHeaderTracksTitleColumnWidth}" />
                                         <ColumnDefinition Width="{ThemeResource gridHeaderTracksArtistColumnWidth}" />
                                         <ColumnDefinition Width="{ThemeResource gridHeaderTracksAlbumColumnWidth}" />
+                                        <ColumnDefinition Width="{ThemeResource gridHeaderTracksGenreColumnWidth}" />
                                         <ColumnDefinition Width="{ThemeResource gridHeaderTracksScoreColumnWidth}" />
                                     </Grid.ColumnDefinitions>
 
@@ -232,7 +238,11 @@
                                                      Style="{StaticResource gridTracksAlbumText}"
                                                      Command="{x:Bind AlbumOpenCommand}" />
 
-                                    <common:RatingControlLightControl Grid.Column="3"
+                                    <HyperlinkButton Grid.Column="3"
+                                                     Style="{StaticResource gridTracksGenreText}"
+                                                     Command="{x:Bind GenreOpenCommand}" />
+
+                                    <common:RatingControlLightControl Grid.Column="4"
                                                                       Style="{StaticResource gridTracksScore}"
                                                                       RatingValue="{x:Bind Score, Mode=TwoWay}" />
                                 </Grid>
