@@ -6,10 +6,161 @@
     xmlns:local="using:Rok.Pages"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    mc:Ignorable="d"
+      xmlns:common="using:Rok.Commons"
+      xmlns:albums="using:Rok.Logic.ViewModels.Albums"
+      mc:Ignorable="d"
+    x:Name="genrePage"
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
     <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition x:Name="headerRow"
+                           Height="{ThemeResource headerRowHeight}" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
 
+        <Grid.Background>
+            <SolidColorBrush Color="{ThemeResource CardBackgroundFillColorDefault}"
+                             Opacity="{StaticResource headerBackgroundOpacity}" />
+        </Grid.Background>
+
+        <Image x:Name="backdrop"
+               Grid.RowSpan="2"
+               Source="{x:Bind ViewModel.Backdrop,Mode=OneWay}"
+               Opacity="{StaticResource headerBackdropOpacity}"
+               Style="{StaticResource headerBackdrop}"
+               Stretch="UniformToFill"
+               IsHitTestVisible="False" />
+
+
+        <!-- Header -->
+        <Grid Padding="2">
+
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition x:Name="pictureColumn"
+                                  Width="{ThemeResource headerPictureColumnWidth}" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+
+            <Grid Style="{StaticResource headerPictureGrid}">
+                <common:PictureControl x:Name="artistPicture"
+                                       Cover="{x:Bind ViewModel.Picture, Mode=OneWay}"
+                                       Style="{StaticResource headerPicture}" />
+            </Grid>
+
+            <RelativePanel Grid.Column="1"
+                           Margin="6,0,0,0">
+                <TextBlock x:Name="genreName"
+                           Text="{x:Bind ViewModel.Genre.Name, Mode=OneWay}"
+                           Style="{StaticResource headerTitleText}" />
+
+                <TextBlock x:Name="panelExtendedInfo"
+                           RelativePanel.Below="genreName"
+                           Style="{StaticResource headerText}"
+                           Text="{x:Bind ViewModel.SubTitle}" />
+
+                <StackPanel x:Name="panelStatsInfo"
+                            RelativePanel.Below="panelExtendedInfo"
+                            Orientation="Horizontal"
+                            Visibility="{x:Bind ViewModel.Genre.ListenCount, Converter={StaticResource IntToVisibilityConverter}}">
+                    <TextBlock x:Uid="AlbumViewListenCount"
+                               Margin="0,0,4,0"
+                               FontSize="12"></TextBlock>
+                    <TextBlock Text="{x:Bind ViewModel.Genre.ListenCount}"
+                               FontSize="12"></TextBlock>
+                    <TextBlock x:Uid="AlbumViewListenCountTimes"
+                               Margin="2,0,0,0"
+                               FontSize="12"></TextBlock>
+
+                    <TextBlock x:Uid="AlbumViewLastListen"
+                               Margin="0,0,2,0"
+                               FontSize="12"></TextBlock>
+                    <TextBlock Text="{x:Bind ViewModel.Genre.LastListen}"
+                               FontSize="12"></TextBlock>
+                </StackPanel>
+
+
+                <CommandBar  RelativePanel.AlignBottomWithPanel="True"
+                             Style="{StaticResource headerCommandBar}">
+
+                    <AppBarButton x:Uid="albumViewListen"
+                                  Style="{StaticResource listenAppBarButtonStyle}"
+                                  Command="{x:Bind ViewModel.ListenCommand}" />
+
+                    <AppBarToggleButton x:Uid="albumViewLike"
+                                        x:Name="genreAppBarLike"
+                                        Style="{StaticResource headerLikeButton}"
+                                        IsChecked="{x:Bind ViewModel.IsFavorite, Mode=OneWay}"
+                                        Command="{x:Bind ViewModel.GenreFavoriteCommand}" />
+                </CommandBar>
+            </RelativePanel>
+
+        </Grid>
+
+        <!-- Content -->
+        <Border Grid.Row="1"
+                CornerRadius="12,12,0,0"
+                Background="{ThemeResource CardBackgroundFillColorDefault}"
+                Margin="4,0,4,4">
+            <common:GridViewExtended x:Name="grid"
+                                     ItemsSource="{x:Bind ViewModel.Albums}"
+                                     ContainerContentChanging="grid_ContainerContentChanging"
+                                     Margin="0"
+                                     ScrollViewer.VerticalScrollMode="Enabled"
+                                     ScrollViewer.VerticalScrollBarVisibility="Auto">
+                <GridView.ItemTemplate>
+                    <DataTemplate x:DataType="albums:AlbumViewModel">
+                        <Grid Style="{StaticResource MainGridCoverStyle}">
+                            <Border CornerRadius="10">
+                                <common:PictureControl Style="{StaticResource PictureCoverStyle}"
+                                                       Cover="{x:Bind Picture, Mode=OneWay}"
+                                                       x:Phase="2"
+                                                       PlayButtonVisibility="Visible"
+                                                       Command="{x:Bind ListenCommand}" />
+                            </Border>
+
+                            <Grid Style="{StaticResource GridCoverBottomStyle}">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="30"></RowDefinition>
+                                    <RowDefinition Height="30"></RowDefinition>
+                                </Grid.RowDefinitions>
+
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition></ColumnDefinition>
+                                    <ColumnDefinition Width="50"></ColumnDefinition>
+                                </Grid.ColumnDefinitions>
+
+                                <HyperlinkButton Grid.ColumnSpan="2"
+                                                 Content="{x:Bind Album.Name}"
+                                                 x:Phase="0"
+                                                 Command="{x:Bind AlbumOpenCommand}"
+                                                 Style="{StaticResource GridCoverBottomFirstLineStyle}" />
+
+                                <TextBlock Grid.Row="1"
+                                           Style="{StaticResource GridCoverBottomSecondLineStyle}"
+                                           Text="{x:Bind SubTitle, Mode=OneWay}"
+                                           x:Phase="1" />
+
+                                <common:AnimatedButton Grid.Row="1"
+                                                       Grid.Column="1"
+                                                       HorizontalAlignment="Right"
+                                                       VerticalAlignment="Stretch"
+                                                       Margin="-15,0,0,0"
+                                                       Icon="{StaticResource HeartPath}"
+                                                       Color="{x:Bind IsFavorite, Converter={StaticResource FavoriteToColorConverter}, Mode=OneWay}"
+                                                       Command="{x:Bind AlbumFavoriteCommand}"
+                                                       CommandParameter="{x:Bind IsFavorite, Converter={StaticResource BoolToInvertBoolConverter}, Mode=OneWay}" />
+                            </Grid>
+                        </Grid>
+                    </DataTemplate>
+                </GridView.ItemTemplate>
+
+                <GridView.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <ItemsWrapGrid Style="{StaticResource gridAlbumsWrapGrid}" />
+                    </ItemsPanelTemplate>
+                </GridView.ItemsPanel>
+            </common:GridViewExtended>
+        </Border>
     </Grid>
 </Page>

@@ -1,6 +1,7 @@
 ﻿using Microsoft.UI.Xaml.Controls;
 using Rok.Logic.ViewModels.Album;
 using Rok.Logic.ViewModels.Artist;
+using Rok.Logic.ViewModels.Genre;
 using Rok.Logic.ViewModels.Playlist;
 using Rok.Logic.ViewModels.Search;
 using Rok.Logic.ViewModels.Track;
@@ -48,6 +49,15 @@ public class NavigationService(ITelemetryClient telemetryClient)
         _ = telemetryClient.CaptureScreenAsync("AlbumPage");
 
         MainFrame.Navigate(typeof(AlbumPage), new AlbumOpenArgs(albumId));
+    }
+
+    public void NavigateToGenre(long genreId)
+    {
+        Guard.Against.NegativeOrZero(genreId);
+
+        _ = telemetryClient.CaptureScreenAsync("GenrePage");
+
+        MainFrame.Navigate(typeof(GenrePage), new GenreOpenArgs(genreId));
     }
 
 

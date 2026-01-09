@@ -3,10 +3,10 @@ using Rok.Domain.Interfaces.Entities;
 
 namespace Rok.Application.Features.Albums.Query;
 
-public class GetAlbumsByGenreIdQuery(int genreId) : IQuery<IEnumerable<AlbumDto>>
+public class GetAlbumsByGenreIdQuery(long genreId) : IQuery<IEnumerable<AlbumDto>>
 {
     [RequiredGreaterThanZero]
-    public int GenreId { get; } = genreId;
+    public long GenreId { get; } = genreId;
 }
 
 

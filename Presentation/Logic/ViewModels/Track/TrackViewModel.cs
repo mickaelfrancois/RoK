@@ -175,6 +175,7 @@ public partial class TrackViewModel : ObservableObject, IDisposable
     public bool Listened { get; set; }
 
     public RelayCommand AlbumOpenCommand { get; private set; }
+    public RelayCommand GenreOpenCommand { get; private set; }
     public RelayCommand ArtistOpenCommand { get; private set; }
     public RelayCommand TrackOpenCommand { get; private set; }
     public AsyncRelayCommand LyricsOpenCommand { get; private set; }
@@ -209,6 +210,7 @@ public partial class TrackViewModel : ObservableObject, IDisposable
         TrackOpenCommand = new RelayCommand(TrackOpen);
         LyricsOpenCommand = new AsyncRelayCommand(LyricsOpenAsync);
         ListenCommand = new RelayCommand(Listen);
+        GenreOpenCommand = new RelayCommand(GenreOpen);
 
         SubscribeToMessages();
     }
@@ -259,6 +261,12 @@ public partial class TrackViewModel : ObservableObject, IDisposable
     {
         if (Track.AlbumId.HasValue)
             _navigationService.NavigateToAlbum(Track.AlbumId);
+    }
+
+    private void GenreOpen()
+    {
+        if (Track.GenreId.HasValue)
+            _navigationService.NavigateToGenre(Track.GenreId);
     }
 
     private void TrackOpen()

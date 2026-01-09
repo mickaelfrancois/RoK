@@ -101,7 +101,7 @@ public partial class ArtistViewModel : ObservableObject
                 if (Artist.CompilationCount > 1)
                     label += _resourceLoader.GetString("compilations");
                 else
-                    label += _resourceLoader.GetString("live");
+                    label += _resourceLoader.GetString("compilation");
                 separator = ", ";
             }
 
@@ -247,7 +247,7 @@ public partial class ArtistViewModel : ObservableObject
         PlaylistMenuService = Guard.Against.Null(playlistMenuService);
         _logger = Guard.Against.Null(logger);
 
-        GenreOpenCommand = new RelayCommand(() => { });
+        GenreOpenCommand = new RelayCommand(GenreOpen);
         ListenCommand = new AsyncRelayCommand(ListenAsync);
         ArtistsByCountryOpenCommand = new RelayCommand(() => { });
         ArtistFavoriteCommand = new AsyncRelayCommand(UpdateFavoriteStateAsync);
@@ -339,6 +339,12 @@ public partial class ArtistViewModel : ObservableObject
     private void ArtistOpen()
     {
         _navigationService.NavigateToArtist(Artist.Id);
+    }
+
+    private void GenreOpen()
+    {
+        if (Artist.GenreId.HasValue)
+            _navigationService.NavigateToGenre(Artist.GenreId.Value);
     }
 
     private async Task ListenAsync()
