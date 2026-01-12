@@ -31,25 +31,34 @@ public class TrackLyricsService(IMediator mediator, ILyricsService lyricsService
 
         await mediator.SendMessageAsync(new UpdateTrackGetLyricsLastAttemptCommand(track.Id));
 
-        MusicDataLyricsDto? lyrics = await musicDataService.GetLyricsAsync(track.ArtistName, track.AlbumName, track.Title, track.Duration);
-        if (lyrics is null)
-            return false;
-
-        if (lyrics.SyncLyrics is null && lyrics.PlainLyrics is null)
-            return false;
-
-        string fileName = lyrics.IsSynchronized
-            ? lyricsService.GetSynchronizedLyricsFileName(track.MusicFile)
-            : lyricsService.GetPlainLyricsFileName(track.MusicFile);
-
-        await lyricsService.SaveLyricsAsync(new LyricsModel
+        try
         {
-            File = fileName,
-            PlainLyrics = lyrics.Lyrics!,
-            LyricsType = lyrics.IsSynchronized ? ELyricsType.Synchronized : ELyricsType.Plain
-        });
 
-        logger.LogTrace("Lyrics saved to {File}", fileName);
+            MusicDataLyricsDto? lyrics = await musicDataService.GetLyricsAsync(track.ArtistName, track.AlbumName, track.Title, track.Duration);
+            if (lyrics is null)
+                return false;
+
+            if (lyrics.SyncLyrics is null && lyrics.PlainLyrics is null)
+                return false;
+
+            string fileName = lyrics.IsSynchronized
+                ? lyricsService.GetSynchronizedLyricsFileName(track.MusicFile)
+                : lyricsService.GetPlainLyricsFileName(track.MusicFile);
+
+            await lyricsService.SaveLyricsAsync(new LyricsModel
+            {
+                File = fileName,
+                PlainLyrics = lyrics.Lyrics!,
+                LyricsType = lyrics.IsSynchronized ? ELyricsType.Synchronized : ELyricsType.Plain
+            });
+
+            logger.LogTrace("Lyrics saved to {File}", fileName);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Error fetching lyrics for {Artist} - {Title} from API", track.ArtistName, track.Title);
+            return false;
+        }
 
         return true;
     }
