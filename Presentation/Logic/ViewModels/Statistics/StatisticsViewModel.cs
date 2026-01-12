@@ -1,10 +1,10 @@
-﻿using Rok.Application.Features.Albums.Command;
+﻿using System.Globalization;
+using Rok.Application.Features.Albums.Command;
 using Rok.Application.Features.Artists.Command;
 using Rok.Application.Features.Genres.Command;
 using Rok.Application.Features.Statistics;
 using Rok.Application.Features.Statistics.Query;
 using Rok.Application.Features.Tracks.Command;
-using System.Globalization;
 
 namespace Rok.Logic.ViewModels.Statistics;
 
@@ -58,6 +58,10 @@ public class StatisticsViewModel : ObservableObject
         }
     }
 
+    public long TotalSyncLyrics { get; set; }
+
+    public long TotalRawLyrics { get; set; }
+
     public List<RankedTopItem> TopGenres { get; set; } = [];
 
     public List<RankedTopItem> TopArtists { get; set; } = [];
@@ -98,6 +102,10 @@ public class StatisticsViewModel : ObservableObject
           .Select((t, i) => new RankedTopItem { Rank = i + 1, Id = t.Id, Name = t.Name, ListenCount = t.ListenCount })
           .ToList();
 
+        LyricsStatisticsDto lyrics = await _mediator.SendMessageAsync(new GetLyricsStatisticsQuery());
+        TotalRawLyrics = lyrics.TotalRawLyrics;
+        TotalSyncLyrics = lyrics.TotalSyncLyrics;
+
         OnPropertyChanged(nameof(Current));
         OnPropertyChanged(nameof(TopTracks));
         OnPropertyChanged(nameof(TopAlbums));
@@ -105,6 +113,8 @@ public class StatisticsViewModel : ObservableObject
         OnPropertyChanged(nameof(TopGenres));
         OnPropertyChanged(nameof(TotalDuration));
         OnPropertyChanged(nameof(TotalSize));
+        OnPropertyChanged(nameof(TotalRawLyrics));
+        OnPropertyChanged(nameof(TotalSyncLyrics));
     }
 
 
