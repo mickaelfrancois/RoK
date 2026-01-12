@@ -103,7 +103,7 @@
                                         <ObjectAnimationUsingKeyFrames Storyboard.TargetName="IconGlyph"
                                                                        Storyboard.TargetProperty="Glyph">
                                             <DiscreteObjectKeyFrame KeyTime="0"
-                                                                    Value="&#xE8E1;" />
+                                                                    Value="&#xEB52;" />
                                         </ObjectAnimationUsingKeyFrames>
                                      </Storyboard>
                                 </VisualState>
@@ -117,7 +117,7 @@
                                         <ObjectAnimationUsingKeyFrames Storyboard.TargetName="IconGlyph"
                                                                        Storyboard.TargetProperty="Glyph">
                                             <DiscreteObjectKeyFrame KeyTime="0"
-                                                                    Value="&#xE8E1;" />
+                                                                    Value="&#xEB52;" />
                                         </ObjectAnimationUsingKeyFrames>
 
                                         <ObjectAnimationUsingKeyFrames Storyboard.TargetName="LabelText"
