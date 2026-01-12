@@ -1134,4 +1134,10 @@
   <data name="compilations" xml:space="preserve">
     <value>compilations</value>
   </data>
+  <data name="StatTotalRawLyrics.Text" xml:space="preserve">
+    <value>🔹Lyrics:</value>
+  </data>
+  <data name="StatTotalSyncLyrics.Text" xml:space="preserve">
+    <value>🔹Synchronized lyrics:</value>
+  </data>
 </root>
