@@ -26,7 +26,7 @@ public class SqlBuilder
 
         _keyPart = new StringBuilder();
         _sql = new StringBuilder();
-        _sql.Append($"CREATE TABLE `{tableName}` (");
+        _sql.Append($"CREATE TABLE IF NOT EXISTS `{tableName}` (");
 
 
         return this;
@@ -111,14 +111,14 @@ public class SqlBuilder
 
     public SqlBuilder AsKey()
     {
-        _keyPart.Append($"CREATE INDEX Idx_{_currentTableName}_{_currentColumnName} ON {_currentTableName} ({_currentColumnName});");
+        _keyPart.Append($"CREATE INDEX IF NOT EXISTS Idx_{_currentTableName}_{_currentColumnName} ON {_currentTableName} ({_currentColumnName});");
         return this;
     }
 
 
     public SqlBuilder AsUniqueKey()
     {
-        _keyPart.Append($"CREATE UNIQUE INDEX {_currentTableName}_{_currentColumnName} ON {_currentTableName} ({_currentColumnName});");
+        _keyPart.Append($"CREATE UNIQUE INDEX IF NOT EXISTS {_currentTableName}_{_currentColumnName} ON {_currentTableName} ({_currentColumnName});");
         return this;
     }
 
