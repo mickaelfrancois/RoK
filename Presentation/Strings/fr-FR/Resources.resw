@@ -874,7 +874,7 @@
     <value>Annuler</value>
   </data>
   <data name="notification_playlist_track_add" xml:space="preserve">
-    <value>Chansons ajoutée à la playlist</value>
+    <value>Chanson ajoutée à la playlist</value>
   </data>
   <data name="notification_playlist_track_add_error" xml:space="preserve">
     <value>Impossible d'ajouter la chanson dans la playlist</value>

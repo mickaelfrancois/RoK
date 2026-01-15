@@ -24,6 +24,7 @@ public partial class PlaylistMenuService : IPlaylistMenuService, IDisposable
         _resourceLoader = resourceManager;
         _logger = logger;
 
+        Messenger.Subscribe<PlaylistUpdatedMessage>(_ => OnPlaylistsChanged());
         Messenger.Subscribe<PlaylistCreatedMessage>(_ => OnPlaylistsChanged());
         Messenger.Subscribe<PlaylistNameUpdatedMessage>(_ => OnPlaylistsChanged());
         Messenger.Subscribe<PlaylistDeletedMessage>(_ => OnPlaylistsChanged());
