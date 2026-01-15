@@ -18,28 +18,28 @@ public static class MenuFlyoutExtensions
             "TrackId",
             typeof(long),
             typeof(MenuFlyoutExtensions),
-            new PropertyMetadata(0L));
+            new PropertyMetadata(0L, OnIdChanged));
 
     public static readonly DependencyProperty AlbumIdProperty =
         DependencyProperty.RegisterAttached(
         "AlbumId",
         typeof(long),
         typeof(MenuFlyoutExtensions),
-        new PropertyMetadata(0L));
+        new PropertyMetadata(0L, OnIdChanged));
 
     public static readonly DependencyProperty ArtistIdProperty =
         DependencyProperty.RegisterAttached(
         "ArtistId",
         typeof(long),
         typeof(MenuFlyoutExtensions),
-        new PropertyMetadata(0L));
+        new PropertyMetadata(0L, OnIdChanged));
 
     public static readonly DependencyProperty FlattenPlaylistMenuProperty =
         DependencyProperty.RegisterAttached(
             "FlattenPlaylistMenu",
             typeof(bool),
             typeof(MenuFlyoutExtensions),
-            new PropertyMetadata(false));
+            new PropertyMetadata(false, OnIdChanged));
 
     private static readonly DependencyProperty MenuItemClickHandlerProperty =
         DependencyProperty.RegisterAttached(
@@ -127,7 +127,18 @@ public static class MenuFlyoutExtensions
         if (e.NewValue is IPlaylistMenuService newService)
         {
             AddMenuFlyoutForService(newService, menuFlyout);
-            await UpdatePlaylistMenuItems(menuFlyout, newService).ConfigureAwait(false);
+            await UpdatePlaylistMenuItems(menuFlyout, newService);
+        }
+    }
+
+    private static void OnIdChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+    {
+        if (d is MenuFlyout menuFlyout && GetPlaylistMenuService(menuFlyout) is { } service)
+        {
+            if (menuFlyout.DispatcherQueue.HasThreadAccess)
+                _ = UpdatePlaylistMenuItems(menuFlyout, service);
+            else
+                menuFlyout.DispatcherQueue.TryEnqueue(() => _ = UpdatePlaylistMenuItems(menuFlyout, service));
         }
     }
 
@@ -268,6 +279,10 @@ public static class MenuFlyoutExtensions
 
         bool flatten = GetFlattenPlaylistMenu(menuFlyout);
 
+        long trackId = GetTrackId(menuFlyout);
+        long albumId = GetAlbumId(menuFlyout);
+        long artistId = GetArtistId(menuFlyout);
+
         if (!menuFlyout.Items.OfType<MenuFlyoutSeparator>().Any())
             menuFlyout.Items.Add(new MenuFlyoutSeparator { Tag = "AddToPlaylistSeparator" });
 
@@ -277,10 +292,6 @@ public static class MenuFlyoutExtensions
             Icon = new FontIcon { Glyph = "\uE710" },
             Tag = "AddToPlaylistSubMenu"
         };
-
-        long trackId = GetTrackId(menuFlyout);
-        long albumId = GetAlbumId(menuFlyout);
-        long artistId = GetArtistId(menuFlyout);
 
         if (playlists.Any())
         {

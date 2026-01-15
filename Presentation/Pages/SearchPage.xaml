@@ -259,7 +259,9 @@
                                     </Grid.ColumnDefinitions>
 
                                     <Grid.ContextFlyout>
-                                        <MenuFlyout ShowMode="TransientWithDismissOnPointerMoveAway">
+                                        <MenuFlyout ShowMode="TransientWithDismissOnPointerMoveAway"
+                                                    common:MenuFlyoutExtensions.PlaylistMenuService="{x:Bind PlaylistMenuService}"
+                                                    common:MenuFlyoutExtensions.TrackId="{x:Bind Track.Id, Mode=OneWay}">
                                             <MenuFlyoutItem x:Uid="trackFlyoutListen"
                                                             Icon="Play"
                                                             Command="{x:Bind ListenCommand}"
