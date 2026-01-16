@@ -120,6 +120,7 @@ public partial class PlaylistViewModel : ObservableObject
     public string GetSortGlyph(bool descending) => descending ? "\uE74B" : "\uE74A";
 
     public AsyncRelayCommand ListenCommand { get; private set; }
+    public RelayCommand ShufflePlaylistCommand { get; private set; }
     public AsyncRelayCommand GenerateCommand { get; private set; }
     public RelayCommand PlaylistOpenCommand { get; private set; }
     public AsyncRelayCommand DeleteCommand { get; private set; }
@@ -150,6 +151,7 @@ public partial class PlaylistViewModel : ObservableObject
         _logger = Guard.Against.Null(logger);
 
         ListenCommand = new AsyncRelayCommand(ListenAsync);
+        ShufflePlaylistCommand = new RelayCommand(ShuffleTracks);
         GenerateCommand = new AsyncRelayCommand(GenerateAsync);
         PlaylistOpenCommand = new RelayCommand(OpenPlaylist);
         DeleteCommand = new AsyncRelayCommand(DeletePlaylistAsync);
@@ -285,6 +287,14 @@ public partial class PlaylistViewModel : ObservableObject
             else
                 _navigationService.NavigateToPlaylist(Playlist.Id);
         }
+    }
+
+    public void ShuffleTracks()
+    {
+        if (Tracks.Count == 0)
+            return;
+
+        Tracks.Shuffle();
     }
 
     private async Task DeletePlaylistAsync()

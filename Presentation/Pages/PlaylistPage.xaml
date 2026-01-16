@@ -54,7 +54,12 @@
                                       Style="{StaticResource listenAppBarButtonStyle}"
                                       Command="{x:Bind ViewModel.ListenCommand}" />
 
-                        <AppBarButton x:Uid="playlistDelete"
+                        <AppBarButton x:Uid="shuffleButton"
+                                  Style="{StaticResource AppBarButtonCompactStyle}"
+                                  Icon="Shuffle"
+                                  Command="{x:Bind ViewModel.ShufflePlaylistCommand}" />
+
+                    <AppBarButton x:Uid="playlistDelete"
                                       Style="{StaticResource AppBarButtonCompactStyle}"
                                       Icon="Delete"
                                       Click="DeleteButton_Click" />
