@@ -17,6 +17,8 @@ public partial class PlaylistViewModel : ObservableObject
     private readonly PlaylistUpdateService _updateService;
     private readonly PlaylistGenerationService _generationService;
 
+    private List<TrackViewModel> _originalTracks = [];
+
     public PlaylistHeaderDto Playlist { get; private set; } = new();
     public RangeObservableCollection<TrackViewModel> Tracks { get; set; } = [];
 
@@ -37,40 +39,21 @@ public partial class PlaylistViewModel : ObservableObject
 
     public int TrackMaximum
     {
-        get
-        {
-            return Playlist.TrackMaximum;
-        }
-        set
-        {
-            Playlist.TrackMaximum = value;
-        }
+        get => Playlist.TrackMaximum;
+        set => Playlist.TrackMaximum = value;
     }
 
     public int TrackCount => Playlist.TrackCount;
 
-    public int ArtistCount
-    {
-        get
-        {
-            if (_tracks == null)
-                return 0;
-            return _tracks.DistinctBy(c => c.ArtistId).Count();
-        }
-    }
+    public int ArtistCount => _tracks?.DistinctBy(c => c.ArtistId).Count() ?? 0;
 
     public string SubTitle
     {
         get
         {
             string label = $"{TrackCount} ";
-            if (TrackCount > 1)
-                label += _resourceLoader.GetString("tracks");
-            else
-                label += _resourceLoader.GetString("track");
-
+            label += TrackCount > 1 ? _resourceLoader.GetString("tracks") : _resourceLoader.GetString("track");
             label += ", " + DurationTotalStr;
-
             return label;
         }
     }
@@ -106,6 +89,36 @@ public partial class PlaylistViewModel : ObservableObject
         }
     }
 
+    private string? _currentSortColumn;
+    public string? CurrentSortColumn
+    {
+        get => _currentSortColumn;
+        set
+        {
+            if (SetProperty(ref _currentSortColumn, value))
+            {
+                OnPropertyChanged(nameof(IsTitleSorted));
+                OnPropertyChanged(nameof(IsArtistSorted));
+                OnPropertyChanged(nameof(IsAlbumSorted));
+                OnPropertyChanged(nameof(IsScoreSorted));
+            }
+        }
+    }
+
+    private bool _sortDescending;
+    public bool SortDescending
+    {
+        get => _sortDescending;
+        set => SetProperty(ref _sortDescending, value);
+    }
+
+    public bool IsTitleSorted => CurrentSortColumn == "Title";
+    public bool IsArtistSorted => CurrentSortColumn == "Artist";
+    public bool IsAlbumSorted => CurrentSortColumn == "Album";
+    public bool IsScoreSorted => CurrentSortColumn == "Score";
+
+    public string GetSortGlyph(bool descending) => descending ? "\uE74B" : "\uE74A";
+
     public AsyncRelayCommand ListenCommand { get; private set; }
     public AsyncRelayCommand GenerateCommand { get; private set; }
     public RelayCommand PlaylistOpenCommand { get; private set; }
@@ -113,7 +126,7 @@ public partial class PlaylistViewModel : ObservableObject
     public AsyncRelayCommand<long> RemoveFromPlaylistCommand { get; private set; }
     public AsyncRelayCommand<List<PlaylistGroupDto>> SavePlaylistCommand { get; private set; }
     public AsyncRelayCommand MoveTrackCommand { get; private set; }
-
+    public RelayCommand<string> SortCommand { get; private set; }
 
     public PlaylistViewModel(
         IBackdropLoader backdropLoader,
@@ -143,13 +156,12 @@ public partial class PlaylistViewModel : ObservableObject
         RemoveFromPlaylistCommand = new AsyncRelayCommand<long>(RemoveTrackAsync);
         SavePlaylistCommand = new AsyncRelayCommand<List<PlaylistGroupDto>>((c) => SavePlaylistAsync(forceUpdate: true, c));
         MoveTrackCommand = new AsyncRelayCommand(async () => await MoveTrackAsync());
+        SortCommand = new RelayCommand<string>(SortTracks);
     }
-
 
     public void SetData(PlaylistHeaderDto playlist)
     {
         string oldPicture = Playlist.Picture;
-
         Playlist = Guard.Against.Null(playlist);
 
         if (oldPicture != Playlist.Picture)
@@ -163,8 +175,7 @@ public partial class PlaylistViewModel : ObservableObject
 
     public async Task LoadDataAsync(long playlistId)
     {
-        Stopwatch stopwatch = new();
-        stopwatch.Start();
+        Stopwatch stopwatch = Stopwatch.StartNew();
 
         await LoadPlaylistAsync(playlistId);
         await LoadTracksAsync(playlistId);
@@ -212,6 +223,7 @@ public partial class PlaylistViewModel : ObservableObject
         {
             List<TrackViewModel> tracks = await _dataLoader.LoadTracksAsync(playlistId);
             _tracks = tracks.Select(t => t.Track);
+            _originalTracks = tracks.ToList();
             Tracks.InitWithAddRange(tracks);
         }
     }
@@ -229,10 +241,7 @@ public partial class PlaylistViewModel : ObservableObject
 
     private async Task MoveTrackAsync()
     {
-        if (Tracks.Count == 0)
-            return;
-
-        if (Playlist.Id == 0)
+        if (Tracks.Count == 0 || Playlist.Id == 0)
             return;
 
         await _updateService.SaveTracksPositionAsync(Playlist.Id, Tracks.Select(c => c.Track.Id).ToList());
@@ -256,10 +265,11 @@ public partial class PlaylistViewModel : ObservableObject
 
     private async Task GenerateAsync()
     {
-        List<TrackDto> tracks = await _generationService.GenerateTracksAsync(Playlist);
+        await _generationService.GenerateTracksAsync(Playlist);
 
         List<TrackViewModel> trackViewModels = await _dataLoader.LoadTracksAsync(Playlist.Id);
         _tracks = trackViewModels.Select(t => t.Track);
+        _originalTracks = trackViewModels.ToList();
         Tracks.InitWithAddRange(trackViewModels);
 
         await SavePlaylistAsync();
@@ -301,7 +311,48 @@ public partial class PlaylistViewModel : ObservableObject
             if (track != null)
                 Tracks.Remove(track);
 
+            TrackViewModel? originalTrack = _originalTracks.FirstOrDefault(t => t.Track.Id == trackId);
+            if (originalTrack != null)
+                _originalTracks.Remove(originalTrack);
+
             _tracks = _tracks!.Where(t => t.Id != trackId).ToList();
         }
+    }
+
+    private void SortTracks(string? column)
+    {
+        if (string.IsNullOrEmpty(column))
+            return;
+
+        if (CurrentSortColumn == column)
+        {
+            if (!SortDescending)
+            {
+                SortDescending = true;
+            }
+            else
+            {
+                CurrentSortColumn = null;
+                SortDescending = false;
+                Tracks.InitWithAddRange(_originalTracks);
+                return;
+            }
+        }
+        else
+        {
+            CurrentSortColumn = column;
+            SortDescending = false;
+        }
+
+        IEnumerable<TrackViewModel> sorted = column switch
+        {
+            "Title" => SortDescending ? Tracks.OrderByDescending(t => t.Title) : Tracks.OrderBy(t => t.Title),
+            "Artist" => SortDescending ? Tracks.OrderByDescending(t => t.ArtistName) : Tracks.OrderBy(t => t.ArtistName),
+            "Album" => SortDescending ? Tracks.OrderByDescending(t => t.AlbumName) : Tracks.OrderBy(t => t.AlbumName),
+            "Score" => SortDescending ? Tracks.OrderByDescending(t => t.Score) : Tracks.OrderBy(t => t.Score),
+            _ => _originalTracks
+        };
+
+        Tracks.InitWithAddRange(sorted.ToList());
     }
 }

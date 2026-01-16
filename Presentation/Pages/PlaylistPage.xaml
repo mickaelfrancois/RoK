@@ -91,19 +91,70 @@
 
                 <TextBlock Text="#"
                            Grid.Column="0"
+                           HorizontalAlignment="Right"
+                           VerticalAlignment="Center"
+                           Margin="0,0,12,0"
                            Style="{StaticResource gridHeaderTracksText}" />
-                <TextBlock x:Uid="gridHeaderTitle"
-                           Grid.Column="1"
-                           Style="{StaticResource gridHeaderTracksText}" />
-                <TextBlock x:Uid="gridHeaderArtist"
-                           Grid.Column="2"
-                           Style="{StaticResource gridHeaderTracksText}" />
-                <TextBlock x:Uid="gridHeaderAlbum"
-                           Grid.Column="3"
-                           Style="{StaticResource gridHeaderTracksText}" />
-                <TextBlock x:Uid="gridHeaderScore"
-                           Grid.Column="4"
-                           Style="{StaticResource gridHeaderTracksText}" />
+
+                <HyperlinkButton Grid.Column="1"
+                                 Command="{x:Bind ViewModel.SortCommand}"
+                                 CommandParameter="Title"
+                                 Style="{StaticResource headerHyperlink}">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock x:Uid="gridHeaderTitle"
+                                   Style="{StaticResource gridHeaderTracksText}"
+                                   Margin="0" />
+                        <FontIcon Glyph="{x:Bind ViewModel.GetSortGlyph(ViewModel.SortDescending), Mode=OneWay}"
+                                  FontSize="12"
+                                  Margin="5,0,0,0"
+                                  Visibility="{x:Bind ViewModel.IsTitleSorted, Converter={StaticResource BoolToVisibilityConverter}, Mode=OneWay}" />
+                    </StackPanel>
+                </HyperlinkButton>
+
+                <HyperlinkButton Grid.Column="2"
+                                 Command="{x:Bind ViewModel.SortCommand}"
+                                 CommandParameter="Artist"
+                                 Style="{StaticResource headerHyperlink}">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock x:Uid="gridHeaderArtist"
+                                   Style="{StaticResource gridHeaderTracksText}"
+                                   Margin="0" />
+                        <FontIcon Glyph="{x:Bind ViewModel.GetSortGlyph(ViewModel.SortDescending), Mode=OneWay}"
+                                  FontSize="12"
+                                  Margin="5,0,0,0"
+                                  Visibility="{x:Bind ViewModel.IsArtistSorted, Converter={StaticResource BoolToVisibilityConverter}, Mode=OneWay}" />
+                    </StackPanel>
+                </HyperlinkButton>
+
+                <HyperlinkButton Grid.Column="3"
+                                 Command="{x:Bind ViewModel.SortCommand}"
+                                 CommandParameter="Album"
+                                 Style="{StaticResource headerHyperlink}">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock x:Uid="gridHeaderAlbum"
+                                   Style="{StaticResource gridHeaderTracksText}"
+                                   Margin="0" />
+                        <FontIcon Glyph="{x:Bind ViewModel.GetSortGlyph(ViewModel.SortDescending), Mode=OneWay}"
+                                  FontSize="12"
+                                  Margin="5,0,0,0"
+                                  Visibility="{x:Bind ViewModel.IsAlbumSorted, Converter={StaticResource BoolToVisibilityConverter}, Mode=OneWay}" />
+                    </StackPanel>
+                </HyperlinkButton>
+
+                <HyperlinkButton Grid.Column="4"
+                                 Command="{x:Bind ViewModel.SortCommand}"
+                                 CommandParameter="Score"
+                                 Style="{StaticResource headerHyperlink}">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock x:Uid="gridHeaderScore"
+                                   Style="{StaticResource gridHeaderTracksText}"
+                                   Margin="0" />
+                        <FontIcon Glyph="{x:Bind ViewModel.GetSortGlyph(ViewModel.SortDescending), Mode=OneWay}"
+                                  FontSize="12"
+                                  Margin="5,0,0,0"
+                                  Visibility="{x:Bind ViewModel.IsScoreSorted, Converter={StaticResource BoolToVisibilityConverter}, Mode=OneWay}" />
+                    </StackPanel>
+                </HyperlinkButton>
             </Grid>
 
             <common:ListViewExtended x:Name="tracksList"
