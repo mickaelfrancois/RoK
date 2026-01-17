@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using Microsoft.Data.Sqlite;
+using Microsoft.Extensions.Logging;
 
 namespace Rok.Infrastructure.Migration;
 
@@ -36,7 +37,18 @@ public class MigrationService(IDbConnection database, IEnumerable<IMigration>? m
     public void MigrateToLatest()
     {
         int current = GetDatabaseVersion();
-        IOrderedEnumerable<IMigration> pending = _migrations.Where(m => m.TargetVersion > current).OrderBy(m => m.TargetVersion);
+        List<IMigration> pending = _migrations.Where(m => m.TargetVersion > current)
+                                                            .OrderBy(m => m.TargetVersion)
+                                                            .ToList();
+
+        bool pendingMigrations = pending.Any();
+        if (pendingMigrations)
+        {
+            logger.LogInformation("Database migration started from version {Current} to {Target}", current, pending.Last().TargetVersion);
+            BackupDatabase();
+        }
+        else
+            logger.LogInformation("Database is up to date at version {Current}", current);
 
         foreach (IMigration? migration in pending)
         {
@@ -56,8 +68,34 @@ public class MigrationService(IDbConnection database, IEnumerable<IMigration>? m
                 throw;
             }
         }
+
+        if (pendingMigrations)
+            MaintainDatabase();
     }
 
+
+    private void MaintainDatabase()
+    {
+        _database.Execute("PRAGMA optimize;");
+        _database.Execute("VACUUM;");
+
+        object? result = _database.ExecuteScalar("PRAGMA integrity_check;");
+        if (result?.ToString() != "ok")
+            logger.LogWarning("Database integrity check failed: {Result}", result);
+    }
+
+    private void BackupDatabase()
+    {
+        if (_database is SqliteConnection sqliteConnection)
+        {
+            string backupFile = $"rok_{DateTime.Now:yyyyMMdd_HHmmss}.db";
+
+            logger.LogInformation("Creating database backup at {BackupFile}", backupFile);
+
+            using SqliteConnection destination = new($"Data Source={backupFile}");
+            sqliteConnection.BackupDatabase(destination);
+        }
+    }
 
     private void CreateTableGenres()
     {
