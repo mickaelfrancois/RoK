@@ -261,7 +261,7 @@ public partial class PlaylistViewModel : ObservableObject
 
         if (_tracks?.Any() == true)
         {
-            _playerService.LoadPlaylist(_tracks.ToList());
+            _playerService.LoadPlaylist(Tracks.Select(t => t.Track).ToList());
         }
     }
 
