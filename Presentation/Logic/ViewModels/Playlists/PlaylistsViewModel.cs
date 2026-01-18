@@ -15,8 +15,23 @@ public partial class PlaylistsViewModel : ObservableObject, IDisposable
 
     public RangeObservableCollection<PlaylistViewModel> SmartPlaylists { get; private set; } = [];
 
+    private bool _isGridView;
+    public bool IsGridView
+    {
+        get
+        {
+            return _isGridView;
+        }
+        private set
+        {
+            _isGridView = value;
+            OnPropertyChanged(nameof(IsGridView));
+        }
+    }
+
     public RelayCommand NewSmartPlaylistCommand { get; private set; }
     public RelayCommand NewPlaylistCommand { get; private set; }
+    public RelayCommand ToggleDisplayModeCommand { get; private set; }
 
     public PlaylistsViewModel(
         PlaylistsDataLoader dataLoader,
@@ -31,6 +46,7 @@ public partial class PlaylistsViewModel : ObservableObject, IDisposable
 
         NewSmartPlaylistCommand = new RelayCommand(async () => await NewSmartPlaylistAsync());
         NewPlaylistCommand = new RelayCommand(async () => await NewPlaylistAsync());
+        ToggleDisplayModeCommand = new RelayCommand(() => IsGridView = !IsGridView);
 
         SubscribeToMessages();
         SubscribeToEvents();
