@@ -14,6 +14,8 @@ public class AppOptions : IAppOptions
 
     public bool CrossFade { get; set; } = true;
 
+    public bool IsGridView { get; set; } = true;
+
     public bool HideArtistsWithoutAlbum { get; set; } = true;
 
     public bool RefreshLibraryAtStartup { get; set; } = true;

@@ -24,6 +24,11 @@ public abstract class ViewStateManager(IAppOptions appOptions)
 
     protected abstract void SaveGenreFilters(List<long> filters);
 
+    public void SaveGridView(bool isGridView) => AppOptions.IsGridView = isGridView;
+
+    public bool GetGridView() => AppOptions.IsGridView;
+
+
     public void Load()
     {
         string? storedGroupBy = GetStoredGroupBy();

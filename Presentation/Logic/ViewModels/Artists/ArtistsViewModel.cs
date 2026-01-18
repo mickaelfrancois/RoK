@@ -89,6 +89,7 @@ public partial class ArtistsViewModel : ObservableObject, IDisposable
         private set
         {
             _isGridView = value;
+            _stateManager.SaveGridView(value);
             OnPropertyChanged(nameof(IsGridView));
         }
     }
@@ -175,6 +176,8 @@ public partial class ArtistsViewModel : ObservableObject, IDisposable
 
     public async Task LoadDataAsync(bool forceReload)
     {
+        IsGridView = _stateManager.GetGridView();
+
         bool mustLoad = _libraryUpdated || forceReload || ViewModels.Count == 0;
         if (!mustLoad)
         {

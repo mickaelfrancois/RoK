@@ -12,6 +12,8 @@ public interface IAppOptions
 
     bool CrossFade { get; set; }
 
+    bool IsGridView { get; set; }
+
     bool HideArtistsWithoutAlbum { get; set; }
 
     bool RefreshLibraryAtStartup { get; set; }

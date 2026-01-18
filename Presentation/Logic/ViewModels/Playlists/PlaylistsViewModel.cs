@@ -10,6 +10,7 @@ public partial class PlaylistsViewModel : ObservableObject, IDisposable
     private readonly PlaylistsDataLoader _dataLoader;
     private readonly PlaylistCreationService _creationService;
     private readonly PlaylistUpdateMessageHandler _updateHandler;
+    private readonly IAppOptions _appOptions;
 
     public RangeObservableCollection<PlaylistViewModel> Playlists { get; private set; } = [];
 
@@ -25,6 +26,7 @@ public partial class PlaylistsViewModel : ObservableObject, IDisposable
         private set
         {
             _isGridView = value;
+            _appOptions.IsGridView = value;
             OnPropertyChanged(nameof(IsGridView));
         }
     }
@@ -37,11 +39,13 @@ public partial class PlaylistsViewModel : ObservableObject, IDisposable
         PlaylistsDataLoader dataLoader,
         PlaylistCreationService creationService,
         PlaylistUpdateMessageHandler updateHandler,
+        IAppOptions appOptions,
         ILogger<PlaylistsViewModel> logger)
     {
         _dataLoader = Guard.Against.Null(dataLoader);
         _creationService = Guard.Against.Null(creationService);
         _updateHandler = Guard.Against.Null(updateHandler);
+        _appOptions = Guard.Against.Null(appOptions);
         _logger = Guard.Against.Null(logger);
 
         NewSmartPlaylistCommand = new RelayCommand(async () => await NewSmartPlaylistAsync());
@@ -70,6 +74,8 @@ public partial class PlaylistsViewModel : ObservableObject, IDisposable
 
     public async Task LoadDataAsync(bool forceReload)
     {
+        IsGridView = _appOptions.IsGridView;
+
         bool mustLoad = forceReload || _dataLoader.ViewModels.Count == 0;
         if (!mustLoad)
         {

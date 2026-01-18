@@ -87,6 +87,7 @@ public partial class AlbumsViewModel : ObservableObject, IDisposable
         private set
         {
             _isGridView = value;
+            _stateManager.SaveGridView(value);
             OnPropertyChanged(nameof(IsGridView));
         }
     }
@@ -127,6 +128,8 @@ public partial class AlbumsViewModel : ObservableObject, IDisposable
         ListenGroupCommand = new AsyncRelayCommand<AlbumsGroupCategoryViewModel>(ListenGroupAsync);
         ListenCommand = new AsyncRelayCommand(ListenAsync);
         ToggleDisplayModeCommand = new RelayCommand(() => IsGridView = !IsGridView);
+
+        IsGridView = _stateManager.GetGridView();
 
         SubscribeToMessages();
         SubscribeToEvents();
@@ -170,6 +173,8 @@ public partial class AlbumsViewModel : ObservableObject, IDisposable
 
     public async Task LoadDataAsync(bool forceReload)
     {
+        IsGridView = _stateManager.GetGridView();
+
         bool mustLoad = _libraryUpdated || forceReload || ViewModels.Count == 0;
         if (!mustLoad)
         {
