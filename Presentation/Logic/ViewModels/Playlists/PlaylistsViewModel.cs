@@ -15,7 +15,7 @@ public partial class PlaylistsViewModel : ObservableObject, IDisposable
 
     public RangeObservableCollection<PlaylistViewModel> SmartPlaylists { get; private set; } = [];
 
-    private bool _isGridView;
+    private bool _isGridView = true;
     public bool IsGridView
     {
         get
