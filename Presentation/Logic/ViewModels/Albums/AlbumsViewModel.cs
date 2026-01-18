@@ -77,7 +77,7 @@ public partial class AlbumsViewModel : ObservableObject, IDisposable
         }
     }
 
-    private bool _isGridView;
+    private bool _isGridView = true;
     public bool IsGridView
     {
         get

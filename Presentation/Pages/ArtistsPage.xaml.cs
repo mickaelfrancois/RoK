@@ -1,9 +1,10 @@
+using System.ComponentModel;
+using System.Threading;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Navigation;
 using Rok.Commons;
 using Rok.Logic.ViewModels.Artists;
-using System.ComponentModel;
-using System.Threading;
+using Rok.Logic.ViewModels.Playlists;
 
 namespace Rok.Pages;
 
@@ -23,7 +24,6 @@ public sealed partial class ArtistsPage : Page, IDisposable
         this.InitializeComponent();
 
         _logger = App.ServiceProvider.GetRequiredService<ILogger<ArtistsPage>>();
-
         ViewModel = App.ServiceProvider.GetRequiredService<ArtistsViewModel>();
         DataContext = ViewModel;
 
@@ -35,6 +35,8 @@ public sealed partial class ArtistsPage : Page, IDisposable
     protected override async void OnNavigatedTo(NavigationEventArgs e)
     {
         await ViewModel.LoadDataAsync(forceReload: false);
+        UpdateVisualState();
+
         base.OnNavigatedTo(e);
     }
 
@@ -59,6 +61,12 @@ public sealed partial class ArtistsPage : Page, IDisposable
 
     private void ViewModel_PropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
+        if (e.PropertyName == nameof(PlaylistsViewModel.IsGridView))
+        {
+            UpdateVisualState();
+            return;
+        }
+
         if (e.PropertyName == nameof(ViewModel.IsGroupingEnabled))
         {
             if (!ViewModel.IsGroupingEnabled && !GridZoom.IsZoomedInViewActive)
@@ -112,6 +120,12 @@ public sealed partial class ArtistsPage : Page, IDisposable
     {
         _groupByMenuBuilder.PopulateGroupByMenu(groupByMenu, ViewModel);
     }
+
+    private void UpdateVisualState()
+    {
+        VisualStateManager.GoToState(this, ViewModel.IsGridView ? "GridViewState" : "ListViewState", true);
+    }
+
 
     public void Dispose()
     {
