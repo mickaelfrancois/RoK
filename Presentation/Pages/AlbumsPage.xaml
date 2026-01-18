@@ -24,7 +24,7 @@
         </Grid.RowDefinitions>
 
         <!-- Actions menu -->
-        <CommandBar Grid.Row="0"
+        <CommandBar Grid.Row="0"                                        
                     Style="{StaticResource headerListCommandBar}">
             <CommandBar.Content>
                 <StackPanel Orientation="Horizontal"
@@ -106,6 +106,12 @@
                     </SplitButton>
                 </StackPanel>
             </CommandBar.Content>
+
+            <AppBarSeparator />
+
+            <AppBarToggleButton Icon="{x:Bind ViewModel.IsGridView, Mode=OneWay, Converter={StaticResource GridListIconConverter}}"
+                                Command="{x:Bind ViewModel.ToggleDisplayModeCommand}"
+                                IsChecked="{x:Bind ViewModel.IsGridView, Mode=OneWay}" />
         </CommandBar>
 
         <!-- Main content-->
@@ -132,6 +138,7 @@
                                              IsMultiSelectCheckBoxEnabled="{x:Bind ViewModel.IsSelectedItems, Mode=OneWay}"
                                              IsItemClickEnabled="True"
                                              Margin="0"
+                                             Visibility="{x:Bind ViewModel.IsGridView, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}"
                                              ScrollViewer.VerticalScrollMode="Enabled"
                                              ScrollViewer.VerticalScrollBarVisibility="Auto">
 
