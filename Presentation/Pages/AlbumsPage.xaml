@@ -8,6 +8,7 @@
       xmlns:common="using:Rok.Commons"
       xmlns:albums="using:Rok.Logic.ViewModels.Albums"
       xmlns:genre="using:Rok.Application.Dto"
+      xmlns:converters="using:Rok.Converters"
       x:Name="albumsView"
       mc:Ignorable="d">
 
@@ -15,27 +16,210 @@
         <CollectionViewSource x:Name="groupedItemsViewSource"
                               IsSourceGrouped="True"
                               ItemsPath="Items" />
+
+        <ItemsPanelTemplate x:Key="AlbumGridPanel">
+            <ItemsWrapGrid Orientation="Horizontal"
+                           ItemHeight="310"
+                           ItemWidth="310"
+                           Margin="0,0,2,2" />
+        </ItemsPanelTemplate>
+
+        <ItemsPanelTemplate x:Key="AlbumListPanel">
+            <ItemsStackPanel Orientation="Vertical" />
+        </ItemsPanelTemplate>
+
+        <Style x:Key="AlbumListItemStyle"
+               TargetType="GridViewItem">
+            <Setter Property="HorizontalContentAlignment"
+                    Value="Stretch" />
+            <Setter Property="Margin"
+                    Value="0,0,0,1" />
+        </Style>
+
+        <DataTemplate x:Key="AlbumGridTemplate"
+                      x:DataType="albums:AlbumViewModel">
+            <Grid Style="{StaticResource MainGridCoverStyle}"
+                  PointerEntered="gridBottom_PointerEntered"
+                  PointerExited="gridBottom_PointerExited"
+                  Background="Transparent">
+                <Grid.Resources>
+                    <Storyboard x:Key="ShowArtistNameStoryboard">
+                        <DoubleAnimation Storyboard.TargetName="artistName"
+                                         Storyboard.TargetProperty="Opacity"
+                                         To="1"
+                                         Duration="0:0:0.6" />
+                        <DoubleAnimation Storyboard.TargetName="subTitle"
+                                         Storyboard.TargetProperty="Opacity"
+                                         To="0"
+                                         Duration="0:0:0.5" />
+                    </Storyboard>
+                    <Storyboard x:Key="ShowSubTitleStoryboard">
+                        <DoubleAnimation Storyboard.TargetName="artistName"
+                                         Storyboard.TargetProperty="Opacity"
+                                         To="0"
+                                         Duration="0:0:0.6" />
+                        <DoubleAnimation Storyboard.TargetName="subTitle"
+                                         Storyboard.TargetProperty="Opacity"
+                                         To="1"
+                                         Duration="0:0:0.2" />
+                    </Storyboard>
+                </Grid.Resources>
+                <Border CornerRadius="10">
+                    <common:PictureControl Style="{StaticResource PictureCoverStyle}"
+                                           Cover="{x:Bind Picture, Mode=OneWay}"
+                                           x:Phase="2"
+                                           PlayButtonVisibility="Visible"
+                                           Command="{x:Bind ListenCommand}" />
+                </Border>
+                <Grid x:Name="gridBottom"
+                      Style="{StaticResource GridCoverBottomStyle}">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="{ThemeResource gridListFirstRowHeight}" />
+                        <RowDefinition Height="{ThemeResource gridListSecondRowHeight}" />
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition />
+                        <ColumnDefinition Width="50" />
+                    </Grid.ColumnDefinitions>
+                    <HyperlinkButton Grid.ColumnSpan="2"
+                                     Content="{x:Bind Album.Name}"
+                                     x:Phase="0"
+                                     Command="{x:Bind AlbumOpenCommand}"
+                                     Style="{StaticResource GridCoverBottomFirstLineStyle}" />
+                    <TextBlock x:Name="subTitle"
+                               Grid.Row="1"
+                               Style="{StaticResource GridCoverBottomSecondLineStyle}"
+                               Text="{x:Bind SubTitle, Mode=OneWay}"
+                               Opacity="1"
+                               x:Phase="1" />
+                    <HyperlinkButton x:Name="artistName"
+                                     Grid.Row="1"
+                                     Style="{StaticResource GridCoverBottomArtistLineStyle}"
+                                     Content="{x:Bind Album.ArtistName, Mode=OneWay}"
+                                     Command="{x:Bind ArtistOpenCommand}"
+                                     Opacity="0"
+                                     x:Phase="1" />
+                    <common:AnimatedButton Grid.Row="1"
+                                           Grid.Column="1"
+                                           HorizontalAlignment="Right"
+                                           VerticalAlignment="Stretch"
+                                           Margin="-15,0,0,0"
+                                           Icon="{StaticResource HeartPath}"
+                                           Color="{x:Bind IsFavorite, Converter={StaticResource FavoriteToColorConverter}, Mode=OneWay}"
+                                           Command="{x:Bind AlbumFavoriteCommand}"
+                                           CommandParameter="{x:Bind IsFavorite, Converter={StaticResource BoolToInvertBoolConverter}, Mode=OneWay}" />
+                </Grid>
+            </Grid>
+        </DataTemplate>
+
+        <DataTemplate x:Key="AlbumListTemplate"
+                      x:DataType="albums:AlbumViewModel">
+            <Grid Padding="12,4"
+                  HorizontalAlignment="Stretch"
+                  Background="Transparent"
+                  PointerEntered="gridBottom_PointerEntered"
+                  PointerExited="gridBottom_PointerExited">
+                <Grid.Resources>
+                    <Storyboard x:Key="ShowArtistNameStoryboard">
+                        <DoubleAnimation Storyboard.TargetName="artistName"
+                                         Storyboard.TargetProperty="Opacity"
+                                         To="1"
+                                         Duration="0:0:0.4" />
+                        <DoubleAnimation Storyboard.TargetName="subTitle"
+                                         Storyboard.TargetProperty="Opacity"
+                                         To="0"
+                                         Duration="0:0:0.3" />
+                    </Storyboard>
+                    <Storyboard x:Key="ShowSubTitleStoryboard">
+                        <DoubleAnimation Storyboard.TargetName="artistName"
+                                         Storyboard.TargetProperty="Opacity"
+                                         To="0"
+                                         Duration="0:0:0.4" />
+                        <DoubleAnimation Storyboard.TargetName="subTitle"
+                                         Storyboard.TargetProperty="Opacity"
+                                         To="1"
+                                         Duration="0:0:0.2" />
+                    </Storyboard>
+                </Grid.Resources>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="56" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="50" />
+                </Grid.ColumnDefinitions>
+                <Border CornerRadius="8"
+                        Width="48"
+                        Height="48"
+                        VerticalAlignment="Center">
+                    <common:PictureControl Cover="{x:Bind Picture, Mode=OneWay}"
+                                           PlayButtonVisibility="Visible"
+                                           Command="{x:Bind ListenCommand}" />
+                </Border>
+                <StackPanel Grid.Column="1"
+                            VerticalAlignment="Center"
+                            Margin="12,0,0,0">
+                    <HyperlinkButton Content="{x:Bind Album.Name}"
+                                     Command="{x:Bind AlbumOpenCommand}"
+                                     Style="{StaticResource HyperlinkSmallButtonStyle}"
+                                     FontSize="15"
+                                     FontWeight="SemiBold"
+                                     Padding="0" />
+                    <Grid Height="20">
+                        <TextBlock x:Name="subTitle"
+                                   Text="{x:Bind SubTitle, Mode=OneWay}"
+                                   Style="{StaticResource CaptionTextBlockStyle}"
+                                   VerticalAlignment="Center" />
+                        <HyperlinkButton x:Name="artistName"
+                                         Content="{x:Bind Album.ArtistName, Mode=OneWay}"
+                                         Command="{x:Bind ArtistOpenCommand}"
+                                         Style="{StaticResource HyperlinkSmallButtonStyle}"
+                                         FontSize="12"
+                                         Opacity="0"
+                                         VerticalAlignment="Center"
+                                         Padding="0" />
+                    </Grid>
+                </StackPanel>
+                <common:AnimatedButton Grid.Column="2"
+                                       HorizontalAlignment="Right"
+                                       VerticalAlignment="Center"
+                                       Icon="{StaticResource HeartPath}"
+                                       Color="{x:Bind IsFavorite, Converter={StaticResource FavoriteToColorConverter}, Mode=OneWay}"
+                                       Command="{x:Bind AlbumFavoriteCommand}"
+                                       CommandParameter="{x:Bind IsFavorite, Converter={StaticResource BoolToInvertBoolConverter}, Mode=OneWay}" />
+            </Grid>
+        </DataTemplate>
     </Page.Resources>
 
     <Grid>
+        <VisualStateManager.VisualStateGroups>
+            <VisualStateGroup x:Name="DisplayModes">
+                <VisualState x:Name="GridViewState" />
+                <VisualState x:Name="ListViewState">
+                    <VisualState.Setters>
+                        <Setter Target="grid.ItemTemplate"
+                                Value="{StaticResource AlbumListTemplate}" />
+                        <Setter Target="grid.ItemsPanel"
+                                Value="{StaticResource AlbumListPanel}" />
+                        <Setter Target="grid.ItemContainerStyle"
+                                Value="{StaticResource AlbumListItemStyle}" />
+                    </VisualState.Setters>
+                </VisualState>
+            </VisualStateGroup>
+        </VisualStateManager.VisualStateGroups>
+
         <Grid.RowDefinitions>
-            <RowDefinition Height="{ThemeResource headerListRowHeight}"></RowDefinition>
+            <RowDefinition Height="{ThemeResource headerListRowHeight}" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
-        <!-- Actions menu -->
         <CommandBar Grid.Row="0"
                     Style="{StaticResource headerListCommandBar}">
             <CommandBar.Content>
                 <StackPanel Orientation="Horizontal"
                             HorizontalAlignment="Left"
                             Spacing="8">
-
                     <AppBarButton x:Uid="artistViewListen"
                                   Style="{StaticResource listenAppBarButtonCompactStyle}"
                                   Command="{x:Bind ViewModel.ListenCommand}" />
-
-                    <!-- Sort -->
                     <SplitButton VerticalAlignment="Center">
                         <SplitButton.Content>
                             <StackPanel Orientation="Horizontal"
@@ -43,17 +227,13 @@
                                         VerticalAlignment="Center"
                                         AutomationProperties.Name="{x:Bind ViewModel.GroupByText, Mode=OneWay}"
                                         ToolTipService.ToolTip="{x:Bind ViewModel.GroupByText, Mode=OneWay}">
-
                                 <FontIcon Glyph="&#xE8CB;"
                                           FontSize="{ThemeResource ControlContentThemeFontSize}"
                                           VerticalAlignment="Center" />
-
                                 <TextBlock x:Uid="artistsViewGroupBy"
                                            Style="{StaticResource BodyTextBlockStyle}"
                                            VerticalAlignment="Center"
-                                           Margin="0,0,2,0"
-                                           TextTrimming="CharacterEllipsis" />
-
+                                           Margin="0,0,2,0" />
                                 <TextBlock Text="{x:Bind ViewModel.GroupByText, Mode=OneWay}"
                                            Style="{StaticResource BodyTextBlockStyle}"
                                            VerticalAlignment="Center"
@@ -68,8 +248,6 @@
                                         Opened="GroupByFlyout_Opened" />
                         </SplitButton.Flyout>
                     </SplitButton>
-
-                    <!-- Filter -->
                     <SplitButton x:Name="buttonFilter"
                                  VerticalAlignment="Center">
                         <SplitButton.Content>
@@ -78,17 +256,13 @@
                                         VerticalAlignment="Center"
                                         AutomationProperties.Name="{x:Bind ViewModel.FilterByText, Mode=OneWay}"
                                         ToolTipService.ToolTip="{x:Bind ViewModel.FilterByText, Mode=OneWay}">
-
                                 <FontIcon Glyph="&#xE71C;"
                                           FontSize="{ThemeResource ControlContentThemeFontSize}"
                                           VerticalAlignment="Center" />
-
                                 <TextBlock x:Uid="artistsViewFilterBy"
                                            Style="{StaticResource BodyTextBlockStyle}"
                                            VerticalAlignment="Center"
-                                           Margin="0,0,2,0"
-                                           TextTrimming="CharacterEllipsis" />
-
+                                           Margin="0,0,2,0" />
                                 <TextBlock Text="{x:Bind ViewModel.FilterByText, Mode=OneWay}"
                                            Style="{StaticResource BodyTextBlockStyle}"
                                            VerticalAlignment="Center"
@@ -100,15 +274,17 @@
                             <MenuFlyout x:Name="filterMenu"
                                         ShowMode="TransientWithDismissOnPointerMoveAway"
                                         Placement="RightEdgeAlignedBottom"
-                                        Opened="FilterFlyout_Opened">
-                            </MenuFlyout>
+                                        Opened="FilterFlyout_Opened" />
                         </SplitButton.Flyout>
                     </SplitButton>
                 </StackPanel>
             </CommandBar.Content>
+            <AppBarSeparator />
+            <AppBarToggleButton Icon="{x:Bind ViewModel.IsGridView, Mode=OneWay, Converter={StaticResource GridListIconConverter}}"
+                                Command="{x:Bind ViewModel.ToggleDisplayModeCommand}"
+                                IsChecked="{x:Bind ViewModel.IsGridView, Mode=OneWay}" />
         </CommandBar>
 
-        <!-- Main content-->
         <Grid Grid.Row="1"
               Style="{StaticResource gridList}">
             <Grid.Background>
@@ -128,122 +304,28 @@
                     <common:GridViewExtended x:Name="grid"
                                              ContainerContentChanging="GridContainerContentChanging"
                                              BindableSelectedItems="{x:Bind ViewModel.Selected, Mode=OneWay}"
+                                             ItemsSource="{x:Bind groupedItemsViewSource.View, Mode=OneWay}"
+                                             ItemTemplate="{StaticResource AlbumGridTemplate}"
+                                             ItemsPanel="{StaticResource AlbumGridPanel}"
                                              SelectionMode="Multiple"
                                              IsMultiSelectCheckBoxEnabled="{x:Bind ViewModel.IsSelectedItems, Mode=OneWay}"
                                              IsItemClickEnabled="True"
                                              Margin="0"
                                              ScrollViewer.VerticalScrollMode="Enabled"
                                              ScrollViewer.VerticalScrollBarVisibility="Auto">
-
-                        <GridView.ItemTemplate>
-                            <DataTemplate x:DataType="albums:AlbumViewModel">
-                                <Grid Style="{StaticResource MainGridCoverStyle}"
-                                      PointerEntered="gridBottom_PointerEntered"
-                                      PointerExited="gridBottom_PointerExited">
-
-                                    <Grid.Resources>
-                                        <Storyboard x:Key="ShowArtistNameStoryboard">
-                                            <DoubleAnimation Storyboard.TargetName="artistName"
-                                                             Storyboard.TargetProperty="Opacity"
-                                                             To="1"
-                                                             Duration="0:0:0.6" />
-                                            <DoubleAnimation Storyboard.TargetName="subTitle"
-                                                             Storyboard.TargetProperty="Opacity"
-                                                             To="0"
-                                                             Duration="0:0:0.5" />
-                                        </Storyboard>
-                                        <Storyboard x:Key="ShowSubTitleStoryboard">
-                                            <DoubleAnimation Storyboard.TargetName="artistName"
-                                                             Storyboard.TargetProperty="Opacity"
-                                                             To="0"
-                                                             Duration="0:0:0.6" />
-                                            <DoubleAnimation Storyboard.TargetName="subTitle"
-                                                             Storyboard.TargetProperty="Opacity"
-                                                             To="1"
-                                                             Duration="0:0:0.2" />
-                                        </Storyboard>
-                                    </Grid.Resources>
-
-                                    <Border CornerRadius="10">
-                                        <common:PictureControl Style="{StaticResource PictureCoverStyle}"
-                                                               Cover="{x:Bind Picture, Mode=OneWay}"
-                                                               x:Phase="2"
-                                                               PlayButtonVisibility="Visible"
-                                                               Command="{x:Bind ListenCommand}" />
-                                    </Border>
-
-                                    <Grid x:Name="gridBottom"
-                                          Style="{StaticResource GridCoverBottomStyle}">
-                                        <Grid.RowDefinitions>
-                                            <RowDefinition Height="{ThemeResource gridListFirstRowHeight}" />
-                                            <RowDefinition Height="{ThemeResource gridListSecondRowHeight}" />
-                                        </Grid.RowDefinitions>
-
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition></ColumnDefinition>
-                                            <ColumnDefinition Width="50"></ColumnDefinition>
-                                        </Grid.ColumnDefinitions>
-
-                                        <HyperlinkButton Grid.ColumnSpan="2"
-                                                         Content="{x:Bind Album.Name}"
-                                                         x:Phase="0"
-                                                         Command="{x:Bind AlbumOpenCommand}"
-                                                         Style="{StaticResource GridCoverBottomFirstLineStyle}" />
-
-                                        <TextBlock x:Name="subTitle"
-                                                   Grid.Row="1"
-                                                   Style="{StaticResource GridCoverBottomSecondLineStyle}"
-                                                   Text="{x:Bind SubTitle, Mode=OneWay}"
-                                                   Opacity="1"
-                                                   x:Phase="1" />
-
-                                        <HyperlinkButton x:Name="artistName"
-                                                         Grid.Row="1"
-                                                         Style="{StaticResource GridCoverBottomArtistLineStyle}"
-                                                         Content="{x:Bind Album.ArtistName, Mode=OneWay}"
-                                                         Command="{x:Bind ArtistOpenCommand}"
-                                                         Opacity="0"
-                                                         x:Phase="1" />
-
-                                        <common:AnimatedButton Grid.Row="1"
-                                                               Grid.Column="1"
-                                                               HorizontalAlignment="Right"
-                                                               VerticalAlignment="Stretch"
-                                                               Margin="-15,0,0,0"
-                                                               Icon="{StaticResource HeartPath}"
-                                                               Color="{x:Bind IsFavorite, Converter={StaticResource FavoriteToColorConverter}, Mode=OneWay}"
-                                                               Command="{x:Bind AlbumFavoriteCommand}"
-                                                               CommandParameter="{x:Bind IsFavorite, Converter={StaticResource BoolToInvertBoolConverter}, Mode=OneWay}" />
-                                    </Grid>
-                                </Grid>
-                            </DataTemplate>
-                        </GridView.ItemTemplate>
-
-                        <GridView.ItemsPanel>
-                            <ItemsPanelTemplate>
-                                <ItemsWrapGrid Orientation="Horizontal"
-                                               ItemHeight="310"
-                                               ItemWidth="310"
-                                               Margin="0,0,2,2"></ItemsWrapGrid>
-                            </ItemsPanelTemplate>
-                        </GridView.ItemsPanel>
-
                         <GridView.GroupStyle>
                             <GroupStyle HidesIfEmpty="True">
                                 <GroupStyle.HeaderTemplate>
                                     <DataTemplate x:DataType="albums:AlbumsGroupCategoryViewModel">
-                                        <StackPanel Orientation="Horizontal"
-                                                    Visibility="Visible">
+                                        <StackPanel Orientation="Horizontal">
                                             <HyperlinkButton Content="{x:Bind Title}"
-                                                             Style="{StaticResource HyperlinkGroupButtonStyle}"></HyperlinkButton>
+                                                             Style="{StaticResource HyperlinkGroupButtonStyle}" />
                                             <Button Margin="10,0,0,0"
                                                     Command="{Binding ElementName=albumsView, Path=DataContext.ListenGroupCommand}"
                                                     CommandParameter="{x:Bind}"
                                                     VerticalAlignment="Center"
                                                     Tapped="GroupButton_Tapped">
-
-                                                <StackPanel Orientation="Horizontal"
-                                                            VerticalAlignment="Top">
+                                                <StackPanel Orientation="Horizontal">
                                                     <FontIcon Glyph="&#xEE4A;"
                                                               Margin="0,0,6,0"
                                                               FontSize="{ThemeResource ControlContentThemeFontSize}"
@@ -254,7 +336,6 @@
                                         </StackPanel>
                                     </DataTemplate>
                                 </GroupStyle.HeaderTemplate>
-
                                 <GroupStyle.Panel>
                                     <ItemsPanelTemplate>
                                         <VariableSizedWrapGrid Orientation="Vertical"
@@ -269,7 +350,6 @@
                 <SemanticZoom.ZoomedOutView>
                     <GridView x:Name="ZoomoutCollectionGrid"
                               VerticalAlignment="Center">
-
                         <GridView.ItemTemplate>
                             <DataTemplate>
                                 <TextBlock HorizontalAlignment="Center"
@@ -277,12 +357,11 @@
                                            Text="{Binding Group.Title}" />
                             </DataTemplate>
                         </GridView.ItemTemplate>
-
                         <GridView.ItemsPanel>
                             <ItemsPanelTemplate>
                                 <WrapGrid Orientation="Horizontal"
                                           VerticalChildrenAlignment="Center"
-                                          MaximumRowsOrColumns="4"></WrapGrid>
+                                          MaximumRowsOrColumns="4" />
                             </ItemsPanelTemplate>
                         </GridView.ItemsPanel>
                     </GridView>

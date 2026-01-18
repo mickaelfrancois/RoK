@@ -77,11 +77,26 @@ public partial class AlbumsViewModel : ObservableObject, IDisposable
         }
     }
 
+    private bool _isGridView;
+    public bool IsGridView
+    {
+        get
+        {
+            return _isGridView;
+        }
+        private set
+        {
+            _isGridView = value;
+            OnPropertyChanged(nameof(IsGridView));
+        }
+    }
+
     public RelayCommand<long?> FilterByGenreCommand { get; private set; }
     public RelayCommand<string> FilterByCommand { get; private set; }
     public RelayCommand<string> GroupByCommand { get; private set; }
     public AsyncRelayCommand ListenCommand { get; private set; }
     public AsyncRelayCommand<AlbumsGroupCategoryViewModel> ListenGroupCommand { get; private set; }
+    public RelayCommand ToggleDisplayModeCommand { get; private set; }
 
     public AlbumsViewModel(
         AlbumsFilter albumsFilter,
@@ -111,6 +126,7 @@ public partial class AlbumsViewModel : ObservableObject, IDisposable
         FilterByGenreCommand = new RelayCommand<long?>(FilterByGenreId);
         ListenGroupCommand = new AsyncRelayCommand<AlbumsGroupCategoryViewModel>(ListenGroupAsync);
         ListenCommand = new AsyncRelayCommand(ListenAsync);
+        ToggleDisplayModeCommand = new RelayCommand(() => IsGridView = !IsGridView);
 
         SubscribeToMessages();
         SubscribeToEvents();
