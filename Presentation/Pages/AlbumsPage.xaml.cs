@@ -1,11 +1,12 @@
-﻿using Microsoft.UI.Xaml.Controls;
+﻿using System.ComponentModel;
+using System.Threading;
+using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media.Animation;
 using Microsoft.UI.Xaml.Navigation;
 using Rok.Commons;
 using Rok.Logic.ViewModels.Albums;
-using System.ComponentModel;
-using System.Threading;
+using Rok.Logic.ViewModels.Playlists;
 
 namespace Rok.Pages;
 
@@ -36,6 +37,8 @@ public sealed partial class AlbumsPage : Page, IDisposable
     protected override async void OnNavigatedTo(NavigationEventArgs e)
     {
         await ViewModel.LoadDataAsync(forceReload: false);
+        UpdateVisualState();
+
         base.OnNavigatedTo(e);
     }
 
@@ -60,6 +63,12 @@ public sealed partial class AlbumsPage : Page, IDisposable
 
     private void ViewModel_PropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
+        if (e.PropertyName == nameof(PlaylistsViewModel.IsGridView))
+        {
+            UpdateVisualState();
+            return;
+        }
+
         if (e.PropertyName == nameof(ViewModel.IsGroupingEnabled))
         {
             if (!ViewModel.IsGroupingEnabled && !GridZoom.IsZoomedInViewActive)
@@ -135,6 +144,11 @@ public sealed partial class AlbumsPage : Page, IDisposable
             Storyboard? showSubTitleStoryboard = gridItem.Resources["ShowSubTitleStoryboard"] as Storyboard;
             showSubTitleStoryboard?.Begin();
         }
+    }
+
+    private void UpdateVisualState()
+    {
+        VisualStateManager.GoToState(this, ViewModel.IsGridView ? "GridViewState" : "ListViewState", true);
     }
 
 
