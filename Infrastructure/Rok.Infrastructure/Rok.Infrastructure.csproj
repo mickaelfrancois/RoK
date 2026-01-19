@@ -3,17 +3,17 @@
 	<PropertyGroup>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
-		<TargetFramework>net9.0-windows10.0.26100.0</TargetFramework>
+		<TargetFramework>net10.0-windows10.0.26100.0</TargetFramework>
 		<EnableWindowsTargeting>true</EnableWindowsTargeting>
 	</PropertyGroup>
 
 	<ItemGroup>
 		<PackageReference Include="Dapper" Version="2.1.66" />
 		<PackageReference Include="DiscordRichPresence" Version="1.6.1.70" />
-		<PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="10.0.1" />
-		<PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="10.0.1" />
-		<PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.1" />
-		<PackageReference Include="Microsoft.Extensions.Logging" Version="10.0.1" />
+		<PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="10.0.2" />
+		<PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="10.0.2" />
+		<PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.2" />
+		<PackageReference Include="Microsoft.Extensions.Logging" Version="10.0.2" />
 		<PackageReference Include="MiF.Guard" Version="1.0.0" />
 		<PackageReference Include="MiF.Messenger" Version="1.0.0" />
 		<PackageReference Include="Serilog.Extensions.Logging" Version="10.0.0" />
