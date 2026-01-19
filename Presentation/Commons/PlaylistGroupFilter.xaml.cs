@@ -42,9 +42,9 @@ public sealed partial class PlaylistGroupFilter : UserControl
             cbEntities.SelectedItem = ((IEnumerable<EntityOption>)cbEntities.ItemsSource).FirstOrDefault(f => f.Key == value.Entity);
 
             LoadFieldsList(value.Entity);
-            FieldOption field = ((IEnumerable<FieldOption>)cbFields.ItemsSource).FirstOrDefault(f => f.Key == value.Field)!;
-            cbFields.SelectedItem = field;
-            SetUnit(field);
+            FieldOption fieldOption = ((IEnumerable<FieldOption>)cbFields.ItemsSource).FirstOrDefault(f => f.Key == value.Field)!;
+            cbFields.SelectedItem = fieldOption;
+            SetUnit(fieldOption);
 
             LoadOperatorList(value.Field);
             cbOperators.SelectedItem = ((IEnumerable<OperatorOption>)cbOperators.ItemsSource).FirstOrDefault(f => f.Key == value.Operator);
