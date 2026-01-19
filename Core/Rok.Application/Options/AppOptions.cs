@@ -1,90 +1,52 @@
-﻿using System.ComponentModel;
-using System.Runtime.CompilerServices;
-using MiF.Guard;
+﻿using MiF.Guard;
 using Rok.Application.Interfaces;
 using Rok.Shared.Enums;
 
 namespace Rok.Application.Options;
 
-public class AppOptions : INotifyPropertyChanged, IAppOptions
+public class AppOptions : BaseNotifyPropertyChanged, IAppOptions
 {
-    public event PropertyChangedEventHandler? PropertyChanged;
+    public Guid Id { get => field; set => SetProperty(ref field, value); } = Guid.NewGuid();
 
-    private void OnPropertyChanged([CallerMemberName] string? propertyName = null)
-        => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+    public AppTheme Theme { get => field; set => SetProperty(ref field, value); } = AppTheme.System;
 
-    private bool SetProperty<T>(ref T storage, T value, [CallerMemberName] string? propertyName = null)
-    {
-        if (Equals(storage, value))
-            return false;
+    public List<string> LibraryTokens { get => field; set => SetProperty(ref field, value); } = new List<string>();
 
-        storage = value;
-        OnPropertyChanged(propertyName);
-        return true;
-    }
+    public bool CrossFade { get => field; set => SetProperty(ref field, value); } = true;
 
-    private Guid _id = Guid.NewGuid();
-    public Guid Id { get => _id; set => SetProperty(ref _id, value); }
+    public bool IsGridView { get => field; set => SetProperty(ref field, value); } = true;
 
-    private AppTheme _theme = AppTheme.System;
-    public AppTheme Theme { get => _theme; set => SetProperty(ref _theme, value); }
+    public bool HideArtistsWithoutAlbum { get => field; set => SetProperty(ref field, value); } = true;
 
-    private List<string> _libraryTokens = [];
-    public List<string> LibraryTokens { get => _libraryTokens; set => SetProperty(ref _libraryTokens, value); }
+    public bool RefreshLibraryAtStartup { get => field; set => SetProperty(ref field, value); } = true;
 
-    private bool _crossFade = true;
-    public bool CrossFade { get => _crossFade; set => SetProperty(ref _crossFade, value); }
+    public bool ImportTrackWithArtistGenre { get => field; set => SetProperty(ref field, value); } = true;
 
-    private bool _isGridView = true;
-    public bool IsGridView { get => _isGridView; set => SetProperty(ref _isGridView, value); }
+    public bool NovaApiEnabled { get => field; set => SetProperty(ref field, value); } = true;
 
-    private bool _hideArtistsWithoutAlbum = true;
-    public bool HideArtistsWithoutAlbum { get => _hideArtistsWithoutAlbum; set => SetProperty(ref _hideArtistsWithoutAlbum, value); }
+    public bool TelemetryEnabled { get => field; set => SetProperty(ref field, value); } = true;
 
-    private bool _refreshLibraryAtStartup = true;
-    public bool RefreshLibraryAtStartup { get => _refreshLibraryAtStartup; set => SetProperty(ref _refreshLibraryAtStartup, value); }
+    public bool DiscordRichPresenceEnabled { get => field; set => SetProperty(ref field, value); } = true;
 
-    private bool _importTrackWithArtistGenre = true;
-    public bool ImportTrackWithArtistGenre { get => _importTrackWithArtistGenre; set => SetProperty(ref _importTrackWithArtistGenre, value); }
+    public string CachePath { get => field; set => SetProperty(ref field, value); } = string.Empty;
 
-    private bool _novaApiEnabled = true;
-    public bool NovaApiEnabled { get => _novaApiEnabled; set => SetProperty(ref _novaApiEnabled, value); }
+    public string ArtistsGroupBy { get => field; set => SetProperty(ref field, value); } = string.Empty;
 
-    private bool _telemetryEnabled = true;
-    public bool TelemetryEnabled { get => _telemetryEnabled; set => SetProperty(ref _telemetryEnabled, value); }
+    public List<long> ArtistsFilterByGenresId { get => field; set => SetProperty(ref field, value); } = new List<long>();
 
-    private bool _discordRichPresenceEnabled = true;
-    public bool DiscordRichPresenceEnabled { get => _discordRichPresenceEnabled; set => SetProperty(ref _discordRichPresenceEnabled, value); }
+    public List<string> ArtistsFilterBy { get => field; set => SetProperty(ref field, value); } = new List<string>();
 
-    private string _cachePath = string.Empty;
-    public string CachePath { get => _cachePath; set => SetProperty(ref _cachePath, value); }
+    public string AlbumsGroupBy { get => field; set => SetProperty(ref field, value); } = string.Empty;
 
-    private string _artistsGroupBy = string.Empty;
-    public string ArtistsGroupBy { get => _artistsGroupBy; set => SetProperty(ref _artistsGroupBy, value); }
+    public List<long> AlbumsFilterByGenresId { get => field; set => SetProperty(ref field, value); } = new List<long>();
 
-    private List<long> _artistsFilterByGenresId = [];
-    public List<long> ArtistsFilterByGenresId { get => _artistsFilterByGenresId; set => SetProperty(ref _artistsFilterByGenresId, value); }
+    public List<string> AlbumsFilterBy { get => field; set => SetProperty(ref field, value); } = new List<string>();
 
-    private List<string> _artistsFilterBy = [];
-    public List<string> ArtistsFilterBy { get => _artistsFilterBy; set => SetProperty(ref _artistsFilterBy, value); }
+    public string TracksGroupBy { get => field; set => SetProperty(ref field, value); } = string.Empty;
 
-    private string _albumsGroupBy = string.Empty;
-    public string AlbumsGroupBy { get => _albumsGroupBy; set => SetProperty(ref _albumsGroupBy, value); }
+    public List<string> TracksFilterBy { get => field; set => SetProperty(ref field, value); } = new List<string>();
 
-    private List<long> _albumsFilterByGenresId = [];
-    public List<long> AlbumsFilterByGenresId { get => _albumsFilterByGenresId; set => SetProperty(ref _albumsFilterByGenresId, value); }
-
-    private List<string> _albumsFilterBy = [];
-    public List<string> AlbumsFilterBy { get => _albumsFilterBy; set => SetProperty(ref _albumsFilterBy, value); }
-
-    private string _tracksGroupBy = string.Empty;
-    public string TracksGroupBy { get => _tracksGroupBy; set => SetProperty(ref _tracksGroupBy, value); }
-
-    private List<string> _tracksFilterBy = [];
-    public List<string> TracksFilterBy { get => _tracksFilterBy; set => SetProperty(ref _tracksFilterBy, value); }
-
-    private List<long> _tracksFilterByGenresId = [];
-    public List<long> TracksFilterByGenresId { get => _tracksFilterByGenresId; set => SetProperty(ref _tracksFilterByGenresId, value); }
+    public List<long> TracksFilterByGenresId { get => field; set => SetProperty(ref field, value); } = new List<long>();
 
     public AppOptions() { }
 
