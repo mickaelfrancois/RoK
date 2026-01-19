@@ -9,6 +9,7 @@ using Rok.Logic.ViewModels.Albums.Services;
 using Rok.Logic.ViewModels.Artist.Services;
 using Rok.Logic.ViewModels.Artists;
 using Rok.Logic.ViewModels.Artists.Handlers;
+using Rok.Logic.ViewModels.Artists.Interfaces;
 using Rok.Logic.ViewModels.Artists.Services;
 using Rok.Logic.ViewModels.Genre;
 using Rok.Logic.ViewModels.Genre.Services;
@@ -92,19 +93,17 @@ public static class DependencyInjection
         services.AddSingleton<ArtistImportedMessageHandler>();
         services.AddTransient<ArtistsGroupCategory>();
         services.AddTransient<ArtistsFilter>();
+        services.AddTransient<IArtistProvider, ArtistProvider>();
+        services.AddTransient<IArtistLibraryMonitor, ArtistLibraryMonitor>();
 
         services.AddKeyedTransient<ArtistsViewModel>("SearchArtists", (sp, _) =>
         {
             return new ArtistsViewModel(
-                        ActivatorUtilities.CreateInstance<ArtistsFilter>(sp),
-                        ActivatorUtilities.CreateInstance<ArtistsGroupCategory>(sp),
-                        ActivatorUtilities.CreateInstance<ArtistsDataLoader>(sp),
+                        ActivatorUtilities.CreateInstance<IArtistProvider>(sp),
+                        ActivatorUtilities.CreateInstance<IArtistLibraryMonitor>(sp),
                         ActivatorUtilities.CreateInstance<ArtistsSelectionManager>(sp),
                         ActivatorUtilities.CreateInstance<ArtistsStateManager>(sp),
                         ActivatorUtilities.CreateInstance<ArtistsPlaybackService>(sp),
-                        ActivatorUtilities.CreateInstance<ArtistUpdateMessageHandler>(sp),
-                        ActivatorUtilities.CreateInstance<LibraryRefreshMessageHandler>(sp),
-                        ActivatorUtilities.CreateInstance<ArtistImportedMessageHandler>(sp),
                         sp.GetRequiredService<IAppOptions>(),
                         sp.GetRequiredService<ILogger<ArtistsViewModel>>()
                        );

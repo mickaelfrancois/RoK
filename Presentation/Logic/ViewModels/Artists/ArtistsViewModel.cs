@@ -1,178 +1,79 @@
-﻿using Rok.Logic.ViewModels.Albums.Handlers;
-using Rok.Logic.ViewModels.Artists.Handlers;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
+using Rok.Logic.ViewModels.Artists.Interfaces;
 using Rok.Logic.ViewModels.Artists.Services;
 
 namespace Rok.Logic.ViewModels.Artists;
 
-public partial class ArtistsViewModel : MyObservableObject, IDisposable
+public partial class ArtistsViewModel : ObservableObject, IDisposable
 {
-    private readonly ArtistsGroupCategory _groupService;
-    private readonly ArtistsFilter _filterService;
-    private readonly IAppOptions _appOptions;
     private readonly ILogger<ArtistsViewModel> _logger;
-
-    private readonly ArtistsDataLoader _dataLoader;
+    private readonly IArtistProvider _artistProvider;
+    private readonly IArtistLibraryMonitor _libraryMonitor;
+    private readonly IAppOptions _appOptions;
     private readonly ArtistsSelectionManager _selectionManager;
     private readonly ArtistsStateManager _stateManager;
     private readonly ArtistsPlaybackService _playbackService;
-
-    private readonly ArtistUpdateMessageHandler _artistUpdateHandler;
-    private readonly LibraryRefreshMessageHandler _libraryRefreshHandler;
-    private readonly ArtistImportedMessageHandler _artistImportedHandler;
-
-    private bool _isGroupingEnabled;
-    public bool IsGroupingEnabled
-    {
-        get => _isGroupingEnabled;
-        set
-        {
-            _isGroupingEnabled = value;
-            OnPropertyChanged(nameof(IsGroupingEnabled));
-        }
-    }
-
     private bool _stateLoaded = false;
     private bool _libraryUpdated = false;
     private List<ArtistViewModel> _filteredArtists = [];
 
-    public List<ArtistViewModel> ViewModels => _dataLoader.ViewModels;
-    public List<GenreDto> Genres => _dataLoader.Genres;
-    public ObservableCollection<object> Selected => _selectionManager.Selected;
-    public List<ArtistViewModel> SelectedItems => _selectionManager.SelectedItems;
-    public int SelectedCount => _selectionManager.SelectedCount;
-    public bool IsSelectedItems => _selectionManager.IsSelectedItems;
-
     public RangeObservableCollection<ArtistsGroupCategoryViewModel> GroupedItems { get; private set; } = [];
 
-    private int _totalCount = 0;
-    public int TotalCount
-    {
-        get => Selected.Count > 0 ? Selected.Count : _totalCount;
-        set => SetProperty(ref _totalCount, value);
-    }
-
-    public string GroupById => _stateManager.GroupBy;
-    public string GroupByText
-    {
-        get => _groupService.GetGroupByLabel(_stateManager.GroupBy);
-        set
-        {
-            _stateManager.GroupBy = value;
-            OnPropertyChanged();
-        }
-    }
-
+    public List<ArtistViewModel> ViewModels => _artistProvider.ViewModels;
+    public List<GenreDto> Genres => _artistProvider.Genres;
+    public ObservableCollection<object> Selected => _selectionManager.Selected;
+    public List<ArtistViewModel> SelectedItems => _selectionManager.SelectedItems;
     public List<string> SelectedFilters => _stateManager.SelectedFilters;
     public List<long> SelectedGenreFilters => _stateManager.SelectedGenreFilters;
+    public bool IsSelectedItems => _selectionManager.IsSelectedItems;
 
-    private string _filterByText = "";
-    public string FilterByText
+    [ObservableProperty]
+    public partial string FilterByText { get; set; } = string.Empty;
+
+    [ObservableProperty]
+    public partial bool IsGroupingEnabled { get; set; }
+
+    [ObservableProperty]
+    public partial bool IsGridView { get; set; }
+    partial void OnIsGridViewChanged(bool value)
     {
-        get => _filterByText;
-        set
-        {
-            if (_filterByText != value)
-            {
-                _filterByText = value;
-                OnPropertyChanged(nameof(FilterByText));
-            }
-        }
+        _stateManager.SaveGridView(value);
     }
 
-    private bool _isGridView = true;
-    public bool IsGridView
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(GroupById))]
+    [NotifyPropertyChangedFor(nameof(GroupByText))]
+    public partial string SelectedGroupBy { get; set; } = string.Empty;
+    partial void OnSelectedGroupByChanged(string value)
     {
-        get
-        {
-            return _isGridView;
-        }
-        private set
-        {
-            _isGridView = value;
-            _stateManager.SaveGridView(value);
-            OnPropertyChanged(nameof(IsGridView));
-        }
+        _stateManager.GroupBy = value;
     }
+    public string GroupById => SelectedGroupBy;
+    public string GroupByText => _artistProvider.GetGroupByLabel(SelectedGroupBy);
 
-    public RelayCommand<long?> FilterByGenreCommand { get; private set; }
-    public RelayCommand<string> FilterByCommand { get; private set; }
-    public RelayCommand<string> GroupByCommand { get; private set; }
-    public AsyncRelayCommand ListenCommand { get; private set; }
-    public AsyncRelayCommand<ArtistsGroupCategoryViewModel> ListenGroupCommand { get; private set; }
-    public RelayCommand ToggleDisplayModeCommand { get; private set; }
 
-    public ArtistsViewModel(
-        ArtistsFilter artistsFilter,
-        ArtistsGroupCategory artistsGroupCategory,
-        ArtistsDataLoader dataLoader,
-        ArtistsSelectionManager selectionManager,
-        ArtistsStateManager stateManager,
-        ArtistsPlaybackService playbackService,
-        ArtistUpdateMessageHandler artistUpdateHandler,
-        LibraryRefreshMessageHandler libraryRefreshHandler,
-        ArtistImportedMessageHandler artistImportedHandler,
-        IAppOptions appOptions,
-        ILogger<ArtistsViewModel> logger)
+    public ArtistsViewModel(IArtistProvider artistProvider, IArtistLibraryMonitor libraryMonitor, ArtistsSelectionManager selectionManager, ArtistsStateManager stateManager, ArtistsPlaybackService playbackService, IAppOptions appOptions, ILogger<ArtistsViewModel> logger)
     {
-        _groupService = artistsGroupCategory;
-        _filterService = artistsFilter;
-        _dataLoader = dataLoader;
+        _artistProvider = artistProvider;
+        _libraryMonitor = libraryMonitor;
         _selectionManager = selectionManager;
         _stateManager = stateManager;
         _playbackService = playbackService;
-        _artistUpdateHandler = artistUpdateHandler;
-        _libraryRefreshHandler = libraryRefreshHandler;
-        _artistImportedHandler = artistImportedHandler;
         _appOptions = appOptions;
         _logger = logger;
 
-        GroupByCommand = new RelayCommand<string>(GroupBy);
-        FilterByCommand = new RelayCommand<string>(FilterBy);
-        FilterByGenreCommand = new RelayCommand<long?>(FilterByGenreId);
-        ListenGroupCommand = new AsyncRelayCommand<ArtistsGroupCategoryViewModel>(ListenGroupAsync);
-        ListenCommand = new AsyncRelayCommand(ListenAsync);
-        ToggleDisplayModeCommand = new RelayCommand(() => IsGridView = !IsGridView);
-
-        SubscribeToMessages();
-        SubscribeToEvents();
+        IsGridView = _stateManager.GetGridView();
+        _libraryMonitor.LibraryChanged += OnLibraryChanged;
     }
 
 
-    private void SubscribeToMessages()
-    {
-        Messenger.Subscribe<ArtistUpdateMessage>(async (message) => await _artistUpdateHandler.HandleAsync(message));
-        Messenger.Subscribe<LibraryRefreshMessage>(_libraryRefreshHandler.Handle);
-        Messenger.Subscribe<ArtistImportedMessage>(_artistImportedHandler.Handle);
-    }
-
-    private void SubscribeToEvents()
-    {
-        _selectionManager.SelectionChanged += OnSelectionChanged;
-        _artistUpdateHandler.DataChanged += OnDataChanged;
-        _libraryRefreshHandler.LibraryChanged += OnLibraryChanged;
-        _artistImportedHandler.ArtistImported += OnArtistImported;
-    }
-
-    private void OnSelectionChanged(object? sender, EventArgs e)
-    {
-        OnPropertyChanged(nameof(TotalCount));
-    }
-
-    private void OnDataChanged(object? sender, EventArgs e)
+    private void OnLibraryChanged(object? sender, EventArgs e)
     {
         _libraryUpdated = true;
         FilterAndSort();
     }
 
-    private void OnLibraryChanged(object? sender, EventArgs e)
-    {
-        _libraryUpdated = true;
-    }
-
-    private void OnArtistImported(object? sender, EventArgs e)
-    {
-        _libraryUpdated = true;
-    }
 
     public async Task LoadDataAsync(bool forceReload)
     {
@@ -186,24 +87,62 @@ public partial class ArtistsViewModel : MyObservableObject, IDisposable
         }
 
         _libraryUpdated = false;
-        _libraryRefreshHandler.ResetLibraryUpdatedFlag();
-        _artistImportedHandler.ResetLibraryUpdatedFlag();
+        _libraryMonitor.ResetUpdateFlags();
 
         if (!_stateLoaded)
             LoadState();
 
-        await _dataLoader.LoadGenresAsync();
-        await _dataLoader.LoadArtistsAsync(_appOptions.HideArtistsWithoutAlbum);
+        await _artistProvider.LoadAsync(_appOptions.HideArtistsWithoutAlbum);
 
         FilterAndSort();
     }
 
     public void SetData(List<ArtistDto> artists)
     {
-        _dataLoader.SetArtists(artists);
+        _artistProvider.SetArtists(artists);
         FilterAndSort();
     }
 
+    private void SetFilterLabel()
+    {
+        if (_stateManager.SelectedFilters.Count > 0)
+        {
+            string lastFilter = _stateManager.SelectedFilters[^1];
+            FilterByText = _artistProvider.GetFilterLabel(lastFilter);
+        }
+        else if (_stateManager.SelectedGenreFilters.Count > 0)
+        {
+            long lastGenreId = _stateManager.SelectedGenreFilters[^1];
+            FilterByText = Genres.FirstOrDefault(c => c.Id == lastGenreId)?.Name ?? "";
+        }
+        else
+        {
+            FilterByText = _artistProvider.GetFilterLabel("");
+        }
+    }
+
+    private void LoadState()
+    {
+        _stateLoaded = true;
+        _stateManager.Load();
+        SelectedGroupBy = _stateManager.GroupBy;
+        SetFilterLabel();
+    }
+
+    public void SaveState()
+    {
+        _stateManager.Save();
+    }
+
+
+
+    [RelayCommand]
+    private void ToggleDisplayMode()
+    {
+        IsGridView = !IsGridView;
+    }
+
+    [RelayCommand]
     private void FilterBy(string filterBy)
     {
         if (string.IsNullOrEmpty(filterBy))
@@ -220,7 +159,8 @@ public partial class ArtistsViewModel : MyObservableObject, IDisposable
         FilterAndSort();
     }
 
-    private void FilterByGenreId(long? id)
+    [RelayCommand]
+    private void FilterByGenre(long? id)
     {
         if (id == null)
             _stateManager.SelectedGenreFilters.Clear();
@@ -233,63 +173,31 @@ public partial class ArtistsViewModel : MyObservableObject, IDisposable
         FilterAndSort();
     }
 
-    private void SetFilterLabel()
-    {
-        if (_stateManager.SelectedFilters.Count > 0)
-            FilterByText = _filterService.GetLabel(_stateManager.SelectedFilters[_stateManager.SelectedFilters.Count - 1]);
-        else if (_stateManager.SelectedGenreFilters.Count > 0)
-            FilterByText = Genres.FirstOrDefault(c => c.Id == _stateManager.SelectedGenreFilters[_stateManager.SelectedGenreFilters.Count - 1])?.Name ?? "";
-        else
-            FilterByText = _filterService.GetLabel("");
-    }
-
+    [RelayCommand]
     private void GroupBy(string groupBy)
     {
-        GroupByText = groupBy;
+        SelectedGroupBy = groupBy;
         FilterAndSort();
     }
 
+    [RelayCommand]
     private void FilterAndSort()
     {
-        IEnumerable<ArtistViewModel> filteredArtists = ViewModels;
+        ArtistProviderResult result = _artistProvider.GetProcessedData(_stateManager.GroupBy, _stateManager.SelectedFilters, _stateManager.SelectedGenreFilters);
 
-        foreach (string filterby in _stateManager.SelectedFilters)
-            filteredArtists = _filterService.Filter(filterby, filteredArtists);
-
-        foreach (long genreId in _stateManager.SelectedGenreFilters)
-            filteredArtists = _filterService.FilterByGenreId(genreId, filteredArtists);
-
-        _filteredArtists = filteredArtists.ToList();
-
-        IEnumerable<ArtistsGroupCategoryViewModel> artists = _groupService.GetGroupedItems(_stateManager.GroupBy, _filteredArtists);
-        GroupedItems.InitWithAddRange(artists);
-
-        IsGroupingEnabled = GroupedItems.Count > 1 || !string.IsNullOrEmpty(GroupedItems.FirstOrDefault()?.Title ?? string.Empty);
-
-        TotalCount = _filteredArtists.Count;
+        _filteredArtists = result.FilteredItems;
+        GroupedItems.InitWithAddRange(result.Groups);
+        IsGroupingEnabled = result.IsGroupingEnabled;
     }
 
-    public void SaveState()
-    {
-        _stateManager.Save();
-    }
-
-    private void LoadState()
-    {
-        _stateLoaded = true;
-        _stateManager.Load();
-        SetFilterLabel();
-
-        OnPropertyChanged(nameof(GroupByText));
-        OnPropertyChanged(nameof(FilterByText));
-    }
-
+    [RelayCommand]
     private async Task ListenGroupAsync(ArtistsGroupCategoryViewModel group)
     {
         List<long> artistIds = group.Items.Select(artist => artist.Artist.Id).ToList();
         await _playbackService.PlayArtistsAsync(artistIds);
     }
 
+    [RelayCommand]
     private async Task ListenAsync()
     {
         List<long> artistIds = Selected.Count == 0
@@ -298,6 +206,8 @@ public partial class ArtistsViewModel : MyObservableObject, IDisposable
 
         await _playbackService.PlayArtistsAsync(artistIds);
     }
+
+
 
     #region IDisposable Support
 
@@ -309,11 +219,8 @@ public partial class ArtistsViewModel : MyObservableObject, IDisposable
         {
             if (disposing)
             {
-                _selectionManager.SelectionChanged -= OnSelectionChanged;
-                _artistUpdateHandler.DataChanged -= OnDataChanged;
-                _libraryRefreshHandler.LibraryChanged -= OnLibraryChanged;
-                _artistImportedHandler.ArtistImported -= OnArtistImported;
-                _dataLoader.Clear();
+                _libraryMonitor.LibraryChanged -= OnLibraryChanged;
+                _artistProvider.Clear();
             }
 
             disposedValue = true;
