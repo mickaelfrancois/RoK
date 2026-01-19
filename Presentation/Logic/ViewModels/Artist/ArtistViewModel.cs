@@ -8,7 +8,7 @@ using Rok.Logic.ViewModels.Tracks;
 
 namespace Rok.Logic.ViewModels.Artists;
 
-public partial class ArtistViewModel : ObservableObject
+public partial class ArtistViewModel : MyObservableObject
 {
     private static string FallbackPictureUri => App.Current.Resources["ArtistFallbackPictureUri"] as string ?? "ms-appx:///Assets/artistFallback.png";
     private static BitmapImage FallbackPicture => new(new Uri(FallbackPictureUri));

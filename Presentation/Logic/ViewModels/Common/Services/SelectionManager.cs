@@ -1,6 +1,6 @@
 namespace Rok.Logic.ViewModels.Common.Services;
 
-public abstract partial class SelectionManager<T> : ObservableObject
+public abstract partial class SelectionManager<T> : MyObservableObject
 {
     public ObservableCollection<object> Selected { get; } = [];
 

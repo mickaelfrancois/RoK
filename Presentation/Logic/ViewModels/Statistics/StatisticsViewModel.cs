@@ -8,7 +8,7 @@ using Rok.Application.Features.Tracks.Command;
 
 namespace Rok.Logic.ViewModels.Statistics;
 
-public class StatisticsViewModel : ObservableObject
+public class StatisticsViewModel : MyObservableObject
 {
     public UserStatisticsDto Current { get; private set; } = new();
 

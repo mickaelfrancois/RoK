@@ -4,7 +4,7 @@ using Rok.Logic.ViewModels.Tracks;
 
 namespace Rok.Logic.ViewModels.Playlists;
 
-public partial class PlaylistViewModel : ObservableObject
+public partial class PlaylistViewModel : MyObservableObject
 {
     private readonly NavigationService _navigationService;
     private readonly ResourceLoader _resourceLoader;

@@ -7,7 +7,7 @@ using Rok.Logic.ViewModels.Track.Services;
 
 namespace Rok.Logic.ViewModels.Tracks;
 
-public partial class TrackViewModel : ObservableObject, IDisposable
+public partial class TrackViewModel : MyObservableObject, IDisposable
 {
     private readonly ResourceLoader _resourceLoader;
     private readonly IPlayerService _playerService;

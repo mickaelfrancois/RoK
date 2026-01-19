@@ -4,7 +4,7 @@ using Rok.Logic.ViewModels.Search;
 
 namespace Rok.Logic.ViewModels.Main;
 
-public partial class MainViewModel : ObservableObject
+public partial class MainViewModel : MyObservableObject
 {
     private DispatcherQueue? _dispatcherQueue;
     private DispatcherQueue DispatcherQueue => _dispatcherQueue ??= DispatcherQueue.GetForCurrentThread();

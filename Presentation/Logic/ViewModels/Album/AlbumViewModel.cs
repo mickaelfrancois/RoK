@@ -6,7 +6,7 @@ using Rok.Logic.ViewModels.Tracks;
 
 namespace Rok.Logic.ViewModels.Albums;
 
-public partial class AlbumViewModel : ObservableObject
+public partial class AlbumViewModel : MyObservableObject
 {
     private readonly NavigationService _navigationService;
     private readonly ResourceLoader _resourceLoader;

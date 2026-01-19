@@ -8,7 +8,7 @@ namespace Rok.Logic.Services;
 /// Code from https://github.com/CommunityToolkit/WindowsCommunityToolkit/blob/ee933854d0013c7856890c1b2b5bec9e3850f908/Microsoft.Toolkit.Mvvm/ComponentModel/ObservableObject.cs#L33-L36
 /// </summary>
 
-public abstract class ObservableObject : INotifyPropertyChanged, INotifyPropertyChanging
+public abstract class MyObservableObject : INotifyPropertyChanged, INotifyPropertyChanging
 {
     /// <inheritdoc cref="INotifyPropertyChanged.PropertyChanged"/>
     public event PropertyChangedEventHandler? PropertyChanged;
@@ -224,7 +224,7 @@ public abstract class ObservableObject : INotifyPropertyChanged, INotifyProperty
     /// also raise notifications when changed. Note that this method is not meant to be a replacement for
     /// <see cref="SetProperty{T}(ref T,T,string)"/>, and it should only be used when relaying properties to a model that
     /// doesn't support notifications, and only if you can't implement notifications to that model directly (eg. by having
-    /// it inherit from <see cref="ObservableObject"/>). The syntax relies on passing the target model and a stateless callback
+    /// it inherit from <see cref="MyObservableObject"/>). The syntax relies on passing the target model and a stateless callback
     /// to allow the C# compiler to cache the function, which results in much better performance and no memory usage.
     /// </summary>
     /// <typeparam name="TModel">The type of model whose property (or field) to set.</typeparam>

@@ -4,7 +4,7 @@ using Rok.Logic.ViewModels.Tracks;
 
 namespace Rok.Logic.ViewModels.Listening.Services;
 
-public partial class ListeningPlaylistManager : ObservableObject
+public partial class ListeningPlaylistManager : MyObservableObject
 {
     private readonly DispatcherQueue _dispatcherQueue;
     private readonly ListeningDataLoader _dataLoader;

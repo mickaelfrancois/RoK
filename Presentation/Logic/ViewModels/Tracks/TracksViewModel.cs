@@ -4,7 +4,7 @@ using Rok.Logic.ViewModels.Tracks.Services;
 
 namespace Rok.Logic.ViewModels.Tracks;
 
-public partial class TracksViewModel : ObservableObject, IDisposable
+public partial class TracksViewModel : MyObservableObject, IDisposable
 {
     private readonly TracksGroupCategory _groupService;
     private readonly TracksFilter _filterService;

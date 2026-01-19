@@ -10,7 +10,7 @@ using System.ComponentModel;
 
 namespace Rok.Logic.ViewModels.Player;
 
-public partial class PlayerViewModel : ObservableObject, IDisposable
+public partial class PlayerViewModel : MyObservableObject, IDisposable
 {
     private readonly IPlayerService _player;
     private readonly IMediator _mediator;

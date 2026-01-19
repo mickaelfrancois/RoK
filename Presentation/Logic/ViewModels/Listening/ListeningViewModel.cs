@@ -5,7 +5,7 @@ using Rok.Logic.ViewModels.Tracks;
 
 namespace Rok.Logic.ViewModels.Listening;
 
-public partial class ListeningViewModel : ObservableObject
+public partial class ListeningViewModel : MyObservableObject
 {
     private readonly ILogger<ListeningViewModel> _logger;
     private readonly IPlayerService _playerService;

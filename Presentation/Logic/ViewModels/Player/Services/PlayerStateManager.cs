@@ -7,7 +7,7 @@ using Rok.Logic.ViewModels.Tracks;
 
 namespace Rok.Logic.ViewModels.Player.Services;
 
-public partial class PlayerStateManager : ObservableObject
+public partial class PlayerStateManager : MyObservableObject
 {
     private readonly DispatcherQueue _dispatcherQueue;
 

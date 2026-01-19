@@ -4,6 +4,7 @@ using Rok.Logic.Services.Player;
 using Rok.Logic.ViewModels.Album.Services;
 using Rok.Logic.ViewModels.Albums;
 using Rok.Logic.ViewModels.Albums.Handlers;
+using Rok.Logic.ViewModels.Albums.Interfaces;
 using Rok.Logic.ViewModels.Albums.Services;
 using Rok.Logic.ViewModels.Artist.Services;
 using Rok.Logic.ViewModels.Artists;
@@ -53,19 +54,17 @@ public static class DependencyInjection
         services.AddSingleton<AlbumImportedMessageHandler>();
         services.AddTransient<AlbumsGroupCategory>();
         services.AddTransient<AlbumsFilter>();
+        services.AddTransient<IAlbumProvider, AlbumProvider>();
+        services.AddTransient<IAlbumLibraryMonitor, AlbumLibraryMonitor>();
 
         services.AddKeyedTransient<AlbumsViewModel>("SearchAlbums", (sp, _) =>
         {
             return new AlbumsViewModel(
-                        ActivatorUtilities.CreateInstance<AlbumsFilter>(sp),
-                        ActivatorUtilities.CreateInstance<AlbumsGroupCategory>(sp),
-                        ActivatorUtilities.CreateInstance<AlbumsDataLoader>(sp),
+                        ActivatorUtilities.CreateInstance<IAlbumProvider>(sp),
+                        ActivatorUtilities.CreateInstance<IAlbumLibraryMonitor>(sp),
                         ActivatorUtilities.CreateInstance<AlbumsSelectionManager>(sp),
                         ActivatorUtilities.CreateInstance<AlbumsStateManager>(sp),
                         ActivatorUtilities.CreateInstance<AlbumsPlaybackService>(sp),
-                        ActivatorUtilities.CreateInstance<AlbumUpdateMessageHandler>(sp),
-                        ActivatorUtilities.CreateInstance<LibraryRefreshMessageHandler>(sp),
-                        ActivatorUtilities.CreateInstance<AlbumImportedMessageHandler>(sp),
                         sp.GetRequiredService<ILogger<AlbumsViewModel>>()
                        );
         });

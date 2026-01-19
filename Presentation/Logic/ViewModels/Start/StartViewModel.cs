@@ -7,7 +7,7 @@ using Windows.Storage.AccessCache;
 namespace Rok.Logic.ViewModels.Start;
 
 
-public class StartViewModel : ObservableObject
+public class StartViewModel : MyObservableObject
 {
     private const int KAlbumMinimumBeforeUse = 30;
 

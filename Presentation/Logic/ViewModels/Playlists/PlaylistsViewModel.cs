@@ -3,7 +3,7 @@ using Rok.Logic.ViewModels.Playlists.Services;
 
 namespace Rok.Logic.ViewModels.Playlists;
 
-public partial class PlaylistsViewModel : ObservableObject, IDisposable
+public partial class PlaylistsViewModel : MyObservableObject, IDisposable
 {
     private readonly ILogger<PlaylistsViewModel> _logger;
 

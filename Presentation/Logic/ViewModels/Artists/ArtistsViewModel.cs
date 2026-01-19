@@ -4,7 +4,7 @@ using Rok.Logic.ViewModels.Artists.Services;
 
 namespace Rok.Logic.ViewModels.Artists;
 
-public partial class ArtistsViewModel : ObservableObject, IDisposable
+public partial class ArtistsViewModel : MyObservableObject, IDisposable
 {
     private readonly ArtistsGroupCategory _groupService;
     private readonly ArtistsFilter _filterService;
