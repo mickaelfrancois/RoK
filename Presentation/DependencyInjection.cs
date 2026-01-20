@@ -54,16 +54,16 @@ public static class DependencyInjection
         services.AddSingleton<AlbumsPlaybackService>();
         services.AddSingleton<AlbumUpdateMessageHandler>();
         services.AddSingleton<AlbumImportedMessageHandler>();
+        services.AddSingleton<IAlbumProvider, AlbumProvider>();
+        services.AddSingleton<IAlbumLibraryMonitor, AlbumLibraryMonitor>();
         services.AddTransient<AlbumsGroupCategory>();
         services.AddTransient<AlbumsFilter>();
-        services.AddTransient<IAlbumProvider, AlbumProvider>();
-        services.AddTransient<IAlbumLibraryMonitor, AlbumLibraryMonitor>();
 
         services.AddKeyedTransient<AlbumsViewModel>("SearchAlbums", (sp, _) =>
         {
             return new AlbumsViewModel(
-                        ActivatorUtilities.CreateInstance<IAlbumProvider>(sp),
-                        ActivatorUtilities.CreateInstance<IAlbumLibraryMonitor>(sp),
+                        ActivatorUtilities.CreateInstance<AlbumProvider>(sp),
+                        ActivatorUtilities.CreateInstance<AlbumLibraryMonitor>(sp),
                         ActivatorUtilities.CreateInstance<AlbumsSelectionManager>(sp),
                         ActivatorUtilities.CreateInstance<AlbumsStateManager>(sp),
                         ActivatorUtilities.CreateInstance<AlbumsPlaybackService>(sp),
@@ -92,16 +92,16 @@ public static class DependencyInjection
         services.AddSingleton<ArtistsPlaybackService>();
         services.AddSingleton<ArtistUpdateMessageHandler>();
         services.AddSingleton<ArtistImportedMessageHandler>();
+        services.AddSingleton<IArtistProvider, ArtistProvider>();
+        services.AddSingleton<IArtistLibraryMonitor, ArtistLibraryMonitor>();
         services.AddTransient<ArtistsGroupCategory>();
         services.AddTransient<ArtistsFilter>();
-        services.AddTransient<IArtistProvider, ArtistProvider>();
-        services.AddTransient<IArtistLibraryMonitor, ArtistLibraryMonitor>();
 
         services.AddKeyedTransient<ArtistsViewModel>("SearchArtists", (sp, _) =>
         {
             return new ArtistsViewModel(
-                        ActivatorUtilities.CreateInstance<IArtistProvider>(sp),
-                        ActivatorUtilities.CreateInstance<IArtistLibraryMonitor>(sp),
+                        ActivatorUtilities.CreateInstance<ArtistProvider>(sp),
+                        ActivatorUtilities.CreateInstance<ArtistLibraryMonitor>(sp),
                         ActivatorUtilities.CreateInstance<ArtistsSelectionManager>(sp),
                         ActivatorUtilities.CreateInstance<ArtistsStateManager>(sp),
                         ActivatorUtilities.CreateInstance<ArtistsPlaybackService>(sp),
@@ -127,14 +127,14 @@ public static class DependencyInjection
         services.AddSingleton<TrackImportedMessageHandler>();
         services.AddTransient<TracksGroupCategory>();
         services.AddTransient<TracksFilter>();
-        services.AddTransient<ITrackProvider, TrackProvider>();
-        services.AddTransient<ITrackLibraryMonitor, TrackLibraryMonitor>();
+        services.AddSingleton<ITrackProvider, TrackProvider>();
+        services.AddSingleton<ITrackLibraryMonitor, TrackLibraryMonitor>();
 
         services.AddKeyedTransient<TracksViewModel>("SearchTracks", (sp, _) =>
         {
             return new TracksViewModel(
-                        ActivatorUtilities.CreateInstance<ITrackProvider>(sp),
-                        ActivatorUtilities.CreateInstance<ITrackLibraryMonitor>(sp),
+                        ActivatorUtilities.CreateInstance<TrackProvider>(sp),
+                        ActivatorUtilities.CreateInstance<TrackLibraryMonitor>(sp),
                         ActivatorUtilities.CreateInstance<TracksSelectionManager>(sp),
                         ActivatorUtilities.CreateInstance<TracksStateManager>(sp),
                         ActivatorUtilities.CreateInstance<TracksPlaybackService>(sp),
