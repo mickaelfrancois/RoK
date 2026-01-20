@@ -1,10 +1,11 @@
-﻿using Microsoft.UI.Dispatching;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using Microsoft.UI.Dispatching;
 using Rok.Logic.ViewModels.Artists;
 using Rok.Logic.ViewModels.Tracks;
 
 namespace Rok.Logic.ViewModels.Listening.Services;
 
-public partial class ListeningPlaylistManager : MyObservableObject
+public partial class ListeningPlaylistManager : ObservableObject
 {
     private readonly DispatcherQueue _dispatcherQueue;
     private readonly ListeningDataLoader _dataLoader;

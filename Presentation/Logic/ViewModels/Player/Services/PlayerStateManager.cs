@@ -1,3 +1,4 @@
+using CommunityToolkit.Mvvm.ComponentModel;
 using Microsoft.UI.Dispatching;
 using Rok.Application.Dto.Lyrics;
 using Rok.Application.Player;
@@ -7,7 +8,7 @@ using Rok.Logic.ViewModels.Tracks;
 
 namespace Rok.Logic.ViewModels.Player.Services;
 
-public partial class PlayerStateManager : MyObservableObject
+public partial class PlayerStateManager : ObservableObject
 {
     private readonly DispatcherQueue _dispatcherQueue;
 

@@ -1,6 +1,8 @@
+using CommunityToolkit.Mvvm.ComponentModel;
+
 namespace Rok.Logic.ViewModels.Common.Services;
 
-public abstract partial class SelectionManager<T> : MyObservableObject
+public abstract partial class SelectionManager<T> : ObservableObject
 {
     public ObservableCollection<object> Selected { get; } = [];
 
