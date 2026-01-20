@@ -54,7 +54,7 @@
                            Text="{x:Bind ViewModel.Artist.Name, Mode=OneWay}" 
                            Style="{StaticResource headerTitleText}" />
 
-                <Button x:Name="buttonCountry" RelativePanel.RightOf="artistName" RelativePanel.AlignVerticalCenterWith="artistName" Style="{StaticResource ButtonTextBlockStyle}" Visibility="{x:Bind ViewModel.Artist.CountryCode, Converter={StaticResource StringToVisibilityConverter}}" Command="{x:Bind ViewModel.ArtistsByCountryOpenCommand}" Margin="6,0,0,0" BorderBrush="Transparent" Background="Transparent" ToolTipService.ToolTip="{x:Bind ViewModel.Artist.CountryName}">
+                <Button x:Name="buttonCountry" RelativePanel.RightOf="artistName" RelativePanel.AlignVerticalCenterWith="artistName" Style="{StaticResource ButtonTextBlockStyle}" Visibility="{x:Bind ViewModel.Artist.CountryCode, Converter={StaticResource StringToVisibilityConverter}}" Margin="6,0,0,0" BorderBrush="Transparent" Background="Transparent" ToolTipService.ToolTip="{x:Bind ViewModel.Artist.CountryName}">
                     <Image Source="{x:Bind ViewModel.Artist.CountryCode, Converter={StaticResource CountryCodeToImageSourceConverter}}" Height="{ThemeResource countryFlagHeigh}"></Image>
                 </Button>
 

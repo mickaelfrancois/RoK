@@ -1,4 +1,6 @@
-﻿using Rok.Application.Features.Playlists.PlaylistMenu;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
+using Rok.Application.Features.Playlists.PlaylistMenu;
 using Rok.Application.Randomizer;
 using Rok.Infrastructure.Translate;
 using Rok.Logic.Services.Player;
@@ -8,7 +10,7 @@ using Rok.Logic.ViewModels.Tracks;
 
 namespace Rok.Logic.ViewModels.Artists;
 
-public partial class ArtistViewModel : MyObservableObject
+public partial class ArtistViewModel : ObservableObject
 {
     private static string FallbackPictureUri => App.Current.Resources["ArtistFallbackPictureUri"] as string ?? "ms-appx:///Assets/artistFallback.png";
     private static BitmapImage FallbackPicture => new(new Uri(FallbackPictureUri));
@@ -26,26 +28,23 @@ public partial class ArtistViewModel : MyObservableObject
     private readonly ArtistApiService _apiService;
     private readonly ArtistStatisticsService _statisticsService;
     private readonly ArtistEditService _editService;
+    private IEnumerable<TrackDto>? _tracks = null;
 
+    public IPlaylistMenuService PlaylistMenuService { get; }
     public ArtistDto Artist { get; private set; } = new();
     public RangeObservableCollection<TrackViewModel> Tracks { get; set; } = [];
     public RangeObservableCollection<AlbumViewModel> Albums { get; set; } = [];
 
-    private IEnumerable<TrackDto>? _tracks = null;
 
-    public IPlaylistMenuService PlaylistMenuService { get; }
-    public bool IsFavorite
+    [ObservableProperty]
+    public partial bool IsFavorite { get; set; }
+    partial void OnIsFavoriteChanged(bool value)
     {
-        get => Artist.IsFavorite;
-        set
-        {
-            if (Artist.IsFavorite != value)
-            {
-                Artist.IsFavorite = value;
-                OnPropertyChanged();
-            }
-        }
+        Artist.IsFavorite = value;
     }
+
+    [ObservableProperty]
+    public partial BitmapImage? Backdrop { get; set; }
 
     public string SubTitle
     {
@@ -181,8 +180,7 @@ public partial class ArtistViewModel : MyObservableObject
         }
         set
         {
-            _picture = value;
-            OnPropertyChanged(nameof(Picture));
+            SetProperty(ref _picture, value);
             OnPropertyChanged(nameof(IsPictureAvailable));
         }
     }
@@ -195,28 +193,8 @@ public partial class ArtistViewModel : MyObservableObject
         }
     }
 
-    private BitmapImage? _backdrop = null;
-    public BitmapImage? Backdrop
-    {
-        get => _backdrop;
-        set
-        {
-            _backdrop = value;
-            OnPropertyChanged();
-        }
-    }
-
-    public AsyncRelayCommand ListenCommand { get; private set; }
-    public RelayCommand ArtistOpenCommand { get; private set; }
-    public RelayCommand ArtistsByCountryOpenCommand { get; private set; }
-    public RelayCommand GenreOpenCommand { get; private set; }
-    public AsyncRelayCommand ArtistFavoriteCommand { get; private set; }
-    public AsyncRelayCommand SelectPictureCommand { get; private set; }
-    public AsyncRelayCommand OpenOfficialSiteCommand { get; private set; }
-    public RelayCommand<string> OpenUrlCommand { get; private set; }
-    public AsyncRelayCommand OpenBiographyCommand { get; private set; }
-
     public override string ToString() => Artist?.Name ?? string.Empty;
+
 
     public ArtistViewModel(
         IBackdropLoader backdropLoader,
@@ -246,16 +224,6 @@ public partial class ArtistViewModel : MyObservableObject
         _appOptions = Guard.Against.Null(appOptions);
         PlaylistMenuService = Guard.Against.Null(playlistMenuService);
         _logger = Guard.Against.Null(logger);
-
-        GenreOpenCommand = new RelayCommand(GenreOpen);
-        ListenCommand = new AsyncRelayCommand(ListenAsync);
-        ArtistsByCountryOpenCommand = new RelayCommand(() => { });
-        ArtistFavoriteCommand = new AsyncRelayCommand(UpdateFavoriteStateAsync);
-        ArtistOpenCommand = new RelayCommand(ArtistOpen);
-        SelectPictureCommand = new AsyncRelayCommand(SelectPictureAsync);
-        OpenOfficialSiteCommand = new AsyncRelayCommand(OpenOfficialSiteAsync);
-        OpenUrlCommand = new RelayCommand<string>(OpenUrl);
-        OpenBiographyCommand = new AsyncRelayCommand(OpenBiographyAsync);
     }
 
 
@@ -336,58 +304,6 @@ public partial class ArtistViewModel : MyObservableObject
         }
     }
 
-    private void ArtistOpen()
-    {
-        _navigationService.NavigateToArtist(Artist.Id);
-    }
-
-    private void GenreOpen()
-    {
-        if (Artist.GenreId.HasValue)
-            _navigationService.NavigateToGenre(Artist.GenreId.Value);
-    }
-
-    private async Task ListenAsync()
-    {
-        if (_tracks == null)
-            await LoadTracksAsync(Artist.Id);
-
-        if (_tracks?.Any() == true)
-        {
-            List<TrackDto> tracks = TracksRandomizer.Randomize(_tracks);
-            _playerService.LoadPlaylist(tracks);
-        }
-    }
-
-    private async Task UpdateFavoriteStateAsync()
-    {
-        bool newFavoriteState = !Artist.IsFavorite;
-        await _editService.UpdateFavoriteAsync(Artist, newFavoriteState);
-
-        OnPropertyChanged(nameof(IsFavorite));
-        Messenger.Send(new ArtistUpdateMessage(Artist.Id, ActionType.Update));
-    }
-
-    private async Task OpenOfficialSiteAsync()
-    {
-        await _editService.OpenOfficialSiteAsync(Artist);
-    }
-
-    private async Task SelectPictureAsync()
-    {
-        BitmapImage? newPicture = await _pictureService.SelectAndSavePictureAsync(Artist.Name);
-
-        if (newPicture != null)
-        {
-            if (Rok.App.MainWindow.DispatcherQueue is { } dq)
-                dq.TryEnqueue(() => Picture = newPicture);
-            else
-                Picture = newPicture;
-
-            Messenger.Send(new ArtistUpdateMessage(Artist.Id, ActionType.Picture));
-        }
-    }
-
     private async Task GetDataFromApiAsync()
     {
         bool updated = await _apiService.GetAndUpdateArtistDataAsync(Artist);
@@ -407,6 +323,66 @@ public partial class ArtistViewModel : MyObservableObject
     }
 
 
+
+    [RelayCommand]
+    private void ArtistOpen()
+    {
+        _navigationService.NavigateToArtist(Artist.Id);
+    }
+
+    [RelayCommand]
+    private void GenreOpen()
+    {
+        if (Artist.GenreId.HasValue)
+            _navigationService.NavigateToGenre(Artist.GenreId.Value);
+    }
+
+    [RelayCommand]
+    private async Task ListenAsync()
+    {
+        if (_tracks == null)
+            await LoadTracksAsync(Artist.Id);
+
+        if (_tracks?.Any() == true)
+        {
+            List<TrackDto> tracks = TracksRandomizer.Randomize(_tracks);
+            _playerService.LoadPlaylist(tracks);
+        }
+    }
+
+    [RelayCommand]
+    private async Task ArtistFavoriteAsync()
+    {
+        bool newFavoriteState = !Artist.IsFavorite;
+        await _editService.UpdateFavoriteAsync(Artist, newFavoriteState);
+
+        OnPropertyChanged(nameof(IsFavorite));
+        Messenger.Send(new ArtistUpdateMessage(Artist.Id, ActionType.Update));
+    }
+
+    [RelayCommand]
+    private async Task OpenOfficialSiteAsync()
+    {
+        await _editService.OpenOfficialSiteAsync(Artist);
+    }
+
+    [RelayCommand]
+    private async Task SelectPictureAsync()
+    {
+        BitmapImage? newPicture = await _pictureService.SelectAndSavePictureAsync(Artist.Name);
+
+        if (newPicture != null)
+        {
+            if (Rok.App.MainWindow.DispatcherQueue is { } dq)
+                dq.TryEnqueue(() => Picture = newPicture);
+            else
+                Picture = newPicture;
+
+            Messenger.Send(new ArtistUpdateMessage(Artist.Id, ActionType.Picture));
+        }
+    }
+
+    [RelayCommand]
     private void OpenUrl(string url)
     {
         if (string.IsNullOrEmpty(url))
@@ -421,7 +397,7 @@ public partial class ArtistViewModel : MyObservableObject
             _ = Windows.System.Launcher.LaunchUriAsync(uri);
     }
 
-
+    [RelayCommand]
     private async Task OpenBiographyAsync()
     {
         if (!string.IsNullOrEmpty(Artist.Biography))
