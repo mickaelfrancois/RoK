@@ -1,4 +1,6 @@
 ﻿using System.Globalization;
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using Rok.Application.Features.Albums.Command;
 using Rok.Application.Features.Artists.Command;
 using Rok.Application.Features.Genres.Command;
@@ -8,12 +10,9 @@ using Rok.Application.Features.Tracks.Command;
 
 namespace Rok.Logic.ViewModels.Statistics;
 
-public class StatisticsViewModel : MyObservableObject
+public partial class StatisticsViewModel(IMediator mediator) : ObservableObject
 {
     public UserStatisticsDto Current { get; private set; } = new();
-
-    private readonly IMediator _mediator;
-
 
     public string FormatWithThousands(long value)
     {
@@ -70,21 +69,9 @@ public class StatisticsViewModel : MyObservableObject
 
     public List<RankedTopItem> TopTracks { get; set; } = [];
 
-    public AsyncRelayCommand ResetListenCountCommand { get; private set; }
-
-
-
-    public StatisticsViewModel(IMediator mediator)
-    {
-        _mediator = mediator;
-
-        ResetListenCountCommand = new AsyncRelayCommand(ResetListenCountAsync);
-    }
-
-
     public async Task LoadAsync()
     {
-        Current = await _mediator.SendMessageAsync(new GetStatisticsQuery());
+        Current = await mediator.SendMessageAsync(new GetStatisticsQuery());
 
         TopTracks = (Current.TopTracks ?? new List<TopItem>())
            .Select((t, i) => new RankedTopItem { Rank = i + 1, Id = t.Id, Name = t.Name, ListenCount = t.ListenCount })
@@ -102,7 +89,7 @@ public class StatisticsViewModel : MyObservableObject
           .Select((t, i) => new RankedTopItem { Rank = i + 1, Id = t.Id, Name = t.Name, ListenCount = t.ListenCount })
           .ToList();
 
-        LyricsStatisticsDto lyrics = await _mediator.SendMessageAsync(new GetLyricsStatisticsQuery());
+        LyricsStatisticsDto lyrics = await mediator.SendMessageAsync(new GetLyricsStatisticsQuery());
         TotalRawLyrics = lyrics.TotalRawLyrics;
         TotalSyncLyrics = lyrics.TotalSyncLyrics;
 
@@ -118,12 +105,13 @@ public class StatisticsViewModel : MyObservableObject
     }
 
 
+    [RelayCommand]
     private async Task ResetListenCountAsync()
     {
-        await _mediator.SendMessageAsync(new ResetGenreListenCountCommand());
-        await _mediator.SendMessageAsync(new ResetArtistListenCountCommand());
-        await _mediator.SendMessageAsync(new ResetAlbumListenCountCommand());
-        await _mediator.SendMessageAsync(new ResetTrackListenCountCommand());
+        await mediator.SendMessageAsync(new ResetGenreListenCountCommand());
+        await mediator.SendMessageAsync(new ResetArtistListenCountCommand());
+        await mediator.SendMessageAsync(new ResetAlbumListenCountCommand());
+        await mediator.SendMessageAsync(new ResetTrackListenCountCommand());
 
         await LoadAsync();
     }
