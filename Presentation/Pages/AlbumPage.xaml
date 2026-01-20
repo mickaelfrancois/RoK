@@ -64,8 +64,7 @@
                         RelativePanel.AlignVerticalCenterWith="artistName"
                         RelativePanel.RightOf="artistName"
                         Style="{StaticResource ButtonTextBlockStyle}"
-                        Visibility="{x:Bind ViewModel.Album.CountryCode, Converter={StaticResource StringToVisibilityConverter}}"
-                        Command="{x:Bind ViewModel.OpenArtistsByCountryCommand}"
+                        Visibility="{x:Bind ViewModel.Album.CountryCode, Converter={StaticResource StringToVisibilityConverter}}"                        
                         BorderBrush="Transparent"
                         Background="Transparent"
                         ToolTipService.ToolTip="{x:Bind ViewModel.Album.CountryName}">

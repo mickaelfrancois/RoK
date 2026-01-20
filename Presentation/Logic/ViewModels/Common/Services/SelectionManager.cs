@@ -1,3 +1,5 @@
+using CommunityToolkit.Mvvm.ComponentModel;
+
 namespace Rok.Logic.ViewModels.Common.Services;
 
 public abstract partial class SelectionManager<T> : ObservableObject

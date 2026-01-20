@@ -1,169 +1,76 @@
-﻿using Rok.Logic.ViewModels.Albums.Handlers;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
+using Rok.Logic.ViewModels.Albums.Interfaces;
 using Rok.Logic.ViewModels.Albums.Services;
 
 namespace Rok.Logic.ViewModels.Albums;
 
+
 public partial class AlbumsViewModel : ObservableObject, IDisposable
 {
-    private readonly AlbumsGroupCategory _groupService;
-    private readonly AlbumsFilter _filterService;
     private readonly ILogger<AlbumsViewModel> _logger;
-
-    private readonly AlbumsDataLoader _dataLoader;
+    private readonly IAlbumProvider _albumProvider;
+    private readonly IAlbumLibraryMonitor _libraryMonitor;
     private readonly AlbumsSelectionManager _selectionManager;
     private readonly AlbumsStateManager _stateManager;
     private readonly AlbumsPlaybackService _playbackService;
-
-    private readonly AlbumUpdateMessageHandler _albumUpdateHandler;
-    private readonly LibraryRefreshMessageHandler _libraryRefreshHandler;
-    private readonly AlbumImportedMessageHandler _albumImportedHandler;
-
     private bool _stateLoaded = false;
     private bool _libraryUpdated = false;
     private List<AlbumViewModel> _filteredAlbums = [];
 
-    private bool _isGroupingEnabled;
-    public bool IsGroupingEnabled
-    {
-        get => _isGroupingEnabled;
-        set
-        {
-            _isGroupingEnabled = value;
-            OnPropertyChanged(nameof(IsGroupingEnabled));
-        }
-    }
-
-    public List<AlbumViewModel> ViewModels => _dataLoader.ViewModels;
-    public List<GenreDto> Genres => _dataLoader.Genres;
-    public ObservableCollection<object> Selected => _selectionManager.Selected;
-    public List<AlbumViewModel> SelectedItems => _selectionManager.SelectedItems;
-    public int SelectedCount => _selectionManager.SelectedCount;
-    public bool IsSelectedItems => _selectionManager.IsSelectedItems;
-
     public RangeObservableCollection<AlbumsGroupCategoryViewModel> GroupedItems { get; private set; } = [];
 
-    private int _totalCount = 0;
-    public int TotalCount
-    {
-        get => Selected.Count > 0 ? Selected.Count : _totalCount;
-        set => SetProperty(ref _totalCount, value);
-    }
-
-    public string GroupById => _stateManager.GroupBy;
-    public string GroupByText
-    {
-        get => _groupService.GetGroupByLabel(_stateManager.GroupBy);
-        set
-        {
-            _stateManager.GroupBy = value;
-            OnPropertyChanged();
-        }
-    }
-
+    public List<AlbumViewModel> ViewModels => _albumProvider.ViewModels;
+    public List<GenreDto> Genres => _albumProvider.Genres;
+    public ObservableCollection<object> Selected => _selectionManager.Selected;
+    public List<AlbumViewModel> SelectedItems => _selectionManager.SelectedItems;
     public List<string> SelectedFilters => _stateManager.SelectedFilters;
     public List<long> SelectedGenreFilters => _stateManager.SelectedGenreFilters;
+    public bool IsSelectedItems => _selectionManager.IsSelectedItems;
 
-    private string _filterByText = "";
-    public string FilterByText
+    [ObservableProperty]
+    public partial string FilterByText { get; set; } = string.Empty;
+
+    [ObservableProperty]
+    public partial bool IsGroupingEnabled { get; set; }
+
+    [ObservableProperty]
+    public partial bool IsGridView { get; set; }
+    partial void OnIsGridViewChanged(bool value)
     {
-        get => _filterByText;
-        set
-        {
-            if (_filterByText != value)
-            {
-                _filterByText = value;
-                OnPropertyChanged(nameof(FilterByText));
-            }
-        }
+        _stateManager.SaveGridView(value);
     }
 
-    private bool _isGridView = true;
-    public bool IsGridView
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(GroupById))]
+    [NotifyPropertyChangedFor(nameof(GroupByText))]
+    public partial string SelectedGroupBy { get; set; } = string.Empty;
+    partial void OnSelectedGroupByChanged(string value)
     {
-        get
-        {
-            return _isGridView;
-        }
-        private set
-        {
-            _isGridView = value;
-            _stateManager.SaveGridView(value);
-            OnPropertyChanged(nameof(IsGridView));
-        }
+        _stateManager.GroupBy = value;
     }
+    public string GroupById => SelectedGroupBy;
+    public string GroupByText => _albumProvider.GetGroupByLabel(SelectedGroupBy);
 
-    public RelayCommand<long?> FilterByGenreCommand { get; private set; }
-    public RelayCommand<string> FilterByCommand { get; private set; }
-    public RelayCommand<string> GroupByCommand { get; private set; }
-    public AsyncRelayCommand ListenCommand { get; private set; }
-    public AsyncRelayCommand<AlbumsGroupCategoryViewModel> ListenGroupCommand { get; private set; }
-    public RelayCommand ToggleDisplayModeCommand { get; private set; }
 
-    public AlbumsViewModel(
-        AlbumsFilter albumsFilter,
-        AlbumsGroupCategory albumsGroupCategory,
-        AlbumsDataLoader dataLoader,
-        AlbumsSelectionManager selectionManager,
-        AlbumsStateManager stateManager,
-        AlbumsPlaybackService playbackService,
-        AlbumUpdateMessageHandler albumUpdateHandler,
-        LibraryRefreshMessageHandler libraryRefreshHandler,
-        AlbumImportedMessageHandler albumImportedHandler,
-        ILogger<AlbumsViewModel> logger)
+
+    public AlbumsViewModel(IAlbumProvider albumProvider, IAlbumLibraryMonitor libraryMonitor, AlbumsSelectionManager selectionManager, AlbumsStateManager stateManager, AlbumsPlaybackService playbackService, ILogger<AlbumsViewModel> logger)
     {
-        _groupService = albumsGroupCategory;
-        _filterService = albumsFilter;
-        _dataLoader = dataLoader;
+        _albumProvider = albumProvider;
+        _libraryMonitor = libraryMonitor;
         _selectionManager = selectionManager;
         _stateManager = stateManager;
         _playbackService = playbackService;
-        _albumUpdateHandler = albumUpdateHandler;
-        _libraryRefreshHandler = libraryRefreshHandler;
-        _albumImportedHandler = albumImportedHandler;
         _logger = logger;
 
-        GroupByCommand = new RelayCommand<string>(GroupBy);
-        FilterByCommand = new RelayCommand<string>(FilterBy);
-        FilterByGenreCommand = new RelayCommand<long?>(FilterByGenreId);
-        ListenGroupCommand = new AsyncRelayCommand<AlbumsGroupCategoryViewModel>(ListenGroupAsync);
-        ListenCommand = new AsyncRelayCommand(ListenAsync);
-        ToggleDisplayModeCommand = new RelayCommand(() => IsGridView = !IsGridView);
-
         IsGridView = _stateManager.GetGridView();
-
-        SubscribeToMessages();
-        SubscribeToEvents();
-    }
-
-    private void SubscribeToMessages()
-    {
-        Messenger.Subscribe<AlbumUpdateMessage>(async (message) => await _albumUpdateHandler.HandleAsync(message));
-        Messenger.Subscribe<LibraryRefreshMessage>(_libraryRefreshHandler.Handle);
-        Messenger.Subscribe<AlbumImportedMessage>(_albumImportedHandler.Handle);
-    }
-
-    private void SubscribeToEvents()
-    {
-        _selectionManager.SelectionChanged += OnSelectionChanged;
-        _albumUpdateHandler.DataChanged += OnDataChanged;
-        _libraryRefreshHandler.LibraryChanged += OnLibraryChanged;
-        _albumImportedHandler.AlbumImported += OnAlbumImported;
-    }
-
-    private void OnSelectionChanged(object? sender, EventArgs e)
-    {
-        OnPropertyChanged(nameof(TotalCount));
-    }
-
-    private void OnDataChanged(object? sender, EventArgs e)
-    {
-        _libraryUpdated = true;
-        FilterAndSort();
+        _libraryMonitor.LibraryChanged += OnLibraryChanged;
     }
 
     private void OnLibraryChanged(object? sender, EventArgs e)
     {
         _libraryUpdated = true;
+        FilterAndSort();
     }
 
     private void OnAlbumImported(object? sender, EventArgs e)
@@ -183,24 +90,63 @@ public partial class AlbumsViewModel : ObservableObject, IDisposable
         }
 
         _libraryUpdated = false;
-        _libraryRefreshHandler.ResetLibraryUpdatedFlag();
-        _albumImportedHandler.ResetLibraryUpdatedFlag();
+        _libraryMonitor.ResetUpdateFlags();
 
         if (!_stateLoaded)
             LoadState();
 
-        await _dataLoader.LoadGenresAsync();
-        await _dataLoader.LoadAlbumsAsync();
+        await _albumProvider.LoadAsync();
 
         FilterAndSort();
     }
 
     public void SetData(List<AlbumDto> albums)
     {
-        _dataLoader.SetAlbums(albums);
+        _albumProvider.SetAlbums(albums);
         FilterAndSort();
     }
 
+    private void SetFilterLabel()
+    {
+        if (_stateManager.SelectedFilters.Count > 0)
+        {
+            string lastFilter = _stateManager.SelectedFilters[^1];
+            FilterByText = _albumProvider.GetFilterLabel(lastFilter);
+        }
+        else if (_stateManager.SelectedGenreFilters.Count > 0)
+        {
+            long lastGenreId = _stateManager.SelectedGenreFilters[^1];
+            FilterByText = Genres.FirstOrDefault(c => c.Id == lastGenreId)?.Name ?? "";
+        }
+        else
+        {
+            FilterByText = _albumProvider.GetFilterLabel("");
+        }
+    }
+
+
+    private void LoadState()
+    {
+        _stateLoaded = true;
+        _stateManager.Load();
+        SelectedGroupBy = _stateManager.GroupBy;
+        SetFilterLabel();
+    }
+
+    public void SaveState()
+    {
+        _stateManager.Save();
+    }
+
+
+
+    [RelayCommand]
+    private void ToggleDisplayMode()
+    {
+        IsGridView = !IsGridView;
+    }
+
+    [RelayCommand]
     private void FilterBy(string filterBy)
     {
         if (string.IsNullOrEmpty(filterBy))
@@ -217,7 +163,8 @@ public partial class AlbumsViewModel : ObservableObject, IDisposable
         FilterAndSort();
     }
 
-    private void FilterByGenreId(long? id)
+    [RelayCommand]
+    private void FilterByGenre(long? id)
     {
         if (id == null)
             _stateManager.SelectedGenreFilters.Clear();
@@ -230,63 +177,31 @@ public partial class AlbumsViewModel : ObservableObject, IDisposable
         FilterAndSort();
     }
 
-    private void SetFilterLabel()
-    {
-        if (_stateManager.SelectedFilters.Count > 0)
-            FilterByText = _filterService.GetLabel(_stateManager.SelectedFilters[_stateManager.SelectedFilters.Count - 1]);
-        else if (_stateManager.SelectedGenreFilters.Count > 0)
-            FilterByText = Genres.FirstOrDefault(c => c.Id == _stateManager.SelectedGenreFilters[_stateManager.SelectedGenreFilters.Count - 1])?.Name ?? "";
-        else
-            FilterByText = _filterService.GetLabel("");
-    }
-
+    [RelayCommand]
     private void GroupBy(string groupBy)
     {
-        GroupByText = groupBy;
+        SelectedGroupBy = groupBy;
         FilterAndSort();
     }
 
+    [RelayCommand]
     private void FilterAndSort()
     {
-        IEnumerable<AlbumViewModel> filteredAlbums = ViewModels;
+        AlbumProviderResult result = _albumProvider.GetProcessedData(_stateManager.GroupBy, _stateManager.SelectedFilters, _stateManager.SelectedGenreFilters);
 
-        foreach (string filterby in _stateManager.SelectedFilters)
-            filteredAlbums = _filterService.Filter(filterby, filteredAlbums);
-
-        foreach (long genreId in _stateManager.SelectedGenreFilters)
-            filteredAlbums = _filterService.FilterByGenreId(genreId, filteredAlbums);
-
-        _filteredAlbums = filteredAlbums.ToList();
-
-        IEnumerable<AlbumsGroupCategoryViewModel> albums = _groupService.GetGroupedItems(_stateManager.GroupBy, _filteredAlbums);
-        GroupedItems.InitWithAddRange(albums);
-
-        IsGroupingEnabled = GroupedItems.Count > 1 || !string.IsNullOrEmpty(GroupedItems.FirstOrDefault()?.Title ?? string.Empty);
-
-        TotalCount = _filteredAlbums.Count;
+        _filteredAlbums = result.FilteredItems;
+        GroupedItems.InitWithAddRange(result.Groups);
+        IsGroupingEnabled = result.IsGroupingEnabled;
     }
 
-    public void SaveState()
-    {
-        _stateManager.Save();
-    }
-
-    private void LoadState()
-    {
-        _stateLoaded = true;
-        _stateManager.Load();
-        SetFilterLabel();
-
-        OnPropertyChanged(nameof(GroupByText));
-        OnPropertyChanged(nameof(FilterByText));
-    }
-
+    [RelayCommand]
     private async Task ListenGroupAsync(AlbumsGroupCategoryViewModel group)
     {
         List<long> albumIds = group.Items.Select(album => album.Album.Id).ToList();
         await _playbackService.PlayAlbumsAsync(albumIds);
     }
 
+    [RelayCommand]
     private async Task ListenAsync()
     {
         List<long> albumIds = Selected.Count == 0
@@ -295,6 +210,8 @@ public partial class AlbumsViewModel : ObservableObject, IDisposable
 
         await _playbackService.PlayAlbumsAsync(albumIds);
     }
+
+
 
     #region IDisposable Support
 
@@ -306,11 +223,8 @@ public partial class AlbumsViewModel : ObservableObject, IDisposable
         {
             if (disposing)
             {
-                _selectionManager.SelectionChanged -= OnSelectionChanged;
-                _albumUpdateHandler.DataChanged -= OnDataChanged;
-                _libraryRefreshHandler.LibraryChanged -= OnLibraryChanged;
-                _albumImportedHandler.AlbumImported -= OnAlbumImported;
-                _dataLoader.Clear();
+                _libraryMonitor.LibraryChanged -= OnLibraryChanged;
+                _albumProvider.Clear();
             }
 
             disposedValue = true;

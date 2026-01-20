@@ -1,4 +1,6 @@
-﻿using Rok.Logic.Services.Player;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
+using Rok.Logic.Services.Player;
 using Rok.Logic.ViewModels.Playlist.Services;
 using Rok.Logic.ViewModels.Tracks;
 
@@ -24,24 +26,40 @@ public partial class PlaylistViewModel : ObservableObject
 
     private IEnumerable<TrackDto>? _tracks = null;
 
-    public string Name
-    {
-        get => Playlist.Name;
-        set
-        {
-            if (Playlist.Name != value)
-            {
-                Playlist.Name = value;
-                _ = SavePlaylistAsync(forceUpdate: true);
-            }
-        }
-    }
-
     public int TrackMaximum
     {
         get => Playlist.TrackMaximum;
         set => Playlist.TrackMaximum = value;
     }
+
+    public string Name
+    {
+        get => Playlist.Name;
+        set
+        {
+            Playlist.Name = value;
+            _ = SavePlaylistAsync();
+        }
+    }
+
+
+    [ObservableProperty]
+    public partial BitmapImage? Backdrop { get; set; }
+
+    [ObservableProperty]
+    public partial BitmapImage? Picture { get; set; }
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(IsTitleSorted))]
+    [NotifyPropertyChangedFor(nameof(IsArtistSorted))]
+    [NotifyPropertyChangedFor(nameof(IsAlbumSorted))]
+    [NotifyPropertyChangedFor(nameof(IsScoreSorted))]
+    public partial string? CurrentSortColumn { get; set; }
+
+    [ObservableProperty]
+    public partial bool SortDescending { get; set; }
+
+
 
     public int TrackCount => Playlist.TrackCount;
 
@@ -67,51 +85,6 @@ public partial class PlaylistViewModel : ObservableObject
         }
     }
 
-    private BitmapImage? _backdrop = null;
-    public BitmapImage? Backdrop
-    {
-        get => _backdrop;
-        set
-        {
-            _backdrop = value;
-            OnPropertyChanged();
-        }
-    }
-
-    private BitmapImage? _picture = null;
-    public BitmapImage? Picture
-    {
-        get => _picture;
-        set
-        {
-            _picture = value;
-            OnPropertyChanged();
-        }
-    }
-
-    private string? _currentSortColumn;
-    public string? CurrentSortColumn
-    {
-        get => _currentSortColumn;
-        set
-        {
-            if (SetProperty(ref _currentSortColumn, value))
-            {
-                OnPropertyChanged(nameof(IsTitleSorted));
-                OnPropertyChanged(nameof(IsArtistSorted));
-                OnPropertyChanged(nameof(IsAlbumSorted));
-                OnPropertyChanged(nameof(IsScoreSorted));
-            }
-        }
-    }
-
-    private bool _sortDescending;
-    public bool SortDescending
-    {
-        get => _sortDescending;
-        set => SetProperty(ref _sortDescending, value);
-    }
-
     public bool IsTitleSorted => CurrentSortColumn == "Title";
     public bool IsArtistSorted => CurrentSortColumn == "Artist";
     public bool IsAlbumSorted => CurrentSortColumn == "Album";
@@ -119,15 +92,6 @@ public partial class PlaylistViewModel : ObservableObject
 
     public string GetSortGlyph(bool descending) => descending ? "\uE74B" : "\uE74A";
 
-    public AsyncRelayCommand ListenCommand { get; private set; }
-    public RelayCommand ShufflePlaylistCommand { get; private set; }
-    public AsyncRelayCommand GenerateCommand { get; private set; }
-    public RelayCommand PlaylistOpenCommand { get; private set; }
-    public AsyncRelayCommand DeleteCommand { get; private set; }
-    public AsyncRelayCommand<long> RemoveFromPlaylistCommand { get; private set; }
-    public AsyncRelayCommand<List<PlaylistGroupDto>> SavePlaylistCommand { get; private set; }
-    public AsyncRelayCommand MoveTrackCommand { get; private set; }
-    public RelayCommand<string> SortCommand { get; private set; }
 
     public PlaylistViewModel(
         IBackdropLoader backdropLoader,
@@ -149,16 +113,6 @@ public partial class PlaylistViewModel : ObservableObject
         _updateService = Guard.Against.Null(updateService);
         _generationService = Guard.Against.Null(generationService);
         _logger = Guard.Against.Null(logger);
-
-        ListenCommand = new AsyncRelayCommand(ListenAsync);
-        ShufflePlaylistCommand = new RelayCommand(ShuffleTracks);
-        GenerateCommand = new AsyncRelayCommand(GenerateAsync);
-        PlaylistOpenCommand = new RelayCommand(OpenPlaylist);
-        DeleteCommand = new AsyncRelayCommand(DeletePlaylistAsync);
-        RemoveFromPlaylistCommand = new AsyncRelayCommand<long>(RemoveTrackAsync);
-        SavePlaylistCommand = new AsyncRelayCommand<List<PlaylistGroupDto>>((c) => SavePlaylistAsync(forceUpdate: true, c));
-        MoveTrackCommand = new AsyncRelayCommand(async () => await MoveTrackAsync());
-        SortCommand = new RelayCommand<string>(SortTracks);
     }
 
     public void SetData(PlaylistHeaderDto playlist)
@@ -198,12 +152,12 @@ public partial class PlaylistViewModel : ObservableObject
     private async Task LoadPlaylistAsync(long playlistId)
     {
         PlaylistHeaderDto? playlist = await _dataLoader.LoadPlaylistAsync(playlistId);
-        if (playlist != null)
-        {
-            Playlist = playlist;
-            LoadBackdrop();
-            LoadPicture();
-        }
+        if (playlist == null)
+            return;
+
+        Playlist = playlist;
+        LoadBackdrop();
+        LoadPicture();
     }
 
     private void LoadBackdrop()
@@ -221,26 +175,41 @@ public partial class PlaylistViewModel : ObservableObject
 
     private async Task LoadTracksAsync(long playlistId)
     {
-        if (playlistId > 0)
-        {
-            List<TrackViewModel> tracks = await _dataLoader.LoadTracksAsync(playlistId);
-            _tracks = tracks.Select(t => t.Track);
-            _originalTracks = tracks.ToList();
-            Tracks.InitWithAddRange(tracks);
-        }
+        if (playlistId <= 0)
+            return;
+
+        List<TrackViewModel> tracks = await _dataLoader.LoadTracksAsync(playlistId);
+        _tracks = tracks.Select(t => t.Track);
+        _originalTracks = tracks.ToList();
+        Tracks.InitWithAddRange(tracks);
     }
 
-    private async Task SavePlaylistAsync(bool forceUpdate = false, List<PlaylistGroupDto>? groups = null)
+    private async Task SavePlaylistAsync()
     {
-        bool updated = await _updateService.SavePlaylistAsync(Playlist, Tracks, forceUpdate, groups);
+        bool updated = await _updateService.SavePlaylistAsync(Playlist, Tracks);
 
-        if (updated)
-        {
-            LoadPicture();
-            OnPropertyChanged();
-        }
+        if (!updated)
+            return;
+
+        LoadPicture();
+        OnPropertyChanged();
     }
 
+
+
+    [RelayCommand]
+    private async Task SavePlaylistAsync(List<PlaylistGroupDto>? groups)
+    {
+        bool updated = await _updateService.SavePlaylistAsync(Playlist, Tracks, forceUpdate: true, groups);
+
+        if (!updated)
+            return;
+
+        LoadPicture();
+        OnPropertyChanged();
+    }
+
+    [RelayCommand]
     private async Task MoveTrackAsync()
     {
         if (Tracks.Count == 0 || Playlist.Id == 0)
@@ -249,6 +218,7 @@ public partial class PlaylistViewModel : ObservableObject
         await _updateService.SaveTracksPositionAsync(Playlist.Id, Tracks.Select(c => c.Track.Id).ToList());
     }
 
+    [RelayCommand]
     private async Task ListenAsync()
     {
         if (_tracks == null)
@@ -260,11 +230,10 @@ public partial class PlaylistViewModel : ObservableObject
         }
 
         if (_tracks?.Any() == true)
-        {
             _playerService.LoadPlaylist(Tracks.Select(t => t.Track).ToList());
-        }
     }
 
+    [RelayCommand]
     private async Task GenerateAsync()
     {
         await _generationService.GenerateTracksAsync(Playlist);
@@ -278,18 +247,21 @@ public partial class PlaylistViewModel : ObservableObject
         OnPropertyChanged();
     }
 
-    private void OpenPlaylist()
+    [RelayCommand]
+    private void PlaylistOpen()
     {
-        if (Playlist.Id > 0)
-        {
-            if (Playlist.Type == (int)PlaylistType.Smart)
-                _navigationService.NavigateToSmartPlaylist(Playlist.Id);
-            else
-                _navigationService.NavigateToPlaylist(Playlist.Id);
-        }
+        if (Playlist.Id <= 0)
+            return;
+
+        if (Playlist.Type == (int)PlaylistType.Smart)
+            _navigationService.NavigateToSmartPlaylist(Playlist.Id);
+        else
+            _navigationService.NavigateToPlaylist(Playlist.Id);
     }
 
-    public void ShuffleTracks()
+
+    [RelayCommand]
+    public void ShufflePlaylist()
     {
         if (Tracks.Count == 0)
             return;
@@ -297,39 +269,42 @@ public partial class PlaylistViewModel : ObservableObject
         Tracks.Shuffle();
     }
 
-    private async Task DeletePlaylistAsync()
+    [RelayCommand]
+    private async Task DeleteAsync()
     {
-        if (Playlist.Id > 0)
-        {
-            bool deleted = await _updateService.DeletePlaylistAsync(Playlist.Id, Playlist.Name);
+        if (Playlist.Id <= 0)
+            return;
 
-            if (deleted)
-            {
-                _navigationService.RemoveLastEntry();
-                _navigationService.NavigateToPlaylists();
-            }
-        }
+        bool deleted = await _updateService.DeletePlaylistAsync(Playlist.Id, Playlist.Name);
+
+        if (!deleted)
+            return;
+
+        _navigationService.RemoveLastEntry();
+        _navigationService.NavigateToPlaylists();
     }
 
-    private async Task RemoveTrackAsync(long trackId)
+    [RelayCommand]
+    private async Task RemoveFromPlaylistAsync(long trackId)
     {
         bool removed = await _updateService.RemoveTrackAsync(Playlist.Id, trackId);
 
-        if (removed)
-        {
-            TrackViewModel? track = Tracks.FirstOrDefault(c => c.Track.Id == trackId);
-            if (track != null)
-                Tracks.Remove(track);
+        if (!removed)
+            return;
 
-            TrackViewModel? originalTrack = _originalTracks.FirstOrDefault(t => t.Track.Id == trackId);
-            if (originalTrack != null)
-                _originalTracks.Remove(originalTrack);
+        TrackViewModel? track = Tracks.FirstOrDefault(c => c.Track.Id == trackId);
+        if (track != null)
+            Tracks.Remove(track);
 
-            _tracks = _tracks!.Where(t => t.Id != trackId).ToList();
-        }
+        TrackViewModel? originalTrack = _originalTracks.FirstOrDefault(t => t.Track.Id == trackId);
+        if (originalTrack != null)
+            _originalTracks.Remove(originalTrack);
+
+        _tracks = _tracks!.Where(t => t.Id != trackId).ToList();
     }
 
-    private void SortTracks(string? column)
+    [RelayCommand]
+    private void Sort(string? column)
     {
         if (string.IsNullOrEmpty(column))
             return;

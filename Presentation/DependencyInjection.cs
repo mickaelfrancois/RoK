@@ -4,10 +4,12 @@ using Rok.Logic.Services.Player;
 using Rok.Logic.ViewModels.Album.Services;
 using Rok.Logic.ViewModels.Albums;
 using Rok.Logic.ViewModels.Albums.Handlers;
+using Rok.Logic.ViewModels.Albums.Interfaces;
 using Rok.Logic.ViewModels.Albums.Services;
 using Rok.Logic.ViewModels.Artist.Services;
 using Rok.Logic.ViewModels.Artists;
 using Rok.Logic.ViewModels.Artists.Handlers;
+using Rok.Logic.ViewModels.Artists.Interfaces;
 using Rok.Logic.ViewModels.Artists.Services;
 using Rok.Logic.ViewModels.Genre;
 using Rok.Logic.ViewModels.Genre.Services;
@@ -26,6 +28,7 @@ using Rok.Logic.ViewModels.Statistics;
 using Rok.Logic.ViewModels.Track.Services;
 using Rok.Logic.ViewModels.Tracks;
 using Rok.Logic.ViewModels.Tracks.Handlers;
+using Rok.Logic.ViewModels.Tracks.Interfaces;
 using Rok.Logic.ViewModels.Tracks.Services;
 
 namespace Rok;
@@ -51,21 +54,19 @@ public static class DependencyInjection
         services.AddSingleton<AlbumsPlaybackService>();
         services.AddSingleton<AlbumUpdateMessageHandler>();
         services.AddSingleton<AlbumImportedMessageHandler>();
+        services.AddSingleton<IAlbumProvider, AlbumProvider>();
+        services.AddSingleton<IAlbumLibraryMonitor, AlbumLibraryMonitor>();
         services.AddTransient<AlbumsGroupCategory>();
         services.AddTransient<AlbumsFilter>();
 
         services.AddKeyedTransient<AlbumsViewModel>("SearchAlbums", (sp, _) =>
         {
             return new AlbumsViewModel(
-                        ActivatorUtilities.CreateInstance<AlbumsFilter>(sp),
-                        ActivatorUtilities.CreateInstance<AlbumsGroupCategory>(sp),
-                        ActivatorUtilities.CreateInstance<AlbumsDataLoader>(sp),
+                        ActivatorUtilities.CreateInstance<AlbumProvider>(sp),
+                        ActivatorUtilities.CreateInstance<AlbumLibraryMonitor>(sp),
                         ActivatorUtilities.CreateInstance<AlbumsSelectionManager>(sp),
                         ActivatorUtilities.CreateInstance<AlbumsStateManager>(sp),
                         ActivatorUtilities.CreateInstance<AlbumsPlaybackService>(sp),
-                        ActivatorUtilities.CreateInstance<AlbumUpdateMessageHandler>(sp),
-                        ActivatorUtilities.CreateInstance<LibraryRefreshMessageHandler>(sp),
-                        ActivatorUtilities.CreateInstance<AlbumImportedMessageHandler>(sp),
                         sp.GetRequiredService<ILogger<AlbumsViewModel>>()
                        );
         });
@@ -91,21 +92,19 @@ public static class DependencyInjection
         services.AddSingleton<ArtistsPlaybackService>();
         services.AddSingleton<ArtistUpdateMessageHandler>();
         services.AddSingleton<ArtistImportedMessageHandler>();
+        services.AddSingleton<IArtistProvider, ArtistProvider>();
+        services.AddSingleton<IArtistLibraryMonitor, ArtistLibraryMonitor>();
         services.AddTransient<ArtistsGroupCategory>();
         services.AddTransient<ArtistsFilter>();
 
         services.AddKeyedTransient<ArtistsViewModel>("SearchArtists", (sp, _) =>
         {
             return new ArtistsViewModel(
-                        ActivatorUtilities.CreateInstance<ArtistsFilter>(sp),
-                        ActivatorUtilities.CreateInstance<ArtistsGroupCategory>(sp),
-                        ActivatorUtilities.CreateInstance<ArtistsDataLoader>(sp),
+                        ActivatorUtilities.CreateInstance<ArtistProvider>(sp),
+                        ActivatorUtilities.CreateInstance<ArtistLibraryMonitor>(sp),
                         ActivatorUtilities.CreateInstance<ArtistsSelectionManager>(sp),
                         ActivatorUtilities.CreateInstance<ArtistsStateManager>(sp),
                         ActivatorUtilities.CreateInstance<ArtistsPlaybackService>(sp),
-                        ActivatorUtilities.CreateInstance<ArtistUpdateMessageHandler>(sp),
-                        ActivatorUtilities.CreateInstance<LibraryRefreshMessageHandler>(sp),
-                        ActivatorUtilities.CreateInstance<ArtistImportedMessageHandler>(sp),
                         sp.GetRequiredService<IAppOptions>(),
                         sp.GetRequiredService<ILogger<ArtistsViewModel>>()
                        );
@@ -128,18 +127,17 @@ public static class DependencyInjection
         services.AddSingleton<TrackImportedMessageHandler>();
         services.AddTransient<TracksGroupCategory>();
         services.AddTransient<TracksFilter>();
+        services.AddSingleton<ITrackProvider, TrackProvider>();
+        services.AddSingleton<ITrackLibraryMonitor, TrackLibraryMonitor>();
 
         services.AddKeyedTransient<TracksViewModel>("SearchTracks", (sp, _) =>
         {
             return new TracksViewModel(
-                        ActivatorUtilities.CreateInstance<TracksFilter>(sp),
-                        ActivatorUtilities.CreateInstance<TracksGroupCategory>(sp),
-                        ActivatorUtilities.CreateInstance<TracksDataLoader>(sp),
+                        ActivatorUtilities.CreateInstance<TrackProvider>(sp),
+                        ActivatorUtilities.CreateInstance<TrackLibraryMonitor>(sp),
                         ActivatorUtilities.CreateInstance<TracksSelectionManager>(sp),
                         ActivatorUtilities.CreateInstance<TracksStateManager>(sp),
                         ActivatorUtilities.CreateInstance<TracksPlaybackService>(sp),
-                        ActivatorUtilities.CreateInstance<LibraryRefreshMessageHandler>(sp),
-                        ActivatorUtilities.CreateInstance<TrackImportedMessageHandler>(sp),
                         sp.GetRequiredService<ILogger<TracksViewModel>>()
                        );
         });
@@ -150,7 +148,6 @@ public static class DependencyInjection
         services.AddTransient<TrackLyricsService>();
         services.AddTransient<TrackScoreService>();
         services.AddTransient<TrackNavigationService>();
-
         // Listening ViewModel and services
         services.AddSingleton<ListeningViewModel>();
         services.AddSingleton<ListeningDataLoader>();

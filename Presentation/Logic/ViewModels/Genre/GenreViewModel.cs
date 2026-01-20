@@ -1,4 +1,6 @@
-﻿using Rok.Application.Randomizer;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
+using Rok.Application.Randomizer;
 using Rok.Logic.Services.Player;
 using Rok.Logic.ViewModels.Albums;
 using Rok.Logic.ViewModels.Artist.Services;
@@ -6,12 +8,11 @@ using Rok.Logic.ViewModels.Genre.Services;
 
 namespace Rok.Logic.ViewModels.Genre;
 
-public class GenreViewModel : ObservableObject
+public partial class GenreViewModel : ObservableObject
 {
     private static string FallbackPictureUri => App.Current.Resources["ArtistFallbackPictureUri"] as string ?? "ms-appx:///Assets/artistFallback.png";
     private static BitmapImage FallbackPicture => new(new Uri(FallbackPictureUri));
 
-    private readonly NavigationService _navigationService;
     private readonly ResourceLoader _resourceLoader;
     private readonly IPlayerService _playerService;
     private readonly GenreDataLoader _dataLoader;
@@ -21,21 +22,17 @@ public class GenreViewModel : ObservableObject
     private readonly GenreEditService _editService;
 
     public RangeObservableCollection<AlbumViewModel> Albums { get; set; } = [];
-
     public GenreDto Genre { get; private set; } = new();
 
-    public bool IsFavorite
+    [ObservableProperty]
+    public partial bool IsFavorite { get; set; }
+    partial void OnIsFavoriteChanged(bool value)
     {
-        get => Genre.IsFavorite;
-        set
-        {
-            if (Genre.IsFavorite != value)
-            {
-                Genre.IsFavorite = value;
-                OnPropertyChanged();
-            }
-        }
+        Genre.IsFavorite = value;
     }
+
+    [ObservableProperty]
+    public partial BitmapImage? Backdrop { get; set; }
 
     private BitmapImage? _picture = null;
     public BitmapImage Picture
@@ -46,8 +43,7 @@ public class GenreViewModel : ObservableObject
         }
         set
         {
-            _picture = value;
-            OnPropertyChanged(nameof(Picture));
+            SetProperty(ref _picture, value);
             OnPropertyChanged(nameof(IsPictureAvailable));
         }
     }
@@ -57,17 +53,6 @@ public class GenreViewModel : ObservableObject
         get
         {
             return _picture != null && _picture.UriSource != FallbackPicture.UriSource;
-        }
-    }
-
-    private BitmapImage? _backdrop = null;
-    public BitmapImage? Backdrop
-    {
-        get => _backdrop;
-        set
-        {
-            _backdrop = value;
-            OnPropertyChanged();
         }
     }
 
@@ -151,12 +136,8 @@ public class GenreViewModel : ObservableObject
         }
     }
 
-    public AsyncRelayCommand GenreFavoriteCommand { get; private set; }
-    public AsyncRelayCommand ListenCommand { get; private set; }
 
-
-    public GenreViewModel(NavigationService navigationService,
-                          IPlayerService playerService,
+    public GenreViewModel(IPlayerService playerService,
                           ResourceLoader resourceLoader,
                           GenreDataLoader dataLoader,
                           ArtistPictureService pictureService,
@@ -164,7 +145,6 @@ public class GenreViewModel : ObservableObject
                           GenreEditService editService,
                           ILogger<GenreViewModel> logger)
     {
-        _navigationService = navigationService;
         _playerService = playerService;
         _dataLoader = dataLoader;
         _pictureService = pictureService;
@@ -172,9 +152,6 @@ public class GenreViewModel : ObservableObject
         _resourceLoader = resourceLoader;
         _editService = editService;
         _logger = logger;
-
-        ListenCommand = new AsyncRelayCommand(ListenAsync);
-        GenreFavoriteCommand = new AsyncRelayCommand(UpdateFavoriteStateAsync);
     }
 
 
@@ -234,6 +211,8 @@ public class GenreViewModel : ObservableObject
         });
     }
 
+
+    [RelayCommand]
     private async Task ListenAsync()
     {
         IEnumerable<TrackDto> tracks = await _dataLoader.LoadTracksAsync(Genre.Id);
@@ -245,7 +224,8 @@ public class GenreViewModel : ObservableObject
         }
     }
 
-    private async Task UpdateFavoriteStateAsync()
+    [RelayCommand]
+    private async Task GenreFavoriteAsync()
     {
         bool newFavoriteState = !Genre.IsFavorite;
         await _editService.UpdateFavoriteAsync(Genre, newFavoriteState);

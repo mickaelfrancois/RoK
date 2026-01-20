@@ -1,4 +1,6 @@
-﻿using Rok.Application.Features.Playlists.PlaylistMenu;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
+using Rok.Application.Features.Playlists.PlaylistMenu;
 using Rok.Infrastructure.Translate;
 using Rok.Logic.Services.Player;
 using Rok.Logic.ViewModels.Album.Services;
@@ -21,25 +23,28 @@ public partial class AlbumViewModel : ObservableObject
     private readonly AlbumApiService _apiService;
     private readonly AlbumStatisticsService _statisticsService;
     private readonly AlbumEditService _editService;
-
-    public AlbumDto Album { get; private set; } = new();
     public RangeObservableCollection<TrackViewModel> Tracks { get; set; } = [];
-
     private IEnumerable<TrackDto>? _tracks = null;
 
+    public AlbumDto Album { get; private set; } = new();
     public IPlaylistMenuService PlaylistMenuService { get; }
 
-    public bool IsFavorite
+
+    [ObservableProperty]
+    public partial bool IsFavorite { get; set; }
+    partial void OnIsFavoriteChanged(bool value)
     {
-        get => Album.IsFavorite;
-        set
-        {
-            if (Album.IsFavorite != value)
-            {
-                Album.IsFavorite = value;
-                OnPropertyChanged();
-            }
-        }
+        Album.IsFavorite = value;
+    }
+
+    [ObservableProperty]
+    public partial BitmapImage? Backdrop { get; set; }
+
+    public override string ToString()
+    {
+        if (Album == null)
+            return string.Empty;
+        return Album.Name;
     }
 
     public string SubTitle
@@ -105,41 +110,10 @@ public partial class AlbumViewModel : ObservableObject
 
             return _picture;
         }
-        set
-        {
-            _picture = value;
-            OnPropertyChanged();
-        }
+        set => SetProperty(ref _picture, value);
     }
 
-    private BitmapImage? _backdrop = null;
-    public BitmapImage? Backdrop
-    {
-        get => _backdrop;
-        set
-        {
-            _backdrop = value;
-            OnPropertyChanged();
-        }
-    }
 
-    public AsyncRelayCommand ListenCommand { get; private set; }
-    public RelayCommand AlbumOpenCommand { get; private set; }
-    public RelayCommand ArtistOpenCommand { get; private set; }
-    public RelayCommand GenreOpenCommand { get; private set; }
-    public RelayCommand OpenArtistsByCountryCommand { get; private set; }
-    public AsyncRelayCommand AlbumFavoriteCommand { get; private set; }
-    public AsyncRelayCommand SelectPictureCommand { get; private set; }
-    public AsyncRelayCommand EditAlbumCommand { get; private set; }
-    public RelayCommand<string> OpenUrlCommand { get; private set; }
-    public AsyncRelayCommand OpenBiographyCommand { get; private set; }
-
-    public override string ToString()
-    {
-        if (Album == null)
-            return string.Empty;
-        return Album.Name;
-    }
 
     public AlbumViewModel(
         IBackdropLoader backdropLoader,
@@ -170,17 +144,6 @@ public partial class AlbumViewModel : ObservableObject
         _dialogService = Guard.Against.Null(dialogService);
         PlaylistMenuService = Guard.Against.Null(playlistMenuService);
         _logger = Guard.Against.Null(logger);
-
-        ListenCommand = new AsyncRelayCommand(ListenAsync);
-        AlbumFavoriteCommand = new AsyncRelayCommand(UpdateFavoriteStateAsync);
-        AlbumOpenCommand = new RelayCommand(AlbumOpen);
-        ArtistOpenCommand = new RelayCommand(ArtistOpen);
-        GenreOpenCommand = new RelayCommand(() => { });
-        OpenArtistsByCountryCommand = new RelayCommand(() => { });
-        SelectPictureCommand = new AsyncRelayCommand(SelectPictureAsync);
-        EditAlbumCommand = new AsyncRelayCommand(EditAlbumAsync);
-        OpenUrlCommand = new RelayCommand<string>(OpenUrl);
-        OpenBiographyCommand = new AsyncRelayCommand(OpenBiographyAsync);
     }
 
 
@@ -242,17 +205,28 @@ public partial class AlbumViewModel : ObservableObject
         }
     }
 
+
+    [RelayCommand]
     private void AlbumOpen()
     {
         _navigationService.NavigateToAlbum(Album.Id);
     }
 
+    [RelayCommand]
     private void ArtistOpen()
     {
         if (Album.ArtistId.HasValue)
             _navigationService.NavigateToArtist(Album.ArtistId.Value);
     }
 
+    [RelayCommand]
+    private void GenreOpen()
+    {
+        if (Album.GenreId.HasValue)
+            _navigationService.NavigateToGenre(Album.GenreId.Value);
+    }
+
+    [RelayCommand]
     private async Task ListenAsync()
     {
         if (_tracks == null)
@@ -262,7 +236,8 @@ public partial class AlbumViewModel : ObservableObject
             _playerService.LoadPlaylist(_tracks.ToList());
     }
 
-    private async Task UpdateFavoriteStateAsync()
+    [RelayCommand]
+    private async Task AlbumFavoriteAsync()
     {
         bool newFavoriteState = !Album.IsFavorite;
         await _editService.UpdateFavoriteAsync(Album, newFavoriteState);
@@ -271,50 +246,53 @@ public partial class AlbumViewModel : ObservableObject
         Messenger.Send(new AlbumUpdateMessage(Album.Id, ActionType.Update));
     }
 
+    [RelayCommand]
     private async Task GetDataFromApiAsync()
     {
         bool updated = await _apiService.GetAndUpdateAlbumDataAsync(Album);
 
-        if (updated)
-        {
-            if (_pictureService.PictureExists(Album.AlbumPath))
-                LoadPicture();
+        if (!updated)
+            return;
 
-            AlbumDto? refreshedAlbum = await _dataLoader.ReloadAlbumAsync(Album.Id);
-            if (refreshedAlbum != null)
-                Album = refreshedAlbum;
+        if (_pictureService.PictureExists(Album.AlbumPath))
+            LoadPicture();
 
-            Messenger.Send(new AlbumUpdateMessage(Album.Id, ActionType.Update));
-        }
+        AlbumDto? refreshedAlbum = await _dataLoader.ReloadAlbumAsync(Album.Id);
+        if (refreshedAlbum != null)
+            Album = refreshedAlbum;
+
+        Messenger.Send(new AlbumUpdateMessage(Album.Id, ActionType.Update));
     }
 
+    [RelayCommand]
     private async Task EditAlbumAsync()
     {
         bool updated = await _editService.EditAlbumAsync(Album);
 
-        if (updated)
-        {
-            Messenger.Send(new AlbumUpdateMessage(Album.Id, ActionType.Update));
-            OnPropertyChanged(nameof(Album));
-        }
+        if (!updated)
+            return;
+
+        Messenger.Send(new AlbumUpdateMessage(Album.Id, ActionType.Update));
+        OnPropertyChanged(nameof(Album));
     }
 
+    [RelayCommand]
     private async Task SelectPictureAsync()
     {
         BitmapImage? newPicture = await _pictureService.SelectAndSavePictureAsync(Album.AlbumPath);
 
-        if (newPicture != null)
-        {
-            if (Rok.App.MainWindow.DispatcherQueue is { } dq)
-                dq.TryEnqueue(() => Picture = newPicture);
-            else
-                Picture = newPicture;
+        if (newPicture is null)
+            return;
 
-            Messenger.Send(new AlbumUpdateMessage(Album.Id, ActionType.Picture));
-        }
+        if (Rok.App.MainWindow.DispatcherQueue is { } dq)
+            dq.TryEnqueue(() => Picture = newPicture);
+        else
+            Picture = newPicture;
+
+        Messenger.Send(new AlbumUpdateMessage(Album.Id, ActionType.Picture));
     }
 
-
+    [RelayCommand]
     private void OpenUrl(string url)
     {
         if (string.IsNullOrEmpty(url))
@@ -329,15 +307,15 @@ public partial class AlbumViewModel : ObservableObject
             _ = Windows.System.Launcher.LaunchUriAsync(uri);
     }
 
-
+    [RelayCommand]
     private async Task OpenBiographyAsync()
     {
-        if (!string.IsNullOrEmpty(Album.Biography))
-        {
-            string? rawLanguage = Windows.Globalization.ApplicationLanguages.Languages.FirstOrDefault();
-            string language = TranslateService.NormalizeLanguageForLibreTranslate(rawLanguage, "fr");
+        if (string.IsNullOrEmpty(Album.Biography))
+            return;
 
-            await _dialogService.ShowTextAsync(Album.Name, Album.Biography, showTranslateButton: _appOptions.NovaApiEnabled, language);
-        }
+        string? rawLanguage = Windows.Globalization.ApplicationLanguages.Languages.FirstOrDefault();
+        string language = TranslateService.NormalizeLanguageForLibreTranslate(rawLanguage, "fr");
+
+        await _dialogService.ShowTextAsync(Album.Name, Album.Biography, showTranslateButton: _appOptions.NovaApiEnabled, language);
     }
 }

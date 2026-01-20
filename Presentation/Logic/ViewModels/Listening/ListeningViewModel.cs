@@ -1,4 +1,6 @@
-﻿using Rok.Logic.Services.Player;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
+using Rok.Logic.Services.Player;
 using Rok.Logic.ViewModels.Artists;
 using Rok.Logic.ViewModels.Listening.Services;
 using Rok.Logic.ViewModels.Tracks;
@@ -9,7 +11,6 @@ public partial class ListeningViewModel : ObservableObject
 {
     private readonly ILogger<ListeningViewModel> _logger;
     private readonly IPlayerService _playerService;
-
     private readonly ListeningPlaylistManager _playlistManager;
     private readonly ListeningPlaybackService _playbackService;
     private readonly NavigationService _navigationService;
@@ -19,12 +20,6 @@ public partial class ListeningViewModel : ObservableObject
     public ArtistViewModel? Artist => _playlistManager.Artist;
     public RangeObservableCollection<TrackViewModel> Tracks => _playlistManager.Tracks;
     public TrackViewModel? CurrentTrack => _playlistManager.CurrentTrack;
-
-    public AsyncRelayCommand<TrackViewModel> AddMoreFromArtistCommand { get; private set; }
-    public RelayCommand ShufflePlaylistCommand { get; private set; }
-    public RelayCommand AlbumOpenCommand { get; private set; }
-    public RelayCommand ArtistOpenCommand { get; private set; }
-    public RelayCommand TrackOpenCommand { get; private set; }
 
     public ListeningViewModel(
         IPlayerService playerService,
@@ -38,12 +33,6 @@ public partial class ListeningViewModel : ObservableObject
         _playbackService = Guard.Against.Null(playbackService);
         _navigationService = Guard.Against.Null(navigationService);
         _logger = Guard.Against.Null(logger);
-
-        AddMoreFromArtistCommand = new AsyncRelayCommand<TrackViewModel>(AddMoreFromArtistAsync);
-        ShufflePlaylistCommand = new RelayCommand(ShuffleTracks);
-        ArtistOpenCommand = new RelayCommand(ArtistOpen);
-        AlbumOpenCommand = new RelayCommand(AlbumOpen);
-        TrackOpenCommand = new RelayCommand(TrackOpen);
 
         SubscribeToMessages();
         SubscribeToEvents();
@@ -100,17 +89,20 @@ public partial class ListeningViewModel : ObservableObject
         await _playlistManager.SetCurrentTrackAsync(_playerService.CurrentTrack);
     }
 
+    [RelayCommand]
     private async Task AddMoreFromArtistAsync(TrackViewModel track)
     {
         IEnumerable<long> currentTrackIds = Tracks.Select(t => t.Track.Id);
         await _playbackService.AddMoreFromArtistAsync(track, currentTrackIds);
     }
 
-    public void ShuffleTracks()
+    [RelayCommand]
+    private void ShufflePlaylist()
     {
         _playbackService.ShuffleTracks();
     }
 
+    [RelayCommand]
     private void ArtistOpen()
     {
         long? artistId = CurrentTrack?.Track.ArtistId;
@@ -120,6 +112,7 @@ public partial class ListeningViewModel : ObservableObject
         _navigationService.NavigateToArtist(artistId.Value);
     }
 
+    [RelayCommand]
     private void AlbumOpen()
     {
         long? albumId = CurrentTrack?.Track.AlbumId;
@@ -129,6 +122,7 @@ public partial class ListeningViewModel : ObservableObject
         _navigationService.NavigateToAlbum(albumId.Value);
     }
 
+    [RelayCommand]
     private void TrackOpen()
     {
         long? trackId = CurrentTrack?.Track.Id;

@@ -1,4 +1,7 @@
-﻿using Rok.Application.Dto.Lyrics;
+﻿using System.ComponentModel;
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
+using Rok.Application.Dto.Lyrics;
 using Rok.Application.Features.Tracks.Command;
 using Rok.Application.Player;
 using Rok.Logic.Services.Player;
@@ -6,7 +9,6 @@ using Rok.Logic.ViewModels.Albums;
 using Rok.Logic.ViewModels.Artists;
 using Rok.Logic.ViewModels.Player.Services;
 using Rok.Logic.ViewModels.Tracks;
-using System.ComponentModel;
 
 namespace Rok.Logic.ViewModels.Player;
 
@@ -129,14 +131,6 @@ public partial class PlayerViewModel : ObservableObject, IDisposable
     public bool IsSynchronizedLyrics => _stateManager.IsSynchronizedLyrics;
     public string? PlainLyrics => _stateManager.PlainLyrics;
 
-    // Commands
-    public RelayCommand FullscreenCommand { get; private set; }
-    public RelayCommand MuteCommand { get; private set; }
-    public RelayCommand SkipPreviousCommand { get; private set; }
-    public AsyncRelayCommand SkipNextCommand { get; private set; }
-    public RelayCommand OpenListeningCommand { get; private set; }
-    public RelayCommand CompactModeCommand { get; private set; }
-    public RelayCommand TogglePlayPauseCommand { get; private set; }
 
     public PlayerViewModel(
         IPlayerService player,
@@ -158,14 +152,6 @@ public partial class PlayerViewModel : ObservableObject, IDisposable
         _timerManager = Guard.Against.Null(timerManager);
         _stateManager = Guard.Against.Null(stateManager);
         _logger = Guard.Against.Null(logger);
-
-        SkipPreviousCommand = new RelayCommand(SkipPrevious);
-        SkipNextCommand = new AsyncRelayCommand(SkipNextAsync);
-        FullscreenCommand = new RelayCommand(Fullscreen);
-        MuteCommand = new RelayCommand(Mute);
-        OpenListeningCommand = new RelayCommand(OpenListening);
-        CompactModeCommand = new RelayCommand(ToggleCompactMode);
-        TogglePlayPauseCommand = new RelayCommand(TogglePlayPause);
 
         _stateManager.PropertyChanged += OnStateManagerPropertyChanged;
 
@@ -396,6 +382,9 @@ public partial class PlayerViewModel : ObservableObject, IDisposable
         OnPropertyChanged(nameof(PlainLyrics));
     }
 
+
+
+    [RelayCommand]
     public void TogglePlayPause()
     {
         if (_player.PlaybackState == EPlaybackState.Paused)
@@ -404,6 +393,7 @@ public partial class PlayerViewModel : ObservableObject, IDisposable
             _player.Pause();
     }
 
+    [RelayCommand]
     public async Task SkipNextAsync()
     {
         if (!CanSkipNext || CurrentTrack == null)
@@ -415,6 +405,7 @@ public partial class PlayerViewModel : ObservableObject, IDisposable
         _player.Skip();
     }
 
+    [RelayCommand]
     public void SkipPrevious()
     {
         if (!CanSkipPrevious)
@@ -424,6 +415,7 @@ public partial class PlayerViewModel : ObservableObject, IDisposable
         CanSkipPrevious = false;
     }
 
+    [RelayCommand]
     private void OpenListening()
     {
         _navigationService.NavigateToListening();
@@ -432,6 +424,7 @@ public partial class PlayerViewModel : ObservableObject, IDisposable
             DisableFullScreen();
     }
 
+    [RelayCommand]
     private void Fullscreen()
     {
         if (_isFullScreen)
@@ -440,27 +433,33 @@ public partial class PlayerViewModel : ObservableObject, IDisposable
             EnableFullScreen();
     }
 
+    [RelayCommand]
     private void EnableFullScreen()
     {
         _isFullScreen = true;
         Messenger.Send(new FullScreenMessage(_isFullScreen));
     }
 
+    [RelayCommand]
     private void DisableFullScreen()
     {
         _isFullScreen = false;
         Messenger.Send(new FullScreenMessage(_isFullScreen));
     }
 
-    private static void ToggleCompactMode()
+    [RelayCommand]
+    private static void CompactMode()
     {
         Messenger.Send(new CompactModeMessage());
     }
 
+    [RelayCommand]
     private void Mute()
     {
         IsMuted = !IsMuted;
     }
+
+
 
     public void Dispose()
     {

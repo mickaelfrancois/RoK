@@ -1,4 +1,5 @@
-﻿using Microsoft.UI.Dispatching;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using Microsoft.UI.Dispatching;
 using Rok.Logic.ViewModels.Artists;
 using Rok.Logic.ViewModels.Tracks;
 

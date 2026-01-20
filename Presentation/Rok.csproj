@@ -15,6 +15,7 @@
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 		<WindowsAppSDKSelfContained>true</WindowsAppSDKSelfContained>
 	    <UserSecretsId>d0581b7b-fae8-471b-96ec-491f08740dcb</UserSecretsId>
+		<LangVersion>preview</LangVersion>
   </PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)'=='Debug'">
@@ -85,6 +86,7 @@
 		<ProjectCapability Include="Msix" />
 	</ItemGroup>
 	<ItemGroup>
+		<PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
 		<PackageReference Include="Microsoft.Extensions.Configuration.FileExtensions" Version="10.0.2" />
 		<PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="10.0.2" />
 		<PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.2" />
