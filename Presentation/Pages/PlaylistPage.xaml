@@ -44,10 +44,15 @@
             <RelativePanel Grid.Column="1"
                            Margin="6,0,0,6">
               
-                    <common:InlineEditableText Text="{x:Bind ViewModel.Name, Mode=TwoWay}"
+                    <common:InlineEditableText x:Name="playlistName" Text="{x:Bind ViewModel.Name, Mode=TwoWay}"
                                                TextStyle="{StaticResource HeaderStyle}" />
 
-                    <CommandBar RelativePanel.AlignBottomWithPanel="True"
+                <TextBlock x:Name="panelExtendedInfo"
+                           RelativePanel.Below="playlistName"
+                           Style="{StaticResource headerText}"
+                           Text="{x:Bind ViewModel.SubTitle, Mode=OneWay}" />
+
+                <CommandBar RelativePanel.AlignBottomWithPanel="True"
                             Style="{StaticResource headerCommandBar}">
 
                         <AppBarButton x:Uid="playlistListen"

@@ -61,7 +61,7 @@ public partial class PlaylistViewModel : ObservableObject
 
 
 
-    public int TrackCount => Playlist.TrackCount;
+    public int TrackCount => _tracks?.Count() ?? Playlist.TrackCount;
 
     public int ArtistCount => _tracks?.DistinctBy(c => c.ArtistId).Count() ?? 0;
 
@@ -80,7 +80,8 @@ public partial class PlaylistViewModel : ObservableObject
     {
         get
         {
-            TimeSpan time = TimeSpan.FromSeconds(Playlist.Duration);
+            long duration = _tracks?.Sum(c => c.Duration) ?? Playlist.Duration;
+            TimeSpan time = TimeSpan.FromSeconds(duration);
             return (int)time.TotalHours + time.ToString(@"\:mm\:ss");
         }
     }
@@ -147,6 +148,8 @@ public partial class PlaylistViewModel : ObservableObject
 
         stopwatch.Stop();
         _logger.LogInformation("Playlist {PlaylistId} loaded in {ElapsedMilliseconds}ms", playlistId, stopwatch.ElapsedMilliseconds);
+
+        OnPropertyChanged(nameof(SubTitle));
     }
 
     private async Task LoadPlaylistAsync(long playlistId)
@@ -244,7 +247,7 @@ public partial class PlaylistViewModel : ObservableObject
         Tracks.InitWithAddRange(trackViewModels);
 
         await SavePlaylistAsync();
-        OnPropertyChanged();
+        OnPropertyChanged(string.Empty);
     }
 
     [RelayCommand]
@@ -301,6 +304,8 @@ public partial class PlaylistViewModel : ObservableObject
             _originalTracks.Remove(originalTrack);
 
         _tracks = _tracks!.Where(t => t.Id != trackId).ToList();
+
+        OnPropertyChanged(nameof(SubTitle));
     }
 
     [RelayCommand]
