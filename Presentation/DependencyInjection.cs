@@ -28,6 +28,7 @@ using Rok.Logic.ViewModels.Statistics;
 using Rok.Logic.ViewModels.Track.Services;
 using Rok.Logic.ViewModels.Tracks;
 using Rok.Logic.ViewModels.Tracks.Handlers;
+using Rok.Logic.ViewModels.Tracks.Interfaces;
 using Rok.Logic.ViewModels.Tracks.Services;
 
 namespace Rok;
@@ -126,18 +127,17 @@ public static class DependencyInjection
         services.AddSingleton<TrackImportedMessageHandler>();
         services.AddTransient<TracksGroupCategory>();
         services.AddTransient<TracksFilter>();
+        services.AddTransient<ITrackProvider, TrackProvider>();
+        services.AddTransient<ITrackLibraryMonitor, TrackLibraryMonitor>();
 
         services.AddKeyedTransient<TracksViewModel>("SearchTracks", (sp, _) =>
         {
             return new TracksViewModel(
-                        ActivatorUtilities.CreateInstance<TracksFilter>(sp),
-                        ActivatorUtilities.CreateInstance<TracksGroupCategory>(sp),
-                        ActivatorUtilities.CreateInstance<TracksDataLoader>(sp),
+                        ActivatorUtilities.CreateInstance<ITrackProvider>(sp),
+                        ActivatorUtilities.CreateInstance<ITrackLibraryMonitor>(sp),
                         ActivatorUtilities.CreateInstance<TracksSelectionManager>(sp),
                         ActivatorUtilities.CreateInstance<TracksStateManager>(sp),
                         ActivatorUtilities.CreateInstance<TracksPlaybackService>(sp),
-                        ActivatorUtilities.CreateInstance<LibraryRefreshMessageHandler>(sp),
-                        ActivatorUtilities.CreateInstance<TrackImportedMessageHandler>(sp),
                         sp.GetRequiredService<ILogger<TracksViewModel>>()
                        );
         });
@@ -148,7 +148,6 @@ public static class DependencyInjection
         services.AddTransient<TrackLyricsService>();
         services.AddTransient<TrackScoreService>();
         services.AddTransient<TrackNavigationService>();
-
         // Listening ViewModel and services
         services.AddSingleton<ListeningViewModel>();
         services.AddSingleton<ListeningDataLoader>();

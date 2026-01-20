@@ -1,147 +1,70 @@
-﻿using Rok.Logic.ViewModels.Albums.Handlers;
-using Rok.Logic.ViewModels.Tracks.Handlers;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
+using Rok.Logic.ViewModels.Tracks.Interfaces;
 using Rok.Logic.ViewModels.Tracks.Services;
 
 namespace Rok.Logic.ViewModels.Tracks;
 
-public partial class TracksViewModel : MyObservableObject, IDisposable
+public partial class TracksViewModel : ObservableObject, IDisposable
 {
-    private readonly TracksGroupCategory _groupService;
-    private readonly TracksFilter _filterService;
     private readonly ILogger<TracksViewModel> _logger;
-
-    private readonly TracksDataLoader _dataLoader;
+    private readonly ITrackProvider _trackProvider;
+    private readonly ITrackLibraryMonitor _libraryMonitor;
     private readonly TracksSelectionManager _selectionManager;
     private readonly TracksStateManager _stateManager;
     private readonly TracksPlaybackService _playbackService;
-
-    private readonly LibraryRefreshMessageHandler _libraryRefreshHandler;
-    private readonly TrackImportedMessageHandler _trackImportedHandler;
-
     private bool _stateLoaded = false;
     private bool _libraryUpdated = false;
     private List<TrackViewModel> _filteredTracks = [];
 
-    private bool _isGroupingEnabled;
-    public bool IsGroupingEnabled
-    {
-        get => _isGroupingEnabled;
-        set
-        {
-            _isGroupingEnabled = value;
-            OnPropertyChanged(nameof(IsGroupingEnabled));
-        }
-    }
+    public RangeObservableCollection<TracksGroupCategoryViewModel> GroupedItems { get; private set; } = [];
 
-    public List<TrackViewModel> ViewModels => _dataLoader.ViewModels;
-    public List<GenreDto> Genres => _dataLoader.Genres;
+    public List<TrackViewModel> ViewModels => _trackProvider.ViewModels;
+    public List<GenreDto> Genres => _trackProvider.Genres;
     public ObservableCollection<object> Selected => _selectionManager.Selected;
     public List<TrackViewModel> SelectedItems => _selectionManager.SelectedItems;
+    public List<string> SelectedFilters => _stateManager.SelectedFilters;
+    public List<long> SelectedGenreFilters => _stateManager.SelectedGenreFilters;
     public int SelectedCount => _selectionManager.SelectedCount;
     public bool IsSelectedItems => _selectionManager.IsSelectedItems;
 
-    public RangeObservableCollection<TracksGroupCategoryViewModel> GroupedItems { get; private set; } = [];
+    [ObservableProperty]
+    public partial string FilterByText { get; set; } = string.Empty;
 
-    private int _totalCount = 0;
-    public int TotalCount
+    [ObservableProperty]
+    public partial bool IsGroupingEnabled { get; set; }
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(GroupById))]
+    [NotifyPropertyChangedFor(nameof(GroupByText))]
+    public partial string SelectedGroupBy { get; set; } = string.Empty;
+    partial void OnSelectedGroupByChanged(string value)
     {
-        get => Selected.Count > 0 ? Selected.Count : _totalCount;
-        set => SetProperty(ref _totalCount, value);
+        _stateManager.GroupBy = value;
     }
+    public string GroupById => SelectedGroupBy;
+    public string GroupByText => _trackProvider.GetGroupByLabel(SelectedGroupBy);
 
-    public string GroupById => _stateManager.GroupBy;
-    public string GroupByText
+
+    public TracksViewModel(ITrackProvider trackProvider, ITrackLibraryMonitor libraryMonitor, TracksSelectionManager selectionManager, TracksStateManager stateManager, TracksPlaybackService playbackService, ILogger<TracksViewModel> logger)
     {
-        get => _groupService.GetGroupByLabel(_stateManager.GroupBy);
-        set
-        {
-            _stateManager.GroupBy = value;
-            OnPropertyChanged();
-        }
-    }
-
-    public List<string> SelectedFilters => _stateManager.SelectedFilters;
-    public List<long> SelectedGenreFilters => _stateManager.SelectedGenreFilters;
-
-    private string _filterByText = "";
-    public string FilterByText
-    {
-        get => _filterByText;
-        set
-        {
-            if (_filterByText != value)
-            {
-                _filterByText = value;
-                OnPropertyChanged(nameof(FilterByText));
-            }
-        }
-    }
-
-    public RelayCommand<long?> FilterByGenreCommand { get; private set; }
-    public RelayCommand<string> FilterByCommand { get; private set; }
-    public RelayCommand<string> GroupByCommand { get; private set; }
-    public RelayCommand ListenCommand { get; private set; }
-    public RelayCommand<TracksGroupCategoryViewModel> ListenGroupCommand { get; private set; }
-
-    public TracksViewModel(
-        TracksFilter tracksFilter,
-        TracksGroupCategory tracksGroupCategory,
-        TracksDataLoader dataLoader,
-        TracksSelectionManager selectionManager,
-        TracksStateManager stateManager,
-        TracksPlaybackService playbackService,
-        LibraryRefreshMessageHandler libraryRefreshHandler,
-        TrackImportedMessageHandler trackImportedHandler,
-        ILogger<TracksViewModel> logger)
-    {
-        _groupService = tracksGroupCategory;
-        _filterService = tracksFilter;
-        _dataLoader = dataLoader;
+        _trackProvider = trackProvider;
+        _libraryMonitor = libraryMonitor;
         _selectionManager = selectionManager;
         _stateManager = stateManager;
         _playbackService = playbackService;
-        _libraryRefreshHandler = libraryRefreshHandler;
-        _trackImportedHandler = trackImportedHandler;
         _logger = logger;
 
-        GroupByCommand = new RelayCommand<string>(GroupBy);
-        FilterByCommand = new RelayCommand<string>(FilterBy);
-        FilterByGenreCommand = new RelayCommand<long?>(FilterByGenreId);
-        ListenCommand = new RelayCommand(ListenTracks);
-        ListenGroupCommand = new RelayCommand<TracksGroupCategoryViewModel>(ListenGroup);
-
-        SubscribeToMessages();
-        SubscribeToEvents();
+        _libraryMonitor.LibraryChanged += OnLibraryChanged;
     }
 
-
-    private void SubscribeToMessages()
-    {
-        Messenger.Subscribe<LibraryRefreshMessage>(_libraryRefreshHandler.Handle);
-        Messenger.Subscribe<AlbumImportedMessage>(_trackImportedHandler.Handle);
-    }
-
-    private void SubscribeToEvents()
-    {
-        _selectionManager.SelectionChanged += OnSelectionChanged;
-        _libraryRefreshHandler.LibraryChanged += OnLibraryChanged;
-        _trackImportedHandler.TrackImported += OnTrackImported;
-    }
-
-    private void OnSelectionChanged(object? sender, EventArgs e)
-    {
-        OnPropertyChanged(nameof(TotalCount));
-    }
 
     private void OnLibraryChanged(object? sender, EventArgs e)
     {
         _libraryUpdated = true;
+        FilterAndSort();
     }
 
-    private void OnTrackImported(object? sender, EventArgs e)
-    {
-        _libraryUpdated = true;
-    }
 
     public async Task LoadDataAsync(bool forceReload)
     {
@@ -153,24 +76,55 @@ public partial class TracksViewModel : MyObservableObject, IDisposable
         }
 
         _libraryUpdated = false;
-        _libraryRefreshHandler.ResetLibraryUpdatedFlag();
-        _trackImportedHandler.ResetLibraryUpdatedFlag();
+        _libraryMonitor.ResetUpdateFlags();
 
         if (!_stateLoaded)
             LoadState();
 
-        await _dataLoader.LoadGenresAsync();
-        await _dataLoader.LoadTracksAsync();
+        await _trackProvider.LoadAsync();
 
         FilterAndSort();
     }
 
     public void SetData(List<TrackDto> tracks)
     {
-        _dataLoader.SetTracks(tracks);
+        _trackProvider.SetTracks(tracks);
         FilterAndSort();
     }
 
+    private void SetFilterLabel()
+    {
+        if (_stateManager.SelectedFilters.Count > 0)
+        {
+            string lastFilter = _stateManager.SelectedFilters[^1];
+            FilterByText = _trackProvider.GetFilterLabel(lastFilter);
+        }
+        else if (_stateManager.SelectedGenreFilters.Count > 0)
+        {
+            long lastGenreId = _stateManager.SelectedGenreFilters[^1];
+            FilterByText = Genres.FirstOrDefault(c => c.Id == lastGenreId)?.Name ?? "";
+        }
+        else
+        {
+            FilterByText = _trackProvider.GetFilterLabel("");
+        }
+    }
+
+    private void LoadState()
+    {
+        _stateLoaded = true;
+        _stateManager.Load();
+        SelectedGroupBy = _stateManager.GroupBy;
+        SetFilterLabel();
+    }
+
+    public void SaveState()
+    {
+        _stateManager.Save();
+    }
+
+
+    [RelayCommand]
     private void FilterBy(string filterBy)
     {
         if (string.IsNullOrEmpty(filterBy))
@@ -187,7 +141,8 @@ public partial class TracksViewModel : MyObservableObject, IDisposable
         FilterAndSort();
     }
 
-    private void FilterByGenreId(long? id)
+    [RelayCommand]
+    private void FilterByGenre(long? id)
     {
         if (id == null)
             _stateManager.SelectedGenreFilters.Clear();
@@ -200,64 +155,32 @@ public partial class TracksViewModel : MyObservableObject, IDisposable
         FilterAndSort();
     }
 
-    private void SetFilterLabel()
-    {
-        if (_stateManager.SelectedFilters.Count > 0)
-            FilterByText = _filterService.GetLabel(_stateManager.SelectedFilters[_stateManager.SelectedFilters.Count - 1]);
-        else if (_stateManager.SelectedGenreFilters.Count > 0)
-            FilterByText = Genres.FirstOrDefault(c => c.Id == _stateManager.SelectedGenreFilters[_stateManager.SelectedGenreFilters.Count - 1])?.Name ?? "";
-        else
-            FilterByText = _filterService.GetLabel("");
-    }
-
+    [RelayCommand]
     private void GroupBy(string groupBy)
     {
-        GroupByText = groupBy;
+        SelectedGroupBy = groupBy;
         FilterAndSort();
     }
 
+    [RelayCommand]
     private void FilterAndSort()
     {
-        IEnumerable<TrackViewModel> filteredTracks = ViewModels;
+        TrackProviderResult result = _trackProvider.GetProcessedData(_stateManager.GroupBy, _stateManager.SelectedFilters, _stateManager.SelectedGenreFilters);
 
-        foreach (string filterby in _stateManager.SelectedFilters)
-            filteredTracks = _filterService.Filter(filterby, filteredTracks);
-
-        foreach (long genreId in _stateManager.SelectedGenreFilters)
-            filteredTracks = _filterService.FilterByGenreId(genreId, filteredTracks);
-
-        _filteredTracks = filteredTracks.ToList();
-
-        IEnumerable<TracksGroupCategoryViewModel> tracks = _groupService.GetGroupedItems(_stateManager.GroupBy, _filteredTracks);
-        GroupedItems.InitWithAddRange(tracks);
-
-        IsGroupingEnabled = GroupedItems.Count > 1 || !string.IsNullOrEmpty(GroupedItems.FirstOrDefault()?.Title ?? string.Empty);
-
-        TotalCount = _filteredTracks.Count;
+        _filteredTracks = result.FilteredItems;
+        GroupedItems.InitWithAddRange(result.Groups);
+        IsGroupingEnabled = result.IsGroupingEnabled;
     }
 
-    public void SaveState()
-    {
-        _stateManager.Save();
-    }
-
-    private void LoadState()
-    {
-        _stateLoaded = true;
-        _stateManager.Load();
-        SetFilterLabel();
-
-        OnPropertyChanged(nameof(GroupByText));
-        OnPropertyChanged(nameof(FilterByText));
-    }
-
+    [RelayCommand]
     private void ListenGroup(TracksGroupCategoryViewModel group)
     {
         List<TrackDto> tracks = group.Items.Select(track => track.Track).ToList();
         _playbackService.PlayTracks(tracks);
     }
 
-    private void ListenTracks()
+    [RelayCommand]
+    private void Listen()
     {
         List<TrackDto> tracks = Selected.Count == 0
             ? _filteredTracks.Select(track => track.Track).ToList()
@@ -276,10 +199,8 @@ public partial class TracksViewModel : MyObservableObject, IDisposable
         {
             if (disposing)
             {
-                _selectionManager.SelectionChanged -= OnSelectionChanged;
-                _libraryRefreshHandler.LibraryChanged -= OnLibraryChanged;
-                _trackImportedHandler.TrackImported -= OnTrackImported;
-                _dataLoader.Clear();
+                _libraryMonitor.LibraryChanged -= OnLibraryChanged;
+                _trackProvider.Clear();
             }
 
             disposedValue = true;
