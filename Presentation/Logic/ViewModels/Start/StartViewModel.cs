@@ -1,13 +1,15 @@
-﻿using Microsoft.UI.Dispatching;
+﻿using System.Threading;
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
+using Microsoft.UI.Dispatching;
 using Rok.Application.Features.Tracks.Query;
-using System.Threading;
 using Windows.Storage;
 using Windows.Storage.AccessCache;
 
 namespace Rok.Logic.ViewModels.Start;
 
 
-public class StartViewModel : MyObservableObject
+public partial class StartViewModel : ObservableObject
 {
     private const int KAlbumMinimumBeforeUse = 30;
 
@@ -23,11 +25,12 @@ public class StartViewModel : MyObservableObject
 
     public RangeObservableCollection<AlbumImportedModel> AlbumsImported { get; } = new();
 
-    public bool LibraryRefreshRunning { get; set; } = true;
+    [ObservableProperty]
+    public partial bool LibraryRefreshRunning { get; set; } = true;
 
-    public bool ErrorOccurred { get; set; } = false;
+    [ObservableProperty]
+    public partial bool ErrorOccurred { get; set; } = false;
 
-    public AsyncRelayCommand<StorageFolder> AddLibraryFolderCommand { get; private set; }
 
 
     public StartViewModel(IAlbumPicture albumPicture, ISettingsFile settingsFile, NavigationService navigationService, IMediator mediator, IImport importService, IAppOptions appOptions)
@@ -38,8 +41,6 @@ public class StartViewModel : MyObservableObject
         _mediator = mediator;
         _importService = importService;
         _appOptions = appOptions;
-
-        AddLibraryFolderCommand = new AsyncRelayCommand<StorageFolder>(AddLibraryFolderAsync);
 
         Messenger.Subscribe<LibraryRefreshMessage>(async (message) => await LibraryRefreshChange(message));
         Messenger.Subscribe<AlbumImportedMessage>(AlbumImported);
@@ -60,7 +61,6 @@ public class StartViewModel : MyObservableObject
             _dispatcherQueue.TryEnqueue(() =>
             {
                 LibraryRefreshRunning = true;
-                OnPropertyChanged(nameof(LibraryRefreshRunning));
             });
         }
 
@@ -71,12 +71,10 @@ public class StartViewModel : MyObservableObject
             _dispatcherQueue.TryEnqueue(() =>
             {
                 LibraryRefreshRunning = false;
-                OnPropertyChanged(nameof(LibraryRefreshRunning));
 
                 if (trackCount == 0)
                 {
                     ErrorOccurred = true;
-                    OnPropertyChanged(nameof(ErrorOccurred));
                 }
                 else
                 {
@@ -124,6 +122,7 @@ public class StartViewModel : MyObservableObject
     }
 
 
+    [RelayCommand]
     private async Task AddLibraryFolderAsync(StorageFolder folder)
     {
         string token = Guid.NewGuid().ToString();
@@ -137,9 +136,6 @@ public class StartViewModel : MyObservableObject
 
             ErrorOccurred = false;
             LibraryRefreshRunning = true;
-
-            OnPropertyChanged(nameof(ErrorOccurred));
-            OnPropertyChanged(nameof(LibraryRefreshRunning));
 
             _importService.StartAsync(0);
         }
