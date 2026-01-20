@@ -14,4 +14,11 @@ public sealed partial class CompactPlayerControl : UserControl
         PlayerViewModel = App.ServiceProvider.GetRequiredService<PlayerViewModel>();
         DataContext = PlayerViewModel;
     }
+
+
+    private void Grid_DoubleTapped(object sender, Microsoft.UI.Xaml.Input.DoubleTappedRoutedEventArgs e)
+    {
+        if (PlayerViewModel.CompactModeCommand.CanExecute(null))
+            PlayerViewModel.CompactModeCommand.Execute(null);
+    }
 }

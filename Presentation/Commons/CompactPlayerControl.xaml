@@ -8,7 +8,9 @@
              mc:Ignorable="d">
 
     <Grid Margin="0"
-          Padding="0">
+          Padding="0"
+          Background="Transparent"
+          DoubleTapped="Grid_DoubleTapped">
         <Image Source="{x:Bind PlayerViewModel.CurrentArtist.Picture, Mode=OneWay, TargetNullValue={Binding PlayerViewModel.MediaList.CurrentItem.Cover}}"
                Stretch="UniformToFill"
                Opacity="0.55" />
