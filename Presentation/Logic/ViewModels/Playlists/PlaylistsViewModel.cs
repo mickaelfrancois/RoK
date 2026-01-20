@@ -1,9 +1,11 @@
-﻿using Rok.Logic.ViewModels.Playlists.Handlers;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
+using Rok.Logic.ViewModels.Playlists.Handlers;
 using Rok.Logic.ViewModels.Playlists.Services;
 
 namespace Rok.Logic.ViewModels.Playlists;
 
-public partial class PlaylistsViewModel : MyObservableObject, IDisposable
+public partial class PlaylistsViewModel : ObservableObject, IDisposable
 {
     private readonly ILogger<PlaylistsViewModel> _logger;
 
@@ -16,24 +18,13 @@ public partial class PlaylistsViewModel : MyObservableObject, IDisposable
 
     public RangeObservableCollection<PlaylistViewModel> SmartPlaylists { get; private set; } = [];
 
-    private bool _isGridView = true;
-    public bool IsGridView
+    [ObservableProperty]
+    public partial bool IsGridView { get; set; }
+    partial void OnIsGridViewChanged(bool value)
     {
-        get
-        {
-            return _isGridView;
-        }
-        private set
-        {
-            _isGridView = value;
-            _appOptions.IsGridView = value;
-            OnPropertyChanged(nameof(IsGridView));
-        }
+        _appOptions.IsGridView = value;
     }
 
-    public RelayCommand NewSmartPlaylistCommand { get; private set; }
-    public RelayCommand NewPlaylistCommand { get; private set; }
-    public RelayCommand ToggleDisplayModeCommand { get; private set; }
 
     public PlaylistsViewModel(
         PlaylistsDataLoader dataLoader,
@@ -47,10 +38,6 @@ public partial class PlaylistsViewModel : MyObservableObject, IDisposable
         _updateHandler = Guard.Against.Null(updateHandler);
         _appOptions = Guard.Against.Null(appOptions);
         _logger = Guard.Against.Null(logger);
-
-        NewSmartPlaylistCommand = new RelayCommand(async () => await NewSmartPlaylistAsync());
-        NewPlaylistCommand = new RelayCommand(async () => await NewPlaylistAsync());
-        ToggleDisplayModeCommand = new RelayCommand(() => IsGridView = !IsGridView);
 
         SubscribeToMessages();
         SubscribeToEvents();
@@ -87,6 +74,15 @@ public partial class PlaylistsViewModel : MyObservableObject, IDisposable
         RefreshPlaylists();
     }
 
+
+
+    [RelayCommand]
+    private void ToggleDisplayMode()
+    {
+        IsGridView = !IsGridView;
+    }
+
+    [RelayCommand]
     private void RefreshPlaylists()
     {
         Playlists.Clear();
@@ -96,15 +92,18 @@ public partial class PlaylistsViewModel : MyObservableObject, IDisposable
         SmartPlaylists.AddRange(_dataLoader.ViewModels.Where(c => c.Playlist.IsSmart));
     }
 
+    [RelayCommand]
     private async Task NewSmartPlaylistAsync()
     {
         await _creationService.CreateSmartPlaylistAsync();
     }
 
+    [RelayCommand]
     private async Task NewPlaylistAsync()
     {
         await _creationService.CreateClassicPlaylistAsync();
     }
+
 
     #region IDisposable Support
 
