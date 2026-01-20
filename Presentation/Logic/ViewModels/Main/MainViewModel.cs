@@ -1,45 +1,27 @@
-﻿using Microsoft.UI.Dispatching;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
+using Microsoft.UI.Dispatching;
 using Rok.Application.Features.Search.Query;
 using Rok.Logic.ViewModels.Search;
 
 namespace Rok.Logic.ViewModels.Main;
 
-public partial class MainViewModel : MyObservableObject
+public partial class MainViewModel : ObservableObject
 {
     private DispatcherQueue? _dispatcherQueue;
     private DispatcherQueue DispatcherQueue => _dispatcherQueue ??= DispatcherQueue.GetForCurrentThread();
 
-    public RelayCommand RefreshLibraryCommand { get; private set; }
-
     private readonly IImport _importService;
-
     private readonly IMediator _mediator;
-
     private readonly NavigationService _navigationService;
+    private readonly IAppOptions _appOptions;
+    private readonly IDialogService _dialogService;
+    private readonly ResourceLoader _resourceLoader;
 
-    private bool _playerVisible = false;
-    public bool PlayerVisible
-    {
-        get
-        {
-            return _playerVisible;
-        }
-        set
-        {
-            _playerVisible = value;
-            OnPropertyChanged(nameof(PlayerVisible));
-        }
-    }
+    [ObservableProperty]
+    public partial bool PlayerVisible { get; set; }
 
     public string Keyword { get; set; } = string.Empty;
-
-    public RelayCommand<string> SearchCommand { get; private set; }
-
-    private readonly IAppOptions _appOptions;
-
-    private readonly IDialogService _dialogService;
-
-    private readonly ResourceLoader _resourceLoader;
 
     public MainViewModel(IImport importService, IMediator mediator, NavigationService navigationService, IAppOptions appOptions, IDialogService dialogService, ResourceLoader resourceLoader)
     {
@@ -51,9 +33,6 @@ public partial class MainViewModel : MyObservableObject
         _resourceLoader = resourceLoader;
 
         Messenger.Subscribe<MediaChangedMessage>(OnMediaChanged);
-
-        SearchCommand = new RelayCommand<string>(async (s) => await SearchAsync(s));
-        RefreshLibraryCommand = new RelayCommand(() => RefreshLibrary(), () => CanRefreshLibrary());
     }
 
 
@@ -78,13 +57,14 @@ public partial class MainViewModel : MyObservableObject
         return !_importService.UpdateInProgress;
     }
 
+    [RelayCommand]
     private void RefreshLibrary()
     {
         if (CanRefreshLibrary())
             _importService.StartAsync(0);
     }
 
-
+    [RelayCommand]
     private async Task SearchAsync(string keyword)
     {
         Keyword = keyword;
