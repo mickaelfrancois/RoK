@@ -48,25 +48,25 @@ public static class DependencyInjection
 
         // Albums ViewModel, services and handlers
         services.AddSingleton<AlbumsViewModel>();
-        services.AddSingleton<AlbumsDataLoader>();
-        services.AddSingleton<AlbumsSelectionManager>();
-        services.AddSingleton<AlbumsStateManager>();
-        services.AddSingleton<AlbumsPlaybackService>();
+        services.AddTransient<AlbumsDataLoader>();
+        services.AddTransient<AlbumsSelectionManager>();
+        services.AddTransient<AlbumsStateManager>();
+        services.AddTransient<AlbumsPlaybackService>();
         services.AddSingleton<AlbumUpdateMessageHandler>();
         services.AddSingleton<AlbumImportedMessageHandler>();
-        services.AddSingleton<IAlbumProvider, AlbumProvider>();
-        services.AddSingleton<IAlbumLibraryMonitor, AlbumLibraryMonitor>();
+        services.AddTransient<IAlbumProvider, AlbumProvider>();
+        services.AddTransient<IAlbumLibraryMonitor, AlbumLibraryMonitor>();
         services.AddTransient<AlbumsGroupCategory>();
         services.AddTransient<AlbumsFilter>();
 
         services.AddKeyedTransient<AlbumsViewModel>("SearchAlbums", (sp, _) =>
         {
             return new AlbumsViewModel(
-                        ActivatorUtilities.CreateInstance<AlbumProvider>(sp),
-                        ActivatorUtilities.CreateInstance<AlbumLibraryMonitor>(sp),
-                        ActivatorUtilities.CreateInstance<AlbumsSelectionManager>(sp),
-                        ActivatorUtilities.CreateInstance<AlbumsStateManager>(sp),
-                        ActivatorUtilities.CreateInstance<AlbumsPlaybackService>(sp),
+                        sp.GetRequiredService<IAlbumProvider>(),
+                        sp.GetRequiredService<IAlbumLibraryMonitor>(),
+                        sp.GetRequiredService<AlbumsSelectionManager>(),
+                        sp.GetRequiredService<AlbumsStateManager>(),
+                        sp.GetRequiredService<AlbumsPlaybackService>(),
                         sp.GetRequiredService<ILogger<AlbumsViewModel>>()
                        );
         });
@@ -86,25 +86,25 @@ public static class DependencyInjection
 
         // Artists ViewModel, services and handlers
         services.AddSingleton<ArtistsViewModel>();
-        services.AddSingleton<ArtistsDataLoader>();
-        services.AddSingleton<ArtistsSelectionManager>();
-        services.AddSingleton<ArtistsStateManager>();
-        services.AddSingleton<ArtistsPlaybackService>();
+        services.AddTransient<ArtistsDataLoader>();
+        services.AddTransient<ArtistsSelectionManager>();
+        services.AddTransient<ArtistsStateManager>();
+        services.AddTransient<ArtistsPlaybackService>();
         services.AddSingleton<ArtistUpdateMessageHandler>();
         services.AddSingleton<ArtistImportedMessageHandler>();
-        services.AddSingleton<IArtistProvider, ArtistProvider>();
-        services.AddSingleton<IArtistLibraryMonitor, ArtistLibraryMonitor>();
+        services.AddTransient<IArtistProvider, ArtistProvider>();
+        services.AddTransient<IArtistLibraryMonitor, ArtistLibraryMonitor>();
         services.AddTransient<ArtistsGroupCategory>();
         services.AddTransient<ArtistsFilter>();
 
         services.AddKeyedTransient<ArtistsViewModel>("SearchArtists", (sp, _) =>
         {
             return new ArtistsViewModel(
-                        ActivatorUtilities.CreateInstance<ArtistProvider>(sp),
-                        ActivatorUtilities.CreateInstance<ArtistLibraryMonitor>(sp),
-                        ActivatorUtilities.CreateInstance<ArtistsSelectionManager>(sp),
-                        ActivatorUtilities.CreateInstance<ArtistsStateManager>(sp),
-                        ActivatorUtilities.CreateInstance<ArtistsPlaybackService>(sp),
+                        sp.GetRequiredService<IArtistProvider>(),
+                        sp.GetRequiredService<IArtistLibraryMonitor>(),
+                        sp.GetRequiredService<ArtistsSelectionManager>(),
+                        sp.GetRequiredService<ArtistsStateManager>(),
+                        sp.GetRequiredService<ArtistsPlaybackService>(),
                         sp.GetRequiredService<IAppOptions>(),
                         sp.GetRequiredService<ILogger<ArtistsViewModel>>()
                        );
@@ -120,24 +120,24 @@ public static class DependencyInjection
 
         // Tracks ViewModel, services and handlers
         services.AddSingleton<TracksViewModel>();
-        services.AddSingleton<TracksDataLoader>();
-        services.AddSingleton<TracksSelectionManager>();
-        services.AddSingleton<TracksStateManager>();
-        services.AddSingleton<TracksPlaybackService>();
+        services.AddTransient<TracksDataLoader>();
+        services.AddTransient<TracksSelectionManager>();
+        services.AddTransient<TracksStateManager>();
+        services.AddTransient<TracksPlaybackService>();
         services.AddSingleton<TrackImportedMessageHandler>();
         services.AddTransient<TracksGroupCategory>();
         services.AddTransient<TracksFilter>();
-        services.AddSingleton<ITrackProvider, TrackProvider>();
-        services.AddSingleton<ITrackLibraryMonitor, TrackLibraryMonitor>();
+        services.AddTransient<ITrackProvider, TrackProvider>();
+        services.AddTransient<ITrackLibraryMonitor, TrackLibraryMonitor>();
 
         services.AddKeyedTransient<TracksViewModel>("SearchTracks", (sp, _) =>
         {
             return new TracksViewModel(
-                        ActivatorUtilities.CreateInstance<TrackProvider>(sp),
-                        ActivatorUtilities.CreateInstance<TrackLibraryMonitor>(sp),
-                        ActivatorUtilities.CreateInstance<TracksSelectionManager>(sp),
-                        ActivatorUtilities.CreateInstance<TracksStateManager>(sp),
-                        ActivatorUtilities.CreateInstance<TracksPlaybackService>(sp),
+                        sp.GetRequiredService<ITrackProvider>(),
+                        sp.GetRequiredService<ITrackLibraryMonitor>(),
+                        sp.GetRequiredService<TracksSelectionManager>(),
+                        sp.GetRequiredService<TracksStateManager>(),
+                        sp.GetRequiredService<TracksPlaybackService>(),
                         sp.GetRequiredService<ILogger<TracksViewModel>>()
                        );
         });
