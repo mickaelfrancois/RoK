@@ -1,9 +1,9 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using System.Diagnostics;
+using System.Transactions;
+using Microsoft.Extensions.Logging;
 using Rok.Application.Dto;
 using Rok.Application.Interfaces;
 using Rok.Domain.Entities;
-using System.Diagnostics;
-using System.Transactions;
 
 namespace Rok.Import;
 
@@ -30,32 +30,45 @@ public class CleanLibraryService(ITrackRepository _trackRepository, IArtistRepos
             .Where(track => !trackIDReadedSet.Contains(track.Id))
             .ToList();
 
-        using TransactionScope scope = new(TransactionScopeAsyncFlowOption.Enabled);
+        if (tracksToDelete.Count == 0)
+            return 0;
+
+        TransactionOptions options = new()
+        {
+            IsolationLevel = IsolationLevel.ReadCommitted,
+            Timeout = TimeSpan.FromMinutes(5)
+        };
+
+        using TransactionScope scope = new(TransactionScopeOption.Required, options, TransactionScopeAsyncFlowOption.Enabled);
+
 
         try
         {
             foreach (TrackEntity track in tracksToDelete)
             {
-                if (cancellationToken.IsCancellationRequested)
-                    break;
+                cancellationToken.ThrowIfCancellationRequested();
 
                 await _trackRepository.DeleteAsync(track, RepositoryConnectionKind.Background);
                 count++;
             }
 
             scope.Complete();
-
-            if (count > 0)
-            {
-                _logger.LogInformation("{Count} tracks were deleted from database in {ElapsedMilliseconds} ms", count, stopwatch.ElapsedMilliseconds);
-                stopwatch.Stop();
-            }
+        }
+        catch (OperationCanceledException ex)
+        {
+            _logger.LogWarning(ex, "Track cleaning was cancelled: {Message}", ex.Message);
+            return 0;
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "An error occurred while cleaning tracks without file.");
-            scope.Dispose();
+            return 0;
         }
+
+        stopwatch.Stop();
+
+        if (count > 0)
+            _logger.LogInformation("{Count} tracks were deleted from database in {ElapsedMilliseconds} ms", count, stopwatch.ElapsedMilliseconds);
 
         return count;
     }
