@@ -24,11 +24,10 @@ public partial class GenreViewModel : ObservableObject
     public RangeObservableCollection<AlbumViewModel> Albums { get; set; } = [];
     public GenreDto Genre { get; private set; } = new();
 
-    [ObservableProperty]
-    public partial bool IsFavorite { get; set; }
-    partial void OnIsFavoriteChanged(bool value)
+    public bool IsFavorite
     {
-        Genre.IsFavorite = value;
+        get => Genre.IsFavorite;
+        set => SetProperty(Genre.IsFavorite, value, Genre, (genre, val) => genre.IsFavorite = val);
     }
 
     [ObservableProperty]

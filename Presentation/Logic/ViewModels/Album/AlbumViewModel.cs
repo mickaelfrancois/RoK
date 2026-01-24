@@ -30,11 +30,10 @@ public partial class AlbumViewModel : ObservableObject
     public IPlaylistMenuService PlaylistMenuService { get; }
 
 
-    [ObservableProperty]
-    public partial bool IsFavorite { get; set; }
-    partial void OnIsFavoriteChanged(bool value)
+    public bool IsFavorite
     {
-        Album.IsFavorite = value;
+        get => Album.IsFavorite;
+        set => SetProperty(Album.IsFavorite, value, Album, (album, val) => album.IsFavorite = val);
     }
 
     [ObservableProperty]
