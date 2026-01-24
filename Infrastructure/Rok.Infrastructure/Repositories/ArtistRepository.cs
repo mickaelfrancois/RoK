@@ -15,7 +15,7 @@ public class ArtistRepository(IDbConnection connection, [FromKeyedServices("Back
     private const string UpdateStatisticsSql = "UPDATE artists SET trackCount = @trackCount, totalDurationSeconds = @totalDurationSeconds, albumCount = @albumCount, bestOfCount = @bestOfCount, liveCount = @liveCount, compilationCount = @compilationCount, yearMini = @yearMini, yearMaxi = @yearMaxi WHERE id = @id";
     private const string UpdateMetadataAttemptSql = "UPDATE artists SET getMetaDataLastAttempt = @lastAttemptDate WHERE id = @id";
     private const string DeleteOrphansSql = "DELETE FROM artists WHERE id NOT IN (SELECT DISTINCT artistId FROM tracks WHERE artistId IS NOT NULL)";
-
+    private const string DefaultGroupBy = " GROUP BY artists.id";
 
     public async Task<IEnumerable<IArtistEntity>> SearchAsync(string name, RepositoryConnectionKind kind = RepositoryConnectionKind.Foreground)
     {
@@ -23,7 +23,7 @@ public class ArtistRepository(IDbConnection connection, [FromKeyedServices("Back
             return [];
 
         name = $"%{name}%";
-        string sql = GetSelectQuery() + " WHERE artists.name LIKE @name";
+        string sql = GetSelectQuery() + " WHERE artists.name LIKE @name" + DefaultGroupBy;
 
         return await ExecuteQueryAsync(sql, kind, new { name });
     }
@@ -33,7 +33,7 @@ public class ArtistRepository(IDbConnection connection, [FromKeyedServices("Back
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(genreId);
 
         string sql = GetSelectQuery() +
-                     "WHERE artists.genreId = @genreId";
+                     "WHERE artists.genreId = @genreId" + DefaultGroupBy;
 
         return await ExecuteQueryAsync(sql, kind, new { genreId });
     }
@@ -88,6 +88,8 @@ public class ArtistRepository(IDbConnection connection, [FromKeyedServices("Back
                      FROM artists 
                      LEFT JOIN genres ON genres.Id = artists.genreId 
                      LEFT JOIN countries ON countries.Id = artists.countryId 
+                     LEFT JOIN artistTags ON artists.id = artistTags.artistId
+                     LEFT JOIN tags ON artistTags.tagId = tags.id 
                 """;
 
         if (!string.IsNullOrEmpty(whereParam))
@@ -96,6 +98,10 @@ public class ArtistRepository(IDbConnection connection, [FromKeyedServices("Back
         return query;
     }
 
+    public override string GetDefaultGroupBy()
+    {
+        return DefaultGroupBy;
+    }
 
     public override string GetTableName()
     {

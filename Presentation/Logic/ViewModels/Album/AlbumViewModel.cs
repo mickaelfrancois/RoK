@@ -1,4 +1,5 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+﻿using System.Collections.Specialized;
+using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Rok.Application.Features.Playlists.PlaylistMenu;
 using Rok.Infrastructure.Translate;
@@ -30,6 +31,12 @@ public partial class AlbumViewModel : ObservableObject
     public IPlaylistMenuService PlaylistMenuService { get; }
 
 
+    //[ObservableProperty]
+    public ObservableCollection<string> Tags { get; set; } = new();
+
+    public ObservableCollection<string> SuggestedTags { get; set; } = new();
+
+
     [ObservableProperty]
     public partial bool IsFavorite { get; set; }
     partial void OnIsFavoriteChanged(bool value)
@@ -51,7 +58,7 @@ public partial class AlbumViewModel : ObservableObject
     {
         get
         {
-            string label = "";
+            string label = "🔹";
             string separator = "";
 
             if (Album.TrackCount > 0)
@@ -161,6 +168,7 @@ public partial class AlbumViewModel : ObservableObject
         await LoadTracksAsync(albumId);
         await UpdateStatisticsIfNeededAsync();
         await GetDataFromApiAsync();
+        await InitializeTagsAsync();
 
         stopwatch.Stop();
         _logger.LogInformation("Album {AlbumId} loaded in {ElapsedMilliseconds} ms", albumId, stopwatch.ElapsedMilliseconds);
@@ -194,6 +202,33 @@ public partial class AlbumViewModel : ObservableObject
         {
             Backdrop = backdropImage;
         });
+    }
+
+    private async Task InitializeTagsAsync()
+    {
+        List<string> albumTags = Album.GetTags();
+
+        Tags.Clear();
+        foreach (string tag in albumTags)
+            Tags.Add(tag);
+
+        Tags.CollectionChanged -= OnTagsCollectionChanged;
+        Tags.CollectionChanged += OnTagsCollectionChanged;
+
+        SuggestedTags.Clear();
+        IEnumerable<TagDto> suggestedTags = await _dataLoader.LoadAllTagsAsync();
+        foreach (string tag in suggestedTags.Where(tag => !Tags.Contains(tag.Name)).Select(tag => tag.Name))
+        {
+            SuggestedTags.Add(tag);
+        }
+    }
+
+    private async void OnTagsCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
+    {
+        Album.TagsAsString = string.Join(",", Tags);
+        await _editService.UpdateTagsAsync(Album.Id, Tags);
+
+        Debug.WriteLine(Album.TagsAsString);
     }
 
     private async Task UpdateStatisticsIfNeededAsync()

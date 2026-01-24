@@ -43,6 +43,7 @@ public interface IAlbumEntity : IEntity
     string? ArtistMusicBrainzID { get; set; }
     string? LastFmUrl { get; set; }
     bool IsLock { get; set; }
+    string? TagsAsString { get; set; }
 
     string ToString();
 }

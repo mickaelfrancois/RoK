@@ -13,7 +13,7 @@ public class AlbumRepository(IDbConnection connection, [FromKeyedServices("Backg
     private const string UpdateStatisticsSql = "UPDATE albums SET trackCount = @trackCount, duration = @duration WHERE id = @id";
     private const string UpdateMetadataAttemptSql = "UPDATE albums SET getMetaDataLastAttempt = @lastAttemptDate WHERE id = @id";
     private const string DeleteOrphansSql = "DELETE FROM albums WHERE id NOT IN (SELECT DISTINCT albumId FROM tracks WHERE albumId IS NOT NULL)";
-
+    private const string DefaultGroupBy = " GROUP BY albums.id";
 
     public async Task<IEnumerable<IAlbumEntity>> SearchAsync(string name, RepositoryConnectionKind kind = RepositoryConnectionKind.Foreground)
     {
@@ -21,7 +21,7 @@ public class AlbumRepository(IDbConnection connection, [FromKeyedServices("Backg
             return [];
 
         name = $"%{name}%";
-        string sql = GetSelectQuery() + " WHERE albums.name LIKE @name";
+        string sql = GetSelectQuery() + " WHERE albums.name LIKE @name" + DefaultGroupBy;
 
         return await ExecuteQueryAsync(sql, kind, new { name });
     }
@@ -30,7 +30,7 @@ public class AlbumRepository(IDbConnection connection, [FromKeyedServices("Backg
     {
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(genreId);
 
-        string sql = GetSelectQuery("genreId");
+        string sql = GetSelectQuery("genreId") + DefaultGroupBy;
 
         return await ExecuteQueryAsync(sql, kind, new { genreId });
     }
@@ -39,7 +39,7 @@ public class AlbumRepository(IDbConnection connection, [FromKeyedServices("Backg
     {
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(artistId);
 
-        string sql = GetSelectQuery("artistId") + " ORDER BY albums.year DESC";
+        string sql = GetSelectQuery("artistId") + DefaultGroupBy + " ORDER BY albums.year DESC";
 
         return await ExecuteQueryAsync(sql, kind, new { artistId });
     }
@@ -90,11 +90,14 @@ public class AlbumRepository(IDbConnection connection, [FromKeyedServices("Backg
                 SELECT albums.*,
                      genres.name AS genreName, genres.isFavorite AS isGenreFavorite,
                      artists.name AS artistName, artists.isFavorite AS isArtistFavorite, artists.musicBrainzID AS artistMusicBrainzID,
-                     countries.code AS countryCode, countries.english AS countryName 
+                     countries.code AS countryCode, countries.english AS countryName,
+                     GROUP_CONCAT(DISTINCT tags.Name) AS TagsAsString
                      FROM albums 
                      LEFT JOIN genres ON genres.Id = albums.genreId                      
                      LEFT JOIN artists ON artists.Id = albums.artistId 
                      LEFT JOIN countries ON countries.Id = artists.countryId
+                     LEFT JOIN albumTags ON albums.id = albumTags.albumId
+                     LEFT JOIN tags ON albumTags.tagId = tags.id 
                 """;
 
         if (!string.IsNullOrEmpty(whereParam))
@@ -103,6 +106,10 @@ public class AlbumRepository(IDbConnection connection, [FromKeyedServices("Backg
         return query;
     }
 
+    public override string GetDefaultGroupBy()
+    {
+        return DefaultGroupBy;
+    }
 
     public override string GetTableName()
     {

@@ -102,4 +102,7 @@ public class ArtistEntity : BaseEntity, IArtistEntity
     [Write(false)]
     public string CountryName { get; set; } = string.Empty;
 
+    [Write(false)]
+    public string? TagsAsString { get; set; }
+
 }

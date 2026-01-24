@@ -69,4 +69,12 @@ public class TrackDto
     public string CountryName { get; set; } = string.Empty;
 
     public bool Listening { get; set; }
+
+    public string? TagsAsString { get; set; }
+
+
+    public List<string> GetTags()
+    {
+        return string.IsNullOrEmpty(TagsAsString) ? new List<string>() : TagsAsString.Split(',').ToList();
+    }
 }

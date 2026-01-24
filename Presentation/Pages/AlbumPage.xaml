@@ -7,13 +7,15 @@
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
       xmlns:common="using:Rok.Commons"
       xmlns:tracks="using:Rok.Logic.ViewModels.Tracks"
+      xmlns:controls="using:CommunityToolkit.WinUI.Controls"
       x:Name="albumPage"
       mc:Ignorable="d">
 
     <Grid>
         <Grid.RowDefinitions>
+            <!--Height="{ThemeResource headerRowHeight}" />-->
             <RowDefinition x:Name="headerRow"
-                           Height="{ThemeResource headerRowHeight}" />
+                           Height="200" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
@@ -29,7 +31,7 @@
                Style="{StaticResource headerBackdrop}"
                Stretch="UniformToFill"
                IsHitTestVisible="False" />
-
+        
         <!-- Header -->
         <Grid Padding="2">
 
@@ -57,6 +59,8 @@
                 <HyperlinkButton x:Name="artistName"
                                  Content="{x:Bind ViewModel.Album.ArtistName}"
                                  RelativePanel.Below="albumName"
+                                 Margin="0" 
+                                 Padding="0"
                                  Command="{x:Bind ViewModel.ArtistOpenCommand}"
                                  Style="{StaticResource headerGenreHyperlink}" />
 
@@ -66,6 +70,7 @@
                         Style="{StaticResource ButtonTextBlockStyle}"
                         Visibility="{x:Bind ViewModel.Album.CountryCode, Converter={StaticResource StringToVisibilityConverter}}"                        
                         BorderBrush="Transparent"
+                        Margin="4,0,0,0"
                         Background="Transparent"
                         ToolTipService.ToolTip="{x:Bind ViewModel.Album.CountryName}">
                     <Image Source="{x:Bind ViewModel.Album.CountryCode, Converter={StaticResource CountryCodeToImageSourceConverter}}"
@@ -110,16 +115,11 @@
                                    Padding="4,0,4,0"/>
                     </Border>
                 </StackPanel>
-
-                <HyperlinkButton x:Name="genreName"
-                                 Visibility="Collapsed"
-                                 Content="{x:Bind ViewModel.Album.GenreName}"
-                                 RelativePanel.Below="artistName"
-                                 Command="{x:Bind ViewModel.GenreOpenCommand}"
-                                 Style="{StaticResource headerGenreHyperlink}" />
-
+           
                 <TextBlock x:Name="panelExtendedInfo"
-                           RelativePanel.Below="genreName"
+                           RelativePanel.RightOf="buttonCountry"
+                           RelativePanel.AlignBottomWith="artistName"
+                           Margin="6,0,0,0"
                            Style="{StaticResource headerText}"
                            Text="{x:Bind ViewModel.SubTitle}" />
 
@@ -141,6 +141,48 @@
                                FontSize="12"></TextBlock>
                     <TextBlock Text="{x:Bind ViewModel.Album.LastListen}"
                                FontSize="12"></TextBlock>
+                </StackPanel>
+
+                <StackPanel x:Name="tagsContainer"
+                            RelativePanel.Below="panelStatsInfo"
+                            Orientation="Horizontal"
+                            Spacing="0"
+                            Margin="0">
+
+                    <controls:TokenizingTextBox
+                                                x:Uid="AlbumTagsBox"
+                                                x:Name="AlbumTagsBox"
+                                                ItemsSource="{x:Bind ViewModel.Tags, Mode=OneWay}"
+                                                SuggestedItemsSource="{x:Bind ViewModel.SuggestedTags, Mode=OneWay}"
+                                                PlaceholderText="+ add tag"
+                                                TokenDelimiter=","
+                                                HorizontalAlignment="Left"
+                                                Background="Transparent"
+                                                BorderThickness="0"
+                                                Margin="0"
+                                                MinWidth="150">
+                        
+                        <controls:TokenizingTextBox.Resources>
+                            <Style TargetType="controls:TokenizingTextBoxItem">
+                                <Setter Property="Background"
+                                        Value="{ThemeResource SystemControlBackgroundBaseLowBrush}" />
+                                <Setter Property="Foreground"
+                                        Value="{ThemeResource SystemControlForegroundBaseHighBrush}" />
+                                <Setter Property="CornerRadius"
+                                        Value="2" />
+                                <Setter Property="FontSize"
+                                        Value="11" />
+                                <Setter Property="Padding"
+                                        Value="6,2,6,2" />
+                                <Setter Property="Margin"
+                                        Value="0,0,4,0" />
+                                <Setter Property="MinHeight"
+                                        Value="24" />
+                                <Setter Property="MinWidth"
+                                        Value="20" />
+                            </Style>
+                        </controls:TokenizingTextBox.Resources>
+                    </controls:TokenizingTextBox>
                 </StackPanel>
 
                 <CommandBar x:Name="panelNetwork"
@@ -167,6 +209,7 @@
                 </CommandBar>
 
                 <CommandBar  RelativePanel.AlignBottomWithPanel="True"
+                             RelativePanel.AlignLeftWith="albumName"
                              Style="{StaticResource headerCommandBar}">
 
                     <AppBarButton x:Uid="albumViewListen"

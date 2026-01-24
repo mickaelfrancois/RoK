@@ -94,8 +94,6 @@ public class ArtistDto
 
     public DateTime? GetMetaDataLastAttempt { get; set; }
 
-
-
     public string GenreName { get; set; } = string.Empty;
 
     public bool IsGenreFavorite { get; set; }
@@ -103,4 +101,12 @@ public class ArtistDto
     public string CountryCode { get; set; } = string.Empty;
 
     public string CountryName { get; set; } = string.Empty;
+
+    public string? TagsAsString { get; set; }
+
+
+    public List<string> GetTags()
+    {
+        return string.IsNullOrEmpty(TagsAsString) ? new List<string>() : TagsAsString.Split(',').ToList();
+    }
 }

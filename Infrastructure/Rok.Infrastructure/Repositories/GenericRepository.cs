@@ -1,10 +1,10 @@
-﻿using Dapper.Contrib.Extensions;
+﻿using System.Buffers;
+using System.Diagnostics;
+using System.Text.Json;
+using Dapper.Contrib.Extensions;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Rok.Application.Interfaces;
-using System.Buffers;
-using System.Diagnostics;
-using System.Text.Json;
 
 namespace Rok.Infrastructure.Repositories;
 
@@ -49,7 +49,7 @@ public partial class GenericRepository<T>(IDbConnection db, [FromKeyedServices("
 
     public async Task<IEnumerable<T>> GetAllAsync(RepositoryConnectionKind kind = RepositoryConnectionKind.Foreground)
     {
-        string sql = GetSelectQuery();
+        string sql = GetSelectQuery() + GetDefaultGroupBy();
 
         return await ExecuteQueryAsync(sql, kind);
     }
@@ -64,19 +64,24 @@ public partial class GenericRepository<T>(IDbConnection db, [FromKeyedServices("
 
     public async Task<T?> GetByIdAsync(long id, RepositoryConnectionKind kind = RepositoryConnectionKind.Foreground)
     {
-        string sql = GetSelectQuery("id");
+        string sql = GetSelectQuery("id") + GetDefaultGroupBy();
         return await QuerySingleOrDefaultAsync(sql, kind, new { id });
     }
 
     public async Task<T?> GetByNameAsync(string name, RepositoryConnectionKind kind = RepositoryConnectionKind.Foreground)
     {
-        string sql = GetSelectQuery("name");
+        string sql = GetSelectQuery("name") + GetDefaultGroupBy();
         return await QuerySingleOrDefaultAsync(sql, kind, new { name });
     }
 
     public virtual string GetSelectQuery(string? whereParam = null)
     {
         throw new NotImplementedException("GetSelectQuery method is not implemented in GenericRepository.");
+    }
+
+    public virtual string GetDefaultGroupBy()
+    {
+        return string.Empty;
     }
 
     public virtual string GetTableName()
@@ -116,6 +121,23 @@ public partial class GenericRepository<T>(IDbConnection db, [FromKeyedServices("
             LogQuery(kind, sql, stopwatch, param);
         }
     }
+
+    protected async Task<int> ExecuteNonQueryAsync(string sql, IDbTransaction transaction, object? param = null, RepositoryConnectionKind kind = RepositoryConnectionKind.Foreground)
+    {
+        Stopwatch stopwatch = Stopwatch.StartNew();
+
+        try
+        {
+            IDbConnection localConnection = ResolveConnection(kind);
+            return await localConnection.ExecuteAsync(sql, param, transaction);
+        }
+        finally
+        {
+            stopwatch.Stop();
+            LogQuery(kind, sql, stopwatch, param);
+        }
+    }
+
 
     protected async Task<IReadOnlyList<T>> ExecuteQueryAsync(string sql, RepositoryConnectionKind kind = RepositoryConnectionKind.Foreground, object? param = null)
     {

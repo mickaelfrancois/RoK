@@ -46,6 +46,6 @@ public interface IArtistEntity : IEntity
     int? YearMaxi { get; set; }
     int? YearMini { get; set; }
     string? YoutubeUrl { get; set; }
-
+    string? TagsAsString { get; set; }
     string ToString();
 }

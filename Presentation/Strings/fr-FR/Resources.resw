@@ -1140,4 +1140,7 @@
   <data name="StatTotalSyncLyrics.Text" xml:space="preserve">
     <value>🔹Paroles synchronisées :</value>
   </data>
+  <data name="AlbumTagsBox.PlaceholderText" xml:space="preserve">
+    <value>+ ajouter tag</value>
+  </data>
 </root>

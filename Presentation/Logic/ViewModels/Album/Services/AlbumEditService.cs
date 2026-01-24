@@ -60,4 +60,9 @@ public class AlbumEditService(IMediator mediator)
         await mediator.SendMessageAsync(new UpdateAlbumFavoriteCommand(album.Id, isFavorite));
         album.IsFavorite = isFavorite;
     }
+
+    public async Task UpdateTagsAsync(long id, IEnumerable<string> tags)
+    {
+        await mediator.SendMessageAsync(new UpdateAlbumTagsCommand(id, tags));
+    }
 }
