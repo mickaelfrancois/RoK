@@ -37,6 +37,15 @@ public abstract class FilterService<TViewModel>
     }
 
 
+    public IEnumerable<TViewModel> FilterByTags(List<string> tags, IEnumerable<TViewModel> items, Func<TViewModel, List<string>> tagsSelector)
+    {
+        if (tags == null || tags.Count == 0)
+            return items;
+
+        return items.Where(item => tags.All(t => tagsSelector(item).Contains(t)));
+    }
+
+
     protected void RegisterFilter(string key, Func<IEnumerable<TViewModel>, IEnumerable<TViewModel>> filter)
     {
         _filterStrategies[key] = filter;

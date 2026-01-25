@@ -10,6 +10,8 @@ public abstract class ViewStateManager(IAppOptions appOptions)
 
     public List<long> SelectedGenreFilters { get; set; } = [];
 
+    public List<string> SelectedTagFilters { get; set; } = [];
+
     protected abstract string GetDefaultGroupBy();
 
     protected abstract string? GetStoredGroupBy();
@@ -22,7 +24,11 @@ public abstract class ViewStateManager(IAppOptions appOptions)
 
     protected abstract List<long> GetStoredGenreFilters();
 
+    protected abstract List<string> GetStoredTagFilters();
+
     protected abstract void SaveGenreFilters(List<long> filters);
+
+    protected abstract void SaveTagFilters(List<string> tags);
 
     public void SaveGridView(bool isGridView) => AppOptions.IsGridView = isGridView;
 
@@ -35,6 +41,7 @@ public abstract class ViewStateManager(IAppOptions appOptions)
         GroupBy = string.IsNullOrEmpty(storedGroupBy) ? GetDefaultGroupBy() : storedGroupBy;
         SelectedFilters = GetStoredFilters();
         SelectedGenreFilters = GetStoredGenreFilters();
+        SelectedTagFilters = GetStoredTagFilters();
     }
 
     public void Save()
@@ -42,5 +49,6 @@ public abstract class ViewStateManager(IAppOptions appOptions)
         SaveGroupBy(GroupBy);
         SaveFilters(SelectedFilters);
         SaveGenreFilters(SelectedGenreFilters);
+        SaveTagFilters(SelectedTagFilters);
     }
 }

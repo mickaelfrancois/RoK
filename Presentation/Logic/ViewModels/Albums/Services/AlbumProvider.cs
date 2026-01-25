@@ -6,16 +6,23 @@ public class AlbumProvider(AlbumsDataLoader dataLoader, AlbumsFilter filterServi
 {
     public List<AlbumViewModel> ViewModels => dataLoader.ViewModels;
     public List<GenreDto> Genres => dataLoader.Genres;
+    public List<string> Tags { get; set; } = [];
 
     public async Task LoadAsync()
     {
         await dataLoader.LoadGenresAsync();
         await dataLoader.LoadAlbumsAsync();
+
+        Tags = dataLoader.ViewModels
+        .SelectMany(v => v.Album.GetTags())
+        .Distinct()
+        .OrderBy(t => t)
+        .ToList();
     }
 
     public void SetAlbums(List<AlbumDto> albums) => dataLoader.SetAlbums(albums);
 
-    public AlbumProviderResult GetProcessedData(string groupBy, List<string> filters, List<long> genreFilters)
+    public AlbumProviderResult GetProcessedData(string groupBy, List<string> filters, List<long> genreFilters, List<string> tagFilters)
     {
         IEnumerable<AlbumViewModel> filtered = dataLoader.ViewModels;
 
@@ -24,6 +31,9 @@ public class AlbumProvider(AlbumsDataLoader dataLoader, AlbumsFilter filterServi
 
         foreach (long genreId in genreFilters)
             filtered = filterService.FilterByGenreId(genreId, filtered);
+
+        if (tagFilters.Count > 0)
+            filtered = filterService.FilterByTags(tagFilters, filtered);
 
         List<AlbumViewModel> filteredList = filtered.ToList();
         List<AlbumsGroupCategoryViewModel> groups = groupService.GetGroupedItems(groupBy, filteredList).ToList();

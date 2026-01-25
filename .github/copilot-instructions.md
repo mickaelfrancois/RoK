@@ -40,3 +40,6 @@ Rok is a .NET 9 application using C# 13.0 with WinUi3 for listening local music 
 ### Architecture Patterns
 
 #### ViewModels
+
+- The application uses `ResourceManager` for translations in `AlbumsFilterMenuBuilder`.
+- Album tags are stored as a comma-separated string in `AlbumDto.TagsAsString`.

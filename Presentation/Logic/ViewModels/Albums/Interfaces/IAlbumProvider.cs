@@ -8,11 +8,13 @@ public interface IAlbumProvider
 
     List<GenreDto> Genres { get; }
 
+    List<string> Tags { get; }
+
     Task LoadAsync();
 
     void SetAlbums(List<AlbumDto> albums);
 
-    AlbumProviderResult GetProcessedData(string groupBy, List<string> filters, List<long> genreFilters);
+    AlbumProviderResult GetProcessedData(string groupBy, List<string> filters, List<long> genreFilters, List<string> tagFilters);
 
     void Clear();
 

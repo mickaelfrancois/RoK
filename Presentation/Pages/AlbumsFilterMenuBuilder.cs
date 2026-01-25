@@ -35,6 +35,9 @@ internal class AlbumsFilterMenuBuilder
 
         if (viewModel?.Genres?.Count > 0)
             PopulateGenreSubMenu(menu, viewModel);
+
+        if (viewModel?.Tags?.Count > 0)
+            PopulateTagSubMenu(menu, viewModel);
     }
 
 
@@ -130,6 +133,38 @@ internal class AlbumsFilterMenuBuilder
             };
 
             subItem.Items.Add(menuItem);
+        }
+    }
+
+
+    private void PopulateTagSubMenu(MenuFlyout menu, AlbumsViewModel viewModel)
+    {
+        string check = viewModel.SelectedTagFilters.Count > 0 ? "\u2713 " : string.Empty;
+
+        MenuFlyoutSubItem tagSubItem = new()
+        {
+            Text = check + "Tags",
+        };
+        menu.Items.Add(tagSubItem);
+
+        MenuFlyoutItem tagAllMenu = new()
+        {
+            Text = _manager.MainResourceMap.GetValue("Resources/filterall").ValueAsString,
+            Command = viewModel.FilterByTagCommand,
+        };
+        tagSubItem.Items.Add(tagAllMenu);
+
+        foreach (string tag in viewModel.Tags)
+        {
+            ToggleMenuFlyoutItem menuItem = new()
+            {
+                Text = tag,
+                IsChecked = viewModel.SelectedTagFilters.Contains(tag),
+                Command = viewModel.FilterByTagCommand,
+                CommandParameter = tag,
+            };
+
+            tagSubItem.Items.Add(menuItem);
         }
     }
 }

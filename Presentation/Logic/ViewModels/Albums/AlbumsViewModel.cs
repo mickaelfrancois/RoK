@@ -22,10 +22,12 @@ public partial class AlbumsViewModel : ObservableObject, IDisposable
 
     public List<AlbumViewModel> ViewModels => _albumProvider.ViewModels;
     public List<GenreDto> Genres => _albumProvider.Genres;
+    public List<string> Tags => _albumProvider.Tags;
     public ObservableCollection<object> Selected => _selectionManager.Selected;
     public List<AlbumViewModel> SelectedItems => _selectionManager.SelectedItems;
     public List<string> SelectedFilters => _stateManager.SelectedFilters;
     public List<long> SelectedGenreFilters => _stateManager.SelectedGenreFilters;
+    public List<string> SelectedTagFilters => _stateManager.SelectedTagFilters;
     public bool IsSelectedItems => _selectionManager.IsSelectedItems;
 
     [ObservableProperty]
@@ -118,18 +120,22 @@ public partial class AlbumsViewModel : ObservableObject, IDisposable
             long lastGenreId = _stateManager.SelectedGenreFilters[^1];
             FilterByText = Genres.FirstOrDefault(c => c.Id == lastGenreId)?.Name ?? "";
         }
+        else if (SelectedTagFilters.Count > 0)
+        {
+            FilterByText = SelectedTagFilters[^1];
+        }
         else
         {
             FilterByText = _albumProvider.GetFilterLabel("");
         }
     }
 
-
     private void LoadState()
     {
         _stateLoaded = true;
         _stateManager.Load();
         SelectedGroupBy = _stateManager.GroupBy;
+
         SetFilterLabel();
     }
 
@@ -153,6 +159,7 @@ public partial class AlbumsViewModel : ObservableObject, IDisposable
         {
             _stateManager.SelectedFilters.Clear();
             _stateManager.SelectedGenreFilters.Clear();
+            _stateManager.SelectedTagFilters.Clear();
         }
         else if (_stateManager.SelectedFilters.Contains(filterBy))
             _stateManager.SelectedFilters.Remove(filterBy);
@@ -178,6 +185,20 @@ public partial class AlbumsViewModel : ObservableObject, IDisposable
     }
 
     [RelayCommand]
+    private void FilterByTag(string tag)
+    {
+        if (string.IsNullOrEmpty(tag))
+            _stateManager.SelectedTagFilters.Clear();
+        else if (_stateManager.SelectedTagFilters.Contains(tag))
+            _stateManager.SelectedTagFilters.Remove(tag);
+        else
+            _stateManager.SelectedTagFilters.Add(tag);
+
+        SetFilterLabel();
+        FilterAndSort();
+    }
+
+    [RelayCommand]
     private void GroupBy(string groupBy)
     {
         SelectedGroupBy = groupBy;
@@ -187,7 +208,7 @@ public partial class AlbumsViewModel : ObservableObject, IDisposable
     [RelayCommand]
     private void FilterAndSort()
     {
-        AlbumProviderResult result = _albumProvider.GetProcessedData(_stateManager.GroupBy, _stateManager.SelectedFilters, _stateManager.SelectedGenreFilters);
+        AlbumProviderResult result = _albumProvider.GetProcessedData(_stateManager.GroupBy, _stateManager.SelectedFilters, _stateManager.SelectedGenreFilters, _stateManager.SelectedTagFilters);
 
         _filteredAlbums = result.FilteredItems;
         GroupedItems.InitWithAddRange(result.Groups);

@@ -15,5 +15,9 @@ public class AlbumsStateManager(IAppOptions appOptions) : ViewStateManager(appOp
 
     protected override List<long> GetStoredGenreFilters() => AppOptions.AlbumsFilterByGenresId;
 
+    protected override List<string> GetStoredTagFilters() => AppOptions.AlbumsFilterByTags;
+
     protected override void SaveGenreFilters(List<long> filters) => AppOptions.AlbumsFilterByGenresId = filters;
+
+    protected override void SaveTagFilters(List<string> tags) => AppOptions.AlbumsFilterByTags = tags;
 }
