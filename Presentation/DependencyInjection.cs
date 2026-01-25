@@ -52,8 +52,8 @@ public static class DependencyInjection
         services.AddTransient<AlbumsSelectionManager>();
         services.AddTransient<AlbumsStateManager>();
         services.AddTransient<AlbumsPlaybackService>();
-        services.AddSingleton<AlbumUpdateMessageHandler>();
-        services.AddSingleton<AlbumImportedMessageHandler>();
+        services.AddTransient<AlbumUpdateMessageHandler>();
+        services.AddTransient<AlbumImportedMessageHandler>();
         services.AddTransient<IAlbumProvider, AlbumProvider>();
         services.AddTransient<IAlbumLibraryMonitor, AlbumLibraryMonitor>();
         services.AddTransient<AlbumsGroupCategory>();

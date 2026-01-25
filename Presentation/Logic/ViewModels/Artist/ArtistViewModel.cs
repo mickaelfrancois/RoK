@@ -36,11 +36,10 @@ public partial class ArtistViewModel : ObservableObject
     public RangeObservableCollection<AlbumViewModel> Albums { get; set; } = [];
 
 
-    [ObservableProperty]
-    public partial bool IsFavorite { get; set; }
-    partial void OnIsFavoriteChanged(bool value)
+    public bool IsFavorite
     {
-        Artist.IsFavorite = value;
+        get => Artist.IsFavorite;
+        set => SetProperty(Artist.IsFavorite, value, Artist, (artist, val) => artist.IsFavorite = val);
     }
 
     [ObservableProperty]
