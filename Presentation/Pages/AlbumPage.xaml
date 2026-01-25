@@ -90,7 +90,7 @@
                                    Style="{StaticResource SubtitleTextBlockStyle}"
                                    Foreground="White"
                                    FontSize="9"
-                                   Padding="4,0,4,0"/>
+                                   Padding="4,0,4,0" />
                     </Border>
 
                     <Border Visibility="{x:Bind ViewModel.Album.IsBestOf, Mode=TwoWay, Converter={StaticResource BoolToVisibilityConverter}}"
@@ -101,7 +101,7 @@
                                    Style="{StaticResource SubtitleTextBlockStyle}"
                                    Foreground="White"
                                    FontSize="9"
-                                   Padding="4,0,4,0"/>
+                                   Padding="4,0,4,0" />
                     </Border>
 
                     <Border Visibility="{x:Bind ViewModel.Album.IsCompilation, Mode=TwoWay, Converter={StaticResource BoolToVisibilityConverter}}"
@@ -112,16 +112,19 @@
                                    Style="{StaticResource SubtitleTextBlockStyle}"
                                    Foreground="White"
                                    FontSize="9"
-                                   Padding="4,0,4,0"/>
+                                   Padding="4,0,4,0" />
                     </Border>
                 </StackPanel>
-           
+
                 <TextBlock x:Name="panelExtendedInfo"
                            RelativePanel.RightOf="buttonCountry"
                            RelativePanel.AlignBottomWith="artistName"
                            Margin="6,0,0,0"
                            Style="{StaticResource headerText}"
-                           Text="{x:Bind ViewModel.SubTitle}" />
+                           Text="{x:Bind ViewModel.SubTitle}">
+                    <Run Text="🔹" />
+                    <Run Text="{x:Bind ViewModel.SubTitle}" />
+                </TextBlock>
 
                 <StackPanel x:Name="panelStatsInfo"
                             RelativePanel.Below="panelExtendedInfo"

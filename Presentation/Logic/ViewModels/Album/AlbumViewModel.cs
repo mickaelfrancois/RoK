@@ -31,11 +31,9 @@ public partial class AlbumViewModel : ObservableObject
     public IPlaylistMenuService PlaylistMenuService { get; }
 
 
-    //[ObservableProperty]
     public ObservableCollection<string> Tags { get; set; } = new();
 
     public ObservableCollection<string> SuggestedTags { get; set; } = new();
-
 
     public bool IsFavorite
     {
@@ -57,7 +55,7 @@ public partial class AlbumViewModel : ObservableObject
     {
         get
         {
-            string label = "🔹";
+            string label = "";
             string separator = "";
 
             if (Album.TrackCount > 0)
