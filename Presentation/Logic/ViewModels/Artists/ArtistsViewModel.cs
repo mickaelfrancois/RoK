@@ -10,6 +10,7 @@ public partial class ArtistsViewModel : ObservableObject, IDisposable
     private readonly ILogger<ArtistsViewModel> _logger;
     private readonly IArtistProvider _artistProvider;
     private readonly IArtistLibraryMonitor _libraryMonitor;
+    private readonly TagsProvider _tagsProvider;
     private readonly IAppOptions _appOptions;
     private readonly ArtistsSelectionManager _selectionManager;
     private readonly ArtistsStateManager _stateManager;
@@ -22,10 +23,12 @@ public partial class ArtistsViewModel : ObservableObject, IDisposable
 
     public List<ArtistViewModel> ViewModels => _artistProvider.ViewModels;
     public List<GenreDto> Genres => _artistProvider.Genres;
+    public List<string> Tags { get; private set; } = [];
     public ObservableCollection<object> Selected => _selectionManager.Selected;
     public List<ArtistViewModel> SelectedItems => _selectionManager.SelectedItems;
     public List<string> SelectedFilters => _stateManager.SelectedFilters;
     public List<long> SelectedGenreFilters => _stateManager.SelectedGenreFilters;
+    public List<string> SelectedTagFilters => _stateManager.SelectedTagFilters;
     public bool IsSelectedItems => _selectionManager.IsSelectedItems;
 
     [ObservableProperty]
@@ -53,8 +56,9 @@ public partial class ArtistsViewModel : ObservableObject, IDisposable
     public string GroupByText => _artistProvider.GetGroupByLabel(SelectedGroupBy);
 
 
-    public ArtistsViewModel(IArtistProvider artistProvider, IArtistLibraryMonitor libraryMonitor, ArtistsSelectionManager selectionManager, ArtistsStateManager stateManager, ArtistsPlaybackService playbackService, IAppOptions appOptions, ILogger<ArtistsViewModel> logger)
+    public ArtistsViewModel(TagsProvider tagProvider, IArtistProvider artistProvider, IArtistLibraryMonitor libraryMonitor, ArtistsSelectionManager selectionManager, ArtistsStateManager stateManager, ArtistsPlaybackService playbackService, IAppOptions appOptions, ILogger<ArtistsViewModel> logger)
     {
+        _tagsProvider = tagProvider;
         _artistProvider = artistProvider;
         _libraryMonitor = libraryMonitor;
         _selectionManager = selectionManager;
@@ -78,6 +82,8 @@ public partial class ArtistsViewModel : ObservableObject, IDisposable
     public async Task LoadDataAsync(bool forceReload)
     {
         IsGridView = _stateManager.GetGridView();
+
+        Tags = await _tagsProvider.GetTagsAsync();
 
         bool mustLoad = _libraryUpdated || forceReload || ViewModels.Count == 0;
         if (!mustLoad)
@@ -126,6 +132,7 @@ public partial class ArtistsViewModel : ObservableObject, IDisposable
         _stateLoaded = true;
         _stateManager.Load();
         SelectedGroupBy = _stateManager.GroupBy;
+
         SetFilterLabel();
     }
 
@@ -149,6 +156,7 @@ public partial class ArtistsViewModel : ObservableObject, IDisposable
         {
             _stateManager.SelectedFilters.Clear();
             _stateManager.SelectedGenreFilters.Clear();
+            _stateManager.SelectedTagFilters.Clear();
         }
         else if (_stateManager.SelectedFilters.Contains(filterBy))
             _stateManager.SelectedFilters.Remove(filterBy);
@@ -174,6 +182,20 @@ public partial class ArtistsViewModel : ObservableObject, IDisposable
     }
 
     [RelayCommand]
+    private void FilterByTag(string tag)
+    {
+        if (string.IsNullOrEmpty(tag))
+            _stateManager.SelectedTagFilters.Clear();
+        else if (_stateManager.SelectedTagFilters.Contains(tag))
+            _stateManager.SelectedTagFilters.Remove(tag);
+        else
+            _stateManager.SelectedTagFilters.Add(tag);
+
+        SetFilterLabel();
+        FilterAndSort();
+    }
+
+    [RelayCommand]
     private void GroupBy(string groupBy)
     {
         SelectedGroupBy = groupBy;
@@ -183,7 +205,7 @@ public partial class ArtistsViewModel : ObservableObject, IDisposable
     [RelayCommand]
     private void FilterAndSort()
     {
-        ArtistProviderResult result = _artistProvider.GetProcessedData(_stateManager.GroupBy, _stateManager.SelectedFilters, _stateManager.SelectedGenreFilters);
+        ArtistProviderResult result = _artistProvider.GetProcessedData(_stateManager.GroupBy, _stateManager.SelectedFilters, _stateManager.SelectedGenreFilters, _stateManager.SelectedTagFilters);
 
         _filteredArtists = result.FilteredItems;
         GroupedItems.InitWithAddRange(result.Groups);

@@ -1,5 +1,6 @@
 ﻿using Rok.Application.Features.Albums.Query;
 using Rok.Application.Features.Genres.Query;
+using Rok.Application.Features.Tags.Query;
 
 namespace Rok.Logic.ViewModels.Albums.Services;
 
@@ -8,6 +9,9 @@ public class AlbumsDataLoader(IMediator mediator, ILogger<AlbumsDataLoader> logg
     public List<AlbumViewModel> ViewModels { get; private set; } = [];
 
     public List<GenreDto> Genres { get; private set; } = [];
+
+    public List<string> Tags { get; set; } = [];
+
 
     public async Task LoadAlbumsAsync()
     {
@@ -22,6 +26,15 @@ public class AlbumsDataLoader(IMediator mediator, ILogger<AlbumsDataLoader> logg
     {
         IEnumerable<GenreDto> genres = await mediator.SendMessageAsync(new GetAllGenresQuery());
         Genres = genres.OrderBy(c => c.Name).ToList();
+    }
+
+    public async Task LoadTagsAsync()
+    {
+        IEnumerable<TagDto> tags = await mediator.SendMessageAsync(new GetAllTagsQuery());
+        Tags = tags.Select(v => v.Name)
+                   .Distinct()
+                   .OrderBy(t => t)
+                   .ToList();
     }
 
     public void SetAlbums(List<AlbumDto> albums)

@@ -20,6 +20,7 @@ public partial class AlbumViewModel : ObservableObject
     private readonly IAppOptions _appOptions;
 
     private readonly AlbumDataLoader _dataLoader;
+    private readonly TagsProvider _tagsProvider;
     private readonly AlbumPictureService _pictureService;
     private readonly AlbumApiService _apiService;
     private readonly AlbumStatisticsService _statisticsService;
@@ -126,6 +127,7 @@ public partial class AlbumViewModel : ObservableObject
         IPlayerService playerService,
         ResourceLoader resourceLoader,
         AlbumDataLoader dataLoader,
+        TagsProvider tagsDataLoader,
         AlbumPictureService pictureService,
         AlbumApiService apiService,
         AlbumStatisticsService statisticsService,
@@ -140,6 +142,7 @@ public partial class AlbumViewModel : ObservableObject
         _playerService = Guard.Against.Null(playerService);
         _resourceLoader = Guard.Against.Null(resourceLoader);
         _dataLoader = Guard.Against.Null(dataLoader);
+        _tagsProvider = Guard.Against.Null(tagsDataLoader);
         _pictureService = Guard.Against.Null(pictureService);
         _apiService = Guard.Against.Null(apiService);
         _statisticsService = Guard.Against.Null(statisticsService);
@@ -213,8 +216,8 @@ public partial class AlbumViewModel : ObservableObject
         Tags.CollectionChanged += OnTagsCollectionChanged;
 
         SuggestedTags.Clear();
-        IEnumerable<TagDto> suggestedTags = await _dataLoader.LoadAllTagsAsync();
-        foreach (string tag in suggestedTags.Where(tag => !Tags.Contains(tag.Name)).Select(tag => tag.Name))
+        List<string> suggestedTags = await _tagsProvider.GetTagsAsync();
+        foreach (string tag in suggestedTags)
         {
             SuggestedTags.Add(tag);
         }

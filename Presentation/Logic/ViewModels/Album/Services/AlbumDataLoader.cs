@@ -1,5 +1,4 @@
 ﻿using Rok.Application.Features.Albums.Query;
-using Rok.Application.Features.Tags.Query;
 using Rok.Application.Features.Tracks.Query;
 using Rok.Logic.ViewModels.Tracks;
 
@@ -28,10 +27,5 @@ public class AlbumDataLoader(IMediator mediator, ILogger<AlbumDataLoader> logger
     {
         Result<AlbumDto> albumResult = await mediator.SendMessageAsync(new GetAlbumByIdQuery(albumId));
         return albumResult.IsSuccess ? albumResult.Value : null;
-    }
-
-    public async Task<IEnumerable<TagDto>> LoadAllTagsAsync()
-    {
-        return await mediator.SendMessageAsync(new GetAllTagsQuery());
     }
 }

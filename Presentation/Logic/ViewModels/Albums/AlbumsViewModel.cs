@@ -11,6 +11,7 @@ public partial class AlbumsViewModel : ObservableObject, IDisposable
     private readonly ILogger<AlbumsViewModel> _logger;
     private readonly IAlbumProvider _albumProvider;
     private readonly IAlbumLibraryMonitor _libraryMonitor;
+    private readonly TagsProvider _tagsProvider;
     private readonly AlbumsSelectionManager _selectionManager;
     private readonly AlbumsStateManager _stateManager;
     private readonly AlbumsPlaybackService _playbackService;
@@ -22,7 +23,7 @@ public partial class AlbumsViewModel : ObservableObject, IDisposable
 
     public List<AlbumViewModel> ViewModels => _albumProvider.ViewModels;
     public List<GenreDto> Genres => _albumProvider.Genres;
-    public List<string> Tags => _albumProvider.Tags;
+    public List<string> Tags { get; private set; } = [];
     public ObservableCollection<object> Selected => _selectionManager.Selected;
     public List<AlbumViewModel> SelectedItems => _selectionManager.SelectedItems;
     public List<string> SelectedFilters => _stateManager.SelectedFilters;
@@ -56,8 +57,9 @@ public partial class AlbumsViewModel : ObservableObject, IDisposable
 
 
 
-    public AlbumsViewModel(IAlbumProvider albumProvider, IAlbumLibraryMonitor libraryMonitor, AlbumsSelectionManager selectionManager, AlbumsStateManager stateManager, AlbumsPlaybackService playbackService, ILogger<AlbumsViewModel> logger)
+    public AlbumsViewModel(TagsProvider tagProvider, IAlbumProvider albumProvider, IAlbumLibraryMonitor libraryMonitor, AlbumsSelectionManager selectionManager, AlbumsStateManager stateManager, AlbumsPlaybackService playbackService, ILogger<AlbumsViewModel> logger)
     {
+        _tagsProvider = tagProvider;
         _albumProvider = albumProvider;
         _libraryMonitor = libraryMonitor;
         _selectionManager = selectionManager;
@@ -75,14 +77,12 @@ public partial class AlbumsViewModel : ObservableObject, IDisposable
         FilterAndSort();
     }
 
-    private void OnAlbumImported(object? sender, EventArgs e)
-    {
-        _libraryUpdated = true;
-    }
 
     public async Task LoadDataAsync(bool forceReload)
     {
         IsGridView = _stateManager.GetGridView();
+
+        Tags = await _tagsProvider.GetTagsAsync();
 
         bool mustLoad = _libraryUpdated || forceReload || ViewModels.Count == 0;
         if (!mustLoad)

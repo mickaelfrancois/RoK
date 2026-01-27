@@ -1,4 +1,5 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+﻿using System.Collections.Specialized;
+using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Rok.Application.Features.Playlists.PlaylistMenu;
 using Rok.Application.Randomizer;
@@ -24,6 +25,7 @@ public partial class ArtistViewModel : ObservableObject
     private readonly IAppOptions _appOptions;
 
     private readonly ArtistDataLoader _dataLoader;
+    private readonly TagsProvider _tagsProvider;
     private readonly ArtistPictureService _pictureService;
     private readonly ArtistApiService _apiService;
     private readonly ArtistStatisticsService _statisticsService;
@@ -35,6 +37,10 @@ public partial class ArtistViewModel : ObservableObject
     public RangeObservableCollection<TrackViewModel> Tracks { get; set; } = [];
     public RangeObservableCollection<AlbumViewModel> Albums { get; set; } = [];
 
+
+    public ObservableCollection<string> Tags { get; set; } = new();
+
+    public ObservableCollection<string> SuggestedTags { get; set; } = new();
 
     public bool IsFavorite
     {
@@ -202,6 +208,7 @@ public partial class ArtistViewModel : ObservableObject
         IDialogService dialogService,
         ResourceLoader resourceLoader,
         ArtistDataLoader dataLoader,
+        TagsProvider tagsDataLoader,
         ArtistPictureService pictureService,
         ArtistApiService apiService,
         ArtistStatisticsService statisticsService,
@@ -216,6 +223,7 @@ public partial class ArtistViewModel : ObservableObject
         _dialogService = Guard.Against.Null(dialogService);
         _resourceLoader = Guard.Against.Null(resourceLoader);
         _dataLoader = Guard.Against.Null(dataLoader);
+        _tagsProvider = Guard.Against.Null(tagsDataLoader);
         _pictureService = Guard.Against.Null(pictureService);
         _apiService = Guard.Against.Null(apiService);
         _statisticsService = Guard.Against.Null(statisticsService);
@@ -250,8 +258,9 @@ public partial class ArtistViewModel : ObservableObject
         if (fetchApi)
             await GetDataFromApiAsync();
 
-        stopwatch.Stop();
+        await InitializeTagsAsync();
 
+        stopwatch.Stop();
         _logger.LogInformation("Artist {ArtistId} loaded in {ElapsedMilliseconds} ms (albums: {LoadAlbums}, tracks: {LoadTracks}, api: {FetchApi})",
                                 artistId, stopwatch.ElapsedMilliseconds, loadAlbums, loadTracks, fetchApi);
     }
@@ -292,6 +301,33 @@ public partial class ArtistViewModel : ObservableObject
         Tracks.AddRange(tracks);
 
         OnPropertyChanged(nameof(DurationTotal));
+    }
+
+    private async Task InitializeTagsAsync()
+    {
+        List<string> artistTags = Artist.GetTags();
+
+        Tags.Clear();
+        foreach (string tag in artistTags)
+            Tags.Add(tag);
+
+        Tags.CollectionChanged -= OnTagsCollectionChanged;
+        Tags.CollectionChanged += OnTagsCollectionChanged;
+
+        SuggestedTags.Clear();
+        List<string> suggestedTags = await _tagsProvider.GetTagsAsync();
+        foreach (string tag in suggestedTags)
+        {
+            SuggestedTags.Add(tag);
+        }
+    }
+
+    private async void OnTagsCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
+    {
+        Artist.TagsAsString = string.Join(",", Tags);
+        await _editService.UpdateTagsAsync(Artist.Id, Tags);
+
+        Debug.WriteLine(Artist.TagsAsString);
     }
 
     private async Task UpdateStatisticsIfNeededAsync()

@@ -47,4 +47,9 @@ public class ArtistEditService(IMediator mediator, ILogger<ArtistEditService> lo
             return false;
         }
     }
+
+    public async Task UpdateTagsAsync(long id, IEnumerable<string> tags)
+    {
+        await mediator.SendMessageAsync(new UpdateArtistTagsCommand(id, tags));
+    }
 }

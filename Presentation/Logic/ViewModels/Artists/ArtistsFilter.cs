@@ -1,18 +1,19 @@
 ﻿namespace Rok.Logic.ViewModels.Artists;
 
-public class ArtistsFilter : FilterService<ArtistViewModel>
+public class ArtistsFilter(ResourceLoader resourceLoader) : FilterService<ArtistViewModel>(resourceLoader)
 {
     public const string KFilterByFavoriteArtist = "ARTISTFAVORITE";
     public const string KFilterByGenreFavorite = "GENREFAVORITE";
     public const string KFilterByNeverListened = "NEVERLISTENED";
 
-    public ArtistsFilter(ResourceLoader resourceLoader) : base(resourceLoader)
-    {
-    }
-
     public IEnumerable<ArtistViewModel> FilterByGenreId(long genreId, IEnumerable<ArtistViewModel> artists)
     {
         return FilterByGenreId(genreId, artists, a => a.Artist.GenreId);
+    }
+
+    public IEnumerable<ArtistViewModel> FilterByTags(List<string> tags, IEnumerable<ArtistViewModel> artists)
+    {
+        return FilterByTags(tags, artists, a => a.Artist.GetTags());
     }
 
     protected override void RegisterFilterStrategies()

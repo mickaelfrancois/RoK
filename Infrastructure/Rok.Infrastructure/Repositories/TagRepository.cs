@@ -1,6 +1,8 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using MiF.SimpleMessenger;
 using Rok.Application.Interfaces;
+using Rok.Application.Messages;
 
 namespace Rok.Infrastructure.Repositories;
 
@@ -44,6 +46,8 @@ public class TagRepository(IDbConnection connection, [FromKeyedServices("Backgro
             }
 
             transaction.Commit();
+
+            Messenger.Send(new TagUpdatedMessage());
 
             return true;
         }

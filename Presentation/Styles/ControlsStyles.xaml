@@ -32,7 +32,7 @@
     <!-- File page -->
 
     <x:Double x:Key="headerPictureColumnWidth">180</x:Double>
-    <x:Double x:Key="headerRowHeight">180</x:Double>
+    <x:Double x:Key="headerRowHeight">200</x:Double>
     <x:Double x:Key="countryFlagHeigh">10</x:Double>
 
     <Style x:Name="headerBackdrop" TargetType="Image">

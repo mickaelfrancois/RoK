@@ -2,22 +2,17 @@
 
 namespace Rok.Logic.ViewModels.Albums.Services;
 
-public class AlbumProvider(AlbumsDataLoader dataLoader, AlbumsFilter filterService, AlbumsGroupCategory groupService) : IAlbumProvider
+public class AlbumProvider(TagsProvider tagsLoader, AlbumsDataLoader dataLoader, AlbumsFilter filterService, AlbumsGroupCategory groupService)
+    : IAlbumProvider
 {
     public List<AlbumViewModel> ViewModels => dataLoader.ViewModels;
     public List<GenreDto> Genres => dataLoader.Genres;
-    public List<string> Tags { get; set; } = [];
+
 
     public async Task LoadAsync()
     {
         await dataLoader.LoadGenresAsync();
         await dataLoader.LoadAlbumsAsync();
-
-        Tags = dataLoader.ViewModels
-        .SelectMany(v => v.Album.GetTags())
-        .Distinct()
-        .OrderBy(t => t)
-        .ToList();
     }
 
     public void SetAlbums(List<AlbumDto> albums) => dataLoader.SetAlbums(albums);

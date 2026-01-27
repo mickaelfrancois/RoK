@@ -84,7 +84,8 @@ public class ArtistRepository(IDbConnection connection, [FromKeyedServices("Back
         string query = """
                 SELECT artists.*,
                      genres.name AS genreName, genres.isFavorite AS isGenreFavorite, 
-                     countries.code AS countryCode, countries.english AS countryName
+                     countries.code AS countryCode, countries.english AS countryName,
+                     GROUP_CONCAT(DISTINCT tags.Name) AS TagsAsString
                      FROM artists 
                      LEFT JOIN genres ON genres.Id = artists.genreId 
                      LEFT JOIN countries ON countries.Id = artists.countryId 

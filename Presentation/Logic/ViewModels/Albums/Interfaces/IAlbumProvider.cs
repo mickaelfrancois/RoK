@@ -8,8 +8,6 @@ public interface IAlbumProvider
 
     List<GenreDto> Genres { get; }
 
-    List<string> Tags { get; }
-
     Task LoadAsync();
 
     void SetAlbums(List<AlbumDto> albums);
