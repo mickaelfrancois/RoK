@@ -36,11 +36,15 @@ public class AppOptions : IAppOptions
 
     public List<string> ArtistsFilterBy { get; set; } = [];
 
+    public List<string> ArtistsFilterByTags { get; set; } = [];
+
     public string AlbumsGroupBy { get; set; } = string.Empty;
 
     public List<long> AlbumsFilterByGenresId { get; set; } = [];
 
     public List<string> AlbumsFilterBy { get; set; } = [];
+
+    public List<string> AlbumsFilterByTags { get; set; } = [];
 
     public string TracksGroupBy { get; set; } = string.Empty;
 
@@ -48,6 +52,7 @@ public class AppOptions : IAppOptions
 
     public List<long> TracksFilterByGenresId { get; set; } = [];
 
+    public List<string> TracksFilterByTags { get; set; } = [];
 
     public AppOptions()
     {

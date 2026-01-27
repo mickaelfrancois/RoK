@@ -8,6 +8,7 @@ public class ArtistsDataLoader(IMediator mediator, ILogger<ArtistsDataLoader> lo
 
     public List<GenreDto> Genres { get; private set; } = [];
 
+
     public async Task LoadArtistsAsync(bool excludeArtistsWithoutAlbum)
     {
         using (PerfLogger perfLogger = new PerfLogger(logger).Parameters("Artists loaded"))

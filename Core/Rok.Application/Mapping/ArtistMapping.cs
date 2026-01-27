@@ -57,7 +57,8 @@ public static class ArtistMapping
             IsGenreFavorite = entity.IsGenreFavorite,
             CountryCode = entity.CountryCode,
             CountryName = entity.CountryName,
-            GetMetaDataLastAttempt = entity.GetMetaDataLastAttempt
+            GetMetaDataLastAttempt = entity.GetMetaDataLastAttempt,
+            TagsAsString = entity.TagsAsString
         };
     }
 

@@ -2,10 +2,12 @@
 
 namespace Rok.Logic.ViewModels.Albums.Services;
 
-public class AlbumProvider(AlbumsDataLoader dataLoader, AlbumsFilter filterService, AlbumsGroupCategory groupService) : IAlbumProvider
+public class AlbumProvider(TagsProvider tagsLoader, AlbumsDataLoader dataLoader, AlbumsFilter filterService, AlbumsGroupCategory groupService)
+    : IAlbumProvider
 {
     public List<AlbumViewModel> ViewModels => dataLoader.ViewModels;
     public List<GenreDto> Genres => dataLoader.Genres;
+
 
     public async Task LoadAsync()
     {
@@ -15,7 +17,7 @@ public class AlbumProvider(AlbumsDataLoader dataLoader, AlbumsFilter filterServi
 
     public void SetAlbums(List<AlbumDto> albums) => dataLoader.SetAlbums(albums);
 
-    public AlbumProviderResult GetProcessedData(string groupBy, List<string> filters, List<long> genreFilters)
+    public AlbumProviderResult GetProcessedData(string groupBy, List<string> filters, List<long> genreFilters, List<string> tagFilters)
     {
         IEnumerable<AlbumViewModel> filtered = dataLoader.ViewModels;
 
@@ -24,6 +26,9 @@ public class AlbumProvider(AlbumsDataLoader dataLoader, AlbumsFilter filterServi
 
         foreach (long genreId in genreFilters)
             filtered = filterService.FilterByGenreId(genreId, filtered);
+
+        if (tagFilters.Count > 0)
+            filtered = filterService.FilterByTags(tagFilters, filtered);
 
         List<AlbumViewModel> filteredList = filtered.ToList();
         List<AlbumsGroupCategoryViewModel> groups = groupService.GetGroupedItems(groupBy, filteredList).ToList();

@@ -72,4 +72,7 @@ public class TrackEntity : BaseEntity
 
     [Write(false)]
     public string CountryName { get; set; } = string.Empty;
+
+    [Write(false)]
+    public string? TagsAsString { get; set; }
 }

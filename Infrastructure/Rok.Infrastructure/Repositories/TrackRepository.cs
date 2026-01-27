@@ -13,6 +13,7 @@ public class TrackRepository(IDbConnection db, [FromKeyedServices("BackgroundCon
     private const string UpdateSkipCountSql = "UPDATE tracks SET skipCount = skipCount + 1, lastSkip = @lastSkip WHERE Id = @id";
     private const string UpdateFileDateSql = "UPDATE tracks SET fileDate = @fileDate WHERE id = @id";
     private const string UpdateGetLyricsLastAttemptSql = "UPDATE tracks SET getLyricsLastAttempt = @lastAttemptDate WHERE id = @id";
+    private const string DefaultGroupBy = " GROUP BY tracks.id";
 
 
     public async Task<IEnumerable<TrackEntity>> SearchAsync(string name, RepositoryConnectionKind kind = RepositoryConnectionKind.Foreground)
@@ -21,7 +22,7 @@ public class TrackRepository(IDbConnection db, [FromKeyedServices("BackgroundCon
             return [];
 
         name = $"%{name}%";
-        string sql = GetSelectQuery() + " WHERE tracks.title LIKE @name";
+        string sql = GetSelectQuery() + $" WHERE tracks.title LIKE @name " + DefaultGroupBy;
 
         return await ExecuteQueryAsync(sql, kind, new { name });
     }
@@ -31,14 +32,15 @@ public class TrackRepository(IDbConnection db, [FromKeyedServices("BackgroundCon
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(playlistId);
 
         string sql = GetSelectQuery() +
-                     "INNER JOIN playlisttracks AS pt ON pt.trackId = tracks.id AND pt.playlistId = @playlistId";
+                     "INNER JOIN playlisttracks AS pt ON pt.trackId = tracks.id AND pt.playlistId = @playlistId " +
+                     DefaultGroupBy;
 
         return await ExecuteQueryAsync(sql, kind, new { playlistId });
     }
 
     public new async Task<TrackEntity?> GetByNameAsync(string name, RepositoryConnectionKind kind = RepositoryConnectionKind.Foreground)
     {
-        string sql = GetSelectQuery("title");
+        string sql = GetSelectQuery("title") + DefaultGroupBy;
         return await QuerySingleOrDefaultAsync(sql, kind, new { title = name });
     }
 
@@ -46,7 +48,7 @@ public class TrackRepository(IDbConnection db, [FromKeyedServices("BackgroundCon
     public async Task<IEnumerable<TrackEntity>> GetByGenreIdAsync(long genreId, RepositoryConnectionKind kind = RepositoryConnectionKind.Foreground)
     {
         string sql = GetSelectQuery() +
-                     "WHERE tracks.genreId = @genreId";
+                     $"WHERE tracks.genreId = @genreId" + DefaultGroupBy;
 
         return await ExecuteQueryAsync(sql, kind, new { genreId });
     }
@@ -54,7 +56,8 @@ public class TrackRepository(IDbConnection db, [FromKeyedServices("BackgroundCon
     public async Task<IEnumerable<TrackEntity>> GetByArtistIdAsync(long artistId, RepositoryConnectionKind kind = RepositoryConnectionKind.Foreground)
     {
         string sql = GetSelectQuery() +
-                     "WHERE tracks.artistId = @artistId" +
+                     "WHERE tracks.artistId = @artistId " +
+                     DefaultGroupBy +
                      " ORDER BY albums.year DESC, tracks.trackNumber ASC";
 
         return await ExecuteQueryAsync(sql, kind, new { artistId });
@@ -74,6 +77,7 @@ public class TrackRepository(IDbConnection db, [FromKeyedServices("BackgroundCon
 
         string sql = GetSelectQuery() +
                      "WHERE tracks.artistId IN @sampledArtistsIds " +
+                     DefaultGroupBy +
                      "ORDER BY RANDOM() " +
                      "LIMIT @limit";
 
@@ -85,7 +89,7 @@ public class TrackRepository(IDbConnection db, [FromKeyedServices("BackgroundCon
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(albumId);
 
         string sql = GetSelectQuery() +
-                     "WHERE tracks.albumId = @albumId";
+                     "WHERE tracks.albumId = @albumId " + DefaultGroupBy;
 
         return await ExecuteQueryAsync(sql, kind, new { albumId });
     }
@@ -104,6 +108,7 @@ public class TrackRepository(IDbConnection db, [FromKeyedServices("BackgroundCon
 
         string sql = GetSelectQuery() +
                      "WHERE tracks.albumId IN @sampledAlbumIds " +
+                     DefaultGroupBy +
                      "ORDER BY RANDOM() " +
                      "LIMIT @limit";
 
@@ -151,6 +156,7 @@ public class TrackRepository(IDbConnection db, [FromKeyedServices("BackgroundCon
         return await ExecuteUpdateAsync(UpdateGetLyricsLastAttemptSql, new { lastAttemptDate = DateTime.UtcNow, id }, kind);
     }
 
+
     public override string GetSelectQuery(string? whereParam = null)
     {
         string query = """
@@ -158,12 +164,15 @@ public class TrackRepository(IDbConnection db, [FromKeyedServices("BackgroundCon
                      albums.name AS albumName, albums.isFavorite AS isAlbumFavorite, albums.isCompilation AS isAlbumCompilation, albums.isLive AS isAlbumLive,
                      artists.name AS artistName, artists.isFavorite AS isArtistFavorite, 
                      genres.name AS genreName, genres.isFavorite AS isGenreFavorite, 
-                     countries.code AS countryCode, countries.english AS countryName
+                     countries.code AS countryCode, countries.english AS countryName,
+                     GROUP_CONCAT(DISTINCT tags.Name) AS TagsAsString
                      FROM tracks 
                      LEFT JOIN artists ON artists.Id = tracks.artistId 
                      LEFT JOIN albums ON albums.Id = tracks.albumId 
                      LEFT JOIN genres ON genres.Id = tracks.genreId 
                      LEFT JOIN countries ON countries.Id = artists.countryId 
+                     LEFT JOIN trackTags ON tracks.id = trackTags.trackId
+                     LEFT JOIN tags ON trackTags.tagId = tags.id 
                 """;
 
         if (!string.IsNullOrEmpty(whereParam))
@@ -171,6 +180,12 @@ public class TrackRepository(IDbConnection db, [FromKeyedServices("BackgroundCon
 
         return query;
     }
+
+    public override string GetDefaultGroupBy()
+    {
+        return DefaultGroupBy;
+    }
+
 
     public override string GetTableName()
     {

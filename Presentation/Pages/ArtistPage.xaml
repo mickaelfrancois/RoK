@@ -9,7 +9,8 @@
     xmlns:common="using:Rok.Commons" 
     xmlns:tracks="using:Rok.Logic.ViewModels.Tracks" 
     xmlns:albums="using:Rok.Logic.ViewModels.Albums"
-    mc:Ignorable="d">
+      xmlns:controls="using:CommunityToolkit.WinUI.Controls"
+      mc:Ignorable="d">
 
     <Grid>
         <Grid.RowDefinitions>
@@ -70,25 +71,25 @@
                 <HyperlinkButton x:Name="genreName"
                                  Content="{x:Bind ViewModel.Artist.GenreName}"
                                  RelativePanel.Below="artistName"
-                                 FontSize="16"
+                                 Margin="0"
+                                 Padding="0"
                                  Command="{x:Bind ViewModel.GenreOpenCommand}"
                                  Style="{StaticResource headerGenreHyperlink}" />
 
                 <TextBlock x:Name="panelExtendedInfo"
-                           RelativePanel.Below="genreName"
-                           Text="{x:Bind ViewModel.SubTitle}"
-                           FontSize="16"
-                           Style="{StaticResource headerText}" />
+                           RelativePanel.RightOf="genreName"
+                           RelativePanel.AlignBottomWith="genreName"                    
+                           Margin="6,0,0,0"
+                           Style="{StaticResource headerText}">
+                    <Run Text="🔹" />
+                    <Run Text="{x:Bind ViewModel.SubTitle}" />
+                </TextBlock>
 
-                <TextBlock x:Name="panelStatsInfo"
-                           RelativePanel.Below="panelExtendedInfo"
-                           Text="{x:Bind ViewModel.ListenStats}"
-                           Style="{StaticResource headerText}"
-                           />
 
                 <CommandBar x:Name="panelNetwork"
-                            RelativePanel.Below="panelStatsInfo"
-                            Margin="-10,-5,0,0"                            
+                            RelativePanel.Below="tagsContainer"
+                            RelativePanel.AlignLeftWith="artistName"
+                            Margin="-5,-5,0,0"
                             Style="{StaticResource headerCommandBar}">
 
                     <AppBarButton x:Uid="artistViewWebSite"
@@ -244,7 +245,48 @@
                     </AppBarButton>
 
                 </CommandBar>
-                
+
+                <StackPanel x:Name="tagsContainer"
+                            RelativePanel.Below="panelExtendedInfo"
+                            RelativePanel.AlignLeftWith="artistName"
+                            Orientation="Horizontal"                                                        
+                            Spacing="0"
+                            Margin="-4,-0,0,0">
+
+                    <controls:TokenizingTextBox x:Uid="TagsBox"
+                                                x:Name="TagsBox"
+                                                ItemsSource="{x:Bind ViewModel.Tags, Mode=OneWay}"
+                                                SuggestedItemsSource="{x:Bind ViewModel.SuggestedTags, Mode=OneWay}"                                                
+                                                TokenDelimiter=","
+                                                HorizontalAlignment="Left"
+                                                Background="Transparent" 
+                                                BorderThickness="0"
+                                                Margin="0"
+                                                MinWidth="150">
+
+                        <controls:TokenizingTextBox.Resources>
+                            <Style TargetType="controls:TokenizingTextBoxItem">
+                                <Setter Property="Background"
+                                        Value="{ThemeResource SystemControlBackgroundBaseLowBrush}" />
+                                <Setter Property="Foreground"
+                                        Value="{ThemeResource SystemControlForegroundBaseHighBrush}" />
+                                <Setter Property="CornerRadius"
+                                        Value="2" />
+                                <Setter Property="FontSize"
+                                        Value="11" />
+                                <Setter Property="Padding"
+                                        Value="6,2,6,2" />
+                                <Setter Property="Margin"
+                                        Value="0,0,4,0" />
+                                <Setter Property="MinHeight"
+                                        Value="24" />
+                                <Setter Property="MinWidth"
+                                        Value="20" />
+                            </Style>
+                        </controls:TokenizingTextBox.Resources>
+                    </controls:TokenizingTextBox>
+                </StackPanel>
+
                 <CommandBar  RelativePanel.AlignBottomWithPanel="True" 
                              Style="{StaticResource headerCommandBar}">
 
@@ -280,7 +322,6 @@
                                         common:MenuFlyoutExtensions.FlattenPlaylistMenu="True" />
                         </AppBarButton.Flyout>
                     </AppBarButton>
-
 
                     <AppBarButton x:Uid="artistViewEdit"
                                   Style="{StaticResource headerGenericButton}"

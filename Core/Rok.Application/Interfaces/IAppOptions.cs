@@ -32,6 +32,8 @@ public interface IAppOptions
 
     List<string> ArtistsFilterBy { get; set; }
 
+    List<string> ArtistsFilterByTags { get; set; }
+
     List<long> ArtistsFilterByGenresId { get; set; }
 
     string AlbumsGroupBy { get; set; }
@@ -40,9 +42,13 @@ public interface IAppOptions
 
     List<long> AlbumsFilterByGenresId { get; set; }
 
+    List<string> AlbumsFilterByTags { get; set; }
+
     string TracksGroupBy { get; set; }
 
     List<string> TracksFilterBy { get; set; }
+
+    List<string> TracksFilterByTags { get; set; }
 
     List<long> TracksFilterByGenresId { get; set; }
 

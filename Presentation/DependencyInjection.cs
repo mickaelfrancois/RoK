@@ -46,6 +46,8 @@ public static class DependencyInjection
         services.AddSingleton<IFolderResolver, FolderResolver>();
         services.AddSingleton<IBackdropLoader, BackdropLoader>();
 
+        services.AddSingleton<TagsProvider>();
+
         // Albums ViewModel, services and handlers
         services.AddSingleton<AlbumsViewModel>();
         services.AddTransient<AlbumsDataLoader>();
@@ -62,6 +64,7 @@ public static class DependencyInjection
         services.AddKeyedTransient<AlbumsViewModel>("SearchAlbums", (sp, _) =>
         {
             return new AlbumsViewModel(
+                        sp.GetRequiredService<TagsProvider>(),
                         sp.GetRequiredService<IAlbumProvider>(),
                         sp.GetRequiredService<IAlbumLibraryMonitor>(),
                         sp.GetRequiredService<AlbumsSelectionManager>(),
@@ -100,6 +103,7 @@ public static class DependencyInjection
         services.AddKeyedTransient<ArtistsViewModel>("SearchArtists", (sp, _) =>
         {
             return new ArtistsViewModel(
+                        sp.GetRequiredService<TagsProvider>(),
                         sp.GetRequiredService<IArtistProvider>(),
                         sp.GetRequiredService<IArtistLibraryMonitor>(),
                         sp.GetRequiredService<ArtistsSelectionManager>(),
@@ -187,6 +191,7 @@ public static class DependencyInjection
 
         // Shared message handlers
         services.AddSingleton<LibraryRefreshMessageHandler>();
+        services.AddTransient<TagUpdatedMessageHandler>();
 
         // Other ViewModels
         services.AddSingleton<MainViewModel>();

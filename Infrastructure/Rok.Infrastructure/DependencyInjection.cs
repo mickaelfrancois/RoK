@@ -50,11 +50,13 @@ public static class DependencyInjection
         services.AddSingleton<IMigration, Migration3>();
         services.AddSingleton<IMigration, Migration4>();
         services.AddSingleton<IMigration, Migration5>();
+        services.AddSingleton<IMigration, Migration6>();
 
         services.AddScoped<IArtistRepository, ArtistRepository>();
         services.AddScoped<IAlbumRepository, AlbumRepository>();
         services.AddScoped<IGenreRepository, GenreRepository>();
         services.AddScoped<ITrackRepository, TrackRepository>();
+        services.AddScoped<ITagRepository, TagRepository>();
         services.AddScoped<ICountryRepository, CountryRepository>();
         services.AddScoped<IPlaylistHeaderRepository, PlaylistHeaderRepository>();
         services.AddScoped<IPlaylistTrackRepository, PlaylistTrackRepository>();

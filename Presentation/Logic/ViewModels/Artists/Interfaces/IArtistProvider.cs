@@ -12,7 +12,7 @@ public interface IArtistProvider
 
     void SetArtists(List<ArtistDto> artists);
 
-    ArtistProviderResult GetProcessedData(string groupBy, List<string> filters, List<long> genreFilters);
+    ArtistProviderResult GetProcessedData(string groupBy, List<string> filters, List<long> genreFilters, List<string> tagFilters);
 
     void Clear();
 

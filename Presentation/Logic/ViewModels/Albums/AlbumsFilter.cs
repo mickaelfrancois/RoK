@@ -1,6 +1,6 @@
 ﻿namespace Rok.Logic.ViewModels.Albums;
 
-public class AlbumsFilter : FilterService<AlbumViewModel>
+public class AlbumsFilter(ResourceLoader resourceLoader) : FilterService<AlbumViewModel>(resourceLoader)
 {
     public const string KFilterByAlbumFavorite = "ALBUMFAVORITE";
     public const string KFilterByArtistFavorite = "ARTISTFAVORITE";
@@ -11,13 +11,14 @@ public class AlbumsFilter : FilterService<AlbumViewModel>
     public const string KFilterByCompilation = "COMPILATION";
     public const string KFilterByAlbum = "ALBUM";
 
-    public AlbumsFilter(ResourceLoader resourceLoader) : base(resourceLoader)
-    {
-    }
-
     public IEnumerable<AlbumViewModel> FilterByGenreId(long genreId, IEnumerable<AlbumViewModel> albums)
     {
         return FilterByGenreId(genreId, albums, a => a.Album.GenreId);
+    }
+
+    public IEnumerable<AlbumViewModel> FilterByTags(List<string> tags, IEnumerable<AlbumViewModel> albums)
+    {
+        return FilterByTags(tags, albums, a => a.Album.GetTags());
     }
 
     protected override void RegisterFilterStrategies()

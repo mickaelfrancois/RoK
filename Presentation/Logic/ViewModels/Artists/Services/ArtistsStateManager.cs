@@ -14,5 +14,9 @@ public class ArtistsStateManager(IAppOptions appOptions) : ViewStateManager(appO
 
     protected override List<long> GetStoredGenreFilters() => AppOptions.ArtistsFilterByGenresId;
 
+    protected override List<string> GetStoredTagFilters() => AppOptions.ArtistsFilterByTags;
+
     protected override void SaveGenreFilters(List<long> filters) => AppOptions.ArtistsFilterByGenresId = filters;
+
+    protected override void SaveTagFilters(List<string> tags) => AppOptions.ArtistsFilterByTags = tags;
 }

@@ -11,9 +11,13 @@ public class TracksStateManager(IAppOptions appOptions) : ViewStateManager(appOp
 
     protected override List<string> GetStoredFilters() => AppOptions.TracksFilterBy;
 
+    protected override List<string> GetStoredTagFilters() => AppOptions.TracksFilterByTags;
+
     protected override void SaveFilters(List<string> filters) => AppOptions.TracksFilterBy = filters;
 
     protected override List<long> GetStoredGenreFilters() => AppOptions.TracksFilterByGenresId;
 
     protected override void SaveGenreFilters(List<long> filters) => AppOptions.TracksFilterByGenresId = filters;
+
+    protected override void SaveTagFilters(List<string> tags) => AppOptions.TracksFilterByTags = tags;
 }

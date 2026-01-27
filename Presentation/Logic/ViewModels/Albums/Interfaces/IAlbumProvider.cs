@@ -12,7 +12,7 @@ public interface IAlbumProvider
 
     void SetAlbums(List<AlbumDto> albums);
 
-    AlbumProviderResult GetProcessedData(string groupBy, List<string> filters, List<long> genreFilters);
+    AlbumProviderResult GetProcessedData(string groupBy, List<string> filters, List<long> genreFilters, List<string> tagFilters);
 
     void Clear();
 

@@ -91,4 +91,12 @@ public class AlbumDto
     public string? ArtistMusicBrainzID { get; set; }
 
     public bool IsLock { get; set; }
+
+    public string? TagsAsString { get; set; }
+
+
+    public List<string> GetTags()
+    {
+        return string.IsNullOrEmpty(TagsAsString) ? new List<string>() : TagsAsString.Split(',').ToList();
+    }
 }
