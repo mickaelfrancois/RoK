@@ -15,7 +15,7 @@ public class ArtistRepository(IDbConnection connection, [FromKeyedServices("Back
     private const string UpdateStatisticsSql = "UPDATE artists SET trackCount = @trackCount, totalDurationSeconds = @totalDurationSeconds, albumCount = @albumCount, bestOfCount = @bestOfCount, liveCount = @liveCount, compilationCount = @compilationCount, yearMini = @yearMini, yearMaxi = @yearMaxi WHERE id = @id";
     private const string UpdateMetadataAttemptSql = "UPDATE artists SET getMetaDataLastAttempt = @lastAttemptDate WHERE id = @id";
     private const string DeleteOrphansSql = "DELETE FROM artists WHERE id NOT IN (SELECT DISTINCT artistId FROM tracks WHERE artistId IS NOT NULL)";
-    private const string DefaultGroupBy = " GROUP BY artists.id";
+    private const string DefaultGroupBy = " GROUP BY artists.id ";
 
     public async Task<IEnumerable<IArtistEntity>> SearchAsync(string name, RepositoryConnectionKind kind = RepositoryConnectionKind.Foreground)
     {

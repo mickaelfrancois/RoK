@@ -13,7 +13,7 @@ public class TrackRepository(IDbConnection db, [FromKeyedServices("BackgroundCon
     private const string UpdateSkipCountSql = "UPDATE tracks SET skipCount = skipCount + 1, lastSkip = @lastSkip WHERE Id = @id";
     private const string UpdateFileDateSql = "UPDATE tracks SET fileDate = @fileDate WHERE id = @id";
     private const string UpdateGetLyricsLastAttemptSql = "UPDATE tracks SET getLyricsLastAttempt = @lastAttemptDate WHERE id = @id";
-    private const string DefaultGroupBy = " GROUP BY tracks.id";
+    private const string DefaultGroupBy = " GROUP BY tracks.id ";
 
 
     public async Task<IEnumerable<TrackEntity>> SearchAsync(string name, RepositoryConnectionKind kind = RepositoryConnectionKind.Foreground)
