@@ -13,7 +13,7 @@ public class AlbumRepository(IDbConnection connection, [FromKeyedServices("Backg
     private const string UpdateStatisticsSql = "UPDATE albums SET trackCount = @trackCount, duration = @duration WHERE id = @id";
     private const string UpdateMetadataAttemptSql = "UPDATE albums SET getMetaDataLastAttempt = @lastAttemptDate WHERE id = @id";
     private const string DeleteOrphansSql = "DELETE FROM albums WHERE id NOT IN (SELECT DISTINCT albumId FROM tracks WHERE albumId IS NOT NULL)";
-    private const string DefaultGroupBy = " GROUP BY albums.id";
+    private const string DefaultGroupBy = " GROUP BY albums.id ";
 
     public async Task<IEnumerable<IAlbumEntity>> SearchAsync(string name, RepositoryConnectionKind kind = RepositoryConnectionKind.Foreground)
     {
