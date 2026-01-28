@@ -1,35 +1,162 @@
 <?xml version="1.0" encoding="utf-8"?>
-<UserControl
-    x:Class="Rok.Pages.PlayerView"
-    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:local="using:Rok.Pages"
-    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:commons="using:Rok.Commons"
-    mc:Ignorable="d">
+<UserControl x:Class="Rok.Pages.PlayerView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="using:Rok.Pages"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:commons="using:Rok.Commons"
+             mc:Ignorable="d">
 
     <UserControl.Resources>
 
-        <Style x:Key="MiniLinkStyle" TargetType="HyperlinkButton">
-            <Setter Property="Padding" Value="0"/>
-            <Setter Property="Margin" Value="0"/>
-            <Setter Property="Foreground" Value="White"/>
-            <Setter Property="FontWeight" Value="Normal"/>
-            <Setter Property="VerticalAlignment" Value="Center"/>
+        <Style x:Key="MiniLinkStyle"
+               TargetType="HyperlinkButton">
+            <Setter Property="Padding"
+                    Value="0" />
+            <Setter Property="Margin"
+                    Value="0" />
+            <Setter Property="Foreground"
+                    Value="White" />
+            <Setter Property="FontWeight"
+                    Value="Normal" />
+            <Setter Property="VerticalAlignment"
+                    Value="Center" />
         </Style>
 
         <DataTemplate x:Key="EllipsisTemplate">
             <TextBlock Text="{Binding}"
-                   TextTrimming="CharacterEllipsis"
-                   VerticalAlignment="Center"/>
+                       TextTrimming="CharacterEllipsis"
+                       VerticalAlignment="Center" />
         </DataTemplate>
 
     </UserControl.Resources>
 
-    <Grid HorizontalAlignment="Stretch"
+    <Grid x:Name="mainGrid"
+          HorizontalAlignment="Stretch"
           Padding="4,4,4,4"
           ColumnSpacing="12"
           Background="{ThemeResource SystemControlBackgroundAccentBrush}">
+
+        <VisualStateManager.VisualStateGroups>
+            <VisualStateGroup>
+                <VisualState x:Name="WideLayout">
+                    <VisualState.StateTriggers>
+                        <AdaptiveTrigger MinWindowWidth="1200" />
+                    </VisualState.StateTriggers>
+                    <VisualState.Setters>
+                        <Setter Target="currentTrack.Visibility"
+                                Value="Visible" />
+                        <Setter Target="currentTrack.Width"
+                                Value="500" />
+                        <Setter Target="currentTrack.HorizontalAlignment"
+                                Value="Left" />
+                        <Setter Target="playerControls.Width"
+                                Value="350" />
+                        <Setter Target="playerControls.HorizontalAlignment"
+                                Value="Center" />
+                        <Setter Target="playerCommands.Width"
+                                Value="300" />
+                        <Setter Target="playerCommands.Visibility"
+                                Value="Visible" />
+                        <Setter Target="trackScore.Visibility"
+                                Value="Visible" />
+                        <Setter Target="trackColumn.Width"
+                                Value="430" />
+                    </VisualState.Setters>
+                </VisualState>
+
+                <VisualState x:Name="MediumLayout">
+                    <VisualState.StateTriggers>
+                        <AdaptiveTrigger MinWindowWidth="800" />
+                    </VisualState.StateTriggers>
+                    <VisualState.Setters>
+                        <Setter Target="currentTrack.Visibility"
+                                Value="Visible" />
+                        <Setter Target="currentTrack.Width"
+                                Value="350" />
+                        <Setter Target="currentTrack.HorizontalAlignment"
+                                Value="Left" />
+                        <Setter Target="playerControls.Width"
+                                Value="300" />
+                        <Setter Target="playerControls.HorizontalAlignment"
+                                Value="Center" />
+                        <Setter Target="playerCommands.Width"
+                                Value="200" />
+                        <Setter Target="playerCommands.Visibility"
+                                Value="Visible" />
+                        <Setter Target="trackScore.Visibility"
+                                Value="Collapsed" />
+                        <Setter Target="trackColumn.Width"
+                                Value="280" />
+                        <Setter Target="trackProgression.Width"
+                                Value="300" />
+                        <Setter Target="progressSlider.Width"
+                                Value="180" />
+                    </VisualState.Setters>
+                </VisualState>
+
+                <VisualState x:Name="NarrowLayout">
+                    <VisualState.StateTriggers>
+                        <AdaptiveTrigger MinWindowWidth="500" />
+                    </VisualState.StateTriggers>
+                    <VisualState.Setters>
+                        <Setter Target="currentTrack.Visibility"
+                                Value="Visible" />
+                        <Setter Target="currentTrack.Width"
+                                Value="250" />
+                        <Setter Target="currentTrack.HorizontalAlignment"
+                                Value="Left" />
+                        <Setter Target="playerControls.Width"
+                                Value="250" />
+                        <Setter Target="playerControls.HorizontalAlignment"
+                                Value="Center" />
+                        <Setter Target="playerCommands.Visibility"
+                                Value="Collapsed" />
+                        <Setter Target="trackScore.Visibility"
+                                Value="Collapsed" />
+                        <Setter Target="trackColumn.Width"
+                                Value="180" />
+                        <Setter Target="trackProgression.Width"
+                                Value="250" />
+                        <Setter Target="progressSlider.Width"
+                                Value="130" />
+                        <Setter Target="trackTitle.MaxWidth"
+                                Value="150" />
+                        <Setter Target="trackArtist.MaxWidth"
+                                Value="100" />
+                        <Setter Target="trackAlbum.MaxWidth"
+                                Value="100" />
+                    </VisualState.Setters>
+                </VisualState>
+
+                <VisualState x:Name="MinimalLayout">
+                    <VisualState.StateTriggers>
+                        <AdaptiveTrigger MinWindowWidth="0" />
+                    </VisualState.StateTriggers>
+                    <VisualState.Setters>
+                        <Setter Target="currentTrack.Visibility"
+                                Value="Collapsed" />
+                        <Setter Target="playerControls.Width"
+                                Value="Auto" />
+                        <Setter Target="playerControls.HorizontalAlignment"
+                                Value="Stretch" />
+                        <Setter Target="playerControls.Margin"
+                                Value="0" />
+                        <Setter Target="playerCommands.Visibility"
+                                Value="Collapsed" />
+                        <Setter Target="trackProgression.Width"
+                                Value="Auto" />
+                        <Setter Target="trackProgression.HorizontalAlignment"
+                                Value="Stretch" />
+                        <Setter Target="progressSlider.Width"
+                                Value="Auto" />
+                        <Setter Target="progressSlider.HorizontalAlignment"
+                                Value="Stretch" />
+                    </VisualState.Setters>
+                </VisualState>
+            </VisualStateGroup>
+        </VisualStateManager.VisualStateGroups>
 
         <Grid Translation="0,0,10">
             <Grid.Shadow>
@@ -38,7 +165,7 @@
         </Grid>
 
         <!-- Current track info -->
-        <Grid x:Name="currentTrack" Width="500" HorizontalAlignment="Left">
+        <Grid x:Name="currentTrack">
             <VisualStateManager.VisualStateGroups>
                 <VisualStateGroup x:Name="visualChangeGroup">
                     <VisualState x:Name="changeTrackTitleAnimation">
@@ -87,16 +214,17 @@
             </VisualStateManager.VisualStateGroups>
 
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="70" x:Name="coverColumn"></ColumnDefinition>
-                <ColumnDefinition Width="430" x:Name="trackColumn"></ColumnDefinition>
+                <ColumnDefinition Width="70"
+                                  x:Name="coverColumn"></ColumnDefinition>
+                <ColumnDefinition x:Name="trackColumn"></ColumnDefinition>
             </Grid.ColumnDefinitions>
 
             <Border x:Name="currentTrackCover"
                     Grid.Column="0"
                     CornerRadius="4"
-                    Padding="1" 
-                    Width="70" 
-                    Height="70" 
+                    Padding="1"
+                    Width="70"
+                    Height="70"
                     BorderThickness="0"
                     Background="{ThemeResource CardBackgroundFillColorDefaultBrush}">
                 <Grid CornerRadius="4"
@@ -116,7 +244,10 @@
                 </Grid>
             </Border>
 
-            <Grid x:Name="currentTrackInfo" Grid.Column="1" HorizontalAlignment="Stretch" Height="70">
+            <Grid x:Name="currentTrackInfo"
+                  Grid.Column="1"
+                  HorizontalAlignment="Stretch"
+                  Height="70">
 
                 <Grid.RowDefinitions>
                     <RowDefinition Height="35"></RowDefinition>
@@ -125,7 +256,11 @@
 
 
                 <!--Title line-->
-                <StackPanel x:Name="trackTitleLine" Grid.Column="1" Grid.Row="0" Orientation="Horizontal" Margin="6,0,0,0">
+                <StackPanel x:Name="trackTitleLine"
+                            Grid.Column="1"
+                            Grid.Row="0"
+                            Orientation="Horizontal"
+                            Margin="6,0,0,0">
                     <HyperlinkButton Grid.Column="0"
                                      x:Name="trackTitle"
                                      HorizontalAlignment="Left"
@@ -136,20 +271,23 @@
                                      Command="{x:Bind ViewModel.CurrentTrack.TrackOpenCommand, Mode=OneWay}"
                                      Content="{x:Bind ViewModel.CurrentTrack.Title, Mode=OneWay}"
                                      ContentTemplate="{StaticResource EllipsisTemplate}"
-                                     ToolTipService.ToolTip="{x:Bind ViewModel.CurrentTrack.Title, Mode=OneWay}"/>
+                                     ToolTipService.ToolTip="{x:Bind ViewModel.CurrentTrack.Title, Mode=OneWay}" />
 
                     <commons:RatingControlDarkControl x:Name="trackScore"
-                                   Margin="30,0,0,0" 
-                                   HorizontalAlignment="Right"                                                       
-                                   InitialValue="{x:Bind ViewModel.CurrentTrack.Score, Mode=OneWay}" 
-                                   Value="{x:Bind ViewModel.CurrentTrack.Score, Mode=TwoWay}" 
-                                   Width="150" 
-                                   VerticalAlignment="Center">
+                                                      Margin="30,0,0,0"
+                                                      HorizontalAlignment="Right"
+                                                      InitialValue="{x:Bind ViewModel.CurrentTrack.Score, Mode=OneWay}"
+                                                      Value="{x:Bind ViewModel.CurrentTrack.Score, Mode=TwoWay}"
+                                                      Width="150"
+                                                      VerticalAlignment="Center">
                     </commons:RatingControlDarkControl>
                 </StackPanel>
 
                 <!--Track info line-->
-                <StackPanel Grid.Column="1" Grid.Row="1" Orientation="Horizontal" Margin="6,0,0,0">
+                <StackPanel Grid.Column="1"
+                            Grid.Row="1"
+                            Orientation="Horizontal"
+                            Margin="6,0,0,0">
                     <HyperlinkButton Style="{StaticResource MiniLinkStyle}"
                                      x:Name="trackArtist"
                                      MaxWidth="200"
@@ -158,10 +296,11 @@
                                      ContentTemplate="{StaticResource EllipsisTemplate}"
                                      ToolTipService.ToolTip="{x:Bind ViewModel.CurrentTrack.ArtistName, Mode=OneWay}" />
 
-                    <TextBlock Text="•" 
-                               Foreground="White" 
+                    <TextBlock Text="•"
+                               Foreground="White"
                                FontSize="12"
-                               VerticalAlignment="Center" Margin="6,0,6,0" />
+                               VerticalAlignment="Center"
+                               Margin="6,0,6,0" />
 
                     <HyperlinkButton Style="{StaticResource MiniLinkStyle}"
                                      x:Name="trackAlbum"
@@ -176,7 +315,7 @@
 
 
         <!-- Player controls -->
-        <Grid x:Name="playerControls" Width="350" HorizontalAlignment="Center">
+        <Grid x:Name="playerControls">
             <Grid.RowDefinitions>
                 <RowDefinition Height="50"></RowDefinition>
                 <RowDefinition></RowDefinition>
@@ -184,69 +323,81 @@
 
 
             <!--Current track progression-->
-            <Grid x:Name="trackProgression" VerticalAlignment="Center" Grid.Row="1" Margin="0" Padding="0" Height="38" Width="350">
+            <Grid x:Name="trackProgression"
+                  VerticalAlignment="Center"
+                  Grid.Row="1"
+                  Margin="0"
+                  Padding="0"
+                  Height="38">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="60"></ColumnDefinition>
-                    <ColumnDefinition Width="230"></ColumnDefinition>
+                    <ColumnDefinition Width="*"></ColumnDefinition>
                     <ColumnDefinition Width="60"></ColumnDefinition>
                 </Grid.ColumnDefinitions>
 
-                <TextBlock Grid.Column="0" 
-                           Text="{x:Bind ViewModel.ListenDurationStr, Mode=OneWay}" 
-                           Foreground="White" 
-                           HorizontalAlignment="Right" 
-                           Margin="0,0,10,0"                            
-                           VerticalAlignment="Center" 
+                <TextBlock Grid.Column="0"
+                           Text="{x:Bind ViewModel.ListenDurationStr, Mode=OneWay}"
+                           Foreground="White"
+                           HorizontalAlignment="Right"
+                           Margin="0,0,10,0"
+                           VerticalAlignment="Center"
                            FontSize="14" />
 
-                <Slider x:Name="slider" 
-                        Grid.Column="1" 
+                <Slider x:Name="progressSlider"
+                        Grid.Column="1"
                         Margin="0,2,0,0"
-                        VerticalAlignment="Center" 
-                        Width="230"                                
+                        VerticalAlignment="Center"
+                        HorizontalAlignment="Stretch"
                         Value="{x:Bind ViewModel.ListenDuration, Mode=OneWay, Converter={StaticResource TimeSpanToDoubleConverter}}"
-                        Maximum="{x:Bind ViewModel.DurationTotal, Mode=OneWay, Converter={StaticResource TimeSpanToDoubleConverter}}"                       
-                        ThumbToolTipValueConverter="{StaticResource DoubleToTimespanConverter}"                        
-                        IsThumbToolTipEnabled="True"                        
-                        LargeChange="7" 
-                        SmallChange="5"  
-                        PointerCaptureLost="Slider_PointerCaptureLost" 
-                        ManipulationStarted="Slider_ManipulationStarted" 
+                        Maximum="{x:Bind ViewModel.DurationTotal, Mode=OneWay, Converter={StaticResource TimeSpanToDoubleConverter}}"
+                        ThumbToolTipValueConverter="{StaticResource DoubleToTimespanConverter}"
+                        IsThumbToolTipEnabled="True"
+                        LargeChange="7"
+                        SmallChange="5"
+                        PointerCaptureLost="Slider_PointerCaptureLost"
+                        ManipulationStarted="Slider_ManipulationStarted"
                         ManipulationMode="All" />
 
                 <TextBlock Grid.Column="2"
-                           Text="{x:Bind ViewModel.DurationTotalStr, Mode=OneWay}" 
-                           Foreground="White" 
-                           HorizontalAlignment="Left" 
-                           Margin="10,0,0,0" 
-                           VerticalAlignment="Center" 
+                           Text="{x:Bind ViewModel.DurationTotalStr, Mode=OneWay}"
+                           Foreground="White"
+                           HorizontalAlignment="Left"
+                           Margin="10,0,0,0"
+                           VerticalAlignment="Center"
                            FontSize="14" />
             </Grid>
 
 
             <!-- Player commands -->
-            <Grid Grid.Row="0" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="0" Width="350">
-                <CommandBar VerticalAlignment="Center" HorizontalAlignment="Center" Background="Transparent" IsDynamicOverflowEnabled="False" OverflowButtonVisibility="Collapsed">
-                    <AppBarButton Icon="Previous" 
-                                  Command="{x:Bind ViewModel.SkipPreviousCommand}" 
-                                  IsEnabled="{x:Bind ViewModel.CanSkipPrevious, Mode=OneWay}"   
-                                  Foreground="White" 
+            <Grid Grid.Row="0"
+                  VerticalAlignment="Center"
+                  HorizontalAlignment="Center"
+                  Margin="0">
+                <CommandBar VerticalAlignment="Center"
+                            HorizontalAlignment="Center"
+                            Background="Transparent"
+                            IsDynamicOverflowEnabled="False"
+                            OverflowButtonVisibility="Collapsed">
+                    <AppBarButton Icon="Previous"
+                                  Command="{x:Bind ViewModel.SkipPreviousCommand}"
+                                  IsEnabled="{x:Bind ViewModel.CanSkipPrevious, Mode=OneWay}"
+                                  Foreground="White"
                                   VerticalAlignment="Stretch"
                                   Height="65"
                                   Width="40"
                                   Margin="0,0,0,0" />
 
-                    <AppBarButton Command="{x:Bind ViewModel.TogglePlayPauseCommand}" 
-                                  Foreground="White" 
+                    <AppBarButton Command="{x:Bind ViewModel.TogglePlayPauseCommand}"
+                                  Foreground="White"
                                   Margin="10,0,0,0"
                                   Style="{StaticResource RoundAppBarButtonStyle}">
-                        <SymbolIcon Symbol="{x:Bind ViewModel.PlaybackState, Mode=OneWay, Converter={StaticResource PlaybackStateToButtonIconConverter}}"/>
+                        <SymbolIcon Symbol="{x:Bind ViewModel.PlaybackState, Mode=OneWay, Converter={StaticResource PlaybackStateToButtonIconConverter}}" />
                     </AppBarButton>
 
-                    <AppBarButton Icon="Next" 
-                                  Command="{x:Bind ViewModel.SkipNextCommand}" 
-                                  IsEnabled="{x:Bind ViewModel.CanSkipNext, Mode=OneWay}" 
-                                  Foreground="White"                                  
+                    <AppBarButton Icon="Next"
+                                  Command="{x:Bind ViewModel.SkipNextCommand}"
+                                  IsEnabled="{x:Bind ViewModel.CanSkipNext, Mode=OneWay}"
+                                  Foreground="White"
                                   VerticalAlignment="Stretch"
                                   Height="65"
                                   Width="40"
@@ -257,42 +408,62 @@
 
 
         <!-- Player extra commands -->
-        <Grid x:Name="playerCommands" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="0,0,4,0" Width="300" Visibility="Visible" >
-            <CommandBar HorizontalAlignment="Right" Background="Transparent" OverflowButtonVisibility="Collapsed">
-                
-                <AppBarButton Icon="MusicInfo" 
-                              Command="{x:Bind ViewModel.OpenListeningCommand}" 
+        <Grid x:Name="playerCommands"
+              VerticalAlignment="Center"
+              HorizontalAlignment="Right"
+              Margin="0,0,4,0">
+            <CommandBar HorizontalAlignment="Right"
+                        Background="Transparent"
+                        OverflowButtonVisibility="Collapsed">
+
+                <AppBarButton Icon="MusicInfo"
+                              Command="{x:Bind ViewModel.OpenListeningCommand}"
                               Foreground="White">
 
                     <ToolTipService.ToolTip>
-                        <TextBlock x:Uid="PlayerCurrentListeningToolTips" Text="Show current playlist"/>
+                        <TextBlock x:Uid="PlayerCurrentListeningToolTips"
+                                   Text="Show current playlist" />
                     </ToolTipService.ToolTip>
                 </AppBarButton>
 
-                <AppBarButton x:Name="volume" Foreground="White">
-                    <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="{x:Bind ViewModel.Volume, Mode=OneWay, Converter={StaticResource VolumeToGlyphConverter}}" />
+                <AppBarButton x:Name="volume"
+                              Foreground="White">
+                    <FontIcon FontFamily="Segoe MDL2 Assets"
+                              Glyph="{x:Bind ViewModel.Volume, Mode=OneWay, Converter={StaticResource VolumeToGlyphConverter}}" />
                     <AppBarButton.Flyout>
                         <Flyout>
-                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                                <Button Margin="0,0,4,0" Command="{x:Bind ViewModel.MuteCommand}" Background="Transparent">
-                                    <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="{x:Bind ViewModel.Volume, Mode=OneWay, Converter={StaticResource VolumeToGlyphConverter}}" />
+                            <StackPanel Orientation="Horizontal"
+                                        VerticalAlignment="Center">
+                                <Button Margin="0,0,4,0"
+                                        Command="{x:Bind ViewModel.MuteCommand}"
+                                        Background="Transparent">
+                                    <FontIcon FontFamily="Segoe MDL2 Assets"
+                                              Glyph="{x:Bind ViewModel.Volume, Mode=OneWay, Converter={StaticResource VolumeToGlyphConverter}}" />
                                 </Button>
-                                <Slider Width="200" Value="{x:Bind ViewModel.Volume, Mode=TwoWay}" Minimum="0" Maximum="100"></Slider>
+                                <Slider Width="200"
+                                        Value="{x:Bind ViewModel.Volume, Mode=TwoWay}"
+                                        Minimum="0"
+                                        Maximum="100"></Slider>
                             </StackPanel>
                         </Flyout>
                     </AppBarButton.Flyout>
                 </AppBarButton>
 
-                <AppBarButton x:Name="btCompactMode" Command="{x:Bind ViewModel.CompactModeCommand}" Foreground="White">
+                <AppBarButton x:Name="btCompactMode"
+                              Command="{x:Bind ViewModel.CompactModeCommand}"
+                              Foreground="White">
                     <ToolTipService.ToolTip>
-                        <TextBlock x:Uid="PlayerCompactModeToolTips" Text="Compact mode."></TextBlock>
+                        <TextBlock x:Uid="PlayerCompactModeToolTips"
+                                   Text="Compact mode."></TextBlock>
                     </ToolTipService.ToolTip>
-                    <SymbolIcon Symbol="StopSlideShow"/>
+                    <SymbolIcon Symbol="StopSlideShow" />
                 </AppBarButton>
 
-                <AppBarButton Command="{x:Bind ViewModel.FullscreenCommand}" Foreground="White">
+                <AppBarButton Command="{x:Bind ViewModel.FullscreenCommand}"
+                              Foreground="White">
                     <ToolTipService.ToolTip>
-                        <TextBlock x:Uid="PlayerFullscreenToolTips" Text="Full screen mode."></TextBlock>
+                        <TextBlock x:Uid="PlayerFullscreenToolTips"
+                                   Text="Full screen mode."></TextBlock>
                     </ToolTipService.ToolTip>
                     <SymbolIcon Symbol="FullScreen"></SymbolIcon>
                 </AppBarButton>
