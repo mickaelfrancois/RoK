@@ -68,7 +68,7 @@ public sealed partial class PlayerView : UserControl
 
     private void ProgresionTimer_Tick(object? sender, object? e)
     {
-        slider.Tag = slider.Value = ViewModel.ListenDuration.TotalSeconds;
+        progressSlider.Tag = progressSlider.Value = ViewModel.ListenDuration.TotalSeconds;
     }
 
     private void MediaChanged(MediaChangedMessage message)
