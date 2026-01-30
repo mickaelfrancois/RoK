@@ -406,16 +406,29 @@
 
             <Grid x:Name="trackInfo">
 
-                <TextBlock x:Name="title"
-                           Text="{x:Bind PlayerViewModel.CurrentTrack.Title, Mode=OneWay}"
-                           VerticalAlignment="Bottom"
-                           Margin="340,0,0,80"
-                           FontSize="30"
-                           Foreground="White"
-                           HorizontalAlignment="Left"
-                           TextWrapping="NoWrap"
-                           Width="auto"
-                           FontWeight="Bold" />
+                <RelativePanel VerticalAlignment="Bottom">
+
+                    <TextBlock x:Name="title"
+                               Text="{x:Bind PlayerViewModel.CurrentTrack.Title, Mode=OneWay}"
+                               VerticalAlignment="Bottom"
+                               Margin="340,0,0,80"
+                               FontSize="30"
+                               Foreground="White"
+                               HorizontalAlignment="Left"
+                               TextWrapping="NoWrap"
+                               Width="auto"
+                               FontWeight="Bold" />
+
+                    <local:RatingControlDarkControl x:Name="score"
+                                                    Value="{x:Bind PlayerViewModel.CurrentTrack.Score, Mode=TwoWay}"
+                                                    RelativePanel.AlignVerticalCenterWith="title"
+                                                    RelativePanel.RightOf="title"
+                                                    Margin="10,0,20,80"
+                                                    Height="30"
+                                                    BorderThickness="0"
+                                                    HorizontalAlignment="Left" />
+                </RelativePanel>
+
                 <TextBlock x:Name="artist"
                            Text="{x:Bind PlayerViewModel.CurrentTrack.ArtistName, Mode=OneWay}"
                            VerticalAlignment="Bottom"
@@ -424,15 +437,8 @@
                            Foreground="White"
                            HorizontalAlignment="Left"
                            TextWrapping="NoWrap"
-                           Width="600"
+                           MaxWidth="600"
                            FontWeight="Bold" />
-                <local:RatingControlDarkControl x:Name="score"
-                                                Value="{x:Bind PlayerViewModel.CurrentTrack.Score, Mode=TwoWay}"
-                                                VerticalAlignment="Bottom"
-                                                Margin="0,0,20,50"
-                                                Height="30"
-                                                BorderThickness="0"
-                                                HorizontalAlignment="Right" />
             </Grid>
         </Grid>
     </Grid>
