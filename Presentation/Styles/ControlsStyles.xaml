@@ -7,7 +7,7 @@
 
     <!-- List pages -->
 
-    <x:Double x:Key="headerListRowHeight">50</x:Double>
+    <x:Double x:Key="headerListRowHeight">45</x:Double>
     <x:Double x:Key="gridListFirstRowHeight">30</x:Double>
     <x:Double x:Key="gridListSecondRowHeight">30</x:Double>
 
