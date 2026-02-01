@@ -24,6 +24,9 @@
 
         <!-- Actions menu -->
         <CommandBar Grid.Row="0"
+                    Padding="0"
+                    VerticalContentAlignment="Center"
+                    VerticalAlignment="Center"
                     Style="{StaticResource headerListCommandBar}">
             <CommandBar.Content>
                 <StackPanel Orientation="Horizontal"
@@ -101,7 +104,7 @@
                             </MenuFlyout>
                         </SplitButton.Flyout>
                     </SplitButton>
-
+                    
                 </StackPanel>
             </CommandBar.Content>
         </CommandBar>
