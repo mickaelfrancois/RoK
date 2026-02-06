@@ -146,9 +146,42 @@
                                         x:Name="searchBox"
                                         QueryIcon="Find"
                                         AutomationProperties.Name="Search"
+                                        TextChanged="SearchBox_TextChanged"
+                                        SuggestionChosen="SearchBox_SuggestionChosen"
                                         QuerySubmitted="SearchBox_QuerySubmitted"
+                                        TextMemberPath="Name"
+                                        Width="400"
+                                        MaxWidth="400"
+                                        MinWidth="400"
                                         CornerRadius="10"
-                                        Text="{x:Bind ViewModel.Keyword, Mode=TwoWay}" />
+                                        Text="{x:Bind ViewModel.Keyword, Mode=TwoWay}">
+                            <AutoSuggestBox.ItemTemplate>
+                                <DataTemplate>
+                                    <Grid Margin="0,4">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto" />
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="Auto" />
+                                        </Grid.ColumnDefinitions>
+                                        <FontIcon Grid.Column="0"
+                                                  FontSize="16"
+                                                  Margin="0,0,12,0"
+                                                  VerticalAlignment="Center"
+                                                  Glyph="{Binding IconGlyph}" />
+                                        <StackPanel Grid.Column="1"
+                                                    VerticalAlignment="Center">
+                                            <TextBlock Text="{Binding Name}"
+                                                       FontWeight="SemiBold"
+                                                       TextTrimming="CharacterEllipsis" />
+                                            <TextBlock Text="{Binding Type}"
+                                                       FontSize="12"
+                                                       Opacity="0.7"
+                                                       TextTrimming="CharacterEllipsis" />
+                                        </StackPanel>
+                                    </Grid>
+                                </DataTemplate>
+                            </AutoSuggestBox.ItemTemplate>
+                        </AutoSuggestBox>
                     </NavigationView.AutoSuggestBox>
 
                     <NavigationView.PaneHeader>

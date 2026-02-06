@@ -23,7 +23,9 @@ public partial class MainViewModel : ObservableObject
 
     public string Keyword { get; set; } = string.Empty;
 
-    public MainViewModel(IImport importService, IMediator mediator, NavigationService navigationService, IAppOptions appOptions, IDialogService dialogService, ResourceLoader resourceLoader)
+    public SearchSuggestionsViewModel SearchSuggestions { get; }
+
+    public MainViewModel(IImport importService, IMediator mediator, NavigationService navigationService, IAppOptions appOptions, IDialogService dialogService, ResourceLoader resourceLoader, SearchSuggestionsViewModel searchSuggestions)
     {
         _importService = importService;
         _mediator = mediator;
@@ -31,6 +33,7 @@ public partial class MainViewModel : ObservableObject
         _appOptions = appOptions;
         _dialogService = dialogService;
         _resourceLoader = resourceLoader;
+        SearchSuggestions = searchSuggestions;
 
         Messenger.Subscribe<MediaChangedMessage>(OnMediaChanged);
     }
@@ -70,7 +73,10 @@ public partial class MainViewModel : ObservableObject
         Keyword = keyword;
 
         if (string.IsNullOrEmpty(keyword))
+        {
+            SearchSuggestions.ClearSuggestions();
             return;
+        }
 
         if (Keyword.Length > 2)
         {
@@ -87,6 +93,25 @@ public partial class MainViewModel : ObservableObject
                 _navigationService.NavigateToSearch(new SearchOpenArgs { SearchResult = result });
             else
                 Messenger.Send(new SearchNoResultMessage());
+        }
+    }
+
+    [RelayCommand]
+    private void SelectSuggestion(object suggestion)
+    {
+        SearchSuggestions.ClearSuggestions();
+
+        switch (suggestion)
+        {
+            case AlbumDto album:
+                _navigationService.NavigateToAlbum(album.Id);
+                break;
+            case ArtistDto artist:
+                _navigationService.NavigateToArtist(artist.Id);
+                break;
+            case TrackDto track:
+                _navigationService.NavigateToTrack(track.Id);
+                break;
         }
     }
 }

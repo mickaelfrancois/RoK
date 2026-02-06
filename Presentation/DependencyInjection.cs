@@ -195,6 +195,7 @@ public static class DependencyInjection
 
         // Other ViewModels
         services.AddSingleton<MainViewModel>();
+        services.AddTransient<SearchSuggestionsViewModel>();
         services.AddTransient<SearchViewModel>();
         services.AddTransient<StartViewModel>();
         services.AddTransient<StatisticsViewModel>();
