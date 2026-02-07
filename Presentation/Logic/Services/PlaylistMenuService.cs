@@ -2,6 +2,8 @@ using System.Threading;
 using Rok.Application.Features.Playlists.Command;
 using Rok.Application.Features.Playlists.PlaylistMenu;
 using Rok.Application.Features.Playlists.Query;
+using Rok.Application.Features.Tracks.Query;
+using Rok.Logic.Services.Player;
 
 
 namespace Rok.Logic.Services;
@@ -11,6 +13,7 @@ public partial class PlaylistMenuService : IPlaylistMenuService, IDisposable
     private readonly IMediator _mediator;
     private readonly ResourceLoader _resourceLoader;
     private readonly ILogger<PlaylistMenuService> _logger;
+    private readonly IPlayerService _playerService;
 
     public event EventHandler? PlaylistsChanged;
 
@@ -18,9 +21,10 @@ public partial class PlaylistMenuService : IPlaylistMenuService, IDisposable
     private readonly SemaphoreSlim _cacheSemaphore = new(1, 1);
 
 
-    public PlaylistMenuService(IMediator mediator, ResourceLoader resourceManager, ILogger<PlaylistMenuService> logger)
+    public PlaylistMenuService(IMediator mediator, IPlayerService playerService, ResourceLoader resourceManager, ILogger<PlaylistMenuService> logger)
     {
         _mediator = mediator;
+        _playerService = playerService;
         _resourceLoader = resourceManager;
         _logger = logger;
 
@@ -165,6 +169,7 @@ public partial class PlaylistMenuService : IPlaylistMenuService, IDisposable
         }
     }
 
+
     public async Task CreateNewPlaylistWithAlbumAsync(string playlistName, long albumId)
     {
         try
@@ -182,6 +187,7 @@ public partial class PlaylistMenuService : IPlaylistMenuService, IDisposable
         }
     }
 
+
     public async Task CreateNewPlaylistWithArtistAsync(string playlistName, long artistId)
     {
         try
@@ -198,6 +204,71 @@ public partial class PlaylistMenuService : IPlaylistMenuService, IDisposable
             _logger.LogError(ex, "Error while add tracks to playlist");
         }
     }
+
+
+    public async Task AddArtistToCurrentListeningAsync(long artistId)
+    {
+        try
+        {
+            IEnumerable<TrackDto> tracks = await _mediator.SendMessageAsync(new GetTracksByArtistIdQuery(artistId));
+            if (tracks == null || !tracks.Any())
+            {
+                Messenger.Send(new ShowNotificationMessage() { Message = _resourceLoader.GetString("notification_playlist_track_add_error")!, Type = NotificationType.Error });
+                _logger.LogWarning("No tracks found for artist '{ArtistId}'", artistId);
+                return;
+            }
+
+            _playerService.AddTracksToPlaylist(tracks.ToList());
+        }
+        catch (Exception ex)
+        {
+            Messenger.Send(new ShowNotificationMessage() { Message = _resourceLoader.GetString("notification_playlist_track_add_error")!, Type = NotificationType.Error });
+            _logger.LogError(ex, "Error while add tracks to current listening");
+        }
+    }
+
+    public async Task AddAlbumToCurrentListeningAsync(long albumId)
+    {
+        try
+        {
+            IEnumerable<TrackDto> tracks = await _mediator.SendMessageAsync(new GetTracksByAlbumIdQuery(albumId));
+            if (tracks == null || !tracks.Any())
+            {
+                Messenger.Send(new ShowNotificationMessage() { Message = _resourceLoader.GetString("notification_playlist_track_add_error")!, Type = NotificationType.Error });
+                _logger.LogWarning("No tracks found for album '{AlbumId}'", albumId);
+                return;
+            }
+
+            _playerService.AddTracksToPlaylist(tracks.ToList());
+        }
+        catch (Exception ex)
+        {
+            Messenger.Send(new ShowNotificationMessage() { Message = _resourceLoader.GetString("notification_playlist_track_add_error")!, Type = NotificationType.Error });
+            _logger.LogError(ex, "Error while add tracks to current listening");
+        }
+    }
+
+    public async Task AddTrackToCurrentListeningAsync(long trackId)
+    {
+        try
+        {
+            Result<TrackDto> trackResult = await _mediator.SendMessageAsync(new GetTrackByIdQuery(trackId));
+            if (!trackResult.IsSuccess || trackResult.Value == null)
+            {
+                Messenger.Send(new ShowNotificationMessage() { Message = _resourceLoader.GetString("notification_playlist_track_add_error")!, Type = NotificationType.Error });
+                _logger.LogWarning("No track found for id '{TrackId}'", trackId);
+                return;
+            }
+
+            _playerService.AddTracksToPlaylist(new List<TrackDto> { trackResult.Value });
+        }
+        catch (Exception ex)
+        {
+            Messenger.Send(new ShowNotificationMessage() { Message = _resourceLoader.GetString("notification_playlist_track_add_error")!, Type = NotificationType.Error });
+            _logger.LogError(ex, "Error while add tracks to current listening");
+        }
+    }
+
 
     private async Task<IEnumerable<PlaylistMenuItem>> RefreshCacheAsync()
     {

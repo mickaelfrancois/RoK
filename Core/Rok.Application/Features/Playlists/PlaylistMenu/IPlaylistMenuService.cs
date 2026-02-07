@@ -12,6 +12,12 @@ public interface IPlaylistMenuService
 
     Task AddArtistToPlaylistAsync(long playlistId, long artistId);
 
+    Task AddArtistToCurrentListeningAsync(long artistId);
+
+    Task AddAlbumToCurrentListeningAsync(long albumId);
+
+    Task AddTrackToCurrentListeningAsync(long trackId);
+
     Task CreateNewPlaylistWithTrackAsync(string playlistName, long trackId);
 
     Task CreateNewPlaylistWithAlbumAsync(string playlistName, long albumId);
