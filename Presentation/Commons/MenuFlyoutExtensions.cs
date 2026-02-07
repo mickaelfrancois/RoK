@@ -325,6 +325,7 @@ public static class MenuFlyoutExtensions
                 addToSubMenu.Items.Add(new MenuFlyoutSeparator { Tag = "AddToPlaylistInnerSeparator" });
         }
 
+
         MenuFlyoutItem newPlaylistItem = new()
         {
             Text = resourceLoader.GetString("MenuFlyout_NewPlaylist_Text") ?? "New playlist...",
@@ -343,16 +344,39 @@ public static class MenuFlyoutExtensions
         newPlaylistItem.Click += newHandler;
         SetMenuItemClickHandler(newPlaylistItem, newHandler);
 
+
+        MenuFlyoutItem addToCurrentListeningItem = new()
+        {
+            Text = resourceLoader.GetString("MenuFlyout_CurrentListening_Text") ?? "Current Listening...",
+            Icon = new FontIcon { Glyph = "\uE7F6" },
+            Tag = "CurrentListeningItem"
+        };
+
+        SetMenuItemPlaylistId(addToCurrentListeningItem, -1);
+        SetMenuItemServiceWeakRef(addToCurrentListeningItem, new WeakReference<IPlaylistMenuService>(service));
+
+        SetTrackId(addToCurrentListeningItem, trackId);
+        SetAlbumId(addToCurrentListeningItem, albumId);
+        SetArtistId(addToCurrentListeningItem, artistId);
+
+        RoutedEventHandler addToCurrentListeningHandler = AddToCurrentListeningStaticClickHandlerAsync;
+        addToCurrentListeningItem.Click += addToCurrentListeningHandler;
+        SetMenuItemClickHandler(addToCurrentListeningItem, addToCurrentListeningHandler);
+
+
+
         if (flatten)
         {
             if (playlists.Any())
                 menuFlyout.Items.Add(new MenuFlyoutSeparator { Tag = "AddToPlaylistInnerSeparator" });
 
             menuFlyout.Items.Add(newPlaylistItem);
+            menuFlyout.Items.Add(addToCurrentListeningItem);
         }
         else
         {
             addToSubMenu.Items.Add(newPlaylistItem);
+            addToSubMenu.Items.Add(addToCurrentListeningItem);
             menuFlyout.Items.Add(addToSubMenu);
         }
     }
@@ -423,6 +447,36 @@ public static class MenuFlyoutExtensions
             }
         }
     }
+
+
+    private static async void AddToCurrentListeningStaticClickHandlerAsync(object? sender, RoutedEventArgs e)
+    {
+        if (sender is not MenuFlyoutItem mi)
+            return;
+
+        object? wr = GetMenuItemServiceWeakRef(mi);
+        long trackId = GetTrackId(mi);
+        long albumId = GetAlbumId(mi);
+        long artistId = GetArtistId(mi);
+
+        if (wr is WeakReference<IPlaylistMenuService> weak && weak.TryGetTarget(out IPlaylistMenuService? service))
+        {
+            try
+            {
+                if (trackId > 0)
+                    await service.AddTrackToCurrentListeningAsync(trackId);
+                else if (albumId > 0)
+                    await service.AddAlbumToCurrentListeningAsync(albumId);
+                else if (artistId > 0)
+                    await service.AddArtistToCurrentListeningAsync(artistId);
+            }
+            catch
+            {
+                // ignore
+            }
+        }
+    }
+
 
     private static async Task<string?> ShowCreatePlaylistDialogAsync(XamlRoot xamlRoot)
     {

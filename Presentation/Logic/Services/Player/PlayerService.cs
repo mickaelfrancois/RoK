@@ -1,6 +1,6 @@
-﻿using Rok.Application.Player;
+﻿using System.Threading;
+using Rok.Application.Player;
 using Rok.Infrastructure.Social;
-using System.Threading;
 
 namespace Rok.Logic.Services.Player;
 
@@ -224,7 +224,12 @@ public class PlayerService : IPlayerService
     {
         Guard.Against.Null(tracks);
 
+        bool hasTracks = Playlist.Count > 0;
+
         tracks.ForEach(c => Playlist.Add(c));
+
+        if (!hasTracks)
+            Start();
 
         Messenger.Send(new PlaylistChanged(Playlist));
     }
