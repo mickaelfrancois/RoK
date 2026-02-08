@@ -117,8 +117,9 @@
                 </StackPanel>
 
                 <TextBlock x:Name="panelExtendedInfo"
-                           RelativePanel.RightOf="buttonCountry"
-                           RelativePanel.AlignBottomWith="artistName"
+                           RelativePanel.Below="albumName"
+                           RelativePanel.RightOf="artistName"
+                           RelativePanel.AlignVerticalCenterWith="artistName"
                            Margin="6,0,0,0"
                            Style="{StaticResource headerText}">
                     <Run Text="🔹" />
