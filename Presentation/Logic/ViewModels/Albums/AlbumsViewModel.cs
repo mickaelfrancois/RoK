@@ -1,5 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Microsoft.UI.Dispatching;
 using Rok.Logic.ViewModels.Albums.Interfaces;
 using Rok.Logic.ViewModels.Albums.Services;
 
@@ -15,6 +16,7 @@ public partial class AlbumsViewModel : ObservableObject, IDisposable
     private readonly AlbumsSelectionManager _selectionManager;
     private readonly AlbumsStateManager _stateManager;
     private readonly AlbumsPlaybackService _playbackService;
+    private readonly DispatcherQueue _dispatcherQueue = DispatcherQueue.GetForCurrentThread();
     private bool _stateLoaded = false;
     private bool _libraryUpdated = false;
     private List<AlbumViewModel> _filteredAlbums = [];
@@ -74,7 +76,7 @@ public partial class AlbumsViewModel : ObservableObject, IDisposable
     private void OnLibraryChanged(object? sender, EventArgs e)
     {
         _libraryUpdated = true;
-        FilterAndSort();
+        _dispatcherQueue.TryEnqueue(() => FilterAndSort());
     }
 
 

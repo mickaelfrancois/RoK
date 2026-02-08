@@ -1,5 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Microsoft.UI.Dispatching;
 using Rok.Logic.ViewModels.Tracks.Interfaces;
 using Rok.Logic.ViewModels.Tracks.Services;
 
@@ -13,6 +14,7 @@ public partial class TracksViewModel : ObservableObject, IDisposable
     private readonly TracksSelectionManager _selectionManager;
     private readonly TracksStateManager _stateManager;
     private readonly TracksPlaybackService _playbackService;
+    private readonly DispatcherQueue _dispatcherQueue = DispatcherQueue.GetForCurrentThread();
     private bool _stateLoaded = false;
     private bool _libraryUpdated = false;
     private List<TrackViewModel> _filteredTracks = [];
@@ -62,7 +64,7 @@ public partial class TracksViewModel : ObservableObject, IDisposable
     private void OnLibraryChanged(object? sender, EventArgs e)
     {
         _libraryUpdated = true;
-        FilterAndSort();
+        _dispatcherQueue.TryEnqueue(() => FilterAndSort());
     }
 
 

@@ -1,5 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Microsoft.UI.Dispatching;
 using Rok.Logic.ViewModels.Artists.Interfaces;
 using Rok.Logic.ViewModels.Artists.Services;
 
@@ -15,6 +16,7 @@ public partial class ArtistsViewModel : ObservableObject, IDisposable
     private readonly ArtistsSelectionManager _selectionManager;
     private readonly ArtistsStateManager _stateManager;
     private readonly ArtistsPlaybackService _playbackService;
+    private readonly DispatcherQueue _dispatcherQueue = DispatcherQueue.GetForCurrentThread();
     private bool _stateLoaded = false;
     private bool _libraryUpdated = false;
     private List<ArtistViewModel> _filteredArtists = [];
@@ -75,7 +77,7 @@ public partial class ArtistsViewModel : ObservableObject, IDisposable
     private void OnLibraryChanged(object? sender, EventArgs e)
     {
         _libraryUpdated = true;
-        FilterAndSort();
+        _dispatcherQueue.TryEnqueue(() => FilterAndSort());
     }
 
 

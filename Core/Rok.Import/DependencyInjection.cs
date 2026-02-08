@@ -18,6 +18,7 @@ public static class DependencyInjection
         services.AddSingleton<TrackImport>();
 
         services.AddSingleton<CountryCache>();
+        services.AddSingleton<ImportMessageThrottler>();
 
         services.AddScoped<ImportProgressService>();
         services.AddScoped<ImportTrackingService>();

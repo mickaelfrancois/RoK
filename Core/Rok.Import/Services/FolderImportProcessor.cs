@@ -21,6 +21,7 @@ public class FolderImportProcessor(
     TrackMetadataService metadataService,
     ImportTrackingService trackingService,
     ITagService tagService,
+    ImportMessageThrottler messageThrottler,
     ILogger<FolderImportProcessor> logger)
 {
     private readonly IAppOptions _options = Guard.Against.Null(options);
@@ -33,6 +34,7 @@ public class FolderImportProcessor(
     private readonly TrackMetadataService _metadataService = Guard.Against.Null(metadataService);
     private readonly ImportTrackingService _trackingService = Guard.Against.Null(trackingService);
     private readonly ITagService _tagService = Guard.Against.Null(tagService);
+    private readonly ImportMessageThrottler _messageThrottler = Guard.Against.Null(messageThrottler);
     private readonly ILogger<FolderImportProcessor> _logger = Guard.Against.Null(logger);
 
     public async Task ImportFolderAsync(
@@ -194,8 +196,11 @@ public class FolderImportProcessor(
             {
                 statistics.ArtistsImported++;
 
-                string artistName = file.Artist ?? string.Empty;
-                Messenger.Send(new ArtistImportedMessage(artistName));
+                if (_messageThrottler.ShouldSendArtistMessage())
+                {
+                    string artistName = file.Artist ?? string.Empty;
+                    Messenger.Send(new ArtistImportedMessage(artistName));
+                }
             }
         }
         catch (Exception ex)
@@ -229,11 +234,14 @@ public class FolderImportProcessor(
             {
                 statistics.AlbumsImported++;
 
-                string albumName = album.Name ?? string.Empty;
-                string artistName = file.Artist ?? string.Empty;
-                string albumPath = album.AlbumPath ?? string.Empty;
+                if (_messageThrottler.ShouldSendAlbumMessage())
+                {
+                    string albumName = album.Name ?? string.Empty;
+                    string artistName = file.Artist ?? string.Empty;
+                    string albumPath = album.AlbumPath ?? string.Empty;
 
-                Messenger.Send(new AlbumImportedMessage(albumName, artistName, albumPath));
+                    Messenger.Send(new AlbumImportedMessage(albumName, artistName, albumPath));
+                }
             }
         }
         catch (Exception ex)

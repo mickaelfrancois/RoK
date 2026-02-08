@@ -1,29 +1,30 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using System.Diagnostics;
+using Microsoft.Extensions.Logging;
 using MiF.Guard;
 using Rok.Application.Dto;
 using Rok.Application.Interfaces;
 using Rok.Import.Services;
 using Rok.Shared;
-using System.Diagnostics;
 
 namespace Rok.Import;
 
 public class ImportService(
-    IFolderResolver folderResolver,
-    CountryCache countryCache,
-    IAppOptions options,
-    Statistics statistics,
-    TrackImport importTrack,
-    GenreImport importGenre,
-    AlbumImport importAlbum,
-    ArtistImport importArtist,
-    ICleanLibrary cleanLibraryService,
-    ITelemetryClient telemetryClient,
-    ImportProgressService progressService,
-    ImportTrackingService trackingService,
-    FileSystemService fileSystemService,
-    FolderImportProcessor folderProcessor,
-    ILogger<ImportService> logger) : IImport
+IFolderResolver folderResolver,
+CountryCache countryCache,
+IAppOptions options,
+Statistics statistics,
+TrackImport importTrack,
+GenreImport importGenre,
+AlbumImport importAlbum,
+ArtistImport importArtist,
+ICleanLibrary cleanLibraryService,
+ITelemetryClient telemetryClient,
+ImportProgressService progressService,
+ImportTrackingService trackingService,
+FileSystemService fileSystemService,
+FolderImportProcessor folderProcessor,
+ImportMessageThrottler messageThrottler,
+ILogger<ImportService> logger) : IImport
 {
     public bool UpdateInProgress { get; private set; }
     public ImportStatisticsDto Statistics { get; private set; } = new();
@@ -42,6 +43,7 @@ public class ImportService(
     private readonly ImportTrackingService _trackingService = Guard.Against.Null(trackingService);
     private readonly FileSystemService _fileSystemService = Guard.Against.Null(fileSystemService);
     private readonly FolderImportProcessor _folderProcessor = Guard.Against.Null(folderProcessor);
+    private readonly ImportMessageThrottler _messageThrottler = Guard.Against.Null(messageThrottler);
 
     private CancellationTokenSource? _cancellationToken;
 
@@ -60,6 +62,8 @@ public class ImportService(
 
         _cancellationToken = new CancellationTokenSource();
         UpdateInProgress = true;
+
+        _messageThrottler.Reset();
 
         _progressService.ReportRunning();
         Stopwatch stopwatch = Stopwatch.StartNew();
@@ -126,6 +130,7 @@ public class ImportService(
     {
         Statistics = new();
         _trackingService.Clear();
+        _messageThrottler.Reset();
     }
 
     private async Task<List<string>> GetLibraryImportPathsAsync(CancellationToken cancellationToken)

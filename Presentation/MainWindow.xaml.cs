@@ -220,6 +220,11 @@ public sealed partial class MainWindow : Window
                 IconRotation.Begin();
                 libraryRefreshButton.Content = msg.ProcessMessage;
             }
+            else if (msg.ProcessState == LibraryRefreshMessage.EState.Unchanged)
+            {
+                if (!string.IsNullOrWhiteSpace(msg.ProcessMessage))
+                    libraryRefreshButton.Content = msg.ProcessMessage;
+            }
             else if (msg.ProcessState == LibraryRefreshMessage.EState.CleanData)
             {
                 libraryRefreshButton.Content = _resourceLoader.GetString("genCleanData");
@@ -235,10 +240,6 @@ public sealed partial class MainWindow : Window
                     IconRotation.Stop();
                     libraryRefreshButton.Content = _resourceLoader.GetString("genRefreshLibrary");
                 }
-            }
-            else
-            {
-                libraryRefreshButton.Content = msg.ProcessMessage;
             }
         });
     }

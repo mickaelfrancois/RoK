@@ -31,6 +31,12 @@ public partial class StartViewModel : ObservableObject
     [ObservableProperty]
     public partial bool ErrorOccurred { get; set; } = false;
 
+    [ObservableProperty]
+    private string _importProgressText = string.Empty;
+
+    [ObservableProperty]
+    private double _importProgress = 0;
+
 
 
     public StartViewModel(IAlbumPicture albumPicture, ISettingsFile settingsFile, NavigationService navigationService, IMediator mediator, IImport importService, IAppOptions appOptions)
@@ -112,7 +118,10 @@ public partial class StartViewModel : ObservableObject
                     Picture = cover
                 });
 
-                if (AlbumsImported.Count > KAlbumMinimumBeforeUse)
+                ImportProgressText = $"{AlbumsImported.Count} albums discovered";
+                ImportProgress = Math.Min((AlbumsImported.Count * 100.0) / KAlbumMinimumBeforeUse, 100);
+
+                if (AlbumsImported.Count >= KAlbumMinimumBeforeUse)
                 {
                     UnregisterEvents();
                     _navigationService.NavigateToAlbums();
