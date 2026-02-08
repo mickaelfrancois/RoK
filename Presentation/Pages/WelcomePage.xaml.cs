@@ -1,3 +1,4 @@
+using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Rok.Logic.ViewModels.Main;
 using Rok.Logic.ViewModels.Start;
@@ -41,12 +42,12 @@ public sealed partial class WelcomePage : Page
         }
         catch
         {
-            // Ignore
         }
     }
 
     private void Grid_Loaded(object sender, RoutedEventArgs e)
     {
+        FadeInStoryboard.Begin();
         MainViewModel.RefreshLibraryCommand.Execute(this);
     }
 }
