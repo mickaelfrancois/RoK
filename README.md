@@ -1,84 +1,86 @@
-﻿# 🎵 Rok
+﻿[🇬🇧 English](README.md) | [🇫🇷 Français](README.fr.md)
 
-**Rok** est un lecteur de musique moderne pour Windows, conçu avec les dernières technologies Microsoft.
+# 🎵 Rok
 
-## 📖 À propos
+**Rok** is a modern music player for Windows, built with the latest Microsoft technologies.
 
-Rok est une application de bureau Windows permettant de gérer et d'écouter votre collection musicale locale. Développée avec .NET 9 et WinUI 3, elle offre une interface fluide et moderne qui s'intègre parfaitement à Windows 11.
+## 📖 About
 
-## ✨ Fonctionnalités
+Rok is a Windows desktop application for managing and playing your local music collection. Developed with .NET 10 and WinUI 3, it offers a fluid and modern interface that seamlessly integrates with Windows 11.
 
-- 🎵 **Lecture audio** - Lecteur complet avec gestion de la file d'attente
-- 📚 **Gestion de bibliothèque** - Navigation par albums, artistes, genres et playlists
-- 🔍 **Recherche** - Recherche rapide dans toute votre collection
-- ✏️ **Édition de métadonnées** - Modification des tags, pochettes et informations des pistes
-- 📝 **Playlists** - Création et gestion de playlists personnalisées
-- 🎮 **Intégration Discord** - Affichage de votre écoute en cours sur Discord
-- 🌓 **Thèmes** - Support des modes clair et sombre
-- 🎯 **Mode compact** - Vue minimale du lecteur
+## ✨ Features
+
+- 🎵 **Audio Playback** - Complete player with queue management
+- 📚 **Library Management** - Browse by albums, artists, genres, and playlists
+- 🔍 **Search** - Quick search across your entire collection
+- ✏️ **Metadata Editing** - Modify tags, covers, and track information
+- 📝 **Playlists** - Create and manage custom playlists
+- 🎮 **Discord Integration** - Display your current listening activity on Discord
+- 🌓 **Themes** - Light and dark mode support
+- 🎯 **Compact Mode** - Minimal player view
 
 ## 🛠️ Technologies
 
-### Stack technique
+### Tech Stack
 
-- **.NET 9.0** - Framework moderne et performant
-- **C# 13.0** - Dernières fonctionnalités du langage
-- **WinUI 3** - Framework d'interface utilisateur natif Windows
-- **Windows App SDK 1.8** - APIs de la plateforme Windows
-- **SQLite** - Base de données locale
-- **Dapper** - Micro-ORM haute performance
-- **TagLibSharp** - Lecture/écriture des métadonnées audio
-- **Serilog** - Journalisation structurée
+- **.NET 10.0** - Modern and performant framework
+- **C# 13.0** - Latest language features
+- **WinUI 3** - Native Windows UI framework
+- **Windows App SDK 1.8** - Windows platform APIs
+- **SQLite** - Local database
+- **Dapper** - High-performance micro-ORM
+- **TagLibSharp** - Audio metadata reading/writing
+- **Serilog** - Structured logging
 
 ### Architecture
 
-Le projet suit les principes de **Clean Architecture** avec une séparation claire des responsabilités :
+The project follows **Clean Architecture** principles with clear separation of concerns:
 
-#### Couches et responsabilités
+#### Layers and Responsibilities
 
 **🎨 Presentation**
-- Interface utilisateur WinUI 3 avec XAML
-- ViewModels implémentant le pattern MVVM
-- Binding de données bidirectionnel
-- Navigation entre les pages
-- Gestion des thèmes et styles
+- WinUI 3 user interface with XAML
+- ViewModels implementing MVVM pattern
+- Two-way data binding
+- Page navigation
+- Theme and style management
 
 **💼 Application (Core/Rok.Application)**
-- Use cases métier (Commands et Queries CQRS)
-- Orchestration de la logique applicative
-- DTOs pour le transfert de données
-- Messages pour la communication découplée (Mediator Pattern)
-- Interfaces de services
+- Business use cases (CQRS Commands and Queries)
+- Application logic orchestration
+- DTOs for data transfer
+- Messages for decoupled communication (Mediator Pattern)
+- Service interfaces
 
 **🏛️ Domain (Core/Rok.Domain)**
-- Entités métier (Album, Artist, Track, Playlist, Genre)
-- Règles métier et validations
-- Interfaces de repositories
-- Modèle de domaine indépendant de l'infrastructure
+- Business entities (Album, Artist, Track, Playlist, Genre)
+- Business rules and validations
+- Repository interfaces
+- Infrastructure-independent domain model
 
 **📦 Infrastructure (Infrastructure/Rok.Infrastructure)**
-- Implémentation des repositories avec Dapper
-- Accès à la base de données SQLite
-- Lecture/écriture de métadonnées avec TagLibSharp
-- Services de fichiers et images
-- Logging avec Serilog
-- Intégration Discord
+- Repository implementation with Dapper
+- SQLite database access
+- Metadata reading/writing with TagLibSharp
+- File and image services
+- Logging with Serilog
+- Discord integration
 
-**Patterns utilisés :**
-- **MVVM** (Model-View-ViewModel) - Séparation UI/logique
-- **CQRS** (Command Query Responsibility Segregation) - Séparation lecture/écriture
-- **Dependency Injection** - Inversion de contrôle avec Microsoft.Extensions.DependencyInjection
-- **Mediator Pattern** - Communication découplée entre composants
-- **Repository Pattern** - Abstraction de l'accès aux données
-- **Unit of Work** - Gestion transactionnelle des opérations
+**Design Patterns:**
+- **MVVM** (Model-View-ViewModel) - UI/logic separation
+- **CQRS** (Command Query Responsibility Segregation) - Read/write separation
+- **Dependency Injection** - Inversion of control with Microsoft.Extensions.DependencyInjection
+- **Mediator Pattern** - Decoupled component communication
+- **Repository Pattern** - Data access abstraction
+- **Unit of Work** - Transactional operation management
 
-## 📋 Prérequis
+## 📋 Requirements
 
-- Windows 10 version 1809 (build 17763) ou supérieur
-- Windows 11 recommandé pour une expérience optimale
+- Windows 10 version 1809 (build 17763) or higher
+- Windows 11 recommended for optimal experience
 
 ## 📧 Contact
 
 Mickaël François - [@mickaelfrancois](https://github.com/mickaelfrancois)
 
-⭐ Si vous aimez ce projet, n'hésitez pas à lui donner une étoile sur GitHub !
+⭐ If you like this project, feel free to give it a star on GitHub!
