@@ -61,13 +61,13 @@ public partial class StatisticsViewModel(IMediator mediator) : ObservableObject
 
     public long TotalRawLyrics { get; set; }
 
-    public List<RankedTopItem> TopGenres { get; set; } = [];
+    public IReadOnlyList<RankedTopItem> TopGenres { get; set; } = [];
 
-    public List<RankedTopItem> TopArtists { get; set; } = [];
+    public IReadOnlyList<RankedTopItem> TopArtists { get; set; } = [];
 
-    public List<RankedTopItem> TopAlbums { get; set; } = [];
+    public IReadOnlyList<RankedTopItem> TopAlbums { get; set; } = [];
 
-    public List<RankedTopItem> TopTracks { get; set; } = [];
+    public IReadOnlyList<RankedTopItem> TopTracks { get; set; } = [];
 
     public async Task LoadAsync()
     {
