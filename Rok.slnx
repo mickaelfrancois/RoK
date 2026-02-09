@@ -23,6 +23,7 @@
   </Folder>
   <Folder Name="/Solution Items/">
     <File Path=".editorconfig" />
+    <File Path="README.fr.md" />
     <File Path="README.md" />
   </Folder>
   <Folder Name="/Tests/" />
