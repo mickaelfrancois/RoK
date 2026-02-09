@@ -21,12 +21,12 @@ public partial class TracksViewModel : ObservableObject, IDisposable
 
     public RangeObservableCollection<TracksGroupCategoryViewModel> GroupedItems { get; private set; } = [];
 
-    public List<TrackViewModel> ViewModels => _trackProvider.ViewModels;
-    public List<GenreDto> Genres => _trackProvider.Genres;
+    public IReadOnlyList<TrackViewModel> ViewModels => _trackProvider.ViewModels;
+    public IReadOnlyList<GenreDto> Genres => _trackProvider.Genres;
     public ObservableCollection<object> Selected => _selectionManager.Selected;
-    public List<TrackViewModel> SelectedItems => _selectionManager.SelectedItems;
-    public List<string> SelectedFilters => _stateManager.SelectedFilters;
-    public List<long> SelectedGenreFilters => _stateManager.SelectedGenreFilters;
+    public IReadOnlyList<TrackViewModel> SelectedItems => _selectionManager.SelectedItems;
+    public IReadOnlyList<string> SelectedFilters => _stateManager.SelectedFilters;
+    public IReadOnlyList<long> SelectedGenreFilters => _stateManager.SelectedGenreFilters;
     public int SelectedCount => _selectionManager.SelectedCount;
     public bool IsSelectedItems => _selectionManager.IsSelectedItems;
 

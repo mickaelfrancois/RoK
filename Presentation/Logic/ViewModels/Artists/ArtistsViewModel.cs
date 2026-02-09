@@ -23,14 +23,14 @@ public partial class ArtistsViewModel : ObservableObject, IDisposable
 
     public RangeObservableCollection<ArtistsGroupCategoryViewModel> GroupedItems { get; private set; } = [];
 
-    public List<ArtistViewModel> ViewModels => _artistProvider.ViewModels;
-    public List<GenreDto> Genres => _artistProvider.Genres;
-    public List<string> Tags { get; private set; } = [];
+    public IReadOnlyList<ArtistViewModel> ViewModels => _artistProvider.ViewModels;
+    public IReadOnlyList<GenreDto> Genres => _artistProvider.Genres;
+    public IReadOnlyList<string> Tags { get; private set; } = [];
     public ObservableCollection<object> Selected => _selectionManager.Selected;
-    public List<ArtistViewModel> SelectedItems => _selectionManager.SelectedItems;
-    public List<string> SelectedFilters => _stateManager.SelectedFilters;
-    public List<long> SelectedGenreFilters => _stateManager.SelectedGenreFilters;
-    public List<string> SelectedTagFilters => _stateManager.SelectedTagFilters;
+    public IReadOnlyList<ArtistViewModel> SelectedItems => _selectionManager.SelectedItems;
+    public IReadOnlyList<string> SelectedFilters => _stateManager.SelectedFilters;
+    public IReadOnlyList<long> SelectedGenreFilters => _stateManager.SelectedGenreFilters;
+    public IReadOnlyList<string> SelectedTagFilters => _stateManager.SelectedTagFilters;
     public bool IsSelectedItems => _selectionManager.IsSelectedItems;
 
     [ObservableProperty]
