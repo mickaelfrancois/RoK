@@ -362,20 +362,53 @@ public class PlayerService : IPlayerService
         if (prefixCount >= Playlist.Count)
             return;
 
-        List<TrackDto> tail = Playlist.GetRange(prefixCount, Playlist.Count - prefixCount);
+        List<List<TrackDto>> groupedByArtist = Playlist
+            .Skip(prefixCount)
+            .GroupBy(track => track.ArtistName)
+            .Select(group => group.ToList())
+            .ToList();
 
-        // Fisher-Yates shuffle
-        Random rng = Random.Shared;
-        for (int i = tail.Count - 1; i > 0; i--)
+        if (groupedByArtist.Count == 1)
         {
-            int j = rng.Next(i + 1);
-            TrackDto tmp = tail[i];
-            tail[i] = tail[j];
-            tail[j] = tmp;
+            List<TrackDto> singleArtistTracks = groupedByArtist[0];
+            Random rng = Random.Shared;
+            for (int i = singleArtistTracks.Count - 1; i > 0; i--)
+            {
+                int j = rng.Next(i + 1);
+                (singleArtistTracks[j], singleArtistTracks[i]) = (singleArtistTracks[i], singleArtistTracks[j]);
+            }
+
+            Playlist.RemoveRange(prefixCount, Playlist.Count - prefixCount);
+            Playlist.InsertRange(prefixCount, singleArtistTracks);
+            Messenger.Send(new PlaylistChanged(Playlist));
+            return;
+        }
+
+        Random random = Random.Shared;
+        groupedByArtist.ForEach(group =>
+        {
+            for (int i = group.Count - 1; i > 0; i--)
+            {
+                int j = random.Next(i + 1);
+                (group[j], group[i]) = (group[i], group[j]);
+            }
+        });
+
+        List<TrackDto> shuffledTracks = new();
+        while (groupedByArtist.Any(group => group.Count > 0))
+        {
+            for (int i = 0; i < groupedByArtist.Count; i++)
+            {
+                if (groupedByArtist[i].Count > 0)
+                {
+                    shuffledTracks.Add(groupedByArtist[i][0]);
+                    groupedByArtist[i].RemoveAt(0);
+                }
+            }
         }
 
         Playlist.RemoveRange(prefixCount, Playlist.Count - prefixCount);
-        Playlist.InsertRange(prefixCount, tail);
+        Playlist.InsertRange(prefixCount, shuffledTracks);
 
         Messenger.Send(new PlaylistChanged(Playlist));
     }
