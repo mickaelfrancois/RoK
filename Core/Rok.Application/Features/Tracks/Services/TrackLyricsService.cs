@@ -1,9 +1,10 @@
-﻿using Rok.Application.Dto.Lyrics;
+﻿using Microsoft.Extensions.Logging;
+using Rok.Application.Dto.Lyrics;
 using Rok.Application.Dto.MusicDataApi;
 using Rok.Application.Features.Tracks.Command;
-using Rok.Infrastructure.MusicData;
+using Rok.Application.Interfaces;
 
-namespace Rok.Logic.ViewModels.Track.Services;
+namespace Rok.Application.Features.Tracks.Services;
 
 public class TrackLyricsService(IMediator mediator, ILyricsService lyricsService, IMusicDataApiService musicDataService, ILogger<TrackLyricsService> logger)
 {
@@ -24,7 +25,7 @@ public class TrackLyricsService(IMediator mediator, ILyricsService lyricsService
         if (string.IsNullOrEmpty(track.MusicFile) || string.IsNullOrEmpty(track.ArtistName) || string.IsNullOrEmpty(track.AlbumName) || string.IsNullOrEmpty(track.Title) || track.Duration <= 0)
             return false;
 
-        if (!MusicDataApiService.IsApiRetryAllowed(track.GetLyricsLastAttempt))
+        if (!musicDataService.IsApiRetryAllowed(track.GetLyricsLastAttempt))
             return false;
 
         logger.LogTrace("Fetching lyrics for {Artist} - {Title} from API", track.ArtistName, track.Title);
@@ -35,7 +36,6 @@ public class TrackLyricsService(IMediator mediator, ILyricsService lyricsService
 
         try
         {
-
             MusicDataLyricsDto? lyrics = await musicDataService.GetLyricsAsync(track.ArtistName, track.AlbumName, track.Title, track.Duration);
             if (lyrics is null)
                 return false;

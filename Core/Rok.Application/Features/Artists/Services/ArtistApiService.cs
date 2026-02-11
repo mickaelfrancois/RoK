@@ -1,18 +1,22 @@
-﻿using System.Threading;
+using Microsoft.Extensions.Logging;
 using Rok.Application.Dto.MusicDataApi;
 using Rok.Application.Features.Artists.Command;
-using Rok.Infrastructure.MusicData;
+using Rok.Application.Interfaces;
+using Rok.Shared.Extensions;
 
-namespace Rok.Logic.ViewModels.Artist.Services;
+namespace Rok.Application.Features.Artists.Services;
 
-public class ArtistApiService(IMediator mediator, IMusicDataApiService musicDataApiService, ArtistPictureService pictureService, BackdropPicture backdropPicture, ILogger<ArtistApiService> logger)
+public class ArtistApiService(
+    IMediator mediator,
+    IMusicDataApiService musicDataApiService,
+    ILogger<ArtistApiService> logger)
 {
-    public async Task<bool> GetAndUpdateArtistDataAsync(ArtistDto artist)
+    public async Task<bool> GetAndUpdateArtistDataAsync(ArtistDto artist, IArtistPictureService pictureService, IBackdropPicture backdropPicture)
     {
         if (string.IsNullOrEmpty(artist.Name))
             return false;
 
-        if (!MusicDataApiService.IsApiRetryAllowed(artist.GetMetaDataLastAttempt))
+        if (!musicDataApiService.IsApiRetryAllowed(artist.GetMetaDataLastAttempt))
             return false;
 
         await mediator.SendMessageAsync(new UpdateArtistGetMetaDataLastAttemptCommand(artist.Id));
@@ -24,8 +28,8 @@ public class ArtistApiService(IMediator mediator, IMusicDataApiService musicData
 
         if (!string.IsNullOrEmpty(artistApi.MusicBrainzID))
         {
-            await DownloadPictureIfNeededAsync(artist, artistApi, CancellationToken.None);
-            await DownloadBackdropsIfNeededAsync(artist, artistApi, CancellationToken.None);
+            await DownloadPictureIfNeededAsync(artist, artistApi, pictureService, CancellationToken.None);
+            await DownloadBackdropsIfNeededAsync(artist, artistApi, backdropPicture, CancellationToken.None);
 
             if (CompareArtistFromApi(artist, artistApi))
                 return await UpdateArtistDataIfNeededAsync(artist, artistApi);
@@ -34,8 +38,7 @@ public class ArtistApiService(IMediator mediator, IMusicDataApiService musicData
         return false;
     }
 
-
-    private async Task DownloadPictureIfNeededAsync(ArtistDto artist, MusicDataArtistDto artistApi, CancellationToken cancellationToken)
+    private async Task DownloadPictureIfNeededAsync(ArtistDto artist, MusicDataArtistDto artistApi, IArtistPictureService pictureService, CancellationToken cancellationToken)
     {
         if (pictureService.PictureExists(artist.Name))
             return;
@@ -48,8 +51,7 @@ public class ArtistApiService(IMediator mediator, IMusicDataApiService musicData
         await musicDataApiService.DownloadArtistPictureAsync(artistApi, picturePath, cancellationToken);
     }
 
-
-    private async Task DownloadBackdropsIfNeededAsync(ArtistDto artist, MusicDataArtistDto artistApi, CancellationToken cancellationToken)
+    private async Task DownloadBackdropsIfNeededAsync(ArtistDto artist, MusicDataArtistDto artistApi, IBackdropPicture backdropPicture, CancellationToken cancellationToken)
     {
         if (backdropPicture.HasBackdrops(artist.Name))
             return;
@@ -58,7 +60,6 @@ public class ArtistApiService(IMediator mediator, IMusicDataApiService musicData
 
         await musicDataApiService.DownloadArtistBackdropsAsync(artistApi, backdropFolder, cancellationToken);
     }
-
 
     private async Task<bool> UpdateArtistDataIfNeededAsync(ArtistDto artist, MusicDataArtistDto artistApi)
     {
@@ -96,7 +97,6 @@ public class ArtistApiService(IMediator mediator, IMusicDataApiService musicData
 
         return true;
     }
-
 
     private static bool CompareArtistFromApi(ArtistDto artist, MusicDataArtistDto artistApi)
     {

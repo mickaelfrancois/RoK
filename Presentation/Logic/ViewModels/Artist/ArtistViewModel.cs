@@ -1,6 +1,7 @@
 ﻿using System.Collections.Specialized;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Rok.Application.Features.Artists.Services;
 using Rok.Application.Features.Playlists.PlaylistMenu;
 using Rok.Application.Randomizer;
 using Rok.Infrastructure.Translate;
@@ -30,6 +31,7 @@ public partial class ArtistViewModel : ObservableObject
     private readonly ArtistApiService _apiService;
     private readonly ArtistStatisticsService _statisticsService;
     private readonly ArtistEditService _editService;
+    private readonly BackdropPicture _backdropPicture;
     private IEnumerable<TrackDto>? _tracks = null;
 
     public IPlaylistMenuService PlaylistMenuService { get; }
@@ -213,6 +215,7 @@ public partial class ArtistViewModel : ObservableObject
         ArtistApiService apiService,
         ArtistStatisticsService statisticsService,
         ArtistEditService editService,
+        BackdropPicture backdropPicture,
         IAppOptions appOptions,
         IPlaylistMenuService playlistMenuService,
         ILogger<ArtistViewModel> logger)
@@ -228,6 +231,7 @@ public partial class ArtistViewModel : ObservableObject
         _apiService = Guard.Against.Null(apiService);
         _statisticsService = Guard.Against.Null(statisticsService);
         _editService = Guard.Against.Null(editService);
+        _backdropPicture = Guard.Against.Null(backdropPicture);
         _appOptions = Guard.Against.Null(appOptions);
         PlaylistMenuService = Guard.Against.Null(playlistMenuService);
         _logger = Guard.Against.Null(logger);
@@ -341,7 +345,7 @@ public partial class ArtistViewModel : ObservableObject
 
     private async Task GetDataFromApiAsync()
     {
-        bool updated = await _apiService.GetAndUpdateArtistDataAsync(Artist);
+        bool updated = await _apiService.GetAndUpdateArtistDataAsync(Artist, _pictureService, _backdropPicture);
 
         if (updated)
         {

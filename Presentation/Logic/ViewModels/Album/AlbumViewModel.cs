@@ -1,6 +1,7 @@
 ﻿using System.Collections.Specialized;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Rok.Application.Features.Albums.Services;
 using Rok.Application.Features.Playlists.PlaylistMenu;
 using Rok.Infrastructure.Translate;
 using Rok.Logic.Services.Player;
@@ -284,7 +285,7 @@ public partial class AlbumViewModel : ObservableObject
     [RelayCommand]
     private async Task GetDataFromApiAsync()
     {
-        bool updated = await _apiService.GetAndUpdateAlbumDataAsync(Album);
+        bool updated = await _apiService.GetAndUpdateAlbumDataAsync(Album, _pictureService);
 
         if (!updated)
             return;

@@ -1,9 +1,10 @@
 ﻿using System.IO;
+using Rok.Application.Interfaces;
 using Windows.Storage;
 
 namespace Rok.Logic.ViewModels.Album.Services;
 
-public class AlbumPictureService(IAlbumPicture albumPicture, ILogger<AlbumPictureService> logger)
+public class AlbumPictureService(IAlbumPicture albumPicture, ILogger<AlbumPictureService> logger) : IAlbumPictureService
 {
     public BitmapImage? LoadPicture(string albumPath)
     {

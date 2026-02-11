@@ -1,7 +1,10 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using MiF.Mediator;
 using MiF.Mediator.DependencyInjection;
+using Rok.Application.Features.Albums.Services;
+using Rok.Application.Features.Artists.Services;
 using Rok.Application.Features.Playlists;
+using Rok.Application.Features.Tracks.Services;
 using Rok.Application.Interfaces;
 using Rok.Application.Options;
 
@@ -14,6 +17,9 @@ public static class DependencyInjection
         services.AddSingleton<IAppOptions, AppOptions>();
         services.AddScoped<IValidationService, ValidationService>();
         services.AddSingleton<IPlaylistService, PlaylistService>();
+        services.AddTransient<TrackLyricsService>();
+        services.AddTransient<AlbumApiService>();
+        services.AddTransient<ArtistApiService>();
 
         services.AddSimpleMediator();
 

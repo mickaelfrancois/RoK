@@ -78,7 +78,7 @@ public static class DependencyInjection
         services.AddTransient<AlbumViewModel>();
         services.AddTransient<AlbumDataLoader>();
         services.AddTransient<AlbumPictureService>();
-        services.AddTransient<AlbumApiService>();
+        services.AddTransient<IAlbumPictureService, AlbumPictureService>();
         services.AddTransient<AlbumStatisticsService>();
         services.AddTransient<AlbumEditService>();
 
@@ -118,7 +118,7 @@ public static class DependencyInjection
         services.AddTransient<ArtistViewModel>();
         services.AddTransient<ArtistDataLoader>();
         services.AddTransient<ArtistPictureService>();
-        services.AddTransient<ArtistApiService>();
+        services.AddTransient<IArtistPictureService, ArtistPictureService>();
         services.AddTransient<ArtistStatisticsService>();
         services.AddTransient<ArtistEditService>();
 
@@ -149,7 +149,6 @@ public static class DependencyInjection
         // Track detail services (for TrackViewModel - single track)
         services.AddTransient<TrackViewModel>();
         services.AddTransient<TrackDetailDataLoader>();
-        services.AddTransient<TrackLyricsService>();
         services.AddTransient<TrackScoreService>();
         services.AddTransient<TrackNavigationService>();
         // Listening ViewModel and services

@@ -4,7 +4,7 @@ using Rok.Shared.Extensions;
 
 namespace Rok.Infrastructure.Files;
 
-public class BackdropPicture
+public class BackdropPicture : IBackdropPicture
 {
     private const string KArtistFolderName = "@Artists";
 
