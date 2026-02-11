@@ -29,7 +29,9 @@ public class TrackLyricsService(IMediator mediator, ILyricsService lyricsService
 
         logger.LogTrace("Fetching lyrics for {Artist} - {Title} from API", track.ArtistName, track.Title);
 
+        track.GetLyricsLastAttempt = DateTime.UtcNow;
         await mediator.SendMessageAsync(new UpdateTrackGetLyricsLastAttemptCommand(track.Id));
+
 
         try
         {
