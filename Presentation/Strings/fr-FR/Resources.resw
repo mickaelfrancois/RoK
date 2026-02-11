@@ -1146,4 +1146,7 @@
   <data name="MenuFlyout_CurrentListening_Text" xml:space="preserve">
     <value>Ecoute en cours</value>
   </data>
+  <data name="SupportProjectButtonText.Text" xml:space="preserve">
+    <value>Soutenez le projet, offrez-moi un café</value>
+  </data>
 </root>

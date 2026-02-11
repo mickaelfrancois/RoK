@@ -184,6 +184,12 @@ public sealed partial class OptionsPage : Page
         if (result == ContentDialogResult.Primary && StatisticsViewModel.ResetListenCountCommand.CanExecute(null))
             StatisticsViewModel.ResetListenCountCommand.Execute(null);
     }
+
+    private void SupportButton_Click(object sender, RoutedEventArgs e)
+    {
+        Uri uri = new("https://www.buymeacoffee.com/mickaelfrancois");
+        _ = Windows.System.Launcher.LaunchUriAsync(uri);
+    }
 }
 
 public class PathItem(string key, string value)
