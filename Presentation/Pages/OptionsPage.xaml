@@ -448,9 +448,37 @@
                                        Text="Developed by Mickaël FRANCOIS" />
                         </StackPanel>
 
+                        <StackPanel Spacing="4"
+                                    Margin="0,8,0,0">
+                            <TextBlock Text="Project stats:"
+                                       FontWeight="SemiBold"
+                                       FontSize="12" />
+                            <TextBlock Text="✅ 1000+ active users"
+                                       FontSize="11" />
+                            <TextBlock Text="✅ Updated regularly"
+                                       FontSize="11" />
+                            <TextBlock Text="✅ 100% free &amp; open-source"
+                                       FontSize="11" />
+                            <TextBlock Text="❤️ Maintained by one developer"
+                                       FontSize="11"
+                                       Foreground="{ThemeResource AccentFillColorDefaultBrush}" />
+                        </StackPanel>
+
                         <StackPanel Orientation="Horizontal"
                                     Spacing="16"
                                     Margin="0,0,0,8">
+
+                            <Button x:Uid="SupportProjectButton"
+                                    Click="SupportButton_Click">
+                                <Button.Content>
+                                    <StackPanel Orientation="Horizontal"
+                                                Spacing="6">
+                                        <FontIcon Glyph="&#xE006;"></FontIcon>
+                                        <TextBlock x:Uid="SupportProjectButtonText"
+                                                   Text="Support the project"></TextBlock>
+                                    </StackPanel>
+                                </Button.Content>
+                            </Button>
 
                             <Button Click="StorePageButton_Click">
                                 <Button.Content>
