@@ -3,7 +3,7 @@ using Windows.Storage;
 
 namespace Rok.Logic.ViewModels.Artist.Services;
 
-public class ArtistPictureService(IArtistPicture artistPicture, ILogger<ArtistPictureService> logger)
+public class ArtistPictureService(IArtistPicture artistPicture, ILogger<ArtistPictureService> logger) : IArtistPictureService
 {
     private static BitmapImage FallbackPicture => new(new Uri("ms-appx:///Assets/artistFallback.png"));
 

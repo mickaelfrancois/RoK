@@ -1,6 +1,6 @@
 ﻿using Rok.Application.Dto.MusicDataApi;
 
-namespace Rok.Infrastructure.MusicData;
+namespace Rok.Application.Interfaces;
 
 public interface IMusicDataApiService
 {
@@ -15,4 +15,6 @@ public interface IMusicDataApiService
     Task DownloadArtistBackdropsAsync(MusicDataArtistDto artist, string artistFolder, CancellationToken cancellationToken);
 
     Task DownloadCoverAsync(MusicDataAlbumDto album, string coverFile, CancellationToken cancellationToken);
+
+    bool IsApiRetryAllowed(DateTime? lastAttempt);
 }

@@ -38,6 +38,7 @@ public static class DependencyInjection
         services.AddSingleton<IArtistPicture, ArtistPicture>();
         services.AddSingleton<IAlbumPicture, AlbumPicture>();
         services.AddSingleton<BackdropPicture>();
+        services.AddSingleton<IBackdropPicture, BackdropPicture>();
 
         services.AddSingleton<IPlayerEngine, WinUIMediaPlayer>();
         services.AddSingleton<ILyricsService, LyricsService>();

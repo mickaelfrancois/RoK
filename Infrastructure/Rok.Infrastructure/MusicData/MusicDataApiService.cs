@@ -251,7 +251,7 @@ public class MusicDataApiService : IMusicDataApiService, IDisposable
     }
 
 
-    public static bool IsApiRetryAllowed(DateTime? lastAttempt)
+    public bool IsApiRetryAllowed(DateTime? lastAttempt)
     {
         if (!lastAttempt.HasValue)
             return true;

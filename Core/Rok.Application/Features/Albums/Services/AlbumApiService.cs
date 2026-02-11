@@ -1,23 +1,22 @@
-﻿using System.Threading;
+using Microsoft.Extensions.Logging;
 using Rok.Application.Dto.MusicDataApi;
 using Rok.Application.Features.Albums.Command;
-using Rok.Infrastructure.MusicData;
+using Rok.Application.Interfaces;
+using Rok.Shared.Extensions;
 
-namespace Rok.Logic.ViewModels.Album.Services;
-
+namespace Rok.Application.Features.Albums.Services;
 
 public class AlbumApiService(
     IMediator mediator,
     IMusicDataApiService musicDataApiService,
-    AlbumPictureService pictureService,
     ILogger<AlbumApiService> logger)
 {
-    public async Task<bool> GetAndUpdateAlbumDataAsync(AlbumDto album)
+    public async Task<bool> GetAndUpdateAlbumDataAsync(AlbumDto album, IAlbumPictureService pictureService)
     {
         if (string.IsNullOrEmpty(album.Name) || string.IsNullOrEmpty(album.ArtistName))
             return false;
 
-        if (!MusicDataApiService.IsApiRetryAllowed(album.GetMetaDataLastAttempt))
+        if (!musicDataApiService.IsApiRetryAllowed(album.GetMetaDataLastAttempt))
             return false;
 
         await mediator.SendMessageAsync(new UpdateAlbumGetMetaDataLastAttemptCommand(album.Id));
@@ -29,7 +28,7 @@ public class AlbumApiService(
 
         if (!string.IsNullOrEmpty(albumApi.MusicBrainzID))
         {
-            await DownloadPictureIfNeededAsync(album, albumApi, CancellationToken.None);
+            await DownloadPictureIfNeededAsync(album, albumApi, pictureService, CancellationToken.None);
 
             if (CompareAlbumFromApi(album, albumApi))
                 return await UpdateAlbumDataIfNeededAsync(album, albumApi);
@@ -38,7 +37,7 @@ public class AlbumApiService(
         return false;
     }
 
-    private async Task DownloadPictureIfNeededAsync(AlbumDto album, MusicDataAlbumDto albumApi, CancellationToken cancellationToken)
+    private async Task DownloadPictureIfNeededAsync(AlbumDto album, MusicDataAlbumDto albumApi, IAlbumPictureService pictureService, CancellationToken cancellationToken)
     {
         if (pictureService.PictureExists(album.AlbumPath))
             return;
@@ -119,6 +118,6 @@ public class AlbumApiService(
         if (album.WikidataID.AreDifferents(albumApi.WikidataID)) return true;
         if (album.WikipediaID.AreDifferents(albumApi.WikipediaID)) return true;
 
-        return false;
+        return string.IsNullOrWhiteSpace(album.Biography) && !string.IsNullOrWhiteSpace(albumApi.Biography);
     }
 }
