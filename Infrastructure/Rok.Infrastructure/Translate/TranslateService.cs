@@ -1,11 +1,11 @@
-﻿using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
-using Rok.Application.Interfaces;
-using Rok.Application.Options;
-using System.Globalization;
+﻿using System.Globalization;
 using System.Reflection;
 using System.Text;
 using System.Text.Json;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using Rok.Application.Interfaces;
+using Rok.Application.Options;
 
 namespace Rok.Infrastructure.Translate;
 

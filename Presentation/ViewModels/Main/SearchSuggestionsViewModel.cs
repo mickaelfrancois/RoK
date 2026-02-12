@@ -1,7 +1,7 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using Rok.Application.Features.Search.Query;
 
-namespace Rok.Logic.ViewModels.Main;
+namespace Rok.ViewModels.Main;
 
 public partial class SearchSuggestionsViewModel(IMediator mediator) : ObservableObject
 {

@@ -4,12 +4,11 @@ using CommunityToolkit.Mvvm.Input;
 using Rok.Application.Features.Albums.Services;
 using Rok.Application.Features.Playlists.PlaylistMenu;
 using Rok.Infrastructure.Translate;
-using Rok.Logic.ViewModels.Tracks;
-using Rok.Services;
 using Rok.Services.Player;
 using Rok.ViewModels.Album.Services;
+using Rok.ViewModels.Track;
 
-namespace Rok.Logic.ViewModels.Albums;
+namespace Rok.ViewModels.Album;
 
 public partial class AlbumViewModel : ObservableObject
 {

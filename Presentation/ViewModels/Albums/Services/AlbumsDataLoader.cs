@@ -1,7 +1,7 @@
 ﻿using Rok.Application.Features.Albums.Query;
 using Rok.Application.Features.Genres.Query;
 using Rok.Application.Features.Tags.Query;
-using Rok.Logic.ViewModels.Albums;
+using Rok.ViewModels.Album;
 using Rok.ViewModels.Albums.Interfaces;
 
 namespace Rok.ViewModels.Albums.Services;

@@ -1,5 +1,5 @@
-﻿using Rok.Logic.ViewModels.Tracks;
-using Rok.Services.Player;
+﻿using Rok.Services.Player;
+using Rok.ViewModels.Track;
 
 namespace Rok.ViewModels.Listening.Services;
 

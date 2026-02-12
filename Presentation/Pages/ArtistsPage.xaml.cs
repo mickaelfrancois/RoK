@@ -3,8 +3,9 @@ using System.Threading;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Navigation;
 using Rok.Commons;
-using Rok.Logic.ViewModels.Artists;
-using Rok.Logic.ViewModels.Playlists;
+using Rok.ViewModels.Artist;
+using Rok.ViewModels.Artists;
+using Rok.ViewModels.Playlists;
 
 namespace Rok.Pages;
 

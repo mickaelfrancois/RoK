@@ -1,7 +1,7 @@
 ﻿using System.Threading;
 using Rok.Application.Features.Tags.Query;
 
-namespace Rok.Logic.Services;
+namespace Rok.Services;
 
 
 public partial class TagsProvider : IDisposable

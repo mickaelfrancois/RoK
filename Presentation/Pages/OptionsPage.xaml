@@ -7,7 +7,7 @@
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
       xmlns:enums="using:Rok.Shared.Enums"
       xmlns:generic="using:System.Collections.Generic"
-      xmlns:statistics="using:Rok.Logic.ViewModels.Statistics"
+      xmlns:statistics="using:Rok.ViewModels.Statistics"
       xmlns:controls="using:Rok.Commons"
       mc:Ignorable="d"
       x:Name="OptionsView">

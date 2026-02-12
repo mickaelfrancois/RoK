@@ -3,12 +3,10 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.UI.Dispatching;
 using Rok.Application.Features.Tracks.Query;
-using Rok.Services;
-using Rok.ViewModels.Start;
 using Windows.Storage;
 using Windows.Storage.AccessCache;
 
-namespace Rok.Logic.ViewModels.Start;
+namespace Rok.ViewModels.Start;
 
 
 public partial class StartViewModel : ObservableObject
@@ -121,7 +119,7 @@ public partial class StartViewModel : ObservableObject
                 });
 
                 ImportProgressText = $"{AlbumsImported.Count} albums discovered";
-                ImportProgress = Math.Min((AlbumsImported.Count * 100.0) / KAlbumMinimumBeforeUse, 100);
+                ImportProgress = Math.Min(AlbumsImported.Count * 100.0 / KAlbumMinimumBeforeUse, 100);
 
                 if (AlbumsImported.Count >= KAlbumMinimumBeforeUse)
                 {

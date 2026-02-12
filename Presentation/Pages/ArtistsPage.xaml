@@ -5,8 +5,9 @@
       xmlns:local="using:Rok.Pages"
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-      xmlns:artists="using:Rok.Logic.ViewModels.Artists"
+      xmlns:artists="using:Rok.ViewModels.Artist"
       xmlns:common="using:Rok.Commons"
+      xmlns:artists1="using:Rok.ViewModels.Artists"
       x:Name="artistsView"
       mc:Ignorable="d">
 
@@ -262,7 +263,7 @@
                         <GridView.GroupStyle>
                             <GroupStyle HidesIfEmpty="True">
                                 <GroupStyle.HeaderTemplate>
-                                    <DataTemplate x:DataType="artists:ArtistsGroupCategoryViewModel">
+                                    <DataTemplate x:DataType="artists1:ArtistsGroupCategoryViewModel">
                                         <StackPanel Orientation="Horizontal"
                                                     Visibility="Visible">
                                             <HyperlinkButton Content="{x:Bind Title}"

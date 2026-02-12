@@ -1,4 +1,4 @@
-﻿using Rok.Logic.ViewModels.Playlists;
+﻿using Rok.ViewModels.Playlist;
 using Rok.ViewModels.Playlists.Services;
 
 namespace Rok.ViewModels.Playlists.Handlers;

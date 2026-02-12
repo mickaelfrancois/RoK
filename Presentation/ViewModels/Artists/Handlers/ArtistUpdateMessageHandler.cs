@@ -1,4 +1,4 @@
-﻿using Rok.Logic.ViewModels.Artists;
+﻿using Rok.ViewModels.Artist;
 using Rok.ViewModels.Artists.Services;
 
 namespace Rok.ViewModels.Artists.Handlers;

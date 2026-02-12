@@ -2,7 +2,7 @@
 using Rok.ViewModels.Tracks.Handlers;
 using Rok.ViewModels.Tracks.Interfaces;
 
-namespace Rok.Logic.ViewModels.Tracks.Services;
+namespace Rok.ViewModels.Tracks.Services;
 
 public partial class TrackLibraryMonitor : ITrackLibraryMonitor
 {

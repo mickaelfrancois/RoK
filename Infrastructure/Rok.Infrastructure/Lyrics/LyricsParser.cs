@@ -1,7 +1,7 @@
-﻿using Rok.Application.Dto.Lyrics;
-using Rok.Application.Interfaces;
-using System.Globalization;
+﻿using System.Globalization;
 using System.Text.RegularExpressions;
+using Rok.Application.Dto.Lyrics;
+using Rok.Application.Interfaces;
 
 namespace Rok.Infrastructure.Lyrics;
 

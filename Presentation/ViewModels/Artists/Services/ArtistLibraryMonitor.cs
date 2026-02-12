@@ -2,7 +2,7 @@
 using Rok.ViewModels.Artists.Handlers;
 using Rok.ViewModels.Artists.Interfaces;
 
-namespace Rok.Logic.ViewModels.Artists.Services;
+namespace Rok.ViewModels.Artists.Services;
 
 public partial class ArtistLibraryMonitor : IArtistLibraryMonitor
 {

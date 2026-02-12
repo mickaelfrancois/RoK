@@ -1,11 +1,10 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using Rok.Logic.ViewModels.Tracks;
-using Rok.Services;
 using Rok.Services.Player;
 using Rok.ViewModels.Playlist.Services;
+using Rok.ViewModels.Track;
 
-namespace Rok.Logic.ViewModels.Playlists;
+namespace Rok.ViewModels.Playlist;
 
 public partial class PlaylistViewModel : ObservableObject
 {

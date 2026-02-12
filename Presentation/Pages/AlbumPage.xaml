@@ -6,7 +6,7 @@
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
       xmlns:common="using:Rok.Commons"
-      xmlns:tracks="using:Rok.Logic.ViewModels.Tracks"
+      xmlns:tracks="using:Rok.ViewModels.Track"
       xmlns:controls="using:CommunityToolkit.WinUI.Controls"
       x:Name="albumPage"
       mc:Ignorable="d">

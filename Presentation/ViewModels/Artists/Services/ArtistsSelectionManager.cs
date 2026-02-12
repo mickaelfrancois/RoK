@@ -1,6 +1,7 @@
-﻿using Rok.ViewModels.Common.Services;
+﻿using Rok.ViewModels.Artist;
+using Rok.ViewModels.Common.Services;
 
-namespace Rok.Logic.ViewModels.Artists.Services;
+namespace Rok.ViewModels.Artists.Services;
 
 public partial class ArtistsSelectionManager : SelectionManager<ArtistViewModel>
 {

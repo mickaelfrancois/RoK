@@ -1,12 +1,11 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.UI.Dispatching;
-using Rok.Logic.ViewModels.Tracks.Services;
-using Rok.ViewModels.Tracks;
+using Rok.ViewModels.Track;
 using Rok.ViewModels.Tracks.Interfaces;
 using Rok.ViewModels.Tracks.Services;
 
-namespace Rok.Logic.ViewModels.Tracks;
+namespace Rok.ViewModels.Tracks;
 
 public partial class TracksViewModel : ObservableObject, IDisposable
 {

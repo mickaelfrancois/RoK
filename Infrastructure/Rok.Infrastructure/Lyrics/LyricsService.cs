@@ -1,6 +1,6 @@
-﻿using Rok.Application.Dto.Lyrics;
+﻿using System.Text.RegularExpressions;
+using Rok.Application.Dto.Lyrics;
 using Rok.Application.Interfaces;
-using System.Text.RegularExpressions;
 
 namespace Rok.Infrastructure.Lyrics;
 

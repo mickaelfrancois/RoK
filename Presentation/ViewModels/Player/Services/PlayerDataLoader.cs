@@ -1,9 +1,9 @@
 using Rok.Application.Features.Albums.Query;
-using Rok.Logic.ViewModels.Albums;
-using Rok.Logic.ViewModels.Artists;
-using Rok.Logic.ViewModels.Tracks;
+using Rok.ViewModels.Album;
 using Rok.ViewModels.Albums.Interfaces;
+using Rok.ViewModels.Artist;
 using Rok.ViewModels.Artists.Interfaces;
+using Rok.ViewModels.Track;
 using Rok.ViewModels.Tracks.Interfaces;
 
 namespace Rok.ViewModels.Player.Services;

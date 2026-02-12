@@ -1,6 +1,6 @@
 ﻿using Rok.Application.Features.Artists.Command;
-using Rok.Logic.ViewModels.Albums;
-using Rok.Logic.ViewModels.Tracks;
+using Rok.ViewModels.Album;
+using Rok.ViewModels.Track;
 
 namespace Rok.ViewModels.Artist.Services;
 

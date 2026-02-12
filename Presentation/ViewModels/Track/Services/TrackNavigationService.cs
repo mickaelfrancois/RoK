@@ -1,6 +1,4 @@
-﻿using Rok.Services;
-
-namespace Rok.ViewModels.Track.Services;
+﻿namespace Rok.ViewModels.Track.Services;
 
 public class TrackNavigationService(NavigationService navigationService)
 {

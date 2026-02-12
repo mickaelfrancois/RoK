@@ -2,11 +2,11 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using Microsoft.UI.Dispatching;
 using Rok.Application.Dto.Lyrics;
 using Rok.Application.Player;
-using Rok.Logic.ViewModels.Albums;
-using Rok.Logic.ViewModels.Artists;
-using Rok.Logic.ViewModels.Tracks;
+using Rok.ViewModels.Album;
+using Rok.ViewModels.Artist;
+using Rok.ViewModels.Track;
 
-namespace Rok.Logic.ViewModels.Player.Services;
+namespace Rok.ViewModels.Player.Services;
 
 public partial class PlayerStateManager : ObservableObject
 {

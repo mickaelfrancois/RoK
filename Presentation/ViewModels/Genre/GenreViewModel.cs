@@ -1,13 +1,12 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Rok.Application.Randomizer;
-using Rok.Logic.ViewModels.Albums;
-using Rok.Services;
 using Rok.Services.Player;
+using Rok.ViewModels.Album;
 using Rok.ViewModels.Artist.Services;
 using Rok.ViewModels.Genre.Services;
 
-namespace Rok.Logic.ViewModels.Genre;
+namespace Rok.ViewModels.Genre;
 
 public partial class GenreViewModel : ObservableObject
 {

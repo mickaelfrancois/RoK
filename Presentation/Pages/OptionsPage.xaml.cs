@@ -1,5 +1,5 @@
 using Microsoft.UI.Xaml.Controls;
-using Rok.Logic.ViewModels.Statistics;
+using Rok.ViewModels.Statistics;
 using Windows.ApplicationModel;
 using Windows.Storage;
 using Windows.Storage.AccessCache;

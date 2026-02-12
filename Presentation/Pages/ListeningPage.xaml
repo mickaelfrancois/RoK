@@ -6,7 +6,7 @@
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
       xmlns:common="using:Rok.Commons"
-      xmlns:track="using:Rok.Logic.ViewModels.Tracks"
+      xmlns:track="using:Rok.ViewModels.Track"
       x:Name="PageRoot"
       mc:Ignorable="d">
 

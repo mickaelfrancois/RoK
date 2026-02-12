@@ -1,10 +1,9 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using Microsoft.UI.Dispatching;
-using Rok.Logic.ViewModels.Artists;
-using Rok.Logic.ViewModels.Tracks;
-using Rok.ViewModels.Listening.Services;
+using Rok.ViewModels.Artist;
+using Rok.ViewModels.Track;
 
-namespace Rok.Logic.ViewModels.Listening.Services;
+namespace Rok.ViewModels.Listening.Services;
 
 public partial class ListeningPlaylistManager : ObservableObject
 {

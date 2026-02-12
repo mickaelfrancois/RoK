@@ -1,5 +1,4 @@
 ﻿using System.IO;
-using Rok.Services;
 using Windows.Storage;
 
 namespace Rok.ViewModels.Artist.Services;

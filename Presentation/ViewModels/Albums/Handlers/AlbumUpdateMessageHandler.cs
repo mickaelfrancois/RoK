@@ -1,4 +1,4 @@
-﻿using Rok.Logic.ViewModels.Albums;
+﻿using Rok.ViewModels.Album;
 using Rok.ViewModels.Albums.Services;
 
 namespace Rok.ViewModels.Albums.Handlers;

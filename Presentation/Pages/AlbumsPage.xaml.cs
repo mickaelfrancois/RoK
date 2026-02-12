@@ -5,8 +5,9 @@ using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media.Animation;
 using Microsoft.UI.Xaml.Navigation;
 using Rok.Commons;
-using Rok.Logic.ViewModels.Albums;
-using Rok.Logic.ViewModels.Playlists;
+using Rok.ViewModels.Album;
+using Rok.ViewModels.Albums;
+using Rok.ViewModels.Playlists;
 
 namespace Rok.Pages;
 

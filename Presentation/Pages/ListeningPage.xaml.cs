@@ -1,5 +1,5 @@
 using Microsoft.UI.Xaml.Controls;
-using Rok.Logic.ViewModels.Listening;
+using Rok.ViewModels.Listening;
 
 
 namespace Rok.Pages;

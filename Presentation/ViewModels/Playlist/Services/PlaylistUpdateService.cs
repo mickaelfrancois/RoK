@@ -1,5 +1,5 @@
 using Rok.Application.Features.Playlists.Command;
-using Rok.Logic.ViewModels.Tracks;
+using Rok.ViewModels.Track;
 
 namespace Rok.ViewModels.Playlist.Services;
 

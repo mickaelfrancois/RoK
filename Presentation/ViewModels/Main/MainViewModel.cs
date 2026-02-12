@@ -2,10 +2,9 @@
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.UI.Dispatching;
 using Rok.Application.Features.Search.Query;
-using Rok.Logic.ViewModels.Search;
-using Rok.Services;
+using Rok.ViewModels.Search;
 
-namespace Rok.Logic.ViewModels.Main;
+namespace Rok.ViewModels.Main;
 
 public partial class MainViewModel : ObservableObject
 {

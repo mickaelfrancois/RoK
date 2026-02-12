@@ -5,8 +5,7 @@ using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media.Animation;
 using Microsoft.UI.Xaml.Navigation;
 using Rok.Infrastructure;
-using Rok.Logic.ViewModels.Main;
-using Rok.Services;
+using Rok.ViewModels.Main;
 
 namespace Rok;
 

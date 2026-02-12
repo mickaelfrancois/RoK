@@ -8,7 +8,7 @@ using Rok.Application.Features.Statistics;
 using Rok.Application.Features.Statistics.Query;
 using Rok.Application.Features.Tracks.Command;
 
-namespace Rok.Logic.ViewModels.Statistics;
+namespace Rok.ViewModels.Statistics;
 
 public partial class StatisticsViewModel(IMediator mediator) : ObservableObject
 {

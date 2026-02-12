@@ -1,7 +1,7 @@
 ﻿using Rok.ViewModels.Albums.Handlers;
 using Rok.ViewModels.Albums.Interfaces;
 
-namespace Rok.Logic.ViewModels.Albums.Services;
+namespace Rok.ViewModels.Albums.Services;
 
 public partial class AlbumLibraryMonitor : IAlbumLibraryMonitor
 {

@@ -1,7 +1,7 @@
 ﻿using Rok.Application.Features.Tracks.Query;
-using Rok.Logic.ViewModels.Artists;
-using Rok.Logic.ViewModels.Tracks;
+using Rok.ViewModels.Artist;
 using Rok.ViewModels.Artists.Interfaces;
+using Rok.ViewModels.Track;
 using Rok.ViewModels.Tracks.Services;
 
 namespace Rok.ViewModels.Listening.Services;

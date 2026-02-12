@@ -1,12 +1,11 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.UI.Dispatching;
-using Rok.Logic.ViewModels.Albums.Services;
-using Rok.ViewModels.Albums;
+using Rok.ViewModels.Album;
 using Rok.ViewModels.Albums.Interfaces;
 using Rok.ViewModels.Albums.Services;
 
-namespace Rok.Logic.ViewModels.Albums;
+namespace Rok.ViewModels.Albums;
 
 
 public partial class AlbumsViewModel : ObservableObject, IDisposable

@@ -1,7 +1,6 @@
-using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-using Rok.Logic.ViewModels.Main;
-using Rok.Logic.ViewModels.Start;
+using Rok.ViewModels.Main;
+using Rok.ViewModels.Start;
 using Windows.Storage;
 using Windows.Storage.Pickers;
 using WinRT.Interop;

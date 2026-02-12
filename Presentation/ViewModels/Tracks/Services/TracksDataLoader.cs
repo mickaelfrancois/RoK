@@ -1,7 +1,6 @@
 ﻿using Rok.Application.Features.Genres.Query;
 using Rok.Application.Features.Tracks.Query;
-using Rok.Logic.ViewModels.Tracks;
-using Rok.Mapping;
+using Rok.ViewModels.Track;
 using Rok.ViewModels.Tracks.Interfaces;
 
 namespace Rok.ViewModels.Tracks.Services;

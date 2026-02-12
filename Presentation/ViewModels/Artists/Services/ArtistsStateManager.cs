@@ -1,7 +1,4 @@
-﻿using Rok.Services;
-using Rok.ViewModels;
-
-namespace Rok.ViewModels.Artists.Services;
+﻿namespace Rok.ViewModels.Artists.Services;
 
 public class ArtistsStateManager(IAppOptions appOptions) : ViewStateManager(appOptions)
 {

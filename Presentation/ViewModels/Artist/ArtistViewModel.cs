@@ -5,13 +5,12 @@ using Rok.Application.Features.Artists.Services;
 using Rok.Application.Features.Playlists.PlaylistMenu;
 using Rok.Application.Randomizer;
 using Rok.Infrastructure.Translate;
-using Rok.Logic.ViewModels.Albums;
-using Rok.Logic.ViewModels.Tracks;
-using Rok.Services;
 using Rok.Services.Player;
+using Rok.ViewModels.Album;
 using Rok.ViewModels.Artist.Services;
+using Rok.ViewModels.Track;
 
-namespace Rok.Logic.ViewModels.Artists;
+namespace Rok.ViewModels.Artist;
 
 public partial class ArtistViewModel : ObservableObject
 {

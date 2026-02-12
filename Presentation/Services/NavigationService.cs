@@ -1,6 +1,11 @@
 ﻿using Microsoft.UI.Xaml.Controls;
 using Rok.Pages;
+using Rok.ViewModels.Album;
+using Rok.ViewModels.Artist;
+using Rok.ViewModels.Genre;
+using Rok.ViewModels.Playlist;
 using Rok.ViewModels.Search;
+using Rok.ViewModels.Track;
 
 namespace Rok.Services;
 

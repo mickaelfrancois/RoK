@@ -1,12 +1,11 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.UI.Dispatching;
-using Rok.Logic.ViewModels.Artists.Services;
-using Rok.ViewModels.Artists;
+using Rok.ViewModels.Artist;
 using Rok.ViewModels.Artists.Interfaces;
 using Rok.ViewModels.Artists.Services;
 
-namespace Rok.Logic.ViewModels.Artists;
+namespace Rok.ViewModels.Artists;
 
 public partial class ArtistsViewModel : ObservableObject, IDisposable
 {

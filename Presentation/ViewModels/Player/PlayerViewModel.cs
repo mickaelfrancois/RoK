@@ -4,15 +4,13 @@ using CommunityToolkit.Mvvm.Input;
 using Rok.Application.Dto.Lyrics;
 using Rok.Application.Features.Tracks.Command;
 using Rok.Application.Player;
-using Rok.Logic.ViewModels.Albums;
-using Rok.Logic.ViewModels.Artists;
-using Rok.Logic.ViewModels.Player.Services;
-using Rok.Logic.ViewModels.Tracks;
-using Rok.Services;
 using Rok.Services.Player;
+using Rok.ViewModels.Album;
+using Rok.ViewModels.Artist;
 using Rok.ViewModels.Player.Services;
+using Rok.ViewModels.Track;
 
-namespace Rok.Logic.ViewModels.Player;
+namespace Rok.ViewModels.Player;
 
 public partial class PlayerViewModel : ObservableObject, IDisposable
 {

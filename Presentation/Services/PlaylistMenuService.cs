@@ -6,7 +6,7 @@ using Rok.Application.Features.Tracks.Query;
 using Rok.Services.Player;
 
 
-namespace Rok.Logic.Services;
+namespace Rok.Services;
 
 public partial class PlaylistMenuService : IPlaylistMenuService, IDisposable
 {

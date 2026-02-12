@@ -5,11 +5,10 @@ using Rok.Application.Dto.Lyrics;
 using Rok.Application.Features.Playlists.PlaylistMenu;
 using Rok.Application.Features.Tracks.Services;
 using Rok.Infrastructure.Translate;
-using Rok.Services;
 using Rok.Services.Player;
 using Rok.ViewModels.Track.Services;
 
-namespace Rok.Logic.ViewModels.Tracks;
+namespace Rok.ViewModels.Track;
 
 public partial class TrackViewModel : ObservableObject, IDisposable
 {

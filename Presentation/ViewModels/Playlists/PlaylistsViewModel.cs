@@ -1,9 +1,10 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Rok.ViewModels.Playlist;
 using Rok.ViewModels.Playlists.Handlers;
 using Rok.ViewModels.Playlists.Services;
 
-namespace Rok.Logic.ViewModels.Playlists;
+namespace Rok.ViewModels.Playlists;
 
 public partial class PlaylistsViewModel : ObservableObject, IDisposable
 {

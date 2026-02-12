@@ -1,6 +1,4 @@
 ﻿using System.IO;
-using Rok.Application.Interfaces;
-using Rok.Services;
 using Windows.Storage;
 
 namespace Rok.ViewModels.Album.Services;

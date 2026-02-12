@@ -1,9 +1,9 @@
-﻿using Moq;
+﻿using System.Text.Json;
+using Moq;
 using Rok.Application.Interfaces;
 using Rok.Application.Options;
 using Rok.Infrastructure.Files;
 using Rok.Shared.Enums;
-using System.Text.Json;
 
 namespace Rok.Infrastructure.UnitTests.Files;
 

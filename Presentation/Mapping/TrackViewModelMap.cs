@@ -1,4 +1,4 @@
-﻿using Rok.Logic.ViewModels.Tracks;
+﻿using Rok.ViewModels.Track;
 using Rok.ViewModels.Tracks.Interfaces;
 
 namespace Rok.Mapping;

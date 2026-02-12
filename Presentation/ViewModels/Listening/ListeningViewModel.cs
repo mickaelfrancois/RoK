@@ -1,13 +1,11 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using Rok.Logic.ViewModels.Artists;
-using Rok.Logic.ViewModels.Listening.Services;
-using Rok.Logic.ViewModels.Tracks;
-using Rok.Services;
 using Rok.Services.Player;
+using Rok.ViewModels.Artist;
 using Rok.ViewModels.Listening.Services;
+using Rok.ViewModels.Track;
 
-namespace Rok.Logic.ViewModels.Listening;
+namespace Rok.ViewModels.Listening;
 
 public partial class ListeningViewModel : ObservableObject
 {

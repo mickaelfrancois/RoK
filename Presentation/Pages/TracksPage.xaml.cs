@@ -1,8 +1,8 @@
+using System.ComponentModel;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Navigation;
 using Rok.Commons;
-using Rok.Logic.ViewModels.Tracks;
-using System.ComponentModel;
+using Rok.ViewModels.Tracks;
 
 namespace Rok.Pages;
 
