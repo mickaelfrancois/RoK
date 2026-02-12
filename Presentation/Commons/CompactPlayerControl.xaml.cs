@@ -1,5 +1,5 @@
 using Microsoft.UI.Xaml.Controls;
-using Rok.Logic.ViewModels.Player;
+using Rok.ViewModels.Player;
 
 namespace Rok.Commons;
 

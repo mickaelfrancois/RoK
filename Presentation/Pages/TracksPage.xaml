@@ -6,7 +6,8 @@
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
       xmlns:common="using:Rok.Commons"
-      xmlns:tracks="using:Rok.Logic.ViewModels.Tracks"
+      xmlns:tracks="using:Rok.ViewModels.Track"
+      xmlns:tracks1="using:Rok.ViewModels.Tracks"
       x:Name="tracksView"
       mc:Ignorable="d">
 
@@ -255,7 +256,7 @@
                         <ListView.GroupStyle>
                             <GroupStyle HidesIfEmpty="True">
                                 <GroupStyle.HeaderTemplate>
-                                    <DataTemplate x:DataType="tracks:TracksGroupCategoryViewModel">
+                                    <DataTemplate x:DataType="tracks1:TracksGroupCategoryViewModel">
                                         <StackPanel Orientation="Horizontal"
                                                     Visibility="Visible">
                                             <HyperlinkButton Content="{x:Bind Title}"

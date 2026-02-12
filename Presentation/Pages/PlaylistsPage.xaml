@@ -5,7 +5,7 @@
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
       xmlns:common="using:Rok.Commons"
-      xmlns:a="using:Rok.Logic.ViewModels.Playlists"
+      xmlns:a="using:Rok.ViewModels.Playlist"
       mc:Ignorable="d"
       x:Name="playlistsView">
 

@@ -1,8 +1,8 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using System.Net.Http.Json;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Rok.Application.Interfaces;
 using Rok.Application.Options;
-using System.Net.Http.Json;
 using Windows.ApplicationModel;
 
 namespace Rok.Infrastructure.Telemetry;

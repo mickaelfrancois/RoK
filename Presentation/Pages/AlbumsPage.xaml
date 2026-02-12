@@ -6,9 +6,10 @@
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
       xmlns:common="using:Rok.Commons"
-      xmlns:albums="using:Rok.Logic.ViewModels.Albums"
+      xmlns:albums="using:Rok.ViewModels.Album"
       xmlns:genre="using:Rok.Application.Dto"
       xmlns:converters="using:Rok.Converters"
+      xmlns:albums1="using:Rok.ViewModels.Albums"
       x:Name="albumsView"
       mc:Ignorable="d">
 
@@ -320,7 +321,7 @@
                         <GridView.GroupStyle>
                             <GroupStyle HidesIfEmpty="True">
                                 <GroupStyle.HeaderTemplate>
-                                    <DataTemplate x:DataType="albums:AlbumsGroupCategoryViewModel">
+                                    <DataTemplate x:DataType="albums1:AlbumsGroupCategoryViewModel">
                                         <StackPanel Orientation="Horizontal">
                                             <HyperlinkButton Content="{x:Bind Title}"
                                                              Style="{StaticResource HyperlinkGroupButtonStyle}" />

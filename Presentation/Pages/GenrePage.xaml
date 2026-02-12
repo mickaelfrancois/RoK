@@ -6,9 +6,9 @@
     xmlns:local="using:Rok.Pages"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-      xmlns:common="using:Rok.Commons"
-      xmlns:albums="using:Rok.Logic.ViewModels.Albums"
-      mc:Ignorable="d"
+    xmlns:common="using:Rok.Commons"
+    xmlns:albums="using:Rok.ViewModels.Album"
+    mc:Ignorable="d"
     x:Name="genrePage"
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 

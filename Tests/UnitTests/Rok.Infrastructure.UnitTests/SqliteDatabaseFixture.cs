@@ -1,8 +1,8 @@
-﻿using Dapper;
+﻿using System.Data;
+using Dapper;
 using Microsoft.Data.Sqlite;
 using Microsoft.Extensions.Logging.Abstractions;
 using Rok.Infrastructure.Migration;
-using System.Data;
 
 namespace Rok.Infrastructure.UnitTests;
 

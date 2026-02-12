@@ -1,6 +1,6 @@
-﻿using Rok.Application.Dto;
+﻿using System.Timers;
+using Rok.Application.Dto;
 using Rok.Application.Interfaces;
-using System.Timers;
 using Windows.Media.Core;
 using Windows.Media.Playback;
 

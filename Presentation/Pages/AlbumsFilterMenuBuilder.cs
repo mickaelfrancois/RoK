@@ -1,6 +1,6 @@
 ﻿using Microsoft.UI.Xaml.Controls;
 using Microsoft.Windows.ApplicationModel.Resources;
-using Rok.Logic.ViewModels.Albums;
+using Rok.ViewModels.Albums;
 
 namespace Rok.Pages;
 

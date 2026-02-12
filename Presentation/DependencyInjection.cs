@@ -1,35 +1,40 @@
 ﻿using Microsoft.UI.Dispatching;
 using Rok.Application.Features.Playlists.PlaylistMenu;
-using Rok.Logic.Services.Player;
-using Rok.Logic.ViewModels.Album.Services;
-using Rok.Logic.ViewModels.Albums;
-using Rok.Logic.ViewModels.Albums.Handlers;
-using Rok.Logic.ViewModels.Albums.Interfaces;
-using Rok.Logic.ViewModels.Albums.Services;
-using Rok.Logic.ViewModels.Artist.Services;
-using Rok.Logic.ViewModels.Artists;
-using Rok.Logic.ViewModels.Artists.Handlers;
-using Rok.Logic.ViewModels.Artists.Interfaces;
-using Rok.Logic.ViewModels.Artists.Services;
-using Rok.Logic.ViewModels.Genre;
-using Rok.Logic.ViewModels.Genre.Services;
-using Rok.Logic.ViewModels.Listening;
-using Rok.Logic.ViewModels.Listening.Services;
-using Rok.Logic.ViewModels.Main;
-using Rok.Logic.ViewModels.Player;
-using Rok.Logic.ViewModels.Player.Services;
-using Rok.Logic.ViewModels.Playlist.Services;
-using Rok.Logic.ViewModels.Playlists;
-using Rok.Logic.ViewModels.Playlists.Handlers;
-using Rok.Logic.ViewModels.Playlists.Services;
-using Rok.Logic.ViewModels.Search;
-using Rok.Logic.ViewModels.Start;
-using Rok.Logic.ViewModels.Statistics;
-using Rok.Logic.ViewModels.Track.Services;
-using Rok.Logic.ViewModels.Tracks;
-using Rok.Logic.ViewModels.Tracks.Handlers;
-using Rok.Logic.ViewModels.Tracks.Interfaces;
-using Rok.Logic.ViewModels.Tracks.Services;
+using Rok.Services.Player;
+using Rok.ViewModels.Album;
+using Rok.ViewModels.Album.Services;
+using Rok.ViewModels.Albums;
+using Rok.ViewModels.Albums.Handlers;
+using Rok.ViewModels.Albums.Interfaces;
+using Rok.ViewModels.Albums.Services;
+using Rok.ViewModels.Artist;
+using Rok.ViewModels.Artist.Services;
+using Rok.ViewModels.Artists;
+using Rok.ViewModels.Artists.Handlers;
+using Rok.ViewModels.Artists.Interfaces;
+using Rok.ViewModels.Artists.Services;
+using Rok.ViewModels.Genre;
+using Rok.ViewModels.Genre.Services;
+using Rok.ViewModels.Listening;
+using Rok.ViewModels.Listening.Services;
+using Rok.ViewModels.Main;
+using Rok.ViewModels.Player;
+using Rok.ViewModels.Player.Services;
+using Rok.ViewModels.Playlist;
+using Rok.ViewModels.Playlist.Services;
+using Rok.ViewModels.Playlists;
+using Rok.ViewModels.Playlists.Handlers;
+using Rok.ViewModels.Playlists.Interfaces;
+using Rok.ViewModels.Playlists.Services;
+using Rok.ViewModels.Search;
+using Rok.ViewModels.Start;
+using Rok.ViewModels.Statistics;
+using Rok.ViewModels.Track;
+using Rok.ViewModels.Track.Services;
+using Rok.ViewModels.Tracks;
+using Rok.ViewModels.Tracks.Handlers;
+using Rok.ViewModels.Tracks.Interfaces;
+using Rok.ViewModels.Tracks.Services;
 
 namespace Rok;
 
@@ -59,6 +64,7 @@ public static class DependencyInjection
         services.AddTransient<IAlbumProvider, AlbumProvider>();
         services.AddTransient<IAlbumLibraryMonitor, AlbumLibraryMonitor>();
         services.AddTransient<AlbumsGroupCategory>();
+        services.AddTransient<IAlbumViewModelFactory, AlbumViewModelFactory>();
         services.AddTransient<AlbumsFilter>();
 
         services.AddKeyedTransient<AlbumsViewModel>("SearchAlbums", (sp, _) =>
@@ -98,6 +104,7 @@ public static class DependencyInjection
         services.AddTransient<IArtistProvider, ArtistProvider>();
         services.AddTransient<IArtistLibraryMonitor, ArtistLibraryMonitor>();
         services.AddTransient<ArtistsGroupCategory>();
+        services.AddTransient<IArtistViewModelFactory, ArtistViewModelFactory>();
         services.AddTransient<ArtistsFilter>();
 
         services.AddKeyedTransient<ArtistsViewModel>("SearchArtists", (sp, _) =>
@@ -132,6 +139,7 @@ public static class DependencyInjection
         services.AddTransient<TracksGroupCategory>();
         services.AddTransient<TracksFilter>();
         services.AddTransient<ITrackProvider, TrackProvider>();
+        services.AddTransient<ITrackViewModelFactory, TrackViewModelFactory>();
         services.AddTransient<ITrackLibraryMonitor, TrackLibraryMonitor>();
 
         services.AddKeyedTransient<TracksViewModel>("SearchTracks", (sp, _) =>
@@ -167,6 +175,7 @@ public static class DependencyInjection
         services.AddSingleton<PlaylistsDataLoader>();
         services.AddSingleton<PlaylistCreationService>();
         services.AddSingleton<PlaylistUpdateMessageHandler>();
+        services.AddTransient<IPlaylistViewModelFactory, PlaylistViewModelFactory>();
 
         // Playlist detail (for PlaylistViewModel - single playlist)
         services.AddTransient<PlaylistViewModel>();

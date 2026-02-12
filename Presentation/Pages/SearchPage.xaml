@@ -6,9 +6,9 @@
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
       xmlns:common="using:Rok.Commons"
-      xmlns:b="using:Rok.Logic.ViewModels.Albums"
-      xmlns:a="using:Rok.Logic.ViewModels.Artists"
-      xmlns:track="using:Rok.Logic.ViewModels.Tracks"
+      xmlns:b="using:Rok.ViewModels.Album"
+      xmlns:a="using:Rok.ViewModels.Artist"
+      xmlns:track="using:Rok.ViewModels.Track"
       mc:Ignorable="d">
 
     <Grid>

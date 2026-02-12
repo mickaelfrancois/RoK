@@ -1,7 +1,7 @@
-﻿using Microsoft.Extensions.Logging;
-using MiF.Guard;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.Runtime.CompilerServices;
+using Microsoft.Extensions.Logging;
+using MiF.Guard;
 
 namespace Rok.Shared;
 

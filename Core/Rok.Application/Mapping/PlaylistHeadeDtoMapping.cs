@@ -1,5 +1,5 @@
-﻿using Rok.Application.Features.Playlists.Command;
-using System.Text.Json;
+﻿using System.Text.Json;
+using Rok.Application.Features.Playlists.Command;
 
 namespace Rok.Application.Mapping;
 
