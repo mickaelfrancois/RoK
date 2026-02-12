@@ -2,10 +2,11 @@
 using Rok.Application.Features.Genres.Query;
 using Rok.Application.Features.Tracks.Query;
 using Rok.Logic.ViewModels.Albums;
+using Rok.Logic.ViewModels.Albums.Interfaces;
 
 namespace Rok.Logic.ViewModels.Genre.Services;
 
-public class GenreDataLoader(IMediator mediator, ILogger<GenreDataLoader> logger)
+public class GenreDataLoader(IMediator mediator, IAlbumViewModelFactory albumViewModelFactory, ILogger<GenreDataLoader> logger)
 {
     public async Task<GenreDto?> LoadGenreAsync(long genreId)
     {
@@ -21,7 +22,7 @@ public class GenreDataLoader(IMediator mediator, ILogger<GenreDataLoader> logger
     public async Task<List<AlbumViewModel>> LoadAlbumsAsync(long genreId)
     {
         IEnumerable<AlbumDto> albums = await mediator.SendMessageAsync(new GetAlbumsByGenreIdQuery(genreId));
-        return AlbumViewModelMap.CreateViewModels(albums.ToList());
+        return AlbumViewModelMap.CreateViewModels(albums.ToList(), albumViewModelFactory);
     }
 
 

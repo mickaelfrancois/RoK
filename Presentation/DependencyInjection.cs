@@ -21,6 +21,7 @@ using Rok.Logic.ViewModels.Player.Services;
 using Rok.Logic.ViewModels.Playlist.Services;
 using Rok.Logic.ViewModels.Playlists;
 using Rok.Logic.ViewModels.Playlists.Handlers;
+using Rok.Logic.ViewModels.Playlists.Interfaces;
 using Rok.Logic.ViewModels.Playlists.Services;
 using Rok.Logic.ViewModels.Search;
 using Rok.Logic.ViewModels.Start;
@@ -59,6 +60,7 @@ public static class DependencyInjection
         services.AddTransient<IAlbumProvider, AlbumProvider>();
         services.AddTransient<IAlbumLibraryMonitor, AlbumLibraryMonitor>();
         services.AddTransient<AlbumsGroupCategory>();
+        services.AddTransient<IAlbumViewModelFactory, AlbumViewModelFactory>();
         services.AddTransient<AlbumsFilter>();
 
         services.AddKeyedTransient<AlbumsViewModel>("SearchAlbums", (sp, _) =>
@@ -98,6 +100,7 @@ public static class DependencyInjection
         services.AddTransient<IArtistProvider, ArtistProvider>();
         services.AddTransient<IArtistLibraryMonitor, ArtistLibraryMonitor>();
         services.AddTransient<ArtistsGroupCategory>();
+        services.AddTransient<IArtistViewModelFactory, ArtistViewModelFactory>();
         services.AddTransient<ArtistsFilter>();
 
         services.AddKeyedTransient<ArtistsViewModel>("SearchArtists", (sp, _) =>
@@ -132,6 +135,7 @@ public static class DependencyInjection
         services.AddTransient<TracksGroupCategory>();
         services.AddTransient<TracksFilter>();
         services.AddTransient<ITrackProvider, TrackProvider>();
+        services.AddTransient<ITrackViewModelFactory, TrackViewModelFactory>();
         services.AddTransient<ITrackLibraryMonitor, TrackLibraryMonitor>();
 
         services.AddKeyedTransient<TracksViewModel>("SearchTracks", (sp, _) =>
@@ -167,6 +171,7 @@ public static class DependencyInjection
         services.AddSingleton<PlaylistsDataLoader>();
         services.AddSingleton<PlaylistCreationService>();
         services.AddSingleton<PlaylistUpdateMessageHandler>();
+        services.AddTransient<IPlaylistViewModelFactory, PlaylistViewModelFactory>();
 
         // Playlist detail (for PlaylistViewModel - single playlist)
         services.AddTransient<PlaylistViewModel>();

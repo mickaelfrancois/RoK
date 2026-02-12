@@ -1,8 +1,9 @@
 ﻿using Rok.Application.Features.Playlists.Query;
+using Rok.Logic.ViewModels.Playlists.Interfaces;
 
 namespace Rok.Logic.ViewModels.Playlists.Services;
 
-public class PlaylistsDataLoader(IMediator mediator, ILogger<PlaylistsDataLoader> logger)
+public class PlaylistsDataLoader(IMediator mediator, IPlaylistViewModelFactory playlistViewModelFactory, ILogger<PlaylistsDataLoader> logger)
 {
     public List<PlaylistViewModel> ViewModels { get; private set; } = [];
 
@@ -30,7 +31,7 @@ public class PlaylistsDataLoader(IMediator mediator, ILogger<PlaylistsDataLoader
 
     public void AddPlaylist(PlaylistHeaderDto playlistDto)
     {
-        PlaylistViewModel viewModel = App.ServiceProvider.GetRequiredService<PlaylistViewModel>();
+        PlaylistViewModel viewModel = playlistViewModelFactory.Create();
         viewModel.SetData(playlistDto);
         ViewModels.Add(viewModel);
     }
@@ -63,14 +64,14 @@ public class PlaylistsDataLoader(IMediator mediator, ILogger<PlaylistsDataLoader
         ViewModels.Clear();
     }
 
-    private static List<PlaylistViewModel> CreatePlaylistsViewModels(IEnumerable<PlaylistHeaderDto> playlists)
+    private List<PlaylistViewModel> CreatePlaylistsViewModels(IEnumerable<PlaylistHeaderDto> playlists)
     {
         int capacity = playlists.Count();
         List<PlaylistViewModel> playlistViewModels = new(capacity);
 
         foreach (PlaylistHeaderDto playlist in playlists)
         {
-            PlaylistViewModel playlistViewModel = App.ServiceProvider.GetRequiredService<PlaylistViewModel>();
+            PlaylistViewModel playlistViewModel = playlistViewModelFactory.Create();
             playlistViewModel.SetData(playlist);
             playlistViewModels.Add(playlistViewModel);
         }

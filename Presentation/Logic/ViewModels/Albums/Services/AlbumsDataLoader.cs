@@ -1,10 +1,11 @@
 ﻿using Rok.Application.Features.Albums.Query;
 using Rok.Application.Features.Genres.Query;
 using Rok.Application.Features.Tags.Query;
+using Rok.Logic.ViewModels.Albums.Interfaces;
 
 namespace Rok.Logic.ViewModels.Albums.Services;
 
-public class AlbumsDataLoader(IMediator mediator, ILogger<AlbumsDataLoader> logger)
+public class AlbumsDataLoader(IMediator mediator, IAlbumViewModelFactory albumViewModelFactory, ILogger<AlbumsDataLoader> logger)
 {
     public List<AlbumViewModel> ViewModels { get; private set; } = [];
 
@@ -60,7 +61,7 @@ public class AlbumsDataLoader(IMediator mediator, ILogger<AlbumsDataLoader> logg
 
     public void AddAlbum(AlbumDto albumDto)
     {
-        AlbumViewModel viewModel = App.ServiceProvider.GetRequiredService<AlbumViewModel>();
+        AlbumViewModel viewModel = albumViewModelFactory.Create();
         viewModel.SetData(albumDto);
         ViewModels.Add(viewModel);
     }
@@ -90,14 +91,14 @@ public class AlbumsDataLoader(IMediator mediator, ILogger<AlbumsDataLoader> logg
         Genres.Clear();
     }
 
-    private static List<AlbumViewModel> CreateAlbumsViewModels(IEnumerable<AlbumDto> albums)
+    private List<AlbumViewModel> CreateAlbumsViewModels(IEnumerable<AlbumDto> albums)
     {
         int capacity = albums.Count();
         List<AlbumViewModel> albumViewModels = new(capacity);
 
         foreach (AlbumDto album in albums)
         {
-            AlbumViewModel albumViewModel = App.ServiceProvider.GetRequiredService<AlbumViewModel>();
+            AlbumViewModel albumViewModel = albumViewModelFactory.Create();
             albumViewModel.SetData(album);
             albumViewModels.Add(albumViewModel);
         }

@@ -1,10 +1,12 @@
 ﻿using Rok.Application.Features.Tracks.Query;
 using Rok.Logic.ViewModels.Artists;
+using Rok.Logic.ViewModels.Artists.Interfaces;
 using Rok.Logic.ViewModels.Tracks;
+using Rok.Logic.ViewModels.Tracks.Services;
 
 namespace Rok.Logic.ViewModels.Listening.Services;
 
-public class ListeningDataLoader(IMediator mediator, ILogger<ListeningDataLoader> logger)
+public class ListeningDataLoader(IMediator mediator, IArtistViewModelFactory artistViewModelFactory, TrackViewModelFactory trackViewModelFactory, ILogger<ListeningDataLoader> logger)
 {
     public List<TrackViewModel> CreateTracksViewModels(List<TrackDto> tracks)
     {
@@ -12,7 +14,7 @@ public class ListeningDataLoader(IMediator mediator, ILogger<ListeningDataLoader
 
         foreach (TrackDto track in tracks)
         {
-            TrackViewModel trackViewModel = App.ServiceProvider.GetRequiredService<TrackViewModel>();
+            TrackViewModel trackViewModel = trackViewModelFactory.Create();
             trackViewModel.SetData(track);
             list.Add(trackViewModel);
         }
@@ -24,7 +26,7 @@ public class ListeningDataLoader(IMediator mediator, ILogger<ListeningDataLoader
     {
         try
         {
-            ArtistViewModel artist = App.ServiceProvider.GetRequiredService<ArtistViewModel>();
+            ArtistViewModel artist = artistViewModelFactory.Create();
             await artist.LoadDataAsync(artistId, loadAlbums: false, loadTracks: false, fetchApi: false);
             return artist;
         }

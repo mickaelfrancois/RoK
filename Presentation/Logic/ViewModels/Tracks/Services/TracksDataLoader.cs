@@ -1,9 +1,10 @@
 ﻿using Rok.Application.Features.Genres.Query;
 using Rok.Application.Features.Tracks.Query;
+using Rok.Logic.ViewModels.Tracks.Interfaces;
 
 namespace Rok.Logic.ViewModels.Tracks.Services;
 
-public class TracksDataLoader(IMediator mediator, ILogger<TracksDataLoader> logger)
+public class TracksDataLoader(IMediator mediator, ITrackViewModelFactory trackViewModelFactory, ILogger<TracksDataLoader> logger)
 {
     public List<TrackViewModel> ViewModels { get; private set; } = [];
 
@@ -14,7 +15,7 @@ public class TracksDataLoader(IMediator mediator, ILogger<TracksDataLoader> logg
         using (PerfLogger perfLogger = new PerfLogger(logger).Parameters("Tracks loaded"))
         {
             IEnumerable<TrackDto> tracks = await mediator.SendMessageAsync(new GetAllTracksQuery());
-            ViewModels = TrackViewModelMap.CreateViewModels(tracks);
+            ViewModels = TrackViewModelMap.CreateViewModels(tracks, trackViewModelFactory);
         }
     }
 
@@ -28,7 +29,7 @@ public class TracksDataLoader(IMediator mediator, ILogger<TracksDataLoader> logg
     {
         using (PerfLogger perfLogger = new PerfLogger(logger).Parameters("Tracks loaded"))
         {
-            ViewModels = TrackViewModelMap.CreateViewModels(tracks);
+            ViewModels = TrackViewModelMap.CreateViewModels(tracks, trackViewModelFactory);
         }
     }
 

@@ -1,10 +1,11 @@
 ﻿using Rok.Application.Features.Playlists.Query;
 using Rok.Application.Features.Tracks.Query;
 using Rok.Logic.ViewModels.Tracks;
+using Rok.Logic.ViewModels.Tracks.Interfaces;
 
 namespace Rok.Logic.ViewModels.Playlist.Services;
 
-public class PlaylistDataLoader(IMediator mediator, ILogger<PlaylistDataLoader> logger)
+public class PlaylistDataLoader(IMediator mediator, ITrackViewModelFactory trackViewModelFactory, ILogger<PlaylistDataLoader> logger)
 {
     public async Task<PlaylistHeaderDto?> LoadPlaylistAsync(long playlistId)
     {
@@ -20,6 +21,6 @@ public class PlaylistDataLoader(IMediator mediator, ILogger<PlaylistDataLoader> 
     public async Task<List<TrackViewModel>> LoadTracksAsync(long playlistId)
     {
         IEnumerable<TrackDto> tracks = await mediator.SendMessageAsync(new GetTracksByPlaylistIdQuery(playlistId));
-        return TrackViewModelMap.CreateViewModels(tracks);
+        return TrackViewModelMap.CreateViewModels(tracks, trackViewModelFactory);
     }
 }

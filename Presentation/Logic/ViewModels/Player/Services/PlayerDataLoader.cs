@@ -1,11 +1,14 @@
 using Rok.Application.Features.Albums.Query;
 using Rok.Logic.ViewModels.Albums;
+using Rok.Logic.ViewModels.Albums.Interfaces;
 using Rok.Logic.ViewModels.Artists;
+using Rok.Logic.ViewModels.Artists.Interfaces;
 using Rok.Logic.ViewModels.Tracks;
+using Rok.Logic.ViewModels.Tracks.Interfaces;
 
 namespace Rok.Logic.ViewModels.Player.Services;
 
-public class PlayerDataLoader(IMediator mediator, ILogger<PlayerDataLoader> logger)
+public class PlayerDataLoader(IMediator mediator, IArtistViewModelFactory artistViewModelFactory, IAlbumViewModelFactory albumViewModelFactory, ITrackViewModelFactory trackViewModelFactory, ILogger<PlayerDataLoader> logger)
 {
     public async Task<AlbumViewModel?> GetAlbumByIdAsync(long albumId)
     {
@@ -16,7 +19,7 @@ public class PlayerDataLoader(IMediator mediator, ILogger<PlayerDataLoader> logg
             return null;
         }
 
-        AlbumViewModel albumViewModel = App.ServiceProvider.GetRequiredService<AlbumViewModel>();
+        AlbumViewModel albumViewModel = albumViewModelFactory.Create();
         albumViewModel.SetData(albumResult.Value!);
 
         return albumViewModel;
@@ -31,7 +34,7 @@ public class PlayerDataLoader(IMediator mediator, ILogger<PlayerDataLoader> logg
             return null;
         }
 
-        ArtistViewModel artistViewModel = App.ServiceProvider.GetRequiredService<ArtistViewModel>();
+        ArtistViewModel artistViewModel = artistViewModelFactory.Create();
         artistViewModel.SetData(artistResult.Value!);
 
         return artistViewModel;
@@ -39,7 +42,7 @@ public class PlayerDataLoader(IMediator mediator, ILogger<PlayerDataLoader> logg
 
     public TrackViewModel CreateTrackViewModel(TrackDto track)
     {
-        TrackViewModel trackViewModel = App.ServiceProvider.GetRequiredService<TrackViewModel>();
+        TrackViewModel trackViewModel = trackViewModelFactory.Create();
         trackViewModel.SetData(track);
         return trackViewModel;
     }

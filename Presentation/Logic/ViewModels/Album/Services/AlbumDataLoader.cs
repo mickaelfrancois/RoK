@@ -1,10 +1,11 @@
 ﻿using Rok.Application.Features.Albums.Query;
 using Rok.Application.Features.Tracks.Query;
 using Rok.Logic.ViewModels.Tracks;
+using Rok.Logic.ViewModels.Tracks.Interfaces;
 
 namespace Rok.Logic.ViewModels.Album.Services;
 
-public class AlbumDataLoader(IMediator mediator, ILogger<AlbumDataLoader> logger)
+public class AlbumDataLoader(IMediator mediator, ITrackViewModelFactory trackViewModelFactory, ILogger<AlbumDataLoader> logger)
 {
     public async Task<AlbumDto?> LoadAlbumAsync(long albumId)
     {
@@ -20,7 +21,7 @@ public class AlbumDataLoader(IMediator mediator, ILogger<AlbumDataLoader> logger
     public async Task<List<TrackViewModel>> LoadTracksAsync(long albumId)
     {
         IEnumerable<TrackDto> tracks = await mediator.SendMessageAsync(new GetTracksByAlbumIdQuery(albumId));
-        return TrackViewModelMap.CreateViewModels(tracks.ToList());
+        return TrackViewModelMap.CreateViewModels(tracks.ToList(), trackViewModelFactory);
     }
 
     public async Task<AlbumDto?> ReloadAlbumAsync(long albumId)

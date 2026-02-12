@@ -1,11 +1,13 @@
 ﻿using Rok.Application.Features.Albums.Query;
 using Rok.Application.Features.Tracks.Query;
 using Rok.Logic.ViewModels.Albums;
+using Rok.Logic.ViewModels.Albums.Interfaces;
 using Rok.Logic.ViewModels.Tracks;
+using Rok.Logic.ViewModels.Tracks.Interfaces;
 
 namespace Rok.Logic.ViewModels.Artist.Services;
 
-public class ArtistDataLoader(IMediator mediator, ILogger<ArtistDataLoader> logger)
+public class ArtistDataLoader(IMediator mediator, IAlbumViewModelFactory albumViewModelFactory, ITrackViewModelFactory trackViewModelFactory, ILogger<ArtistDataLoader> logger)
 {
     public async Task<ArtistDto?> LoadArtistAsync(long artistId)
     {
@@ -21,13 +23,13 @@ public class ArtistDataLoader(IMediator mediator, ILogger<ArtistDataLoader> logg
     public async Task<List<AlbumViewModel>> LoadAlbumsAsync(long artistId)
     {
         IEnumerable<AlbumDto> albums = await mediator.SendMessageAsync(new GetAlbumsByArtistIdQuery(artistId));
-        return AlbumViewModelMap.CreateViewModels(albums.ToList());
+        return AlbumViewModelMap.CreateViewModels(albums.ToList(), albumViewModelFactory);
     }
 
     public async Task<List<TrackViewModel>> LoadTracksAsync(long artistId)
     {
         IEnumerable<TrackDto> tracks = await mediator.SendMessageAsync(new GetTracksByArtistIdQuery(artistId));
-        return TrackViewModelMap.CreateViewModels(tracks.ToList());
+        return TrackViewModelMap.CreateViewModels(tracks.ToList(), trackViewModelFactory);
     }
 
     public async Task<ArtistDto?> ReloadArtistAsync(long artistId)

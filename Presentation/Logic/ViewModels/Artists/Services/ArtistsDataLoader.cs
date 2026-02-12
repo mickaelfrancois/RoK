@@ -1,8 +1,9 @@
 ﻿using Rok.Application.Features.Genres.Query;
+using Rok.Logic.ViewModels.Artists.Interfaces;
 
 namespace Rok.Logic.ViewModels.Artists.Services;
 
-public class ArtistsDataLoader(IMediator mediator, ILogger<ArtistsDataLoader> logger)
+public class ArtistsDataLoader(IMediator mediator, IArtistViewModelFactory artistViewModelFactory, ILogger<ArtistsDataLoader> logger)
 {
     public List<ArtistViewModel> ViewModels { get; private set; } = [];
 
@@ -47,7 +48,7 @@ public class ArtistsDataLoader(IMediator mediator, ILogger<ArtistsDataLoader> lo
 
     public void AddArtist(ArtistDto artistDto)
     {
-        ArtistViewModel viewModel = App.ServiceProvider.GetRequiredService<ArtistViewModel>();
+        ArtistViewModel viewModel = artistViewModelFactory.Create();
         viewModel.SetData(artistDto);
         ViewModels.Add(viewModel);
     }
@@ -91,16 +92,16 @@ public class ArtistsDataLoader(IMediator mediator, ILogger<ArtistsDataLoader> lo
         Genres.Clear();
     }
 
-    private static List<ArtistViewModel> CreateArtistsViewModels(IEnumerable<ArtistDto> artists)
+    private List<ArtistViewModel> CreateArtistsViewModels(IEnumerable<ArtistDto> artists)
     {
         int capacity = artists.Count();
         List<ArtistViewModel> artistViewModels = new(capacity);
 
         foreach (ArtistDto artist in artists)
         {
-            ArtistViewModel artistViewModel = App.ServiceProvider.GetRequiredService<ArtistViewModel>();
-            artistViewModel.SetData(artist);
-            artistViewModels.Add(artistViewModel);
+            ArtistViewModel viewModel = artistViewModelFactory.Create();
+            viewModel.SetData(artist);
+            artistViewModels.Add(viewModel);
         }
 
         return artistViewModels;
