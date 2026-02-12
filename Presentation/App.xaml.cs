@@ -3,6 +3,7 @@ using Microsoft.Extensions.Configuration;
 using Rok.Application.Options;
 using Rok.Import;
 using Rok.Infrastructure;
+using Rok.Services;
 using Serilog;
 using Windows.Storage;
 using Windows.Storage.AccessCache;

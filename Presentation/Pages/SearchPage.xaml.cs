@@ -2,8 +2,8 @@ using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Navigation;
 using Rok.Logic.ViewModels.Albums;
 using Rok.Logic.ViewModels.Artists;
-using Rok.Logic.ViewModels.Search;
 using Rok.Logic.ViewModels.Tracks;
+using Rok.ViewModels.Search;
 
 
 namespace Rok.Pages;
