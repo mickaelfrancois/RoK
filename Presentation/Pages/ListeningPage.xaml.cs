@@ -1,5 +1,6 @@
 using Microsoft.UI.Xaml.Controls;
 using Rok.ViewModels.Listening;
+using Rok.ViewModels.Track;
 
 
 namespace Rok.Pages;
@@ -15,6 +16,14 @@ public sealed partial class ListeningPage : Page, IDisposable
 
         ViewModel = App.ServiceProvider.GetRequiredService<ListeningViewModel>();
         DataContext = ViewModel;
+    }
+
+    private void ListeningPage_Loaded(object sender, RoutedEventArgs e)
+    {
+        TrackViewModel? listeningTrack = ViewModel.Tracks.FirstOrDefault(track => track.Listening);
+
+        if (listeningTrack != null)
+            tracksList.ScrollIntoView(listeningTrack, ScrollIntoViewAlignment.Leading);
     }
 
 
