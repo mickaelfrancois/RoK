@@ -3,7 +3,7 @@ using Rok.ViewModels.Artists.Interfaces;
 
 namespace Rok.ViewModels.Artists.Services;
 
-public class ArtistProvider(TagsProvider tagsLoader, ArtistsDataLoader dataLoader, ArtistsFilter filterService, ArtistsGroupCategory groupService)
+public class ArtistProvider(ArtistsDataLoader dataLoader, ArtistsFilter filterService, ArtistsGroupCategory groupService)
     : IArtistProvider
 {
     public List<ArtistViewModel> ViewModels => dataLoader.ViewModels;

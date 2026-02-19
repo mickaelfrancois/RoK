@@ -77,7 +77,7 @@ public partial class AlbumsViewModel : ObservableObject, IDisposable
     private void OnLibraryChanged(object? sender, EventArgs e)
     {
         _libraryUpdated = true;
-        _dispatcherQueue.TryEnqueue(() => FilterAndSort());
+        _dispatcherQueue.TryEnqueue(async () => await FilterAndSortAsync());
     }
 
 
@@ -101,14 +101,13 @@ public partial class AlbumsViewModel : ObservableObject, IDisposable
             LoadState();
 
         await _albumProvider.LoadAsync();
-
-        FilterAndSort();
+        await FilterAndSortAsync();
     }
 
-    public void SetData(List<AlbumDto> albums)
+    public async Task SetDataAsync(List<AlbumDto> albums)
     {
         _albumProvider.SetAlbums(albums);
-        FilterAndSort();
+        await FilterAndSortAsync();
     }
 
     private void SetFilterLabel()
@@ -156,7 +155,7 @@ public partial class AlbumsViewModel : ObservableObject, IDisposable
     }
 
     [RelayCommand]
-    private void FilterBy(string filterBy)
+    private async Task FilterByAsync(string filterBy)
     {
         if (string.IsNullOrEmpty(filterBy))
         {
@@ -170,11 +169,11 @@ public partial class AlbumsViewModel : ObservableObject, IDisposable
             _stateManager.SelectedFilters.Add(filterBy);
 
         SetFilterLabel();
-        FilterAndSort();
+        await FilterAndSortAsync();
     }
 
     [RelayCommand]
-    private void FilterByGenre(long? id)
+    private async Task FilterByGenreAsync(long? id)
     {
         if (id == null)
             _stateManager.SelectedGenreFilters.Clear();
@@ -184,11 +183,11 @@ public partial class AlbumsViewModel : ObservableObject, IDisposable
             _stateManager.SelectedGenreFilters.Add(id.Value);
 
         SetFilterLabel();
-        FilterAndSort();
+        await FilterAndSortAsync();
     }
 
     [RelayCommand]
-    private void FilterByTag(string tag)
+    private async Task FilterByTagAsync(string tag)
     {
         if (string.IsNullOrEmpty(tag))
             _stateManager.SelectedTagFilters.Clear();
@@ -198,20 +197,22 @@ public partial class AlbumsViewModel : ObservableObject, IDisposable
             _stateManager.SelectedTagFilters.Add(tag);
 
         SetFilterLabel();
-        FilterAndSort();
+        await FilterAndSortAsync();
     }
 
     [RelayCommand]
-    private void GroupBy(string groupBy)
+    private async Task GroupByAsync(string groupBy)
     {
         SelectedGroupBy = groupBy;
-        FilterAndSort();
+        await FilterAndSortAsync();
     }
 
     [RelayCommand]
-    private void FilterAndSort()
+    private async Task FilterAndSortAsync()
     {
-        AlbumProviderResult result = _albumProvider.GetProcessedData(_stateManager.GroupBy, _stateManager.SelectedFilters, _stateManager.SelectedGenreFilters, _stateManager.SelectedTagFilters);
+        AlbumProviderResult result = await Task.Run(() =>
+            _albumProvider.GetProcessedData(_stateManager.GroupBy, _stateManager.SelectedFilters, _stateManager.SelectedGenreFilters, _stateManager.SelectedTagFilters)
+        );
 
         _filteredAlbums = result.FilteredItems;
         GroupedItems.InitWithAddRange(result.Groups);

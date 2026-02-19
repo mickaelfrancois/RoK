@@ -37,7 +37,7 @@ public sealed partial class SearchPage : Page
         TracksViewModel = App.ServiceProvider.GetRequiredKeyedService<TracksViewModel>("SearchTracks");
     }
 
-    protected override void OnNavigatedTo(NavigationEventArgs e)
+    protected override async void OnNavigatedTo(NavigationEventArgs e)
     {
         SearchOpenArgs openArgs = e.Parameter as SearchOpenArgs ?? new SearchOpenArgs();
 
@@ -45,9 +45,9 @@ public sealed partial class SearchPage : Page
         ArtistCount = openArgs.SearchResult.Artists.Count;
         AlbumCount = openArgs.SearchResult.Albums.Count;
 
-        ArtistsViewModel.SetData(openArgs.SearchResult.Artists);
-        AlbumsViewModel.SetData(openArgs.SearchResult.Albums);
-        TracksViewModel.SetData(openArgs.SearchResult.Tracks);
+        await ArtistsViewModel.SetDataAsync(openArgs.SearchResult.Artists);
+        await AlbumsViewModel.SetDataAsync(openArgs.SearchResult.Albums);
+        await TracksViewModel.SetDataAsync(openArgs.SearchResult.Tracks);
     }
 
     private void grid_ContainerContentChanging(ListViewBase sender, ContainerContentChangingEventArgs args)

@@ -3,7 +3,7 @@ using Rok.ViewModels.Albums.Interfaces;
 
 namespace Rok.ViewModels.Albums.Services;
 
-public class AlbumProvider(TagsProvider tagsLoader, AlbumsDataLoader dataLoader, AlbumsFilter filterService, AlbumsGroupCategory groupService)
+public class AlbumProvider(AlbumsDataLoader dataLoader, AlbumsFilter filterService, AlbumsGroupCategory groupService)
     : IAlbumProvider
 {
     public List<AlbumViewModel> ViewModels => dataLoader.ViewModels;

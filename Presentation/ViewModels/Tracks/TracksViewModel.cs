@@ -65,7 +65,7 @@ public partial class TracksViewModel : ObservableObject, IDisposable
     private void OnLibraryChanged(object? sender, EventArgs e)
     {
         _libraryUpdated = true;
-        _dispatcherQueue.TryEnqueue(() => FilterAndSort());
+        _dispatcherQueue.TryEnqueue(async () => await FilterAndSortAsync());
     }
 
 
@@ -85,14 +85,13 @@ public partial class TracksViewModel : ObservableObject, IDisposable
             LoadState();
 
         await _trackProvider.LoadAsync();
-
-        FilterAndSort();
+        await FilterAndSortAsync();
     }
 
-    public void SetData(List<TrackDto> tracks)
+    public async Task SetDataAsync(List<TrackDto> tracks)
     {
         _trackProvider.SetTracks(tracks);
-        FilterAndSort();
+        await FilterAndSortAsync();
     }
 
     private void SetFilterLabel()
@@ -128,7 +127,7 @@ public partial class TracksViewModel : ObservableObject, IDisposable
 
 
     [RelayCommand]
-    private void FilterBy(string filterBy)
+    private async Task FilterByAsync(string filterBy)
     {
         if (string.IsNullOrEmpty(filterBy))
         {
@@ -141,11 +140,11 @@ public partial class TracksViewModel : ObservableObject, IDisposable
             _stateManager.SelectedFilters.Add(filterBy);
 
         SetFilterLabel();
-        FilterAndSort();
+        await FilterAndSortAsync();
     }
 
     [RelayCommand]
-    private void FilterByGenre(long? id)
+    private async Task FilterByGenreAsync(long? id)
     {
         if (id == null)
             _stateManager.SelectedGenreFilters.Clear();
@@ -155,20 +154,22 @@ public partial class TracksViewModel : ObservableObject, IDisposable
             _stateManager.SelectedGenreFilters.Add(id.Value);
 
         SetFilterLabel();
-        FilterAndSort();
+        await FilterAndSortAsync();
     }
 
     [RelayCommand]
-    private void GroupBy(string groupBy)
+    private async Task GroupByAsync(string groupBy)
     {
         SelectedGroupBy = groupBy;
-        FilterAndSort();
+        await FilterAndSortAsync();
     }
 
     [RelayCommand]
-    private void FilterAndSort()
+    private async Task FilterAndSortAsync()
     {
-        TrackProviderResult result = _trackProvider.GetProcessedData(_stateManager.GroupBy, _stateManager.SelectedFilters, _stateManager.SelectedGenreFilters);
+        TrackProviderResult result = await Task.Run(() =>
+            _trackProvider.GetProcessedData(_stateManager.GroupBy, _stateManager.SelectedFilters, _stateManager.SelectedGenreFilters)
+        );
 
         _filteredTracks = result.FilteredItems;
         GroupedItems.InitWithAddRange(result.Groups);
