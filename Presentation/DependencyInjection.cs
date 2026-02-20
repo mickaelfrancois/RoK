@@ -1,6 +1,5 @@
 ﻿using Microsoft.UI.Dispatching;
 using Rok.Application.Features.Playlists.PlaylistMenu;
-using Rok.Services.Player;
 using Rok.ViewModels.Album;
 using Rok.ViewModels.Album.Services;
 using Rok.ViewModels.Albums;
@@ -44,7 +43,6 @@ public static class DependencyInjection
     {
         services.AddSingleton<ResourceLoader>((c) => ResourceLoader.GetForViewIndependentUse());
         services.AddSingleton<NavigationService>();
-        services.AddSingleton<IPlayerService, PlayerService>();
         services.AddSingleton<PlaylistsSeed>();
         services.AddSingleton<IDialogService, DialogService>();
         services.AddSingleton<IPlaylistMenuService, PlaylistMenuService>();

@@ -68,7 +68,7 @@ public static class DependencyInjection
         services.AddSingleton<ITranslateService, TranslateService>();
         services.AddSingleton<ILastFmClient, LastFmClient>();
         services.AddSingleton<ITelemetryClient, TelemetryClient>();
-        services.AddSingleton<DiscordRichPresenceService>();
+        services.AddSingleton<IDiscordRichPresenceService, DiscordRichPresenceService>();
 
         return services;
     }

@@ -7,6 +7,8 @@ using Rok.Application.Features.Playlists;
 using Rok.Application.Features.Tracks.Services;
 using Rok.Application.Interfaces;
 using Rok.Application.Options;
+using Rok.Application.Player;
+using Rok.Services.Player;
 
 namespace Rok.Application;
 
@@ -17,6 +19,8 @@ public static class DependencyInjection
         services.AddSingleton<IAppOptions, AppOptions>();
         services.AddScoped<IValidationService, ValidationService>();
         services.AddSingleton<IPlaylistService, PlaylistService>();
+        services.AddSingleton<IPlayerService, PlayerService>();
+
         services.AddTransient<TrackLyricsService>();
         services.AddTransient<AlbumApiService>();
         services.AddTransient<ArtistApiService>();

@@ -6,7 +6,7 @@ using Rok.Application.Options;
 
 namespace Rok.Infrastructure.Social;
 
-public class DiscordRichPresenceService : IDisposable
+public class DiscordRichPresenceService : IDisposable, IDiscordRichPresenceService
 {
     private readonly DiscordRpcClient? _client;
     private readonly ILogger<DiscordRichPresenceService> _logger;
