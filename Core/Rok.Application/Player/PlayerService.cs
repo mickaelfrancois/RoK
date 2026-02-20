@@ -1,14 +1,18 @@
-﻿using System.Threading;
-using Rok.Application.Player;
+﻿using Microsoft.Extensions.Logging;
+using MiF.Guard;
+using MiF.SimpleMessenger;
+using Rok.Application.Interfaces;
+using Rok.Application.Messages;
 using Rok.Infrastructure.Social;
+using Rok.Services.Player;
 
-namespace Rok.Services.Player;
+namespace Rok.Application.Player;
 
 public class PlayerService : IPlayerService
 {
     private EPlaybackState _playerState = EPlaybackState.Stopped;
 
-    private readonly DiscordRichPresenceService? _discordService;
+    private readonly IDiscordRichPresenceService? _discordService;
 
     private readonly IAppOptions _appOptions;
 
@@ -129,7 +133,7 @@ public class PlayerService : IPlayerService
     private readonly ILogger<PlayerService> _logger;
 
 
-    public PlayerService(IPlayerEngine player, IAppOptions appOptions, DiscordRichPresenceService? discordService, ILogger<PlayerService> logger)
+    public PlayerService(IPlayerEngine player, IAppOptions appOptions, IDiscordRichPresenceService? discordService, ILogger<PlayerService> logger)
     {
         _player = Guard.Against.Null(player, nameof(player));
         _appOptions = Guard.Against.Null(appOptions, nameof(appOptions));
