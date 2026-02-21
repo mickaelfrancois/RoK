@@ -1,5 +1,5 @@
-﻿using Rok.Application.Randomizer;
-using Rok.Services.Player;
+﻿using Rok.Application.Player;
+using Rok.Application.Randomizer;
 
 namespace Rok.ViewModels.Tracks.Services;
 
@@ -16,7 +16,7 @@ public class TracksPlaybackService(IPlayerService playerService, ILogger<TracksP
         List<TrackDto> trackList = tracks.ToList();
 
         if (trackList.Count > 1)
-            trackList = TracksRandomizer.Randomize(trackList);
+            TracksRandomizer.Randomize(trackList);
 
         playerService.LoadPlaylist(trackList);
     }

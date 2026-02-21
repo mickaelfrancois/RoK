@@ -1,6 +1,4 @@
-﻿using Rok.Application.Player;
-
-namespace Rok.Services.Player;
+﻿namespace Rok.Application.Player;
 
 public interface IPlayerService
 {
@@ -42,7 +40,7 @@ public interface IPlayerService
 
     void Previous();
 
-    void Start(TrackDto? startTrack = null, TimeSpan? startPosition = null);
+    void Start(TrackDto? startTrack = null);
 
     void Stop(bool firePlaybackStateChange);
 

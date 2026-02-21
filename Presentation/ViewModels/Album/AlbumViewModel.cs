@@ -3,8 +3,8 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Rok.Application.Features.Albums.Services;
 using Rok.Application.Features.Playlists.PlaylistMenu;
+using Rok.Application.Player;
 using Rok.Infrastructure.Translate;
-using Rok.Services.Player;
 using Rok.ViewModels.Album.Services;
 using Rok.ViewModels.Track;
 

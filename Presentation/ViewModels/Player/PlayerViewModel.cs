@@ -4,7 +4,6 @@ using CommunityToolkit.Mvvm.Input;
 using Rok.Application.Dto.Lyrics;
 using Rok.Application.Features.Tracks.Command;
 using Rok.Application.Player;
-using Rok.Services.Player;
 using Rok.ViewModels.Album;
 using Rok.ViewModels.Artist;
 using Rok.ViewModels.Player.Services;

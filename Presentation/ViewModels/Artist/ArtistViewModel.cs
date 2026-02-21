@@ -3,9 +3,9 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Rok.Application.Features.Artists.Services;
 using Rok.Application.Features.Playlists.PlaylistMenu;
+using Rok.Application.Player;
 using Rok.Application.Randomizer;
 using Rok.Infrastructure.Translate;
-using Rok.Services.Player;
 using Rok.ViewModels.Album;
 using Rok.ViewModels.Artist.Services;
 using Rok.ViewModels.Track;
@@ -384,7 +384,8 @@ public partial class ArtistViewModel : ObservableObject
 
         if (_tracks?.Any() == true)
         {
-            List<TrackDto> tracks = TracksRandomizer.Randomize(_tracks);
+            List<TrackDto> tracks = _tracks.ToList();
+            TracksRandomizer.Randomize(tracks);
             _playerService.LoadPlaylist(tracks);
         }
     }

@@ -3,8 +3,7 @@ using Rok.Application.Features.Playlists.Command;
 using Rok.Application.Features.Playlists.PlaylistMenu;
 using Rok.Application.Features.Playlists.Query;
 using Rok.Application.Features.Tracks.Query;
-using Rok.Services.Player;
-
+using Rok.Application.Player;
 
 namespace Rok.Services;
 
