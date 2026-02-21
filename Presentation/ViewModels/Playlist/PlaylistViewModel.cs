@@ -1,6 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using Rok.Services.Player;
+using Rok.Application.Player;
 using Rok.ViewModels.Playlist.Services;
 using Rok.ViewModels.Track;
 

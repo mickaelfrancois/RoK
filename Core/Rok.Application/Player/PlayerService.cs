@@ -3,6 +3,7 @@ using MiF.Guard;
 using MiF.SimpleMessenger;
 using Rok.Application.Interfaces;
 using Rok.Application.Messages;
+using Rok.Application.Randomizer;
 using Rok.Infrastructure.Social;
 using Rok.Services.Player;
 
@@ -218,7 +219,7 @@ public class PlayerService : IPlayerService
         _currentIndex = 0;
         _currentTrack = null;
 
-        Start(startTrack, null);
+        Start(startTrack);
 
         Messenger.Send(new PlaylistChanged(Playlist));
     }
@@ -249,12 +250,8 @@ public class PlayerService : IPlayerService
         List<TrackDto> itemsToInsert = new(tracks.Count);
         itemsToInsert.AddRange(tracks);
 
-        if (itemsToInsert.Count == 0)
-            return;
-
-        if (index == null) index = _currentIndex + 1;
-        if (index < 0) index = 0;
-        if (index > Playlist.Count) index = Playlist.Count;
+        index ??= _currentIndex + 1;
+        index = Math.Clamp(index.Value, 0, Playlist.Count);
 
         Playlist.InsertRange(index.Value, itemsToInsert);
 
@@ -262,7 +259,7 @@ public class PlayerService : IPlayerService
     }
 
 
-    public void Start(TrackDto? startTrack = null, TimeSpan? startPosition = null)
+    public void Start(TrackDto? startTrack = null)
     {
         if (startTrack == null)
             _currentIndex = 0;
@@ -270,9 +267,6 @@ public class PlayerService : IPlayerService
             _currentIndex = Playlist.FindIndex(c => c.Id == startTrack.Id);
 
         LoadFile(Playlist[_currentIndex]);
-
-        if (startPosition.HasValue)
-            Position = startPosition.Value.TotalSeconds;
 
         Play();
     }
@@ -333,8 +327,10 @@ public class PlayerService : IPlayerService
                 return;
             }
         }
+        else
+            _currentIndex++;
 
-        LoadFile(Playlist[++_currentIndex]);
+        LoadFile(Playlist[_currentIndex]);
         Play();
     }
 
@@ -345,74 +341,22 @@ public class PlayerService : IPlayerService
             if (IsLoopingEnabled)
                 _currentIndex = Playlist.Count - 1;
             else
+            {
+                PlaybackState = EPlaybackState.Stopped;
                 return;
+            }
         }
+        else
+            _currentIndex--;
 
-        LoadFile(Playlist[--_currentIndex]);
+        LoadFile(Playlist[_currentIndex]);
         Play();
     }
 
 
     public void ShuffleTracks()
     {
-        if (Playlist == null || Playlist.Count <= 1)
-            return;
-
-        if (_currentIndex < 0) _currentIndex = 0;
-        if (_currentIndex >= Playlist.Count) _currentIndex = Playlist.Count - 1;
-
-        int prefixCount = Math.Clamp(_currentIndex + 1, 0, Playlist.Count);
-
-        if (prefixCount >= Playlist.Count)
-            return;
-
-        List<List<TrackDto>> groupedByArtist = Playlist
-            .Skip(prefixCount)
-            .GroupBy(track => track.ArtistName)
-            .Select(group => group.ToList())
-            .ToList();
-
-        if (groupedByArtist.Count == 1)
-        {
-            List<TrackDto> singleArtistTracks = groupedByArtist[0];
-            Random rng = Random.Shared;
-            for (int i = singleArtistTracks.Count - 1; i > 0; i--)
-            {
-                int j = rng.Next(i + 1);
-                (singleArtistTracks[j], singleArtistTracks[i]) = (singleArtistTracks[i], singleArtistTracks[j]);
-            }
-
-            Playlist.RemoveRange(prefixCount, Playlist.Count - prefixCount);
-            Playlist.InsertRange(prefixCount, singleArtistTracks);
-            Messenger.Send(new PlaylistChanged(Playlist));
-            return;
-        }
-
-        Random random = Random.Shared;
-        groupedByArtist.ForEach(group =>
-        {
-            for (int i = group.Count - 1; i > 0; i--)
-            {
-                int j = random.Next(i + 1);
-                (group[j], group[i]) = (group[i], group[j]);
-            }
-        });
-
-        List<TrackDto> shuffledTracks = new();
-        while (groupedByArtist.Any(group => group.Count > 0))
-        {
-            for (int i = 0; i < groupedByArtist.Count; i++)
-            {
-                if (groupedByArtist[i].Count > 0)
-                {
-                    shuffledTracks.Add(groupedByArtist[i][0]);
-                    groupedByArtist[i].RemoveAt(0);
-                }
-            }
-        }
-
-        Playlist.RemoveRange(prefixCount, Playlist.Count - prefixCount);
-        Playlist.InsertRange(prefixCount, shuffledTracks);
+        TracksRandomizer.ArtistBalancedTrackRandomize(Playlist, _currentIndex);
 
         Messenger.Send(new PlaylistChanged(Playlist));
     }

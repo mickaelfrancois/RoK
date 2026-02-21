@@ -8,7 +8,6 @@ using Rok.Application.Features.Tracks.Services;
 using Rok.Application.Interfaces;
 using Rok.Application.Options;
 using Rok.Application.Player;
-using Rok.Services.Player;
 
 namespace Rok.Application;
 

@@ -1,7 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Rok.Application.Player;
 using Rok.Application.Randomizer;
-using Rok.Services.Player;
 using Rok.ViewModels.Album;
 using Rok.ViewModels.Artist.Services;
 using Rok.ViewModels.Genre.Services;
@@ -218,8 +218,9 @@ public partial class GenreViewModel : ObservableObject
 
         if (tracks?.Any() == true)
         {
-            List<TrackDto> randomizedTracks = TracksRandomizer.Randomize(tracks);
-            _playerService.LoadPlaylist(randomizedTracks);
+            List<TrackDto> shuffledTracks = tracks.ToList();
+            TracksRandomizer.Randomize(shuffledTracks);
+            _playerService.LoadPlaylist(shuffledTracks);
         }
     }
 

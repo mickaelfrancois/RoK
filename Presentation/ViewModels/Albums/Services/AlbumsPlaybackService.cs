@@ -1,6 +1,6 @@
 ﻿using Rok.Application.Features.Tracks.Query;
+using Rok.Application.Player;
 using Rok.Application.Randomizer;
-using Rok.Services.Player;
 
 namespace Rok.ViewModels.Albums.Services;
 
@@ -14,12 +14,12 @@ public class AlbumsPlaybackService(IMediator mediator, IPlayerService playerServ
             return;
         }
 
-        IEnumerable<TrackDto> tracks = await mediator
-            .SendMessageAsync(new GetTracksByAlbumListQuery { AlbumsId = albumIds.ToList() });
+        List<TrackDto> tracks = (await mediator.SendMessageAsync(new GetTracksByAlbumListQuery { AlbumsId = albumIds.ToList() })).ToList();
 
-        tracks = albumIds.Count() == 1
-            ? TracksRandomizer.Randomize(tracks)
-            : ArtistBalancedTrackRandomizer.Randomize(tracks);
+        if (albumIds.Count() == 1)
+            TracksRandomizer.Randomize(tracks);
+        else
+            TracksRandomizer.ArtistBalancedTrackRandomize(tracks, 0);
 
         playerService.LoadPlaylist(tracks.ToList());
     }
