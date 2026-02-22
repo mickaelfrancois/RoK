@@ -133,6 +133,9 @@ public sealed partial class AlbumsPage : Page, IDisposable
         {
             Storyboard? showArtistStoryboard = gridItem.Resources["ShowArtistNameStoryboard"] as Storyboard;
             showArtistStoryboard?.Begin();
+
+            Storyboard? showFavoriteButtonStoryboard = gridItem.Resources["ShowFavoriteButtonStoryboard"] as Storyboard;
+            showFavoriteButtonStoryboard?.Begin();
         }
     }
 
@@ -144,6 +147,9 @@ public sealed partial class AlbumsPage : Page, IDisposable
         {
             Storyboard? showSubTitleStoryboard = gridItem.Resources["ShowSubTitleStoryboard"] as Storyboard;
             showSubTitleStoryboard?.Begin();
+
+            Storyboard? hideFavoriteButtonStoryboard = gridItem.Resources["HideFavoriteButtonStoryboard"] as Storyboard;
+            hideFavoriteButtonStoryboard?.Begin();
         }
     }
 

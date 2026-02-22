@@ -1,6 +1,8 @@
 using System.ComponentModel;
 using System.Threading;
 using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Input;
+using Microsoft.UI.Xaml.Media.Animation;
 using Microsoft.UI.Xaml.Navigation;
 using Rok.Commons;
 using Rok.ViewModels.Artist;
@@ -103,6 +105,27 @@ public sealed partial class ArtistsPage : Page, IDisposable
     private void FilterFlyout_Opened(object sender, object e)
     {
         _filterMenuBuilder.PopulateFilterMenu(filterMenu, ViewModel);
+    }
+
+    private void gridBottom_PointerEntered(object sender, PointerRoutedEventArgs e)
+    {
+        Grid? gridItem = sender as Grid;
+        if (gridItem != null)
+        {
+            Storyboard? showFavoriteButtonStoryboard = gridItem.Resources["ShowFavoriteButtonStoryboard"] as Storyboard;
+            showFavoriteButtonStoryboard?.Begin();
+        }
+    }
+
+
+    private void gridBottom_PointerExited(object sender, PointerRoutedEventArgs e)
+    {
+        Grid? gridItem = sender as Grid;
+        if (gridItem != null)
+        {
+            Storyboard? hideFavoriteButtonStoryboard = gridItem.Resources["HideFavoriteButtonStoryboard"] as Storyboard;
+            hideFavoriteButtonStoryboard?.Begin();
+        }
     }
 
     private void GroupButton_Tapped(object sender, Microsoft.UI.Xaml.Input.TappedRoutedEventArgs e)

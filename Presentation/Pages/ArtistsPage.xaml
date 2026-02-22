@@ -85,7 +85,23 @@
                       x:DataType="artists:ArtistViewModel">
             <Grid Padding="12,4"
                   HorizontalAlignment="Stretch"
-                  Background="Transparent">
+                  Background="Transparent"
+                  PointerEntered="gridBottom_PointerEntered"
+                  PointerExited="gridBottom_PointerExited">
+                <Grid.Resources>
+                    <Storyboard x:Key="ShowFavoriteButtonStoryboard">
+                        <DoubleAnimation Storyboard.TargetName="artistFavoriteButton"
+                                         Storyboard.TargetProperty="Opacity"
+                                         To="1"
+                                         Duration="0:0:0.4" />
+                    </Storyboard>
+                    <Storyboard x:Key="HideFavoriteButtonStoryboard">
+                        <DoubleAnimation Storyboard.TargetName="artistFavoriteButton"
+                                         Storyboard.TargetProperty="Opacity"
+                                         To="0"
+                                         Duration="0:0:0.3" />
+                    </Storyboard>
+                </Grid.Resources>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="56" />
                     <ColumnDefinition Width="*" />
@@ -109,11 +125,12 @@
                                          FontSize="15"
                                          FontWeight="SemiBold"
                                          Padding="0" />
-                        <common:AnimatedButton Grid.Column="2"
+                        <common:AnimatedButton x:Name="artistFavoriteButton"
                                                HorizontalAlignment="Right"
                                                VerticalAlignment="Center"
                                                Icon="{StaticResource HeartPath}"
                                                Color="{x:Bind IsFavorite, Converter={StaticResource FavoriteToColorConverter}, Mode=OneWay}"
+                                               Opacity="0"
                                                Command="{x:Bind ArtistFavoriteCommand}"
                                                CommandParameter="{x:Bind IsFavorite, Converter={StaticResource BoolToInvertBoolConverter}, Mode=OneWay}" />
                     </StackPanel>
