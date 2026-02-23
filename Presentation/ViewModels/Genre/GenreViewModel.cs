@@ -220,7 +220,7 @@ public partial class GenreViewModel : ObservableObject
         {
             List<TrackDto> shuffledTracks = tracks.ToList();
             TracksRandomizer.Randomize(shuffledTracks);
-            _playerService.LoadPlaylist(shuffledTracks);
+            _playerService.LoadPlaylist(shuffledTracks.Take(100).ToList());
         }
     }
 
