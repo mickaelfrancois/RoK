@@ -37,7 +37,25 @@
 
         <DataTemplate x:Key="ArtistGridTemplate"
                       x:DataType="artists:ArtistViewModel">
-            <Grid Style="{StaticResource MainGridCoverStyle}">
+            <Grid Style="{StaticResource MainGridCoverStyle}"
+                  PointerEntered="gridBottom_PointerEntered"
+                  PointerExited="gridBottom_PointerExited"
+                  Background="Transparent">
+                <Grid.Resources>
+                    <Storyboard x:Key="ShowFavoriteButtonStoryboard">
+                        <DoubleAnimation Storyboard.TargetName="favoriteButton"
+                                         Storyboard.TargetProperty="Opacity"
+                                         To="1"
+                                         Duration="0:0:0.6" />
+                    </Storyboard>
+                    <Storyboard x:Key="HideFavoriteButtonStoryboard">
+                        <DoubleAnimation Storyboard.TargetName="favoriteButton"
+                                         Storyboard.TargetProperty="Opacity"
+                                         To="0"
+                                         Duration="0:0:0.2" />
+                    </Storyboard>
+                </Grid.Resources>
+                
                 <Border CornerRadius="10">
                     <common:PictureControl Style="{StaticResource PictureCoverStyle}"
                                            Cover="{x:Bind Picture, Mode=OneWay}"
@@ -57,8 +75,7 @@
                         <ColumnDefinition Width="50" />
                     </Grid.ColumnDefinitions>
 
-                    <HyperlinkButton Grid.ColumnSpan="2"
-                                     Content="{x:Bind Artist.Name}"
+                    <HyperlinkButton Content="{x:Bind Artist.Name}"
                                      x:Phase="0"
                                      Command="{x:Bind ArtistOpenCommand}"
                                      Style="{StaticResource GridCoverBottomFirstLineStyle}" />
@@ -68,11 +85,13 @@
                                Text="{x:Bind SubTitle, Mode=OneWay}"
                                x:Phase="1" />
 
-                    <common:AnimatedButton Grid.Row="1"
+                    <common:AnimatedButton Grid.Row="0"
                                            Grid.Column="1"
+                                           x:Name="favoriteButton"
                                            HorizontalAlignment="Right"
                                            VerticalAlignment="Stretch"
                                            Margin="-15,0,0,0"
+                                           Opacity="{x:Bind IsFavorite, Converter={StaticResource BoolToOpacityConverter}, Mode=OneWay}"
                                            Icon="{StaticResource HeartPath}"
                                            Color="{x:Bind IsFavorite, Converter={StaticResource FavoriteToColorConverter}, Mode=OneWay}"
                                            Command="{x:Bind ArtistFavoriteCommand}"
@@ -90,16 +109,16 @@
                   PointerExited="gridBottom_PointerExited">
                 <Grid.Resources>
                     <Storyboard x:Key="ShowFavoriteButtonStoryboard">
-                        <DoubleAnimation Storyboard.TargetName="artistFavoriteButton"
+                        <DoubleAnimation Storyboard.TargetName="favoriteButton"
                                          Storyboard.TargetProperty="Opacity"
                                          To="1"
-                                         Duration="0:0:0.4" />
+                                         Duration="0:0:0.6" />
                     </Storyboard>
                     <Storyboard x:Key="HideFavoriteButtonStoryboard">
-                        <DoubleAnimation Storyboard.TargetName="artistFavoriteButton"
+                        <DoubleAnimation Storyboard.TargetName="favoriteButton"
                                          Storyboard.TargetProperty="Opacity"
                                          To="0"
-                                         Duration="0:0:0.3" />
+                                         Duration="0:0:0.2" />
                     </Storyboard>
                 </Grid.Resources>
                 <Grid.ColumnDefinitions>
@@ -125,7 +144,7 @@
                                          FontSize="15"
                                          FontWeight="SemiBold"
                                          Padding="0" />
-                        <common:AnimatedButton x:Name="artistFavoriteButton"
+                        <common:AnimatedButton x:Name="favoriteButton"
                                                HorizontalAlignment="Right"
                                                VerticalAlignment="Center"
                                                Icon="{StaticResource HeartPath}"

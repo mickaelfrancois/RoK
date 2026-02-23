@@ -64,6 +64,19 @@
                                          To="1"
                                          Duration="0:0:0.2" />
                     </Storyboard>
+
+                    <Storyboard x:Key="ShowFavoriteButtonStoryboard">
+                        <DoubleAnimation Storyboard.TargetName="favoriteButton"
+                                         Storyboard.TargetProperty="Opacity"
+                                         To="1"
+                                         Duration="0:0:0.6" />
+                    </Storyboard>
+                    <Storyboard x:Key="HideFavoriteButtonStoryboard">
+                        <DoubleAnimation Storyboard.TargetName="favoriteButton"
+                                         Storyboard.TargetProperty="Opacity"
+                                         To="0"
+                                         Duration="0:0:0.2" />
+                    </Storyboard>
                 </Grid.Resources>
                 <Border CornerRadius="10">
                     <common:PictureControl Style="{StaticResource PictureCoverStyle}"
@@ -82,9 +95,8 @@
                         <ColumnDefinition />
                         <ColumnDefinition Width="50" />
                     </Grid.ColumnDefinitions>
-                    <HyperlinkButton Grid.ColumnSpan="2"
-                                     Content="{x:Bind Album.Name}"
-                                     x:Phase="0"
+                    <HyperlinkButton Content="{x:Bind Album.Name}"
+                                     x:Phase="0"                                                           
                                      Command="{x:Bind AlbumOpenCommand}"
                                      Style="{StaticResource GridCoverBottomFirstLineStyle}" />
                     <TextBlock x:Name="subTitle"
@@ -100,11 +112,13 @@
                                      Command="{x:Bind ArtistOpenCommand}"
                                      Opacity="0"
                                      x:Phase="1" />
-                    <common:AnimatedButton Grid.Row="1"
+                    <common:AnimatedButton Grid.Row="0"
                                            Grid.Column="1"
+                                           x:Name="favoriteButton"
                                            HorizontalAlignment="Right"
                                            VerticalAlignment="Stretch"
                                            Margin="-15,0,0,0"
+                                           Opacity="{x:Bind IsFavorite, Converter={StaticResource BoolToOpacityConverter}, Mode=OneWay}"
                                            Icon="{StaticResource HeartPath}"
                                            Color="{x:Bind IsFavorite, Converter={StaticResource FavoriteToColorConverter}, Mode=OneWay}"
                                            Command="{x:Bind AlbumFavoriteCommand}"
@@ -125,17 +139,17 @@
                         <DoubleAnimation Storyboard.TargetName="artistName"
                                          Storyboard.TargetProperty="Opacity"
                                          To="1"
-                                         Duration="0:0:0.4" />
+                                         Duration="0:0:0.6" />
                         <DoubleAnimation Storyboard.TargetName="subTitle"
                                          Storyboard.TargetProperty="Opacity"
                                          To="0"
-                                         Duration="0:0:0.3" />
+                                         Duration="0:0:0.5" />
                     </Storyboard>
                     <Storyboard x:Key="ShowSubTitleStoryboard">
                         <DoubleAnimation Storyboard.TargetName="artistName"
                                          Storyboard.TargetProperty="Opacity"
                                          To="0"
-                                         Duration="0:0:0.4" />
+                                         Duration="0:0:0.6" />
                         <DoubleAnimation Storyboard.TargetName="subTitle"
                                          Storyboard.TargetProperty="Opacity"
                                          To="1"
@@ -143,16 +157,16 @@
                     </Storyboard>
 
                     <Storyboard x:Key="ShowFavoriteButtonStoryboard">
-                        <DoubleAnimation Storyboard.TargetName="albumFavoriteButton"
+                        <DoubleAnimation Storyboard.TargetName="favoriteButton"
                                          Storyboard.TargetProperty="Opacity"
                                          To="1"
-                                         Duration="0:0:0.4" />
+                                         Duration="0:0:0.6" />
                     </Storyboard>
                     <Storyboard x:Key="HideFavoriteButtonStoryboard">
-                        <DoubleAnimation Storyboard.TargetName="albumFavoriteButton"
+                        <DoubleAnimation Storyboard.TargetName="favoriteButton"
                                          Storyboard.TargetProperty="Opacity"
                                          To="0"
-                                         Duration="0:0:0.3" />
+                                         Duration="0:0:0.2" />
                     </Storyboard>
                 </Grid.Resources>
                 <Grid.ColumnDefinitions>
@@ -179,8 +193,7 @@
                                          FontWeight="SemiBold"
                                          Padding="0" />
 
-                        <common:AnimatedButton
-                                               x:Name="albumFavoriteButton"
+                        <common:AnimatedButton x:Name="favoriteButton"
                                                HorizontalAlignment="Right"
                                                VerticalAlignment="Center"
                                                Icon="{StaticResource HeartPath}"

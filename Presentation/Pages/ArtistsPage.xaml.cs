@@ -110,10 +110,13 @@ public sealed partial class ArtistsPage : Page, IDisposable
     private void gridBottom_PointerEntered(object sender, PointerRoutedEventArgs e)
     {
         Grid? gridItem = sender as Grid;
-        if (gridItem != null)
+        if (gridItem != null && gridItem.DataContext is ArtistViewModel artistViewModel)
         {
-            Storyboard? showFavoriteButtonStoryboard = gridItem.Resources["ShowFavoriteButtonStoryboard"] as Storyboard;
-            showFavoriteButtonStoryboard?.Begin();
+            if (!artistViewModel.IsFavorite)
+            {
+                Storyboard? showFavoriteButtonStoryboard = gridItem.Resources["ShowFavoriteButtonStoryboard"] as Storyboard;
+                showFavoriteButtonStoryboard?.Begin();
+            }
         }
     }
 
@@ -121,10 +124,13 @@ public sealed partial class ArtistsPage : Page, IDisposable
     private void gridBottom_PointerExited(object sender, PointerRoutedEventArgs e)
     {
         Grid? gridItem = sender as Grid;
-        if (gridItem != null)
+        if (gridItem != null && gridItem.DataContext is ArtistViewModel artistViewModel)
         {
-            Storyboard? hideFavoriteButtonStoryboard = gridItem.Resources["HideFavoriteButtonStoryboard"] as Storyboard;
-            hideFavoriteButtonStoryboard?.Begin();
+            if (!artistViewModel.IsFavorite)
+            {
+                Storyboard? hideFavoriteButtonStoryboard = gridItem.Resources["HideFavoriteButtonStoryboard"] as Storyboard;
+                hideFavoriteButtonStoryboard?.Begin();
+            }
         }
     }
 
