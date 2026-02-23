@@ -129,10 +129,16 @@ public sealed partial class AlbumsPage : Page, IDisposable
     private void gridBottom_PointerEntered(object sender, PointerRoutedEventArgs e)
     {
         Grid? gridItem = sender as Grid;
-        if (gridItem != null)
+        if (gridItem != null && gridItem.DataContext is AlbumViewModel albumViewModel)
         {
             Storyboard? showArtistStoryboard = gridItem.Resources["ShowArtistNameStoryboard"] as Storyboard;
             showArtistStoryboard?.Begin();
+
+            if (!albumViewModel.IsFavorite)
+            {
+                Storyboard? showFavoriteButtonStoryboard = gridItem.Resources["ShowFavoriteButtonStoryboard"] as Storyboard;
+                showFavoriteButtonStoryboard?.Begin();
+            }
         }
     }
 
@@ -140,10 +146,16 @@ public sealed partial class AlbumsPage : Page, IDisposable
     private void gridBottom_PointerExited(object sender, PointerRoutedEventArgs e)
     {
         Grid? gridItem = sender as Grid;
-        if (gridItem != null)
+        if (gridItem != null && gridItem.DataContext is AlbumViewModel albumViewModel)
         {
             Storyboard? showSubTitleStoryboard = gridItem.Resources["ShowSubTitleStoryboard"] as Storyboard;
             showSubTitleStoryboard?.Begin();
+
+            if (!albumViewModel.IsFavorite)
+            {
+                Storyboard? hideFavoriteButtonStoryboard = gridItem.Resources["HideFavoriteButtonStoryboard"] as Storyboard;
+                hideFavoriteButtonStoryboard?.Begin();
+            }
         }
     }
 

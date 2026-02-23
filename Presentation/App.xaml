@@ -43,6 +43,7 @@
             <converters:PlaybackStateToButtonIconConverter x:Key="PlaybackStateToButtonIconConverter" />
             <converters:VolumeToGlyphConverter x:Key="VolumeToGlyphConverter" />
             <converters:GridListIconConverter x:Key="GridListIconConverter" />
+            <converters:BoolToOpacityConverter x:Key="BoolToOpacityConverter" />
 
             <converters:BoolToColorConverter x:Key="FavoriteToColorConverter">
                 <converters:BoolToColorConverter.TrueBrush>
