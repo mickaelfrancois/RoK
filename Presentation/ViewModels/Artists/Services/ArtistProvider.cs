@@ -1,4 +1,5 @@
-﻿using Rok.ViewModels.Artist;
+﻿using Rok.Application.Services.Filters;
+using Rok.ViewModels.Artist;
 using Rok.ViewModels.Artists.Interfaces;
 
 namespace Rok.ViewModels.Artists.Services;
@@ -20,7 +21,7 @@ public class ArtistProvider(TagsProvider tagsLoader, ArtistsDataLoader dataLoade
 
     public ArtistProviderResult GetProcessedData(string groupBy, List<string> filters, List<long> genreFilters, List<string> tagFilters)
     {
-        IEnumerable<ArtistViewModel> filtered = dataLoader.ViewModels;
+        IEnumerable<IFilterableArtist> filtered = dataLoader.ViewModels;
 
         foreach (string filter in filters)
             filtered = filterService.Filter(filter, filtered);
@@ -31,7 +32,7 @@ public class ArtistProvider(TagsProvider tagsLoader, ArtistsDataLoader dataLoade
         if (tagFilters.Count > 0)
             filtered = filterService.FilterByTags(tagFilters, filtered);
 
-        List<ArtistViewModel> filteredList = filtered.ToList();
+        List<ArtistViewModel> filteredList = filtered.Cast<ArtistViewModel>().ToList();
         List<ArtistsGroupCategoryViewModel> groups = groupService.GetGroupedItems(groupBy, filteredList).ToList();
 
         bool isGroupingEnabled = groups.Count > 1 || !string.IsNullOrEmpty(groups.FirstOrDefault()?.Title ?? string.Empty);

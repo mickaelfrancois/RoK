@@ -1,4 +1,5 @@
-﻿using Rok.ViewModels.Track;
+﻿using Rok.Application.Services.Filters;
+using Rok.ViewModels.Track;
 using Rok.ViewModels.Tracks.Interfaces;
 
 namespace Rok.ViewModels.Tracks.Services;
@@ -14,11 +15,11 @@ public class TrackProvider(TracksDataLoader dataLoader, TracksFilter filterServi
         await dataLoader.LoadTracksAsync();
     }
 
-    public void SetTracks(List<TrackDto> albums) => dataLoader.SetTracks(albums);
+    public void SetTracks(List<TrackDto> tracks) => dataLoader.SetTracks(tracks);
 
     public TrackProviderResult GetProcessedData(string groupBy, List<string> filters, List<long> genreFilters)
     {
-        IEnumerable<TrackViewModel> filtered = dataLoader.ViewModels;
+        IEnumerable<IFilterableTrack> filtered = dataLoader.ViewModels;
 
         foreach (string filter in filters)
             filtered = filterService.Filter(filter, filtered);
@@ -26,7 +27,7 @@ public class TrackProvider(TracksDataLoader dataLoader, TracksFilter filterServi
         foreach (long genreId in genreFilters)
             filtered = filterService.FilterByGenreId(genreId, filtered);
 
-        List<TrackViewModel> filteredList = filtered.ToList();
+        List<TrackViewModel> filteredList = filtered.Cast<TrackViewModel>().ToList();
         List<TracksGroupCategoryViewModel> groups = groupService.GetGroupedItems(groupBy, filteredList).ToList();
 
         bool isGroupingEnabled = groups.Count > 1 || !string.IsNullOrEmpty(groups.FirstOrDefault()?.Title ?? string.Empty);

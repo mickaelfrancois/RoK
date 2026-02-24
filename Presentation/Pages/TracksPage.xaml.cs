@@ -60,9 +60,8 @@ public sealed partial class TracksPage : Page, IDisposable
             {
                 tracksListZoom.IsZoomedInViewActive = true;
             }
-
-            UpdateItemsSource();
         }
+        UpdateItemsSource();
     }
 
     private void UpdateItemsSource()

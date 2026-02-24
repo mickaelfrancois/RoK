@@ -5,12 +5,13 @@ using Rok.Application.Dto.Lyrics;
 using Rok.Application.Features.Playlists.PlaylistMenu;
 using Rok.Application.Features.Tracks.Services;
 using Rok.Application.Player;
+using Rok.Application.Services.Filters;
 using Rok.Infrastructure.Translate;
 using Rok.ViewModels.Track.Services;
 
 namespace Rok.ViewModels.Track;
 
-public partial class TrackViewModel : ObservableObject, IDisposable
+public partial class TrackViewModel : ObservableObject, IDisposable, IFilterableTrack
 {
     private readonly ResourceLoader _resourceLoader;
     private readonly IPlayerService _playerService;
@@ -152,7 +153,19 @@ public partial class TrackViewModel : ObservableObject, IDisposable
 
     public bool Listened { get; set; }
 
+    public bool IsArtistFavorite => Track.IsArtistFavorite;
 
+    public bool IsAlbumFavorite => Track.IsAlbumFavorite;
+
+    public bool IsLive => Track.IsLive;
+
+    public long? GenreId => Track.GenreId;
+
+    public int ListenCount => Track.ListenCount;
+
+    public bool IsGenreFavorite => Track.IsGenreFavorite;
+
+    public List<string> Tags => new();
 
     public TrackViewModel(
         IBackdropLoader backdropLoader,

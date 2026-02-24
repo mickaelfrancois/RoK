@@ -4,13 +4,14 @@ using CommunityToolkit.Mvvm.Input;
 using Rok.Application.Features.Albums.Services;
 using Rok.Application.Features.Playlists.PlaylistMenu;
 using Rok.Application.Player;
+using Rok.Application.Services.Filters;
 using Rok.Infrastructure.Translate;
 using Rok.ViewModels.Album.Services;
 using Rok.ViewModels.Track;
 
 namespace Rok.ViewModels.Album;
 
-public partial class AlbumViewModel : ObservableObject
+public partial class AlbumViewModel : ObservableObject, IFilterableAlbum
 {
     private readonly NavigationService _navigationService;
     private readonly ResourceLoader _resourceLoader;
@@ -33,7 +34,7 @@ public partial class AlbumViewModel : ObservableObject
     public IPlaylistMenuService PlaylistMenuService { get; }
 
 
-    public ObservableCollection<string> Tags { get; set; } = new();
+    public ObservableCollection<string> EditableTags { get; set; } = new();
 
     public ObservableCollection<string> SuggestedTags { get; set; } = new();
 
@@ -42,6 +43,25 @@ public partial class AlbumViewModel : ObservableObject
         get => Album.IsFavorite;
         set => SetProperty(Album.IsFavorite, value, Album, (album, val) => album.IsFavorite = val);
     }
+
+    public long? GenreId => Album.GenreId;
+
+    public int ListenCount => Album.ListenCount;
+
+    public bool IsLive => Album.IsLive;
+
+    public bool IsBestOf => Album.IsBestOf;
+
+    public bool IsCompilation => Album.IsCompilation;
+
+    public bool IsGenreFavorite => Album.IsGenreFavorite;
+
+    public bool IsArtistFavorite => Album.IsArtistFavorite;
+
+    public bool IsAlbumFavorite => Album.IsFavorite;
+
+    public List<string> Tags => Album.GetTags();
+
 
     [ObservableProperty]
     public partial BitmapImage? Backdrop { get; set; }
@@ -209,12 +229,12 @@ public partial class AlbumViewModel : ObservableObject
     {
         List<string> albumTags = Album.GetTags();
 
-        Tags.Clear();
+        EditableTags.Clear();
         foreach (string tag in albumTags)
-            Tags.Add(tag);
+            EditableTags.Add(tag);
 
-        Tags.CollectionChanged -= OnTagsCollectionChanged;
-        Tags.CollectionChanged += OnTagsCollectionChanged;
+        EditableTags.CollectionChanged -= OnTagsCollectionChanged;
+        EditableTags.CollectionChanged += OnTagsCollectionChanged;
 
         SuggestedTags.Clear();
         List<string> suggestedTags = await _tagsProvider.GetTagsAsync();
@@ -226,8 +246,8 @@ public partial class AlbumViewModel : ObservableObject
 
     private async void OnTagsCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
     {
-        Album.TagsAsString = string.Join(",", Tags);
-        await _editService.UpdateTagsAsync(Album.Id, Tags);
+        Album.TagsAsString = string.Join(",", EditableTags);
+        await _editService.UpdateTagsAsync(Album.Id, EditableTags);
 
         Debug.WriteLine(Album.TagsAsString);
     }

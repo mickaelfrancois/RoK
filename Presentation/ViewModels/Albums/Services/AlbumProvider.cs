@@ -1,4 +1,5 @@
-﻿using Rok.ViewModels.Album;
+﻿using Rok.Application.Services.Filters;
+using Rok.ViewModels.Album;
 using Rok.ViewModels.Albums.Interfaces;
 
 namespace Rok.ViewModels.Albums.Services;
@@ -20,7 +21,7 @@ public class AlbumProvider(TagsProvider tagsLoader, AlbumsDataLoader dataLoader,
 
     public AlbumProviderResult GetProcessedData(string groupBy, List<string> filters, List<long> genreFilters, List<string> tagFilters)
     {
-        IEnumerable<AlbumViewModel> filtered = dataLoader.ViewModels;
+        IEnumerable<IFilterableAlbum> filtered = dataLoader.ViewModels;
 
         foreach (string filter in filters)
             filtered = filterService.Filter(filter, filtered);
@@ -31,7 +32,7 @@ public class AlbumProvider(TagsProvider tagsLoader, AlbumsDataLoader dataLoader,
         if (tagFilters.Count > 0)
             filtered = filterService.FilterByTags(tagFilters, filtered);
 
-        List<AlbumViewModel> filteredList = filtered.ToList();
+        List<AlbumViewModel> filteredList = filtered.Cast<AlbumViewModel>().ToList();
         List<AlbumsGroupCategoryViewModel> groups = groupService.GetGroupedItems(groupBy, filteredList).ToList();
 
         bool isGroupingEnabled = groups.Count > 1 || !string.IsNullOrEmpty(groups.FirstOrDefault()?.Title ?? string.Empty);
