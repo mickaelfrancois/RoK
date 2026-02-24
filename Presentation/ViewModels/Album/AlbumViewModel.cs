@@ -283,13 +283,13 @@ public partial class AlbumViewModel : ObservableObject, IFilterableAlbum
     }
 
     [RelayCommand]
-    private async Task ListenAsync()
+    private async Task ListenAsync(TrackViewModel? startTrack = null)
     {
         if (_tracks == null)
             await LoadTracksAsync(Album.Id);
 
         if (_tracks?.Any() == true)
-            _playerService.LoadPlaylist(_tracks.ToList());
+            _playerService.LoadPlaylist(_tracks.ToList(), startTrack?.Track);
     }
 
     [RelayCommand]
