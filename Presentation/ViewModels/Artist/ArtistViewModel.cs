@@ -5,6 +5,7 @@ using Rok.Application.Features.Artists.Services;
 using Rok.Application.Features.Playlists.PlaylistMenu;
 using Rok.Application.Player;
 using Rok.Application.Randomizer;
+using Rok.Application.Services.Filters;
 using Rok.Infrastructure.Translate;
 using Rok.ViewModels.Album;
 using Rok.ViewModels.Artist.Services;
@@ -12,7 +13,7 @@ using Rok.ViewModels.Track;
 
 namespace Rok.ViewModels.Artist;
 
-public partial class ArtistViewModel : ObservableObject
+public partial class ArtistViewModel : ObservableObject, IFilterableArtist
 {
     private static string FallbackPictureUri => App.Current.Resources["ArtistFallbackPictureUri"] as string ?? "ms-appx:///Assets/artistFallback.png";
     private static BitmapImage FallbackPicture => new(new Uri(FallbackPictureUri));
@@ -40,7 +41,7 @@ public partial class ArtistViewModel : ObservableObject
     public RangeObservableCollection<AlbumViewModel> Albums { get; set; } = [];
 
 
-    public ObservableCollection<string> Tags { get; set; } = new();
+    public ObservableCollection<string> EditableTags { get; set; } = new();
 
     public ObservableCollection<string> SuggestedTags { get; set; } = new();
 
@@ -200,6 +201,14 @@ public partial class ArtistViewModel : ObservableObject
         }
     }
 
+    public long? GenreId => Artist.GenreId;
+
+    public int ListenCount => Artist.ListenCount;
+
+    public bool IsGenreFavorite => Artist.IsGenreFavorite;
+
+    public List<string> Tags => Artist.GetTags();
+
     public override string ToString() => Artist?.Name ?? string.Empty;
 
 
@@ -311,12 +320,12 @@ public partial class ArtistViewModel : ObservableObject
     {
         List<string> artistTags = Artist.GetTags();
 
-        Tags.Clear();
+        EditableTags.Clear();
         foreach (string tag in artistTags)
-            Tags.Add(tag);
+            EditableTags.Add(tag);
 
-        Tags.CollectionChanged -= OnTagsCollectionChanged;
-        Tags.CollectionChanged += OnTagsCollectionChanged;
+        EditableTags.CollectionChanged -= OnTagsCollectionChanged;
+        EditableTags.CollectionChanged += OnTagsCollectionChanged;
 
         SuggestedTags.Clear();
         List<string> suggestedTags = await _tagsProvider.GetTagsAsync();
@@ -328,8 +337,8 @@ public partial class ArtistViewModel : ObservableObject
 
     private async void OnTagsCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
     {
-        Artist.TagsAsString = string.Join(",", Tags);
-        await _editService.UpdateTagsAsync(Artist.Id, Tags);
+        Artist.TagsAsString = string.Join(",", EditableTags);
+        await _editService.UpdateTagsAsync(Artist.Id, EditableTags);
 
         Debug.WriteLine(Artist.TagsAsString);
     }

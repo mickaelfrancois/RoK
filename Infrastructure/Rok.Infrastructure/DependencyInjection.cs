@@ -6,6 +6,7 @@ using Rok.Application.Tag;
 using Rok.Infrastructure.Files;
 using Rok.Infrastructure.FileSystem;
 using Rok.Infrastructure.LastFm;
+using Rok.Infrastructure.Localization;
 using Rok.Infrastructure.Lyrics;
 using Rok.Infrastructure.Migration;
 using Rok.Infrastructure.MusicData;
@@ -69,6 +70,8 @@ public static class DependencyInjection
         services.AddSingleton<ILastFmClient, LastFmClient>();
         services.AddSingleton<ITelemetryClient, TelemetryClient>();
         services.AddSingleton<IDiscordRichPresenceService, DiscordRichPresenceService>();
+
+        services.AddSingleton<IResourceService, ResourceService>();
 
         return services;
     }

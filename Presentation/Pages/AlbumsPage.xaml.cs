@@ -7,7 +7,6 @@ using Microsoft.UI.Xaml.Navigation;
 using Rok.Commons;
 using Rok.ViewModels.Album;
 using Rok.ViewModels.Albums;
-using Rok.ViewModels.Playlists;
 
 namespace Rok.Pages;
 
@@ -64,7 +63,7 @@ public sealed partial class AlbumsPage : Page, IDisposable
 
     private void ViewModel_PropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
-        if (e.PropertyName == nameof(PlaylistsViewModel.IsGridView))
+        if (e.PropertyName == nameof(ViewModel.IsGridView))
         {
             UpdateVisualState();
             return;
@@ -76,9 +75,9 @@ public sealed partial class AlbumsPage : Page, IDisposable
             {
                 GridZoom.IsZoomedInViewActive = true;
             }
-
-            UpdateItemsSource();
         }
+
+        UpdateItemsSource();
     }
 
     private void UpdateItemsSource()

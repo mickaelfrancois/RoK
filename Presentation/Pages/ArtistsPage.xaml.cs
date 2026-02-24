@@ -76,9 +76,9 @@ public sealed partial class ArtistsPage : Page, IDisposable
             {
                 GridZoom.IsZoomedInViewActive = true;
             }
-
-            UpdateItemsSource();
         }
+
+        UpdateItemsSource();
     }
 
     private void UpdateItemsSource()

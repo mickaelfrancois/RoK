@@ -1,8 +1,8 @@
-﻿using Rok.ViewModels.Track;
+﻿using Rok.Application.Interfaces;
 
-namespace Rok.ViewModels.Tracks;
+namespace Rok.Application.Services.Filters;
 
-public class TracksFilter : FilterService<TrackViewModel>
+public class TracksFilter(IResourceService resourceLoader) : FilterService<IFilterableTrack>(resourceLoader)
 {
     public const string KFilterByArtistFavorite = "ARTISTFAVORITE";
     public const string KFilterByGenreFavorite = "GENREFAVORITE";
@@ -11,34 +11,14 @@ public class TracksFilter : FilterService<TrackViewModel>
     public const string KFilterByNeverListened = "NEVERLISTENED";
     public const string KFilterByLive = "LIVE";
 
-    public TracksFilter(ResourceLoader resourceLoader) : base(resourceLoader)
-    {
-    }
-
-    public IEnumerable<TrackViewModel> FilterByGenreId(long genreId, IEnumerable<TrackViewModel> tracks)
-    {
-        return FilterByGenreId(genreId, tracks, t => t.Track.GenreId);
-    }
-
     protected override void RegisterFilterStrategies()
     {
-        RegisterFilter(KFilterByArtistFavorite,
-            tracks => FilterByFavorite(tracks, t => t.Track.IsArtistFavorite));
-
-        RegisterFilter(KFilterByGenreFavorite,
-            tracks => FilterByFavorite(tracks, t => t.Track.IsGenreFavorite));
-
-        RegisterFilter(KFilterByAlbumFavorite,
-            tracks => FilterByFavorite(tracks, t => t.Track.IsAlbumFavorite));
-
-        RegisterFilter(KFilterByTrackFavorite,
-            tracks => FilterByCondition(tracks, t => t.Track.Score > 0));
-
-        RegisterFilter(KFilterByNeverListened,
-            tracks => FilterByNeverListened(tracks, t => t.Track.ListenCount));
-
-        RegisterFilter(KFilterByLive,
-            tracks => FilterByCondition(tracks, t => t.Track.IsLive));
+        RegisterFilter(KFilterByArtistFavorite, tracks => tracks.Where(t => t.IsArtistFavorite));
+        RegisterFilter(KFilterByGenreFavorite, tracks => tracks.Where(t => t.IsGenreFavorite));
+        RegisterFilter(KFilterByAlbumFavorite, tracks => tracks.Where(t => t.IsAlbumFavorite));
+        RegisterFilter(KFilterByTrackFavorite, tracks => tracks.Where(t => t.Score > 0));
+        RegisterFilter(KFilterByNeverListened, tracks => tracks.Where(t => t.ListenCount == 0));
+        RegisterFilter(KFilterByLive, tracks => tracks.Where(t => t.IsLive));
     }
 
     public override string GetLabel(string filterBy)
