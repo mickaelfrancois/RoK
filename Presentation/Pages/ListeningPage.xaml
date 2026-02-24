@@ -444,7 +444,7 @@
                                         VerticalAlignment="Center">
 
                                 <HyperlinkButton Style="{StaticResource gridTracksTitleText}"
-                                                 Command="{x:Bind ListenCommand}"
+                                                 Command="{x:Bind TrackOpenCommand}"
                                                  CommandParameter="{x:Bind}"
                                                  VerticalAlignment="Center" />
 
