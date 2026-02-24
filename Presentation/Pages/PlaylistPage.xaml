@@ -236,8 +236,8 @@
                                         Orientation="Horizontal">
                                 
                                 <HyperlinkButton Style="{StaticResource gridTracksTitleText}"
-                                                 Command="{x:Bind ListenCommand}"
-                                                 CommandParameter="{x:Bind}" />
+                                                 Command="{Binding DataContext.ListenCommand, ElementName=playlistPage}"
+                                                 CommandParameter="{Binding}" />
 
                                 <HyperlinkButton x:Uid="lyricsTag"
                                                  Visibility="{x:Bind LyricsExists, Converter={StaticResource BoolToVisibilityConverter}}"
