@@ -314,8 +314,8 @@
                                            Style="{StaticResource gridTracksRowIndexText}" />
 
                                 <HyperlinkButton Style="{StaticResource gridTracksTitleText}"
-                                                 Command="{x:Bind ListenCommand}"
-                                                 CommandParameter="{x:Bind}" />
+                                                 Command="{Binding DataContext.ListenCommand, ElementName=albumPage}"
+                                                 CommandParameter="{Binding}" />
 
                                 <HyperlinkButton x:Uid="lyricsTag"
                                                  Visibility="{x:Bind LyricsExists, Converter={StaticResource BoolToVisibilityConverter}}"
