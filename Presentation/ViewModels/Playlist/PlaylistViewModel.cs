@@ -222,7 +222,7 @@ public partial class PlaylistViewModel : ObservableObject
     }
 
     [RelayCommand]
-    private async Task ListenAsync()
+    private async Task ListenAsync(TrackViewModel? track)
     {
         if (_tracks == null)
         {
@@ -233,7 +233,7 @@ public partial class PlaylistViewModel : ObservableObject
         }
 
         if (_tracks?.Any() == true)
-            _playerService.LoadPlaylist(Tracks.Select(t => t.Track).ToList());
+            _playerService.LoadPlaylist(_tracks.ToList(), track?.Track);
     }
 
     [RelayCommand]
