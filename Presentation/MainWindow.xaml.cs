@@ -6,6 +6,7 @@ using Microsoft.UI.Xaml.Media.Animation;
 using Microsoft.UI.Xaml.Navigation;
 using Rok.Infrastructure;
 using Rok.ViewModels.Main;
+using Windows.Graphics;
 
 namespace Rok;
 
@@ -14,6 +15,10 @@ public sealed partial class MainWindow : Window
     private readonly NavigationService _navigationService;
 
     private readonly ResourceLoader _resourceLoader;
+
+    private PointInt32? _compactModeAppPosition;
+    private PointInt32? _normalModeAppPosition;
+    private SizeInt32? _normalModeAppSize;
 
     private bool _compactModeEnabled = false;
 
@@ -171,21 +176,40 @@ public sealed partial class MainWindow : Window
     }
 
 
+
     private void ToggleCompactMode()
     {
         if (_compactModeEnabled)
         {
+            _compactModeAppPosition = AppWindow.Position;
+
             AppWindow.SetPresenter(AppWindowPresenterKind.Overlapped);
+
+            if (_normalModeAppSize.HasValue)
+                AppWindow.Resize(_normalModeAppSize.Value);
+
+            if (_normalModeAppPosition.HasValue)
+                AppWindow.Move(_normalModeAppPosition.Value);
+
             gridCompactScreen.Visibility = Visibility.Collapsed;
             MainGrid.Visibility = Visibility.Visible;
+
             _compactModeEnabled = false;
         }
         else
         {
+            _normalModeAppPosition = AppWindow.Position;
+            _normalModeAppSize = AppWindow.ClientSize;
+
             AppWindow.SetPresenter(AppWindowPresenterKind.CompactOverlay);
-            AppWindow.Resize(new Windows.Graphics.SizeInt32 { Width = 360, Height = 420 });
+            AppWindow.Resize(new SizeInt32 { Width = 360, Height = 420 });
+
+            if (_compactModeAppPosition.HasValue)
+                AppWindow.Move(_compactModeAppPosition.Value);
+
             gridCompactScreen.Visibility = Visibility.Visible;
             MainGrid.Visibility = Visibility.Collapsed;
+
             _compactModeEnabled = true;
         }
     }
