@@ -32,4 +32,10 @@
     <Project Path="Tests/UnitTests/Rok.ApplicationTests/Rok.ApplicationTests.csproj" Id="6e136894-8609-4546-8336-1f7cf7e5f288" />
     <Project Path="Tests/UnitTests/Rok.Infrastructure.UnitTests/Rok.Infrastructure.UnitTests.csproj" Id="179c2a02-8034-4e18-9ed9-8d575d58e8f4" />
   </Folder>
+  <Folder Name="/Éléments de solution/">
+    <File Path="CHANGELOG.MD" />
+    <File Path="LICENSE.txt" />
+    <File Path="README.fr.md" />
+    <File Path="README.md" />
+  </Folder>
 </Solution>
