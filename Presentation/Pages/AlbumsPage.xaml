@@ -340,7 +340,6 @@
                     <common:GridViewExtended x:Name="grid"
                                              ContainerContentChanging="GridContainerContentChanging"
                                              BindableSelectedItems="{x:Bind ViewModel.Selected, Mode=OneWay}"
-                                             ItemsSource="{x:Bind groupedItemsViewSource.View, Mode=OneWay}"
                                              ItemTemplate="{StaticResource AlbumGridTemplate}"
                                              ItemsPanel="{StaticResource AlbumGridPanel}"
                                              SelectionMode="Multiple"
