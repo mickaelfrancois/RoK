@@ -54,7 +54,7 @@ internal class ArtistsFilterMenuBuilder
         MenuFlyoutItem genreAllMenu = new()
         {
             Text = _manager.MainResourceMap.GetValue("Resources/filtergenreall").ValueAsString,
-            Command = viewModel.FilterByCommand,
+            Command = viewModel.FilterByGenreCommand,
         };
         genreSubItem.Items.Add(genreAllMenu);
 
