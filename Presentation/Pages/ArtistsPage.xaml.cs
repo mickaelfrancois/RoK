@@ -24,7 +24,7 @@ public sealed partial class ArtistsPage : Page, IDisposable
 
     public ArtistsPage()
     {
-        this.InitializeComponent();
+        InitializeComponent();
 
         _logger = App.ServiceProvider.GetRequiredService<ILogger<ArtistsPage>>();
         ViewModel = App.ServiceProvider.GetRequiredService<ArtistsViewModel>();
@@ -32,6 +32,7 @@ public sealed partial class ArtistsPage : Page, IDisposable
 
         Loaded += Page_Loaded;
         ViewModel.PropertyChanged += ViewModel_PropertyChanged;
+        ViewModel.GroupedItems.CollectionChanged += GroupedItems_CollectionChanged;
     }
 
 
@@ -76,8 +77,13 @@ public sealed partial class ArtistsPage : Page, IDisposable
             {
                 GridZoom.IsZoomedInViewActive = true;
             }
-        }
 
+            UpdateItemsSource();
+        }
+    }
+
+    private void GroupedItems_CollectionChanged(object? sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+    {
         UpdateItemsSource();
     }
 
@@ -86,8 +92,12 @@ public sealed partial class ArtistsPage : Page, IDisposable
         if (ViewModel.GroupedItems.Count == 0)
             return;
 
+        grid.ItemsSource = null;
+        ZoomoutCollectionGrid.ItemsSource = null;
+
         if (ViewModel.IsGroupingEnabled)
         {
+            groupedItemsViewSource.Source = null;
             groupedItemsViewSource.IsSourceGrouped = true;
             groupedItemsViewSource.Source = ViewModel.GroupedItems;
 
@@ -96,9 +106,10 @@ public sealed partial class ArtistsPage : Page, IDisposable
         }
         else
         {
+            groupedItemsViewSource.Source = null;
             groupedItemsViewSource.IsSourceGrouped = false;
+
             grid.ItemsSource = ViewModel.GroupedItems[0].Items;
-            ZoomoutCollectionGrid.ItemsSource = null;
         }
     }
 
