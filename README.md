@@ -1,5 +1,9 @@
 ﻿[🇬🇧 English](README.md) | [🇫🇷 Français](README.fr.md)
 
+![WinUI 3](https://img.shields.io/badge/Made%20with-WinUI%203-0078D4?style=for-the-badge&logo=windows)
+![.NET 10](https://img.shields.io/badge/.NET-10.0-512BD4?style=for-the-badge&logo=dotnet)
+
+
 # 🎵 Rok
 
 **Rok** is a modern music player for Windows, built with the latest Microsoft technologies.
