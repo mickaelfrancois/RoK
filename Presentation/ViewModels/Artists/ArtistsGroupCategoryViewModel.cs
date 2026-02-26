@@ -1,8 +1,9 @@
-﻿using Rok.ViewModels.Artist;
+﻿using Rok.Application.Services.Grouping;
+using Rok.ViewModels.Artist;
 
 namespace Rok.ViewModels.Artists;
 
-public class ArtistsGroupCategoryViewModel : IGroupCategoryViewModel<ArtistViewModel>
+public class ArtistsGroupCategoryViewModel : IGroupCategory<ArtistViewModel>
 {
     public string Title { get; set; } = string.Empty;
 

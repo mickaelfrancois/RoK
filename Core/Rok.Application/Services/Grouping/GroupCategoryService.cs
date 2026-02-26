@@ -1,11 +1,12 @@
-﻿using Rok.ViewModels;
+using Rok.Application.Interfaces;
+using Rok.Shared.Extensions;
 
-namespace Rok.Services;
+namespace Rok.Application.Services.Grouping;
 
-public abstract class GroupCategoryService<TViewModel, TGroupCategory>(ResourceLoader resourceLoader)
-    where TGroupCategory : IGroupCategoryViewModel<TViewModel>, new()
+public abstract class GroupCategoryService<TViewModel, TGroupCategory>(IResourceService resourceLoader)
+    where TGroupCategory : IGroupCategory<TViewModel>, new()
 {
-    protected readonly ResourceLoader ResourceLoader = resourceLoader;
+    protected readonly IResourceService ResourceLoader = resourceLoader;
     private readonly Dictionary<string, Func<List<TViewModel>, IEnumerable<TGroupCategory>>> _groupStrategies = new();
 
     protected abstract void RegisterGroupingStrategies();

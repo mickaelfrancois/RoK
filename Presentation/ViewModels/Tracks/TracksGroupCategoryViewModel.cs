@@ -1,8 +1,9 @@
-﻿using Rok.ViewModels.Track;
+﻿using Rok.Application.Services.Grouping;
+using Rok.ViewModels.Track;
 
 namespace Rok.ViewModels.Tracks;
 
-public class TracksGroupCategoryViewModel : IGroupCategoryViewModel<TrackViewModel>
+public class TracksGroupCategoryViewModel : IGroupCategory<TrackViewModel>
 {
     public string Title { get; set; } = string.Empty;
 

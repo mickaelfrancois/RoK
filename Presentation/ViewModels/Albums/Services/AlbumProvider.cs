@@ -1,4 +1,5 @@
 ﻿using Rok.Application.Services.Filters;
+using Rok.Application.Services.Grouping;
 using Rok.ViewModels.Album;
 using Rok.ViewModels.Albums.Interfaces;
 
@@ -33,7 +34,10 @@ public class AlbumProvider(TagsProvider tagsLoader, AlbumsDataLoader dataLoader,
             filtered = filterService.FilterByTags(tagFilters, filtered);
 
         List<AlbumViewModel> filteredList = filtered.Cast<AlbumViewModel>().ToList();
-        List<AlbumsGroupCategoryViewModel> groups = groupService.GetGroupedItems(groupBy, filteredList).ToList();
+        List<AlbumsGroupCategoryViewModel> groups = groupService
+            .GetGroupedItems(groupBy, filteredList.Cast<IGroupableAlbum>().ToList())
+            .Select(g => new AlbumsGroupCategoryViewModel { Title = g.Title, Items = g.Items.Cast<AlbumViewModel>().ToList() })
+            .ToList();
 
         bool isGroupingEnabled = groups.Count > 1 || !string.IsNullOrEmpty(groups.FirstOrDefault()?.Title ?? string.Empty);
 
