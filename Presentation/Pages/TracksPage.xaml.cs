@@ -27,6 +27,7 @@ public sealed partial class TracksPage : Page, IDisposable
 
         Loaded += Page_Loaded;
         ViewModel.PropertyChanged += ViewModel_PropertyChanged;
+        ViewModel.GroupedItems.CollectionChanged += GroupedItems_CollectionChanged;
     }
 
     protected override async void OnNavigatedTo(NavigationEventArgs e)
@@ -60,7 +61,13 @@ public sealed partial class TracksPage : Page, IDisposable
             {
                 tracksListZoom.IsZoomedInViewActive = true;
             }
+
+            UpdateItemsSource();
         }
+    }
+
+    private void GroupedItems_CollectionChanged(object? sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+    {
         UpdateItemsSource();
     }
 
@@ -69,8 +76,12 @@ public sealed partial class TracksPage : Page, IDisposable
         if (ViewModel.GroupedItems.Count == 0)
             return;
 
+        tracksList.ItemsSource = null;
+        tracksZoomoutCollectionList.ItemsSource = null;
+
         if (ViewModel.IsGroupingEnabled)
         {
+            groupedItemsViewSource.Source = null;
             groupedItemsViewSource.IsSourceGrouped = true;
             groupedItemsViewSource.Source = ViewModel.GroupedItems;
 
@@ -79,9 +90,10 @@ public sealed partial class TracksPage : Page, IDisposable
         }
         else
         {
+            groupedItemsViewSource.Source = null;
             groupedItemsViewSource.IsSourceGrouped = false;
+
             tracksList.ItemsSource = ViewModel.GroupedItems[0].Items;
-            tracksZoomoutCollectionList.ItemsSource = null;
         }
     }
 
