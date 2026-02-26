@@ -6,6 +6,7 @@ using Rok.Application.Features.Playlists.PlaylistMenu;
 using Rok.Application.Player;
 using Rok.Application.Randomizer;
 using Rok.Application.Services.Filters;
+using Rok.Application.Services.Grouping;
 using Rok.Infrastructure.Translate;
 using Rok.ViewModels.Album;
 using Rok.ViewModels.Artist.Services;
@@ -13,7 +14,7 @@ using Rok.ViewModels.Track;
 
 namespace Rok.ViewModels.Artist;
 
-public partial class ArtistViewModel : ObservableObject, IFilterableArtist
+public partial class ArtistViewModel : ObservableObject, IFilterableArtist, IGroupableArtist
 {
     private static string FallbackPictureUri => App.Current.Resources["ArtistFallbackPictureUri"] as string ?? "ms-appx:///Assets/artistFallback.png";
     private static BitmapImage FallbackPicture => new(new Uri(FallbackPictureUri));
@@ -208,6 +209,12 @@ public partial class ArtistViewModel : ObservableObject, IFilterableArtist
     public bool IsGenreFavorite => Artist.IsGenreFavorite;
 
     public List<string> Tags => Artist.GetTags();
+
+    string IGroupableArtist.Name => Artist.Name;
+    int? IGroupableArtist.YearMini => Artist.YearMini;
+    string? IGroupable.CountryCode => Artist.CountryCode;
+    DateTime IGroupable.CreatDate => Artist.CreatDate;
+    DateTime? IGroupable.LastListen => Artist.LastListen;
 
     public override string ToString() => Artist?.Name ?? string.Empty;
 

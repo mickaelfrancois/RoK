@@ -1,4 +1,4 @@
-namespace Rok.ViewModels;
+namespace Rok.Application.Services.Grouping;
 
 public static class GroupingConstants
 {

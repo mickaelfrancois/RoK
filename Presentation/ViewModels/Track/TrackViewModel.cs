@@ -6,12 +6,13 @@ using Rok.Application.Features.Playlists.PlaylistMenu;
 using Rok.Application.Features.Tracks.Services;
 using Rok.Application.Player;
 using Rok.Application.Services.Filters;
+using Rok.Application.Services.Grouping;
 using Rok.Infrastructure.Translate;
 using Rok.ViewModels.Track.Services;
 
 namespace Rok.ViewModels.Track;
 
-public partial class TrackViewModel : ObservableObject, IDisposable, IFilterableTrack
+public partial class TrackViewModel : ObservableObject, IDisposable, IFilterableTrack, IGroupableTrack
 {
     private readonly ResourceLoader _resourceLoader;
     private readonly IPlayerService _playerService;
@@ -166,6 +167,16 @@ public partial class TrackViewModel : ObservableObject, IDisposable, IFilterable
     public bool IsGenreFavorite => Track.IsGenreFavorite;
 
     public List<string> Tags => new();
+
+    string IGroupableTrack.Title => Track.Title;
+    string IGroupableTrack.AlbumName => Track.AlbumName;
+    string IGroupableTrack.ArtistName => Track.ArtistName;
+    string? IGroupableTrack.GenreName => Track.GenreName;
+    int IGroupableTrack.Score => Track.Score;
+    int? IGroupableTrack.TrackNumber => Track.TrackNumber;
+    string? IGroupable.CountryCode => Track.CountryCode;
+    DateTime IGroupable.CreatDate => Track.CreatDate;
+    DateTime? IGroupable.LastListen => Track.LastListen;
 
     public TrackViewModel(
         IBackdropLoader backdropLoader,

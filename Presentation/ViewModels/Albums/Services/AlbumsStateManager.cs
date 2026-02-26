@@ -1,4 +1,6 @@
-﻿namespace Rok.ViewModels.Albums.Services;
+﻿using Rok.Application.Services.Grouping;
+
+namespace Rok.ViewModels.Albums.Services;
 
 
 public class AlbumsStateManager(IAppOptions appOptions) : ViewStateManager(appOptions)

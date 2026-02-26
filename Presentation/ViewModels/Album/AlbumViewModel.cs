@@ -5,13 +5,14 @@ using Rok.Application.Features.Albums.Services;
 using Rok.Application.Features.Playlists.PlaylistMenu;
 using Rok.Application.Player;
 using Rok.Application.Services.Filters;
+using Rok.Application.Services.Grouping;
 using Rok.Infrastructure.Translate;
 using Rok.ViewModels.Album.Services;
 using Rok.ViewModels.Track;
 
 namespace Rok.ViewModels.Album;
 
-public partial class AlbumViewModel : ObservableObject, IFilterableAlbum
+public partial class AlbumViewModel : ObservableObject, IFilterableAlbum, IGroupableAlbum
 {
     private readonly NavigationService _navigationService;
     private readonly ResourceLoader _resourceLoader;
@@ -61,6 +62,13 @@ public partial class AlbumViewModel : ObservableObject, IFilterableAlbum
     public bool IsAlbumFavorite => Album.IsFavorite;
 
     public List<string> Tags => Album.GetTags();
+
+    string IGroupableAlbum.Name => Album.Name;
+    string IGroupableAlbum.ArtistName => Album.ArtistName;
+    int? IGroupableAlbum.Year => Album.Year;
+    string? IGroupable.CountryCode => Album.CountryCode;
+    DateTime IGroupable.CreatDate => Album.CreatDate;
+    DateTime? IGroupable.LastListen => Album.LastListen;
 
 
     [ObservableProperty]

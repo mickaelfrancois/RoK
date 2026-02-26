@@ -1,9 +1,10 @@
-﻿using Rok.ViewModels.Album;
+﻿using Rok.Application.Services.Grouping;
+using Rok.ViewModels.Album;
 
 namespace Rok.ViewModels.Albums;
 
 
-public class AlbumsGroupCategoryViewModel : IGroupCategoryViewModel<AlbumViewModel>
+public class AlbumsGroupCategoryViewModel : IGroupCategory<AlbumViewModel>
 {
     public string Title { get; set; } = string.Empty;
 

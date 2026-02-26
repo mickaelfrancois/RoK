@@ -1,4 +1,6 @@
-﻿namespace Rok.ViewModels.Tracks.Services;
+﻿using Rok.Application.Services.Grouping;
+
+namespace Rok.ViewModels.Tracks.Services;
 
 
 public class TracksStateManager(IAppOptions appOptions) : ViewStateManager(appOptions)

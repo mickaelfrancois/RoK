@@ -1,4 +1,5 @@
 ﻿using Rok.Application.Services.Filters;
+using Rok.Application.Services.Grouping;
 using Rok.ViewModels.Track;
 using Rok.ViewModels.Tracks.Interfaces;
 
@@ -28,7 +29,10 @@ public class TrackProvider(TracksDataLoader dataLoader, TracksFilter filterServi
             filtered = filterService.FilterByGenreId(genreId, filtered);
 
         List<TrackViewModel> filteredList = filtered.Cast<TrackViewModel>().ToList();
-        List<TracksGroupCategoryViewModel> groups = groupService.GetGroupedItems(groupBy, filteredList).ToList();
+        List<TracksGroupCategoryViewModel> groups = groupService
+            .GetGroupedItems(groupBy, filteredList.Cast<IGroupableTrack>().ToList())
+            .Select(g => new TracksGroupCategoryViewModel { Title = g.Title, Items = g.Items.Cast<TrackViewModel>().ToList() })
+            .ToList();
 
         bool isGroupingEnabled = groups.Count > 1 || !string.IsNullOrEmpty(groups.FirstOrDefault()?.Title ?? string.Empty);
 

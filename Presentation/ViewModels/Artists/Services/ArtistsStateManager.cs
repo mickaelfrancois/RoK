@@ -1,4 +1,6 @@
-﻿namespace Rok.ViewModels.Artists.Services;
+﻿using Rok.Application.Services.Grouping;
+
+namespace Rok.ViewModels.Artists.Services;
 
 public class ArtistsStateManager(IAppOptions appOptions) : ViewStateManager(appOptions)
 {
