@@ -85,6 +85,41 @@
                                            PlayButtonVisibility="Visible"
                                            Command="{x:Bind ListenCommand}" />
                 </Border>
+
+                <StackPanel HorizontalAlignment="Right"
+                            VerticalAlignment="Top"
+                            Orientation="Vertical"
+                            Spacing="4"
+                            Margin="0,8,8,0">
+                    <Border Visibility="{x:Bind IsLive, Converter={StaticResource BoolToVisibilityConverter}}"
+                            Background="{StaticResource BadgeLive}"
+                            CornerRadius="4"
+                            Padding="6,2">
+                        <TextBlock Text="Live"
+                                   FontSize="10"
+                                   FontWeight="SemiBold"
+                                   Foreground="White" />
+                    </Border>
+                    <Border Visibility="{x:Bind IsBestOf, Converter={StaticResource BoolToVisibilityConverter}}"
+                            Background="{StaticResource BadgeBestOf}"
+                            CornerRadius="4"
+                            Padding="6,2">
+                        <TextBlock Text="Best of"
+                                   FontSize="10"
+                                   FontWeight="SemiBold"
+                                   Foreground="White" />
+                    </Border>
+                    <Border Visibility="{x:Bind IsCompilation, Converter={StaticResource BoolToVisibilityConverter}}"
+                            Background="{StaticResource BadgeCompilation}"
+                            CornerRadius="4"
+                            Padding="6,2">
+                        <TextBlock Text="Compilation"
+                                   FontSize="10"
+                                   FontWeight="SemiBold"
+                                   Foreground="White" />
+                    </Border>
+                </StackPanel>
+
                 <Grid x:Name="gridBottom"
                       Style="{StaticResource GridCoverBottomStyle}">
                     <Grid.RowDefinitions>
