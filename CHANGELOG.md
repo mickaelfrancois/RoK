@@ -1,5 +1,26 @@
 ﻿# ChangeLog
 
+## [1.4.0] StoreRelease – 25 février 2026
+
+### Ajouté
+
+- Mémorisation de la position de la fenêtre et du mode compact (#172).
+- Le clic sur un titre d'un album démarre la lecture de cet album à partir de la piste cliquée (#171).
+- Le clic sur un titre d'une playlist démarre la lecture de cette playlist à partir de la piste cliquée (#171).
+
+### Modifié
+
+- Le clic sur un titre de la liste d'écoute ouvre désormais les infos de la piste au lieu de démarrer la lecture (#169).
+
+### Corrigé
+
+- Le choix 'Tous' dans les filtres des genres réinitialisait tous les filtres au lieu de réinitialiser uniquement le filtre sur les genres (#174).
+- L'affichage d'une grille sans groupement ne fonctionnait pas correctement (#173).
+
+ 
+--
+
+
 ## [1.3.3] – 25 février 2026
 
 ### Ajouté
@@ -52,7 +73,7 @@
 --
 
 
-## [1.3.0] – 8 février 2026
+## [1.3.0] StoreRelease – 8 février 2026
 
 ### Ajouté
 
