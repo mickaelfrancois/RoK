@@ -17,6 +17,17 @@
     <SolidColorBrush x:Key="PressedThemeBrush"
                      Color="#123D7A" />
 
+    <SolidColorBrush x:Key="BadgeLive"
+                     Color="DarkCyan" />
+
+    <SolidColorBrush x:Key="BadgeCompilation"
+                     Color="DarkViolet" />
+
+    <SolidColorBrush x:Key="BadgeBestOf"
+                     Color="DarkBlue" />
+
+
+
     <!--<SolidColorBrush x:Key="HoverThemeBrush" Color="#3ABC2C" />
     <SolidColorBrush x:Key="PressedThemeBrush" Color="#33732C" />-->
 

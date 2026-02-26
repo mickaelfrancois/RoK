@@ -83,7 +83,7 @@
                             Orientation="Horizontal"
                             Margin="4,0,0,0">
                     <Border Visibility="{x:Bind ViewModel.Album.IsLive, Mode=TwoWay, Converter={StaticResource BoolToVisibilityConverter}}"
-                            Background="DarkCyan"
+                            Background="{StaticResource BadgeLive}"
                             CornerRadius="1"
                             Margin="0,0,10,0">
                         <TextBlock Text="Live"
@@ -94,7 +94,7 @@
                     </Border>
 
                     <Border Visibility="{x:Bind ViewModel.Album.IsBestOf, Mode=TwoWay, Converter={StaticResource BoolToVisibilityConverter}}"
-                            Background="DarkBlue"
+                            Background="{StaticResource BadgeBestOf}"
                             CornerRadius="1"
                             Margin="0,0,10,0">
                         <TextBlock Text="Bestof"
@@ -105,7 +105,7 @@
                     </Border>
 
                     <Border Visibility="{x:Bind ViewModel.Album.IsCompilation, Mode=TwoWay, Converter={StaticResource BoolToVisibilityConverter}}"
-                            Background="DarkViolet"
+                            Background="{StaticResource BadgeCompilation}"
                             CornerRadius="1"
                             Margin="0,0,10,0">
                         <TextBlock Text="Compilation"

@@ -172,7 +172,7 @@ public partial class TrackViewModel : ObservableObject, IDisposable, IFilterable
     string IGroupableTrack.AlbumName => Track.AlbumName;
     string IGroupableTrack.ArtistName => Track.ArtistName;
     string? IGroupableTrack.GenreName => Track.GenreName;
-    int IGroupableTrack.Score => Track.Score;
+    //int IGroupableTrack.Score => Track.Score;
     int? IGroupableTrack.TrackNumber => Track.TrackNumber;
     string? IGroupable.CountryCode => Track.CountryCode;
     DateTime IGroupable.CreatDate => Track.CreatDate;
