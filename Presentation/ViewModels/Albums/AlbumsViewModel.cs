@@ -34,7 +34,7 @@ public partial class AlbumsViewModel : ObservableObject, IDisposable
     public IReadOnlyList<string> SelectedTagFilters => _stateManager.SelectedTagFilters;
     public bool IsSelectedItems => _selectionManager.IsSelectedItems;
     public int Count => _filteredAlbums.Count;
-    public string DurationText => TimeSpan.FromSeconds(_filteredAlbums.Sum(album => album.Album.Duration)).TotalHours.ToString("#0");
+    public double DurationText => TimeSpan.FromSeconds(_filteredAlbums.Sum(album => album.Album.Duration)).TotalHours;
 
     [ObservableProperty]
     public partial string FilterByText { get; set; } = string.Empty;

@@ -364,7 +364,7 @@
                                   FontSize="14"
                                   VerticalAlignment="Center" />
                         <TextBlock VerticalAlignment="Center">
-                            <Run Text="{x:Bind ViewModel.Count, Mode=OneWay}"
+                            <Run Text="{x:Bind ViewModel.Count, Mode=OneWay, Converter={StaticResource NumberToFormattedStringConverter}}"
                                  FontWeight="SemiBold" />
                                     <Run x:Uid="albumsViewAlbums" />
                         </TextBlock>
@@ -376,7 +376,7 @@
                                   FontSize="14"
                                   VerticalAlignment="Center" />
                         <TextBlock VerticalAlignment="Center">
-                            <Run Text="{x:Bind ViewModel.DurationText, Mode=OneWay}"
+                            <Run Text="{x:Bind ViewModel.DurationText, Mode=OneWay, Converter={StaticResource NumberToFormattedStringConverter}}"
                                  FontWeight="SemiBold" />
                             <Run x:Uid="hours" />
                         </TextBlock>

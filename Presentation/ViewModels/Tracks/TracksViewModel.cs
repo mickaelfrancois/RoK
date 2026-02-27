@@ -31,6 +31,9 @@ public partial class TracksViewModel : ObservableObject, IDisposable
     public int SelectedCount => _selectionManager.SelectedCount;
     public bool IsSelectedItems => _selectionManager.IsSelectedItems;
 
+    public int Count => _filteredTracks.Count;
+    public double DurationText => TimeSpan.FromSeconds(_filteredTracks.Sum(track => track.Track.Duration)).TotalHours;
+
     [ObservableProperty]
     public partial string FilterByText { get; set; } = string.Empty;
 

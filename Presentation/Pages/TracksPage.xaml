@@ -105,7 +105,37 @@
                             </MenuFlyout>
                         </SplitButton.Flyout>
                     </SplitButton>
-                    
+
+                    <AppBarSeparator />
+
+                    <!-- Info about albums count and duration -->
+                    <StackPanel Orientation="Horizontal"
+                                Spacing="4"
+                                VerticalAlignment="Center"
+                                Margin="12,0,0,0">
+                        <FontIcon Glyph="&#xE8D6;"
+                                  FontFamily="Segoe Fluent Icons"
+                                  FontSize="14"
+                                  VerticalAlignment="Center" />
+                        <TextBlock VerticalAlignment="Center">
+                            <Run Text="{x:Bind ViewModel.Count, Mode=OneWay, Converter={StaticResource NumberToFormattedStringConverter}}"
+                                FontWeight="SemiBold" />
+                            <Run x:Uid="tracksPageTracks" />
+                        </TextBlock>
+                        <TextBlock Text="•"
+                                   VerticalAlignment="Center"
+                                   Opacity="0.4" />
+                        <FontIcon Glyph="&#xE916;"
+                                  FontFamily="Segoe Fluent Icons"
+                                  FontSize="14"
+                                  VerticalAlignment="Center" />
+                        <TextBlock VerticalAlignment="Center">
+                            <Run Text="{x:Bind ViewModel.DurationText, Mode=OneWay, Converter={StaticResource NumberToFormattedStringConverter}}"
+                                FontWeight="SemiBold" />
+                            <Run x:Uid="hours" />
+                         </TextBlock>
+                    </StackPanel>
+
                 </StackPanel>
             </CommandBar.Content>
         </CommandBar>

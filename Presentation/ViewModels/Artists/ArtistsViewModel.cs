@@ -35,7 +35,7 @@ public partial class ArtistsViewModel : ObservableObject, IDisposable
     public bool IsSelectedItems => _selectionManager.IsSelectedItems;
 
     public int Count => _filteredArtists.Count;
-    public string DurationText => TimeSpan.FromSeconds(_filteredArtists.Sum(artist => artist.Artist.TotalDurationSeconds)).TotalHours.ToString("#0");
+    public double DurationText => TimeSpan.FromSeconds(_filteredArtists.Sum(artist => artist.Artist.TotalDurationSeconds)).TotalHours;
 
     [ObservableProperty]
     public partial string FilterByText { get; set; } = string.Empty;

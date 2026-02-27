@@ -1158,4 +1158,10 @@
   <data name="albumsViewAlbums.Text" xml:space="preserve">
     <value>albums</value>
   </data>
+  <data name="tracksPageTracks.Text" xml:space="preserve">
+    <value>chansons</value>
+  </data>
+  <data name="artistsPageArtists.Text" xml:space="preserve">
+    <value>artistes</value>
+  </data>
 </root>
