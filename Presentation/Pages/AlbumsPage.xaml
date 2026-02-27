@@ -468,6 +468,20 @@
                     </GridView>
                 </SemanticZoom.ZoomedOutView>
             </SemanticZoom>
+
+            <StackPanel HorizontalAlignment="Center"
+                        VerticalAlignment="Center"
+                        Spacing="12"
+                        Visibility="{x:Bind ViewModel.HasNoData, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">
+                <FontIcon Glyph="&#xE93C;"
+                          FontFamily="Segoe Fluent Icons"
+                          FontSize="48"
+                          Opacity="0.4" />
+                <TextBlock x:Uid="albumsViewNoData"
+                           HorizontalAlignment="Center"
+                           Style="{StaticResource SubtitleTextBlockStyle}"
+                           Opacity="0.6" />
+            </StackPanel>
         </Grid>
     </Grid>
 </Page>

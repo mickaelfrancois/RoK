@@ -1164,4 +1164,7 @@
   <data name="artistsPageArtists.Text" xml:space="preserve">
     <value>artistes</value>
   </data>
+  <data name="albumsViewNoData.Text" xml:space="preserve">
+    <value>Aucun album trouvé</value>
+  </data>
 </root>
