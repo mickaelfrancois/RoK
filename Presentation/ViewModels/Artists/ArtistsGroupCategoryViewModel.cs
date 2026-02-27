@@ -9,5 +9,7 @@ public class ArtistsGroupCategoryViewModel : IGroupCategory<ArtistViewModel>
 
     public List<ArtistViewModel> Items { get; set; } = [];
 
+    public int Count => Items.Count;
+
     public override string ToString() => Title;
 }

@@ -9,5 +9,7 @@ public class TracksGroupCategoryViewModel : IGroupCategory<TrackViewModel>
 
     public List<TrackViewModel> Items { get; set; } = [];
 
+    public int Count => Items.Count;
+
     public override string ToString() => Title;
 }
