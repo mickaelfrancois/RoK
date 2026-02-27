@@ -216,6 +216,9 @@ public partial class ArtistsViewModel : ObservableObject, IDisposable
         _filteredArtists = result.FilteredItems;
         GroupedItems.InitWithAddRange(result.Groups);
         IsGroupingEnabled = result.IsGroupingEnabled;
+
+        OnPropertyChanged(nameof(Count));
+        OnPropertyChanged(nameof(DurationText));
     }
 
     [RelayCommand]

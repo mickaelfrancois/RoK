@@ -176,6 +176,9 @@ public partial class TracksViewModel : ObservableObject, IDisposable
         _filteredTracks = result.FilteredItems;
         GroupedItems.InitWithAddRange(result.Groups);
         IsGroupingEnabled = result.IsGroupingEnabled;
+
+        OnPropertyChanged(nameof(Count));
+        OnPropertyChanged(nameof(DurationText));
     }
 
     [RelayCommand]
