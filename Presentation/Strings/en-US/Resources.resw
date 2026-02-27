@@ -1149,4 +1149,7 @@
   <data name="SupportProjectButtonText.Text" xml:space="preserve">
     <value>Support the project, buy me a coffee</value>
   </data>
+  <data name="hours" xml:space="preserve">
+    <value>hours</value>
+  </data>
 </root>
