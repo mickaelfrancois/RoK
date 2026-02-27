@@ -1167,4 +1167,10 @@
   <data name="albumsViewNoData.Text" xml:space="preserve">
     <value>Aucun album trouvé</value>
   </data>
+  <data name="artistsViewNoData.Text" xml:space="preserve">
+    <value>Aucun artiste trouvé</value>
+  </data>
+  <data name="tracksViewNoData.Text" xml:space="preserve">
+    <value>Aucune chanson trouvée</value>
+  </data>
 </root>
