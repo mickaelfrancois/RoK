@@ -10,5 +10,7 @@ public class AlbumsGroupCategoryViewModel : IGroupCategory<AlbumViewModel>
 
     public List<AlbumViewModel> Items { get; set; } = [];
 
+    public int Count => Items.Count;
+
     public override string ToString() => Title;
 }
