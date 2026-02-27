@@ -34,6 +34,9 @@ public partial class ArtistsViewModel : ObservableObject, IDisposable
     public IReadOnlyList<string> SelectedTagFilters => _stateManager.SelectedTagFilters;
     public bool IsSelectedItems => _selectionManager.IsSelectedItems;
 
+    public int Count => _filteredArtists.Count;
+    public string DurationText => TimeSpan.FromSeconds(_filteredArtists.Sum(artist => artist.Artist.TotalDurationSeconds)).TotalHours.ToString("#0");
+
     [ObservableProperty]
     public partial string FilterByText { get; set; } = string.Empty;
 

@@ -1149,7 +1149,13 @@
   <data name="SupportProjectButtonText.Text" xml:space="preserve">
     <value>Soutenez le projet, offrez-moi un café</value>
   </data>
-  <data name="hours" xml:space="preserve">
+  <data name="hours.Text" xml:space="preserve">
     <value>heures</value>
+  </data>
+  <data name="artistsViewArtists.Text" xml:space="preserve">
+    <value>artistes</value>
+  </data>
+  <data name="albumsViewAlbums.Text" xml:space="preserve">
+    <value>albums</value>
   </data>
 </root>

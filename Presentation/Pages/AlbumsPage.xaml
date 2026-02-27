@@ -354,6 +354,7 @@
 
                     <AppBarSeparator />
 
+                    <!-- Info about albums count and duration -->
                     <StackPanel Orientation="Horizontal"
                                 Spacing="4"
                                 VerticalAlignment="Center"
@@ -365,7 +366,7 @@
                         <TextBlock VerticalAlignment="Center">
                             <Run Text="{x:Bind ViewModel.Count, Mode=OneWay}"
                                  FontWeight="SemiBold" />
-                                    <Run x:Uid="albums" />
+                                    <Run x:Uid="albumsViewAlbums" />
                         </TextBlock>
                         <TextBlock Text="•"
                                    VerticalAlignment="Center"
