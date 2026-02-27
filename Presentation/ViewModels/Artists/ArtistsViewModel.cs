@@ -34,6 +34,9 @@ public partial class ArtistsViewModel : ObservableObject, IDisposable
     public IReadOnlyList<string> SelectedTagFilters => _stateManager.SelectedTagFilters;
     public bool IsSelectedItems => _selectionManager.IsSelectedItems;
 
+    public int Count => _filteredArtists.Count;
+    public double DurationText => TimeSpan.FromSeconds(_filteredArtists.Sum(artist => artist.Artist.TotalDurationSeconds)).TotalHours;
+
     [ObservableProperty]
     public partial string FilterByText { get; set; } = string.Empty;
 
@@ -213,6 +216,9 @@ public partial class ArtistsViewModel : ObservableObject, IDisposable
         _filteredArtists = result.FilteredItems;
         GroupedItems.InitWithAddRange(result.Groups);
         IsGroupingEnabled = result.IsGroupingEnabled;
+
+        OnPropertyChanged(nameof(Count));
+        OnPropertyChanged(nameof(DurationText));
     }
 
     [RelayCommand]

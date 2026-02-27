@@ -263,9 +263,41 @@
                     </SplitButton>
 
                     <AppBarSeparator />
+                    
                     <AppBarButton Icon="{x:Bind ViewModel.IsGridView, Mode=OneWay, Converter={StaticResource GridListIconConverter}}"
                                   Style="{StaticResource AppBarButtonCompactStyle}"
                                   Command="{x:Bind ViewModel.ToggleDisplayModeCommand}" />
+
+                    <AppBarSeparator />
+                    
+                    <!-- Info about albums count and duration -->
+                    <StackPanel Orientation="Horizontal"
+                                Spacing="4"
+                                VerticalAlignment="Center"
+                                Margin="12,0,0,0">
+                        <FontIcon Glyph="&#xE93C;"
+                                  FontFamily="Segoe Fluent Icons"
+                                  FontSize="14"
+                                  VerticalAlignment="Center" />
+                        <TextBlock VerticalAlignment="Center">
+                             <Run Text="{x:Bind ViewModel.Count, Mode=OneWay, Converter={StaticResource NumberToFormattedStringConverter}}"
+                                  FontWeight="SemiBold" />
+                             <Run x:Uid="artistsPageArtists" />
+                        </TextBlock>
+                        <TextBlock Text="•"
+                                   VerticalAlignment="Center"
+                                   Opacity="0.4" />
+                        <FontIcon Glyph="&#xE916;"
+                                  FontFamily="Segoe Fluent Icons"
+                                  FontSize="14"
+                                  VerticalAlignment="Center" />
+                        <TextBlock VerticalAlignment="Center">
+                            <Run Text="{x:Bind ViewModel.DurationText, Mode=OneWay, Converter={StaticResource NumberToFormattedStringConverter}}"
+                                 FontWeight="SemiBold" />
+                             <Run x:Uid="hours" />
+                        </TextBlock>
+                    </StackPanel>
+
                 </StackPanel>
             </CommandBar.Content>
         </CommandBar>

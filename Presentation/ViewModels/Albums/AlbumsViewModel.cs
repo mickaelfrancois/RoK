@@ -33,6 +33,8 @@ public partial class AlbumsViewModel : ObservableObject, IDisposable
     public IReadOnlyList<long> SelectedGenreFilters => _stateManager.SelectedGenreFilters;
     public IReadOnlyList<string> SelectedTagFilters => _stateManager.SelectedTagFilters;
     public bool IsSelectedItems => _selectionManager.IsSelectedItems;
+    public int Count => _filteredAlbums.Count;
+    public double DurationText => TimeSpan.FromSeconds(_filteredAlbums.Sum(album => album.Album.Duration)).TotalHours;
 
     [ObservableProperty]
     public partial string FilterByText { get; set; } = string.Empty;
@@ -216,6 +218,9 @@ public partial class AlbumsViewModel : ObservableObject, IDisposable
         _filteredAlbums = result.FilteredItems;
         GroupedItems.InitWithAddRange(result.Groups);
         IsGroupingEnabled = result.IsGroupingEnabled;
+
+        OnPropertyChanged(nameof(Count));
+        OnPropertyChanged(nameof(DurationText));
     }
 
     [RelayCommand]
