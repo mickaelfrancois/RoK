@@ -35,6 +35,7 @@ public partial class ArtistsViewModel : ObservableObject, IDisposable
     public bool IsSelectedItems => _selectionManager.IsSelectedItems;
 
     public int Count => _filteredArtists.Count;
+    public bool HasNoData => _filteredArtists.Count == 0;
     public double DurationText => TimeSpan.FromSeconds(_filteredArtists.Sum(artist => artist.Artist.TotalDurationSeconds)).TotalHours;
 
     [ObservableProperty]
@@ -219,6 +220,7 @@ public partial class ArtistsViewModel : ObservableObject, IDisposable
 
         OnPropertyChanged(nameof(Count));
         OnPropertyChanged(nameof(DurationText));
+        OnPropertyChanged(nameof(HasNoData));
     }
 
     [RelayCommand]

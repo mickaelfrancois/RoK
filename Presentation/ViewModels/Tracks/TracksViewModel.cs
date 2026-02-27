@@ -32,6 +32,7 @@ public partial class TracksViewModel : ObservableObject, IDisposable
     public bool IsSelectedItems => _selectionManager.IsSelectedItems;
 
     public int Count => _filteredTracks.Count;
+    public bool HasNoData => _filteredTracks.Count == 0;
     public double DurationText => TimeSpan.FromSeconds(_filteredTracks.Sum(track => track.Track.Duration)).TotalHours;
 
     [ObservableProperty]
@@ -179,6 +180,7 @@ public partial class TracksViewModel : ObservableObject, IDisposable
 
         OnPropertyChanged(nameof(Count));
         OnPropertyChanged(nameof(DurationText));
+        OnPropertyChanged(nameof(HasNoData));
     }
 
     [RelayCommand]

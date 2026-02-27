@@ -34,6 +34,7 @@ public partial class AlbumsViewModel : ObservableObject, IDisposable
     public IReadOnlyList<string> SelectedTagFilters => _stateManager.SelectedTagFilters;
     public bool IsSelectedItems => _selectionManager.IsSelectedItems;
     public int Count => _filteredAlbums.Count;
+    public bool HasNoData => _filteredAlbums.Count == 0;
     public double DurationText => TimeSpan.FromSeconds(_filteredAlbums.Sum(album => album.Album.Duration)).TotalHours;
 
     [ObservableProperty]
@@ -221,6 +222,7 @@ public partial class AlbumsViewModel : ObservableObject, IDisposable
 
         OnPropertyChanged(nameof(Count));
         OnPropertyChanged(nameof(DurationText));
+        OnPropertyChanged(nameof(HasNoData));
     }
 
     [RelayCommand]
