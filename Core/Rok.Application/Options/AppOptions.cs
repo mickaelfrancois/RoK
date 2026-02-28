@@ -10,6 +10,10 @@ public class AppOptions : IAppOptions
 
     public AppTheme Theme { get; set; } = AppTheme.System;
 
+    public int AlbumRecentThresholdDays { get; set; } = 30;
+
+    public int ArtistRecentThresholdDays { get; set; } = 30;
+
     public List<string> LibraryTokens { get; set; } = [];
 
     public bool CrossFade { get; set; } = true;

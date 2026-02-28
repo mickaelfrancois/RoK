@@ -61,6 +61,12 @@ public partial class AlbumViewModel : ObservableObject, IFilterableAlbum, IGroup
 
     public bool IsAlbumFavorite => Album.IsFavorite;
 
+    [ObservableProperty]
+    public partial bool IsNew { get; set; }
+
+    [ObservableProperty]
+    public partial bool ShowNewBadge { get; set; }
+
     public List<string> Tags => Album.GetTags();
 
     string IGroupableAlbum.Name => Album.Name;
@@ -186,6 +192,7 @@ public partial class AlbumViewModel : ObservableObject, IFilterableAlbum, IGroup
     public void SetData(AlbumDto album)
     {
         Album = Guard.Against.Null(album);
+        IsNew = Album.CreatDate > DateTime.UtcNow.AddDays(-_appOptions.AlbumRecentThresholdDays);
     }
 
     public async Task LoadDataAsync(long albumId)
@@ -216,6 +223,8 @@ public partial class AlbumViewModel : ObservableObject, IFilterableAlbum, IGroup
         if (album != null)
         {
             Album = album;
+            IsNew = Album.CreatDate > DateTime.UtcNow.AddDays(-_appOptions.AlbumRecentThresholdDays);
+
             LoadBackrop();
         }
     }
