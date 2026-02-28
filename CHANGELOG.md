@@ -1,5 +1,19 @@
 ﻿# ChangeLog
 
+## [1.5.0] StoreRelease – 28 février 2026
+
+### Ajouté
+
+- Ajout du nombre d'élements (et durée) dans la liste des albums, artistes, et chansons (#183)
+- Ajout du nombre d'éléments dans le titre des groupes dans la liste des albums, artistes et chansons (#185)
+- Ajout d'un label si les filtres retournent aucune donnée (#184)
+
+### Modifié
+- Modification de la licence (#182)
+
+### Corrigé
+
+
 ## [1.4.0] StoreRelease – 25 février 2026
 
 ### Ajouté
