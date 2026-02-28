@@ -118,7 +118,7 @@
                                   FontSize="14"
                                   VerticalAlignment="Center" />
                         <TextBlock VerticalAlignment="Center">
-                            <Run Text="{x:Bind ViewModel.Count, Mode=OneWay, Converter={StaticResource NumberToFormattedStringConverter}}"
+                            <Run x:Name="trackCountRun"
                                 FontWeight="SemiBold" />
                             <Run x:Uid="tracksPageTracks" />
                         </TextBlock>
@@ -130,7 +130,7 @@
                                   FontSize="14"
                                   VerticalAlignment="Center" />
                         <TextBlock VerticalAlignment="Center">
-                            <Run Text="{x:Bind ViewModel.DurationText, Mode=OneWay, Converter={StaticResource NumberToFormattedStringConverter}}"
+                            <Run x:Name="trackDurationRun"
                                 FontWeight="SemiBold" />
                             <Run x:Uid="hours" />
                          </TextBlock>
