@@ -15,10 +15,18 @@ public sealed partial class TracksPage : Page, IDisposable
     private readonly TracksGroupByMenuBuilder _groupByMenuBuilder = new();
 
     private bool _disposed;
+    private bool _pageLoaded;
+
+    private readonly AnimatedNumberHelper _countAnimation;
+    private readonly AnimatedNumberHelper _durationAnimation;
+
 
     public TracksPage()
     {
-        this.InitializeComponent();
+        InitializeComponent();
+
+        _countAnimation = new AnimatedNumberHelper(t => trackCountRun.Text = t);
+        _durationAnimation = new AnimatedNumberHelper(t => trackDurationRun.Text = t);
 
         _logger = App.ServiceProvider.GetRequiredService<ILogger<TracksPage>>();
 
@@ -41,7 +49,7 @@ public sealed partial class TracksPage : Page, IDisposable
         ScrollStateHelper.SaveScrollOffset(tracksList);
         ViewModel.SaveState();
 
-        // Cleanup bindings and handlers to avoid keeping generated binding tracking objects alive
+        _pageLoaded = false;
         Dispose();
 
         base.OnNavigatingFrom(e);
@@ -49,12 +57,29 @@ public sealed partial class TracksPage : Page, IDisposable
 
     private void Page_Loaded(object sender, RoutedEventArgs e)
     {
+        _pageLoaded = true;
         UpdateItemsSource();
         ScrollStateHelper.RestoreScrollOffset(tracksList);
+        _countAnimation.AnimateTo(ViewModel.Count);
+        _durationAnimation.AnimateTo(ViewModel.DurationText);
     }
 
     private void ViewModel_PropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
+        if (e.PropertyName == nameof(ViewModel.Count))
+        {
+            if (_pageLoaded)
+                _countAnimation.AnimateTo(ViewModel.Count);
+            return;
+        }
+
+        if (e.PropertyName == nameof(ViewModel.DurationText))
+        {
+            if (_pageLoaded)
+                _durationAnimation.AnimateTo(ViewModel.DurationText);
+            return;
+        }
+
         if (e.PropertyName == nameof(ViewModel.IsGroupingEnabled))
         {
             if (!ViewModel.IsGroupingEnabled && !tracksListZoom.IsZoomedInViewActive)
@@ -120,6 +145,9 @@ public sealed partial class TracksPage : Page, IDisposable
         try
         {
             Loaded -= Page_Loaded;
+
+            _countAnimation.Dispose();
+            _durationAnimation.Dispose();
 
             if (ViewModel != null)
                 ViewModel.PropertyChanged -= ViewModel_PropertyChanged;

@@ -280,7 +280,7 @@
                                   FontSize="14"
                                   VerticalAlignment="Center" />
                         <TextBlock VerticalAlignment="Center">
-                             <Run Text="{x:Bind ViewModel.Count, Mode=OneWay, Converter={StaticResource NumberToFormattedStringConverter}}"
+                             <Run x:Name="artistCountRun"
                                   FontWeight="SemiBold" />
                              <Run x:Uid="artistsPageArtists" />
                         </TextBlock>
@@ -292,7 +292,7 @@
                                   FontSize="14"
                                   VerticalAlignment="Center" />
                         <TextBlock VerticalAlignment="Center">
-                            <Run Text="{x:Bind ViewModel.DurationText, Mode=OneWay, Converter={StaticResource NumberToFormattedStringConverter}}"
+                            <Run x:Name="artistDurationRun"
                                  FontWeight="SemiBold" />
                              <Run x:Uid="hours" />
                         </TextBlock>

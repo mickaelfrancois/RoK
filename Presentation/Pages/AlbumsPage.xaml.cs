@@ -20,10 +20,18 @@ public sealed partial class AlbumsPage : Page, IDisposable
     private readonly AlbumsGroupByMenuBuilder _groupByMenuBuilder = new();
 
     private bool _disposed;
+    private bool _pageLoaded;
+
+    private readonly AnimatedNumberHelper _countAnimation;
+    private readonly AnimatedNumberHelper _durationAnimation;
+
 
     public AlbumsPage()
     {
         InitializeComponent();
+
+        _countAnimation = new AnimatedNumberHelper(t => albumCountRun.Text = t);
+        _durationAnimation = new AnimatedNumberHelper(t => albumDurationRun.Text = t);
 
         _logger = App.ServiceProvider.GetRequiredService<ILogger<AlbumsPage>>();
         ViewModel = App.ServiceProvider.GetRequiredService<AlbumsViewModel>();
@@ -34,7 +42,6 @@ public sealed partial class AlbumsPage : Page, IDisposable
         ViewModel.GroupedItems.CollectionChanged += GroupedItems_CollectionChanged;
     }
 
-
     protected override async void OnNavigatedTo(NavigationEventArgs e)
     {
         await ViewModel.LoadDataAsync(forceReload: false);
@@ -43,27 +50,42 @@ public sealed partial class AlbumsPage : Page, IDisposable
         base.OnNavigatedTo(e);
     }
 
-
     protected override void OnNavigatingFrom(NavigatingCancelEventArgs e)
     {
         ScrollStateHelper.SaveScrollOffset(grid);
         ViewModel.SaveState();
 
-        // Cleanup bindings and handlers to avoid keeping generated binding tracking objects alive
+        _pageLoaded = false;
         Dispose();
 
         base.OnNavigatingFrom(e);
     }
 
-
     private void Page_Loaded(object sender, RoutedEventArgs e)
     {
+        _pageLoaded = true;
         UpdateItemsSource();
         ScrollStateHelper.RestoreScrollOffset(grid);
+        _countAnimation.AnimateTo(ViewModel.Count);
+        _durationAnimation.AnimateTo(ViewModel.DurationText);
     }
 
     private void ViewModel_PropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
+        if (e.PropertyName == nameof(ViewModel.Count))
+        {
+            if (_pageLoaded)
+                _countAnimation.AnimateTo(ViewModel.Count);
+            return;
+        }
+
+        if (e.PropertyName == nameof(ViewModel.DurationText))
+        {
+            if (_pageLoaded)
+                _durationAnimation.AnimateTo(ViewModel.DurationText);
+            return;
+        }
+
         if (e.PropertyName == nameof(ViewModel.IsGridView))
         {
             UpdateVisualState();
@@ -117,12 +139,10 @@ public sealed partial class AlbumsPage : Page, IDisposable
         _filterMenuBuilder.PopulateFilterMenu(filterMenu, ViewModel);
     }
 
-
     private void GroupButton_Tapped(object sender, Microsoft.UI.Xaml.Input.TappedRoutedEventArgs e)
     {
         e.Handled = true;
     }
-
 
     private void GridContainerContentChanging(ListViewBase sender, ContainerContentChangingEventArgs args)
     {
@@ -134,7 +154,6 @@ public sealed partial class AlbumsPage : Page, IDisposable
     {
         _groupByMenuBuilder.PopulateGroupByMenu(groupByMenu, ViewModel);
     }
-
 
     private void gridBottom_PointerEntered(object sender, PointerRoutedEventArgs e)
     {
@@ -151,7 +170,6 @@ public sealed partial class AlbumsPage : Page, IDisposable
             }
         }
     }
-
 
     private void gridBottom_PointerExited(object sender, PointerRoutedEventArgs e)
     {
@@ -189,6 +207,9 @@ public sealed partial class AlbumsPage : Page, IDisposable
         try
         {
             Loaded -= Page_Loaded;
+
+            _countAnimation.Dispose();
+            _durationAnimation.Dispose();
 
             if (ViewModel != null)
             {
