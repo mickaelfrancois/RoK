@@ -118,6 +118,15 @@
                                    FontWeight="SemiBold"
                                    Foreground="White" />
                     </Border>
+                    <Border Visibility="{x:Bind ShowNewBadge, Converter={StaticResource BoolToVisibilityConverter}, Mode=OneWay}"
+                            Background="{StaticResource BadgeNew}"
+                            CornerRadius="4"
+                            Padding="6,2">
+                        <TextBlock Text="New"
+                                   FontSize="10"
+                                   FontWeight="SemiBold"
+                                   Foreground="White" />
+                    </Border>
                 </StackPanel>
 
                 <Grid x:Name="gridBottom"

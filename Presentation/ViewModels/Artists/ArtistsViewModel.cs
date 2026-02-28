@@ -215,12 +215,23 @@ public partial class ArtistsViewModel : ObservableObject, IDisposable
         ArtistProviderResult result = _artistProvider.GetProcessedData(_stateManager.GroupBy, _stateManager.SelectedFilters, _stateManager.SelectedGenreFilters, _stateManager.SelectedTagFilters);
 
         _filteredArtists = result.FilteredItems;
+
+        ApplyNewBadge();
+
         GroupedItems.InitWithAddRange(result.Groups);
         IsGroupingEnabled = result.IsGroupingEnabled;
 
         OnPropertyChanged(nameof(Count));
         OnPropertyChanged(nameof(DurationText));
         OnPropertyChanged(nameof(HasNoData));
+    }
+
+    private void ApplyNewBadge()
+    {
+        bool allNew = _filteredArtists.Count > 0 && _filteredArtists.All(a => a.IsNew);
+
+        foreach (ArtistViewModel viewModel in _filteredArtists)
+            viewModel.ShowNewBadge = viewModel.IsNew && !allNew;
     }
 
     [RelayCommand]

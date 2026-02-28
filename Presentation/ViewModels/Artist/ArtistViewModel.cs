@@ -208,6 +208,12 @@ public partial class ArtistViewModel : ObservableObject, IFilterableArtist, IGro
 
     public bool IsGenreFavorite => Artist.IsGenreFavorite;
 
+    [ObservableProperty]
+    public partial bool IsNew { get; set; }
+
+    [ObservableProperty]
+    public partial bool ShowNewBadge { get; set; }
+
     public List<string> Tags => Artist.GetTags();
 
     string IGroupableArtist.Name => Artist.Name;
@@ -257,6 +263,7 @@ public partial class ArtistViewModel : ObservableObject, IFilterableArtist, IGro
     public void SetData(ArtistDto artist)
     {
         Artist = Guard.Against.Null(artist);
+        IsNew = Artist.CreatDate > DateTime.UtcNow.AddDays(-_appOptions.ArtistRecentThresholdDays);
     }
 
     public async Task LoadDataAsync(long artistId, bool loadAlbums = true, bool loadTracks = true, bool fetchApi = true)
@@ -291,6 +298,8 @@ public partial class ArtistViewModel : ObservableObject, IFilterableArtist, IGro
         if (artist != null)
         {
             Artist = artist;
+            IsNew = Artist.CreatDate > DateTime.UtcNow.AddDays(-_appOptions.ArtistRecentThresholdDays);
+
             LoadBackdrop();
         }
     }

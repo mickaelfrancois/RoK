@@ -33,6 +33,7 @@ public partial class AlbumsViewModel : ObservableObject, IDisposable
     public IReadOnlyList<long> SelectedGenreFilters => _stateManager.SelectedGenreFilters;
     public IReadOnlyList<string> SelectedTagFilters => _stateManager.SelectedTagFilters;
     public bool IsSelectedItems => _selectionManager.IsSelectedItems;
+
     public int Count => _filteredAlbums.Count;
     public bool HasNoData => _filteredAlbums.Count == 0;
     public double DurationText => TimeSpan.FromSeconds(_filteredAlbums.Sum(album => album.Album.Duration)).TotalHours;
@@ -217,12 +218,23 @@ public partial class AlbumsViewModel : ObservableObject, IDisposable
         AlbumProviderResult result = _albumProvider.GetProcessedData(_stateManager.GroupBy, _stateManager.SelectedFilters, _stateManager.SelectedGenreFilters, _stateManager.SelectedTagFilters);
 
         _filteredAlbums = result.FilteredItems;
+
+        ApplyNewBadge();
+
         GroupedItems.InitWithAddRange(result.Groups);
         IsGroupingEnabled = result.IsGroupingEnabled;
 
         OnPropertyChanged(nameof(Count));
         OnPropertyChanged(nameof(DurationText));
         OnPropertyChanged(nameof(HasNoData));
+    }
+
+    private void ApplyNewBadge()
+    {
+        bool allNew = _filteredAlbums.Count > 0 && _filteredAlbums.All(a => a.IsNew);
+
+        foreach (AlbumViewModel viewModel in _filteredAlbums)
+            viewModel.ShowNewBadge = viewModel.IsNew && !allNew;
     }
 
     [RelayCommand]

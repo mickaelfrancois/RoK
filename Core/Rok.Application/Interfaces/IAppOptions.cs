@@ -8,6 +8,10 @@ public interface IAppOptions
 
     AppTheme Theme { get; set; }
 
+    int AlbumRecentThresholdDays { get; set; }
+
+    int ArtistRecentThresholdDays { get; set; }
+
     List<string> LibraryTokens { get; set; }
 
     bool CrossFade { get; set; }

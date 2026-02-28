@@ -23,6 +23,9 @@
     <SolidColorBrush x:Key="BadgeCompilation"
                      Color="DarkViolet" />
 
+    <SolidColorBrush x:Key="BadgeNew"
+                     Color="DarkOrange" />
+
     <SolidColorBrush x:Key="BadgeBestOf"
                      Color="DarkBlue" />
 
