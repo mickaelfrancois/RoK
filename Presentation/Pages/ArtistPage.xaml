@@ -353,7 +353,30 @@
                                     <common:PictureControl Style="{StaticResource PictureCoverStyle}" Cover="{x:Bind Picture, Mode=OneWay}" x:Phase="2" PlayButtonVisibility="Visible" Command="{x:Bind ListenCommand}"/>
                                 </Border>
 
-                                <Grid Style="{StaticResource GridCoverBottomStyle}">
+                                    <StackPanel HorizontalAlignment="Right"
+                                                VerticalAlignment="Top"
+                                                Orientation="Vertical"
+                                                Spacing="4"
+                                                Margin="0,8,8,0">
+
+                                        <common:BadgeControl x:Uid="badgeLive"
+                                                             Visibility="{x:Bind IsLive, Converter={StaticResource BoolToVisibilityConverter}}"
+                                                             BadgeBackground="{StaticResource BadgeLive}" />
+
+                                        <common:BadgeControl x:Uid="badgeBestof"
+                                                             Visibility="{x:Bind IsBestOf, Converter={StaticResource BoolToVisibilityConverter}}"
+                                                             BadgeBackground="{StaticResource BadgeBestOf}" />
+
+                                        <common:BadgeControl x:Uid="badgeCompilation"
+                                                             Visibility="{x:Bind IsCompilation, Converter={StaticResource BoolToVisibilityConverter}}"
+                                                             BadgeBackground="{StaticResource BadgeCompilation}" />
+
+                                        <common:BadgeControl x:Uid="badgeNew"
+                                                             Visibility="{x:Bind ShowNewBadge, Converter={StaticResource BoolToVisibilityConverter}}"
+                                                             BadgeBackground="{StaticResource BadgeNew}" />
+                                    </StackPanel>
+
+                                    <Grid Style="{StaticResource GridCoverBottomStyle}">
                                     <Grid.RowDefinitions>
                                         <RowDefinition Height="30"></RowDefinition>
                                         <RowDefinition Height="30"></RowDefinition>
