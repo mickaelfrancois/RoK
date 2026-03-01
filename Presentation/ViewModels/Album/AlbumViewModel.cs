@@ -6,6 +6,7 @@ using Rok.Application.Features.Playlists.PlaylistMenu;
 using Rok.Application.Player;
 using Rok.Application.Services.Filters;
 using Rok.Application.Services.Grouping;
+using Rok.Commons;
 using Rok.Infrastructure.Translate;
 using Rok.ViewModels.Album.Services;
 using Rok.ViewModels.Track;
@@ -60,6 +61,9 @@ public partial class AlbumViewModel : ObservableObject, IFilterableAlbum, IGroup
     public bool IsArtistFavorite => Album.IsArtistFavorite;
 
     public bool IsAlbumFavorite => Album.IsFavorite;
+
+    [ObservableProperty]
+    public partial Windows.UI.Color DominantColor { get; set; }
 
     [ObservableProperty]
     public partial bool IsNew { get; set; }
@@ -231,8 +235,40 @@ public partial class AlbumViewModel : ObservableObject, IFilterableAlbum, IGroup
 
     public void LoadPicture()
     {
-        Picture = _pictureService.LoadPicture(Album.AlbumPath);
+        try
+        {
+            Picture = _pictureService.LoadPicture(Album.AlbumPath);
+
+            if (!_pictureService.PictureExists(Album.AlbumPath))
+                return;
+
+            _ = CalculatePictureDominantColorAsync(Album.AlbumPath);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "Failed to load picture for {AlbumPath}", Album.AlbumPath);
+        }
     }
+
+
+    public async Task CalculatePictureDominantColorAsync(string albumPath)
+    {
+        try
+        {
+            string filePath = _pictureService.GetPictureFilePath(albumPath);
+
+            Windows.UI.Color color = await DominantColorExtractor.ExtractAsync(filePath);
+            if (App.MainWindow.DispatcherQueue is { } dq)
+                dq.TryEnqueue(() => DominantColor = color);
+            else
+                DominantColor = color;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "Failed to load picture or dominant color for {AlbumPath}", Album.AlbumPath);
+        }
+    }
+
 
     public void LoadBackrop()
     {

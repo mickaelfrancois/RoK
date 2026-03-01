@@ -30,6 +30,7 @@
 
             <converters:BoolToGridLengthAutoConverter x:Key="BoolToGridLengthAutoConverter" />
             <converters:ColorToBrushConverter x:Key="ColorToBrushConverter" />
+            <converters:ColorToGradientBrushConverter x:Key="ColorToGradientBrushConverter" />
             <converters:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter" />
             <converters:BoolToInvertBoolConverter x:Key="BoolToInvertBoolConverter" />
             <converters:CountryCodeToImageSourceConverter x:Key="CountryCodeToImageSourceConverter" />

@@ -144,10 +144,13 @@ public sealed partial class AlbumsPage : Page, IDisposable
         e.Handled = true;
     }
 
-    private void GridContainerContentChanging(ListViewBase sender, ContainerContentChangingEventArgs args)
+    private async void GridContainerContentChanging(ListViewBase sender, ContainerContentChangingEventArgs args)
     {
         if (args.Item is AlbumViewModel item && item.Picture == null)
+        {
+            // Seems to never be hit. Investigate to see if this code can be removed.
             item.LoadPicture();
+        }
     }
 
     private void GroupByFlyout_Opened(object sender, object e)
