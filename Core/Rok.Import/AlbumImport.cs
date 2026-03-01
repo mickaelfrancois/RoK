@@ -1,4 +1,5 @@
-﻿using Rok.Application.Interfaces;
+﻿using System.Text.RegularExpressions;
+using Rok.Application.Interfaces;
 using Rok.Application.Tag;
 using Rok.Domain.Entities;
 using Rok.Import.Models;
@@ -13,6 +14,8 @@ public class AlbumImport(IAlbumRepository _albumRepository)
     public int CountInCache => _cache.Count;
 
     private readonly Dictionary<string, AlbumCacheItem> _cache = new(StringComparer.InvariantCultureIgnoreCase);
+
+    private static readonly Regex _liveRegex = new(@"\b(live|concert|performance)\b", RegexOptions.IgnoreCase | RegexOptions.Compiled);
 
 
     /// <summary>
@@ -86,6 +89,11 @@ public class AlbumImport(IAlbumRepository _albumRepository)
         if (string.IsNullOrEmpty(track.FullPath))
             return null;
 
+        string[] bestOfMask = new[] { "best of", "best hits", "greatest hits", "bestof" };
+        bool isBestOf = bestOfMask.Any(mask => track.Album.Contains(mask, StringComparison.InvariantCultureIgnoreCase));
+
+        bool isLive = _liveRegex.IsMatch(track.Album);
+
         AlbumEntity album = new()
         {
             Name = track.Album.Capitalize(),
@@ -93,6 +101,8 @@ public class AlbumImport(IAlbumRepository _albumRepository)
             GenreId = genreId,
             Year = track.Year,
             IsCompilation = track.IsCompilation,
+            IsBestOf = isBestOf,
+            IsLive = isLive,
             AlbumPath = Path.GetDirectoryName(track.FullPath)!,
             MusicBrainzID = track.MusicbrainzAlbumID,
             CreatDate = DateTime.Now
