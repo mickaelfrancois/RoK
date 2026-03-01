@@ -1173,4 +1173,16 @@
   <data name="tracksViewNoData.Text" xml:space="preserve">
     <value>Aucune chanson trouvée</value>
   </data>
+  <data name="badgeNew.Text" xml:space="preserve">
+    <value>nouveau</value>
+  </data>
+  <data name="badgeCompilation.Text" xml:space="preserve">
+    <value>compil</value>
+  </data>
+  <data name="badgeBestof.Text" xml:space="preserve">
+    <value>best of</value>
+  </data>
+  <data name="badgeLive.Text" xml:space="preserve">
+    <value>live</value>
+  </data>
 </root>

@@ -69,15 +69,9 @@
                             Orientation="Vertical"
                             Spacing="4"
                             Margin="0,8,8,0">
-                    <Border Visibility="{x:Bind IsNew, Converter={StaticResource BoolToVisibilityConverter}}"
-                            Background="{StaticResource BadgeNew}"
-                            CornerRadius="4"
-                            Padding="6,2">
-                        <TextBlock Text="New"
-                                   FontSize="10"
-                                   FontWeight="SemiBold"
-                                   Foreground="White" />
-                    </Border>
+                    <common:BadgeControl x:Uid="badgeNew"
+                                         Visibility="{x:Bind ShowNewBadge, Converter={StaticResource BoolToVisibilityConverter}}"
+                                         BadgeBackground="{StaticResource BadgeNew}" />
                 </StackPanel>
 
                 <Grid Style="{StaticResource GridCoverBottomStyle}">

@@ -37,6 +37,7 @@
 		<None Remove="Assets\BadgeLogo.scale-200.png" />
 		<None Remove="Assets\BadgeLogo.scale-400.png" />
 		<None Remove="Commons\BackdropControl.xaml" />
+		<None Remove="Commons\BadgeControl.xaml" />
 		<None Remove="Commons\CompactPlayerControl.xaml" />
 		<None Remove="Commons\FullScreenControl.xaml" />
 		<None Remove="Commons\InlineEditableText.xaml" />
@@ -258,6 +259,9 @@
 	  <None Update="appsettings.json">
 	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 	  </None>
+	  <Page Update="Commons\BadgeControl.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </Page>
 	  <Page Update="Styles\RatingControlStyles.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </Page>
