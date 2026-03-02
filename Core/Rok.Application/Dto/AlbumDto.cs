@@ -16,6 +16,8 @@ public class AlbumDto
 
     public string? ReleaseGroupMusicBrainzID { get; set; }
 
+    public long? PictureDominantColor { get; set; }
+
     public string? AudioDbID { get; set; }
 
     public string? AudioDbArtistID { get; set; }

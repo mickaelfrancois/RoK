@@ -23,6 +23,7 @@ ImportProgressService progressService,
 ImportTrackingService trackingService,
 FileSystemService fileSystemService,
 FolderImportProcessor folderProcessor,
+PostImportDominantColorTask postImportDominantColorTask,
 ImportMessageThrottler messageThrottler,
 ILogger<ImportService> logger) : IImport
 {
@@ -44,6 +45,7 @@ ILogger<ImportService> logger) : IImport
     private readonly FileSystemService _fileSystemService = Guard.Against.Null(fileSystemService);
     private readonly FolderImportProcessor _folderProcessor = Guard.Against.Null(folderProcessor);
     private readonly ImportMessageThrottler _messageThrottler = Guard.Against.Null(messageThrottler);
+    private readonly PostImportDominantColorTask _postImportDominantColorTask = Guard.Against.Null(postImportDominantColorTask);
 
     private CancellationTokenSource? _cancellationToken;
 
@@ -122,6 +124,9 @@ ILogger<ImportService> logger) : IImport
 
         if (!errorOccurred)
             await CleanDataAsync(cancellationToken);
+
+        if (!errorOccurred)
+            await _postImportDominantColorTask.RunAsync(cancellationToken);
 
         await SendMetricsAsync().ConfigureAwait(false);
     }

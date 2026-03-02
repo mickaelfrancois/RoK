@@ -111,7 +111,8 @@
                 <GridView.ItemTemplate>
                     <DataTemplate x:DataType="albums:AlbumViewModel">
                         <Grid Style="{StaticResource MainGridCoverStyle}">
-                            <Border CornerRadius="10">
+                            <Border CornerRadius="10"
+                                    Background="{x:Bind DominantColor, Converter={StaticResource ColorToGradientBrushConverter}, Mode=OneWay}">
                                 <common:PictureControl Style="{StaticResource PictureCoverStyle}"
                                                        Cover="{x:Bind Picture, Mode=OneWay}"
                                                        x:Phase="2"

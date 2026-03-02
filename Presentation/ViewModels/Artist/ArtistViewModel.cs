@@ -1,4 +1,5 @@
 ﻿using System.Collections.Specialized;
+using System.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Rok.Application.Features.Artists.Services;
@@ -7,6 +8,7 @@ using Rok.Application.Player;
 using Rok.Application.Randomizer;
 using Rok.Application.Services.Filters;
 using Rok.Application.Services.Grouping;
+using Rok.Commons;
 using Rok.Infrastructure.Translate;
 using Rok.ViewModels.Album;
 using Rok.ViewModels.Artist.Services;
@@ -34,7 +36,10 @@ public partial class ArtistViewModel : ObservableObject, IFilterableArtist, IGro
     private readonly ArtistStatisticsService _statisticsService;
     private readonly ArtistEditService _editService;
     private readonly BackdropPicture _backdropPicture;
+    private readonly IDominantColorCalculator _dominantColorCalculator;
+
     private IEnumerable<TrackDto>? _tracks = null;
+    private CancellationTokenSource _navigationCts = new();
 
     public IPlaylistMenuService PlaylistMenuService { get; }
     public ArtistDto Artist { get; private set; } = new();
@@ -51,6 +56,10 @@ public partial class ArtistViewModel : ObservableObject, IFilterableArtist, IGro
         get => Artist.IsFavorite;
         set => SetProperty(Artist.IsFavorite, value, Artist, (artist, val) => artist.IsFavorite = val);
     }
+
+    [ObservableProperty]
+    public partial Windows.UI.Color DominantColor { get; set; }
+    private int _dominantColorCalculating = 0;
 
     [ObservableProperty]
     public partial BitmapImage? Backdrop { get; set; }
@@ -236,6 +245,7 @@ public partial class ArtistViewModel : ObservableObject, IFilterableArtist, IGro
         ArtistPictureService pictureService,
         ArtistApiService apiService,
         ArtistStatisticsService statisticsService,
+        IDominantColorCalculator dominantColorCalculator,
         ArtistEditService editService,
         BackdropPicture backdropPicture,
         IAppOptions appOptions,
@@ -252,6 +262,7 @@ public partial class ArtistViewModel : ObservableObject, IFilterableArtist, IGro
         _pictureService = Guard.Against.Null(pictureService);
         _apiService = Guard.Against.Null(apiService);
         _statisticsService = Guard.Against.Null(statisticsService);
+        _dominantColorCalculator = Guard.Against.Null(dominantColorCalculator);
         _editService = Guard.Against.Null(editService);
         _backdropPicture = Guard.Against.Null(backdropPicture);
         _appOptions = Guard.Against.Null(appOptions);
@@ -264,10 +275,15 @@ public partial class ArtistViewModel : ObservableObject, IFilterableArtist, IGro
     {
         Artist = Guard.Against.Null(artist);
         IsNew = Artist.CreatDate > DateTime.UtcNow.AddDays(-_appOptions.ArtistRecentThresholdDays);
+
+        if (Artist.PictureDominantColor.HasValue)
+            DominantColor = ColorHelper.FromArgb(Artist.PictureDominantColor.Value);
     }
 
     public async Task LoadDataAsync(long artistId, bool loadAlbums = true, bool loadTracks = true, bool fetchApi = true)
     {
+        CancellationToken cancellationToken = InitNavigationCancellation();
+
         Stopwatch stopwatch = new();
         stopwatch.Start();
 
@@ -276,14 +292,28 @@ public partial class ArtistViewModel : ObservableObject, IFilterableArtist, IGro
         if (loadAlbums)
             await LoadAlbumsAsync(artistId);
 
+        if (cancellationToken.IsCancellationRequested)
+            return;
+
         if (loadTracks)
             await LoadTracksAsync(artistId);
+
+        if (cancellationToken.IsCancellationRequested)
+            return;
 
         if (loadAlbums && loadTracks)
             await UpdateStatisticsIfNeededAsync();
 
+        if (cancellationToken.IsCancellationRequested)
+            return;
+
         if (fetchApi)
             await GetDataFromApiAsync();
+
+        if (cancellationToken.IsCancellationRequested)
+            return;
+
+        await CalculatePictureDominantColorAsync();
 
         await InitializeTagsAsync();
 
@@ -291,6 +321,22 @@ public partial class ArtistViewModel : ObservableObject, IFilterableArtist, IGro
         _logger.LogInformation("Artist {ArtistId} loaded in {ElapsedMilliseconds} ms (albums: {LoadAlbums}, tracks: {LoadTracks}, api: {FetchApi})",
                                 artistId, stopwatch.ElapsedMilliseconds, loadAlbums, loadTracks, fetchApi);
     }
+
+    public void OnNavigatedFrom()
+    {
+        InitNavigationCancellation();
+        Backdrop = null;
+    }
+
+
+    private CancellationToken InitNavigationCancellation()
+    {
+        _navigationCts.Cancel();
+        _navigationCts.Dispose();
+        _navigationCts = new CancellationTokenSource();
+        return _navigationCts.Token;
+    }
+
 
     private async Task LoadArtistAsync(long artistId)
     {
@@ -306,15 +352,53 @@ public partial class ArtistViewModel : ObservableObject, IFilterableArtist, IGro
 
     public void LoadPicture()
     {
-        Picture = _pictureService.LoadPicture(Artist.Name);
+        try
+        {
+            Picture = _pictureService.LoadPicture(Artist.Name);
+
+            if (!_pictureService.PictureExists(Artist.Name))
+                return;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "Failed to load picture for {ArtistName}", Artist.Name);
+        }
     }
+
 
     public void LoadBackdrop()
     {
+        CancellationToken token = _navigationCts.Token;
+
         _backdropLoader.LoadBackdrop(Artist.Name, (BitmapImage? backdropImage) =>
         {
-            Backdrop = backdropImage;
+            if (!token.IsCancellationRequested)
+                Backdrop = backdropImage;
         });
+    }
+
+    private async Task CalculatePictureDominantColorAsync()
+    {
+        if (Artist.PictureDominantColor.HasValue)
+            return;
+
+        if (Interlocked.Exchange(ref _dominantColorCalculating, 1) == 1)
+            return;
+
+        try
+        {
+            string filePath = _pictureService.GetPictureFilePath(Artist.Name);
+            long? packed = await _dominantColorCalculator.CalculateAsync(filePath);
+
+            Artist.PictureDominantColor = packed;
+
+            if (packed.HasValue)
+                await _editService.UpdatePictureDominantColorAsync(Artist.Id, packed);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "Failed to load picture or dominant color for {ArtistName}", Artist.Name);
+        }
     }
 
     private async Task LoadAlbumsAsync(long artistId)
@@ -370,20 +454,21 @@ public partial class ArtistViewModel : ObservableObject, IFilterableArtist, IGro
 
     private async Task GetDataFromApiAsync()
     {
+        CancellationToken token = _navigationCts.Token;
+
         bool updated = await _apiService.GetAndUpdateArtistDataAsync(Artist, _pictureService, _backdropPicture);
 
-        if (updated)
-        {
-            if (_pictureService.PictureExists(Artist.Name))
-                LoadPicture();
+        if (!updated || token.IsCancellationRequested)
+            return;
 
-            ArtistDto? refreshedArtist = await _dataLoader.ReloadArtistAsync(Artist.Id);
-            if (refreshedArtist != null)
-                Artist = refreshedArtist;
+        if (_pictureService.PictureExists(Artist.Name))
+            LoadPicture();
 
-            OnPropertyChanged("");
-            Messenger.Send(new ArtistUpdateMessage(Artist.Id, ActionType.Update));
-        }
+        ArtistDto? refreshedArtist = await _dataLoader.ReloadArtistAsync(Artist.Id);
+        if (refreshedArtist != null)
+            Artist = refreshedArtist;
+
+        Messenger.Send(new ArtistUpdateMessage(Artist.Id, ActionType.Update));
     }
 
 
@@ -434,17 +519,19 @@ public partial class ArtistViewModel : ObservableObject, IFilterableArtist, IGro
     [RelayCommand]
     private async Task SelectPictureAsync()
     {
+        CancellationToken token = _navigationCts.Token;
+
         BitmapImage? newPicture = await _pictureService.SelectAndSavePictureAsync(Artist.Name);
 
-        if (newPicture != null)
-        {
-            if (Rok.App.MainWindow.DispatcherQueue is { } dq)
-                dq.TryEnqueue(() => Picture = newPicture);
-            else
-                Picture = newPicture;
+        if (newPicture is null || token.IsCancellationRequested)
+            return;
 
-            Messenger.Send(new ArtistUpdateMessage(Artist.Id, ActionType.Picture));
-        }
+        Artist.PictureDominantColor = null;
+        await CalculatePictureDominantColorAsync();
+
+        Picture = newPicture;
+
+        Messenger.Send(new ArtistUpdateMessage(Artist.Id, ActionType.Picture));
     }
 
     [RelayCommand]

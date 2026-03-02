@@ -86,6 +86,7 @@
                                            Command="{x:Bind ListenCommand}" />
                 </Border>
 
+                
                 <StackPanel HorizontalAlignment="Right"
                             VerticalAlignment="Top"
                             Orientation="Vertical"
@@ -108,46 +109,47 @@
                                          Visibility="{x:Bind ShowNewBadge, Converter={StaticResource BoolToVisibilityConverter}}"
                                          BadgeBackground="{StaticResource BadgeNew}" />
                 </StackPanel>
-
+              
                 <Grid x:Name="gridBottom"
-                      Style="{StaticResource GridCoverBottomStyle}">
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="{ThemeResource gridListFirstRowHeight}" />
-                        <RowDefinition Height="{ThemeResource gridListSecondRowHeight}" />
-                    </Grid.RowDefinitions>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition />
-                        <ColumnDefinition Width="50" />
-                    </Grid.ColumnDefinitions>
-                    <HyperlinkButton Content="{x:Bind Album.Name}"
-                                     x:Phase="0"                                                           
-                                     Command="{x:Bind AlbumOpenCommand}"
-                                     Style="{StaticResource GridCoverBottomFirstLineStyle}" />
-                    <TextBlock x:Name="subTitle"
-                               Grid.Row="1"
-                               Style="{StaticResource GridCoverBottomSecondLineStyle}"
-                               Text="{x:Bind SubTitle, Mode=OneWay}"
-                               Opacity="1"
-                               x:Phase="1" />
-                    <HyperlinkButton x:Name="artistName"
-                                     Grid.Row="1"
-                                     Style="{StaticResource GridCoverBottomArtistLineStyle}"
-                                     Content="{x:Bind Album.ArtistName, Mode=OneWay}"
-                                     Command="{x:Bind ArtistOpenCommand}"
-                                     Opacity="0"
-                                     x:Phase="1" />
-                    <common:AnimatedButton Grid.Row="0"
-                                           Grid.Column="1"
-                                           x:Name="favoriteButton"
-                                           HorizontalAlignment="Right"
-                                           VerticalAlignment="Stretch"
-                                           Margin="-15,0,0,0"
-                                           Opacity="{x:Bind IsFavorite, Converter={StaticResource BoolToOpacityConverter}, Mode=OneWay}"
-                                           Icon="{StaticResource HeartPath}"
-                                           Color="{x:Bind IsFavorite, Converter={StaticResource FavoriteToColorConverter}, Mode=OneWay}"
-                                           Command="{x:Bind AlbumFavoriteCommand}"
-                                           CommandParameter="{x:Bind IsFavorite, Converter={StaticResource BoolToInvertBoolConverter}, Mode=OneWay}" />
-                </Grid>
+                          Style="{StaticResource GridCoverBottomStyle}"
+                          Background="{x:Bind DominantColor, Converter={StaticResource ColorToGradientBrushConverter}, Mode=OneWay}">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="{ThemeResource gridListFirstRowHeight}" />
+                            <RowDefinition Height="{ThemeResource gridListSecondRowHeight}" />
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition />
+                            <ColumnDefinition Width="50" />
+                        </Grid.ColumnDefinitions>
+                        <HyperlinkButton Content="{x:Bind Album.Name}"
+                                         x:Phase="0"
+                                         Command="{x:Bind AlbumOpenCommand}"
+                                         Style="{StaticResource GridCoverBottomFirstLineStyle}" />
+                        <TextBlock x:Name="subTitle"
+                                   Grid.Row="1"
+                                   Style="{StaticResource GridCoverBottomSecondLineStyle}"
+                                   Text="{x:Bind SubTitle, Mode=OneWay}"
+                                   Opacity="1"
+                                   x:Phase="1" />
+                        <HyperlinkButton x:Name="artistName"
+                                         Grid.Row="1"
+                                         Style="{StaticResource GridCoverBottomArtistLineStyle}"
+                                         Content="{x:Bind Album.ArtistName, Mode=OneWay}"
+                                         Command="{x:Bind ArtistOpenCommand}"
+                                         Opacity="0"
+                                         x:Phase="1" />
+                        <common:AnimatedButton Grid.Row="0"
+                                               Grid.Column="1"
+                                               x:Name="favoriteButton"
+                                               HorizontalAlignment="Right"
+                                               VerticalAlignment="Stretch"
+                                               Margin="-15,0,0,0"
+                                               Opacity="{x:Bind IsFavorite, Converter={StaticResource BoolToOpacityConverter}, Mode=OneWay}"
+                                               Icon="{StaticResource HeartPath}"
+                                               Color="{x:Bind IsFavorite, Converter={StaticResource FavoriteToColorConverter}, Mode=OneWay}"
+                                               Command="{x:Bind AlbumFavoriteCommand}"
+                                               CommandParameter="{x:Bind IsFavorite, Converter={StaticResource BoolToInvertBoolConverter}, Mode=OneWay}" />
+                    </Grid>
             </Grid>
         </DataTemplate>
 

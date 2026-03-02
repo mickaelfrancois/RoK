@@ -1,4 +1,5 @@
 ﻿using System.Collections.Specialized;
+using System.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Rok.Application.Features.Albums.Services;
@@ -6,6 +7,7 @@ using Rok.Application.Features.Playlists.PlaylistMenu;
 using Rok.Application.Player;
 using Rok.Application.Services.Filters;
 using Rok.Application.Services.Grouping;
+using Rok.Commons;
 using Rok.Infrastructure.Translate;
 using Rok.ViewModels.Album.Services;
 using Rok.ViewModels.Track;
@@ -28,6 +30,10 @@ public partial class AlbumViewModel : ObservableObject, IFilterableAlbum, IGroup
     private readonly AlbumApiService _apiService;
     private readonly AlbumStatisticsService _statisticsService;
     private readonly AlbumEditService _editService;
+    private readonly IDominantColorCalculator _dominantColorCalculator;
+
+    private CancellationTokenSource _navigationCts = new();
+
     public RangeObservableCollection<TrackViewModel> Tracks { get; set; } = [];
     private IEnumerable<TrackDto>? _tracks = null;
 
@@ -60,6 +66,10 @@ public partial class AlbumViewModel : ObservableObject, IFilterableAlbum, IGroup
     public bool IsArtistFavorite => Album.IsArtistFavorite;
 
     public bool IsAlbumFavorite => Album.IsFavorite;
+
+    [ObservableProperty]
+    public partial Windows.UI.Color DominantColor { get; set; }
+    private int _dominantColorCalculating = 0;
 
     [ObservableProperty]
     public partial bool IsNew { get; set; }
@@ -166,6 +176,7 @@ public partial class AlbumViewModel : ObservableObject, IFilterableAlbum, IGroup
         AlbumPictureService pictureService,
         AlbumApiService apiService,
         AlbumStatisticsService statisticsService,
+        IDominantColorCalculator dominantColorCalculator,
         AlbumEditService editService,
         IAppOptions appOptions,
         IDialogService dialogService,
@@ -181,6 +192,7 @@ public partial class AlbumViewModel : ObservableObject, IFilterableAlbum, IGroup
         _pictureService = Guard.Against.Null(pictureService);
         _apiService = Guard.Against.Null(apiService);
         _statisticsService = Guard.Against.Null(statisticsService);
+        _dominantColorCalculator = Guard.Against.Null(dominantColorCalculator);
         _editService = Guard.Against.Null(editService);
         _appOptions = Guard.Against.Null(appOptions);
         _dialogService = Guard.Against.Null(dialogService);
@@ -189,26 +201,71 @@ public partial class AlbumViewModel : ObservableObject, IFilterableAlbum, IGroup
     }
 
 
+
+
     public void SetData(AlbumDto album)
     {
         Album = Guard.Against.Null(album);
+
         IsNew = Album.CreatDate > DateTime.UtcNow.AddDays(-_appOptions.AlbumRecentThresholdDays);
+
+        if (Album.PictureDominantColor.HasValue)
+            DominantColor = ColorHelper.FromArgb(Album.PictureDominantColor.Value);
     }
 
     public async Task LoadDataAsync(long albumId)
     {
+        CancellationToken cancellationToken = InitNavigationCancellation();
+
         Stopwatch stopwatch = new();
         stopwatch.Start();
 
         await LoadAlbumAsync(albumId);
+
+        if (cancellationToken.IsCancellationRequested)
+            return;
+
         await LoadTracksAsync(albumId);
+
+        if (cancellationToken.IsCancellationRequested)
+            return;
+
         await UpdateStatisticsIfNeededAsync();
+
+        if (cancellationToken.IsCancellationRequested)
+            return;
+
         await GetDataFromApiAsync();
+
+        if (cancellationToken.IsCancellationRequested)
+            return;
+
         await InitializeTagsAsync();
+
+        if (cancellationToken.IsCancellationRequested)
+            return;
+
+        await CalculatePictureDominantColorAsync();
 
         stopwatch.Stop();
         _logger.LogInformation("Album {AlbumId} loaded in {ElapsedMilliseconds} ms", albumId, stopwatch.ElapsedMilliseconds);
     }
+
+    public void OnNavigatedFrom()
+    {
+        InitNavigationCancellation();
+        Backdrop = null;
+    }
+
+
+    private CancellationToken InitNavigationCancellation()
+    {
+        _navigationCts.Cancel();
+        _navigationCts.Dispose();
+        _navigationCts = new CancellationTokenSource();
+        return _navigationCts.Token;
+    }
+
 
     private async Task LoadTracksAsync(long albumId)
     {
@@ -231,15 +288,54 @@ public partial class AlbumViewModel : ObservableObject, IFilterableAlbum, IGroup
 
     public void LoadPicture()
     {
-        Picture = _pictureService.LoadPicture(Album.AlbumPath);
+        try
+        {
+            Picture = _pictureService.LoadPicture(Album.AlbumPath);
+
+            if (!_pictureService.PictureExists(Album.AlbumPath))
+                return;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "Failed to load picture for {AlbumPath}", Album.AlbumPath);
+        }
     }
 
-    public void LoadBackrop()
+
+    private void LoadBackrop()
     {
+        CancellationToken token = _navigationCts.Token;
+
         _backdropLoader.LoadBackdrop(Album.ArtistName, (BitmapImage? backdropImage) =>
         {
-            Backdrop = backdropImage;
+            if (!token.IsCancellationRequested)
+                Backdrop = backdropImage;
         });
+    }
+
+
+    private async Task CalculatePictureDominantColorAsync()
+    {
+        if (Album.PictureDominantColor.HasValue)
+            return;
+
+        if (Interlocked.Exchange(ref _dominantColorCalculating, 1) == 1)
+            return;
+
+        try
+        {
+            string filePath = _pictureService.GetPictureFilePath(Album.AlbumPath);
+            long? packed = await _dominantColorCalculator.CalculateAsync(filePath);
+
+            Album.PictureDominantColor = packed;
+
+            if (packed.HasValue)
+                await _editService.UpdatePictureDominantColorAsync(Album.Id, packed);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "Failed to load picture or dominant color for {AlbumPath}", Album.AlbumPath);
+        }
     }
 
     private async Task InitializeTagsAsync()
@@ -272,10 +368,9 @@ public partial class AlbumViewModel : ObservableObject, IFilterableAlbum, IGroup
     private async Task UpdateStatisticsIfNeededAsync()
     {
         bool updated = await _statisticsService.UpdateIfNeededAsync(Album, Tracks);
+
         if (updated)
-        {
             Messenger.Send(new AlbumUpdateMessage(Album.Id, ActionType.Update));
-        }
     }
 
 
@@ -322,9 +417,11 @@ public partial class AlbumViewModel : ObservableObject, IFilterableAlbum, IGroup
     [RelayCommand]
     private async Task GetDataFromApiAsync()
     {
+        CancellationToken token = _navigationCts.Token;
+
         bool updated = await _apiService.GetAndUpdateAlbumDataAsync(Album, _pictureService);
 
-        if (!updated)
+        if (!updated || token.IsCancellationRequested)
             return;
 
         if (_pictureService.PictureExists(Album.AlbumPath))
@@ -352,15 +449,17 @@ public partial class AlbumViewModel : ObservableObject, IFilterableAlbum, IGroup
     [RelayCommand]
     private async Task SelectPictureAsync()
     {
+        CancellationToken token = _navigationCts.Token;
+
         BitmapImage? newPicture = await _pictureService.SelectAndSavePictureAsync(Album.AlbumPath);
 
-        if (newPicture is null)
+        if (newPicture is null || token.IsCancellationRequested)
             return;
 
-        if (Rok.App.MainWindow.DispatcherQueue is { } dq)
-            dq.TryEnqueue(() => Picture = newPicture);
-        else
-            Picture = newPicture;
+        Album.PictureDominantColor = null;
+        await CalculatePictureDominantColorAsync();
+
+        Picture = newPicture;
 
         Messenger.Send(new AlbumUpdateMessage(Album.Id, ActionType.Picture));
     }

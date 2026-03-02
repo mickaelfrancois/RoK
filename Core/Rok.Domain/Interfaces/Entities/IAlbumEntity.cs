@@ -12,6 +12,7 @@ public interface IAlbumEntity : IEntity
     string CountryCode { get; set; }
     string CountryName { get; set; }
     string? DiscogsID { get; set; }
+    long? PictureDominantColor { get; set; }
     long Duration { get; set; }
     string? GeniusID { get; set; }
     long? GenreId { get; set; }

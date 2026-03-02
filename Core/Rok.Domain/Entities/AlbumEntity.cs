@@ -8,6 +8,8 @@ public class AlbumEntity : BaseEntity, IAlbumEntity
 
     public string Name { get; set; } = string.Empty;
 
+    public long? PictureDominantColor { get; set; }
+
     public string? MusicBrainzID { get; set; }
 
     public string? ReleaseGroupMusicBrainzID { get; set; }

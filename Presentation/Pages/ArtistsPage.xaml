@@ -74,7 +74,8 @@
                                          BadgeBackground="{StaticResource BadgeNew}" />
                 </StackPanel>
 
-                <Grid Style="{StaticResource GridCoverBottomStyle}">
+                <Grid Style="{StaticResource GridCoverBottomStyle}"
+                      Background="{x:Bind DominantColor, Converter={StaticResource ColorToGradientBrushConverter}, Mode=OneWay}">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="{ThemeResource gridListFirstRowHeight}" />
                         <RowDefinition Height="{ThemeResource gridListSecondRowHeight}" />

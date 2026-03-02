@@ -14,6 +14,7 @@ public class ArtistRepository(IDbConnection connection, [FromKeyedServices("Back
     private const string ResetListenCountSql = "UPDATE artists SET listenCount = 0";
     private const string UpdateStatisticsSql = "UPDATE artists SET trackCount = @trackCount, totalDurationSeconds = @totalDurationSeconds, albumCount = @albumCount, bestOfCount = @bestOfCount, liveCount = @liveCount, compilationCount = @compilationCount, yearMini = @yearMini, yearMaxi = @yearMaxi WHERE id = @id";
     private const string UpdateMetadataAttemptSql = "UPDATE artists SET getMetaDataLastAttempt = @lastAttemptDate WHERE id = @id";
+    private const string UpdateDominantColorSql = "UPDATE artists SET pictureDominantColor = @colorValue WHERE Id = @id";
     private const string DeleteOrphansSql = "DELETE FROM artists WHERE id NOT IN (SELECT DISTINCT artistId FROM tracks WHERE artistId IS NOT NULL)";
     private const string DefaultGroupBy = " GROUP BY artists.id ";
 
@@ -51,6 +52,13 @@ public class ArtistRepository(IDbConnection connection, [FromKeyedServices("Back
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(id);
 
         return await ExecuteUpdateAsync(UpdateLastListenSql, new { lastListen = DateTime.UtcNow, id }, kind);
+    }
+
+    public async Task<bool> UpdatePictureDominantColorAsync(long id, long? colorValue, RepositoryConnectionKind kind = RepositoryConnectionKind.Foreground)
+    {
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(id);
+
+        return await ExecuteUpdateAsync(UpdateDominantColorSql, new { colorValue, id }, kind);
     }
 
     public async Task<bool> ResetListenCountAsync(RepositoryConnectionKind kind = RepositoryConnectionKind.Foreground)

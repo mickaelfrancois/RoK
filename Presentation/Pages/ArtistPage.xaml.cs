@@ -29,6 +29,13 @@ public sealed partial class ArtistPage : Page
     }
 
 
+    protected override void OnNavigatedFrom(NavigationEventArgs e)
+    {
+        ViewModel.OnNavigatedFrom();
+        base.OnNavigatedFrom(e);
+    }
+
+
     private void grid_ContainerContentChanging(ListViewBase sender, ContainerContentChangingEventArgs args)
     {
         if (args.Item is AlbumViewModel item && item.Picture == null)

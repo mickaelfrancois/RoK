@@ -40,6 +40,7 @@ public static class DependencyInjection
         services.AddSingleton<IAlbumPicture, AlbumPicture>();
         services.AddSingleton<BackdropPicture>();
         services.AddSingleton<IBackdropPicture, BackdropPicture>();
+        services.AddSingleton<IDominantColorCalculator, DominantColorCalculator>();
 
         services.AddSingleton<IPlayerEngine, WinUIMediaPlayer>();
         services.AddSingleton<ILyricsService, LyricsService>();
@@ -54,6 +55,7 @@ public static class DependencyInjection
         services.AddSingleton<IMigration, Migration5>();
         services.AddSingleton<IMigration, Migration6>();
         services.AddSingleton<IMigration, Migration7>();
+        services.AddSingleton<IMigration, Migration8>();
 
         services.AddScoped<IArtistRepository, ArtistRepository>();
         services.AddScoped<IAlbumRepository, AlbumRepository>();
