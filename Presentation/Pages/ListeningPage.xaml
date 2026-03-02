@@ -23,14 +23,14 @@
 
         <Grid.Background>
             <SolidColorBrush Color="{ThemeResource CardBackgroundFillColorDefault}"
-                             Opacity="{StaticResource headerBackgroundOpacity}" />
+                             Opacity="{StaticResource HeaderBackgroundOpacity}" />
         </Grid.Background>
 
         <Image x:Name="backdrop"
                Grid.RowSpan="4"
                Source="{x:Bind ViewModel.Artist.Backdrop,Mode=OneWay}"
                Opacity="0.20"
-               Style="{StaticResource headerBackdrop}"
+               Style="{StaticResource HeaderBackdropStyle}"
                Stretch="UniformToFill"
                IsHitTestVisible="False" />
 
@@ -83,7 +83,7 @@
                   CornerRadius="10">
                 <common:PictureControl x:Name="artistPicture" Height="100" Width="100"
                                        Cover="{x:Bind ViewModel.Artist.Picture, Mode=OneWay}"
-                                       Style="{StaticResource headerPicture}" />
+                                       Style="{StaticResource HeaderPictureStyle}" />
                 <common:AnimatedButton Grid.Row="1"
                                        Grid.Column="1"
                                        HorizontalAlignment="Right"
@@ -95,7 +95,7 @@
                                        CommandParameter="{x:Bind ViewModel.Artist.IsFavorite, Converter={StaticResource BoolToInvertBoolConverter}, Mode=OneWay}" />
 
                 <Button x:Uid="selectPicture"
-                        Style="{StaticResource headerPictureSelectButton}"
+                        Style="{StaticResource HeaderPictureSelectButtonStyle}"
                         Command="{x:Bind ViewModel.Artist.SelectPictureCommand}" />
             </Grid>
 
@@ -109,7 +109,7 @@
                                  FontWeight="Bold"                                 
                                  Padding="0"
                                  Margin="0"
-                                 Style="{StaticResource headerGenreHyperlink}" />
+                                 Style="{StaticResource HeaderGenreHyperlinkStyle}" />
 
                 <Button x:Name="buttonCountry"
                         RelativePanel.RightOf="artistName"
@@ -137,15 +137,15 @@
                                  Content="{x:Bind ViewModel.Artist.Artist.GenreName}"
                                  RelativePanel.Below="artistName"                                 
                                  Command="{x:Bind ViewModel.Artist.GenreOpenCommand}"
-                                 Style="{StaticResource headerGenreHyperlink}" />
+                                 Style="{StaticResource HeaderGenreHyperlinkStyle}" />
 
                 <CommandBar x:Name="panelNetwork"
                             RelativePanel.Below="genreName"
                             Margin="-5,-5,0,0"
-                            Style="{StaticResource headerCommandBar}">
+                            Style="{StaticResource HeaderCommandBarStyle}">
 
                     <AppBarButton x:Uid="artistViewWebSite"
-                                  Style="{StaticResource headerBrandButton}"
+                                  Style="{StaticResource HeaderBrandButtonStyle}"
                                   Command="{x:Bind ViewModel.Artist.OpenOfficialSiteCommand, Mode=OneWay}"
                                   Visibility="{x:Bind ViewModel.Artist.Artist.OfficialSiteUrl, Mode=OneWay, Converter={StaticResource StringToVisibilityConverter}}">
                         <Viewbox Width="24"
@@ -161,7 +161,7 @@
                     </AppBarButton>
 
                     <AppBarButton x:Uid="artistViewLastFm"
-                                  Style="{StaticResource headerBrandButton}"
+                                  Style="{StaticResource HeaderBrandButtonStyle}"
                                   ToolTipService.ToolTip="Last.FM"
                                   Command="{x:Bind ViewModel.Artist.OpenUrlCommand, Mode=OneWay}"
                                   CommandParameter="{x:Bind ViewModel.Artist.Artist.LastFmUrl, Mode=OneWay}"
@@ -178,7 +178,7 @@
                     </AppBarButton>
 
                     <AppBarButton x:Uid="artistViewWikipedia"
-                                  Style="{StaticResource headerBrandButton}"
+                                  Style="{StaticResource HeaderBrandButtonStyle}"
                                   ToolTipService.ToolTip="Wikipedia"
                                   Command="{x:Bind ViewModel.Artist.OpenUrlCommand, Mode=OneWay}"
                                   CommandParameter="{x:Bind ViewModel.Artist.Artist.WikipediaUrl, Mode=OneWay}"
@@ -195,7 +195,7 @@
                     </AppBarButton>
 
                     <AppBarButton x:Uid="artistViewFacebook"
-                                  Style="{StaticResource headerBrandButton}"
+                                  Style="{StaticResource HeaderBrandButtonStyle}"
                                   ToolTipService.ToolTip="Facebook"
                                   Command="{x:Bind ViewModel.Artist.OpenUrlCommand, Mode=OneWay}"
                                   CommandParameter="{x:Bind ViewModel.Artist.Artist.FacebookUrl, Mode=OneWay}"
@@ -212,7 +212,7 @@
                     </AppBarButton>
 
                     <AppBarButton x:Uid="artistViewInstagram"
-                                  Style="{StaticResource headerBrandButton}"
+                                  Style="{StaticResource HeaderBrandButtonStyle}"
                                   ToolTipService.ToolTip="Instagram"
                                   Command="{x:Bind ViewModel.Artist.OpenUrlCommand, Mode=OneWay}"
                                   CommandParameter="{x:Bind ViewModel.Artist.Artist.InstagramUrl, Mode=OneWay}"
@@ -229,7 +229,7 @@
                     </AppBarButton>
 
                     <AppBarButton x:Uid="artistViewTwitter"
-                                  Style="{StaticResource headerBrandButton}"
+                                  Style="{StaticResource HeaderBrandButtonStyle}"
                                   ToolTipService.ToolTip="X"
                                   Command="{x:Bind ViewModel.Artist.OpenUrlCommand, Mode=OneWay}"
                                   CommandParameter="{x:Bind ViewModel.Artist.Artist.TwitterUrl, Mode=OneWay}"
@@ -246,7 +246,7 @@
                     </AppBarButton>
 
                     <AppBarButton x:Uid="artistViewThreads"
-                                  Style="{StaticResource headerBrandButton}"
+                                  Style="{StaticResource HeaderBrandButtonStyle}"
                                   ToolTipService.ToolTip="Threads"
                                   Command="{x:Bind ViewModel.Artist.OpenUrlCommand, Mode=OneWay}"
                                   CommandParameter="{x:Bind ViewModel.Artist.Artist.ThreadsUrl, Mode=OneWay}"
@@ -263,7 +263,7 @@
                     </AppBarButton>
 
                     <AppBarButton x:Uid="artistViewTikTok"
-                                  Style="{StaticResource headerBrandButton}"
+                                  Style="{StaticResource HeaderBrandButtonStyle}"
                                   ToolTipService.ToolTip="Tiktok"
                                   Command="{x:Bind ViewModel.Artist.OpenUrlCommand, Mode=OneWay}"
                                   CommandParameter="{x:Bind ViewModel.Artist.Artist.TiktokUrl, Mode=OneWay}"
@@ -280,7 +280,7 @@
                     </AppBarButton>
 
                     <AppBarButton x:Uid="artistViewYoutube"
-                                  Style="{StaticResource headerBrandButton}"
+                                  Style="{StaticResource HeaderBrandButtonStyle}"
                                   ToolTipService.ToolTip="Youtube"
                                   Command="{x:Bind ViewModel.Artist.OpenUrlCommand, Mode=OneWay}"
                                   CommandParameter="{x:Bind ViewModel.Artist.Artist.YoutubeUrl, Mode=OneWay}"
@@ -304,7 +304,7 @@
         <RelativePanel Grid.Row="2"
                        Margin="6,0,0,0">
             <CommandBar RelativePanel.AlignBottomWithPanel="True"
-                        Style="{StaticResource headerCommandBar}">
+                        Style="{StaticResource HeaderCommandBarStyle}">
                 <AppBarButton x:Uid="shuffleButton"
                               Style="{StaticResource AppBarButtonCompactStyle}"
                               Icon="Shuffle"                              

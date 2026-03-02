@@ -9,6 +9,7 @@ namespace Rok.ApplicationTests;
 public class PlayerServiceTests
 {
     private readonly Mock<IPlayerEngine> mockPlayerEngine;
+    private readonly Mock<ICallDetectionService> mockCallDetectionService;
     private readonly Mock<IAppOptions> mockAppOptions;
     private readonly Mock<ILogger<PlayerService>> mockLogger;
     private readonly PlayerService playerService;
@@ -23,7 +24,7 @@ public class PlayerServiceTests
         mockPlayerEngine.Setup(o => o.SetTrack(It.IsAny<TrackDto>())).Returns(true);
         mockAppOptions.SetupGet(o => o.CrossFade).Returns(false);
 
-        playerService = new PlayerService(mockPlayerEngine.Object, mockAppOptions.Object, null, mockLogger.Object);
+        playerService = new PlayerService(mockCallDetectionService.Object, mockPlayerEngine.Object, mockAppOptions.Object, null, mockLogger.Object);
     }
 
     [Fact]

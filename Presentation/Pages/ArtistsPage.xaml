@@ -71,7 +71,7 @@
                             Margin="0,8,8,0">
                     <common:BadgeControl x:Uid="badgeNew"
                                          Visibility="{x:Bind ShowNewBadge, Converter={StaticResource BoolToVisibilityConverter}}"
-                                         BadgeBackground="{StaticResource BadgeNew}" />
+                                         BadgeBackground="{StaticResource BadgeNewBrush}" />
                 </StackPanel>
 
                 <Grid Style="{StaticResource GridCoverBottomStyle}"
@@ -202,7 +202,7 @@
                             Spacing="8">
 
                     <AppBarButton x:Uid="artistViewListen"
-                                  Style="{StaticResource listenAppBarButtonCompactStyle}"
+                                  Style="{StaticResource ListenAppBarButtonCompactStyle}"
                                   Command="{x:Bind ViewModel.ListenCommand}" />
 
                     <SplitButton VerticalAlignment="Center">

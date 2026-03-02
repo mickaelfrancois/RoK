@@ -36,7 +36,7 @@
 
                     <!-- Listen -->
                     <AppBarButton x:Uid="artistViewListen"
-                                  Style="{StaticResource listenAppBarButtonCompactStyle}"
+                                  Style="{StaticResource ListenAppBarButtonCompactStyle}"
                                   Command="{x:Bind ViewModel.ListenCommand}" />
 
                     <!-- Sort -->

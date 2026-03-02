@@ -21,7 +21,7 @@
         <Grid>
             <Grid.Background>
                 <SolidColorBrush Color="{ThemeResource CardBackgroundFillColorDefault}"
-                                 Opacity="{StaticResource headerBackgroundOpacity}" />
+                                 Opacity="{StaticResource HeaderBackgroundOpacity}" />
             </Grid.Background>
 
             <Grid.ColumnDefinitions>
@@ -32,13 +32,13 @@
 
             <Image x:Name="backdrop"
                    Source="{x:Bind ViewModel.Backdrop,Mode=OneWay}"
-                   Style="{StaticResource headerBackdrop}"
+                   Style="{StaticResource HeaderBackdropStyle}"
                    Grid.ColumnSpan="2" />
 
-            <Grid Style="{StaticResource headerPictureGrid}">
+            <Grid Style="{StaticResource HeaderPictureGridStyle}">
                 <common:PictureControl x:Name="artistPicture"
                                        Cover="{x:Bind ViewModel.Picture, Mode=OneWay}"
-                                       Style="{StaticResource headerPicture}" />
+                                       Style="{StaticResource HeaderPictureStyle}" />
             </Grid>
 
             <RelativePanel Grid.Column="1" 
@@ -50,14 +50,14 @@
 
                 <TextBlock x:Name="panelExtendedInfo"
                            RelativePanel.Below="playlistName"
-                           Style="{StaticResource headerText}"
+                           Style="{StaticResource HeaderTextStyle}"
                            Text="{x:Bind ViewModel.SubTitle, Mode=OneWay}" />
                 
                 <CommandBar RelativePanel.AlignBottomWithPanel="True"
-                            Style="{StaticResource headerCommandBar}">
+                            Style="{StaticResource HeaderCommandBarStyle}">
 
                     <AppBarButton x:Uid="playlistListen"
-                                      Style="{StaticResource listenAppBarButtonStyle}"
+                                      Style="{StaticResource ListenAppBarButtonStyle}"
                                       Command="{x:Bind ViewModel.ListenCommand}" />
 
                         <AppBarButton x:Uid="playlistRefresh"
@@ -143,7 +143,7 @@
                         <HyperlinkButton Grid.Column="1"
                                          Command="{x:Bind ViewModel.SortCommand}"
                                          CommandParameter="Title"
-                                         Style="{StaticResource headerHyperlink}">
+                                         Style="{StaticResource HeaderHyperlinkStyle}">
                             <StackPanel Orientation="Horizontal">
                                 <TextBlock x:Uid="gridHeaderTitle"
                                            Style="{StaticResource gridHeaderTracksText}"
@@ -158,7 +158,7 @@
                         <HyperlinkButton Grid.Column="2"
                                          Command="{x:Bind ViewModel.SortCommand}"
                                          CommandParameter="Artist"
-                                         Style="{StaticResource headerHyperlink}">
+                                         Style="{StaticResource HeaderHyperlinkStyle}">
                             <StackPanel Orientation="Horizontal">
                                 <TextBlock x:Uid="gridHeaderArtist"
                                            Style="{StaticResource gridHeaderTracksText}"
@@ -173,7 +173,7 @@
                         <HyperlinkButton Grid.Column="3"
                                          Command="{x:Bind ViewModel.SortCommand}"
                                          CommandParameter="Album"
-                                         Style="{StaticResource headerHyperlink}">
+                                         Style="{StaticResource HeaderHyperlinkStyle}">
                             <StackPanel Orientation="Horizontal">
                                 <TextBlock x:Uid="gridHeaderAlbum"
                                            Style="{StaticResource gridHeaderTracksText}"
@@ -188,7 +188,7 @@
                         <HyperlinkButton Grid.Column="4"
                                          Command="{x:Bind ViewModel.SortCommand}"
                                          CommandParameter="Score"
-                                         Style="{StaticResource headerHyperlink}">
+                                         Style="{StaticResource HeaderHyperlinkStyle}">
                             <StackPanel Orientation="Horizontal">
                                 <TextBlock x:Uid="gridHeaderScore"
                                            Style="{StaticResource gridHeaderTracksText}"

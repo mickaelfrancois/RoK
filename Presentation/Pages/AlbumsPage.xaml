@@ -95,19 +95,19 @@
 
                     <common:BadgeControl x:Uid="badgeLive"
                                          Visibility="{x:Bind IsLive, Converter={StaticResource BoolToVisibilityConverter}}"
-                                         BadgeBackground="{StaticResource BadgeLive}"/>
+                                         BadgeBackground="{StaticResource BadgeLiveBrush}"/>
 
                     <common:BadgeControl x:Uid="badgeBestof"
                                          Visibility="{x:Bind IsBestOf, Converter={StaticResource BoolToVisibilityConverter}}"
-                                         BadgeBackground="{StaticResource BadgeBestOf}" />
+                                         BadgeBackground="{StaticResource BadgeBestOfBrush}" />
 
                     <common:BadgeControl x:Uid="badgeCompilation"
                                          Visibility="{x:Bind IsCompilation, Converter={StaticResource BoolToVisibilityConverter}}"
-                                         BadgeBackground="{StaticResource BadgeCompilation}" />
+                                         BadgeBackground="{StaticResource BadgeCompilationBrush}" />
 
                     <common:BadgeControl x:Uid="badgeNew"
                                          Visibility="{x:Bind ShowNewBadge, Converter={StaticResource BoolToVisibilityConverter}}"
-                                         BadgeBackground="{StaticResource BadgeNew}" />
+                                         BadgeBackground="{StaticResource BadgeNewBrush}" />
                 </StackPanel>
               
                 <Grid x:Name="gridBottom"
@@ -122,7 +122,7 @@
                             <ColumnDefinition Width="50" />
                         </Grid.ColumnDefinitions>
                         <HyperlinkButton Content="{x:Bind Album.Name}"
-                                         x:Phase="0"
+                                         x:Phase="0"                                         
                                          Command="{x:Bind AlbumOpenCommand}"
                                          Style="{StaticResource GridCoverBottomFirstLineStyle}" />
                         <TextBlock x:Name="subTitle"
@@ -278,7 +278,7 @@
                             Spacing="8">
                     
                     <AppBarButton x:Uid="artistViewListen"
-                                  Style="{StaticResource listenAppBarButtonCompactStyle}"
+                                  Style="{StaticResource ListenAppBarButtonCompactStyle}"
                                   Command="{x:Bind ViewModel.ListenCommand}" />
                     <SplitButton VerticalAlignment="Center">
                         <SplitButton.Content>

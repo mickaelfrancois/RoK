@@ -118,10 +118,10 @@
                             <RowDefinition Height="*" />
                         </Grid.RowDefinitions>
 
-                        <CommandBar Style="{StaticResource headerCommandBar}"
+                        <CommandBar Style="{StaticResource HeaderCommandBarStyle}"
                                     HorizontalAlignment="Left">
                             <AppBarButton x:Uid="resetListenCount"
-                                          Style="{StaticResource headerGenericButton}"
+                                          Style="{StaticResource HeaderGenericButtonStyle}"
                                           Icon="Refresh"
                                           Click="ResetListenCount_Click">
                                 <ToolTipService.ToolTip>

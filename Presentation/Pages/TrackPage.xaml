@@ -18,14 +18,14 @@
 
         <Grid.Background>
             <SolidColorBrush Color="{ThemeResource CardBackgroundFillColorDefault}"
-                             Opacity="{StaticResource headerBackgroundOpacity}" />
+                             Opacity="{StaticResource HeaderBackgroundOpacity}" />
         </Grid.Background>
 
         <Image x:Name="backdrop"
                Grid.RowSpan="2"
                Source="{x:Bind ViewModel.Backdrop,Mode=OneWay}"
-               Opacity="{StaticResource headerBackdropOpacity}"
-               Style="{StaticResource headerBackdrop}"
+               Opacity="{StaticResource HeaderBackdropOpacity}"
+               Style="{StaticResource HeaderBackdropStyle}"
                Stretch="UniformToFill"
                IsHitTestVisible="False" />
 

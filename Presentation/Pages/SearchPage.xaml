@@ -94,7 +94,7 @@
                                                 Margin="0,8,8,0">
                                         <common:BadgeControl x:Uid="badgeNew"
                                                              Visibility="{x:Bind ShowNewBadge, Converter={StaticResource BoolToVisibilityConverter}}"
-                                                             BadgeBackground="{StaticResource BadgeNew}" />
+                                                             BadgeBackground="{StaticResource BadgeNewBrush}" />
                                     </StackPanel>
 
                                     <TextBlock Grid.Row="1"
@@ -169,19 +169,19 @@
 
                                     <common:BadgeControl x:Uid="badgeLive"
                                                          Visibility="{x:Bind IsLive, Converter={StaticResource BoolToVisibilityConverter}}"
-                                                         BadgeBackground="{StaticResource BadgeLive}" />
+                                                         BadgeBackground="{StaticResource BadgeLiveBrush}" />
 
                                     <common:BadgeControl x:Uid="badgeBestof"
                                                          Visibility="{x:Bind IsBestOf, Converter={StaticResource BoolToVisibilityConverter}}"
-                                                         BadgeBackground="{StaticResource BadgeBestOf}" />
+                                                         BadgeBackground="{StaticResource BadgeBestOfBrush}" />
 
                                     <common:BadgeControl x:Uid="badgeCompilation"
                                                          Visibility="{x:Bind IsCompilation, Converter={StaticResource BoolToVisibilityConverter}}"
-                                                         BadgeBackground="{StaticResource BadgeCompilation}" />
+                                                         BadgeBackground="{StaticResource BadgeCompilationBrush}" />
 
                                     <common:BadgeControl x:Uid="badgeNew"
                                                          Visibility="{x:Bind ShowNewBadge, Converter={StaticResource BoolToVisibilityConverter}}"
-                                                         BadgeBackground="{StaticResource BadgeNew}" />
+                                                         BadgeBackground="{StaticResource BadgeNewBrush}" />
                                 </StackPanel>
 
 

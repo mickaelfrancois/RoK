@@ -21,14 +21,14 @@
 
         <Grid.Background>
             <SolidColorBrush Color="{ThemeResource CardBackgroundFillColorDefault}"
-                             Opacity="{StaticResource headerBackgroundOpacity}" />
+                             Opacity="{StaticResource HeaderBackgroundOpacity}" />
         </Grid.Background>
 
         <Image x:Name="backdrop"
                Grid.RowSpan="2"
                Source="{x:Bind ViewModel.Backdrop,Mode=OneWay}"
-               Opacity="{StaticResource headerBackdropOpacity}"
-               Style="{StaticResource headerBackdrop}"
+               Opacity="{StaticResource HeaderBackdropOpacity}"
+               Style="{StaticResource HeaderBackdropStyle}"
                Stretch="UniformToFill"
                IsHitTestVisible="False" />
         
@@ -41,12 +41,12 @@
                 <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
 
-            <Grid Style="{StaticResource headerPictureGrid}">
+            <Grid Style="{StaticResource HeaderPictureGridStyle}">
                 <common:PictureControl x:Name="artistPicture"
                                        Cover="{x:Bind ViewModel.Picture, Mode=OneWay}"
-                                       Style="{StaticResource headerPicture}" />
+                                       Style="{StaticResource HeaderPictureStyle}" />
                 <Button x:Uid="selectPicture"
-                        Style="{StaticResource headerPictureSelectButton}"
+                        Style="{StaticResource HeaderPictureSelectButtonStyle}"
                         Command="{x:Bind ViewModel.SelectPictureCommand}" />
             </Grid>
 
@@ -54,7 +54,7 @@
                            Margin="6,0,0,0">
                 <TextBlock x:Name="albumName"
                            Text="{x:Bind ViewModel.Album.Name, Mode=OneWay}"
-                           Style="{StaticResource headerTitleText}" />
+                           Style="{StaticResource HeaderTitleTextStyle}" />
 
                 <HyperlinkButton x:Name="artistName"
                                  Content="{x:Bind ViewModel.Album.ArtistName}"
@@ -62,7 +62,7 @@
                                  Margin="0" 
                                  Padding="0"
                                  Command="{x:Bind ViewModel.ArtistOpenCommand}"
-                                 Style="{StaticResource headerGenreHyperlink}" />
+                                 Style="{StaticResource HeaderGenreHyperlinkStyle}" />
 
                 <Button x:Name="buttonCountry"
                         RelativePanel.AlignVerticalCenterWith="artistName"
@@ -83,7 +83,7 @@
                             Orientation="Horizontal"
                             Margin="4,0,0,0">
                     <Border Visibility="{x:Bind ViewModel.Album.IsLive, Mode=TwoWay, Converter={StaticResource BoolToVisibilityConverter}}"
-                            Background="{StaticResource BadgeLive}"
+                            Background="{StaticResource BadgeLiveBrush}"
                             CornerRadius="1"
                             Margin="0,0,10,0">
                         <TextBlock Text="Live"
@@ -94,7 +94,7 @@
                     </Border>
 
                     <Border Visibility="{x:Bind ViewModel.Album.IsBestOf, Mode=TwoWay, Converter={StaticResource BoolToVisibilityConverter}}"
-                            Background="{StaticResource BadgeBestOf}"
+                            Background="{StaticResource BadgeBestOfBrush}"
                             CornerRadius="1"
                             Margin="0,0,10,0">
                         <TextBlock Text="Bestof"
@@ -105,7 +105,7 @@
                     </Border>
 
                     <Border Visibility="{x:Bind ViewModel.Album.IsCompilation, Mode=TwoWay, Converter={StaticResource BoolToVisibilityConverter}}"
-                            Background="{StaticResource BadgeCompilation}"
+                            Background="{StaticResource BadgeCompilationBrush}"
                             CornerRadius="1"
                             Margin="0,0,10,0">
                         <TextBlock Text="Compilation"
@@ -121,7 +121,7 @@
                            RelativePanel.RightOf="artistName"
                            RelativePanel.AlignVerticalCenterWith="artistName"
                            Margin="6,0,0,0"
-                           Style="{StaticResource headerText}">
+                           Style="{StaticResource HeaderTextStyle}">
                     <Run Text="🔹" />
                     <Run Text="{x:Bind ViewModel.SubTitle}" />
                 </TextBlock>
@@ -129,10 +129,10 @@
                 <CommandBar x:Name="panelNetwork"
                             RelativePanel.Below="tagsContainer"
                             Margin="-5,0,0,0"
-                            Style="{StaticResource headerCommandBar}">
+                            Style="{StaticResource HeaderCommandBarStyle}">
 
                     <AppBarButton x:Uid="albumViewLastFm"
-                                  Style="{StaticResource headerBrandButton}"
+                                  Style="{StaticResource HeaderBrandButtonStyle}"
                                   ToolTipService.ToolTip="Last.FM"
                                   Command="{x:Bind ViewModel.OpenUrlCommand, Mode=OneWay}"
                                   CommandParameter="{x:Bind ViewModel.Album.LastFmUrl, Mode=OneWay}"
@@ -193,26 +193,26 @@
 
                 <CommandBar  RelativePanel.AlignBottomWithPanel="True"
                              RelativePanel.AlignLeftWith="albumName"
-                             Style="{StaticResource headerCommandBar}">
+                             Style="{StaticResource HeaderCommandBarStyle}">
 
                     <AppBarButton x:Uid="albumViewListen"
-                                  Style="{StaticResource listenAppBarButtonStyle}"
+                                  Style="{StaticResource ListenAppBarButtonStyle}"
                                   Command="{x:Bind ViewModel.ListenCommand}" />
 
                     <AppBarToggleButton x:Uid="albumViewLike"
                                         x:Name="albumAppBarLike"
-                                        Style="{StaticResource headerLikeButton}"
+                                        Style="{StaticResource HeaderLikeButtonStyle}"
                                         IsChecked="{x:Bind ViewModel.IsFavorite, Mode=OneWay}"
                                         Command="{x:Bind ViewModel.AlbumFavoriteCommand}" />
                     
                     <AppBarButton x:Uid="albumViewBiography"
-                                  Style="{StaticResource headerGenericButton}"
+                                  Style="{StaticResource HeaderGenericButtonStyle}"
                                   Icon="Library"
                                   Command="{x:Bind ViewModel.OpenBiographyCommand}"
                                   Visibility="{x:Bind ViewModel.Album.Biography, Converter={StaticResource StringToVisibilityConverter}}" />
                                         
                     <AppBarButton x:Uid="albumViewPlaylist"
-                                  Style="{StaticResource headerGenericButton}"
+                                  Style="{StaticResource HeaderGenericButtonStyle}"
                                   Icon="Add">
                         <AppBarButton.Flyout>
                             <MenuFlyout x:Name="albumPlaylistFlyout"
@@ -223,7 +223,7 @@
                     </AppBarButton>
 
                     <AppBarButton x:Uid="albumViewEdit"
-                                  Style="{StaticResource headerGenericButton}"
+                                  Style="{StaticResource HeaderGenericButtonStyle}"
                                   Icon="Edit"
                                   Command="{x:Bind ViewModel.EditAlbumCommand}" />
 

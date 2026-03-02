@@ -21,14 +21,14 @@
 
         <Grid.Background>
             <SolidColorBrush Color="{ThemeResource CardBackgroundFillColorDefault}"
-                             Opacity="{StaticResource headerBackgroundOpacity}" />
+                             Opacity="{StaticResource HeaderBackgroundOpacity}" />
         </Grid.Background>
 
         <Image x:Name="backdrop"
                Grid.RowSpan="2"
                Source="{x:Bind ViewModel.Backdrop,Mode=OneWay}"
-               Opacity="{StaticResource headerBackdropOpacity}"
-               Style="{StaticResource headerBackdrop}"
+               Opacity="{StaticResource HeaderBackdropOpacity}"
+               Style="{StaticResource HeaderBackdropStyle}"
                Stretch="UniformToFill"
                IsHitTestVisible="False" />
 
@@ -42,21 +42,21 @@
                 <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
 
-            <Grid Style="{StaticResource headerPictureGrid}">
+            <Grid Style="{StaticResource HeaderPictureGridStyle}">
                 <common:PictureControl x:Name="artistPicture"
                                        Cover="{x:Bind ViewModel.Picture, Mode=OneWay}"
-                                       Style="{StaticResource headerPicture}" />
+                                       Style="{StaticResource HeaderPictureStyle}" />
             </Grid>
 
             <RelativePanel Grid.Column="1"
                            Margin="6,0,0,0">
                 <TextBlock x:Name="genreName"
                            Text="{x:Bind ViewModel.Genre.Name, Mode=OneWay}"
-                           Style="{StaticResource headerTitleText}" />
+                           Style="{StaticResource HeaderTitleTextStyle}" />
 
                 <TextBlock x:Name="panelExtendedInfo"
                            RelativePanel.Below="genreName"
-                           Style="{StaticResource headerText}"
+                           Style="{StaticResource HeaderTextStyle}"
                            Text="{x:Bind ViewModel.SubTitle}" />
 
                 <StackPanel x:Name="panelStatsInfo"
@@ -81,15 +81,15 @@
 
 
                 <CommandBar  RelativePanel.AlignBottomWithPanel="True"
-                             Style="{StaticResource headerCommandBar}">
+                             Style="{StaticResource HeaderCommandBarStyle}">
 
                     <AppBarButton x:Uid="albumViewListen"
-                                  Style="{StaticResource listenAppBarButtonStyle}"
+                                  Style="{StaticResource ListenAppBarButtonStyle}"
                                   Command="{x:Bind ViewModel.ListenCommand}" />
 
                     <AppBarToggleButton x:Uid="albumViewLike"
                                         x:Name="genreAppBarLike"
-                                        Style="{StaticResource headerLikeButton}"
+                                        Style="{StaticResource HeaderLikeButtonStyle}"
                                         IsChecked="{x:Bind ViewModel.IsFavorite, Mode=OneWay}"
                                         Command="{x:Bind ViewModel.GenreFavoriteCommand}" />
                 </CommandBar>
