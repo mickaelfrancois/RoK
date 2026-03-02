@@ -209,7 +209,7 @@ public partial class AlbumViewModel : ObservableObject, IFilterableAlbum, IGroup
 
         IsNew = Album.CreatDate > DateTime.UtcNow.AddDays(-_appOptions.AlbumRecentThresholdDays);
 
-        if (_appOptions.DominantColorEnabled && Album.PictureDominantColor.HasValue)
+        if (Album.PictureDominantColor.HasValue)
             DominantColor = ColorHelper.FromArgb(Album.PictureDominantColor.Value);
     }
 

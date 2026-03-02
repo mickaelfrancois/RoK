@@ -276,7 +276,7 @@ public partial class ArtistViewModel : ObservableObject, IFilterableArtist, IGro
         Artist = Guard.Against.Null(artist);
         IsNew = Artist.CreatDate > DateTime.UtcNow.AddDays(-_appOptions.ArtistRecentThresholdDays);
 
-        if (_appOptions.DominantColorEnabled && Artist.PictureDominantColor.HasValue)
+        if (Artist.PictureDominantColor.HasValue)
             DominantColor = ColorHelper.FromArgb(Artist.PictureDominantColor.Value);
     }
 
