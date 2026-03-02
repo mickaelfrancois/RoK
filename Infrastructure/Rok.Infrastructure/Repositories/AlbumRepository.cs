@@ -14,6 +14,7 @@ public class AlbumRepository(IDbConnection connection, [FromKeyedServices("Backg
     private const string UpdateMetadataAttemptSql = "UPDATE albums SET getMetaDataLastAttempt = @lastAttemptDate WHERE id = @id";
     private const string DeleteOrphansSql = "DELETE FROM albums WHERE id NOT IN (SELECT DISTINCT albumId FROM tracks WHERE albumId IS NOT NULL)";
     private const string DefaultGroupBy = " GROUP BY albums.id ";
+    private const string UpdateDominantColorSql = "UPDATE albums SET pictureDominantColor = @colorValue WHERE Id = @id";
 
     public async Task<IEnumerable<IAlbumEntity>> SearchAsync(string name, RepositoryConnectionKind kind = RepositoryConnectionKind.Foreground)
     {
@@ -57,6 +58,13 @@ public class AlbumRepository(IDbConnection connection, [FromKeyedServices("Backg
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(id);
 
         return await ExecuteUpdateAsync(UpdateLastListenSql, new { lastListen = DateTime.UtcNow, id }, kind);
+    }
+
+    public async Task<bool> UpdatePictureDominantColorAsync(long id, long? colorValue, RepositoryConnectionKind kind = RepositoryConnectionKind.Foreground)
+    {
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(id);
+
+        return await ExecuteUpdateAsync(UpdateDominantColorSql, new { colorValue, id }, kind);
     }
 
     public async Task<bool> ResetListenCountAsync(RepositoryConnectionKind kind = RepositoryConnectionKind.Foreground)

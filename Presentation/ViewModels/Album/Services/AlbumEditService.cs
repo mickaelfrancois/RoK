@@ -65,4 +65,9 @@ public class AlbumEditService(IMediator mediator)
     {
         await mediator.SendMessageAsync(new UpdateAlbumTagsCommand(id, tags));
     }
+
+    public async Task UpdatePictureDominantColorAsync(long id, long? colorValue)
+    {
+        await mediator.SendMessageAsync(new UpdateAlbumPictureDominantColorCommand(id, colorValue));
+    }
 }

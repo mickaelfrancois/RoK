@@ -15,6 +15,7 @@ internal static class AlbumMapping
             MusicBrainzID = entity.MusicBrainzID,
             ReleaseGroupMusicBrainzID = entity.ReleaseGroupMusicBrainzID,
 
+            PictureDominantColor = entity.PictureDominantColor,
             Year = entity.Year,
             IsLive = entity.IsLive,
             IsCompilation = entity.IsCompilation,

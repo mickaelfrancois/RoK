@@ -14,6 +14,8 @@ public interface IAlbumRepository : IRepository<AlbumEntity>
 
     Task<bool> UpdateLastListenAsync(long id, RepositoryConnectionKind kind = RepositoryConnectionKind.Foreground);
 
+    Task<bool> UpdatePictureDominantColorAsync(long id, long? colorValue, RepositoryConnectionKind kind = RepositoryConnectionKind.Foreground);
+
     Task<bool> ResetListenCountAsync(RepositoryConnectionKind kind = RepositoryConnectionKind.Foreground);
 
     Task<int> DeleteOrphansAsync(RepositoryConnectionKind kind = RepositoryConnectionKind.Foreground);

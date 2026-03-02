@@ -14,6 +14,8 @@ public class ArtistDto
 
     public string? MusicBrainzID { get; set; }
 
+    public long? PictureDominantColor { get; set; }
+
     /* Social networks and external links */
 
     public string? WikipediaUrl { get; set; }

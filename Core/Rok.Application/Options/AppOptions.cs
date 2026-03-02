@@ -16,6 +16,8 @@ public class AppOptions : IAppOptions
 
     public List<string> LibraryTokens { get; set; } = [];
 
+    public bool DominantColorEnabled { get; set; } = true;
+
     public bool CrossFade { get; set; } = true;
 
     public bool IsGridView { get; set; } = true;

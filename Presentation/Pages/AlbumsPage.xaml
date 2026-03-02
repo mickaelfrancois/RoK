@@ -109,12 +109,7 @@
                                          Visibility="{x:Bind ShowNewBadge, Converter={StaticResource BoolToVisibilityConverter}}"
                                          BadgeBackground="{StaticResource BadgeNew}" />
                 </StackPanel>
-
-                <!-- Dominant color gradient overlay - Spotify-like immersion -->
-                <!--<Border CornerRadius="10"
-                        IsHitTestVisible="False"
-                        Background="{x:Bind DominantColor, Converter={StaticResource ColorToGradientBrushConverter}, Mode=OneWay}" />-->
-
+              
                 <Grid x:Name="gridBottom"
                           Style="{StaticResource GridCoverBottomStyle}"
                           Background="{x:Bind DominantColor, Converter={StaticResource ColorToGradientBrushConverter}, Mode=OneWay}">

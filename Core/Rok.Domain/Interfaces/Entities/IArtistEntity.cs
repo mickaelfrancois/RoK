@@ -16,6 +16,7 @@ public interface IArtistEntity : IEntity
     int? DiedYear { get; set; }
     bool Disbanded { get; set; }
     string? DiscogsUrl { get; set; }
+    long? PictureDominantColor { get; set; }
     string? FacebookUrl { get; set; }
     string? FlickrUrl { get; set; }
     int? FormedYear { get; set; }

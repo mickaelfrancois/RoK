@@ -15,6 +15,7 @@ public static class ArtistMapping
             Name = entity.Name,
             MusicBrainzID = entity.MusicBrainzID,
 
+            PictureDominantColor = entity.PictureDominantColor,
             WikipediaUrl = entity.WikipediaUrl,
             OfficialSiteUrl = entity.OfficialSiteUrl,
             FacebookUrl = entity.FacebookUrl,

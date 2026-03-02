@@ -14,6 +14,8 @@ public interface IAppOptions
 
     List<string> LibraryTokens { get; set; }
 
+    bool DominantColorEnabled { get; set; }
+
     bool CrossFade { get; set; }
 
     bool IsGridView { get; set; }

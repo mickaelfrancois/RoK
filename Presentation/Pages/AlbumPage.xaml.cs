@@ -27,6 +27,12 @@ public sealed partial class AlbumPage : Page
         base.OnNavigatedTo(e);
     }
 
+    protected override void OnNavigatedFrom(NavigationEventArgs e)
+    {
+        ViewModel.OnNavigatedFrom();
+        base.OnNavigatedFrom(e);
+    }
+
 
     private void tracksList_ContainerContentChanging(ListViewBase sender, ContainerContentChangingEventArgs args)
     {
