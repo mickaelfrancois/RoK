@@ -15,7 +15,7 @@
         <Grid.RowDefinitions>
             
             <RowDefinition x:Name="headerRow"
-                           Height="{ThemeResource headerRowHeight}" />
+                           Height="{StaticResource HeaderRowHeight}" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
@@ -37,7 +37,7 @@
 
             <Grid.ColumnDefinitions>
                 <ColumnDefinition x:Name="pictureColumn"
-                                  Width="{ThemeResource headerPictureColumnWidth}" />
+                                  Width="{StaticResource HeaderPictureColumnWidth}" />
                 <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
 
@@ -74,7 +74,7 @@
                         Background="Transparent"
                         ToolTipService.ToolTip="{x:Bind ViewModel.Album.CountryName}">
                     <Image Source="{x:Bind ViewModel.Album.CountryCode, Converter={StaticResource CountryCodeToImageSourceConverter}}"
-                           Height="{ThemeResource countryFlagHeigh}"></Image>
+                           Height="{StaticResource CountryFlagHeigh}"></Image>
                 </Button>
 
                 <StackPanel x:Name="albumType"

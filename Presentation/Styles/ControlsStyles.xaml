@@ -272,9 +272,9 @@
 
     <!-- File page -->
 
-    <x:Double x:Key="headerPictureColumnWidth">180</x:Double>
-    <x:Double x:Key="headerRowHeight">200</x:Double>
-    <x:Double x:Key="countryFlagHeigh">10</x:Double>
+    <x:Double x:Key="HeaderPictureColumnWidth">180</x:Double>
+    <x:Double x:Key="HeaderRowHeight">200</x:Double>
+    <x:Double x:Key="CountryFlagHeigh">10</x:Double>
 
     <Style x:Key="HeaderBackdropStyle" TargetType="Image">
         <Setter Property="Opacity" Value="0.1"/>

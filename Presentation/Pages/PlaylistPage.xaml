@@ -14,7 +14,7 @@
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition x:Name="headerRow"
-                           Height="{ThemeResource headerRowHeight}" />
+                           Height="{StaticResource HeaderRowHeight}" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
@@ -26,7 +26,7 @@
 
             <Grid.ColumnDefinitions>
                 <ColumnDefinition x:Name="pictureColumn"
-                                  Width="{ThemeResource headerPictureColumnWidth}" />
+                                  Width="{StaticResource HeaderPictureColumnWidth}" />
                 <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
 
