@@ -20,6 +20,8 @@ public class AppOptions : IAppOptions
 
     public bool IsGridView { get; set; } = true;
 
+    public bool PauseOnCall { get; set; } = true;
+
     public bool HideArtistsWithoutAlbum { get; set; } = true;
 
     public bool RefreshLibraryAtStartup { get; set; } = true;
@@ -95,6 +97,7 @@ public class AppOptions : IAppOptions
         HideArtistsWithoutAlbum = options.HideArtistsWithoutAlbum;
         TelemetryEnabled = options.TelemetryEnabled;
         NovaApiEnabled = options.NovaApiEnabled;
+        PauseOnCall = options.PauseOnCall;
 
         ArtistsGroupBy = options.ArtistsGroupBy;
         ArtistsFilterBy = options.ArtistsFilterBy;

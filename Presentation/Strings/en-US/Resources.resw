@@ -1185,4 +1185,7 @@
   <data name="badgeLive.Text" xml:space="preserve">
     <value>live</value>
   </data>
+  <data name="OptionsPauseOnCall.Header" xml:space="preserve">
+    <value>Pause when receiving a call</value>
+  </data>
 </root>

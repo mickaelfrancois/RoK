@@ -54,6 +54,8 @@
                                       IsOn="{x:Bind Options.RefreshLibraryAtStartup, Mode=TwoWay}" />
                         <ToggleSwitch x:Uid="OptionsImportWithArtistGenreSwitch"
                                       IsOn="{x:Bind Options.ImportTrackWithArtistGenre, Mode=TwoWay}" />
+                        <ToggleSwitch x:Uid="OptionsPauseOnCall"
+                                      IsOn="{x:Bind Options.PauseOnCall, Mode=TwoWay}" />
                         <ToggleSwitch x:Uid="OptionsNovaApiEnabledSwitch"
                                       IsOn="{x:Bind Options.NovaApiEnabled, Mode=TwoWay}" />
                         <ToggleSwitch x:Uid="OptionsTelemetryEnabledSwitch"
