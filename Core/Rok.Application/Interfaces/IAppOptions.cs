@@ -18,6 +18,8 @@ public interface IAppOptions
 
     bool IsGridView { get; set; }
 
+    bool PauseOnCall { get; set; }
+
     bool HideArtistsWithoutAlbum { get; set; }
 
     bool RefreshLibraryAtStartup { get; set; }

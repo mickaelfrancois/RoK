@@ -15,7 +15,11 @@ public class PlayerService : IPlayerService
 
     private readonly IDiscordRichPresenceService? _discordService;
 
+    private readonly ICallDetectionService _callDetectionService;
+
     private readonly IAppOptions _appOptions;
+
+    private bool _callingPaused = false;
 
     public EPlaybackState PlaybackState
     {
@@ -134,8 +138,9 @@ public class PlayerService : IPlayerService
     private readonly ILogger<PlayerService> _logger;
 
 
-    public PlayerService(IPlayerEngine player, IAppOptions appOptions, IDiscordRichPresenceService? discordService, ILogger<PlayerService> logger)
+    public PlayerService(ICallDetectionService callDetectionService, IPlayerEngine player, IAppOptions appOptions, IDiscordRichPresenceService? discordService, ILogger<PlayerService> logger)
     {
+        _callDetectionService = Guard.Against.Null(callDetectionService, nameof(callDetectionService));
         _player = Guard.Against.Null(player, nameof(player));
         _appOptions = Guard.Against.Null(appOptions, nameof(appOptions));
         _discordService = discordService;
@@ -161,6 +166,32 @@ public class PlayerService : IPlayerService
         _player.OnMediaChanged += OnMediaChanged;
         _player.OnMediaEnded += OnMediaEnded;
         _player.OnMediaStateChanged += OnMediaStateChanged;
+
+        _callDetectionService.CallStateChanged += (s, inCall) =>
+        {
+            if (!_appOptions.PauseOnCall)
+                return;
+
+            _logger.LogInformation("Call state changed, in call: {InCall}", inCall);
+
+            if (inCall)
+            {
+                if (PlaybackState == EPlaybackState.Playing)
+                {
+                    Pause();
+                    _callingPaused = true;
+                }
+            }
+            else
+            {
+                if (PlaybackState == EPlaybackState.Paused && _callingPaused)
+                {
+                    Play();
+                    _callingPaused = false;
+                }
+            }
+        };
+        _callDetectionService.Start();
     }
 
 

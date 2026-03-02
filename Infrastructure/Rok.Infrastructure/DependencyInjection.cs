@@ -41,6 +41,7 @@ public static class DependencyInjection
         services.AddSingleton<BackdropPicture>();
         services.AddSingleton<IBackdropPicture, BackdropPicture>();
         services.AddSingleton<IDominantColorCalculator, DominantColorCalculator>();
+        services.AddSingleton<ICallDetectionService, CallDetectionService>();
 
         services.AddSingleton<IPlayerEngine, WinUIMediaPlayer>();
         services.AddSingleton<ILyricsService, LyricsService>();
