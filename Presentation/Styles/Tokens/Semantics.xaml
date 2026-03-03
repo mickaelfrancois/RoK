@@ -8,7 +8,7 @@
     <ResourceDictionary.ThemeDictionaries>
         <ResourceDictionary x:Key="Dark">
             <SolidColorBrush x:Key="BrandPrimaryBrush" Color="{StaticResource Blue700}" />
-            <SolidColorBrush x:Key="BrandPrimaryHoverBrush" Color="{StaticResource Blue900}" />
+            <SolidColorBrush x:Key="BrandPrimaryHoverBrush" Color="{StaticResource Blue400}" />
             <SolidColorBrush x:Key="BrandPrimaryPressedBrush" Color="{StaticResource Blue800}" />
             <SolidColorBrush x:Key="BrandAccentBrush" Color="{StaticResource Blue400}" />
 
@@ -17,22 +17,31 @@
             <SolidColorBrush x:Key="OnSurfaceAccentBrush" Color="{StaticResource Blue400}" />
 
             <SolidColorBrush x:Key="PlayerSurfaceBrush" Color="{StaticResource Gray950}" />
+
+            <StaticResource x:Key="OnNeutralSurfacePrimaryBrush" ResourceKey="SystemControlForegroundBaseHighBrush" />
         </ResourceDictionary>
 
         <ResourceDictionary x:Key="Light">
             <SolidColorBrush x:Key="BrandPrimaryBrush" Color="{StaticResource Blue700}" />
-            <SolidColorBrush x:Key="BrandPrimaryHoverBrush" Color="{StaticResource Blue900}" />
+            <SolidColorBrush x:Key="BrandPrimaryHoverBrush" Color="{StaticResource Blue400}" />
             <SolidColorBrush x:Key="BrandPrimaryPressedBrush" Color="{StaticResource Blue800}" />
             <SolidColorBrush x:Key="BrandAccentBrush" Color="{StaticResource Blue400}" />
-
+            
             <SolidColorBrush x:Key="SurfaceOverlayBrush" Color="{StaticResource Black70}" />
             <SolidColorBrush x:Key="OnSurfacePrimaryBrush" Color="White" />
             <SolidColorBrush x:Key="OnSurfaceAccentBrush" Color="{StaticResource Blue400}" />
 
             <SolidColorBrush x:Key="PlayerSurfaceBrush" Color="{StaticResource Gray950}" />
+
+            <StaticResource x:Key="OnNeutralSurfacePrimaryBrush" ResourceKey="SystemControlForegroundBaseHighBrush" />
         </ResourceDictionary>
     </ResourceDictionary.ThemeDictionaries>
 
+    <!-- Content area background -->
+    <LinearGradientBrush x:Key="ContentListBackgroundBrush" StartPoint="0.5,0" EndPoint="0.5,1">
+        <GradientStop Color="{ThemeResource NavigationViewExpandedPaneBackground}" Offset="0.8" />
+        <GradientStop Color="{ThemeResource SystemChromeBlackMediumColor}" Offset="1" />
+    </LinearGradientBrush>
 
     <!-- Badge brushes (not theme-dependent) -->
     <SolidColorBrush x:Key="BadgeLiveBrush" Color="{StaticResource BadgeLive}" />

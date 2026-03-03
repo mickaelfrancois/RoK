@@ -250,32 +250,8 @@
     </Style>
 
     <!-- List pages -->
-
-    <GridLength x:Key="headerListRowHeight">45</GridLength>
-    <GridLength x:Key="gridListFirstRowHeight">30</GridLength>
-    <GridLength x:Key="gridListSecondRowHeight">30</GridLength>
-
-    <Style x:Key="headerListCommandBar" TargetType="CommandBar">
-        <Setter Property="HorizontalAlignment" Value="Stretch"/>
-        <Setter Property="Padding" Value="4"/>
-        <Setter Property="IsSticky" Value="True"/>
-        <Setter Property="DefaultLabelPosition" Value="Right"/>
-    </Style>
-
-    <Style x:Key="gridList"
-           TargetType="Grid">
-        <Setter Property="BorderThickness"
-                Value="0,1,0,0" />
-        <Setter Property="BorderBrush"
-                Value="{ThemeResource AppBarBorderThemeBrush}" />
-    </Style>
-
+    
     <!-- File page -->
-
-    <GridLength x:Key="HeaderPictureColumnWidth">180</GridLength>
-    <GridLength x:Key="HeaderRowHeight">200</GridLength>
-    <x:Double x:Key="CountryFlagHeigh">10</x:Double>
-
     <Style x:Key="HeaderBackdropStyle" TargetType="Image">
         <Setter Property="Opacity" Value="0.1"/>
         <Setter Property="Stretch" Value="UniformToFill"/>
@@ -345,14 +321,6 @@
 
 
     <!-- Tracks list -->
-    <x:Double x:Key="gridHeaderTracksTitleColumnWidth">350</x:Double>
-    <x:Double x:Key="gridHeaderTracksAlbumColumnWidth">250</x:Double>
-    <x:Double x:Key="gridHeaderTracksArtistColumnWidth">350</x:Double>
-    <x:Double x:Key="gridHeaderTracksGenreColumnWidth">250</x:Double>
-    <x:Double x:Key="gridHeaderTracksScoreColumnWidth">150</x:Double>
-
-    <x:Double x:Key="gridHeaderTracksHeight">25</x:Double>
-
     <Style x:Key="gridTracks" TargetType="Grid">
         <Setter Property="BorderThickness" Value="0,0,0,1"/>
         <Setter Property="BorderBrush" Value="{StaticResource DefaultThemeBrush}"/>

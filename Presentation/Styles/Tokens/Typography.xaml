@@ -7,6 +7,9 @@
 
     <x:Double  x:Key="FontSizeXSmall">12</x:Double>
     <x:Double  x:Key="FontSizeSmall">14</x:Double>
+    <x:Double  x:Key="FontSizeLarge">24</x:Double>
+    <x:Double  x:Key="FontSizeXLarge">48</x:Double>
+    
     <x:Double  x:Key="FontSizeBody">16</x:Double>
     <x:Double  x:Key="FontSizeTitle">18</x:Double>
     <x:Double  x:Key="FontSizeHeading">24</x:Double>

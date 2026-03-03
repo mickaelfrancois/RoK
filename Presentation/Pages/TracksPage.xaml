@@ -19,7 +19,7 @@
 
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="{ThemeResource headerListRowHeight}"></RowDefinition>
+            <RowDefinition Height="{StaticResource HeaderListRowHeight}"></RowDefinition>
             <RowDefinition Height="*"></RowDefinition>
         </Grid.RowDefinitions>
 
@@ -27,8 +27,8 @@
         <CommandBar Grid.Row="0"
                     Padding="0"
                     VerticalContentAlignment="Center"
-                    VerticalAlignment="Center"
-                    Style="{StaticResource headerListCommandBar}">
+                    VerticalAlignment="Center"                    
+                    Style="{StaticResource HeaderCommandBarListStyle}">
             <CommandBar.Content>
                 <StackPanel Orientation="Horizontal"
                             HorizontalAlignment="Left"
@@ -142,7 +142,7 @@
 
         <!-- Main content-->
         <Grid Grid.Row="1"
-              Style="{StaticResource gridList}">
+              Style="{StaticResource GridListStyle}">
 
             <Grid.Background>
                 <LinearGradientBrush StartPoint="0.5,0"
@@ -155,21 +155,21 @@
             </Grid.Background>
 
             <Grid.RowDefinitions>
-                <RowDefinition Height="{ThemeResource gridHeaderTracksHeight}" />
+                <RowDefinition Height="{StaticResource GridHeaderTracksHeight}" />
                 <RowDefinition />
             </Grid.RowDefinitions>
 
             <Grid Style="{StaticResource gridTracks}">
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="{ThemeResource gridHeaderTracksTitleColumnWidth}"
+                    <ColumnDefinition Width="{StaticResource GridHeaderTracksTitleColumnWidth}"
                                       x:Name="trackTitle" />
-                    <ColumnDefinition Width="{ThemeResource gridHeaderTracksArtistColumnWidth}"
+                    <ColumnDefinition Width="{StaticResource GridHeaderTracksArtistColumnWidth}"
                                       x:Name="trackArtist" />
-                    <ColumnDefinition Width="{ThemeResource gridHeaderTracksAlbumColumnWidth}"
+                    <ColumnDefinition Width="{StaticResource GridHeaderTracksAlbumColumnWidth}"
                                       x:Name="trackAlbum" />
-                    <ColumnDefinition Width="{ThemeResource gridHeaderTracksGenreColumnWidth}"
+                    <ColumnDefinition Width="{StaticResource GridHeaderTracksGenreColumnWidth}"
                                       x:Name="trackGenre" />
-                    <ColumnDefinition Width="{ThemeResource gridHeaderTracksScoreColumnWidth}"
+                    <ColumnDefinition Width="{StaticResource GridHeaderTracksScoreColumnWidth}"
                                       x:Name="trackScore" />
                 </Grid.ColumnDefinitions>
 
@@ -213,11 +213,11 @@
                                 <Grid Background="Transparent">
 
                                     <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="{ThemeResource gridHeaderTracksTitleColumnWidth}" />
-                                        <ColumnDefinition Width="{ThemeResource gridHeaderTracksArtistColumnWidth}" />
-                                        <ColumnDefinition Width="{ThemeResource gridHeaderTracksAlbumColumnWidth}" />
-                                        <ColumnDefinition Width="{ThemeResource gridHeaderTracksGenreColumnWidth}" />
-                                        <ColumnDefinition Width="{ThemeResource gridHeaderTracksScoreColumnWidth}" />
+                                        <ColumnDefinition Width="{StaticResource GridHeaderTracksTitleColumnWidth}" />
+                                        <ColumnDefinition Width="{StaticResource GridHeaderTracksArtistColumnWidth}" />
+                                        <ColumnDefinition Width="{StaticResource GridHeaderTracksAlbumColumnWidth}" />
+                                        <ColumnDefinition Width="{StaticResource GridHeaderTracksGenreColumnWidth}" />
+                                        <ColumnDefinition Width="{StaticResource GridHeaderTracksScoreColumnWidth}" />
                                     </Grid.ColumnDefinitions>
 
                                     <Grid.ContextFlyout>
@@ -355,21 +355,7 @@
                 </SemanticZoom.ZoomedOutView>
             </SemanticZoom>
 
-
-            <StackPanel Grid.Row="1"
-                        HorizontalAlignment="Center"
-                        VerticalAlignment="Center"
-                        Spacing="12"
-                        Visibility="{x:Bind ViewModel.HasNoData, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">
-                <FontIcon Glyph="&#xE8D6;"
-                          FontFamily="Segoe Fluent Icons"
-                          FontSize="48"
-                          Opacity="0.4" />
-                <TextBlock x:Uid="tracksViewNoData"
-                           HorizontalAlignment="Center"
-                           Style="{StaticResource SubtitleTextBlockStyle}"
-                           Opacity="0.6" />
-            </StackPanel>
+            <common:EmptyStateControl x:Uid="tracksViewNoData" Grid.Row="1"  Glyph="&#xE8D6;" Visibility="{x:Bind ViewModel.HasNoData, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" />
         </Grid>
     </Grid>
 </Page>

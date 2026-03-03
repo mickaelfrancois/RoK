@@ -323,22 +323,22 @@
               Grid.Row="3">
 
             <Grid.RowDefinitions>
-                <RowDefinition Height="{ThemeResource gridHeaderTracksHeight}" />
+                <RowDefinition Height="{StaticResource GridHeaderTracksHeight}" />
                 <RowDefinition />
             </Grid.RowDefinitions>
 
             <Grid Style="{StaticResource gridTracks}">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="38" />
-                    <ColumnDefinition Width="{ThemeResource gridHeaderTracksTitleColumnWidth}"
+                    <ColumnDefinition Width="{StaticResource GridHeaderTracksTitleColumnWidth}"
                                       x:Name="trackTitle" />
-                    <ColumnDefinition Width="{ThemeResource gridHeaderTracksArtistColumnWidth}"
+                    <ColumnDefinition Width="{StaticResource GridHeaderTracksArtistColumnWidth}"
                                       x:Name="trackArtist" />
-                    <ColumnDefinition Width="{ThemeResource gridHeaderTracksAlbumColumnWidth}"
+                    <ColumnDefinition Width="{StaticResource GridHeaderTracksAlbumColumnWidth}"
                                       x:Name="trackAlbum" />
-                    <ColumnDefinition Width="{ThemeResource gridHeaderTracksGenreColumnWidth}"
+                    <ColumnDefinition Width="{StaticResource GridHeaderTracksGenreColumnWidth}"
                                       x:Name="trackGenre" />
-                    <ColumnDefinition Width="{ThemeResource gridHeaderTracksScoreColumnWidth}"
+                    <ColumnDefinition Width="{StaticResource GridHeaderTracksScoreColumnWidth}"
                                       x:Name="trackScore" />
                 </Grid.ColumnDefinitions>
 
@@ -376,11 +376,11 @@
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="38"
                                                   x:Name="listened" />
-                                <ColumnDefinition Width="{ThemeResource gridHeaderTracksTitleColumnWidth}" />
-                                <ColumnDefinition Width="{ThemeResource gridHeaderTracksArtistColumnWidth}" />
-                                <ColumnDefinition Width="{ThemeResource gridHeaderTracksAlbumColumnWidth}" />
-                                <ColumnDefinition Width="{ThemeResource gridHeaderTracksGenreColumnWidth}" />
-                                <ColumnDefinition Width="{ThemeResource gridHeaderTracksScoreColumnWidth}" />
+                                <ColumnDefinition Width="{StaticResource GridHeaderTracksTitleColumnWidth}" />
+                                <ColumnDefinition Width="{StaticResource GridHeaderTracksArtistColumnWidth}" />
+                                <ColumnDefinition Width="{StaticResource GridHeaderTracksAlbumColumnWidth}" />
+                                <ColumnDefinition Width="{StaticResource GridHeaderTracksGenreColumnWidth}" />
+                                <ColumnDefinition Width="{StaticResource GridHeaderTracksScoreColumnWidth}" />
                             </Grid.ColumnDefinitions>
 
                             <Grid.ContextFlyout>

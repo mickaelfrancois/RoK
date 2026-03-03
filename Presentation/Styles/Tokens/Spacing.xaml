@@ -21,4 +21,27 @@
     <x:Double x:Key="NavigationExpandedThreshold">500</x:Double>
     <x:Double x:Key="NavigationSeparatorThickness">1</x:Double>
     <x:Double x:Key="NavigationSeparatorOpacity">0.6</x:Double>
+
+    <!-- List pages -->
+    <GridLength x:Key="HeaderListRowHeight">45</GridLength>
+    <GridLength x:Key="GridBottomFirstRowHeight">30</GridLength>
+    <GridLength x:Key="GridBottomSecondRowHeight">30</GridLength>
+    
+    <!-- File page -->
+    <GridLength x:Key="HeaderPictureColumnWidth">180</GridLength>
+    <GridLength x:Key="HeaderRowHeight">200</GridLength>
+    <x:Double x:Key="CountryFlagHeight">10</x:Double>
+
+    <!-- Tracks list -->
+    <GridLength x:Key="GridHeaderTracksTitleColumnWidth">350</GridLength>
+    <GridLength x:Key="GridHeaderTracksAlbumColumnWidth">250</GridLength>
+    <GridLength x:Key="GridHeaderTracksArtistColumnWidth">350</GridLength>
+    <GridLength x:Key="GridHeaderTracksGenreColumnWidth">250</GridLength>
+    <GridLength x:Key="GridHeaderTracksScoreColumnWidth">150</GridLength>
+    <GridLength x:Key="GridHeaderTracksHeight">25</GridLength>
+
+    <!-- Grid item dimensions -->
+    <x:Double x:Key="GridItemHeight">310</x:Double>
+    <x:Double x:Key="GridItemWidth">310</x:Double>
+    <GridLength x:Key="FavoriteButtonColumnWidth">50</GridLength>
 </ResourceDictionary>

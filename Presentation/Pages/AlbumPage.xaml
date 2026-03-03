@@ -74,7 +74,7 @@
                         Background="Transparent"
                         ToolTipService.ToolTip="{x:Bind ViewModel.Album.CountryName}">
                     <Image Source="{x:Bind ViewModel.Album.CountryCode, Converter={StaticResource CountryCodeToImageSourceConverter}}"
-                           Height="{StaticResource CountryFlagHeigh}"></Image>
+                           Height="{StaticResource CountryFlagHeight}"></Image>
                 </Button>
 
                 <StackPanel x:Name="albumType"
@@ -241,16 +241,16 @@
               ScrollViewer.VerticalScrollBarVisibility="Auto">
 
             <Grid.RowDefinitions>
-                <RowDefinition Height="{ThemeResource gridHeaderTracksHeight}" />
+                <RowDefinition Height="{StaticResource GridHeaderTracksHeight}" />
                 <RowDefinition />
             </Grid.RowDefinitions>
 
             <!-- Grid headers -->
             <Grid Style="{StaticResource gridTracks}">
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="{ThemeResource gridHeaderTracksTitleColumnWidth}" />
-                    <ColumnDefinition Width="{ThemeResource gridHeaderTracksArtistColumnWidth}" />
-                    <ColumnDefinition Width="{ThemeResource gridHeaderTracksScoreColumnWidth}" />
+                    <ColumnDefinition Width="{StaticResource GridHeaderTracksTitleColumnWidth}" />
+                    <ColumnDefinition Width="{StaticResource GridHeaderTracksArtistColumnWidth}" />
+                    <ColumnDefinition Width="{StaticResource GridHeaderTracksScoreColumnWidth}" />
                 </Grid.ColumnDefinitions>
 
                 <TextBlock x:Uid="gridHeaderTitle"
@@ -277,9 +277,9 @@
                         <Grid Background="Transparent">
                             
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="{ThemeResource gridHeaderTracksTitleColumnWidth}" />
-                                <ColumnDefinition Width="{ThemeResource gridHeaderTracksArtistColumnWidth}" />
-                                <ColumnDefinition Width="{ThemeResource gridHeaderTracksScoreColumnWidth}" />
+                                <ColumnDefinition Width="{StaticResource GridHeaderTracksTitleColumnWidth}" />
+                                <ColumnDefinition Width="{StaticResource GridHeaderTracksArtistColumnWidth}" />
+                                <ColumnDefinition Width="{StaticResource GridHeaderTracksScoreColumnWidth}" />
                             </Grid.ColumnDefinitions>
 
                             <Grid.ContextFlyout>

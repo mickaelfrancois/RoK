@@ -18,11 +18,6 @@
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
-        <Grid.Background>
-            <SolidColorBrush Color="{ThemeResource CardBackgroundFillColorDefault}"
-                             Opacity="{StaticResource HeaderBackgroundOpacity}" />
-        </Grid.Background>
-
         <Image x:Name="backdrop"
                Grid.RowSpan="2"
                Source="{x:Bind ViewModel.Backdrop,Mode=OneWay}"
@@ -66,7 +61,7 @@
                         Background="Transparent"
                         ToolTipService.ToolTip="{x:Bind ViewModel.Artist.CountryName}">
                     <Image Source="{x:Bind ViewModel.Artist.CountryCode, Converter={StaticResource CountryCodeToImageSourceConverter}}"
-                           Height="{StaticResource CountryFlagHeigh}"></Image>
+                           Height="{StaticResource CountryFlagHeight}"></Image>
                 </Button>
 
                 <TextBlock x:Name="year"
@@ -441,18 +436,18 @@
                           Grid.Row="1">
 
                         <Grid.RowDefinitions>
-                            <RowDefinition Height="{ThemeResource gridHeaderTracksHeight}" />
+                            <RowDefinition Height="{StaticResource GridHeaderTracksHeight}" />
                             <RowDefinition />
                         </Grid.RowDefinitions>
 
                         <!-- Grid headers -->
                         <Grid Style="{StaticResource gridTracks}">
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="{ThemeResource gridHeaderTracksTitleColumnWidth}"
+                                <ColumnDefinition Width="{StaticResource GridHeaderTracksTitleColumnWidth}"
                                                   x:Name="trackTitle" />
-                                <ColumnDefinition Width="{ThemeResource gridHeaderTracksAlbumColumnWidth}"
+                                <ColumnDefinition Width="{StaticResource GridHeaderTracksAlbumColumnWidth}"
                                                   x:Name="trackAlbum" />
-                                <ColumnDefinition Width="{ThemeResource gridHeaderTracksScoreColumnWidth}"
+                                <ColumnDefinition Width="{StaticResource GridHeaderTracksScoreColumnWidth}"
                                                   x:Name="trackScore" />
                             </Grid.ColumnDefinitions>
 
@@ -478,9 +473,9 @@
                                     <Grid Background="Transparent">
 
                                         <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="{ThemeResource gridHeaderTracksTitleColumnWidth}" />
-                                            <ColumnDefinition Width="{ThemeResource gridHeaderTracksAlbumColumnWidth}" />
-                                            <ColumnDefinition Width="{ThemeResource gridHeaderTracksScoreColumnWidth}" />
+                                            <ColumnDefinition Width="{StaticResource GridHeaderTracksTitleColumnWidth}" />
+                                            <ColumnDefinition Width="{StaticResource GridHeaderTracksAlbumColumnWidth}" />
+                                            <ColumnDefinition Width="{StaticResource GridHeaderTracksScoreColumnWidth}" />
                                         </Grid.ColumnDefinitions>
 
                                         <Grid.ContextFlyout>

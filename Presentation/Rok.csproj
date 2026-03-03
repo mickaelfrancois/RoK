@@ -39,6 +39,7 @@
 		<None Remove="Commons\BackdropControl.xaml" />
 		<None Remove="Commons\BadgeControl.xaml" />
 		<None Remove="Commons\CompactPlayerControl.xaml" />
+		<None Remove="Commons\EmptyStateControl.xaml" />
 		<None Remove="Commons\FullScreenControl.xaml" />
 		<None Remove="Commons\InlineEditableText.xaml" />
 		<None Remove="Commons\NotificationControl.xaml" />
@@ -260,6 +261,9 @@
 	  <None Update="appsettings.json">
 	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 	  </None>
+	  <Page Update="Commons\EmptyStateControl.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </Page>
 	  <Page Update="Commons\BadgeControl.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </Page>

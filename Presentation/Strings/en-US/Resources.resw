@@ -1164,13 +1164,13 @@
   <data name="artistsPageArtists.Text" xml:space="preserve">
     <value>artists</value>
   </data>
-  <data name="albumsViewNoData.Text" xml:space="preserve">
+  <data name="albumsViewNoData.Message" xml:space="preserve">
     <value>No albums found</value>
   </data>
-  <data name="artistsViewNoData.Text" xml:space="preserve">
+  <data name="artistsViewNoData.Message" xml:space="preserve">
     <value>No artists found</value>
   </data>
-  <data name="tracksViewNoData.Text" xml:space="preserve">
+  <data name="tracksViewNoData.Message" xml:space="preserve">
     <value>No songs found</value>
   </data>
   <data name="badgeNew.Text" xml:space="preserve">
