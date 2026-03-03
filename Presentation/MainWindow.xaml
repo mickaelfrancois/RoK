@@ -25,18 +25,11 @@
                 </Grid.RowDefinitions>
 
                 <NavigationView x:Name="navMenu"
-                                Background="{ThemeResource NavigationViewExpandedPaneBackground}"
-                                IsSettingsVisible="True"
-                                IsBackButtonVisible="Auto"
+                                Style="{StaticResource MainNavigationViewStyle}"
                                 IsBackEnabled="True"
                                 ItemInvoked="NavigationView_ItemInvoked"
                                 BackRequested="NavigationView_BackRequested"
-                                Loaded="NavigationView_Loaded"
-                                AlwaysShowHeader="False"
-                                PaneDisplayMode="Top"
-                                ExpandedModeThresholdWidth="500"
-                                SelectionFollowsFocus="Enabled"
-                                IsTabStop="False">
+                                Loaded="NavigationView_Loaded">
 
                     <NavigationView.Resources>
                         <Storyboard x:Name="IconRotation"
@@ -144,43 +137,12 @@
                     <NavigationView.AutoSuggestBox>
                         <AutoSuggestBox x:Uid="searchBox"
                                         x:Name="searchBox"
-                                        QueryIcon="Find"
+                                        Style="{StaticResource NavigationSearchBoxStyle}"
                                         AutomationProperties.Name="Search"
                                         TextChanged="SearchBox_TextChanged"
                                         SuggestionChosen="SearchBox_SuggestionChosen"
                                         QuerySubmitted="SearchBox_QuerySubmitted"
-                                        TextMemberPath="Name"
-                                        Width="400"
-                                        MaxWidth="400"
-                                        MinWidth="400"
-                                        CornerRadius="10"
                                         Text="{x:Bind ViewModel.Keyword, Mode=TwoWay}">
-                            <AutoSuggestBox.ItemTemplate>
-                                <DataTemplate>
-                                    <Grid Margin="0,4">
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="Auto" />
-                                            <ColumnDefinition Width="*" />
-                                            <ColumnDefinition Width="Auto" />
-                                        </Grid.ColumnDefinitions>
-                                        <FontIcon Grid.Column="0"
-                                                  FontSize="16"
-                                                  Margin="0,0,12,0"
-                                                  VerticalAlignment="Center"
-                                                  Glyph="{Binding IconGlyph}" />
-                                        <StackPanel Grid.Column="1"
-                                                    VerticalAlignment="Center">
-                                            <TextBlock Text="{Binding Name}"
-                                                       FontWeight="SemiBold"
-                                                       TextTrimming="CharacterEllipsis" />
-                                            <TextBlock Text="{Binding Type}"
-                                                       FontSize="12"
-                                                       Opacity="0.7"
-                                                       TextTrimming="CharacterEllipsis" />
-                                        </StackPanel>
-                                    </Grid>
-                                </DataTemplate>
-                            </AutoSuggestBox.ItemTemplate>
                         </AutoSuggestBox>
                     </NavigationView.AutoSuggestBox>
 
@@ -188,33 +150,23 @@
                         <StackPanel Orientation="Horizontal">
                             <ImageIcon x:Name="AppLogo"
                                        Source="/Assets/logo.png"
-                                       Margin="0,0,4,0"
-                                       Height="25"
-                                       Width="25"
+                                       Margin="0,0,4,0" 
+                                       Height="{StaticResource AppLogoSize}" 
+                                       Width="{StaticResource AppLogoSize}" 
                                        RenderTransformOrigin="0.5,0.5"
                                        PointerEntered="AppLogo_PointerEntered"
                                        PointerExited="AppLogo_PointerExited">
                                 <ImageIcon.RenderTransform>
                                     <TransformGroup>
-                                        <ScaleTransform ScaleX="1"
-                                                        ScaleY="1" />
+                                        <ScaleTransform ScaleX="1" ScaleY="1" />
                                         <RotateTransform Angle="0" />
                                     </TransformGroup>
                                 </ImageIcon.RenderTransform>
                             </ImageIcon>
-                            <TextBlock x:Name="applicationName"
-                                       FontFamily="Consolas"
-                                       FontWeight="Bold"
-                                       FontSize="24"
-                                       Text="RoK"
-                                       VerticalAlignment="Center" />
 
-                            <Border Width="1"
-                                    Height="25"
-                                    Margin="8,0,8,0"
-                                    VerticalAlignment="Center"
-                                    Background="{ThemeResource ControlStrokeColorDefaultBrush}"
-                                    Opacity="0.6" />
+                            <TextBlock x:Name="applicationName" Text="RoK" Style="{StaticResource ApplicationTitleStyle}" VerticalAlignment="Center" />
+
+                            <Border Style="{StaticResource PaneHeaderSeparatorStyle}" />
                         </StackPanel>
                     </NavigationView.PaneHeader>
 
@@ -262,9 +214,7 @@
                 <!-- Player -->
                 <Border Grid.Row="1"
                         x:Name="HorizontalPlayer"
-                        Background="#FF1F1F1F"
-                        VerticalAlignment="Bottom"
-                        HorizontalAlignment="Stretch"
+                        Style="{StaticResource HorizontalPlayerBorderStyle}"
                         Visibility="{Binding PlayerVisible, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">
                     <v:PlayerView x:Name="HorizontalPlayerView"
                                   HorizontalAlignment="Stretch"></v:PlayerView>

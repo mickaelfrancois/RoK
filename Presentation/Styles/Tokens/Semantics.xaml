@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <ResourceDictionary.MergedDictionaries>
+        <ResourceDictionary Source="ms-appx:///Styles/Tokens/Colors.xaml" />
+    </ResourceDictionary.MergedDictionaries>
+
+    <ResourceDictionary.ThemeDictionaries>
+        <ResourceDictionary x:Key="Dark">
+            <SolidColorBrush x:Key="BrandPrimaryBrush" Color="{StaticResource Blue700}" />
+            <SolidColorBrush x:Key="BrandPrimaryHoverBrush" Color="{StaticResource Blue900}" />
+            <SolidColorBrush x:Key="BrandPrimaryPressedBrush" Color="{StaticResource Blue800}" />
+            <SolidColorBrush x:Key="BrandAccentBrush" Color="{StaticResource Blue400}" />
+
+            <SolidColorBrush x:Key="SurfaceOverlayBrush" Color="{StaticResource Black85}" />
+            <SolidColorBrush x:Key="OnSurfacePrimaryBrush" Color="White" />
+            <SolidColorBrush x:Key="OnSurfaceAccentBrush" Color="{StaticResource Blue400}" />
+
+            <SolidColorBrush x:Key="PlayerSurfaceBrush" Color="{StaticResource Gray950}" />
+        </ResourceDictionary>
+
+        <ResourceDictionary x:Key="Light">
+            <SolidColorBrush x:Key="BrandPrimaryBrush" Color="{StaticResource Blue700}" />
+            <SolidColorBrush x:Key="BrandPrimaryHoverBrush" Color="{StaticResource Blue900}" />
+            <SolidColorBrush x:Key="BrandPrimaryPressedBrush" Color="{StaticResource Blue800}" />
+            <SolidColorBrush x:Key="BrandAccentBrush" Color="{StaticResource Blue400}" />
+
+            <SolidColorBrush x:Key="SurfaceOverlayBrush" Color="{StaticResource Black70}" />
+            <SolidColorBrush x:Key="OnSurfacePrimaryBrush" Color="White" />
+            <SolidColorBrush x:Key="OnSurfaceAccentBrush" Color="{StaticResource Blue400}" />
+
+            <SolidColorBrush x:Key="PlayerSurfaceBrush" Color="{StaticResource Gray950}" />
+        </ResourceDictionary>
+    </ResourceDictionary.ThemeDictionaries>
+
+
+    <!-- Badge brushes (not theme-dependent) -->
+    <SolidColorBrush x:Key="BadgeLiveBrush" Color="{StaticResource BadgeLive}" />
+    <SolidColorBrush x:Key="BadgeCompilationBrush" Color="{StaticResource BadgeCompilation}" />
+    <SolidColorBrush x:Key="BadgeNewBrush" Color="{StaticResource BadgeNew}" />
+    <SolidColorBrush x:Key="BadgeBestOfBrush" Color="{StaticResource BadgeBestOf}" />
+
+</ResourceDictionary>

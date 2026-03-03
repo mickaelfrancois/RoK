@@ -254,9 +254,7 @@
 	</ItemGroup>
 	<ItemGroup>
 	  <Folder Include="Commons\Extensions\" />
-	  <Folder Include="Styles\Components\" />
 	  <Folder Include="Styles\Templates\" />
-	  <Folder Include="Styles\Tokens\" />
 	</ItemGroup>
 	<ItemGroup>
 	  <None Update="appsettings.json">
@@ -291,6 +289,18 @@
 	<ItemGroup>
 	  <Page Update="Commons\NotificationControl.xaml">
 	    <Generator>MSBuild:Compile</Generator>
+	  </Page>
+	  <Page Update="Styles\Tokens\Spacing.xaml">
+	    <SubType>Designer</SubType>
+	  </Page>
+	  <Page Update="Styles\Tokens\Typography.xaml">
+	    <SubType>Designer</SubType>
+	  </Page>
+	  <Page Update="Styles\Tokens\Semantics.xaml">
+	    <SubType>Designer</SubType>
+	  </Page>
+	  <Page Update="Styles\Tokens\Colors.xaml">
+	    <SubType>Designer</SubType>
 	  </Page>
 	</ItemGroup>
 	

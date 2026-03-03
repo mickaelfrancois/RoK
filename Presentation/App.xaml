@@ -48,6 +48,19 @@
                 <ResourceDictionary Source="ms-appx:///Styles/ControlsStyles.xaml" />
                 <ResourceDictionary Source="ms-appx:///Styles/RatingControlStyles.xaml" />
                 <ResourceDictionary Source="ms-appx:///Styles/AlbumTemplates.xaml" />
+
+                <!-- Tokens -->
+                <ResourceDictionary Source="ms-appx:///Styles/Tokens/Colors.xaml" />
+                <ResourceDictionary Source="ms-appx:///Styles/Tokens/Semantics.xaml" />
+                <ResourceDictionary Source="ms-appx:///Styles/Tokens/Typography.xaml" />
+                <ResourceDictionary Source="ms-appx:///Styles/Tokens/Spacing.xaml" />
+                <!-- Components -->
+                <ResourceDictionary Source="ms-appx:///Styles/Components/ControlsStyles.xaml" />
+                <!--<ResourceDictionary Source="ms-appx:///Styles/Components/ButtonStyles.xaml" />
+                
+                <ResourceDictionary Source="ms-appx:///Styles/Components/RatingControlStyles.xaml" />-->
+                <!-- Templates -->
+
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Application.Resources>
