@@ -254,6 +254,9 @@
 	</ItemGroup>
 	<ItemGroup>
 	  <Folder Include="Commons\Extensions\" />
+	  <Folder Include="Styles\Components\" />
+	  <Folder Include="Styles\Templates\" />
+	  <Folder Include="Styles\Tokens\" />
 	</ItemGroup>
 	<ItemGroup>
 	  <None Update="appsettings.json">

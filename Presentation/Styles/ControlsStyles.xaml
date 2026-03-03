@@ -251,9 +251,9 @@
 
     <!-- List pages -->
 
-    <x:Double x:Key="headerListRowHeight">45</x:Double>
-    <x:Double x:Key="gridListFirstRowHeight">30</x:Double>
-    <x:Double x:Key="gridListSecondRowHeight">30</x:Double>
+    <GridLength x:Key="headerListRowHeight">45</GridLength>
+    <GridLength x:Key="gridListFirstRowHeight">30</GridLength>
+    <GridLength x:Key="gridListSecondRowHeight">30</GridLength>
 
     <Style x:Key="headerListCommandBar" TargetType="CommandBar">
         <Setter Property="HorizontalAlignment" Value="Stretch"/>
@@ -272,8 +272,8 @@
 
     <!-- File page -->
 
-    <x:Double x:Key="HeaderPictureColumnWidth">180</x:Double>
-    <x:Double x:Key="HeaderRowHeight">200</x:Double>
+    <GridLength x:Key="HeaderPictureColumnWidth">180</GridLength>
+    <GridLength x:Key="HeaderRowHeight">200</GridLength>
     <x:Double x:Key="CountryFlagHeigh">10</x:Double>
 
     <Style x:Key="HeaderBackdropStyle" TargetType="Image">
