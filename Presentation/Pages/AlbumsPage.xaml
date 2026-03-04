@@ -16,12 +16,6 @@
     <Page.Resources>
         <CollectionViewSource x:Name="groupedItemsViewSource" IsSourceGrouped="True" ItemsPath="Items" />
 
-        <ItemsPanelTemplate x:Key="AlbumGridPanel">
-            <ItemsWrapGrid Orientation="Horizontal" ItemHeight="{StaticResource GridItemHeight}" ItemWidth="{StaticResource GridItemWidth}" Margin="0,0,2,2" />
-        </ItemsPanelTemplate>
-
-
-
         <DataTemplate x:Key="AlbumGridTemplate" x:DataType="albums:AlbumViewModel">
             <Grid Style="{StaticResource MainGridCoverStyle}" PointerEntered="gridBottom_PointerEntered" PointerExited="gridBottom_PointerExited" Background="Transparent">
                 <Grid.Resources>
@@ -41,8 +35,8 @@
                         <DoubleAnimation Storyboard.TargetName="favoriteButton" Storyboard.TargetProperty="Opacity" To="0" Duration="0:0:0.2" />
                     </Storyboard>
                 </Grid.Resources>
-                
-                <Border CornerRadius="{StaticResource OverlayCornerRadius}">
+
+                <Border CornerRadius="{StaticResource CornerRadiusMediumValue}">
                     <common:PictureControl Style="{StaticResource PictureCoverStyle}" Cover="{x:Bind Picture, Mode=OneWay}" x:Phase="2" PlayButtonVisibility="Visible" Command="{x:Bind ListenCommand}" />
                 </Border>
 
@@ -63,10 +57,10 @@
                         <ColumnDefinition />
                         <ColumnDefinition Width="{StaticResource FavoriteButtonColumnWidth}" />
                     </Grid.ColumnDefinitions>
-                    
-                    <HyperlinkButton Content="{x:Bind Album.Name}" x:Phase="0" Command="{x:Bind AlbumOpenCommand}" Style="{StaticResource GridCoverBottomFirstLineStyle}" />
-                    <TextBlock x:Name="subTitle" Grid.Row="1" Style="{StaticResource GridCoverBottomSecondLineStyle}" Text="{x:Bind SubTitle, Mode=OneWay}" Opacity="1" x:Phase="1" />
-                    <HyperlinkButton x:Name="artistName" Grid.Row="1" Style="{StaticResource GridCoverBottomArtistLineStyle}" Content="{x:Bind Album.ArtistName, Mode=OneWay}" Command="{x:Bind ArtistOpenCommand}" Opacity="0" x:Phase="1" />
+
+                    <HyperlinkButton Content="{x:Bind Album.Name}" x:Phase="0" Command="{x:Bind AlbumOpenCommand}" Style="{StaticResource GridCoverButtonStyle}" />
+                    <TextBlock x:Name="subTitle" Grid.Row="1" Style="{StaticResource GridCoverBottomSecondLineStyle}" Margin="4,6,0,0" Text="{x:Bind SubTitle, Mode=OneWay}" Opacity="1" x:Phase="1" />
+                    <HyperlinkButton x:Name="artistName" Grid.Row="1" Style="{StaticResource GridCoverButtonStyle}" Content="{x:Bind Album.ArtistName, Mode=OneWay}" Command="{x:Bind ArtistOpenCommand}" Opacity="0" x:Phase="1" />
                     <common:AnimatedButton x:Name="favoriteButton"
                                                Grid.Row="0" Grid.Column="1"                                               
                                                HorizontalAlignment="Right" VerticalAlignment="Stretch"
@@ -80,10 +74,8 @@
             </Grid>
         </DataTemplate>
 
-        <DataTemplate x:Key="AlbumListTemplate"
-                      x:DataType="albums:AlbumViewModel">
+        <DataTemplate x:Key="AlbumListTemplate" x:DataType="albums:AlbumViewModel">
             <Grid Padding="12,4" HorizontalAlignment="Stretch" Background="Transparent" PointerEntered="gridBottom_PointerEntered" PointerExited="gridBottom_PointerExited">
-
                 <Grid.Resources>
                     <Storyboard x:Key="ShowArtistNameStoryboard">
                         <DoubleAnimation Storyboard.TargetName="artistName" Storyboard.TargetProperty="Opacity" To="1" Duration="0:0:0.6" />
@@ -105,37 +97,23 @@
                 </Grid.Resources>
                 
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="56" />
+                    <ColumnDefinition Width="{StaticResource ListCoverColumnWidth}" />
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
 
-                <Border CornerRadius="{StaticResource ControlCornerRadius}" Width="48" Height="48" VerticalAlignment="Center">
+                <Border CornerRadius="{StaticResource ControlCornerRadius}" Width="{StaticResource ListCoverWidth}" Height="{StaticResource ListCoverHeight}" VerticalAlignment="Center">
                     <common:PictureControl Cover="{x:Bind Picture, Mode=OneWay}" PlayButtonVisibility="Visible" Command="{x:Bind ListenCommand}" />
                 </Border>
                 
                 <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="12,0,0,0">
                     <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingSmall}">
-                        <HyperlinkButton Content="{x:Bind Album.Name}" Command="{x:Bind AlbumOpenCommand}" Style="{StaticResource HyperlinkSmallButtonStyle}" FontSize="15" FontWeight="SemiBold" Padding="0" />
-
-                        <common:AnimatedButton x:Name="favoriteButton"
-                                               HorizontalAlignment="Right"
-                                               VerticalAlignment="Center"
-                                               Icon="{StaticResource HeartPath}"
-                                               Color="{x:Bind IsFavorite, Converter={StaticResource FavoriteToColorConverter}, Mode=OneWay}"
-                                               Opacity="0" 
-                                               Command="{x:Bind AlbumFavoriteCommand}"
-                                               CommandParameter="{x:Bind IsFavorite, Converter={StaticResource BoolToInvertBoolConverter}, Mode=OneWay}" />
+                        <HyperlinkButton Content="{x:Bind Album.Name}" Command="{x:Bind AlbumOpenCommand}" Style="{StaticResource HyperlinkSmallButtonStyle}" Margin="4,0,0,0" FontSize="{StaticResource FontSizeXMedium}" FontWeight="SemiBold" />
+                        <common:AnimatedButton x:Name="favoriteButton" HorizontalAlignment="Right" VerticalAlignment="Center" Icon="{StaticResource HeartPath}" Color="{x:Bind IsFavorite, Converter={StaticResource FavoriteToColorConverter}, Mode=OneWay}" Opacity="0"  Command="{x:Bind AlbumFavoriteCommand}" CommandParameter="{x:Bind IsFavorite, Converter={StaticResource BoolToInvertBoolConverter}, Mode=OneWay}" />
                     </StackPanel>
+                    
                     <Grid Height="20">
-                        <TextBlock x:Name="subTitle" Text="{x:Bind SubTitle, Mode=OneWay}" Style="{StaticResource CaptionTextBlockStyle}" VerticalAlignment="Center" />
-                        <HyperlinkButton x:Name="artistName"
-                                         Content="{x:Bind Album.ArtistName, Mode=OneWay}"
-                                         Command="{x:Bind ArtistOpenCommand}"
-                                         Style="{StaticResource HyperlinkSmallButtonStyle}"
-                                         FontSize="{StaticResource FontSizeXSmall}"
-                                         Opacity="0"
-                                         VerticalAlignment="Center"
-                                         Padding="0" />
+                        <TextBlock x:Name="subTitle" Text="{x:Bind SubTitle, Mode=OneWay}" Style="{StaticResource ListCoverBottomSecondLineStyle}" VerticalAlignment="Center" />
+                        <HyperlinkButton x:Name="artistName" Content="{x:Bind Album.ArtistName, Mode=OneWay}" Command="{x:Bind ArtistOpenCommand}" Style="{StaticResource HyperlinkSmallButtonStyle}" Margin="4,0,0,0" FontSize="{StaticResource FontSizeSmall}" Opacity="0" VerticalAlignment="Center" Padding="0" />
                     </Grid>
                 </StackPanel>
             </Grid>

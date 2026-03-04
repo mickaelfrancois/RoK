@@ -10,9 +10,11 @@
     <x:Double x:Key="CoverSize">300</x:Double>
     <x:Double x:Key="CoverOverlayHeight">60</x:Double>
     <x:Double x:Key="CornerRadiusSmall">4</x:Double>
+    <x:Double x:Key="CornerRadiusXMedium">6</x:Double>
     <x:Double x:Key="CornerRadiusMedium">10</x:Double>
 
     <CornerRadius x:Key="CornerRadiusSmallValue">4</CornerRadius>
+    <CornerRadius x:Key="CornerRadiusXMediumValue">6</CornerRadius>
     <CornerRadius x:Key="CornerRadiusMediumValue">10</CornerRadius>
 
     <x:Double x:Key="AppLogoSize">25</x:Double>
@@ -40,8 +42,16 @@
     <GridLength x:Key="GridHeaderTracksScoreColumnWidth">150</GridLength>
     <GridLength x:Key="GridHeaderTracksHeight">25</GridLength>
 
+    <x:Double x:Key="ListCoverWidth">48</x:Double>
+    <x:Double x:Key="ListCoverHeight">48</x:Double>
+    <GridLength x:Key="ListCoverColumnWidth">56</GridLength>
+    
     <!-- Grid item dimensions -->
     <x:Double x:Key="GridItemHeight">310</x:Double>
     <x:Double x:Key="GridItemWidth">310</x:Double>
     <GridLength x:Key="FavoriteButtonColumnWidth">50</GridLength>
+
+    <x:Double x:Key="GridCoverBottomFirstLineWidth">310</x:Double>
+    <x:Double x:Key="GridCoverBottomSecondLineWidth">310</x:Double>
+    <x:Double x:Key="GridCoverBottomLineHeight">60</x:Double>
 </ResourceDictionary>

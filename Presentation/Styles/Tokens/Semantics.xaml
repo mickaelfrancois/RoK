@@ -19,6 +19,9 @@
             <SolidColorBrush x:Key="PlayerSurfaceBrush" Color="{StaticResource Gray950}" />
 
             <StaticResource x:Key="OnNeutralSurfacePrimaryBrush" ResourceKey="SystemControlForegroundBaseHighBrush" />
+
+            <SolidColorBrush x:Key="GridCoverBottomSecondLineBrush" Color="White"/>
+            <SolidColorBrush x:Key="ListCoverBottomSecondLineBrush" Color="White"/>
         </ResourceDictionary>
 
         <ResourceDictionary x:Key="Light">
@@ -32,10 +35,16 @@
             <SolidColorBrush x:Key="OnSurfaceAccentBrush" Color="{StaticResource Blue400}" />
 
             <SolidColorBrush x:Key="PlayerSurfaceBrush" Color="{StaticResource Gray950}" />
-
+            
             <StaticResource x:Key="OnNeutralSurfacePrimaryBrush" ResourceKey="SystemControlForegroundBaseHighBrush" />
+
+            <SolidColorBrush x:Key="GridCoverBottomSecondLineBrush" Color="White"/>
+            <SolidColorBrush x:Key="ListCoverBottomSecondLineBrush" Color="Black"/>
         </ResourceDictionary>
     </ResourceDictionary.ThemeDictionaries>
+
+    <SolidColorBrush x:Key="CoverOverlayBackgroundBrush" Color="{StaticResource Black67}"/>
+    <SolidColorBrush x:Key="HyperlinkForegroundBrush" Color="{StaticResource Cyan400}" />
 
     <!-- Content area background -->
     <LinearGradientBrush x:Key="ContentListBackgroundBrush" StartPoint="0.5,0" EndPoint="0.5,1">

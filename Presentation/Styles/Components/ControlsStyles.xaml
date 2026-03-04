@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ResourceDictionary
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:common="using:Rok.Commons" >
 
     <Style x:Key="ApplicationTitleStyle" TargetType="TextBlock">
         <Setter Property="FontFamily" Value="{StaticResource FontFamilyBrand}" />
@@ -75,6 +76,15 @@
     </Style>
 
     
+    <Style x:Key="PictureCoverStyle" TargetType="common:PictureControl">
+        <Setter Property="Icon" Value="&#xE8D4;" />
+        <Setter Property="Padding" Value="0" />
+        <Setter Property="Margin" Value="0" />
+        <Setter Property="VerticalAlignment" Value="Center" />
+        <Setter Property="HorizontalAlignment" Value="Center" />
+    </Style>
+
+
     <!-- Buttons -->
 
     <Style x:Key="ListenAppBarButtonCompactStyle"
@@ -177,8 +187,7 @@
         </Setter>
     </Style>
 
-    <Style x:Key="AppBarButtonCompactStyle"
-           TargetType="AppBarButton">
+    <Style x:Key="AppBarButtonCompactStyle" TargetType="AppBarButton">
         <Setter Property="Foreground" Value="{ThemeResource OnNeutralSurfacePrimaryBrush}" />
         <Setter Property="Background" Value="Transparent" />
         <Setter Property="BorderBrush" Value="Transparent" />
@@ -209,7 +218,7 @@
 
                                 <ContentPresenter x:Name="IconGlyph"
                                                   Content="{TemplateBinding Icon}"
-                                                  FontSize="18"
+                                                  FontSize="{StaticResource FontSizeMedium}"
                                                   Foreground="{TemplateBinding Foreground}" />
 
                                 <TextBlock x:Name="LabelText"
@@ -285,7 +294,85 @@
             </Setter.Value>
         </Setter>
     </Style>
-    
+
+    <Style x:Key="HyperlinkGroupButtonStyle" TargetType="HyperlinkButton">
+        <Setter Property="FontWeight" Value="SemiBold" />
+        <Setter Property="FontSize" Value="{StaticResource FontSizeLarge}" />
+        <Setter Property="Padding" Value="8,4,8,4" />
+        <Setter Property="HorizontalAlignment" Value="Left" />
+        <Setter Property="VerticalAlignment" Value="Center" />
+        <Setter Property="CornerRadius" Value="{StaticResource CornerRadiusMediumValue}"></Setter>
+    </Style>
+
+    <Style x:Key="HyperlinkSmallButtonStyle" TargetType="HyperlinkButton">
+        <Setter Property="Foreground" Value="{StaticResource HyperlinkForegroundBrush}" />
+        <Setter Property="Background" Value="{ThemeResource HyperlinkButtonBackgroundThemeBrush}" />
+        <Setter Property="BorderBrush" Value="{ThemeResource HyperlinkButtonBorderThemeBrush}" />
+        <Setter Property="BorderThickness" Value="{ThemeResource HyperlinkButtonBorderThemeThickness}" />
+        <Setter Property="Padding" Value="0,0,0,0" />
+        <Setter Property="HorizontalAlignment" Value="Left" />
+        <Setter Property="VerticalAlignment" Value="Center" />
+        <Setter Property="FontFamily" Value="{ThemeResource ContentControlThemeFontFamily}" />
+        <Setter Property="FontWeight" Value="Bold" />
+        <Setter Property="FontSize" Value="{ThemeResource ControlContentThemeFontSize}" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="HyperlinkButton">
+                    <Grid>
+                        <VisualStateManager.VisualStateGroups>
+                            <VisualStateGroup x:Name="CommonStates">
+                                <VisualState x:Name="Normal" />
+                                <VisualState x:Name="PointerOver">
+                                    <Storyboard>
+                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="Foreground" Storyboard.TargetName="TextElement">
+                                            <DiscreteObjectKeyFrame KeyTime="0" Value="{ThemeResource SystemAccentColorLight2}" />
+                                        </ObjectAnimationUsingKeyFrames>
+                                    </Storyboard>
+                                </VisualState>
+                                <VisualState x:Name="Pressed">
+                                    <Storyboard>
+                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="Foreground" Storyboard.TargetName="TextElement">
+                                            <DiscreteObjectKeyFrame KeyTime="0" Value="{ThemeResource PressedThemeBrush}" />
+                                        </ObjectAnimationUsingKeyFrames>
+                                    </Storyboard>
+                                </VisualState>
+                                <VisualState x:Name="Disabled">
+                                    <Storyboard>
+                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="Foreground" Storyboard.TargetName="TextElement">
+                                            <DiscreteObjectKeyFrame KeyTime="0" Value="{ThemeResource HyperlinkDisabledThemeBrush}" />
+                                        </ObjectAnimationUsingKeyFrames>
+                                    </Storyboard>
+                                </VisualState>
+                            </VisualStateGroup>
+                            <VisualStateGroup x:Name="FocusStates">
+                                <VisualState x:Name="Focused">
+                                    <Storyboard>
+                                        <DoubleAnimation Duration="0" To="1" Storyboard.TargetProperty="Opacity" Storyboard.TargetName="FocusVisualWhite" />
+                                        <DoubleAnimation Duration="0" To="1" Storyboard.TargetProperty="Opacity" Storyboard.TargetName="FocusVisualBlack" />
+                                    </Storyboard>
+                                </VisualState>
+                                <VisualState x:Name="Unfocused" />
+                                <VisualState x:Name="PointerFocused" />
+                            </VisualStateGroup>
+                        </VisualStateManager.VisualStateGroups>
+
+                        <Border Background="{TemplateBinding Background}" Padding="{TemplateBinding Padding}">
+                            <TextBlock x:Name="TextElement" Foreground="{TemplateBinding Foreground}" Text="{TemplateBinding Content}"
+                                   HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                                   TextWrapping="NoWrap" TextTrimming="CharacterEllipsis">
+                            <ToolTipService.ToolTip>
+                                <ToolTip Content="{TemplateBinding Content}" />
+                            </ToolTipService.ToolTip>
+                            </TextBlock>
+                        </Border>
+
+                        <Rectangle x:Name="FocusVisualWhite" IsHitTestVisible="False" Opacity="0" StrokeDashOffset="1.5" StrokeEndLineCap="Square" Stroke="{ThemeResource FocusVisualWhiteStrokeThemeBrush}" StrokeDashArray="1,1" />
+                        <Rectangle x:Name="FocusVisualBlack" IsHitTestVisible="False" Opacity="0" StrokeDashOffset="0.5" StrokeEndLineCap="Square" Stroke="{ThemeResource FocusVisualBlackStrokeThemeBrush}" StrokeDashArray="1,1" />
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
 
     <!-- CommandBar SplitButton -->
     
@@ -336,6 +423,51 @@
     </Style>
 
 
+    <!-- Grid pages-->
+
+    <Style x:Key="MainGridCoverStyle" TargetType="Grid">
+        <Setter Property="HorizontalAlignment" Value="Left" />
+        <Setter Property="Width" Value="{StaticResource CoverSize}" />
+        <Setter Property="Height" Value="{StaticResource CoverSize}" />
+        <Setter Property="Padding" Value="0" />
+        <Setter Property="Margin" Value="0" />
+        <Setter Property="BorderBrush" Value="Gray" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="CornerRadius" Value="{StaticResource CornerRadiusMediumValue}" />
+    </Style>
+
+    <Style x:Key="GridCoverBottomStyle" TargetType="Grid">
+        <Setter Property="VerticalAlignment" Value="Bottom" />
+        <Setter Property="Background"  Value="{StaticResource CoverOverlayBackgroundBrush}" />
+        <Setter Property="Height" Value="{StaticResource GridCoverBottomLineHeight}" />
+        <Setter Property="Margin" Value="0,0,0,0" />
+    </Style>
+
+    <Style x:Key="GridCoverButtonStyle" TargetType="HyperlinkButton" BasedOn="{StaticResource HyperlinkSmallButtonStyle}">
+        <Setter Property="Foreground" Value="{StaticResource HyperlinkForegroundBrush}"/>
+        <Setter Property="Margin" Value="4,0,0,0"/>
+        <Setter Property="FontSize" Value="{StaticResource FontSizeMedium}"/>
+        <Setter Property="Width" Value="{StaticResource GridCoverBottomFirstLineWidth}"/>
+        <Setter Property="HorizontalAlignment" Value="Left"/>
+        <Setter Property="HorizontalContentAlignment" Value="Left"/>
+    </Style>
+
+    <Style x:Key="GridCoverBottomSecondLineStyle" TargetType="TextBlock">
+        <Setter Property="Margin" Value="4,0,0,0" />
+        <Setter Property="HorizontalAlignment" Value="Left" />
+        <Setter Property="Foreground" Value="{ThemeResource GridCoverBottomSecondLineBrush}" />
+        <Setter Property="Width" Value="{StaticResource GridCoverBottomSecondLineWidth}" />
+        <Setter Property="FontSize" Value="{StaticResource FontSizeSmall}" />
+    </Style>
+
+    <Style x:Key="ListCoverBottomSecondLineStyle" TargetType="TextBlock">
+        <Setter Property="Margin" Value="4,0,0,0" />
+        <Setter Property="HorizontalAlignment" Value="Left" />
+        <Setter Property="Foreground" Value="{ThemeResource ListCoverBottomSecondLineBrush}" />
+        <Setter Property="Width" Value="{StaticResource GridCoverBottomSecondLineWidth}" />
+        <Setter Property="FontSize" Value="{StaticResource FontSizeSmall}" />
+    </Style>
+
     <!-- List pages-->
     
     <Style x:Key="HeaderCommandBarListStyle" TargetType="CommandBar">
@@ -382,6 +514,52 @@
         <Setter Property="Margin" Value="10,0,0,0" />
         <Setter Property="VerticalAlignment" Value="Center" />
         <Setter Property="CornerRadius" Value="{StaticResource CornerRadiusSmallValue}" />
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="BorderBrush" Value="Transparent" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="UseSystemFocusVisuals" Value="False" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Grid x:Name="Root">
+                        <Border x:Name="Bg"
+                             Background="{TemplateBinding Background}"
+                             CornerRadius="{TemplateBinding CornerRadius}"
+                             BorderBrush="{TemplateBinding BorderBrush}"
+                             BorderThickness="{TemplateBinding BorderThickness}"
+                             Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                           VerticalAlignment="{TemplateBinding VerticalContentAlignment}" />
+                        </Border>
+
+                        <VisualStateManager.VisualStateGroups>
+                            <VisualStateGroup x:Name="CommonStates">
+                                <VisualState x:Name="Normal" />
+                                <VisualState x:Name="PointerOver">
+                                    <Storyboard>
+                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="Bg" Storyboard.TargetProperty="Background">
+                                            <DiscreteObjectKeyFrame KeyTime="0" Value="{ThemeResource BrandPrimaryHoverBrush}" />
+                                        </ObjectAnimationUsingKeyFrames>
+                                    </Storyboard>
+                                </VisualState>
+                                <VisualState x:Name="Pressed">
+                                    <Storyboard>
+                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="Bg" Storyboard.TargetProperty="Background">
+                                            <DiscreteObjectKeyFrame KeyTime="0" Value="{ThemeResource BrandPrimaryPressedBrush}" />
+                                        </ObjectAnimationUsingKeyFrames>
+                                    </Storyboard>
+                                </VisualState>
+                                <VisualState x:Name="Disabled">
+                                    <Storyboard>
+                                        <DoubleAnimation Storyboard.TargetName="Root" Storyboard.TargetProperty="Opacity" To="0.45" Duration="0:0:0" />
+                                    </Storyboard>
+                                </VisualState>
+                            </VisualStateGroup>
+                        </VisualStateManager.VisualStateGroups>
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
     </Style>
 
     <!-- SemanticZoom — ZoomedOut view -->
