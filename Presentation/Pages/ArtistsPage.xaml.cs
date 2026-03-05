@@ -149,6 +149,9 @@ public sealed partial class ArtistsPage : Page, IDisposable
         Grid? gridItem = sender as Grid;
         if (gridItem != null && gridItem.DataContext is ArtistViewModel artistViewModel)
         {
+            Storyboard? showGenreStoryboard = gridItem.Resources["ShowGenreNameStoryboard"] as Storyboard;
+            showGenreStoryboard?.Begin();
+
             if (!artistViewModel.IsFavorite)
             {
                 Storyboard? showFavoriteButtonStoryboard = gridItem.Resources["ShowFavoriteButtonStoryboard"] as Storyboard;
@@ -163,6 +166,9 @@ public sealed partial class ArtistsPage : Page, IDisposable
         Grid? gridItem = sender as Grid;
         if (gridItem != null && gridItem.DataContext is ArtistViewModel artistViewModel)
         {
+            Storyboard? showSubTitleStoryboard = gridItem.Resources["ShowSubTitleStoryboard"] as Storyboard;
+            showSubTitleStoryboard?.Begin();
+
             if (!artistViewModel.IsFavorite)
             {
                 Storyboard? hideFavoriteButtonStoryboard = gridItem.Resources["HideFavoriteButtonStoryboard"] as Storyboard;
