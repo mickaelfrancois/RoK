@@ -58,4 +58,15 @@
     <SolidColorBrush x:Key="BadgeNewBrush" Color="{StaticResource BadgeNew}" />
     <SolidColorBrush x:Key="BadgeBestOfBrush" Color="{StaticResource BadgeBestOf}" />
 
+    <!-- Social networks brush -->
+    <SolidColorBrush x:Key="LastFmBrush" Color="{StaticResource LastFm}" />
+    <SolidColorBrush x:Key="WikipediaBrush" Color="{StaticResource Wikipedia}" />
+    <SolidColorBrush x:Key="FacebookBrush" Color="{StaticResource Facebook}" />
+    <SolidColorBrush x:Key="InstagramBrush" Color="{StaticResource Instagram}" />
+    <SolidColorBrush x:Key="TwitterBrush" Color="{StaticResource Twitter}" />
+    <SolidColorBrush x:Key="ThreadsBrush" Color="{StaticResource Threads}" />
+    <SolidColorBrush x:Key="TiktokBrush" Color="{StaticResource Tiktok}" />
+    <SolidColorBrush x:Key="YoutubeBrush" Color="{StaticResource Youtube}" />
+    <SolidColorBrush x:Key="WebsiteBrush" Color="{StaticResource Website}" />
+
 </ResourceDictionary>

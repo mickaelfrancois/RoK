@@ -109,7 +109,7 @@
                                  FontWeight="Bold"                                 
                                  Padding="0"
                                  Margin="0"
-                                 Style="{StaticResource HeaderGenreHyperlinkStyle}" />
+                                 Style="{StaticResource HeaderHyperlinkStyle}" />
 
                 <Button x:Name="buttonCountry"
                         RelativePanel.RightOf="artistName"
@@ -137,7 +137,7 @@
                                  Content="{x:Bind ViewModel.Artist.Artist.GenreName}"
                                  RelativePanel.Below="artistName"                                 
                                  Command="{x:Bind ViewModel.Artist.GenreOpenCommand}"
-                                 Style="{StaticResource HeaderGenreHyperlinkStyle}" />
+                                 Style="{StaticResource HeaderHyperlinkStyle}" />
 
                 <CommandBar x:Name="panelNetwork"
                             RelativePanel.Below="genreName"

@@ -64,6 +64,7 @@
 		<None Remove="Pages\TracksPage.xaml" />
 		<None Remove="Pages\WelcomePage.xaml" />
 		<None Remove="Styles\RatingControlStyles.xaml" />
+		<None Remove="Styles\Tokens\Icons.xaml" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -261,6 +262,9 @@
 	  <None Update="appsettings.json">
 	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 	  </None>
+	  <Page Update="Styles\Tokens\Icons.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </Page>
 	  <Page Update="Commons\EmptyStateControl.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </Page>

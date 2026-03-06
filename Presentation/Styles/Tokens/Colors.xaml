@@ -15,10 +15,20 @@
     <Color x:Key="Black70">#B3000000</Color>
     <Color x:Key="Black85">#D9000000</Color>
 
+    <Color x:Key="Gray950">#FF1F1F1F</Color>
+    
     <Color x:Key="BadgeLive">DarkCyan</Color>
     <Color x:Key="BadgeCompilation">DarkViolet</Color>
     <Color x:Key="BadgeNew">DarkOrange</Color>
     <Color x:Key="BadgeBestOf">DarkBlue</Color>
 
-    <Color x:Key="Gray950">#FF1F1F1F</Color>
+    <Color x:Key="LastFm">#D51007</Color>
+    <Color x:Key="Wikipedia">#000000</Color>
+    <Color x:Key="Facebook">#0866FF</Color>
+    <Color x:Key="Instagram">#FF0069</Color>
+    <Color x:Key="Twitter">#000000</Color>
+    <Color x:Key="Threads">#000000</Color>
+    <Color x:Key="Tiktok">#000000</Color>
+    <Color x:Key="Youtube">#FF0000</Color>
+    <Color x:Key="Website">#086500</Color>
 </ResourceDictionary>

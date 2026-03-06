@@ -51,6 +51,7 @@
 
                 <!-- Tokens -->
                 <ResourceDictionary Source="ms-appx:///Styles/Tokens/Colors.xaml" />
+                <ResourceDictionary Source="ms-appx:///Styles/Tokens/Icons.xaml" />
                 <ResourceDictionary Source="ms-appx:///Styles/Tokens/Semantics.xaml" />
                 <ResourceDictionary Source="ms-appx:///Styles/Tokens/Typography.xaml" />
                 <ResourceDictionary Source="ms-appx:///Styles/Tokens/Spacing.xaml" />
