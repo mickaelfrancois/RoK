@@ -136,7 +136,6 @@
         <CommandBar Grid.Row="0" Style="{StaticResource HeaderCommandBarListStyle}">
             <CommandBar.Content>
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Spacing="{StaticResource SpacingSmall}">
-
                     <AppBarButton x:Uid="artistViewListen" Style="{StaticResource ListenAppBarButtonCompactStyle}" Command="{x:Bind ViewModel.ListenCommand}" />
 
                     <SplitButton x:Name="groupBySplitButton" VerticalAlignment="Center">
