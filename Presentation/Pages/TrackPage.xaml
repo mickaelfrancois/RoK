@@ -11,144 +11,85 @@
 
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition x:Name="headerRow"
-                           Height="110" />
+            <RowDefinition x:Name="headerRow" Height="110" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
         <Grid.Background>
-            <SolidColorBrush Color="{ThemeResource CardBackgroundFillColorDefault}"
-                             Opacity="{StaticResource HeaderBackgroundOpacity}" />
+            <SolidColorBrush Color="{ThemeResource CardBackgroundFillColorDefault}" Opacity="{StaticResource HeaderBackgroundOpacity}" />
         </Grid.Background>
 
-        <Image x:Name="backdrop"
-               Grid.RowSpan="2"
-               Source="{x:Bind ViewModel.Backdrop,Mode=OneWay}"
-               Opacity="{StaticResource HeaderBackdropOpacity}"
-               Style="{StaticResource HeaderBackdropStyle}"
-               Stretch="UniformToFill"
-               IsHitTestVisible="False" />
+        <Image x:Name="backdrop" Grid.RowSpan="2" Source="{x:Bind ViewModel.Backdrop,Mode=OneWay}" Opacity="{StaticResource HeaderBackdropOpacity}" Style="{StaticResource HeaderBackdropStyle}" Stretch="UniformToFill" IsHitTestVisible="False" />
 
         <!-- Header -->
         <StackPanel Grid.Row="0" Orientation="Vertical" Padding="6" Spacing="4">
-            <TextBlock Text="{x:Bind ViewModel.Track.Title}"
-                       FontSize="32"
-                       FontWeight="Bold"
-                       Foreground="{ThemeResource SystemAccentColor }" />
+            <TextBlock Text="{x:Bind ViewModel.Track.Title}" FontSize="{StaticResource FontSizeLarge}" FontWeight="Bold" Foreground="{ThemeResource BrandAccentBrush }" />
 
             <StackPanel Orientation="Horizontal">
-                <TextBlock x:Uid="genByLabel" 
-                           FontSize="20"
-                           Margin="0,0,6,0" />
-                <TextBlock Text="{x:Bind ViewModel.ArtistName}"
-                           FontSize="20"
-                           FontWeight="SemiBold" />
+                <TextBlock x:Uid="genByLabel" FontSize="{StaticResource FontSizeMedium}" Margin="0,0,6,0" />
+                <TextBlock Text="{x:Bind ViewModel.ArtistName}" FontSize="{StaticResource FontSizeMedium}" FontWeight="SemiBold" />
             </StackPanel>
 
             <StackPanel Orientation="Horizontal">
-                <TextBlock x:Uid="genOnLabel" 
-                           Margin="0,0,6,0" />
-                <TextBlock Text="{x:Bind ViewModel.AlbumName}"
-                           FontStyle="Italic" />
+                <TextBlock x:Uid="genOnLabel" FontSize="{StaticResource FontSizeXMedium}" Margin="0,0,6,0" />
+                <TextBlock Text="{x:Bind ViewModel.AlbumName}" FontSize="{StaticResource FontSizeXMedium}" FontStyle="Italic" />
             </StackPanel>
         </StackPanel>
 
         <!-- Content -->
-        <Border Grid.Row="2"
-                Background="{ThemeResource CardBackgroundFillColorDefault}"
-                Padding="24"
-                CornerRadius="12"
-                Margin="8">
+        <Grid Grid.Row="2" Style="{StaticResource FileGridStyle}" Padding="10">
             <StackPanel>
-
-                <StackPanel Orientation="Horizontal"
-                            Spacing="24">
-                    <StackPanel Orientation="Horizontal"
-                                Spacing="8">
-                        <SymbolIcon Symbol="Audio"
-                                    Foreground="{ThemeResource SystemAccentColor}" />
+                <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingLarge}">
+                    <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingSmall}">
+                        <SymbolIcon Symbol="Audio" Foreground="{ThemeResource BrandAccentBrush}" />
                         <TextBlock Text="{x:Bind ViewModel.BitrateStr}" />
                     </StackPanel>
-                    <StackPanel Orientation="Horizontal"
-                                Spacing="8">
-                        <SymbolIcon Symbol="Save"
-                                    Foreground="{ThemeResource SystemAccentColor}" />
+                    <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingSmall}">
+                        <SymbolIcon Symbol="Save" Foreground="{ThemeResource BrandAccentBrush}" />
                         <TextBlock Text="{x:Bind ViewModel.SizeStr}" />
                     </StackPanel>
-                    <StackPanel Orientation="Horizontal"
-                                Spacing="8">
-                        <FontIcon Glyph="&#xE823;"
-                                  Foreground="{ThemeResource SystemAccentColor}" />
+                    <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingSmall}">
+                        <FontIcon Glyph="&#xE823;" Foreground="{ThemeResource BrandAccentBrush}" />
                         <TextBlock Text="{x:Bind ViewModel.DurationStr}" />
                     </StackPanel>
-                    <StackPanel Orientation="Horizontal"
-                                Spacing="8"
-                                Visibility="{x:Bind ViewModel.Score, Converter={StaticResource IntToVisibilityConverter}}">
-                        <SymbolIcon Symbol="SolidStar"
-                                    Foreground="{ThemeResource SystemAccentColor}" />
+                    <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingSmall}" Visibility="{x:Bind ViewModel.Score, Converter={StaticResource IntToVisibilityConverter}}">
+                        <SymbolIcon Symbol="SolidStar" Foreground="{ThemeResource BrandAccentBrush}" />
                         <TextBlock Text="{x:Bind ViewModel.Score}" />
                     </StackPanel>
-
                 </StackPanel>
 
                 <StackPanel Margin="0,16,0,0">
-
-                    <StackPanel Orientation="Horizontal"
-                                Margin="0,0,0,8">
-                        <TextBlock x:Uid="trackListenCountLabel"
-                                   VerticalAlignment="Center"
-                                   Margin="0,0,6,0" />
-                        <TextBlock Text="{x:Bind ViewModel.Track.ListenCount, Mode=OneWay}"
-                                   VerticalAlignment="Center" />
+                    <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+                        <TextBlock x:Uid="trackListenCountLabel" VerticalAlignment="Center" Margin="0,0,6,0" />
+                        <TextBlock Text="{x:Bind ViewModel.Track.ListenCount, Mode=OneWay}" VerticalAlignment="Center" />
                     </StackPanel>
 
-                    <StackPanel Orientation="Horizontal"
-                                Margin="0,0,0,8">
-                        <TextBlock x:Uid="trackLastListenLabel"
-                                   VerticalAlignment="Center"
-                                   Margin="0,0,6,0" />
-                        <TextBlock Text="{x:Bind ViewModel.Track.LastListen, Mode=OneWay}"
-                                   VerticalAlignment="Center" />
+                    <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+                        <TextBlock x:Uid="trackLastListenLabel" VerticalAlignment="Center" Margin="0,0,6,0" />
+                        <TextBlock Text="{x:Bind ViewModel.Track.LastListen, Mode=OneWay}" VerticalAlignment="Center" />
                     </StackPanel>
 
-                    <StackPanel Orientation="Horizontal"
-                                Margin="0,0,0,8">
-                        <TextBlock x:Uid="trackSkipCountLabel"
-                                   VerticalAlignment="Center"
-                                   Margin="0,0,6,0" />
-                        <TextBlock Text="{x:Bind ViewModel.Track.SkipCount, Mode=OneWay}"
-                                   VerticalAlignment="Center" />
+                    <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+                        <TextBlock x:Uid="trackSkipCountLabel" VerticalAlignment="Center" Margin="0,0,6,0" />
+                        <TextBlock Text="{x:Bind ViewModel.Track.SkipCount, Mode=OneWay}" VerticalAlignment="Center" />
                     </StackPanel>
 
-                    <StackPanel Orientation="Horizontal"
-                                Margin="0,0,0,8">
-                        <TextBlock x:Uid="trackLastSkipLabel"
-                                   VerticalAlignment="Center"
-                                   Margin="0,0,6,0" />
-                        <TextBlock Text="{x:Bind ViewModel.Track.LastSkip, Mode=OneWay}"
-                                   VerticalAlignment="Center" />
+                    <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+                        <TextBlock x:Uid="trackLastSkipLabel" VerticalAlignment="Center" Margin="0,0,6,0" />
+                        <TextBlock Text="{x:Bind ViewModel.Track.LastSkip, Mode=OneWay}" VerticalAlignment="Center" />
                     </StackPanel>
 
-                    <StackPanel Orientation="Horizontal"
-                                Margin="0,0,0,8">
-                        <TextBlock x:Uid="trackMusicBrainzIdLabel"
-                                   VerticalAlignment="Center"
-                                   Margin="0,0,6,0" />
-                        <TextBlock Text="{x:Bind ViewModel.Track.MusicBrainzID, Mode=OneWay}"
-                                   VerticalAlignment="Center" />
+                    <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+                        <TextBlock x:Uid="trackMusicBrainzIdLabel" VerticalAlignment="Center" Margin="0,0,6,0" />
+                        <TextBlock Text="{x:Bind ViewModel.Track.MusicBrainzID, Mode=OneWay}" VerticalAlignment="Center" />
                     </StackPanel>
 
-                    <StackPanel Orientation="Horizontal"
-                                Margin="0,0,0,8">
-                        <TextBlock x:Uid="trackStorageLabel"
-                                   VerticalAlignment="Center"
-                                   Margin="0,0,6,0" />
-                        <TextBlock Text="{x:Bind ViewModel.Track.MusicFile, Mode=OneWay}"
-                                   VerticalAlignment="Center" />
+                    <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+                        <TextBlock x:Uid="trackStorageLabel" VerticalAlignment="Center" Margin="0,0,6,0" />
+                        <TextBlock Text="{x:Bind ViewModel.Track.MusicFile, Mode=OneWay}" VerticalAlignment="Center" />
                     </StackPanel>
-                    
                 </StackPanel>
             </StackPanel>
-        </Border>
+        </Grid>
     </Grid>
 </Page>
