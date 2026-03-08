@@ -753,8 +753,13 @@
         </Setter>
     </Style>
 
+    <Style x:Key="HeaderStyle" TargetType="TextBlock">
+        <Setter Property="FontFamily" Value="Arial"></Setter>
+        <Setter Property="FontWeight" Value="Bold"></Setter>
+        <Setter Property="FontSize" Value="{StaticResource FontSizeLarge}"></Setter>
+    </Style>
 
-    
+
     <!-- CommandBar SplitButton -->
     
     <Style x:Key="CommandBarSplitButtonPanelStyle" TargetType="StackPanel">

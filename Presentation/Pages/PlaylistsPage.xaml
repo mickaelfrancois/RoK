@@ -10,81 +10,37 @@
       x:Name="playlistsView">
 
     <Page.Resources>
-
-        <ItemsPanelTemplate x:Key="GridPanel">
-            <ItemsWrapGrid Orientation="Horizontal"
-                           ItemHeight="320"
-                           ItemWidth="320"
-                           Margin="0,0,2,2" />
-        </ItemsPanelTemplate>
-
-        <ItemsPanelTemplate x:Key="ListPanel">
-            <ItemsStackPanel Orientation="Vertical" />
-        </ItemsPanelTemplate>
-
-        <DataTemplate x:Key="PlaylistGridTemplate"
-                      x:DataType="a:PlaylistViewModel">
+        <DataTemplate x:Key="PlaylistGridTemplate" x:DataType="a:PlaylistViewModel">
             <Grid Style="{StaticResource MainGridCoverStyle}">
-                <Border CornerRadius="10">
-                    <common:PictureControl Style="{StaticResource PictureCoverStyle}"
-                                           Cover="{x:Bind Picture, Mode=OneWay}"
-                                           PlayButtonVisibility="Visible"
-                                           Command="{x:Bind ListenCommand}" />
+                <Border CornerRadius="{StaticResource CornerRadiusMediumValue}">
+                    <common:PictureControl Style="{StaticResource PictureCoverStyle}" Cover="{x:Bind Picture, Mode=OneWay}" x:Phase="2" PlayButtonVisibility="Visible" Command="{x:Bind ListenCommand}" />
                 </Border>
 
-                <Grid Style="{StaticResource GridCoverBottomStyle}">
+                <Grid x:Name="gridBottom" Style="{StaticResource GridCoverBottomStyle}">
                     <Grid.RowDefinitions>
-                        <RowDefinition Height="30" />
-                        <RowDefinition Height="30" />
+                        <RowDefinition Height="{StaticResource GridBottomFirstRowHeight}" />
+                        <RowDefinition Height="{StaticResource GridBottomSecondRowHeight}" />
                     </Grid.RowDefinitions>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="2*" />
-                        <ColumnDefinition />
-                    </Grid.ColumnDefinitions>
 
-                    <HyperlinkButton Grid.ColumnSpan="2"
-                                     Content="{x:Bind Playlist.Name}"
-                                     Command="{x:Bind PlaylistOpenCommand}"
-                                     Style="{StaticResource GridCoverBottomFirstLineStyle}" />
-                    <TextBlock Grid.Row="1"
-                               Style="{StaticResource GridCoverBottomSecondLineStyle}"
-                               Text="{x:Bind SubTitle, Mode=OneWay}" />
+                    <HyperlinkButton Content="{x:Bind Playlist.Name}" Command="{x:Bind PlaylistOpenCommand}" Style="{StaticResource GridCoverButtonStyle}" />
+                    <TextBlock Grid.Row="1" Style="{StaticResource GridCoverBottomSecondLineStyle}" Text="{x:Bind SubTitle, Mode=OneWay}" />
                 </Grid>
             </Grid>
         </DataTemplate>
 
-        <DataTemplate x:Key="PlaylistListTemplate"
-                      x:DataType="a:PlaylistViewModel">
-            <Grid Height="60"
-                  Padding="10,0"
-                  HorizontalAlignment="Stretch">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="60" />
-                    <ColumnDefinition Width="*" />
-                </Grid.ColumnDefinitions>
+        <DataTemplate x:Key="PlaylistListTemplate" x:DataType="a:PlaylistViewModel">
+            <Grid Padding="12,4" HorizontalAlignment="Stretch" Background="Transparent">
 
-                <Border CornerRadius="6"
-                        Width="48"
-                        Height="48"
-                        HorizontalAlignment="Left"
-                        VerticalAlignment="Center">
-                    <common:PictureControl Cover="{x:Bind Picture, Mode=OneWay}"
-                                           PlayButtonVisibility="Visible"
-                                           Command="{x:Bind ListenCommand}" />
+                <Border CornerRadius="{StaticResource CornerRadiusMediumValue}" Width="{StaticResource ListCoverWidth}" Height="{StaticResource ListCoverHeight}" VerticalAlignment="Center">
+                    <common:PictureControl Cover="{x:Bind Picture, Mode=OneWay}" PlayButtonVisibility="Visible" Command="{x:Bind ListenCommand}" />
                 </Border>
 
-                <StackPanel Grid.Column="1"
-                            VerticalAlignment="Center"
-                            Margin="10,0,0,0">
-                    <HyperlinkButton Content="{x:Bind Playlist.Name}"
-                                     Command="{x:Bind PlaylistOpenCommand}"
-                                     Style="{StaticResource HyperlinkSmallButtonStyle}"
-                                     FontSize="16"
-                                     FontWeight="SemiBold"
-                                     Padding="0" />
+                <StackPanel VerticalAlignment="Center" Margin="12,0,0,0">
+                    <HyperlinkButton Content="{x:Bind Playlist.Name}" Command="{x:Bind PlaylistOpenCommand}" Style="{StaticResource HyperlinkSmallButtonStyle}" Margin="4,0,0,0" FontSize="{StaticResource FontSizeXMedium}" FontWeight="SemiBold" />
 
-                    <TextBlock Text="{x:Bind SubTitle, Mode=OneWay}"
-                               Style="{StaticResource CaptionTextBlockStyle}" />
+                    <Grid Height="20">
+                        <TextBlock x:Name="subTitle" Text="{x:Bind SubTitle, Mode=OneWay}" Style="{StaticResource ListCoverBottomSecondLineStyle}" VerticalAlignment="Center" />
+                    </Grid>
                 </StackPanel>
             </Grid>
         </DataTemplate>
@@ -96,50 +52,25 @@
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
-        <CommandBar Grid.Row="0"
-                    DefaultLabelPosition="Right"
-                    Style="{StaticResource HeaderCommandBarListStyle}">
+        <CommandBar Grid.Row="0" DefaultLabelPosition="Right" Style="{StaticResource HeaderCommandBarListStyle}">
             <CommandBar.Content>
-                <StackPanel Orientation="Horizontal"
-                            HorizontalAlignment="Left">
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Spacing="{StaticResource SpacingSmall}">
                     <AppBarButton x:Uid="playlistsAdd"
-                                  Style="{StaticResource AppBarButtonCompactStyle}"
-                                  Icon="Add"
-                                  Command="{x:Bind ViewModel.NewPlaylistCommand}" />
-                    <AppBarButton x:Uid="playlistsSmartAdd"
-                                  Style="{StaticResource AppBarButtonCompactStyle}"
-                                  Icon="OutlineStar"
-                                  Command="{x:Bind ViewModel.NewSmartPlaylistCommand}" />
-
+                                  Style="{StaticResource AppBarButtonCompactStyle}" Icon="Add" Command="{x:Bind ViewModel.NewPlaylistCommand}" />
+                    <AppBarButton x:Uid="playlistsSmartAdd" Style="{StaticResource AppBarButtonCompactStyle}" Icon="OutlineStar" Command="{x:Bind ViewModel.NewSmartPlaylistCommand}" />
                     <AppBarSeparator />
-                    <AppBarButton Icon="{x:Bind ViewModel.IsGridView, Mode=OneWay, Converter={StaticResource GridListIconConverter}}"
-                                  Style="{StaticResource AppBarButtonCompactStyle}"
-                                  Command="{x:Bind ViewModel.ToggleDisplayModeCommand}" />
+                    <AppBarButton Icon="{x:Bind ViewModel.IsGridView, Mode=OneWay, Converter={StaticResource GridListIconConverter}}" Style="{StaticResource AppBarButtonCompactStyle}" Command="{x:Bind ViewModel.ToggleDisplayModeCommand}" />
                 </StackPanel>
             </CommandBar.Content>
         </CommandBar>
 
-        <Grid Grid.Row="1"
-              Style="{StaticResource GridListStyle}">
-            <Grid.Background>
-                <LinearGradientBrush StartPoint="0.5,0"
-                                     EndPoint="0.5,1">
-                    <GradientStop Color="{ThemeResource NavigationViewExpandedPaneBackground}"
-                                  Offset="0.8" />
-                    <GradientStop Color="{ThemeResource SystemChromeBlackMediumColor}"
-                                  Offset="1" />
-                </LinearGradientBrush>
-            </Grid.Background>
-
+        <Grid Grid.Row="1" Style="{StaticResource GridListStyle}">
             <ScrollViewer>
                 <StackPanel>
-                    <GridViewHeaderItem FontSize="24"
-                                        FontWeight="Bold"
-                                        HorizontalAlignment="Left">
+                    <GridViewHeaderItem FontSize="{StaticResource FontSizeLarge}" FontWeight="Bold" HorizontalAlignment="Left">
                         <GridViewHeaderItem.Content>
                             <StackPanel Orientation="Horizontal">
-                                <SymbolIcon Symbol="OutlineStar"
-                                            Margin="4,0,4,0" />
+                                <SymbolIcon Symbol="OutlineStar" Margin="4,0,4,0" />
                                 <TextBlock x:Uid="smartPlaylistHeader" />
                             </StackPanel>
                         </GridViewHeaderItem.Content>
@@ -149,7 +80,7 @@
                                              ContainerContentChanging="grid_ContainerContentChanging"
                                              ItemsSource="{x:Bind ViewModel.SmartPlaylists}"
                                              ItemTemplate="{StaticResource PlaylistGridTemplate}"
-                                             ItemsPanel="{StaticResource GridPanel}"
+                                             ItemsPanel="{StaticResource GridPanelTemplate}"
                                              Visibility="{x:Bind ViewModel.IsGridView, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}"
                                              SelectionMode="None"
                                              IsItemClickEnabled="True"
@@ -163,13 +94,10 @@
                               SelectionMode="None"
                               IsItemClickEnabled="True" />
 
-                    <GridViewHeaderItem FontSize="24"
-                                        FontWeight="Bold"
-                                        HorizontalAlignment="Left">
+                    <GridViewHeaderItem FontSize="{StaticResource FontSizeLarge}" FontWeight="Bold" HorizontalAlignment="Left">
                         <GridViewHeaderItem.Content>
                             <StackPanel Orientation="Horizontal">
-                                <SymbolIcon Symbol="Shop"
-                                            Margin="4,0,4,0" />
+                                <SymbolIcon Symbol="Shop" Margin="4,0,4,0" />
                                 <TextBlock x:Uid="playlistHeader" />
                             </StackPanel>
                         </GridViewHeaderItem.Content>
@@ -179,7 +107,7 @@
                                              ContainerContentChanging="grid_ContainerContentChanging"
                                              ItemsSource="{x:Bind ViewModel.Playlists}"
                                              ItemTemplate="{StaticResource PlaylistGridTemplate}"
-                                             ItemsPanel="{StaticResource GridPanel}"
+                                             ItemsPanel="{StaticResource GridPanelTemplate}"
                                              Visibility="{x:Bind ViewModel.IsGridView, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}"
                                              SelectionMode="None"
                                              IsItemClickEnabled="True"
