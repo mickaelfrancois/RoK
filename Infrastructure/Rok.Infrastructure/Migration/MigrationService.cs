@@ -76,24 +76,46 @@ public class MigrationService(IDbConnection database, IEnumerable<IMigration>? m
 
     private void MaintainDatabase()
     {
-        _database.Execute("PRAGMA optimize;");
-        _database.Execute("VACUUM;");
+        try
+        {
+            _database.Execute("PRAGMA optimize;");
+            _database.Execute("VACUUM;");
 
-        object? result = _database.ExecuteScalar("PRAGMA integrity_check;");
-        if (result?.ToString() != "ok")
-            logger.LogWarning("Database integrity check failed: {Result}", result);
+            object? result = _database.ExecuteScalar("PRAGMA integrity_check;");
+            if (result?.ToString() != "ok")
+                logger.LogWarning("Database integrity check failed: {Result}", result);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Database maintain failed: {Message}", ex.Message);
+        }
     }
 
     private void BackupDatabase()
     {
-        if (_database is SqliteConnection sqliteConnection)
-        {
-            string backupFile = $"rok_{DateTime.Now:yyyyMMdd_HHmmss}.db";
+        if (_database is not SqliteConnection sharedConnection)
+            return;
 
-            logger.LogInformation("Creating database backup at {BackupFile}", backupFile);
+        string backupFile = $"rok_{DateTime.Now:yyyyMMdd_HHmmss}.db";
+        string sourceConnectionString = sharedConnection.ConnectionString;
+
+        logger.LogInformation("Creating database backup at {BackupFile}", backupFile);
+
+        try
+        {
+            using SqliteConnection source = new(sourceConnectionString);
+            source.Open();
 
             using SqliteConnection destination = new($"Data Source={backupFile}");
-            sqliteConnection.BackupDatabase(destination);
+            destination.Open();
+
+            source.BackupDatabase(destination);
+
+            logger.LogInformation("Database backup completed at {BackupFile}", backupFile);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Database backup failed at {BackupFile}", backupFile);
         }
     }
 
