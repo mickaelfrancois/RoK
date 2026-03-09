@@ -1,5 +1,21 @@
 ﻿# ChangeLog
 
+## [1.6.0] StoreRelease – 09 mars 2026  
+
+### Ajouté
+
+- Possibilité de mettre en pause automatiquement la lecture en cas de réception d'un appel (Teams, Discord, Slack, Zoom).
+- Utilisation de la couleur dominante de la pochette pour le thème d'un album dans la liste des albums, artistes et chansons.
+- Import : Détection du type bestof ou live dans le nom de l'album
+- Ajout de badge "Nouveau dans la liste des albums, artistes et chansons.
+
+### Modifié  
+
+### Corrigé
+
+- Correction de l'erreur 'Database is locked' lors de la sauvegarde avant migration des données.
+
+
 ## [1.5.0] StoreRelease – 28 février 2026
 
 ### Ajouté
