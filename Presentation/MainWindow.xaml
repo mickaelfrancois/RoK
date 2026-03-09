@@ -16,20 +16,14 @@
 
     <Grid>
         <Grid DataContext="{x:Bind ViewModel, FallbackValue={x:Null}}">
-            <Grid x:Name="MainGrid"
-                  Visibility="Collapsed">
+            <Grid x:Name="MainGrid" Visibility="Collapsed">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="*" />
-                    <RowDefinition Height="Auto"
-                                   x:Name="PlayerRow" />
+                    <RowDefinition Height="Auto" x:Name="PlayerRow" />
                 </Grid.RowDefinitions>
 
                 <NavigationView x:Name="navMenu"
-                                Style="{StaticResource MainNavigationViewStyle}"
-                                IsBackEnabled="True"
-                                ItemInvoked="NavigationView_ItemInvoked"
-                                BackRequested="NavigationView_BackRequested"
-                                Loaded="NavigationView_Loaded">
+                                Style="{StaticResource MainNavigationViewStyle}" IsBackEnabled="True" ItemInvoked="NavigationView_ItemInvoked" BackRequested="NavigationView_BackRequested" Loaded="NavigationView_Loaded">
 
                     <NavigationView.Resources>
                         <Storyboard x:Name="IconRotation"
@@ -106,28 +100,18 @@
                     </NavigationView.Resources>
 
                     <NavigationView.MenuItems>
-                        <NavigationViewItem x:Uid="menuAlbums"
-                                            Tag="Albums"
-                                            x:Name="albumsItem">
+                        <NavigationViewItem x:Uid="menuAlbums" Tag="Albums" x:Name="albumsItem">
                             <NavigationViewItem.Icon>
-                                <FontIcon Glyph="&#xe93c;"
-                                          FontFamily="Segoe Fluent Icons" />
+                                <FontIcon Glyph="&#xe93c;" FontFamily="Segoe Fluent Icons" />
                             </NavigationViewItem.Icon>
                         </NavigationViewItem>
-                        <NavigationViewItem x:Uid="menuArtists"
-                                            Tag="Artists"
-                                            x:Name="artistsItem"
-                                            Icon="People" />
-                        <NavigationViewItem x:Uid="menuTracks"
-                                            Tag="Tracks"
-                                            x:Name="tracksItem">
+                        <NavigationViewItem x:Uid="menuArtists" Tag="Artists" x:Name="artistsItem" Icon="People" />
+                        <NavigationViewItem x:Uid="menuTracks" Tag="Tracks" x:Name="tracksItem">
                             <NavigationViewItem.Icon>
                                 <SymbolIcon Symbol="Audio" />
                             </NavigationViewItem.Icon>
                         </NavigationViewItem>
-                        <NavigationViewItem x:Uid="menuPlaylists"
-                                            Tag="Playlists"
-                                            x:Name="playlistItem">
+                        <NavigationViewItem x:Uid="menuPlaylists" Tag="Playlists" x:Name="playlistItem">
                             <NavigationViewItem.Icon>
                                 <SymbolIcon Symbol="Shop" />
                             </NavigationViewItem.Icon>
@@ -148,14 +132,7 @@
 
                     <NavigationView.PaneHeader>
                         <StackPanel Orientation="Horizontal">
-                            <ImageIcon x:Name="AppLogo"
-                                       Source="/Assets/logo.png"
-                                       Margin="0,0,4,0" 
-                                       Height="{StaticResource AppLogoSize}" 
-                                       Width="{StaticResource AppLogoSize}" 
-                                       RenderTransformOrigin="0.5,0.5"
-                                       PointerEntered="AppLogo_PointerEntered"
-                                       PointerExited="AppLogo_PointerExited">
+                            <ImageIcon x:Name="AppLogo" Source="/Assets/logo.png" Margin="0,0,4,0"  Height="{StaticResource AppLogoSize}"  Width="{StaticResource AppLogoSize}"  RenderTransformOrigin="0.5,0.5" PointerEntered="AppLogo_PointerEntered" PointerExited="AppLogo_PointerExited">
                                 <ImageIcon.RenderTransform>
                                     <TransformGroup>
                                         <ScaleTransform ScaleX="1" ScaleY="1" />
@@ -165,13 +142,11 @@
                             </ImageIcon>
 
                             <TextBlock x:Name="applicationName" Text="RoK" Style="{StaticResource ApplicationTitleStyle}" VerticalAlignment="Center" />
-
                             <Border Style="{StaticResource PaneHeaderSeparatorStyle}" />
                         </StackPanel>
                     </NavigationView.PaneHeader>
 
-                    <Frame x:Name="ContentFrame"
-                           Margin="0">
+                    <Frame x:Name="ContentFrame" Margin="0">
                         <Frame.Transitions>
                             <TransitionCollection>
                                 <NavigationThemeTransition />
@@ -180,16 +155,9 @@
                     </Frame>
 
                     <NavigationView.FooterMenuItems>
-                        <NavigationViewItem x:Uid="libraryRefreshButton"
-                                            x:Name="libraryRefreshButton"
-                                            SelectsOnInvoked="False"
-                                            AutomationProperties.Name="refresh"
-                                            Visibility="Visible"
-                                            Tapped="LibraryRefreshButton_Tapped">
+                        <NavigationViewItem x:Uid="libraryRefreshButton" x:Name="libraryRefreshButton" SelectsOnInvoked="False" AutomationProperties.Name="refresh" Visibility="Visible" Tapped="LibraryRefreshButton_Tapped">
                             <NavigationViewItem.Icon>
-                                <FontIcon Glyph="&#xE72C;"
-                                          RenderTransformOrigin="0.5,0.5"
-                                          x:Name="libraryRefresh">
+                                <FontIcon Glyph="&#xE72C;" RenderTransformOrigin="0.5,0.5" x:Name="libraryRefresh">
                                     <FontIcon.RenderTransform>
                                         <RotateTransform Angle="0" />
                                     </FontIcon.RenderTransform>
@@ -197,11 +165,7 @@
                             </NavigationViewItem.Icon>
                         </NavigationViewItem>
 
-                        <NavigationViewItem x:Uid="toggleTheme"
-                                            x:Name="toggleTheme"
-                                            SelectsOnInvoked="False"
-                                            Tapped="ToggleTheme_Tapped"
-                                            ToolTipService.ToolTip="">
+                        <NavigationViewItem x:Uid="toggleTheme" x:Name="toggleTheme" SelectsOnInvoked="False" Tapped="ToggleTheme_Tapped" ToolTipService.ToolTip="">
                             <NavigationViewItem.Icon>
                                 <FontIcon Glyph="&#xE793;" />
                             </NavigationViewItem.Icon>
@@ -212,34 +176,22 @@
                 </NavigationView>
 
                 <!-- Player -->
-                <Border Grid.Row="1"
-                        x:Name="HorizontalPlayer"
-                        Style="{StaticResource HorizontalPlayerBorderStyle}"
-                        Visibility="{Binding PlayerVisible, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">
-                    <v:PlayerView x:Name="HorizontalPlayerView"
-                                  HorizontalAlignment="Stretch"></v:PlayerView>
+                <Border Grid.Row="1" x:Name="HorizontalPlayer" Style="{StaticResource HorizontalPlayerBorderStyle}" Visibility="{Binding PlayerVisible, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">
+                    <v:PlayerView x:Name="HorizontalPlayerView" HorizontalAlignment="Stretch"></v:PlayerView>
                 </Border>
             </Grid>
 
-            <Grid x:Name="FullScreenGrid"
-                  Visibility="Collapsed"
-                  Margin="0,25,0,0">
-                <c:FullScreenControl x:Name="fullscreen"></c:FullScreenControl>
+            <Grid x:Name="FullScreenGrid" Visibility="Collapsed" Margin="0,25,0,0">
+                <c:FullScreenControl x:Name="fullscreen"/>
             </Grid>
 
-            <Grid x:Name="gridCompactScreen"
-                  Visibility="Collapsed">
-                <c:CompactPlayerControl></c:CompactPlayerControl>
+            <Grid x:Name="gridCompactScreen" Visibility="Collapsed">
+                <c:CompactPlayerControl/>
             </Grid>
 
-            <c:SplashScreenControl x:Name="SplashScreen"
-                                   Visibility="Visible"></c:SplashScreenControl>
+            <c:SplashScreenControl x:Name="SplashScreen" Visibility="Visible" />
         </Grid>
 
-        <c:NotificationControl x:Name="notificationControl"
-                               VerticalAlignment="Top"
-                               HorizontalAlignment="Right"
-                               Canvas.ZIndex="9999"
-                               Margin="0,20,20,0" />
+        <c:NotificationControl x:Name="notificationControl" VerticalAlignment="Top" HorizontalAlignment="Right" Canvas.ZIndex="9999" Margin="0,20,20,0" />
     </Grid>
 </Window>

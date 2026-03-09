@@ -73,8 +73,7 @@
                 </StackPanel>
             </CommandBar.Content>
         </CommandBar>
-
-        <!--Style="{StaticResource GridListStyle}"-->
+        
         <Grid Grid.Row="1" >
             <Grid.RowDefinitions>
                 <RowDefinition Height="{StaticResource GridHeaderTracksHeight}" />
