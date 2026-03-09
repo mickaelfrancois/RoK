@@ -39,6 +39,7 @@
 		<None Remove="Commons\BackdropControl.xaml" />
 		<None Remove="Commons\BadgeControl.xaml" />
 		<None Remove="Commons\CompactPlayerControl.xaml" />
+		<None Remove="Commons\EmptyStateControl.xaml" />
 		<None Remove="Commons\FullScreenControl.xaml" />
 		<None Remove="Commons\InlineEditableText.xaml" />
 		<None Remove="Commons\NotificationControl.xaml" />
@@ -63,6 +64,7 @@
 		<None Remove="Pages\TracksPage.xaml" />
 		<None Remove="Pages\WelcomePage.xaml" />
 		<None Remove="Styles\RatingControlStyles.xaml" />
+		<None Remove="Styles\Tokens\Icons.xaml" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -254,11 +256,18 @@
 	</ItemGroup>
 	<ItemGroup>
 	  <Folder Include="Commons\Extensions\" />
+	  <Folder Include="Styles\Templates\" />
 	</ItemGroup>
 	<ItemGroup>
 	  <None Update="appsettings.json">
 	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 	  </None>
+	  <Page Update="Styles\Tokens\Icons.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </Page>
+	  <Page Update="Commons\EmptyStateControl.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </Page>
 	  <Page Update="Commons\BadgeControl.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </Page>
@@ -288,6 +297,18 @@
 	<ItemGroup>
 	  <Page Update="Commons\NotificationControl.xaml">
 	    <Generator>MSBuild:Compile</Generator>
+	  </Page>
+	  <Page Update="Styles\Tokens\Spacing.xaml">
+	    <SubType>Designer</SubType>
+	  </Page>
+	  <Page Update="Styles\Tokens\Typography.xaml">
+	    <SubType>Designer</SubType>
+	  </Page>
+	  <Page Update="Styles\Tokens\Semantics.xaml">
+	    <SubType>Designer</SubType>
+	  </Page>
+	  <Page Update="Styles\Tokens\Colors.xaml">
+	    <SubType>Designer</SubType>
 	  </Page>
 	</ItemGroup>
 	

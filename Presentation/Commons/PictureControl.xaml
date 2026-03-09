@@ -117,7 +117,7 @@
         <StackPanel Orientation="Horizontal"
                     HorizontalAlignment="Center"
                     VerticalAlignment="Center">
-            <AppBarButton Style="{StaticResource coverPlayButtonCircle}"
+            <AppBarButton Style="{StaticResource CoverPlayButtonCircleStyle}"
                           Icon="Play"
                           IsCompact="True"
                           Visibility="Collapsed"
@@ -129,7 +129,7 @@
                           Background="Gray"
                           Width="96"
                           Height="96"></AppBarButton>
-            <AppBarButton Style="{StaticResource coverPlayButtonCircle}"
+            <AppBarButton Style="{StaticResource CoverPlayButtonCircleStyle}"
                           Icon="Add"
                           IsCompact="True"
                           Visibility="Collapsed"

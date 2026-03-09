@@ -102,7 +102,7 @@ public sealed partial class TracksPage : Page, IDisposable
             return;
 
         tracksList.ItemsSource = null;
-        tracksZoomoutCollectionList.ItemsSource = null;
+        ZoomoutCollectionGrid.ItemsSource = null;
 
         if (ViewModel.IsGroupingEnabled)
         {
@@ -111,7 +111,7 @@ public sealed partial class TracksPage : Page, IDisposable
             groupedItemsViewSource.Source = ViewModel.GroupedItems;
 
             tracksList.ItemsSource = groupedItemsViewSource.View;
-            tracksZoomoutCollectionList.ItemsSource = groupedItemsViewSource.View.CollectionGroups;
+            ZoomoutCollectionGrid.ItemsSource = groupedItemsViewSource.View.CollectionGroups;
         }
         else
         {
@@ -155,8 +155,8 @@ public sealed partial class TracksPage : Page, IDisposable
             if (tracksList is not null)
                 tracksList.ItemsSource = null;
 
-            if (tracksZoomoutCollectionList is not null)
-                tracksZoomoutCollectionList.ItemsSource = null;
+            if (ZoomoutCollectionGrid is not null)
+                ZoomoutCollectionGrid.ItemsSource = null;
 
             if (groupedItemsViewSource is not null)
             {

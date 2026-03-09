@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <ResourceDictionary.MergedDictionaries>
+        <ResourceDictionary Source="ms-appx:///Styles/Tokens/Colors.xaml" />
+    </ResourceDictionary.MergedDictionaries>
+
+    <ResourceDictionary.ThemeDictionaries>
+        <ResourceDictionary x:Key="Dark">
+            <SolidColorBrush x:Key="BrandPrimaryBrush" Color="{StaticResource Blue700}" />
+            <SolidColorBrush x:Key="BrandPrimaryHoverBrush" Color="{StaticResource Blue400}" />
+            <SolidColorBrush x:Key="BrandPrimaryPressedBrush" Color="{StaticResource Blue800}" />
+            <SolidColorBrush x:Key="BrandAccentBrush" Color="{StaticResource Blue400}" />
+
+            <SolidColorBrush x:Key="SurfaceOverlayBrush" Color="{StaticResource Black85}" />
+            <SolidColorBrush x:Key="OnSurfacePrimaryBrush" Color="White" />
+            <SolidColorBrush x:Key="OnSurfaceAccentBrush" Color="{StaticResource Blue400}" />
+
+            <SolidColorBrush x:Key="PlayerSurfaceBrush" Color="{StaticResource Gray950}" />
+
+            <StaticResource x:Key="OnNeutralSurfacePrimaryBrush" ResourceKey="SystemControlForegroundBaseHighBrush" />
+
+            <SolidColorBrush x:Key="GridCoverBottomSecondLineBrush" Color="White"/>
+            <SolidColorBrush x:Key="ListCoverBottomSecondLineBrush" Color="White"/>
+        </ResourceDictionary>
+
+        <ResourceDictionary x:Key="Light">
+            <SolidColorBrush x:Key="BrandPrimaryBrush" Color="{StaticResource Blue700}" />
+            <SolidColorBrush x:Key="BrandPrimaryHoverBrush" Color="{StaticResource Blue400}" />
+            <SolidColorBrush x:Key="BrandPrimaryPressedBrush" Color="{StaticResource Blue800}" />
+            <SolidColorBrush x:Key="BrandAccentBrush" Color="{StaticResource Blue400}" />
+            
+            <SolidColorBrush x:Key="SurfaceOverlayBrush" Color="{StaticResource Black70}" />
+            <SolidColorBrush x:Key="OnSurfacePrimaryBrush" Color="White" />
+            <SolidColorBrush x:Key="OnSurfaceAccentBrush" Color="{StaticResource Blue400}" />
+
+            <SolidColorBrush x:Key="PlayerSurfaceBrush" Color="{StaticResource Gray950}" />
+            
+            <StaticResource x:Key="OnNeutralSurfacePrimaryBrush" ResourceKey="SystemControlForegroundBaseHighBrush" />
+
+            <SolidColorBrush x:Key="GridCoverBottomSecondLineBrush" Color="White"/>
+            <SolidColorBrush x:Key="ListCoverBottomSecondLineBrush" Color="Black"/>
+        </ResourceDictionary>
+    </ResourceDictionary.ThemeDictionaries>
+
+    <SolidColorBrush x:Key="CoverOverlayBackgroundBrush" Color="{StaticResource Black67}"/>
+    <SolidColorBrush x:Key="HyperlinkForegroundBrush" Color="{StaticResource Cyan400}" />
+
+    <!-- Content area background -->
+    <LinearGradientBrush x:Key="ContentListBackgroundBrush" StartPoint="0.5,0" EndPoint="0.5,1">
+        <GradientStop Color="{ThemeResource NavigationViewExpandedPaneBackground}" Offset="0.8" />
+        <GradientStop Color="{ThemeResource SystemChromeBlackMediumColor}" Offset="1" />
+    </LinearGradientBrush>
+
+    <!-- Badge brushes (not theme-dependent) -->
+    <SolidColorBrush x:Key="BadgeLiveBrush" Color="{StaticResource BadgeLive}" />
+    <SolidColorBrush x:Key="BadgeCompilationBrush" Color="{StaticResource BadgeCompilation}" />
+    <SolidColorBrush x:Key="BadgeNewBrush" Color="{StaticResource BadgeNew}" />
+    <SolidColorBrush x:Key="BadgeBestOfBrush" Color="{StaticResource BadgeBestOf}" />
+
+    <!-- Social networks brush -->
+    <SolidColorBrush x:Key="LastFmBrush" Color="{StaticResource LastFm}" />
+    <SolidColorBrush x:Key="WikipediaBrush" Color="{StaticResource Wikipedia}" />
+    <SolidColorBrush x:Key="FacebookBrush" Color="{StaticResource Facebook}" />
+    <SolidColorBrush x:Key="InstagramBrush" Color="{StaticResource Instagram}" />
+    <SolidColorBrush x:Key="TwitterBrush" Color="{StaticResource Twitter}" />
+    <SolidColorBrush x:Key="ThreadsBrush" Color="{StaticResource Threads}" />
+    <SolidColorBrush x:Key="TiktokBrush" Color="{StaticResource Tiktok}" />
+    <SolidColorBrush x:Key="YoutubeBrush" Color="{StaticResource Youtube}" />
+    <SolidColorBrush x:Key="WebsiteBrush" Color="{StaticResource Website}" />
+
+</ResourceDictionary>

@@ -13,21 +13,6 @@
             
             <x:String x:Key="ArtistFallbackPictureUri">ms-appx:///Assets/artistFallback.png</x:String>
             
-            <x:Double x:Key="headerBackgroundOpacity">0.9</x:Double>
-            <x:Double x:Key="headerBackdropOpacity">0.1</x:Double>
-            <x:Double x:Key="largeHeaderHeight">280</x:Double>
-            <x:Double x:Key="normalHeaderHeight">180</x:Double>
-            <x:Double x:Key="smallHeaderHeight">100</x:Double>
-            <Thickness x:Key="scrollAwareThickness">0,0,17,0</Thickness>
-            <Thickness x:Key="scrollHeaderThickness">0,0,130,0</Thickness>
-            <Thickness x:Key="largeHeaderThickness">0,280,0,0</Thickness>
-            <Thickness x:Key="normalHeaderThickness">0,130,0,0</Thickness>
-
-            <x:Double x:Key="largeScreen">1230</x:Double>
-            <x:Double x:Key="mediumScreen">640</x:Double>
-
-            <x:String x:Key="HeartPath">M12,21 C12,21 4,13.36 4,8.5 C4,5.42 6.42,3 9.5,3 C11.24,3 12,4.1 12,4.1 C12,4.1 12.76,3 14.5,3 C17.58,3 20,5.42 20,8.5 C20,13.36 12,21 12,21 Z</x:String>
-
             <converters:BoolToGridLengthAutoConverter x:Key="BoolToGridLengthAutoConverter" />
             <converters:ColorToBrushConverter x:Key="ColorToBrushConverter" />
             <converters:ColorToGradientBrushConverter x:Key="ColorToGradientBrushConverter" />
@@ -58,11 +43,25 @@
 
             <ResourceDictionary.MergedDictionaries>
                 <XamlControlsResources xmlns="using:Microsoft.UI.Xaml.Controls" />
-                <ResourceDictionary Source="ms-appx:///Styles/AlbumTemplates.xaml" />
-                <ResourceDictionary Source="ms-appx:///Styles/NovaStyles.xaml" />
+                <ResourceDictionary Source="ms-appx:///Styles/Tokens.xaml" />
                 <ResourceDictionary Source="ms-appx:///Styles/ButtonStyles.xaml" />
                 <ResourceDictionary Source="ms-appx:///Styles/ControlsStyles.xaml" />
                 <ResourceDictionary Source="ms-appx:///Styles/RatingControlStyles.xaml" />
+                <ResourceDictionary Source="ms-appx:///Styles/AlbumTemplates.xaml" />
+
+                <!-- Tokens -->
+                <ResourceDictionary Source="ms-appx:///Styles/Tokens/Colors.xaml" />
+                <ResourceDictionary Source="ms-appx:///Styles/Tokens/Icons.xaml" />
+                <ResourceDictionary Source="ms-appx:///Styles/Tokens/Semantics.xaml" />
+                <ResourceDictionary Source="ms-appx:///Styles/Tokens/Typography.xaml" />
+                <ResourceDictionary Source="ms-appx:///Styles/Tokens/Spacing.xaml" />
+                <!-- Components -->
+                <ResourceDictionary Source="ms-appx:///Styles/Components/ControlsStyles.xaml" />
+                <!--<ResourceDictionary Source="ms-appx:///Styles/Components/ButtonStyles.xaml" />
+                
+                <ResourceDictionary Source="ms-appx:///Styles/Components/RatingControlStyles.xaml" />-->
+                <!-- Templates -->
+
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Application.Resources>

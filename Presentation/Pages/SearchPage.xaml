@@ -17,121 +17,89 @@
             <RowDefinition Height="*"></RowDefinition>
         </Grid.RowDefinitions>
 
-        <StackPanel Orientation="Horizontal"
-                    Margin="4,6,0,6">
-            
-            <SymbolIcon Symbol="Find"
-                        Margin="4,0,4,0" />
-            
-            <TextBlock x:Uid="searchViewTitle"
-                   Style="{StaticResource HeaderStyle}" />
+        <StackPanel Orientation="Horizontal" Margin="4,6,0,6">
+            <SymbolIcon Symbol="Find" Margin="4,0,4,0" />
+            <TextBlock x:Uid="searchViewTitle" Style="{StaticResource HeaderStyle}" />
         </StackPanel>
-        
-        <Line Stretch="Fill"
-              Stroke="{StaticResource AppBarSeparatorForegroundThemeBrush}"
-              VerticalAlignment="Bottom"
-              X2="100" />
 
-        <ScrollViewer VerticalScrollBarVisibility="Visible"
-                      Grid.Row="1"
-                      Margin="0,10,10,10">
+        <Line Stretch="Fill" Stroke="{ThemeResource BrandAccentBrush}" VerticalAlignment="Bottom" X2="100" />
+
+        <ScrollViewer VerticalScrollBarVisibility="Visible" Grid.Row="1" Margin="0,10,10,10">
             <StackPanel Orientation="Vertical">
 
                 <!-- Artists -->
-                <GridViewHeaderItem x:Name="searchArtistHeader"
-                                    FontSize="24"
-                                    FontWeight="Bold"
-                                    HorizontalAlignment="Left">
+                <GridViewHeaderItem x:Name="searchArtistHeader" FontSize="{StaticResource FontSizeLarge}" FontWeight="Bold" HorizontalAlignment="Left">
                     <GridViewHeaderItem.Content>
                         <StackPanel Orientation="Horizontal">
-                            <SymbolIcon Symbol="People"
-                                        Margin="4,0,4,0" />
+                            <SymbolIcon Symbol="People" Margin="4,0,4,0" />
                             <TextBlock x:Uid="searchArtistHeader"></TextBlock>
                         </StackPanel>
                     </GridViewHeaderItem.Content>
                 </GridViewHeaderItem>
-                <common:GridViewExtended x:Name="artistsGrid"
-                                         x:Load="{x:Bind ArtistCount, Converter={StaticResource IntToBoolConverter}}"
-                                         ItemsSource="{x:Bind ArtistsViewModel.ViewModels}"
-                                         ContainerContentChanging="grid_ContainerContentChanging"
-                                         Margin="0"
-                                         ScrollViewer.VerticalScrollMode="Enabled"
+
+                <common:GridViewExtended x:Name="artistsGrid" 
+                                         x:Load="{x:Bind ArtistCount, Converter={StaticResource IntToBoolConverter}}" 
+                                         ItemsSource="{x:Bind ArtistsViewModel.ViewModels}"                                          
+                                         ItemsPanel="{StaticResource GridPanelTemplate}"
+                                         ContainerContentChanging="grid_ContainerContentChanging" 
+                                         Margin="0" 
+                                         ScrollViewer.VerticalScrollMode="Enabled" 
                                          ScrollViewer.VerticalScrollBarVisibility="Auto">
 
                     <GridView.ItemTemplate>
                         <DataTemplate x:DataType="a:ArtistViewModel">
-                            <Grid Style="{StaticResource MainGridCoverStyle}">
-                                <Border CornerRadius="10"
-                                        Background="{x:Bind DominantColor, Converter={StaticResource ColorToGradientBrushConverter}, Mode=OneWay}">
-                                    <common:PictureControl Style="{StaticResource PictureCoverStyle}"
-                                                           Cover="{x:Bind Picture, Mode=OneWay}"
-                                                           x:Phase="2"
-                                                           PlayButtonVisibility="Visible"
-                                                           Command="{x:Bind ListenCommand}" />
+                            <Grid Style="{StaticResource MainGridCoverStyle}" PointerEntered="gridBottom_PointerEntered" PointerExited="gridBottom_PointerExited" Background="Transparent">
+                                <Grid.Resources>
+                                    <Storyboard x:Key="ShowGenreNameStoryboard">
+                                        <DoubleAnimation Storyboard.TargetName="genreName" Storyboard.TargetProperty="Opacity" To="1" Duration="0:0:0.6" />
+                                        <DoubleAnimation Storyboard.TargetName="subTitle" Storyboard.TargetProperty="Opacity" To="0" Duration="0:0:0.5" />
+                                    </Storyboard>
+                                    <Storyboard x:Key="ShowSubTitleStoryboard">
+                                        <DoubleAnimation Storyboard.TargetName="genreName" Storyboard.TargetProperty="Opacity" To="0" Duration="0:0:0.6" />
+                                        <DoubleAnimation Storyboard.TargetName="subTitle" Storyboard.TargetProperty="Opacity" To="1" Duration="0:0:0.2" />
+                                    </Storyboard>
+
+                                    <Storyboard x:Key="ShowFavoriteButtonStoryboard">
+                                        <DoubleAnimation Storyboard.TargetName="favoriteButton" Storyboard.TargetProperty="Opacity" To="1" Duration="0:0:0.6" />
+                                    </Storyboard>
+                                    <Storyboard x:Key="HideFavoriteButtonStoryboard">
+                                        <DoubleAnimation Storyboard.TargetName="favoriteButton" Storyboard.TargetProperty="Opacity" To="0" Duration="0:0:0.2" />
+                                    </Storyboard>
+                                </Grid.Resources>
+
+                                <Border CornerRadius="{StaticResource CornerRadiusMediumValue}">
+                                    <common:PictureControl Style="{StaticResource PictureCoverStyle}" Cover="{x:Bind Picture, Mode=OneWay}" x:Phase="2" PlayButtonVisibility="Visible" Command="{x:Bind ListenCommand}" />
                                 </Border>
 
-                                <Grid Style="{StaticResource GridCoverBottomStyle}">
+                                <StackPanel HorizontalAlignment="Right" VerticalAlignment="Top" Orientation="Vertical" Spacing="{StaticResource SpacingXSmall}" Margin="0,8,8,0">
+                                    <common:BadgeControl x:Uid="badgeNew" Visibility="{x:Bind ShowNewBadge, Converter={StaticResource BoolToVisibilityConverter}}" BadgeBackground="{StaticResource BadgeNewBrush}" />
+                                </StackPanel>
+
+                                <Grid x:Name="gridBottom" Style="{StaticResource GridCoverBottomStyle}" Background="{x:Bind DominantColor, Converter={StaticResource ColorToGradientBrushConverter}, Mode=OneWay}">
                                     <Grid.RowDefinitions>
-                                        <RowDefinition Height="{ThemeResource gridListFirstRowHeight}" />
-                                        <RowDefinition Height="{ThemeResource gridListSecondRowHeight}" />
+                                        <RowDefinition Height="{StaticResource GridBottomFirstRowHeight}" />
+                                        <RowDefinition Height="{StaticResource GridBottomSecondRowHeight}" />
                                     </Grid.RowDefinitions>
 
                                     <Grid.ColumnDefinitions>
-                                        <ColumnDefinition></ColumnDefinition>
-                                        <ColumnDefinition></ColumnDefinition>
+                                        <ColumnDefinition />
+                                        <ColumnDefinition Width="{StaticResource FavoriteButtonColumnWidth}" />
                                     </Grid.ColumnDefinitions>
 
-                                    <HyperlinkButton Grid.ColumnSpan="2"
-                                                     Content="{x:Bind Artist.Name}"
-                                                     x:Phase="0"
-                                                     Command="{x:Bind ArtistOpenCommand}"
-                                                     Style="{StaticResource GridCoverBottomFirstLineStyle}" />
+                                    <HyperlinkButton Content="{x:Bind Artist.Name}" x:Phase="0" Command="{x:Bind ArtistOpenCommand}" Style="{StaticResource GridCoverButtonStyle}" />
 
-                                    <StackPanel HorizontalAlignment="Right"
-                                                VerticalAlignment="Top"
-                                                Orientation="Vertical"
-                                                Spacing="4"
-                                                Margin="0,8,8,0">
-                                        <common:BadgeControl x:Uid="badgeNew"
-                                                             Visibility="{x:Bind ShowNewBadge, Converter={StaticResource BoolToVisibilityConverter}}"
-                                                             BadgeBackground="{StaticResource BadgeNew}" />
-                                    </StackPanel>
+                                    <TextBlock x:Name="subTitle" Grid.Row="1" Style="{StaticResource GridCoverBottomSecondLineStyle}" Margin="4,6,0,0" Text="{x:Bind SubTitle, Mode=OneWay}" Opacity="1" x:Phase="1" />
+                                    <HyperlinkButton x:Name="genreName" Grid.Row="1" Style="{StaticResource GridCoverButtonStyle}" Content="{x:Bind Artist.GenreName, Mode=OneWay}" Command="{x:Bind GenreOpenCommand}" Opacity="0" x:Phase="1" />
 
-                                    <TextBlock Grid.Row="1"
-                                               Style="{StaticResource GridCoverBottomSecondLineStyle}"
-                                               Text="{x:Bind SubTitle, Mode=OneWay}"
-                                               x:Phase="1" />
-
-                                    <common:AnimatedButton Grid.Row="1"
-                                                           Grid.Column="1"
-                                                           HorizontalAlignment="Right"
-                                                           VerticalAlignment="Stretch"
-                                                           Margin="-15,0,0,0"
-                                                           x:Phase="1"
-                                                           Icon="{StaticResource HeartPath}"
-                                                           Color="{x:Bind IsFavorite, Converter={StaticResource FavoriteToColorConverter}, Mode=OneWay}"
-                                                           Command="{x:Bind ArtistFavoriteCommand}"
-                                                           CommandParameter="{x:Bind IsFavorite, Converter={StaticResource BoolToInvertBoolConverter}, Mode=OneWay}" />
+                                    <common:AnimatedButton x:Name="favoriteButton" Grid.Row="0" Grid.Column="1" HorizontalAlignment="Right" VerticalAlignment="Stretch" Margin="0" Opacity="{x:Bind IsFavorite, Converter={StaticResource BoolToOpacityConverter}, Mode=OneWay}" Icon="{StaticResource HeartPath}" Color="{x:Bind IsFavorite, Converter={StaticResource FavoriteToColorConverter}, Mode=OneWay}" Command="{x:Bind ArtistFavoriteCommand}" CommandParameter="{x:Bind IsFavorite, Converter={StaticResource BoolToInvertBoolConverter}, Mode=OneWay}" />
                                 </Grid>
                             </Grid>
                         </DataTemplate>
                     </GridView.ItemTemplate>
-
-                    <GridView.ItemsPanel>
-                        <ItemsPanelTemplate>
-                            <ItemsWrapGrid Orientation="Horizontal"
-                                           ItemHeight="310"
-                                           ItemWidth="310"
-                                           Margin="0,0,2,2"></ItemsWrapGrid>
-                        </ItemsPanelTemplate>
-                    </GridView.ItemsPanel>
                 </common:GridViewExtended>
 
                 <!-- Albums -->
-                <GridViewHeaderItem x:Name="searchAlbumHeader"
-                                    FontSize="24"
-                                    FontWeight="Bold"
-                                    HorizontalAlignment="Left">
+                <GridViewHeaderItem x:Name="searchAlbumHeader" FontSize="{StaticResource FontSizeLarge}" FontWeight="Bold" HorizontalAlignment="Left">
                     <GridViewHeaderItem.Content>
                         <StackPanel Orientation="Horizontal">
                             <FontIcon Glyph="&#xe93c;"
@@ -144,6 +112,7 @@
                 <common:GridViewExtended x:Name="albumsGrid"
                                          x:Load="{x:Bind AlbumCount, Converter={StaticResource IntToBoolConverter}}"
                                          ItemsSource="{x:Bind AlbumsViewModel.ViewModels}"
+                                         ItemsPanel="{StaticResource GridPanelTemplate}"
                                          ContainerContentChanging="grid_ContainerContentChanging"
                                          Margin="0"
                                          ScrollViewer.VerticalScrollMode="Enabled"
@@ -151,173 +120,115 @@
 
                     <GridView.ItemTemplate>
                         <DataTemplate x:DataType="b:AlbumViewModel">
-                            <Grid Style="{StaticResource MainGridCoverStyle}">
-                                <Border CornerRadius="10"
-                                        Background="{x:Bind DominantColor, Converter={StaticResource ColorToGradientBrushConverter}, Mode=OneWay}">
-                                    <common:PictureControl Style="{StaticResource PictureCoverStyle}"
-                                                           Cover="{x:Bind Picture, Mode=OneWay}"
-                                                           x:Phase="2"
-                                                           PlayButtonVisibility="Visible"
-                                                           Command="{x:Bind ListenCommand}" />
+                            <Grid Style="{StaticResource MainGridCoverStyle}" PointerEntered="gridBottom_PointerEntered" PointerExited="gridBottom_PointerExited" Background="Transparent">
+                                <Grid.Resources>
+                                    <Storyboard x:Key="ShowAlbumArtistNameStoryboard">
+                                        <DoubleAnimation Storyboard.TargetName="albumArtistName" Storyboard.TargetProperty="Opacity" To="1" Duration="0:0:0.6" />
+                                        <DoubleAnimation Storyboard.TargetName="albumSubTitle" Storyboard.TargetProperty="Opacity" To="0" Duration="0:0:0.5" />
+                                    </Storyboard>
+                                    <Storyboard x:Key="ShowAlbumSubTitleStoryboard">
+                                        <DoubleAnimation Storyboard.TargetName="albumArtistName" Storyboard.TargetProperty="Opacity" To="0" Duration="0:0:0.6" />
+                                        <DoubleAnimation Storyboard.TargetName="albumSubTitle" Storyboard.TargetProperty="Opacity" To="1" Duration="0:0:0.2" />
+                                    </Storyboard>
+
+                                    <Storyboard x:Key="ShowAlbumFavoriteButtonStoryboard">
+                                        <DoubleAnimation Storyboard.TargetName="albumFavoriteButton" Storyboard.TargetProperty="Opacity" To="1" Duration="0:0:0.6" />
+                                    </Storyboard>
+                                    <Storyboard x:Key="HideAlbumFavoriteButtonStoryboard">
+                                        <DoubleAnimation Storyboard.TargetName="albumFavoriteButton" Storyboard.TargetProperty="Opacity" To="0" Duration="0:0:0.2" />
+                                    </Storyboard>
+                                </Grid.Resources>
+
+                                <Border CornerRadius="{StaticResource CornerRadiusMediumValue}">
+                                    <common:PictureControl Style="{StaticResource PictureCoverStyle}" Cover="{x:Bind Picture, Mode=OneWay}" x:Phase="2" PlayButtonVisibility="Visible" Command="{x:Bind ListenCommand}" />
                                 </Border>
 
-                                <StackPanel HorizontalAlignment="Right"
-                                            VerticalAlignment="Top"
-                                            Orientation="Vertical"
-                                            Spacing="4"
-                                            Margin="0,8,8,0">
-
-                                    <common:BadgeControl x:Uid="badgeLive"
-                                                         Visibility="{x:Bind IsLive, Converter={StaticResource BoolToVisibilityConverter}}"
-                                                         BadgeBackground="{StaticResource BadgeLive}" />
-
-                                    <common:BadgeControl x:Uid="badgeBestof"
-                                                         Visibility="{x:Bind IsBestOf, Converter={StaticResource BoolToVisibilityConverter}}"
-                                                         BadgeBackground="{StaticResource BadgeBestOf}" />
-
-                                    <common:BadgeControl x:Uid="badgeCompilation"
-                                                         Visibility="{x:Bind IsCompilation, Converter={StaticResource BoolToVisibilityConverter}}"
-                                                         BadgeBackground="{StaticResource BadgeCompilation}" />
-
-                                    <common:BadgeControl x:Uid="badgeNew"
-                                                         Visibility="{x:Bind ShowNewBadge, Converter={StaticResource BoolToVisibilityConverter}}"
-                                                         BadgeBackground="{StaticResource BadgeNew}" />
+                                <StackPanel HorizontalAlignment="Right" VerticalAlignment="Top" Orientation="Vertical" Spacing="{StaticResource SpacingXSmall}" Margin="0,8,8,0">
+                                    <common:BadgeControl x:Uid="badgeLive" Visibility="{x:Bind IsLive, Converter={StaticResource BoolToVisibilityConverter}}" BadgeBackground="{StaticResource BadgeLiveBrush}"/>
+                                    <common:BadgeControl x:Uid="badgeBestof" Visibility="{x:Bind IsBestOf, Converter={StaticResource BoolToVisibilityConverter}}" BadgeBackground="{StaticResource BadgeBestOfBrush}" />
+                                    <common:BadgeControl x:Uid="badgeCompilation" Visibility="{x:Bind IsCompilation, Converter={StaticResource BoolToVisibilityConverter}}" BadgeBackground="{StaticResource BadgeCompilationBrush}" />
+                                    <common:BadgeControl x:Uid="badgeNew" Visibility="{x:Bind ShowNewBadge, Converter={StaticResource BoolToVisibilityConverter}}" BadgeBackground="{StaticResource BadgeNewBrush}" />
                                 </StackPanel>
 
-
-                                <Grid Style="{StaticResource GridCoverBottomStyle}">
+                                <Grid x:Name="gridBottom" Style="{StaticResource GridCoverBottomStyle}" Background="{x:Bind DominantColor, Converter={StaticResource ColorToGradientBrushConverter}, Mode=OneWay}">
                                     <Grid.RowDefinitions>
-                                        <RowDefinition Height="{ThemeResource gridListFirstRowHeight}" />
-                                        <RowDefinition Height="{ThemeResource gridListSecondRowHeight}" />
+                                        <RowDefinition Height="{StaticResource GridBottomFirstRowHeight}" />
+                                        <RowDefinition Height="{StaticResource GridBottomSecondRowHeight}" />
                                     </Grid.RowDefinitions>
 
                                     <Grid.ColumnDefinitions>
-                                        <ColumnDefinition></ColumnDefinition>
-                                        <ColumnDefinition></ColumnDefinition>
+                                        <ColumnDefinition />
+                                        <ColumnDefinition Width="{StaticResource FavoriteButtonColumnWidth}" />
                                     </Grid.ColumnDefinitions>
 
-                                    <HyperlinkButton Grid.ColumnSpan="2"
-                                                     Content="{x:Bind Album.Name}"
-                                                     x:Phase="0"
-                                                     Command="{x:Bind AlbumOpenCommand}"
-                                                     Style="{StaticResource GridCoverBottomFirstLineStyle}" />
+                                    <HyperlinkButton Content="{x:Bind Album.Name}" x:Phase="0" Command="{x:Bind AlbumOpenCommand}" Style="{StaticResource GridCoverButtonStyle}" />
 
-                                    <TextBlock Grid.Row="1"
-                                               Style="{StaticResource GridCoverBottomSecondLineStyle}"
-                                               Text="{x:Bind SubTitle, Mode=OneWay}"
-                                               x:Phase="1" />
+                                    <TextBlock x:Name="albumSubTitle" Grid.Row="1" Style="{StaticResource GridCoverBottomSecondLineStyle}" Margin="4,6,0,0" Text="{x:Bind SubTitle, Mode=OneWay}" Opacity="1" x:Phase="1" />
+                                    <HyperlinkButton x:Name="albumArtistName" Grid.Row="1" Style="{StaticResource GridCoverButtonStyle}" Content="{x:Bind Album.ArtistName, Mode=OneWay}" Command="{x:Bind ArtistOpenCommand}" Opacity="0" x:Phase="1" />
 
-                                    <common:AnimatedButton Grid.Row="1"
-                                                           Grid.Column="1"
-                                                           HorizontalAlignment="Right"
-                                                           VerticalAlignment="Stretch"
-                                                           Margin="-15,0,0,0"
-                                                           x:Phase="1"
-                                                           Icon="{StaticResource HeartPath}"
-                                                           Color="{x:Bind IsFavorite, Converter={StaticResource FavoriteToColorConverter}, Mode=OneWay}"
-                                                           Command="{x:Bind AlbumFavoriteCommand}"
-                                                           CommandParameter="{x:Bind IsFavorite, Converter={StaticResource BoolToInvertBoolConverter}, Mode=OneWay}" />
+                                    <common:AnimatedButton x:Name="albumFavoriteButton" Grid.Column="1" HorizontalAlignment="Right" VerticalAlignment="Stretch" Margin="0" Opacity="{x:Bind IsFavorite, Converter={StaticResource BoolToOpacityConverter}, Mode=OneWay}" Icon="{StaticResource HeartPath}" Color="{x:Bind IsFavorite, Converter={StaticResource FavoriteToColorConverter}, Mode=OneWay}" Command="{x:Bind AlbumFavoriteCommand}" CommandParameter="{x:Bind IsFavorite, Converter={StaticResource BoolToInvertBoolConverter}, Mode=OneWay}" />
                                 </Grid>
                             </Grid>
                         </DataTemplate>
                     </GridView.ItemTemplate>
-
-                    <GridView.ItemsPanel>
-                        <ItemsPanelTemplate>
-                            <ItemsWrapGrid Orientation="Horizontal"
-                                           ItemHeight="310"
-                                           ItemWidth="310"
-                                           Margin="0,0,2,2"></ItemsWrapGrid>
-                        </ItemsPanelTemplate>
-                    </GridView.ItemsPanel>
                 </common:GridViewExtended>
 
                 <!-- Tracks -->
-                <GridViewHeaderItem x:Name="searchTrackHeader"
-                                    FontSize="24"
-                                    FontWeight="Bold"
-                                    HorizontalAlignment="Left">
+                <GridViewHeaderItem x:Name="searchTrackHeader" FontSize="{StaticResource FontSizeLarge}" FontWeight="Bold" HorizontalAlignment="Left">
                     <GridViewHeaderItem.Content>
                         <StackPanel Orientation="Horizontal">
-                            <SymbolIcon Symbol="Audio"
-                                        Margin="4,0,4,0" />
+                            <SymbolIcon Symbol="Audio" Margin="4,0,4,0" />
                             <TextBlock x:Uid="searchTrackHeader"></TextBlock>
                         </StackPanel>
                     </GridViewHeaderItem.Content>
                 </GridViewHeaderItem>
 
-                <Grid Style="{StaticResource gridList}">
+                <Grid MinHeight="100">
                     <Grid.RowDefinitions>
-                        <RowDefinition Height="{ThemeResource gridHeaderTracksHeight}" />
+                        <RowDefinition Height="{StaticResource GridHeaderTracksHeight}" />
                         <RowDefinition />
                     </Grid.RowDefinitions>
 
-                    <Grid Style="{StaticResource gridTracks}">
+                    <Grid Style="{StaticResource HeaderTracksGridStyle}">
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="{ThemeResource gridHeaderTracksTitleColumnWidth}"
-                                              x:Name="trackTitle" />
-                            <ColumnDefinition Width="{ThemeResource gridHeaderTracksArtistColumnWidth}"
-                                              x:Name="trackArtist" />
-                            <ColumnDefinition Width="{ThemeResource gridHeaderTracksAlbumColumnWidth}"
-                                              x:Name="trackAlbum" />
-                            <ColumnDefinition Width="{ThemeResource gridHeaderTracksScoreColumnWidth}"
-                                              x:Name="trackScore" />
+                            <ColumnDefinition Width="{StaticResource GridHeaderTracksTitleColumnWidth}" />
+                            <ColumnDefinition Width="{StaticResource GridHeaderTracksArtistColumnWidth}" />
+                            <ColumnDefinition Width="{StaticResource GridHeaderTracksAlbumColumnWidth}" />
+                            <ColumnDefinition Width="{StaticResource GridHeaderTracksGenreColumnWidth}" />
+                            <ColumnDefinition Width="{StaticResource GridHeaderTracksScoreColumnWidth}" />
                         </Grid.ColumnDefinitions>
 
-                        <TextBlock x:Uid="gridHeaderTitle"
-                                   Grid.Column="0"
-                                   Style="{StaticResource gridHeaderTracksText}" />
-                        <TextBlock x:Uid="gridHeaderArtist"
-                                   Grid.Column="1"
-                                   Style="{StaticResource gridHeaderTracksText}" />
-                        <TextBlock x:Uid="gridHeaderAlbum"
-                                   Grid.Column="2"
-                                   Style="{StaticResource gridHeaderTracksText}" />
-                        <TextBlock x:Uid="gridHeaderScore"
-                                   Grid.Column="3"
-                                   Style="{StaticResource gridHeaderTracksText}" />
+                        <TextBlock x:Uid="gridHeaderTitle" Grid.Column="0" Style="{StaticResource GridHeaderTracksTextBlockStyle}" />
+                        <TextBlock x:Uid="gridHeaderArtist" Grid.Column="1" Style="{StaticResource GridHeaderTracksTextBlockStyle}" />
+                        <TextBlock x:Uid="gridHeaderAlbum" Grid.Column="2" Style="{StaticResource GridHeaderTracksTextBlockStyle}" />
+                        <TextBlock x:Uid="gridHeaderGenre" Grid.Column="3" Style="{StaticResource GridHeaderTracksTextBlockStyle}" />
+                        <TextBlock x:Uid="gridHeaderScore" Grid.Column="4" Style="{StaticResource GridHeaderTracksTextBlockStyle}" />
                     </Grid>
 
-                    <common:ListViewExtended x:Name="tracksList"
-                                             Grid.Row="1"
-                                             ItemContainerStyle="{StaticResource tracksListViewItem}"
-                                             x:Load="{x:Bind TrackCount, Converter={StaticResource IntToBoolConverter}}"
-                                             ItemsSource="{x:Bind TracksViewModel.ViewModels}">
-
+                    <common:ListViewExtended x:Name="tracksList" ItemsSource="{x:Bind TracksViewModel.ViewModels}" Grid.Row="1"  BorderThickness="0" ItemContainerStyle="{StaticResource TracksListViewItemStyle}" Margin="0">
                         <ListView.ItemTemplate>
                             <DataTemplate x:DataType="track:TrackViewModel">
                                 <Grid Background="Transparent">
                                     <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="{ThemeResource gridHeaderTracksTitleColumnWidth}" />
-                                        <ColumnDefinition Width="{ThemeResource gridHeaderTracksArtistColumnWidth}" />
-                                        <ColumnDefinition Width="{ThemeResource gridHeaderTracksAlbumColumnWidth}" />
-                                        <ColumnDefinition Width="{ThemeResource gridHeaderTracksScoreColumnWidth}" />
+                                        <ColumnDefinition Width="{StaticResource GridHeaderTracksTitleColumnWidth}" />
+                                        <ColumnDefinition Width="{StaticResource GridHeaderTracksArtistColumnWidth}" />
+                                        <ColumnDefinition Width="{StaticResource GridHeaderTracksAlbumColumnWidth}" />
+                                        <ColumnDefinition Width="{StaticResource GridHeaderTracksGenreColumnWidth}" />
+                                        <ColumnDefinition Width="{StaticResource GridHeaderTracksScoreColumnWidth}" />
                                     </Grid.ColumnDefinitions>
 
                                     <Grid.ContextFlyout>
-                                        <MenuFlyout ShowMode="TransientWithDismissOnPointerMoveAway"
-                                                    common:MenuFlyoutExtensions.PlaylistMenuService="{x:Bind PlaylistMenuService}"
-                                                    common:MenuFlyoutExtensions.TrackId="{x:Bind Track.Id, Mode=OneWay}">
-                                            <MenuFlyoutItem x:Uid="trackFlyoutListen"
-                                                            Icon="Play"
-                                                            Command="{x:Bind ListenCommand}"
-                                                            CommandParameter="{x:Bind}" />
-                                            <MenuFlyoutItem x:Uid="trackFlyoutArtist"
-                                                            Icon="People"
-                                                            Command="{x:Bind ArtistOpenCommand}" />
-                                            <MenuFlyoutItem x:Uid="trackFlyoutAlbum"
-                                                            Command="{x:Bind AlbumOpenCommand}">
+                                        <MenuFlyout ShowMode="TransientWithDismissOnPointerMoveAway" common:MenuFlyoutExtensions.PlaylistMenuService="{x:Bind PlaylistMenuService}" common:MenuFlyoutExtensions.TrackId="{x:Bind Track.Id, Mode=OneWay}">
+                                            <MenuFlyoutItem x:Uid="trackFlyoutListen" Icon="Play" Command="{x:Bind ListenCommand}" CommandParameter="{x:Bind}" />
+                                            <MenuFlyoutItem x:Uid="trackFlyoutArtist" Icon="People" Command="{x:Bind ArtistOpenCommand}" />
+                                            <MenuFlyoutItem x:Uid="trackFlyoutAlbum" Command="{x:Bind AlbumOpenCommand}">
                                                 <MenuFlyoutItem.Icon>
                                                     <FontIcon Glyph="&#xE93C;" />
                                                 </MenuFlyoutItem.Icon>
                                             </MenuFlyoutItem>
-                                            <MenuFlyoutItem x:Uid="trackFlyoutTrack"
-                                                            Icon="Audio"
-                                                            Command="{x:Bind TrackOpenCommand}" />
+                                            <MenuFlyoutItem x:Uid="trackFlyoutTrack" Icon="Audio" Command="{x:Bind TrackOpenCommand}" />
                                             <MenuFlyoutSeparator />
-                                            <MenuFlyoutItem x:Uid="trackFlyoutLyrics"
-                                                            Command="{x:Bind LyricsOpenCommand}"
-                                                            Visibility="{x:Bind LyricsExists, Converter={StaticResource BoolToVisibilityConverter}}">
+                                            <MenuFlyoutItem x:Uid="trackFlyoutLyrics" Command="{x:Bind LyricsOpenCommand}" Visibility="{x:Bind LyricsExists, Converter={StaticResource BoolToVisibilityConverter}}">
                                                 <MenuFlyoutItem.Icon>
                                                     <FontIcon Glyph="&#xE90B;" />
                                                 </MenuFlyoutItem.Icon>
@@ -325,29 +236,15 @@
                                         </MenuFlyout>
                                     </Grid.ContextFlyout>
 
-                                    <StackPanel Grid.Column="0"
-                                                Orientation="Horizontal">
-                                        <HyperlinkButton Style="{StaticResource gridTracksTitleText}"
-                                                         Command="{x:Bind ListenCommand}"
-                                                         CommandParameter="{x:Bind}" />
-
-                                        <HyperlinkButton x:Uid="lyricsTag"
-                                                         Visibility="{x:Bind LyricsExists, Converter={StaticResource BoolToVisibilityConverter}}"
-                                                         Style="{StaticResource gridTracksLyricsText}"
-                                                         Command="{x:Bind LyricsOpenCommand}" />
+                                    <StackPanel Grid.Column="0" Orientation="Horizontal">
+                                        <HyperlinkButton Style="{StaticResource GridTracksTitleHyperlinkButtonStyle}" Command="{x:Bind ListenCommand}" CommandParameter="{x:Bind}" />
+                                        <HyperlinkButton x:Uid="lyricsTag" Visibility="{x:Bind LyricsExists, Converter={StaticResource BoolToVisibilityConverter}}" Style="{StaticResource GridTracksLyricsHyperlinkButtonStyle}" Command="{x:Bind LyricsOpenCommand}" />
                                     </StackPanel>
 
-                                    <HyperlinkButton Grid.Column="1"
-                                                     Style="{StaticResource gridTracksArtistText}"
-                                                     Command="{x:Bind ArtistOpenCommand}" />
-
-                                    <HyperlinkButton Grid.Column="2"
-                                                     Style="{StaticResource gridTracksAlbumText}"
-                                                     Command="{x:Bind AlbumOpenCommand}" />
-
-                                    <common:RatingControlLightControl Grid.Column="3"
-                                                                      Style="{StaticResource gridTracksScore}"
-                                                                      RatingValue="{x:Bind Score, Mode=TwoWay}" />
+                                    <HyperlinkButton Grid.Column="1" Style="{StaticResource GridTracksArtistHyperlinkButtonStyle}" Command="{x:Bind ArtistOpenCommand}" />
+                                    <HyperlinkButton Grid.Column="2" Style="{StaticResource GridTracksAlbumHyperlinkButtonStyle}" Command="{x:Bind AlbumOpenCommand}" />
+                                    <HyperlinkButton Grid.Column="3" Style="{StaticResource GridTracksGenreHyperlinkButtonStyle}" Command="{x:Bind GenreOpenCommand}" />
+                                    <common:RatingControlLightControl Grid.Column="4" Style="{StaticResource GridTracksScoreStyle}" RatingValue="{x:Bind Score, Mode=TwoWay}" />
                                 </Grid>
                             </DataTemplate>
                         </ListView.ItemTemplate>

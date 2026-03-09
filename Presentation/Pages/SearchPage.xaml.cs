@@ -1,4 +1,6 @@
 using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Input;
+using Microsoft.UI.Xaml.Media.Animation;
 using Microsoft.UI.Xaml.Navigation;
 using Rok.ViewModels.Album;
 using Rok.ViewModels.Albums;
@@ -56,5 +58,62 @@ public sealed partial class SearchPage : Page
             item.LoadPicture();
         else if (args.Item is AlbumViewModel album && album.Picture == null)
             album.LoadPicture();
+    }
+
+    private void gridBottom_PointerEntered(object sender, PointerRoutedEventArgs e)
+    {
+        Grid? gridItem = sender as Grid;
+        if (gridItem != null && gridItem.DataContext is ArtistViewModel artistViewModel)
+        {
+            Storyboard? showGenreStoryboard = gridItem.Resources["ShowGenreNameStoryboard"] as Storyboard;
+            showGenreStoryboard?.Begin();
+
+            if (!artistViewModel.IsFavorite)
+            {
+                Storyboard? showFavoriteButtonStoryboard = gridItem.Resources["ShowFavoriteButtonStoryboard"] as Storyboard;
+                showFavoriteButtonStoryboard?.Begin();
+            }
+        }
+
+        if (gridItem != null && gridItem.DataContext is AlbumViewModel albumViewModel)
+        {
+            Storyboard? showArtistStoryboard = gridItem.Resources["ShowAlbumArtistNameStoryboard"] as Storyboard;
+            showArtistStoryboard?.Begin();
+
+            if (!albumViewModel.IsFavorite)
+            {
+                Storyboard? showFavoriteButtonStoryboard = gridItem.Resources["ShowAlbumFavoriteButtonStoryboard"] as Storyboard;
+                showFavoriteButtonStoryboard?.Begin();
+            }
+        }
+    }
+
+
+    private void gridBottom_PointerExited(object sender, PointerRoutedEventArgs e)
+    {
+        Grid? gridItem = sender as Grid;
+        if (gridItem != null && gridItem.DataContext is ArtistViewModel artistViewModel)
+        {
+            Storyboard? showSubTitleStoryboard = gridItem.Resources["ShowSubTitleStoryboard"] as Storyboard;
+            showSubTitleStoryboard?.Begin();
+
+            if (!artistViewModel.IsFavorite)
+            {
+                Storyboard? hideFavoriteButtonStoryboard = gridItem.Resources["HideFavoriteButtonStoryboard"] as Storyboard;
+                hideFavoriteButtonStoryboard?.Begin();
+            }
+        }
+
+        if (gridItem != null && gridItem.DataContext is AlbumViewModel albumViewModel)
+        {
+            Storyboard? showSubTitleStoryboard = gridItem.Resources["ShowAlbumSubTitleStoryboard"] as Storyboard;
+            showSubTitleStoryboard?.Begin();
+
+            if (!albumViewModel.IsFavorite)
+            {
+                Storyboard? hideFavoriteButtonStoryboard = gridItem.Resources["HideAlbumFavoriteButtonStoryboard"] as Storyboard;
+                hideFavoriteButtonStoryboard?.Begin();
+            }
+        }
     }
 }

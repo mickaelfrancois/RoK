@@ -16,29 +16,14 @@
 
         <Pivot>
             <PivotItem x:Uid="OptionTabOptions">
-                <Border Background="{ThemeResource CardBackgroundFillColorDefault}"
-                        Padding="4"
-                        CornerRadius="12"
-                        Margin="8">
-                    <StackPanel Spacing="10"
-                                Margin="6,12,0,0">
-                        <StackPanel Orientation="Vertical"
-                                    Spacing="12"
-                                    VerticalAlignment="Center">
-                            <TextBlock x:Uid="optionsThemeLabel"
-                                       VerticalAlignment="Center" />
-                            <ComboBox Width="220"
-                                      SelectedValuePath="Tag"
-                                      SelectedValue="{x:Bind ThemeString, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
-                                <ComboBoxItem x:Uid="optionsThemeSystemItem"
-                                              Tag="System"
-                                              Content="Système" />
-                                <ComboBoxItem x:Uid="optionsThemeLightItem"
-                                              Tag="Light"
-                                              Content="Clair" />
-                                <ComboBoxItem x:Uid="optionsThemeDarkItem"
-                                              Tag="Dark"
-                                              Content="Sombre" />
+                <Border Background="{ThemeResource CardBackgroundFillColorDefault}" Padding="4" CornerRadius="12" Margin="8">
+                    <StackPanel Spacing="10" Margin="6,12,0,0">
+                        <StackPanel Orientation="Vertical" Spacing="12" VerticalAlignment="Center">
+                            <TextBlock x:Uid="optionsThemeLabel" VerticalAlignment="Center" />
+                            <ComboBox Width="220" SelectedValuePath="Tag" SelectedValue="{x:Bind ThemeString, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+                                <ComboBoxItem x:Uid="optionsThemeSystemItem" Tag="System" Content="Système" />
+                                <ComboBoxItem x:Uid="optionsThemeLightItem" Tag="Light" Content="Clair" />
+                                <ComboBoxItem x:Uid="optionsThemeDarkItem" Tag="Dark" Content="Sombre" />
                             </ComboBox>
                         </StackPanel>
 
@@ -118,10 +103,10 @@
                             <RowDefinition Height="*" />
                         </Grid.RowDefinitions>
 
-                        <CommandBar Style="{StaticResource headerCommandBar}"
+                        <CommandBar Style="{StaticResource HeaderCommandBarStyle}"
                                     HorizontalAlignment="Left">
                             <AppBarButton x:Uid="resetListenCount"
-                                          Style="{StaticResource headerGenericButton}"
+                                          Style="{StaticResource HeaderGenericButtonStyle}"
                                           Icon="Refresh"
                                           Click="ResetListenCount_Click">
                                 <ToolTipService.ToolTip>
