@@ -110,21 +110,14 @@
 
                             <Grid.ContextFlyout>
                                 <MenuFlyout ShowMode="TransientWithDismissOnPointerMoveAway" common:MenuFlyoutExtensions.PlaylistMenuService="{x:Bind PlaylistMenuService}" common:MenuFlyoutExtensions.TrackId="{x:Bind Track.Id}">
-                                    <MenuFlyoutItem x:Uid="trackFlyoutListen" Command="{x:Bind ListenCommand}" CommandParameter="{x:Bind}">
+                                    <MenuFlyoutItem x:Uid="trackFlyoutListen" Icon="Play" Command="{x:Bind ListenCommand}" CommandParameter="{x:Bind}" />
+                                    <MenuFlyoutItem x:Uid="trackFlyoutArtist" Icon="People" Command="{x:Bind ArtistOpenCommand}" />
+                                    <MenuFlyoutItem x:Uid="trackFlyoutAlbum" Command="{x:Bind AlbumOpenCommand}" Visibility="Collapsed" >
                                         <MenuFlyoutItem.Icon>
-                                            <IconSourceElement IconSource="{StaticResource IconPlay}" />
+                                            <FontIcon Glyph="&#xe93c;" />
                                         </MenuFlyoutItem.Icon>
                                     </MenuFlyoutItem>
-                                    <MenuFlyoutItem x:Uid="trackFlyoutArtist" Command="{x:Bind ArtistOpenCommand}">
-                                        <MenuFlyoutItem.Icon>
-                                            <IconSourceElement IconSource="{StaticResource IconPeople}" />
-                                        </MenuFlyoutItem.Icon>
-                                    </MenuFlyoutItem>
-                                    <MenuFlyoutItem x:Uid="trackFlyoutTrack" Command="{x:Bind TrackOpenCommand}">
-                                        <MenuFlyoutItem.Icon>
-                                            <IconSourceElement IconSource="{StaticResource IconAudio}" />
-                                        </MenuFlyoutItem.Icon>
-                                    </MenuFlyoutItem>
+                                    <MenuFlyoutItem x:Uid="trackFlyoutTrack" Icon="Audio" Command="{x:Bind TrackOpenCommand}"/>
                                     <MenuFlyoutSeparator />
                                     <MenuFlyoutItem x:Uid="trackFlyoutLyrics" Command="{x:Bind LyricsOpenCommand}" Visibility="{x:Bind LyricsExists, Converter={StaticResource BoolToVisibilityConverter}}">
                                         <MenuFlyoutItem.Icon>

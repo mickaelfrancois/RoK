@@ -47,7 +47,7 @@
         </Grid>
 
         <!-- Content -->
-        <Border Grid.Row="1" Style="{StaticResource FileGridStyle}">
+        <Grid Grid.Row="1" Style="{StaticResource FileGridStyle}">
             <common:GridViewExtended x:Name="grid" ItemsPanel="{StaticResource GridPanelTemplate}" ItemsSource="{x:Bind ViewModel.Albums}" ContainerContentChanging="grid_ContainerContentChanging" Margin="0" ScrollViewer.VerticalScrollMode="Enabled" ScrollViewer.VerticalScrollBarVisibility="Auto">
                 <GridView.ItemTemplate>
                     <DataTemplate x:DataType="albums:AlbumViewModel">
@@ -70,7 +70,7 @@
                                 </Storyboard>
                             </Grid.Resources>
 
-                            <Border CornerRadius="10" Background="{x:Bind DominantColor, Converter={StaticResource ColorToGradientBrushConverter}, Mode=OneWay}">
+                            <Border CornerRadius="{StaticResource CornerRadiusMediumValue}">
                                 <common:PictureControl Style="{StaticResource PictureCoverStyle}" Cover="{x:Bind Picture, Mode=OneWay}" x:Phase="2" PlayButtonVisibility="Visible" Command="{x:Bind ListenCommand}" />
                             </Border>
 
@@ -103,6 +103,6 @@
                     </DataTemplate>
                 </GridView.ItemTemplate>
             </common:GridViewExtended>
-        </Border>
+        </Grid>
     </Grid>
 </Page>

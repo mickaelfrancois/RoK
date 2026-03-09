@@ -14,76 +14,38 @@
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="auto" x:Name="playlistRow" />
-            <RowDefinition MinHeight="{StaticResource smallHeaderHeight}"
-                           MaxHeight="{StaticResource smallHeaderHeight}"
-                           x:Name="headerRow" />
+            <RowDefinition MinHeight="{StaticResource SmallHeaderHeight}" MaxHeight="{StaticResource SmallHeaderHeight}" x:Name="headerRow" />
             <RowDefinition Height="auto" x:Name="commandRow" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
         <Grid.Background>
-            <SolidColorBrush Color="{ThemeResource CardBackgroundFillColorDefault}"
-                             Opacity="{StaticResource HeaderBackgroundOpacity}" />
+            <SolidColorBrush Color="{ThemeResource CardBackgroundFillColorDefault}" Opacity="{StaticResource HeaderBackgroundOpacity}" />
         </Grid.Background>
 
-        <Image x:Name="backdrop"
-               Grid.RowSpan="4"
-               Source="{x:Bind ViewModel.Artist.Backdrop,Mode=OneWay}"
-               Opacity="0.20"
-               Style="{StaticResource HeaderBackdropStyle}"
-               Stretch="UniformToFill"
-               IsHitTestVisible="False" />
+        <Image x:Name="backdrop" Grid.RowSpan="4" Source="{x:Bind ViewModel.Artist.Backdrop,Mode=OneWay}" Opacity="0.20" Style="{StaticResource HeaderBackdropStyle}" Stretch="UniformToFill" IsHitTestVisible="False" />
 
         <!-- Title -->
-        <StackPanel Orientation="Horizontal"
-                    Margin="4,6,0,6">
-
-            <SymbolIcon Symbol="MusicInfo"
-                        Margin="4,0,4,0" />
-
-            <TextBlock x:Uid="ListeningViewTitle"
-                       x:Name="title"
-                       Style="{StaticResource HeaderStyle}" />
-
-            <TextBlock Text="{x:Bind ViewModel.TrackCount}"
-                       Style="{StaticResource SubtitleTextBlockStyle}"
-                       FontSize="16"
-                       Margin="6,0,4,4"
-                       VerticalAlignment="Bottom" />
-
-            <TextBlock x:Uid="ListeningViewTitleCount"
-                       Style="{StaticResource SubtitleTextBlockStyle}"
-                       FontSize="16"
-                       Margin="0,0,4,4"
-                       VerticalAlignment="Bottom" />
-
-            <TextBlock Text="{x:Bind ViewModel.Duration, Converter={StaticResource LongToTimespanConverter}}"
-                       Style="{StaticResource SubtitleTextBlockStyle}"
-                       FontSize="16"
-                       Margin="0,0,4,4"
-                       VerticalAlignment="Bottom" />
+        <StackPanel Orientation="Horizontal" Margin="4,6,0,6">
+            <SymbolIcon Symbol="MusicInfo" Margin="4,0,4,0" />
+            <TextBlock x:Uid="ListeningViewTitle" x:Name="title" Style="{StaticResource HeaderStyle}" />
+            <TextBlock Text="{x:Bind ViewModel.TrackCount}" Style="{StaticResource SubtitleTextBlockStyle}" FontSize="{StaticResource FontSizeXMedium}" Margin="6,0,4,4" VerticalAlignment="Bottom" />
+            <TextBlock x:Uid="ListeningViewTitleCount" Style="{StaticResource SubtitleTextBlockStyle}" FontSize="{StaticResource FontSizeXMedium}" Margin="0,0,4,4" VerticalAlignment="Bottom" />
+            <TextBlock Text="{x:Bind ViewModel.Duration, Converter={StaticResource LongToTimespanConverter}}" Style="{StaticResource SubtitleTextBlockStyle}" FontSize="{StaticResource FontSizeXMedium}" Margin="0,0,4,4" VerticalAlignment="Bottom" />
         </StackPanel>
 
-        <Line Stretch="Fill"
-              Stroke="{StaticResource AppBarSeparatorForegroundThemeBrush}"
-              VerticalAlignment="Bottom"
-              X2="100"></Line>
+        <Line Stretch="Fill" Stroke="{StaticResource AppBarSeparatorForegroundThemeBrush}" VerticalAlignment="Bottom" X2="100"></Line>
 
         <!-- Header -->
         <Grid Grid.Row="1" Padding="2">
 
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="100"
-                                  x:Name="pictureColumn"></ColumnDefinition>
+                <ColumnDefinition x:Name="pictureColumn" Width="100" />
                 <ColumnDefinition Width="*"></ColumnDefinition>
             </Grid.ColumnDefinitions>
 
-            <Grid Margin="6"
-                  Padding="0"
-                  CornerRadius="10">
-                <common:PictureControl x:Name="artistPicture" Height="100" Width="100"
-                                       Cover="{x:Bind ViewModel.Artist.Picture, Mode=OneWay}"
-                                       Style="{StaticResource HeaderPictureStyle}" />
+            <Grid Margin="6" Padding="0" CornerRadius="{StaticResource CornerRadiusMediumValue}">
+                <common:PictureControl x:Name="artistPicture" Height="100" Width="100" Cover="{x:Bind ViewModel.Artist.Picture, Mode=OneWay}" Style="{StaticResource HeaderPictureStyle}" />
                 <common:AnimatedButton Grid.Row="1"
                                        Grid.Column="1"
                                        HorizontalAlignment="Right"
@@ -94,22 +56,12 @@
                                        Command="{x:Bind ViewModel.Artist.ArtistFavoriteCommand}"
                                        CommandParameter="{x:Bind ViewModel.Artist.IsFavorite, Converter={StaticResource BoolToInvertBoolConverter}, Mode=OneWay}" />
 
-                <Button x:Uid="selectPicture"
-                        Style="{StaticResource HeaderPictureSelectButtonStyle}"
-                        Command="{x:Bind ViewModel.Artist.SelectPictureCommand}" />
+                <Button x:Uid="selectPicture" Style="{StaticResource HeaderPictureSelectButtonStyle}" Command="{x:Bind ViewModel.Artist.SelectPictureCommand}" />
             </Grid>
 
-            <RelativePanel Grid.Column="1"
-                           Margin="6,0,0,0">
+            <RelativePanel Grid.Column="1" Margin="6,0,0,0">
 
-                <HyperlinkButton x:Name="artistName"
-                                 Content="{x:Bind ViewModel.CurrentTrack.ArtistName, Mode=OneWay}"
-                                 Command="{x:Bind ViewModel.ArtistOpenCommand}"
-                                 FontSize="{StaticResource TitleTextBlockFontSize}"
-                                 FontWeight="Bold"                                 
-                                 Padding="0"
-                                 Margin="0"
-                                 Style="{StaticResource HeaderHyperlinkStyle}" />
+                <HyperlinkButton x:Name="artistName" Content="{x:Bind ViewModel.CurrentTrack.ArtistName, Mode=OneWay}" Command="{x:Bind ViewModel.ArtistOpenCommand}" FontSize="{StaticResource TitleTextBlockFontSize}" FontWeight="Bold" Padding="0" Margin="0" Style="{StaticResource HeaderHyperlinkStyle}" />
 
                 <Button x:Name="buttonCountry"
                         RelativePanel.RightOf="artistName"
@@ -327,7 +279,7 @@
                 <RowDefinition />
             </Grid.RowDefinitions>
 
-            <Grid Style="{StaticResource gridTracks}">
+            <Grid Style="{StaticResource HeaderTracksGridStyle}">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="38" />
                     <ColumnDefinition Width="{StaticResource GridHeaderTracksTitleColumnWidth}"
@@ -344,19 +296,19 @@
 
                 <TextBlock x:Uid="gridHeaderTitle"
                            Grid.Column="1"
-                           Style="{StaticResource gridHeaderTracksText}" />
+                           Style="{StaticResource GridHeaderTracksTextBlockStyle}" />
                 <TextBlock x:Uid="gridHeaderArtist"
                            Grid.Column="2"
-                           Style="{StaticResource gridHeaderTracksText}" />
+                           Style="{StaticResource GridHeaderTracksTextBlockStyle}" />
                 <TextBlock x:Uid="gridHeaderAlbum"
                            Grid.Column="3"
-                           Style="{StaticResource gridHeaderTracksText}" />
+                           Style="{StaticResource GridHeaderTracksTextBlockStyle}" />
                 <TextBlock x:Uid="gridHeaderGenre"
                            Grid.Column="4"
-                           Style="{StaticResource gridHeaderTracksText}" />
+                           Style="{StaticResource GridHeaderTracksTextBlockStyle}" />
                 <TextBlock x:Uid="gridHeaderScore"
                            Grid.Column="5"
-                           Style="{StaticResource gridHeaderTracksText}" />
+                           Style="{StaticResource GridHeaderTracksTextBlockStyle}" />
             </Grid>
 
             <common:ListViewExtended x:Name="tracksList"

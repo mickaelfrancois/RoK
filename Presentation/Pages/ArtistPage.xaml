@@ -87,7 +87,7 @@
 
 
         <!-- Content -->
-        <Border Grid.Row="1" Style="{StaticResource FileGridStyle}">
+        <Grid Grid.Row="1" Style="{StaticResource FileGridStyle}">
             <Pivot>
                 <!-- Albums -->
                 <PivotItem x:Uid="artistViewTabAlbums">
@@ -95,7 +95,7 @@
                         <GridView.ItemTemplate>
                             <DataTemplate x:DataType="albums:AlbumViewModel">
                                 <Grid Style="{StaticResource MainGridCoverStyle}">
-                                    <Border CornerRadius="10" Background="{x:Bind DominantColor, Converter={StaticResource ColorToGradientBrushConverter}, Mode=OneWay}">
+                                    <Border CornerRadius="{StaticResource CornerRadiusMediumValue}">
                                         <common:PictureControl Style="{StaticResource PictureCoverStyle}" Cover="{x:Bind Picture, Mode=OneWay}" x:Phase="2" PlayButtonVisibility="Visible" Command="{x:Bind ListenCommand}" />
                                     </Border>
 
@@ -137,7 +137,7 @@
                         </Grid.RowDefinitions>
 
                         <!-- Grid headers -->
-                        <Grid Style="{StaticResource gridTracks}">
+                        <Grid Style="{StaticResource HeaderTracksGridStyle}">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="{StaticResource GridHeaderTracksTitleColumnWidth}" />
                                 <ColumnDefinition Width="{StaticResource GridHeaderTracksAlbumColumnWidth}" />
@@ -161,21 +161,14 @@
 
                                         <Grid.ContextFlyout>
                                             <MenuFlyout ShowMode="TransientWithDismissOnPointerMoveAway" common:MenuFlyoutExtensions.PlaylistMenuService="{x:Bind PlaylistMenuService}" common:MenuFlyoutExtensions.TrackId="{x:Bind Track.Id}">
-                                                <MenuFlyoutItem x:Uid="trackFlyoutListen" Command="{x:Bind ListenCommand}" CommandParameter="{x:Bind}">
+                                                <MenuFlyoutItem x:Uid="trackFlyoutListen" Icon="Play" Command="{x:Bind ListenCommand}" CommandParameter="{x:Bind}" />
+                                                <MenuFlyoutItem x:Uid="trackFlyoutArtist" Icon="People" Command="{x:Bind ArtistOpenCommand}" Visibility="Collapsed" />
+                                                <MenuFlyoutItem x:Uid="trackFlyoutAlbum" Command="{x:Bind AlbumOpenCommand}" >
                                                     <MenuFlyoutItem.Icon>
-                                                        <IconSourceElement IconSource="{StaticResource IconPlay}" />
+                                                        <FontIcon Glyph="&#xe93c;" />
                                                     </MenuFlyoutItem.Icon>
                                                 </MenuFlyoutItem>
-                                                <MenuFlyoutItem x:Uid="trackFlyoutArtist" Command="{x:Bind ArtistOpenCommand}">
-                                                    <MenuFlyoutItem.Icon>
-                                                        <IconSourceElement IconSource="{StaticResource IconPeople}" />
-                                                    </MenuFlyoutItem.Icon>
-                                                </MenuFlyoutItem>
-                                                <MenuFlyoutItem x:Uid="trackFlyoutTrack" Command="{x:Bind TrackOpenCommand}">
-                                                    <MenuFlyoutItem.Icon>
-                                                        <IconSourceElement IconSource="{StaticResource IconAudio}" />
-                                                    </MenuFlyoutItem.Icon>
-                                                </MenuFlyoutItem>
+                                                <MenuFlyoutItem x:Uid="trackFlyoutTrack" Icon="Audio" Command="{x:Bind TrackOpenCommand}"/>
                                                 <MenuFlyoutSeparator />
                                                 <MenuFlyoutItem x:Uid="trackFlyoutLyrics" Command="{x:Bind LyricsOpenCommand}" Visibility="{x:Bind LyricsExists, Converter={StaticResource BoolToVisibilityConverter}}">
                                                     <MenuFlyoutItem.Icon>
@@ -184,14 +177,14 @@
                                                 </MenuFlyoutItem>
                                             </MenuFlyout>
                                         </Grid.ContextFlyout>
-
+                                        
                                         <StackPanel Grid.Column="0" Orientation="Horizontal">
                                             <TextBlock x:Name="RowIndexText" Style="{StaticResource GridTracksRowIndexTextBlockStyle}" />
                                             <HyperlinkButton Style="{StaticResource GridTracksTitleHyperlinkButtonStyle}" Command="{x:Bind ListenCommand}" CommandParameter="{x:Bind}" />
                                             <HyperlinkButton x:Uid="lyricsTag" Visibility="{x:Bind LyricsExists, Converter={StaticResource BoolToVisibilityConverter}}" Style="{StaticResource GridTracksLyricsHyperlinkButtonStyle}" Command="{x:Bind LyricsOpenCommand}" />
                                         </StackPanel>
 
-                                        <HyperlinkButton Grid.Column="1" Style="{StaticResource GridTracksArtistHyperlinkButtonStyle}" Command="{x:Bind AlbumOpenCommand}" />
+                                        <HyperlinkButton Grid.Column="1" Style="{StaticResource GridTracksArtistHyperlinkButtonStyle}" Command="{x:Bind ArtistOpenCommand}" />
                                         <common:RatingControlLightControl Grid.Column="2" Style="{StaticResource GridTracksScoreStyle}" RatingValue="{x:Bind Score, Mode=TwoWay}" />
                                     </Grid>
                                 </DataTemplate>
@@ -200,6 +193,6 @@
                     </Grid>
                 </PivotItem>
             </Pivot>
-        </Border>
+        </Grid>
     </Grid>
 </Page>

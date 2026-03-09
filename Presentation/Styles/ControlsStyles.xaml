@@ -168,13 +168,6 @@
 
 
 
-    <Style x:Key="HeaderPictureStyle" TargetType="common:PictureControl">
-        <Setter Property="Margin" Value="0"/>
-        <Setter Property="Padding" Value="0"/>
-        <Setter Property="VerticalAlignment" Value="Center"/>
-        <Setter Property="HorizontalAlignment" Value="Center"/>
-        <Setter Property="Icon" Value="&#xE8D4;"/>
-    </Style>
 
 
 
