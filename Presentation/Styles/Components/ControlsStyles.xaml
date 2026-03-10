@@ -880,6 +880,12 @@
         <Setter Property="BorderBrush" Value="{ThemeResource BrandAccentBrush}" />
     </Style>
 
+    <Style x:Key="InlineSearchStyle" TargetType="AutoSuggestBox" BasedOn="{StaticResource DefaultAutoSuggestBoxStyle}">
+        <Setter Property="Width" Value="150"/>
+        <Setter Property="VerticalAlignment" Value="Center"/>
+        <Setter Property="CornerRadius" Value="{StaticResource CornerRadiusSmallValue}" />
+    </Style>
+    
     <Style x:Key="ListModeGridViewItemStyle" TargetType="GridViewItem">
         <Setter Property="HorizontalContentAlignment" Value="Stretch" />
         <Setter Property="Margin" Value="0,0,0,1" />

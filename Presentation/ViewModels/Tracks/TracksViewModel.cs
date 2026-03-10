@@ -36,6 +36,10 @@ public partial class TracksViewModel : ObservableObject, IDisposable
     public double DurationText => TimeSpan.FromSeconds(_filteredTracks.Sum(track => track.Track.Duration)).TotalHours;
 
     [ObservableProperty]
+    public partial string SearchText { get; set; }
+    partial void OnSearchTextChanged(string value) => FilterAndSort();
+
+    [ObservableProperty]
     public partial string FilterByText { get; set; } = string.Empty;
 
     [ObservableProperty]
@@ -175,8 +179,31 @@ public partial class TracksViewModel : ObservableObject, IDisposable
         TrackProviderResult result = _trackProvider.GetProcessedData(_stateManager.GroupBy, _stateManager.SelectedFilters, _stateManager.SelectedGenreFilters);
 
         _filteredTracks = result.FilteredItems;
-        GroupedItems.InitWithAddRange(result.Groups);
-        IsGroupingEnabled = result.IsGroupingEnabled;
+
+        List<TracksGroupCategoryViewModel> groups = result.Groups.ToList();
+
+        if (!string.IsNullOrWhiteSpace(SearchText))
+        {
+            _filteredTracks = _filteredTracks
+                .Where(a => a.Title.Contains(SearchText, StringComparison.OrdinalIgnoreCase) ||
+                            a.ArtistName.Contains(SearchText, StringComparison.OrdinalIgnoreCase))
+                .ToList();
+
+            groups = groups
+                .Select(g => new TracksGroupCategoryViewModel
+                {
+                    Title = g.Title,
+                    Items = g.Items
+                        .Where(a => a.Title.Contains(SearchText, StringComparison.OrdinalIgnoreCase) ||
+                                    a.ArtistName.Contains(SearchText, StringComparison.OrdinalIgnoreCase))
+                        .ToList()
+                })
+                .Where(g => g.Items.Count > 0)
+                .ToList();
+        }
+
+        GroupedItems.InitWithAddRange(groups);
+        IsGroupingEnabled = groups.Count > 1 || !string.IsNullOrEmpty(groups.FirstOrDefault()?.Title ?? string.Empty);
 
         OnPropertyChanged(nameof(Count));
         OnPropertyChanged(nameof(DurationText));
