@@ -54,6 +54,7 @@
                         </SplitButton.Flyout>
                     </SplitButton>
 
+                    <AutoSuggestBox x:Uid="inlineListSearch" QueryIcon="Find" Style="{StaticResource InlineSearchStyle}" Text="{x:Bind ViewModel.SearchText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                     <AppBarSeparator />
 
                     <!-- Info about albums count and duration -->

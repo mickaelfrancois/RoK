@@ -1188,4 +1188,7 @@
   <data name="OptionsPauseOnCall.Header" xml:space="preserve">
     <value>Pause when receiving a call</value>
   </data>
+  <data name="inlineListSearch.PlaceholderText" xml:space="preserve">
+    <value>Search</value>
+  </data>
 </root>

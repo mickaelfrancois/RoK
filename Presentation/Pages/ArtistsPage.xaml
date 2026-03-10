@@ -107,7 +107,7 @@
                     </StackPanel>
 
                     <Grid Height="20">
-                        <TextBlock Text="{x:Bind SubTitle, Mode=OneWay}" Style="{StaticResource ListCoverBottomSecondLineStyle}" VerticalAlignment="Center" />
+                        <TextBlock x:Name="subTitle" Text="{x:Bind SubTitle, Mode=OneWay}" Style="{StaticResource ListCoverBottomSecondLineStyle}" VerticalAlignment="Center" />
                         <HyperlinkButton x:Name="genreName" Content="{x:Bind Artist.GenreName, Mode=OneWay}" Command="{x:Bind GenreOpenCommand}" Style="{StaticResource HyperlinkSmallButtonStyle}" Margin="4,0,0,0" FontSize="{StaticResource FontSizeSmall}" Opacity="0" VerticalAlignment="Center" Padding="0" />
                     </Grid>
                 </StackPanel>
@@ -166,14 +166,11 @@
                         </SplitButton.Flyout>
                     </SplitButton>
 
+                    <AutoSuggestBox x:Uid="inlineListSearch" QueryIcon="Find" Style="{StaticResource InlineSearchStyle}" Text="{x:Bind ViewModel.SearchText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                    <AppBarSeparator />
+                    <AppBarButton x:Name="gridListModeButton" Style="{StaticResource AppBarButtonCompactStyle}" Icon="{x:Bind ViewModel.IsGridView, Mode=OneWay, Converter={StaticResource GridListIconConverter}}" Command="{x:Bind ViewModel.ToggleDisplayModeCommand}" />
                     <AppBarSeparator />
 
-                    <AppBarButton x:Name="gridListModeButton" Style="{StaticResource AppBarButtonCompactStyle}"
-                                  Icon="{x:Bind ViewModel.IsGridView, Mode=OneWay, Converter={StaticResource GridListIconConverter}}"                                                                                                 
-                                  Command="{x:Bind ViewModel.ToggleDisplayModeCommand}" />
-
-                    <AppBarSeparator />
-                    
                     <!-- Info about albums count and duration -->
                     <StackPanel Style="{StaticResource CommandBarStatInfoPanelStyle}" Margin="12,0,0,0">
                         <FontIcon Glyph="&#xE93C;" Style="{StaticResource CommandBarStatInfoIconStyle}" />

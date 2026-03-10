@@ -52,6 +52,10 @@ public partial class ArtistsViewModel : ObservableObject, IDisposable
     }
 
     [ObservableProperty]
+    public partial string SearchText { get; set; }
+    partial void OnSearchTextChanged(string value) => FilterAndSort();
+
+    [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(GroupById))]
     [NotifyPropertyChangedFor(nameof(GroupByText))]
     public partial string SelectedGroupBy { get; set; } = string.Empty;
@@ -215,11 +219,32 @@ public partial class ArtistsViewModel : ObservableObject, IDisposable
         ArtistProviderResult result = _artistProvider.GetProcessedData(_stateManager.GroupBy, _stateManager.SelectedFilters, _stateManager.SelectedGenreFilters, _stateManager.SelectedTagFilters);
 
         _filteredArtists = result.FilteredItems;
+        List<ArtistsGroupCategoryViewModel> groups = result.Groups.ToList();
+
+        if (!string.IsNullOrWhiteSpace(SearchText))
+        {
+            _filteredArtists = _filteredArtists
+                .Where(a => a.Artist.Name.Contains(SearchText, StringComparison.OrdinalIgnoreCase) ||
+                            a.Artist.GenreName.Contains(SearchText, StringComparison.OrdinalIgnoreCase))
+                .ToList();
+
+            groups = groups
+                .Select(g => new ArtistsGroupCategoryViewModel
+                {
+                    Title = g.Title,
+                    Items = g.Items
+                        .Where(a => a.Artist.Name.Contains(SearchText, StringComparison.OrdinalIgnoreCase) ||
+                                    a.Artist.GenreName.Contains(SearchText, StringComparison.OrdinalIgnoreCase))
+                        .ToList()
+                })
+                .Where(g => g.Items.Count > 0)
+                .ToList();
+        }
 
         ApplyNewBadge();
 
-        GroupedItems.InitWithAddRange(result.Groups);
-        IsGroupingEnabled = result.IsGroupingEnabled;
+        GroupedItems.InitWithAddRange(groups);
+        IsGroupingEnabled = groups.Count > 1 || !string.IsNullOrEmpty(groups.FirstOrDefault()?.Title ?? string.Empty);
 
         OnPropertyChanged(nameof(Count));
         OnPropertyChanged(nameof(DurationText));
