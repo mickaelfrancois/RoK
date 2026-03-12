@@ -1,9 +1,11 @@
 ﻿using System.IO;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Windows.AppLifecycle;
 using Rok.Application.Options;
 using Rok.Import;
 using Rok.Infrastructure;
 using Serilog;
+using Windows.ApplicationModel.Activation;
 using Windows.Storage;
 using Windows.Storage.AccessCache;
 using WinRT.Interop;
@@ -68,6 +70,27 @@ public partial class App : Microsoft.UI.Xaml.Application
 #endif
 
         ThemeManager.Initialize(options.Theme, MainWindow);
+
+        AppInstance.GetCurrent().Activated += OnInstanceActivated;
+
+        if (!string.IsNullOrWhiteSpace(args.Arguments))
+            HandleCliCommand(args.Arguments);
+    }
+
+
+    private void OnInstanceActivated(object? sender, AppActivationArguments args)
+    {
+        if (args.Kind != ExtendedActivationKind.Launch)
+            return;
+
+        if (args.Data is ILaunchActivatedEventArgs launchArgs)
+            HandleCliCommand(launchArgs.Arguments);
+    }
+
+    private void HandleCliCommand(string? arguments)
+    {
+        IPlayerCommandHandler handler = ServiceProvider.GetRequiredService<IPlayerCommandHandler>();
+        MainWindow?.DispatcherQueue.TryEnqueue(() => handler.Handle(arguments));
     }
 
 
