@@ -50,6 +50,7 @@ public static class DependencyInjection
         services.AddSingleton<IPlaylistMenuService, PlaylistMenuService>();
         services.AddSingleton<IFolderResolver, FolderResolver>();
         services.AddSingleton<IBackdropLoader, BackdropLoader>();
+        services.AddSingleton<IPlayerCommandHandler, PlayerCommandHandler>();
 
         services.AddSingleton<TagsProvider>();
 

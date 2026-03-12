@@ -16,6 +16,7 @@
 		<WindowsAppSDKSelfContained>true</WindowsAppSDKSelfContained>
 	    <UserSecretsId>d0581b7b-fae8-471b-96ec-491f08740dcb</UserSecretsId>
 		<LangVersion>preview</LangVersion>
+		<DefineConstants>$(DefineConstants);DISABLE_XAML_GENERATED_MAIN</DefineConstants>
   </PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)'=='Debug'">
@@ -29,6 +30,20 @@
 		<DebugSymbols>true</DebugSymbols>
 		<PathMap>$(MSBuildProjectDirectory)=.</PathMap>
 	</PropertyGroup>
+
+	<Target Name="SelectConditionalManifest" BeforeTargets="PrepareForBuild;GetAppxPackageInputs">
+		<ItemGroup>
+			<AppxManifest Remove="@(AppxManifest)" />
+			<AppxManifest Remove="Package.appxmanifest" />
+			<AppxManifest Remove="Package.Debug.appxmanifest" />
+		</ItemGroup>
+		<ItemGroup Condition="'$(Configuration)' == 'Debug'">
+			<AppxManifest Include="Package.Debug.appxmanifest" />
+		</ItemGroup>
+		<ItemGroup Condition="'$(Configuration)' != 'Debug'">
+			<AppxManifest Include="Package.appxmanifest" />
+		</ItemGroup>
+	</Target>
 
 	<ItemGroup>
 		<None Remove="Assets\BadgeLogo.scale-100.png" />

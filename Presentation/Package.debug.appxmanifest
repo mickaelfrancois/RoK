@@ -8,12 +8,12 @@
          IgnorableNamespaces="uap rescap uap3 desktop">
 
 	<Identity
-	  Name="Rokapp.Rokmusicplayer"
+	  Name="dev-Rokapp.Rokmusicplayer"
 	  Publisher="CN=C9A55691-54ED-46EA-9D4F-F3CD41C04242"
 	  Version="1.6.1.0" />
 
 	<Properties>
-		<DisplayName>Rok musicplayer</DisplayName>
+		<DisplayName>Rok musicplayer (dev)</DisplayName>
 		<PublisherDisplayName>Rok app</PublisherDisplayName>
 		<Logo>Assets\StoreLogo.png</Logo>
 	</Properties>
@@ -51,7 +51,7 @@
 			<Extensions>
 				<uap3:Extension Category="windows.appExecutionAlias">
 					<uap3:AppExecutionAlias>
-						<desktop:ExecutionAlias Alias="rok.exe" />
+						<desktop:ExecutionAlias Alias="rok-debug.exe" />
 					</uap3:AppExecutionAlias>
 				</uap3:Extension>
 			</Extensions>
