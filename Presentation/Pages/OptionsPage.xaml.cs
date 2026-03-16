@@ -190,6 +190,19 @@ public sealed partial class OptionsPage : Page
         Uri uri = new("https://www.buymeacoffee.com/mickaelfrancois");
         _ = Windows.System.Launcher.LaunchUriAsync(uri);
     }
+
+
+    private async void TestEndpoint_Click(object sender, RoutedEventArgs e)
+    {
+        if (sender is not Button button)
+            return;
+
+        string endpoint = button.Tag?.ToString() ?? string.Empty;
+        string url = $"http://localhost:{Options.WebApiPort}{endpoint}";
+
+        Uri uri = new(url);
+        await Windows.System.Launcher.LaunchUriAsync(uri);
+    }
 }
 
 public class PathItem(string key, string value)

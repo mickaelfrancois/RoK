@@ -12,6 +12,10 @@ public interface IAppOptions
 
     int ArtistRecentThresholdDays { get; set; }
 
+    int WebApiPort { get; set; }
+
+    bool EnableWebApi { get; set; }
+
     List<string> LibraryTokens { get; set; }
 
     bool CrossFade { get; set; }

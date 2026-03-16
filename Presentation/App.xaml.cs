@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Windows.AppLifecycle;
 using Rok.Application.Options;
+using Rok.Application.Player;
 using Rok.Import;
 using Rok.Infrastructure;
 using Serilog;
@@ -75,6 +76,9 @@ public partial class App : Microsoft.UI.Xaml.Application
 
         if (!string.IsNullOrWhiteSpace(args.Arguments))
             HandleCliCommand(args.Arguments);
+
+        if (options.EnableWebApi)
+            ServiceProvider.GetRequiredService<PlayerWebApiService>().Start();
     }
 
 
@@ -140,6 +144,12 @@ public partial class App : Microsoft.UI.Xaml.Application
         services.AddLogger(ApplicationData.Current.LocalFolder.Path);
         services.AddLogic();
 
+        services.AddSingleton<PlayerWebApiService>(sp => new PlayerWebApiService(
+            sp.GetRequiredService<IPlayerService>(),
+            sp.GetRequiredService<IAppOptions>(),
+            action => MainWindow.DispatcherQueue.TryEnqueue(() => action()),
+            sp.GetRequiredService<ILogger<PlayerWebApiService>>()));
+
         return services.BuildServiceProvider();
     }
 
@@ -186,6 +196,8 @@ public partial class App : Microsoft.UI.Xaml.Application
         ISettingsFile settingFileService = ServiceProvider.GetRequiredService<ISettingsFile>();
 
         await settingFileService.SaveAsync(options);
+
+        ServiceProvider.GetRequiredService<PlayerWebApiService>().Stop();
 
         await Log.CloseAndFlushAsync();
     }
