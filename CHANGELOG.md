@@ -1,5 +1,20 @@
 ﻿# ChangeLog
 
+## [1.7.0] Preview – 16 mars 2026  
+
+### Ajouté
+
+- Ajout d'une API permettant de contrôler la lecture à partir d'autres applications.
+- Ajout de la possibilité de contrôler la lecture à partir de la ligne de comande.
+- Ajout d'une recherche dans la page des albums, artistes et chansons.
+
+### Modifié  
+
+- Refonte du design system.
+
+### Corrigé
+
+
 ## [1.6.0] StoreRelease – 09 mars 2026  
 
 ### Ajouté
