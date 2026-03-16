@@ -99,7 +99,7 @@
 
                             <StackPanel Spacing="10">
                                 <ToggleSwitch x:Uid="OptionsHideEnableWebApi" Header="Enable Web API" x:Name="HideEnableWebApi" IsOn="{x:Bind Options.EnableWebApi, Mode=TwoWay}" VerticalAlignment="Center" />
-                                <NumberBox x:Uid="OptionsWebApiPort" Header="Web API Port" x:Name="WebApiPort" Value="{x:Bind Options.WebApiPort, Mode=TwoWay}" Minimum="1" Maximum="65535" VerticalAlignment="Center" MaxWidth="150" />
+                                <NumberBox x:Uid="OptionsWebApiPort" Header="Web API Port" x:Name="WebApiPort" Value="{x:Bind Options.WebApiPort, Mode=TwoWay}" Minimum="1" Maximum="65535" VerticalAlignment="Center" HorizontalAlignment="Left" Width="100" MaxWidth="100" />
                             </StackPanel>
 
                             <Line Stroke="{ThemeResource AccentFillColorDefaultBrush}" StrokeThickness="1" X1="0" Y1="0" X2="800" Y2="0" />
