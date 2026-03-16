@@ -45,4 +45,6 @@ public interface IPlayerService
     void Stop(bool firePlaybackStateChange);
 
     void ShuffleTracks();
+
+    List<TrackDto> GetQueue();
 }

@@ -256,6 +256,12 @@ public class PlayerService : IPlayerService
     }
 
 
+    public List<TrackDto> GetQueue()
+    {
+        return Playlist.Skip(_currentIndex + 1).ToList();
+    }
+
+
     public void AddTracksToPlaylist(List<TrackDto> tracks)
     {
         Guard.Against.Null(tracks);

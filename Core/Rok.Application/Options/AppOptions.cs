@@ -14,6 +14,10 @@ public class AppOptions : IAppOptions
 
     public int ArtistRecentThresholdDays { get; set; } = 30;
 
+    public int WebApiPort { get; set; } = 5075;
+
+    public bool EnableWebApi { get; set; } = true;
+
     public List<string> LibraryTokens { get; set; } = [];
 
     public bool CrossFade { get; set; } = true;
@@ -98,6 +102,8 @@ public class AppOptions : IAppOptions
         TelemetryEnabled = options.TelemetryEnabled;
         NovaApiEnabled = options.NovaApiEnabled;
         PauseOnCall = options.PauseOnCall;
+        WebApiPort = options.WebApiPort;
+        EnableWebApi = options.EnableWebApi;
 
         ArtistsGroupBy = options.ArtistsGroupBy;
         ArtistsFilterBy = options.ArtistsFilterBy;

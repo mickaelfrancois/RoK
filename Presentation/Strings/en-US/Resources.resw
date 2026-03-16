@@ -1191,4 +1191,88 @@
   <data name="inlineListSearch.PlaceholderText" xml:space="preserve">
     <value>Search</value>
   </data>
+  <data name="OptionTabCommand.Header" xml:space="preserve">
+    <value>API</value>
+  </data>
+  <data name="CommandTabApiConfigTitle.Text" xml:space="preserve">
+    <value>API Configuration</value>
+  </data>
+  <data name="OptionsHideEnableWebApi.Header" xml:space="preserve">
+    <value>Enable Web API</value>
+  </data>
+  <data name="OptionsWebApiPort.Header" xml:space="preserve">
+    <value>Web API Port</value>
+  </data>
+  <data name="CommandTabApiDocTitle.Text" xml:space="preserve">
+    <value>Web API</value>
+  </data>
+  <data name="CommandTabHeaderMethod.Text" xml:space="preserve">
+    <value>Method</value>
+  </data>
+  <data name="CommandTabHeaderEndpoint.Text" xml:space="preserve">
+    <value>Endpoint</value>
+  </data>
+  <data name="CommandTabHeaderDescription.Text" xml:space="preserve">
+    <value>Description</value>
+  </data>
+  <data name="CommandTabHeaderTest.Text" xml:space="preserve">
+    <value>Test</value>
+  </data>
+  <data name="ApiEndpointStatusDesc.Text" xml:space="preserve">
+    <value>Returns the current playback status (state, volume, position)</value>
+  </data>
+  <data name="ApiEndpointCurrentDesc.Text" xml:space="preserve">
+    <value>Returns information about the current track (title, artist, album, duration)</value>
+  </data>
+  <data name="ApiEndpointQueueDesc.Text" xml:space="preserve">
+    <value>Returns the current playback queue</value>
+  </data>
+  <data name="ApiEndpointPlayDesc.Text" xml:space="preserve">
+    <value>Start or resume playback</value>
+  </data>
+  <data name="ApiEndpointPauseDesc.Text" xml:space="preserve">
+    <value>Pause playback</value>
+  </data>
+  <data name="ApiEndpointStopDesc.Text" xml:space="preserve">
+    <value>Stop playback</value>
+  </data>
+  <data name="ApiEndpointNextDesc.Text" xml:space="preserve">
+    <value>Skip to the next track</value>
+  </data>
+  <data name="ApiEndpointPreviousDesc.Text" xml:space="preserve">
+    <value>Go to the previous track</value>
+  </data>
+  <data name="ApiEndpointVolumeDesc.Text" xml:space="preserve">
+    <value>Set the volume. Value must be between 0 and 100</value>
+  </data>
+  <data name="ApiEndpointMuteDesc.Text" xml:space="preserve">
+    <value>Mute the volume</value>
+  </data>
+  <data name="CommandTabCliTitle.Text" xml:space="preserve">
+    <value>Command Line</value>
+  </data>
+  <data name="CommandTabCliUsage.Text" xml:space="preserve">
+    <value>Usage: rok.exe [command] [argument]</value>
+  </data>
+  <data name="CommandTabHeaderCommand.Text" xml:space="preserve">
+    <value>Command</value>
+  </data>
+  <data name="CommandTabHeaderCommandDescription.Text" xml:space="preserve">
+    <value>Description</value>
+  </data>
+  <data name="CliPlayDesc.Text" xml:space="preserve">
+    <value>Start or resume playback</value>
+  </data>
+  <data name="CliPauseDesc.Text" xml:space="preserve">
+    <value>Pause playback</value>
+  </data>
+  <data name="CliStopDesc.Text" xml:space="preserve">
+    <value>Stop playback</value>
+  </data>
+  <data name="CliNextDesc.Text" xml:space="preserve">
+    <value>Skip to the next track</value>
+  </data>
+  <data name="CliPrevDesc.Text" xml:space="preserve">
+    <value>Go to the previous track</value>
+  </data>
 </root>

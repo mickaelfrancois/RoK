@@ -13,7 +13,6 @@
       x:Name="OptionsView">
 
     <Grid>
-
         <Pivot>
             <PivotItem x:Uid="OptionTabOptions">
                 <Border Background="{ThemeResource CardBackgroundFillColorDefault}" Padding="4" CornerRadius="12" Margin="8">
@@ -88,6 +87,275 @@
                             </ListView.ItemTemplate>
                         </ListView>
                     </StackPanel>
+                </Border>
+            </PivotItem>
+
+            <PivotItem x:Uid="OptionTabCommand">
+                <Border Background="{ThemeResource CardBackgroundFillColorDefault}" Padding="4" CornerRadius="12" Margin="8">
+                    <ScrollViewer VerticalScrollBarVisibility="Auto">
+                        <StackPanel Spacing="16" Margin="6,12,12,12">
+
+                            <TextBlock x:Uid="CommandTabApiConfigTitle" Text="API Configuration" FontWeight="SemiBold" FontSize="14" />
+
+                            <StackPanel Spacing="10">
+                                <ToggleSwitch x:Uid="OptionsHideEnableWebApi" Header="Enable Web API" x:Name="HideEnableWebApi" IsOn="{x:Bind Options.EnableWebApi, Mode=TwoWay}" VerticalAlignment="Center" />
+                                <NumberBox x:Uid="OptionsWebApiPort" Header="Web API Port" x:Name="WebApiPort" Value="{x:Bind Options.WebApiPort, Mode=TwoWay}" Minimum="1" Maximum="65535" VerticalAlignment="Center" MaxWidth="150" />
+                            </StackPanel>
+
+                            <Line Stroke="{ThemeResource AccentFillColorDefaultBrush}" StrokeThickness="1" X1="0" Y1="0" X2="800" Y2="0" />
+
+                            <!-- Web API documentation -->
+                            <StackPanel Spacing="10">
+                                <TextBlock x:Uid="CommandTabApiDocTitle" Text="Web API" FontWeight="SemiBold" FontSize="14" />
+                                <TextBlock x:Uid="CommandTabApiDocBaseUrl" Text="Base URL: http://localhost:{port}/api" FontFamily="Consolas" FontSize="12" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+
+                                <Border Background="{ThemeResource ContentDialogBackground}" CornerRadius="8" Padding="12,8">
+                                    <StackPanel Spacing="0">
+
+                                        <!-- Header row -->
+                                        <Grid Margin="0,0,0,6">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="56" />
+                                                <ColumnDefinition Width="210" />
+                                                <ColumnDefinition Width="*" />
+                                                <ColumnDefinition Width="120" />
+                                            </Grid.ColumnDefinitions>
+                                            <TextBlock Grid.Column="0" x:Uid="CommandTabHeaderMethod" Text="Method" FontWeight="SemiBold" FontSize="11" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                                            <TextBlock Grid.Column="1" x:Uid="CommandTabHeaderEndpoint" Text="Endpoint" FontWeight="SemiBold" FontSize="11" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                                            <TextBlock Grid.Column="2" x:Uid="CommandTabHeaderDescription" Text="Description" FontWeight="SemiBold" FontSize="11" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                                            <TextBlock Grid.Column="3" x:Uid="CommandTabHeaderTest" Text="Test" FontWeight="SemiBold" FontSize="11" Foreground="{ThemeResource TextFillColorSecondaryBrush}" HorizontalAlignment="Center" />
+                                        </Grid>
+
+                                        <Line Stroke="{ThemeResource DividerStrokeColorDefaultBrush}" StrokeThickness="1" X1="0" Y1="0" X2="700" Y2="0" Margin="0,0,0,6" />
+
+                                        <!-- /api/status -->
+                                        <Grid Margin="0,4">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="56" />
+                                                <ColumnDefinition Width="210" />
+                                                <ColumnDefinition Width="*" />
+                                                <ColumnDefinition Width="120" />
+                                            </Grid.ColumnDefinitions>
+                                            <TextBlock Grid.Column="0" Text="GET" FontFamily="Consolas" FontSize="12" FontWeight="SemiBold" Foreground="{ThemeResource AccentFillColorDefaultBrush}" VerticalAlignment="Center" />
+                                            <TextBlock Grid.Column="1" Text="/status" FontFamily="Consolas" FontSize="12" VerticalAlignment="Center" />
+                                            <TextBlock Grid.Column="2" x:Uid="ApiEndpointStatusDesc" Text="Returns the current playback status (state, volume, position)" FontSize="12" VerticalAlignment="Center" TextWrapping="Wrap" />
+                                            <Button Grid.Column="3" Tag="/status" Click="TestEndpoint_Click" Content="▶ Test" FontSize="11" Padding="8,3" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                        </Grid>
+
+                                        <!-- /api/current -->
+                                        <Grid Margin="0,4">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="56" />
+                                                <ColumnDefinition Width="210" />
+                                                <ColumnDefinition Width="*" />
+                                                <ColumnDefinition Width="120" />
+                                            </Grid.ColumnDefinitions>
+                                            <TextBlock Grid.Column="0" Text="GET" FontFamily="Consolas" FontSize="12" FontWeight="SemiBold" Foreground="{ThemeResource AccentFillColorDefaultBrush}" VerticalAlignment="Center" />
+                                            <TextBlock Grid.Column="1" Text="/current" FontFamily="Consolas" FontSize="12" VerticalAlignment="Center" />
+                                            <TextBlock Grid.Column="2" x:Uid="ApiEndpointCurrentDesc" Text="Returns information about the current track (title, artist, album, duration)" FontSize="12" VerticalAlignment="Center" TextWrapping="Wrap" />
+                                            <Button Grid.Column="3" Tag="/current" Click="TestEndpoint_Click" Content="▶ Test" FontSize="11" Padding="8,3" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                        </Grid>
+
+                                        <!-- /api/queue -->
+                                        <Grid Margin="0,4">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="56" />
+                                                <ColumnDefinition Width="210" />
+                                                <ColumnDefinition Width="*" />
+                                                <ColumnDefinition Width="120" />
+                                            </Grid.ColumnDefinitions>
+                                            <TextBlock Grid.Column="0" Text="GET" FontFamily="Consolas" FontSize="12" FontWeight="SemiBold" Foreground="{ThemeResource AccentFillColorDefaultBrush}" VerticalAlignment="Center" />
+                                            <TextBlock Grid.Column="1" Text="/queue" FontFamily="Consolas" FontSize="12" VerticalAlignment="Center" />
+                                            <TextBlock Grid.Column="2" x:Uid="ApiEndpointQueueDesc" Text="Returns the current playback queue" FontSize="12" VerticalAlignment="Center" TextWrapping="Wrap" />
+                                            <Button Grid.Column="3" Tag="/queue" Click="TestEndpoint_Click" Content="▶ Test" FontSize="11" Padding="8,3" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                        </Grid>
+
+                                        <!-- /api/play -->
+                                        <Grid Margin="0,4">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="56" />
+                                                <ColumnDefinition Width="210" />
+                                                <ColumnDefinition Width="*" />
+                                                <ColumnDefinition Width="120" />
+                                            </Grid.ColumnDefinitions>
+                                            <TextBlock Grid.Column="0" Text="GET" FontFamily="Consolas" FontSize="12" FontWeight="SemiBold" Foreground="{ThemeResource SystemFillColorSuccessBrush}" VerticalAlignment="Center" />
+                                            <TextBlock Grid.Column="1" Text="/play" FontFamily="Consolas" FontSize="12" VerticalAlignment="Center" />
+                                            <TextBlock Grid.Column="2" x:Uid="ApiEndpointPlayDesc" Text="Start or resume playback" FontSize="12" VerticalAlignment="Center" TextWrapping="Wrap" />
+                                            <Button Grid.Column="3" Tag="/play" Click="TestEndpoint_Click" Content="▶ Test" FontSize="11" Padding="8,3" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                        </Grid>
+
+                                        <!-- /api/pause -->
+                                        <Grid Margin="0,4">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="56" />
+                                                <ColumnDefinition Width="210" />
+                                                <ColumnDefinition Width="*" />
+                                                <ColumnDefinition Width="120" />
+                                            </Grid.ColumnDefinitions>
+                                            <TextBlock Grid.Column="0" Text="GET" FontFamily="Consolas" FontSize="12" FontWeight="SemiBold" Foreground="{ThemeResource SystemFillColorSuccessBrush}" VerticalAlignment="Center" />
+                                            <TextBlock Grid.Column="1" Text="/pause" FontFamily="Consolas" FontSize="12" VerticalAlignment="Center" />
+                                            <TextBlock Grid.Column="2" x:Uid="ApiEndpointPauseDesc" Text="Pause playback" FontSize="12" VerticalAlignment="Center" TextWrapping="Wrap" />
+                                            <Button Grid.Column="3" Tag="/pause" Click="TestEndpoint_Click" Content="▶ Test" FontSize="11" Padding="8,3" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                        </Grid>
+
+                                        <!-- /api/stop -->
+                                        <Grid Margin="0,4">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="56" />
+                                                <ColumnDefinition Width="210" />
+                                                <ColumnDefinition Width="*" />
+                                                <ColumnDefinition Width="120" />
+                                            </Grid.ColumnDefinitions>
+                                            <TextBlock Grid.Column="0" Text="GET" FontFamily="Consolas" FontSize="12" FontWeight="SemiBold" Foreground="{ThemeResource SystemFillColorSuccessBrush}" VerticalAlignment="Center" />
+                                            <TextBlock Grid.Column="1" Text="/stop" FontFamily="Consolas" FontSize="12" VerticalAlignment="Center" />
+                                            <TextBlock Grid.Column="2" x:Uid="ApiEndpointStopDesc" Text="Stop playback" FontSize="12" VerticalAlignment="Center" TextWrapping="Wrap" />
+                                            <Button Grid.Column="3" Tag="/stop" Click="TestEndpoint_Click" Content="▶ Test" FontSize="11" Padding="8,3" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                        </Grid>
+
+                                        <!-- /api/toggle -->
+                                        <Grid Margin="0,4">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="56" />
+                                                <ColumnDefinition Width="210" />
+                                                <ColumnDefinition Width="*" />
+                                                <ColumnDefinition Width="120" />
+                                            </Grid.ColumnDefinitions>
+                                            <TextBlock Grid.Column="0" Text="GET" FontFamily="Consolas" FontSize="12" FontWeight="SemiBold" Foreground="{ThemeResource SystemFillColorSuccessBrush}" VerticalAlignment="Center" />
+                                            <TextBlock Grid.Column="1" Text="/toggle" FontFamily="Consolas" FontSize="12" VerticalAlignment="Center" />
+                                            <TextBlock Grid.Column="2" x:Uid="ApiEndpointToggleDesc" Text="Stop playback" FontSize="12" VerticalAlignment="Center" TextWrapping="Wrap" />
+                                            <Button Grid.Column="3" Tag="/toggle" Click="TestEndpoint_Click" Content="▶ Test" FontSize="11" Padding="8,3" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                        </Grid>
+
+                                        <!-- /api/next -->
+                                        <Grid Margin="0,4">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="56" />
+                                                <ColumnDefinition Width="210" />
+                                                <ColumnDefinition Width="*" />
+                                                <ColumnDefinition Width="120" />
+                                            </Grid.ColumnDefinitions>
+                                            <TextBlock Grid.Column="0" Text="GET" FontFamily="Consolas" FontSize="12" FontWeight="SemiBold" Foreground="{ThemeResource SystemFillColorSuccessBrush}" VerticalAlignment="Center" />
+                                            <TextBlock Grid.Column="1" Text="/next" FontFamily="Consolas" FontSize="12" VerticalAlignment="Center" />
+                                            <TextBlock Grid.Column="2" x:Uid="ApiEndpointNextDesc" Text="Skip to the next track" FontSize="12" VerticalAlignment="Center" TextWrapping="Wrap" />
+                                            <Button Grid.Column="3" Tag="/next" Click="TestEndpoint_Click" Content="▶ Test" FontSize="11" Padding="8,3" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                        </Grid>
+
+                                        <!-- /api/previous -->
+                                        <Grid Margin="0,4">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="56" />
+                                                <ColumnDefinition Width="210" />
+                                                <ColumnDefinition Width="*" />
+                                                <ColumnDefinition Width="120" />
+                                            </Grid.ColumnDefinitions>
+                                            <TextBlock Grid.Column="0" Text="GET" FontFamily="Consolas" FontSize="12" FontWeight="SemiBold" Foreground="{ThemeResource SystemFillColorSuccessBrush}" VerticalAlignment="Center" />
+                                            <TextBlock Grid.Column="1" Text="/previous" FontFamily="Consolas" FontSize="12" VerticalAlignment="Center" />
+                                            <TextBlock Grid.Column="2" x:Uid="ApiEndpointPreviousDesc" Text="Go to the previous track" FontSize="12" VerticalAlignment="Center" TextWrapping="Wrap" />
+                                            <Button Grid.Column="3" Tag="/previous" Click="TestEndpoint_Click" Content="▶ Test" FontSize="11" Padding="8,3" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                        </Grid>
+
+                                        <!-- /api/volume/{value} — inline NumberBox for the test value -->
+                                        <Grid Margin="0,4">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="56" />
+                                                <ColumnDefinition Width="210" />
+                                                <ColumnDefinition Width="*" />
+                                                <ColumnDefinition Width="120" />
+                                            </Grid.ColumnDefinitions>
+                                            <TextBlock Grid.Column="0" Text="GET" FontFamily="Consolas" FontSize="12" FontWeight="SemiBold" Foreground="{ThemeResource SystemFillColorSuccessBrush}" VerticalAlignment="Center" />
+                                            <TextBlock Grid.Column="1" Text="/volume/{value}" FontFamily="Consolas" FontSize="12" VerticalAlignment="Center" />
+                                            <TextBlock Grid.Column="2" x:Uid="ApiEndpointVolumeDesc" Text="Set the volume. Value must be between 0 and 100" FontSize="12" VerticalAlignment="Center" TextWrapping="Wrap" />
+                                            <Button Grid.Column="3" Tag="/volume/20" Click="TestEndpoint_Click" Content="▶ Test" FontSize="11" Padding="8,3" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                        </Grid>
+
+                                        <!-- /api/mute -->
+                                        <Grid Margin="0,4">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="56" />
+                                                <ColumnDefinition Width="210" />
+                                                <ColumnDefinition Width="*" />
+                                                <ColumnDefinition Width="120" />
+                                            </Grid.ColumnDefinitions>
+                                            <TextBlock Grid.Column="0" Text="GET" FontFamily="Consolas" FontSize="12" FontWeight="SemiBold" Foreground="{ThemeResource SystemFillColorSuccessBrush}" VerticalAlignment="Center" />
+                                            <TextBlock Grid.Column="1" Text="/mute/" FontFamily="Consolas" FontSize="12" VerticalAlignment="Center" />
+                                            <TextBlock Grid.Column="2" x:Uid="ApiEndpointMuteDesc" Text="Mute the volume" FontSize="12" VerticalAlignment="Center" TextWrapping="Wrap" />
+                                            <Button Grid.Column="3" Tag="/mute/" Click="TestEndpoint_Click" Content="▶ Test" FontSize="11" Padding="8,3" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                        </Grid>
+
+                                    </StackPanel>
+                                </Border>
+                            </StackPanel>
+
+                            <Line Stroke="{ThemeResource AccentFillColorDefaultBrush}" StrokeThickness="1" X1="0" Y1="0" X2="800" Y2="0" />
+
+                            <!-- Command Line documentation -->
+                            <StackPanel Spacing="10">
+                                <TextBlock x:Uid="CommandTabCliTitle" Text="Command Line" FontWeight="SemiBold" FontSize="14" />
+                                <TextBlock x:Uid="CommandTabCliUsage" Text="Usage: rok.exe [command] [argument]" FontFamily="Consolas" FontSize="12" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+
+                                <Border Background="{ThemeResource ContentDialogBackground}" CornerRadius="8" Padding="12,8">
+                                    <StackPanel Spacing="0">
+                                        <Grid Margin="0,0,0,6">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="240" />
+                                                <ColumnDefinition Width="*" />
+                                            </Grid.ColumnDefinitions>
+                                            <TextBlock Grid.Column="0" x:Uid="CommandTabHeaderCommand" Text="Command" FontWeight="SemiBold" FontSize="11" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                                            <TextBlock Grid.Column="1" x:Uid="CommandTabHeaderCommandDescription" Text="Description" FontWeight="SemiBold" FontSize="11" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                                        </Grid>
+
+                                        <Line Stroke="{ThemeResource DividerStrokeColorDefaultBrush}" StrokeThickness="1" X1="0" Y1="0" X2="700" Y2="0" Margin="0,0,0,6" />
+
+                                        <Grid Margin="0,4">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="240" />
+                                                <ColumnDefinition Width="*" />
+                                            </Grid.ColumnDefinitions>
+                                            <TextBlock Grid.Column="0" Text="rok play" FontFamily="Consolas" FontSize="12" VerticalAlignment="Center" />
+                                            <TextBlock Grid.Column="1" x:Uid="CliPlayDesc" Text="Start or resume playback" FontSize="12" VerticalAlignment="Center" TextWrapping="Wrap" />
+                                        </Grid>
+
+                                        <Grid Margin="0,4">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="240" />
+                                                <ColumnDefinition Width="*" />
+                                            </Grid.ColumnDefinitions>
+                                            <TextBlock Grid.Column="0" Text="rok pause" FontFamily="Consolas" FontSize="12" VerticalAlignment="Center" />
+                                            <TextBlock Grid.Column="1" x:Uid="CliPauseDesc" Text="Pause playback" FontSize="12" VerticalAlignment="Center" TextWrapping="Wrap" />
+                                        </Grid>
+
+                                        <Grid Margin="0,4">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="240" />
+                                                <ColumnDefinition Width="*" />
+                                            </Grid.ColumnDefinitions>
+                                            <TextBlock Grid.Column="0" Text="rok stop" FontFamily="Consolas" FontSize="12" VerticalAlignment="Center" />
+                                            <TextBlock Grid.Column="1" x:Uid="CliStopDesc" Text="Stop playback" FontSize="12" VerticalAlignment="Center" TextWrapping="Wrap" />
+                                        </Grid>
+
+                                        <Grid Margin="0,4">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="240" />
+                                                <ColumnDefinition Width="*" />
+                                            </Grid.ColumnDefinitions>
+                                            <TextBlock Grid.Column="0" Text="rok next" FontFamily="Consolas" FontSize="12" VerticalAlignment="Center" />
+                                            <TextBlock Grid.Column="1" x:Uid="CliNextDesc" Text="Skip to the next track" FontSize="12" VerticalAlignment="Center" TextWrapping="Wrap" />
+                                        </Grid>
+
+                                        <Grid Margin="0,4">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="240" />
+                                                <ColumnDefinition Width="*" />
+                                            </Grid.ColumnDefinitions>
+                                            <TextBlock Grid.Column="0" Text="rok prev" FontFamily="Consolas" FontSize="12" VerticalAlignment="Center" />
+                                            <TextBlock Grid.Column="1" x:Uid="CliPrevDesc" Text="Go to the previous track" FontSize="12" VerticalAlignment="Center" TextWrapping="Wrap" />
+                                        </Grid>
+                                    </StackPanel>
+                                </Border>
+                            </StackPanel>
+
+                        </StackPanel>
+                    </ScrollViewer>
                 </Border>
             </PivotItem>
 
