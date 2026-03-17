@@ -198,20 +198,6 @@
                                             <Button Grid.Column="3" Tag="/pause" Click="TestEndpoint_Click" Content="▶ Test" FontSize="11" Padding="8,3" HorizontalAlignment="Center" VerticalAlignment="Center" />
                                         </Grid>
 
-                                        <!-- /api/stop -->
-                                        <Grid Margin="0,4">
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="56" />
-                                                <ColumnDefinition Width="210" />
-                                                <ColumnDefinition Width="*" />
-                                                <ColumnDefinition Width="120" />
-                                            </Grid.ColumnDefinitions>
-                                            <TextBlock Grid.Column="0" Text="GET" FontFamily="Consolas" FontSize="12" FontWeight="SemiBold" Foreground="{ThemeResource SystemFillColorSuccessBrush}" VerticalAlignment="Center" />
-                                            <TextBlock Grid.Column="1" Text="/stop" FontFamily="Consolas" FontSize="12" VerticalAlignment="Center" />
-                                            <TextBlock Grid.Column="2" x:Uid="ApiEndpointStopDesc" Text="Stop playback" FontSize="12" VerticalAlignment="Center" TextWrapping="Wrap" />
-                                            <Button Grid.Column="3" Tag="/stop" Click="TestEndpoint_Click" Content="▶ Test" FontSize="11" Padding="8,3" HorizontalAlignment="Center" VerticalAlignment="Center" />
-                                        </Grid>
-
                                         <!-- /api/toggle -->
                                         <Grid Margin="0,4">
                                             <Grid.ColumnDefinitions>
@@ -322,15 +308,6 @@
                                             </Grid.ColumnDefinitions>
                                             <TextBlock Grid.Column="0" Text="rok pause" FontFamily="Consolas" FontSize="12" VerticalAlignment="Center" />
                                             <TextBlock Grid.Column="1" x:Uid="CliPauseDesc" Text="Pause playback" FontSize="12" VerticalAlignment="Center" TextWrapping="Wrap" />
-                                        </Grid>
-
-                                        <Grid Margin="0,4">
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="240" />
-                                                <ColumnDefinition Width="*" />
-                                            </Grid.ColumnDefinitions>
-                                            <TextBlock Grid.Column="0" Text="rok stop" FontFamily="Consolas" FontSize="12" VerticalAlignment="Center" />
-                                            <TextBlock Grid.Column="1" x:Uid="CliStopDesc" Text="Stop playback" FontSize="12" VerticalAlignment="Center" TextWrapping="Wrap" />
                                         </Grid>
 
                                         <Grid Margin="0,4">

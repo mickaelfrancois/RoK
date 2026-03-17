@@ -33,9 +33,6 @@ public sealed class PlayerCommandHandler(IPlayerService playerService, ILogger<P
             case "previous":
                 playerService.Previous();
                 break;
-            case "stop":
-                playerService.Stop(true);
-                break;
         }
     }
 
