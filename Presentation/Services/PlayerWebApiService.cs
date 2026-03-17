@@ -111,7 +111,6 @@ public sealed partial class PlayerWebApiService(IPlayerService playerService, IA
                 "/toggle" => await DispatchAsync(HandleToggle),
                 "/next" => await DispatchVoidAsync(playerService.Skip),
                 "/previous" => await DispatchVoidAsync(playerService.Previous),
-                "/stop" => await DispatchVoidAsync(() => playerService.Stop(true)),
                 "/mute" => await DispatchVoidAsync(() => playerService.IsMuted = !playerService.IsMuted),
                 _ => null
             };
