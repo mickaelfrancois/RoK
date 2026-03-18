@@ -106,13 +106,13 @@
 	<ItemGroup>
 		<PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
 		<PackageReference Include="CommunityToolkit.WinUI.Controls.TokenizingTextBox" Version="8.2.251219" />
-		<PackageReference Include="Microsoft.Extensions.Configuration.FileExtensions" Version="10.0.3" />
-		<PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="10.0.3" />
-		<PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.3" />
-		<PackageReference Include="Microsoft.Extensions.Http" Version="10.0.3" />
-		<PackageReference Include="Microsoft.Extensions.Logging" Version="10.0.3" />
-		<PackageReference Include="Microsoft.Extensions.Logging.Console" Version="10.0.3" />
-		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="10.0.3" />
+		<PackageReference Include="Microsoft.Extensions.Configuration.FileExtensions" Version="10.0.5" />
+		<PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="10.0.5" />
+		<PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.5" />
+		<PackageReference Include="Microsoft.Extensions.Http" Version="10.0.5" />
+		<PackageReference Include="Microsoft.Extensions.Logging" Version="10.0.5" />
+		<PackageReference Include="Microsoft.Extensions.Logging.Console" Version="10.0.5" />
+		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="10.0.5" />
 		<PackageReference Include="Microsoft.Windows.CsWin32" Version="0.3.269">
 		  <PrivateAssets>all</PrivateAssets>
 		  <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
