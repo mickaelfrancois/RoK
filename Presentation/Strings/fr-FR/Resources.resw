@@ -1255,10 +1255,10 @@
     <value>Aller au morceau précédent</value>
   </data>
   <data name="ApiEndpointVolumeDesc.Text" xml:space="preserve">
-    <value>Réglez le volume. La valeur doit être comprise entre 0 et 100</value>
+    <value>Régler le volume. La valeur doit être comprise entre 0 et 100</value>
   </data>
   <data name="ApiEndpointMuteDesc.Text" xml:space="preserve">
-    <value>Coupez le son</value>
+    <value>Couper le son</value>
   </data>
   <data name="CliPlayDesc.Text" xml:space="preserve">
     <value>Démarrer ou reprendre la lecture</value>
@@ -1274,5 +1274,35 @@
   </data>
   <data name="CliPrevDesc.Text" xml:space="preserve">
     <value>Aller au morceau précédent</value>
+  </data>
+  <data name="ApiEndpointPlayPlaylistDesc.Text" xml:space="preserve">
+    <value>Lancer la lecture d'une playlist</value>
+  </data>
+  <data name="ApiEndpointPlayGenreDesc.Text" xml:space="preserve">
+    <value>Lancer la lecture d'un genre</value>
+  </data>
+  <data name="ApiEndpointPlayArtistDesc.Text" xml:space="preserve">
+    <value>Lancer la lecture d'un artiste</value>
+  </data>
+  <data name="ApiEndpointPlayAlbumDesc.Text" xml:space="preserve">
+    <value>Lancer la lecture d'un album</value>
+  </data>
+  <data name="CliListenGenreDesc.Text" xml:space="preserve">
+    <value>Lancer la lecture d'un genre</value>
+  </data>
+  <data name="CliListenArtistDesc.Text" xml:space="preserve">
+    <value>Lancer la lecture d'un artiste</value>
+  </data>
+  <data name="CliListenAlbumDesc.Text" xml:space="preserve">
+    <value>Lancer la lecture d'un album</value>
+  </data>
+  <data name="CliListenPlaylistDesc.Text" xml:space="preserve">
+    <value>Lancer la lecture d'une playlist</value>
+  </data>
+  <data name="CliMuteDesc.Text" xml:space="preserve">
+    <value>Couper le son</value>
+  </data>
+  <data name="CliVolumeDesc.Text" xml:space="preserve">
+    <value>Régler le volume. La valeur doit être comprise entre 0 et 100</value>
   </data>
 </root>

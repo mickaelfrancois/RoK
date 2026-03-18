@@ -12,19 +12,22 @@
 
 ## Project Overview
 
-Rok is a .NET 9 application using C# 13.0 with WinUi3 for listening local music and content management (albums, artists, tracks).
+Rok is a .NET 10 application using C# 13.0 with WinUi3 for listening local music and content management (albums, artists, tracks).
 
 ## Architecture
 
 - **Presentation Layer**: MVVM ViewModels with CommunityToolkit.Mvvm
-- **Logic Layer**: Business logic and services
+- **Application Layer**: Business logic and services
+- **Domain Layer**: Core entities and domain logic
+- **Import Layer**: Importing music from the file system
+- **Shared Layer**: Shared utilities and models
 - **Infrastructure Layer**: Data access, telemetry
 
 ## Code Standards
 
 ### General Conventions
 
-- **Framework**: .NET 9, C# 13.0
+- **Framework**: .NET 10, C# 13.0
 - **Patterns**: MVVM with `ObservableObject`, dependency injection
 - **Collections**: Never use collection expressions (see `.editorconfig`)
 - **Warnings**: Code must compile with zero warnings
