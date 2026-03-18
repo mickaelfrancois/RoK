@@ -2,9 +2,9 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Windows.AppLifecycle;
 using Rok.Application.Options;
-using Rok.Application.Player;
 using Rok.Import;
 using Rok.Infrastructure;
+using Rok.Services.PlayerCommand.Terminal;
 using Serilog;
 using Windows.ApplicationModel.Activation;
 using Windows.Storage;
@@ -94,7 +94,7 @@ public partial class App : Microsoft.UI.Xaml.Application
     private void HandleCliCommand(string? arguments)
     {
         IPlayerCommandHandler handler = ServiceProvider.GetRequiredService<IPlayerCommandHandler>();
-        MainWindow?.DispatcherQueue.TryEnqueue(() => handler.Handle(arguments));
+        MainWindow?.DispatcherQueue.TryEnqueue(() => handler.HandleAsync(arguments));
     }
 
 
@@ -144,11 +144,8 @@ public partial class App : Microsoft.UI.Xaml.Application
         services.AddLogger(ApplicationData.Current.LocalFolder.Path);
         services.AddLogic();
 
-        services.AddSingleton<PlayerWebApiService>(sp => new PlayerWebApiService(
-            sp.GetRequiredService<IPlayerService>(),
-            sp.GetRequiredService<IAppOptions>(),
-            action => MainWindow.DispatcherQueue.TryEnqueue(() => action()),
-            sp.GetRequiredService<ILogger<PlayerWebApiService>>()));
+        services.AddSingleton<Action<Action>>(_ => action => MainWindow.DispatcherQueue.TryEnqueue(() => action()));
+        services.AddSingleton<PlayerWebApiService>();
 
         return services.BuildServiceProvider();
     }

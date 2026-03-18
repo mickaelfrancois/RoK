@@ -4,10 +4,33 @@ using System.Text;
 using System.Text.Json;
 using System.Threading;
 using Rok.Application.Player;
+using Rok.Services.PlayerCommand;
+using Rok.Services.PlayerCommand.Api;
 
 namespace Rok.Services;
 
-public sealed partial class PlayerWebApiService(IPlayerService playerService, IAppOptions options, Action<Action> dispatch, ILogger<PlayerWebApiService> logger) : IDisposable
+/// <summary>
+/// Provides a web API service for controlling and monitoring player operations, such as playback commands and status
+/// retrieval, over HTTP.
+/// </summary>
+/// <remarks>This service hosts an HTTP listener that exposes endpoints for player control and status queries. It
+/// automatically selects an available port if the preferred port is unavailable. The service is thread-safe and should
+/// be disposed of when no longer needed to release resources.</remarks>
+/// <param name="playerService">The service that manages the state and operations of the player, including playback status, current track, and queue
+/// information.</param>
+/// <param name="options">The application configuration options that specify settings for the web API, including the preferred port to listen
+/// on.</param>
+/// <param name="dispatch">An action used to dispatch operations to the appropriate thread, ensuring thread safety for player-related actions.</param>
+/// <param name="routeHandlers">A collection of route handlers that process custom or extended API routes beyond the built-in player commands.</param>
+/// <param name="commandService">The service responsible for executing player commands, such as play, pause, next, and volume adjustments.</param>
+/// <param name="logger">A logger instance used to record informational messages and errors related to the operation of the web API service.</param>
+public sealed partial class PlayerWebApiService(
+    IPlayerService playerService,
+    IAppOptions options,
+    Action<Action> dispatch,
+    IEnumerable<IWebApiRouteHandler> routeHandlers,
+    IPlayerCommandService commandService,
+    ILogger<PlayerWebApiService> logger) : IDisposable
 {
     private HttpListener? _listener;
     private CancellationTokenSource? _cts;
@@ -100,40 +123,19 @@ public sealed partial class PlayerWebApiService(IPlayerService playerService, IA
         try
         {
             string path = request.Url?.AbsolutePath.TrimEnd('/').ToLowerInvariant() ?? string.Empty;
+            string method = request.HttpMethod.ToUpperInvariant();
 
-            string? json = path switch
-            {
-                "/status" => await DispatchAsync(BuildStatusJson),
-                "/current" => await DispatchAsync(BuildCurrentJson),
-                "/queue" => await DispatchAsync(BuildQueueJson),
-                "/play" => await DispatchVoidAsync(playerService.Play),
-                "/pause" => await DispatchVoidAsync(playerService.Pause),
-                "/toggle" => await DispatchAsync(HandleToggle),
-                "/next" => await DispatchVoidAsync(playerService.Skip),
-                "/previous" => await DispatchVoidAsync(playerService.Previous),
-                "/mute" => await DispatchVoidAsync(() => playerService.IsMuted = !playerService.IsMuted),
-                _ => null
-            };
-
-            if (path.StartsWith("/volume/", StringComparison.Ordinal)
-                && double.TryParse(path["/volume/".Length..], out double volume))
-            {
-                json = await DispatchVoidAsync(() => playerService.Volume = Math.Clamp(volume, 0, 100));
-            }
-
-            if (json is null)
-            {
-                response.StatusCode = 404;
-                return;
-            }
+            WebApiResult result = await ResolveAsync(method, path);
 
             response.ContentType = "application/json";
-            response.StatusCode = 200;
+            response.StatusCode = result.StatusCode;
 
-            byte[] buffer = Encoding.UTF8.GetBytes(json);
-            response.ContentLength64 = buffer.Length;
-
-            await response.OutputStream.WriteAsync(buffer);
+            if (!string.IsNullOrEmpty(result.Body))
+            {
+                byte[] buffer = Encoding.UTF8.GetBytes(result.Body);
+                response.ContentLength64 = buffer.Length;
+                await response.OutputStream.WriteAsync(buffer);
+            }
         }
         catch (Exception ex)
         {
@@ -145,6 +147,41 @@ public sealed partial class PlayerWebApiService(IPlayerService playerService, IA
             response.Close();
         }
     }
+
+    private async Task<WebApiResult> ResolveAsync(string method, string path)
+    {
+        string? json = path switch
+        {
+            "/status" => await DispatchAsync(BuildStatusJson),
+            "/current" => await DispatchAsync(BuildCurrentJson),
+            "/queue" => await DispatchAsync(BuildQueueJson),
+            "/play" => await DispatchVoidAsync(commandService.Play),
+            "/pause" => await DispatchVoidAsync(commandService.Pause),
+            "/toggle" => await DispatchVoidAsync(commandService.Toggle),
+            "/next" => await DispatchVoidAsync(commandService.Next),
+            "/previous" => await DispatchVoidAsync(commandService.Previous),
+            "/mute" => await DispatchVoidAsync(commandService.ToggleMute),
+            _ => null
+        };
+
+        if (json is not null)
+            return WebApiResult.Ok(json);
+
+        if (path.StartsWith("/volume/", StringComparison.Ordinal)
+            && double.TryParse(path["/volume/".Length..], System.Globalization.NumberStyles.Any,
+                System.Globalization.CultureInfo.InvariantCulture, out double volume))
+        {
+            await DispatchVoidAsync(() => commandService.SetVolume(volume));
+            return WebApiResult.Ok();
+        }
+
+        IWebApiRouteHandler? handler = routeHandlers.FirstOrDefault(h => h.CanHandle(method, path));
+        if (handler is not null)
+            return await handler.HandleAsync(path);
+
+        return WebApiResult.NotFound();
+    }
+
 
     private Task<string> DispatchAsync(Func<string> action)
     {
@@ -204,16 +241,6 @@ public sealed partial class PlayerWebApiService(IPlayerService playerService, IA
                                         isFavoriteAlbum = t.IsAlbumFavorite,
                                         isFavoriteGenre = t.IsGenreFavorite
                                     }));
-    }
-
-    private string HandleToggle()
-    {
-        if (playerService.PlaybackState == EPlaybackState.Playing)
-            playerService.Pause();
-        else
-            playerService.Play();
-
-        return string.Empty;
     }
 
     public void Dispose()

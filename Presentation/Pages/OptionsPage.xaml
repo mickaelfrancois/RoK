@@ -240,6 +240,62 @@
                                             <Button Grid.Column="3" Tag="/previous" Click="TestEndpoint_Click" Content="▶ Test" FontSize="11" Padding="8,3" HorizontalAlignment="Center" VerticalAlignment="Center" />
                                         </Grid>
 
+                                        <!-- /api/listen/playlist/{name} -->
+                                        <Grid Margin="0,4">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="56" />
+                                                <ColumnDefinition Width="210" />
+                                                <ColumnDefinition Width="*" />
+                                                <ColumnDefinition Width="120" />
+                                            </Grid.ColumnDefinitions>
+                                            <TextBlock Grid.Column="0" Text="GET" FontFamily="Consolas" FontSize="12" FontWeight="SemiBold" Foreground="{ThemeResource SystemFillColorSuccessBrush}" VerticalAlignment="Center" />
+                                            <TextBlock Grid.Column="1" Text="/listen/playlist/{name}" FontFamily="Consolas" FontSize="12" VerticalAlignment="Center" />
+                                            <TextBlock Grid.Column="2" x:Uid="ApiEndpointPlayPlaylistDesc" Text="Start listen a playlist" FontSize="12" VerticalAlignment="Center" TextWrapping="Wrap" />
+                                            <Button Grid.Column="3" Tag="/listen/playlist/radio" Click="TestEndpoint_Click" Content="▶ Test" FontSize="11" Padding="8,3" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                        </Grid>
+
+                                        <!-- /api/listen/album/{name} -->
+                                        <Grid Margin="0,4">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="56" />
+                                                <ColumnDefinition Width="210" />
+                                                <ColumnDefinition Width="*" />
+                                                <ColumnDefinition Width="120" />
+                                            </Grid.ColumnDefinitions>
+                                            <TextBlock Grid.Column="0" Text="GET" FontFamily="Consolas" FontSize="12" FontWeight="SemiBold" Foreground="{ThemeResource SystemFillColorSuccessBrush}" VerticalAlignment="Center" />
+                                            <TextBlock Grid.Column="1" Text="/listen/album/{name}" FontFamily="Consolas" FontSize="12" VerticalAlignment="Center" />
+                                            <TextBlock Grid.Column="2" x:Uid="ApiEndpointPlayAlbumDesc" Text="Start listen an album" FontSize="12" VerticalAlignment="Center" TextWrapping="Wrap" />
+                                            <Button Grid.Column="3" Tag="/listen/album/thriller" Click="TestEndpoint_Click" Content="▶ Test" FontSize="11" Padding="8,3" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                        </Grid>
+
+                                        <!-- /api/listen/artist/{name} -->
+                                        <Grid Margin="0,4">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="56" />
+                                                <ColumnDefinition Width="210" />
+                                                <ColumnDefinition Width="*" />
+                                                <ColumnDefinition Width="120" />
+                                            </Grid.ColumnDefinitions>
+                                            <TextBlock Grid.Column="0" Text="GET" FontFamily="Consolas" FontSize="12" FontWeight="SemiBold" Foreground="{ThemeResource SystemFillColorSuccessBrush}" VerticalAlignment="Center" />
+                                            <TextBlock Grid.Column="1" Text="/listen/artist/{name}" FontFamily="Consolas" FontSize="12" VerticalAlignment="Center" />
+                                            <TextBlock Grid.Column="2" x:Uid="ApiEndpointPlayArtistDesc" Text="Start listen an artist" FontSize="12" VerticalAlignment="Center" TextWrapping="Wrap" />
+                                            <Button Grid.Column="3" Tag="/listen/artist/madonna" Click="TestEndpoint_Click" Content="▶ Test" FontSize="11" Padding="8,3" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                        </Grid>
+
+                                        <!-- /api/listen/genre/{name} -->
+                                        <Grid Margin="0,4">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="56" />
+                                                <ColumnDefinition Width="210" />
+                                                <ColumnDefinition Width="*" />
+                                                <ColumnDefinition Width="120" />
+                                            </Grid.ColumnDefinitions>
+                                            <TextBlock Grid.Column="0" Text="GET" FontFamily="Consolas" FontSize="12" FontWeight="SemiBold" Foreground="{ThemeResource SystemFillColorSuccessBrush}" VerticalAlignment="Center" />
+                                            <TextBlock Grid.Column="1" Text="/listen/genre/{name}" FontFamily="Consolas" FontSize="12" VerticalAlignment="Center" />
+                                            <TextBlock Grid.Column="2" x:Uid="ApiEndpointPlayGenreDesc" Text="Start listen a genre" FontSize="12" VerticalAlignment="Center" TextWrapping="Wrap" />
+                                            <Button Grid.Column="3" Tag="/listen/genre/rock" Click="TestEndpoint_Click" Content="▶ Test" FontSize="11" Padding="8,3" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                        </Grid>
+
                                         <!-- /api/volume/{value} — inline NumberBox for the test value -->
                                         <Grid Margin="0,4">
                                             <Grid.ColumnDefinitions>
@@ -327,6 +383,60 @@
                                             <TextBlock Grid.Column="0" Text="rok prev" FontFamily="Consolas" FontSize="12" VerticalAlignment="Center" />
                                             <TextBlock Grid.Column="1" x:Uid="CliPrevDesc" Text="Go to the previous track" FontSize="12" VerticalAlignment="Center" TextWrapping="Wrap" />
                                         </Grid>
+
+                                        <Grid Margin="0,4">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="240" />
+                                                <ColumnDefinition Width="*" />
+                                            </Grid.ColumnDefinitions>
+                                            <TextBlock Grid.Column="0" Text="rok volume {volume 0-100}" FontFamily="Consolas" FontSize="12" VerticalAlignment="Center" />
+                                            <TextBlock Grid.Column="1" x:Uid="CliVolumeDesc" Text="Set the volume level" FontSize="12" VerticalAlignment="Center" TextWrapping="Wrap" />
+                                        </Grid>
+
+                                        <Grid Margin="0,4">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="240" />
+                                                <ColumnDefinition Width="*" />
+                                            </Grid.ColumnDefinitions>
+                                            <TextBlock Grid.Column="0" Text="rok mute" FontFamily="Consolas" FontSize="12" VerticalAlignment="Center" />
+                                            <TextBlock Grid.Column="1" x:Uid="CliMuteDesc" Text="Mute the volume" FontSize="12" VerticalAlignment="Center" TextWrapping="Wrap" />
+                                        </Grid>
+
+                                        <Grid Margin="0,4">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="240" />
+                                                <ColumnDefinition Width="*" />
+                                            </Grid.ColumnDefinitions>
+                                            <TextBlock Grid.Column="0" Text="rok listen playlist {playlist}" FontFamily="Consolas" FontSize="12" VerticalAlignment="Center" />
+                                            <TextBlock Grid.Column="1" x:Uid="CliListenPlaylistDesc" Text="Start listen a playlist" FontSize="12" VerticalAlignment="Center" TextWrapping="Wrap" />
+                                        </Grid>
+
+                                        <Grid Margin="0,4">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="240" />
+                                                <ColumnDefinition Width="*" />
+                                            </Grid.ColumnDefinitions>
+                                            <TextBlock Grid.Column="0" Text="rok listen album {album}" FontFamily="Consolas" FontSize="12" VerticalAlignment="Center" />
+                                            <TextBlock Grid.Column="1" x:Uid="CliListenAlbumDesc" Text="Start listen an album" FontSize="12" VerticalAlignment="Center" TextWrapping="Wrap" />
+                                        </Grid>
+
+                                        <Grid Margin="0,4">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="240" />
+                                                <ColumnDefinition Width="*" />
+                                            </Grid.ColumnDefinitions>
+                                            <TextBlock Grid.Column="0" Text="rok listen artist {artist}" FontFamily="Consolas" FontSize="12" VerticalAlignment="Center" />
+                                            <TextBlock Grid.Column="1" x:Uid="CliListenArtistDesc" Text="Start listen an artist" FontSize="12" VerticalAlignment="Center" TextWrapping="Wrap" />
+                                        </Grid>
+                                        <Grid Margin="0,4">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="240" />
+                                                <ColumnDefinition Width="*" />
+                                            </Grid.ColumnDefinitions>
+                                            <TextBlock Grid.Column="0" Text="rok listen genre {genre}" FontFamily="Consolas" FontSize="12" VerticalAlignment="Center" />
+                                            <TextBlock Grid.Column="1" x:Uid="CliListenGenreDesc" Text="Start listen a genre" FontSize="12" VerticalAlignment="Center" TextWrapping="Wrap" />
+                                        </Grid>
+
                                     </StackPanel>
                                 </Border>
                             </StackPanel>

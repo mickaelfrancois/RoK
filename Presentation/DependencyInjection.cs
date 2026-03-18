@@ -2,6 +2,9 @@
 using Rok.Application.Features.Playlists.PlaylistMenu;
 using Rok.Application.Services.Filters;
 using Rok.Application.Services.Grouping;
+using Rok.Services.PlayerCommand;
+using Rok.Services.PlayerCommand.Api;
+using Rok.Services.PlayerCommand.Terminal;
 using Rok.ViewModels.Album;
 using Rok.ViewModels.Album.Services;
 using Rok.ViewModels.Albums;
@@ -50,7 +53,10 @@ public static class DependencyInjection
         services.AddSingleton<IPlaylistMenuService, PlaylistMenuService>();
         services.AddSingleton<IFolderResolver, FolderResolver>();
         services.AddSingleton<IBackdropLoader, BackdropLoader>();
+
+        services.AddSingleton<IPlayerCommandService, PlayerCommandService>();
         services.AddSingleton<IPlayerCommandHandler, PlayerCommandHandler>();
+        services.AddSingleton<IWebApiRouteHandler, ListenPlaylistRouteHandler>();
 
         services.AddSingleton<TagsProvider>();
 

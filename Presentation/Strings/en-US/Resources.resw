@@ -1275,4 +1275,34 @@
   <data name="CliPrevDesc.Text" xml:space="preserve">
     <value>Go to the previous track</value>
   </data>
+  <data name="ApiEndpointPlayPlaylistDesc.Text" xml:space="preserve">
+    <value>Start listen a playlist</value>
+  </data>
+  <data name="ApiEndpointPlayGenreDesc.Text" xml:space="preserve">
+    <value>Start listen a genre</value>
+  </data>
+  <data name="ApiEndpointPlayArtistDesc.Text" xml:space="preserve">
+    <value>Start listen an artist</value>
+  </data>
+  <data name="ApiEndpointPlayAlbumDesc.Text" xml:space="preserve">
+    <value>Start listen an album</value>
+  </data>
+  <data name="CliListenGenreDesc.Text" xml:space="preserve">
+    <value>Start listen a genre</value>
+  </data>
+  <data name="CliListenArtistDesc.Text" xml:space="preserve">
+    <value>Start listen an artist</value>
+  </data>
+  <data name="CliListenAlbumDesc.Text" xml:space="preserve">
+    <value>Start listen an album</value>
+  </data>
+  <data name="CliListenPlaylistDesc.Text" xml:space="preserve">
+    <value>Start listen a playlist</value>
+  </data>
+  <data name="CliMuteDesc.Text" xml:space="preserve">
+    <value>Mute the volume</value>
+  </data>
+  <data name="CliVolumeDesc.Text" xml:space="preserve">
+    <value>Set the volume. Value must be between 0 and 100</value>
+  </data>
 </root>
