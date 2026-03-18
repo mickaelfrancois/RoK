@@ -2,7 +2,7 @@
 
 namespace Rok.ViewModels.Genre.Services;
 
-public class GenreEditService(IMediator mediator, ILogger<GenreEditService> logger)
+public class GenreEditService(IMediator mediator)
 {
     public async Task UpdateFavoriteAsync(GenreDto genre, bool isFavorite)
     {

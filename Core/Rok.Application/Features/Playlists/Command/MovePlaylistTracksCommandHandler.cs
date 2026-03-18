@@ -28,7 +28,7 @@ public class MovePlaylistTracksCommandHandler(IPlaylistTrackRepository _reposito
             {
                 long trackId = message.Tracks[newIndex];
 
-                if (!byTrackId.TryGetValue(trackId, out PlaylistTrackEntity playlistTrack))
+                if (!byTrackId.TryGetValue(trackId, out PlaylistTrackEntity? playlistTrack))
                     continue;
 
                 if (playlistTrack.Position == newIndex)

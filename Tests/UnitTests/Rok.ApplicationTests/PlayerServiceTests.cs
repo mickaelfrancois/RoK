@@ -20,6 +20,7 @@ public class PlayerServiceTests
         mockPlayerEngine = new Mock<IPlayerEngine>();
         mockAppOptions = new Mock<IAppOptions>();
         mockLogger = new Mock<ILogger<PlayerService>>();
+        mockCallDetectionService = new Mock<ICallDetectionService>();
 
         mockPlayerEngine.Setup(o => o.SetTrack(It.IsAny<TrackDto>())).Returns(true);
         mockAppOptions.SetupGet(o => o.CrossFade).Returns(false);
@@ -227,7 +228,7 @@ public class PlayerServiceTests
         TrackDto track2 = new() { Id = 2, Title = "Track 2" };
 
         // Act
-        playerService.AddTracksToPlaylist(new List<TrackDto> { track2 });
+        playerService.AddTracksToPlaylist(new List<TrackDto> { track1, track2 });
 
         // Assert
         Assert.Equal(EPlaybackState.Playing, playerService.PlaybackState);

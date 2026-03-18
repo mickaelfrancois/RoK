@@ -32,10 +32,10 @@ public partial class StartViewModel : ObservableObject
     public partial bool ErrorOccurred { get; set; } = false;
 
     [ObservableProperty]
-    private string _importProgressText = string.Empty;
+    public partial string ImportProgressText { get; set; } = string.Empty;
 
     [ObservableProperty]
-    private double _importProgress = 0;
+    public partial double ImportProgress { get; set; } = 0;
 
 
 
@@ -96,7 +96,7 @@ public partial class StartViewModel : ObservableObject
     {
         BitmapImage cover;
 
-        _dispatcherQueue.TryEnqueue(() =>
+        _dispatcherQueue.TryEnqueue((DispatcherQueueHandler)(() =>
         {
             if (_albumPicture.PictureFileExists(message.AlbumPath))
             {
@@ -118,7 +118,7 @@ public partial class StartViewModel : ObservableObject
                     Picture = cover
                 });
 
-                ImportProgressText = $"{AlbumsImported.Count} albums discovered";
+                this.ImportProgressText = $"{AlbumsImported.Count} albums discovered";
                 ImportProgress = Math.Min(AlbumsImported.Count * 100.0 / KAlbumMinimumBeforeUse, 100);
 
                 if (AlbumsImported.Count >= KAlbumMinimumBeforeUse)
@@ -127,7 +127,7 @@ public partial class StartViewModel : ObservableObject
                     _navigationService.NavigateToAlbums();
                 }
             }
-        });
+        }));
     }
 
 
