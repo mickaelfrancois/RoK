@@ -317,7 +317,7 @@
                 <ProgressBar Margin="6,0,6,0"
                              Width="400"
                              VerticalAlignment="Center"
-                             Foreground="Green"
+                             Foreground="{ThemeResource BrandAccentBrush}"
                              RequestedTheme="Dark"
                              Minimum="0"
                              Maximum="100"

@@ -60,7 +60,7 @@
 
             <RelativePanel Grid.Column="1" Margin="6,0,0,0">
 
-                <HyperlinkButton x:Name="artistName" Content="{x:Bind ViewModel.CurrentTrack.ArtistName, Mode=OneWay}" Command="{x:Bind ViewModel.ArtistOpenCommand}" FontSize="{StaticResource TitleTextBlockFontSize}" FontWeight="Bold" Padding="0" Margin="0" Style="{StaticResource HeaderHyperlinkStyle}" />
+                <HyperlinkButton x:Name="artistName" Content="{x:Bind ViewModel.CurrentTrack.ArtistName, Mode=OneWay}" Command="{x:Bind ViewModel.ArtistOpenCommand}" FontSize="{StaticResource FontSizeLarge}" FontWeight="Bold" Padding="0" Margin="0" Foreground="White" Style="{StaticResource HeaderHyperlinkStyle}" />
 
                 <Button x:Name="buttonCountry" RelativePanel.RightOf="artistName" RelativePanel.AlignVerticalCenterWith="artistName" Margin="4,0,0,0" Style="{StaticResource ButtonTextBlockStyle}" Visibility="{x:Bind ViewModel.Artist.Artist.CountryCode, Mode=OneWay, Converter={StaticResource StringToVisibilityConverter}}" BorderBrush="Transparent" Background="Transparent" ToolTipService.ToolTip="{x:Bind ViewModel.Artist.Artist.CountryName, Mode=OneWay}">
                     <Image Source="{x:Bind ViewModel.Artist.Artist.CountryCode, Mode=OneWay, Converter={StaticResource CountryCodeToImageSourceConverter}}" Height="10"></Image>
@@ -220,7 +220,7 @@
                                     </Image>
                                     <TextBlock x:Name="RowIndexText" VerticalAlignment="Center" Visibility="{x:Bind Listening, Mode=OneWay, Converter={StaticResource BoolToInvertVisibilityConverter}}" Style="{StaticResource gridTracksRowIndexText}" />
 
-                                    <HyperlinkButton Style="{StaticResource gridTracksTitleText}" Command="{x:Bind TrackOpenCommand}" CommandParameter="{x:Bind}" VerticalAlignment="Center" />
+                                    <HyperlinkButton Style="{StaticResource GridTracksTitleHyperlinkButtonStyle}" Command="{x:Bind TrackOpenCommand}" CommandParameter="{x:Bind}" VerticalAlignment="Center" />
                                     <HyperlinkButton x:Uid="lyricsTag" Visibility="{x:Bind LyricsExists, Converter={StaticResource BoolToVisibilityConverter}}" Style="{StaticResource GridTracksLyricsHyperlinkButtonStyle}" Command="{x:Bind LyricsOpenCommand}" />
                                 </StackPanel>
                             </Grid>
