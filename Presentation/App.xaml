@@ -6,10 +6,8 @@
              xmlns:converters="using:Rok.Converters">
     <Application.Resources>
         <ResourceDictionary>
-            <BitmapImage x:Key='artistPictureFallback'
-                         UriSource='Assets/artistFallback.png' />
-            <BitmapImage x:Key='albumCoverFallback'
-                         UriSource='Assets/albumFallback.png' />
+            <BitmapImage x:Key='artistPictureFallback' UriSource='Assets/artistFallback.png' />
+            <BitmapImage x:Key='albumCoverFallback' UriSource='Assets/albumFallback.png' />
             
             <x:String x:Key="ArtistFallbackPictureUri">ms-appx:///Assets/artistFallback.png</x:String>
             
@@ -57,9 +55,6 @@
                 <ResourceDictionary Source="ms-appx:///Styles/Tokens/Spacing.xaml" />
                 <!-- Components -->
                 <ResourceDictionary Source="ms-appx:///Styles/Components/ControlsStyles.xaml" />
-                <!--<ResourceDictionary Source="ms-appx:///Styles/Components/ButtonStyles.xaml" />
-                
-                <ResourceDictionary Source="ms-appx:///Styles/Components/RatingControlStyles.xaml" />-->
                 <!-- Templates -->
 
             </ResourceDictionary.MergedDictionaries>
