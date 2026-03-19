@@ -11,11 +11,41 @@
     <UserControl.Resources>
 
         <Style x:Key="MiniLinkStyle" TargetType="HyperlinkButton">
+            <Setter Property="Background" Value="Transparent"/>
             <Setter Property="Padding" Value="0" />
             <Setter Property="Margin" Value="0" />
-            <Setter Property="Foreground" Value="White" />
+            <Setter Property="Foreground" Value="{ThemeResource HyperlinkForegroundBrush}" />
             <Setter Property="FontWeight" Value="Normal" />
             <Setter Property="VerticalAlignment" Value="Center" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="HyperlinkButton">
+                        <Grid x:Name="RootGrid" Background="Transparent">
+                            <VisualStateManager.VisualStateGroups>
+                                <VisualStateGroup x:Name="CommonStates">
+                                    <VisualState x:Name="Normal" />
+                                    <VisualState x:Name="PointerOver">
+                                        <Storyboard>
+                                            <DoubleAnimation Storyboard.TargetName="RootGrid" Storyboard.TargetProperty="Opacity" To="0.75" Duration="0" />
+                                        </Storyboard>
+                                    </VisualState>
+                                    <VisualState x:Name="Pressed">
+                                        <Storyboard>
+                                            <DoubleAnimation Storyboard.TargetName="RootGrid" Storyboard.TargetProperty="Opacity" To="0.5" Duration="0" />
+                                        </Storyboard>
+                                    </VisualState>
+                                    <VisualState x:Name="Disabled">
+                                        <Storyboard>
+                                            <DoubleAnimation Storyboard.TargetName="RootGrid" Storyboard.TargetProperty="Opacity" To="0.4" Duration="0" />
+                                        </Storyboard>
+                                    </VisualState>
+                                </VisualStateGroup>
+                            </VisualStateManager.VisualStateGroups>
+                            <ContentPresenter Content="{TemplateBinding Content}" ContentTemplate="{TemplateBinding ContentTemplate}" Padding="{TemplateBinding Padding}" HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}" VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}" />
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
         </Style>
 
         <DataTemplate x:Key="EllipsisTemplate">
@@ -24,7 +54,7 @@
 
     </UserControl.Resources>
 
-    <Grid x:Name="mainGrid" HorizontalAlignment="Stretch" Padding="4,4,4,4" ColumnSpacing="12" Background="{ThemeResource SystemControlBackgroundAccentBrush}">
+    <Grid x:Name="mainGrid" HorizontalAlignment="Stretch" Padding="4,4,4,4" ColumnSpacing="12" Background="{ThemeResource BrandPrimaryBrush}">
         <VisualStateManager.VisualStateGroups>
             <VisualStateGroup>
                 <VisualState x:Name="WideLayout">

@@ -8,7 +8,7 @@
     <ResourceDictionary.ThemeDictionaries>
         <ResourceDictionary x:Key="Dark">
             <SolidColorBrush x:Key="BrandPrimaryBrush" Color="{StaticResource Blue700}" />
-            <SolidColorBrush x:Key="BrandPrimaryHoverBrush" Color="{StaticResource Blue400}" />
+            <SolidColorBrush x:Key="BrandPrimaryHoverBrush" Color="{StaticResource Blue300}" />
             <SolidColorBrush x:Key="BrandPrimaryPressedBrush" Color="{StaticResource Blue800}" />
             <SolidColorBrush x:Key="BrandAccentBrush" Color="{StaticResource Blue400}" />
 
@@ -22,6 +22,12 @@
 
             <SolidColorBrush x:Key="GridCoverBottomSecondLineBrush" Color="White"/>
             <SolidColorBrush x:Key="ListCoverBottomSecondLineBrush" Color="White"/>
+
+            <SolidColorBrush x:Key="HyperlinkForegroundBrush" Color="White" />
+
+            <Color x:Key="StarSelectedColor">#257EF9</Color>
+            <Color x:Key="StarPointerOverColor">#92BEFC</Color>
+            <Color x:Key="StarCheckedPointerOverColor">#92BEFC</Color>
         </ResourceDictionary>
 
         <ResourceDictionary x:Key="Light">
@@ -40,11 +46,17 @@
 
             <SolidColorBrush x:Key="GridCoverBottomSecondLineBrush" Color="White"/>
             <SolidColorBrush x:Key="ListCoverBottomSecondLineBrush" Color="Black"/>
+
+            <SolidColorBrush x:Key="HyperlinkForegroundBrush" Color="Black" />
+
+            <Color x:Key="StarSelectedColor">#257EF9</Color>
+            <Color x:Key="StarPointerOverColor">#154587</Color>
+            <Color x:Key="StarCheckedPointerOverColor">#154587</Color>
         </ResourceDictionary>
     </ResourceDictionary.ThemeDictionaries>
 
     <SolidColorBrush x:Key="CoverOverlayBackgroundBrush" Color="{StaticResource Black67}"/>
-    <SolidColorBrush x:Key="HyperlinkForegroundBrush" Color="{StaticResource Cyan400}" />
+
 
     <!-- Content area background -->
     <LinearGradientBrush x:Key="ContentListBackgroundBrush" StartPoint="0.5,0" EndPoint="0.5,1">

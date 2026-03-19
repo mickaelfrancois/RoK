@@ -7,6 +7,9 @@
     <Color x:Key="Blue800">#123D7A</Color>
     <Color x:Key="Blue700">#154587</Color>
     <Color x:Key="Blue400">#257EF9</Color>
+    <Color x:Key="Blue300">#5B9EFA</Color>
+    <Color x:Key="Blue200">#92BEFC</Color>
+    <Color x:Key="Blue100">#C9DEFD</Color>
 
     <Color x:Key="Cyan400">#00B4D8</Color>
     <Color x:Key="Cyan600">#0096C7</Color>

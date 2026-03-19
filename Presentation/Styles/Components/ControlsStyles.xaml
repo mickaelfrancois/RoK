@@ -88,8 +88,7 @@
 
     <!-- Buttons -->
 
-    <Style x:Key="ListenAppBarButtonCompactStyle"
-           TargetType="AppBarButton">
+    <Style x:Key="ListenAppBarButtonCompactStyle" TargetType="AppBarButton">
         <Setter Property="Foreground" Value="{ThemeResource OnSurfacePrimaryBrush}" />
         <Setter Property="Icon" Value="Play" />
         <Setter Property="Background" Value="{ThemeResource BrandPrimaryBrush}" />
@@ -111,22 +110,10 @@
                           Height="{TemplateBinding Height}"
                           VerticalAlignment="Center"
                           Background="Transparent">
-                        <Border x:Name="Bg"
-                                Background="{TemplateBinding Background}"
-                                CornerRadius="{TemplateBinding CornerRadius}"
-                                BorderBrush="{TemplateBinding BorderBrush}"
-                                BorderThickness="{TemplateBinding BorderThickness}"
-                                Padding="{TemplateBinding Padding}"
-                                VerticalAlignment="Center"
-                                Height="{TemplateBinding Height}">
+                        <Border x:Name="Bg" Background="{TemplateBinding Background}" CornerRadius="{TemplateBinding CornerRadius}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Padding="{TemplateBinding Padding}" VerticalAlignment="Center" Height="{TemplateBinding Height}">
                             <StackPanel x:Name="ContentPanel" Orientation="Horizontal" Spacing="{StaticResource SpacingSmall}" VerticalAlignment="Center" HorizontalAlignment="Center">
                                 <ContentPresenter x:Name="IconPresenter" Content="{TemplateBinding Icon}" VerticalAlignment="Center" />
-                                <TextBlock x:Name="LabelText"
-                                           Text="{TemplateBinding Label}"
-                                           Foreground="{TemplateBinding Foreground}"
-                                           VerticalAlignment="Center"
-                                           FontSize="{TemplateBinding FontSize}"
-                                           FontWeight="{TemplateBinding FontWeight}" />
+                                <TextBlock x:Name="LabelText" Text="{TemplateBinding Label}" Foreground="{TemplateBinding Foreground}" VerticalAlignment="Center" FontSize="{TemplateBinding FontSize}" FontWeight="{TemplateBinding FontWeight}" />
                             </StackPanel>
                         </Border>
 
@@ -297,6 +284,8 @@
     </Style>
 
     <Style x:Key="HyperlinkGroupButtonStyle" TargetType="HyperlinkButton">
+        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="Foreground" Value="{ThemeResource BrandAccentBrush}"/>
         <Setter Property="FontWeight" Value="SemiBold" />
         <Setter Property="FontSize" Value="{StaticResource FontSizeLarge}" />
         <Setter Property="Padding" Value="8,4,8,4" />
@@ -326,7 +315,7 @@
                                 <VisualState x:Name="PointerOver">
                                     <Storyboard>
                                         <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="Foreground" Storyboard.TargetName="TextElement">
-                                            <DiscreteObjectKeyFrame KeyTime="0" Value="{ThemeResource SystemAccentColorLight2}" />
+                                            <DiscreteObjectKeyFrame KeyTime="0" Value="{ThemeResource BrandAccentBrush }" />
                                         </ObjectAnimationUsingKeyFrames>
                                     </Storyboard>
                                 </VisualState>
@@ -394,6 +383,7 @@
     </Style>
 
     <Style x:Key="HeaderHyperlinkStyle" TargetType="HyperlinkButton">
+        <Setter Property="Foreground" Value="{ThemeResource OnSurfaceAccentBrush}"/>
         <Setter Property="Padding" Value="2"/>
         <Setter Property="CornerRadius" Value="{StaticResource CornerRadiusSmallValue}"/>
         <Setter Property="FontSize" Value="{StaticResource FontSizeXMedium}"/>
@@ -494,9 +484,9 @@
     </Style>
 
     <Style x:Key="ListenAppBarButtonStyle" TargetType="AppBarButton">
-        <Setter Property="Foreground" Value="White" />
+        <Setter Property="Foreground" Value="{ThemeResource OnSurfacePrimaryBrush}" />
         <Setter Property="Icon" Value="Play" />
-        <Setter Property="Background" Value="{StaticResource PrimaryThemeBrush}" />
+        <Setter Property="Background" Value="{ThemeResource BrandPrimaryBrush}" />
         <Setter Property="BorderBrush" Value="Transparent" />
         <Setter Property="BorderThickness" Value="0" />
         <Setter Property="Padding" Value="8,4" />
@@ -524,14 +514,14 @@
                                 <VisualState x:Name="PointerOver">
                                     <Storyboard>
                                         <ObjectAnimationUsingKeyFrames Storyboard.TargetName="Bg" Storyboard.TargetProperty="Background">
-                                            <DiscreteObjectKeyFrame KeyTime="0" Value="{StaticResource PrimaryHoverThemeBrush}" />
+                                            <DiscreteObjectKeyFrame KeyTime="0" Value="{ThemeResource BrandPrimaryHoverBrush}" />
                                         </ObjectAnimationUsingKeyFrames>
                                     </Storyboard>
                                 </VisualState>
                                 <VisualState x:Name="Pressed">
                                     <Storyboard>
                                         <ObjectAnimationUsingKeyFrames Storyboard.TargetName="Bg" Storyboard.TargetProperty="Background">
-                                            <DiscreteObjectKeyFrame KeyTime="0" Value="{StaticResource PrimaryPressedThemeBrush}" />
+                                            <DiscreteObjectKeyFrame KeyTime="0" Value="{ThemeResource BrandPrimaryPressedBrush}" />
                                         </ObjectAnimationUsingKeyFrames>
                                     </Storyboard>
                                 </VisualState>
@@ -546,7 +536,7 @@
                                 <VisualState x:Name="Focused">
                                     <Storyboard>
                                         <ObjectAnimationUsingKeyFrames Storyboard.TargetName="Bg" Storyboard.TargetProperty="BorderBrush">
-                                            <DiscreteObjectKeyFrame KeyTime="0" Value="White" />
+                                            <DiscreteObjectKeyFrame KeyTime="0" Value="{ThemeResource OnSurfacePrimaryBrush}" />
                                         </ObjectAnimationUsingKeyFrames>
                                         <ObjectAnimationUsingKeyFrames Storyboard.TargetName="Bg" Storyboard.TargetProperty="BorderThickness">
                                             <DiscreteObjectKeyFrame KeyTime="0" Value="1" />
@@ -594,7 +584,7 @@
                     <Grid x:Name="Root" Height="{TemplateBinding Height}" VerticalAlignment="Center" Background="Transparent">
                         <Border x:Name="Bg" Background="{TemplateBinding Background}" CornerRadius="{TemplateBinding CornerRadius}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Padding="{TemplateBinding Padding}" VerticalAlignment="Center" Height="{TemplateBinding Height}">
                             <StackPanel x:Name="ContentPanel" Orientation="Horizontal" Spacing="6" VerticalAlignment="Center" HorizontalAlignment="Center">
-                                <FontIcon x:Name="IconGlyph" Glyph="&#xE8DF;" FontSize="18" Foreground="{TemplateBinding Foreground}" />
+                                <FontIcon x:Name="IconPresenter" Glyph="&#xE8DF;" FontSize="18" Foreground="{TemplateBinding Foreground}" />
                                 <TextBlock x:Name="LabelText" Text="{TemplateBinding Label}" Foreground="{TemplateBinding Foreground}" VerticalAlignment="Center" FontSize="{TemplateBinding FontSize}" FontWeight="{TemplateBinding FontWeight}" />
                             </StackPanel>
                         </Border>
@@ -605,25 +595,41 @@
                                 <VisualState x:Name="PointerOver">
                                     <Storyboard>
                                         <ObjectAnimationUsingKeyFrames Storyboard.TargetName="Bg" Storyboard.TargetProperty="Background">
-                                            <DiscreteObjectKeyFrame KeyTime="0" Value="{StaticResource PrimaryHoverThemeBrush}" />
+                                            <DiscreteObjectKeyFrame KeyTime="0" Value="{ThemeResource BrandPrimaryHoverBrush}" />
                                         </ObjectAnimationUsingKeyFrames>
                                         <ObjectAnimationUsingKeyFrames Storyboard.TargetName="LabelText" Storyboard.TargetProperty="Foreground">
                                             <DiscreteObjectKeyFrame KeyTime="0" Value="White" />
                                         </ObjectAnimationUsingKeyFrames>
-                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="IconGlyph" Storyboard.TargetProperty="Foreground">
+                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="IconPresenter" Storyboard.TargetProperty="Foreground">
                                             <DiscreteObjectKeyFrame KeyTime="0" Value="White" />
                                         </ObjectAnimationUsingKeyFrames>
                                     </Storyboard>
                                 </VisualState>
-                                <VisualState x:Name="Pressed" />
-                                <VisualState x:Name="Disabled" />
+                                <VisualState x:Name="Pressed">
+                                    <Storyboard>
+                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="Bg" Storyboard.TargetProperty="Background">
+                                            <DiscreteObjectKeyFrame KeyTime="0" Value="{ThemeResource BrandPrimaryPressedBrush}" />
+                                        </ObjectAnimationUsingKeyFrames>
+                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="LabelText" Storyboard.TargetProperty="Foreground">
+                                            <DiscreteObjectKeyFrame KeyTime="0" Value="White" />
+                                        </ObjectAnimationUsingKeyFrames>
+                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="IconPresenter" Storyboard.TargetProperty="Foreground">
+                                            <DiscreteObjectKeyFrame KeyTime="0" Value="White" />
+                                        </ObjectAnimationUsingKeyFrames>
+                                    </Storyboard>
+                                </VisualState>
+                                <VisualState x:Name="Disabled">
+                                    <Storyboard>
+                                        <DoubleAnimation Storyboard.TargetName="Root" Storyboard.TargetProperty="Opacity" To="0.45" Duration="0:0:0" />
+                                    </Storyboard>
+                                </VisualState>
                                 <VisualState x:Name="Checked">
                                     <Storyboard>
                                         <ObjectAnimationUsingKeyFrames Storyboard.TargetName="Bg" Storyboard.TargetProperty="Background">
                                             <DiscreteObjectKeyFrame KeyTime="0" Value="transparent" />
                                         </ObjectAnimationUsingKeyFrames>
 
-                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="IconGlyph" Storyboard.TargetProperty="Glyph">
+                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="IconPresenter" Storyboard.TargetProperty="Glyph">
                                             <DiscreteObjectKeyFrame KeyTime="0" Value="&#xEB52;" />
                                         </ObjectAnimationUsingKeyFrames>
                                     </Storyboard>
@@ -631,16 +637,17 @@
                                 <VisualState x:Name="CheckedPointerOver">
                                     <Storyboard>
                                         <ObjectAnimationUsingKeyFrames Storyboard.TargetName="Bg" Storyboard.TargetProperty="Background">
-                                            <DiscreteObjectKeyFrame KeyTime="0" Value="{StaticResource PrimaryHoverThemeBrush}" />
+                                            <DiscreteObjectKeyFrame KeyTime="0" Value="{ThemeResource BrandPrimaryHoverBrush}" />
                                         </ObjectAnimationUsingKeyFrames>
-                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="IconGlyph" Storyboard.TargetProperty="Glyph">
+
+                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="IconPresenter" Storyboard.TargetProperty="Glyph">
                                             <DiscreteObjectKeyFrame KeyTime="0" Value="&#xEB52;" />
                                         </ObjectAnimationUsingKeyFrames>
 
                                         <ObjectAnimationUsingKeyFrames Storyboard.TargetName="LabelText" Storyboard.TargetProperty="Foreground">
                                             <DiscreteObjectKeyFrame KeyTime="0" Value="White" />
                                         </ObjectAnimationUsingKeyFrames>
-                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="IconGlyph" Storyboard.TargetProperty="Foreground">
+                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="IconPresenter" Storyboard.TargetProperty="Foreground">
                                             <DiscreteObjectKeyFrame KeyTime="0" Value="White" />
                                         </ObjectAnimationUsingKeyFrames>
                                     </Storyboard>
@@ -670,6 +677,7 @@
 
     <Style x:Key="HeaderGenericButtonStyle" TargetType="AppBarButton">
         <Setter Property="Foreground" Value="{ThemeResource SystemControlForegroundBaseHighBrush}" />
+        <Setter Property="Background" Value="Transparent" />
         <Setter Property="BorderBrush" Value="Transparent" />
         <Setter Property="BorderThickness" Value="0" />
         <Setter Property="Padding" Value="8,4" />
@@ -697,7 +705,7 @@
                                 <VisualState x:Name="PointerOver">
                                     <Storyboard>
                                         <ObjectAnimationUsingKeyFrames Storyboard.TargetName="Bg" Storyboard.TargetProperty="Background">
-                                            <DiscreteObjectKeyFrame KeyTime="0" Value="{StaticResource PrimaryHoverThemeBrush}" />
+                                            <DiscreteObjectKeyFrame KeyTime="0" Value="{ThemeResource BrandPrimaryHoverBrush}" />
                                         </ObjectAnimationUsingKeyFrames>
                                         <ObjectAnimationUsingKeyFrames Storyboard.TargetName="LabelText" Storyboard.TargetProperty="Foreground">
                                             <DiscreteObjectKeyFrame KeyTime="0" Value="White" />
@@ -710,7 +718,13 @@
                                 <VisualState x:Name="Pressed">
                                     <Storyboard>
                                         <ObjectAnimationUsingKeyFrames Storyboard.TargetName="Bg" Storyboard.TargetProperty="Background">
-                                            <DiscreteObjectKeyFrame KeyTime="0" Value="{StaticResource PrimaryPressedThemeBrush}" />
+                                            <DiscreteObjectKeyFrame KeyTime="0" Value="{ThemeResource BrandPrimaryPressedBrush}" />
+                                        </ObjectAnimationUsingKeyFrames>
+                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="LabelText" Storyboard.TargetProperty="Foreground">
+                                            <DiscreteObjectKeyFrame KeyTime="0" Value="White" />
+                                        </ObjectAnimationUsingKeyFrames>
+                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="IconPresenter" Storyboard.TargetProperty="Foreground">
+                                            <DiscreteObjectKeyFrame KeyTime="0" Value="White" />
                                         </ObjectAnimationUsingKeyFrames>
                                     </Storyboard>
                                 </VisualState>
@@ -830,7 +844,7 @@
     </Style>
 
     <Style x:Key="GridCoverButtonStyle" TargetType="HyperlinkButton" BasedOn="{StaticResource HyperlinkSmallButtonStyle}">
-        <Setter Property="Foreground" Value="{StaticResource HyperlinkForegroundBrush}"/>
+        <Setter Property="Foreground" Value="{ThemeResource OnSurfacePrimaryBrush}"/>
         <Setter Property="Margin" Value="4,0,0,0"/>
         <Setter Property="FontSize" Value="{StaticResource FontSizeMedium}"/>
         <Setter Property="Width" Value="{StaticResource GridCoverBottomFirstLineWidth}"/>
@@ -958,6 +972,54 @@
         <Setter Property="Margin" Value="20,0,0,0" />
     </Style>
 
+    <Style x:Key="GridTracksBaseHyperlinkButtonStyle" TargetType="HyperlinkButton">
+        <Setter Property="Foreground" Value="{ThemeResource HyperlinkForegroundBrush}" />
+        <Setter Property="Padding" Value="0" />
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="BorderBrush" Value="Transparent" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="HyperlinkButton">
+                    <Grid>
+                        <VisualStateManager.VisualStateGroups>
+                            <VisualStateGroup x:Name="CommonStates">
+                                <VisualState x:Name="Normal" />
+                                <VisualState x:Name="PointerOver">
+                                    <Storyboard>
+                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="Foreground" Storyboard.TargetName="Presenter">
+                                            <DiscreteObjectKeyFrame KeyTime="0" Value="{ThemeResource BrandPrimaryHoverBrush}" />
+                                        </ObjectAnimationUsingKeyFrames>
+                                    </Storyboard>
+                                </VisualState>
+                                <VisualState x:Name="Pressed">
+                                    <Storyboard>
+                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="Foreground" Storyboard.TargetName="Presenter">
+                                            <DiscreteObjectKeyFrame KeyTime="0" Value="{ThemeResource PressedThemeBrush}" />
+                                        </ObjectAnimationUsingKeyFrames>
+                                    </Storyboard>
+                                </VisualState>
+                                <VisualState x:Name="Disabled">
+                                    <Storyboard>
+                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="Foreground" Storyboard.TargetName="Presenter">
+                                            <DiscreteObjectKeyFrame KeyTime="0" Value="{ThemeResource HyperlinkDisabledThemeBrush}" />
+                                        </ObjectAnimationUsingKeyFrames>
+                                    </Storyboard>
+                                </VisualState>
+                            </VisualStateGroup>
+                        </VisualStateManager.VisualStateGroups>
+                        <ContentPresenter x:Name="Presenter"
+                                      Foreground="{TemplateBinding Foreground}"
+                                      ContentTemplate="{TemplateBinding ContentTemplate}"
+                                      Content="{TemplateBinding Content}"
+                                      HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                      VerticalAlignment="{TemplateBinding VerticalContentAlignment}" />
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
     <Style x:Key="GridTracksRowIndexTextBlockStyle" TargetType="TextBlock">
         <Setter Property="HorizontalTextAlignment" Value="Right"/>
         <Setter Property="VerticalAlignment" Value="Center"/>
@@ -966,7 +1028,7 @@
         <Setter Property="Foreground" Value="{ThemeResource SystemColorDisabledTextColor}"/>
     </Style>
 
-    <Style x:Key="GridTracksTitleHyperlinkButtonStyle" TargetType="HyperlinkButton">
+    <Style x:Key="GridTracksTitleHyperlinkButtonStyle" TargetType="HyperlinkButton" BasedOn="{StaticResource GridTracksBaseHyperlinkButtonStyle}">
         <Setter Property="Padding" Value="0"/>
         <Setter Property="MaxWidth" Value="280"/>
         <Setter Property="ContentTemplate">
@@ -985,7 +1047,7 @@
         <Setter Property="Padding" Value="0"/>
     </Style>
 
-    <Style x:Key="GridTracksAlbumHyperlinkButtonStyle" TargetType="HyperlinkButton">
+    <Style x:Key="GridTracksAlbumHyperlinkButtonStyle" TargetType="HyperlinkButton" BasedOn="{StaticResource GridTracksBaseHyperlinkButtonStyle}">
         <Setter Property="Padding" Value="0"/>
         <Setter Property="ContentTemplate">
             <Setter.Value>
@@ -996,7 +1058,7 @@
         </Setter>
     </Style>
 
-    <Style x:Key="GridTracksGenreHyperlinkButtonStyle" TargetType="HyperlinkButton">
+    <Style x:Key="GridTracksGenreHyperlinkButtonStyle" TargetType="HyperlinkButton" BasedOn="{StaticResource GridTracksBaseHyperlinkButtonStyle}">
         <Setter Property="Padding" Value="0" />
         <Setter Property="ContentTemplate">
             <Setter.Value>
@@ -1007,7 +1069,7 @@
         </Setter>
     </Style>
 
-    <Style x:Key="GridTracksArtistHyperlinkButtonStyle" TargetType="HyperlinkButton">
+    <Style x:Key="GridTracksArtistHyperlinkButtonStyle" TargetType="HyperlinkButton" BasedOn="{StaticResource GridTracksBaseHyperlinkButtonStyle}">
         <Setter Property="Padding" Value="0"/>
         <Setter Property="ContentTemplate">
             <Setter.Value>
@@ -1026,9 +1088,9 @@
         <Setter Property="VerticalAlignment" Value="Center" />
         <Setter Property="VerticalContentAlignment" Value="Bottom" />
         <Setter Property="StarEmptyColor" Value="Transparent" />
-        <Setter Property="StarSelectedColor" Value="{ThemeResource SystemAccentColor}" />
-        <Setter Property="StarPointerOverColor" Value="{ThemeResource SystemAccentColorLight3}" />
-        <Setter Property="StarCheckedPointerOverColor" Value="{ThemeResource SystemAccentColorLight2}" />
+        <Setter Property="StarSelectedColor" Value="{ThemeResource StarSelectedColor}" />
+        <Setter Property="StarPointerOverColor" Value="{ThemeResource StarPointerOverColor}" />
+        <Setter Property="StarCheckedPointerOverColor" Value="{ThemeResource StarCheckedPointerOverColor}" />
         <Setter Property="StarStrokeColor" Value="{ThemeResource StarStrokeColor}" />
         <Setter Property="Width" Value="130" />
     </Style>
@@ -1072,8 +1134,7 @@
                              BorderBrush="{TemplateBinding BorderBrush}"
                              BorderThickness="{TemplateBinding BorderThickness}"
                              Padding="{TemplateBinding Padding}">
-                            <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
-                                           VerticalAlignment="{TemplateBinding VerticalContentAlignment}" />
+                            <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}" />
                         </Border>
 
                         <VisualStateManager.VisualStateGroups>

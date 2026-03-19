@@ -1,4 +1,6 @@
-﻿using Windows.UI;
+﻿using Microsoft.UI;
+using Microsoft.UI.Windowing;
+using Windows.UI;
 using Windows.UI.ViewManagement;
 
 namespace Rok.Services;
@@ -66,6 +68,8 @@ public static class ThemeManager
 
         if (_window?.Content is FrameworkElement fe)
             fe.RequestedTheme = effective;
+
+        ApplyTitleBarColors();
     }
 
 
@@ -86,5 +90,34 @@ public static class ThemeManager
         // Simple relative luminance
         double luminance = ((0.2126 * c.R) + (0.7152 * c.G) + (0.0722 * c.B)) / 255.0;
         return luminance >= 0.5;
+    }
+
+
+    private static void ApplyTitleBarColors()
+    {
+        if (_window == null || !AppWindowTitleBar.IsCustomizationSupported())
+            return;
+
+        AppWindowTitleBar titleBar = _window.AppWindow.TitleBar;
+
+        Color brand = Color.FromArgb(0xFF, 0x15, 0x45, 0x87); // Blue700
+        Color hover = Color.FromArgb(0xFF, 0x25, 0x7E, 0xF9); // Blue400
+        Color pressed = Color.FromArgb(0xFF, 0x12, 0x3D, 0x7A); // Blue800
+        Color inactive = Color.FromArgb(0xFF, 0x0D, 0x2A, 0x54); // Blue900
+        Color dimText = Color.FromArgb(0xFF, 0xAA, 0xAA, 0xAA);
+
+        titleBar.BackgroundColor = brand;
+        titleBar.ForegroundColor = Colors.White;
+        titleBar.InactiveBackgroundColor = inactive;
+        titleBar.InactiveForegroundColor = dimText;
+
+        titleBar.ButtonBackgroundColor = brand;
+        titleBar.ButtonForegroundColor = Colors.White;
+        titleBar.ButtonHoverBackgroundColor = hover;
+        titleBar.ButtonHoverForegroundColor = Colors.White;
+        titleBar.ButtonPressedBackgroundColor = pressed;
+        titleBar.ButtonPressedForegroundColor = Colors.White;
+        titleBar.ButtonInactiveBackgroundColor = inactive;
+        titleBar.ButtonInactiveForegroundColor = dimText;
     }
 }
