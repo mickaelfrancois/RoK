@@ -104,7 +104,7 @@
 		<ProjectCapability Include="Msix" />
 	</ItemGroup>
 	<ItemGroup>
-		<PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
+		<PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.1" />
 		<PackageReference Include="CommunityToolkit.WinUI.Controls.TokenizingTextBox" Version="8.2.251219" />
 		<PackageReference Include="Microsoft.Extensions.Configuration.FileExtensions" Version="10.0.5" />
 		<PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="10.0.5" />
@@ -118,7 +118,7 @@
 		  <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
 		<PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.26100.7705" />
-		<PackageReference Include="Microsoft.WindowsAppSDK" Version="1.8.260209005" />
+		<PackageReference Include="Microsoft.WindowsAppSDK" Version="1.8.260317003" />
 		<PackageReference Include="MiF.Guard" Version="1.0.0" />
 		<PackageReference Include="MiF.Messenger" Version="1.0.0" />
 		<PackageReference Include="MiF.RelayCommand" Version="1.0.0" />
