@@ -1,6 +1,13 @@
 ﻿# ChangeLog
 
 
+## [1.7.2] Store – 20 mars 2026  
+
+### Corrigé
+
+- Correction d'un problème de style sur le player en thème sombre.
+
+
 ## [1.7.1] Store – 20 mars 2026  
 
 ### Modifié
