@@ -1,5 +1,14 @@
 ﻿# ChangeLog
 
+
+## [1.7.1] Store – 20 mars 2026  
+
+### Modifié
+
+- Mise à jour des styles
+- Unification des commandes API et Terminal
+
+- 
 ## [1.7.0] Preview – 16 mars 2026  
 
 ### Ajouté
