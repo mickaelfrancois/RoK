@@ -232,12 +232,12 @@
             <!-- Player commands -->
             <Grid Grid.Row="0" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="0">
                 <CommandBar VerticalAlignment="Center" HorizontalAlignment="Center" Background="Transparent" IsDynamicOverflowEnabled="False" OverflowButtonVisibility="Collapsed">
-                    <AppBarButton Icon="Previous" Command="{x:Bind ViewModel.SkipPreviousCommand}" IsEnabled="{x:Bind ViewModel.CanSkipPrevious, Mode=OneWay}" Foreground="White" VerticalAlignment="Stretch" Height="65" Width="40" Margin="0,0,0,0" />
-                    <AppBarButton Command="{x:Bind ViewModel.TogglePlayPauseCommand}" Foreground="White" Margin="10,0,0,0" Style="{StaticResource RoundAppBarButtonStyle}">
+                    <AppBarButton Icon="Previous" Command="{x:Bind ViewModel.SkipPreviousCommand}" IsEnabled="{x:Bind ViewModel.CanSkipPrevious, Mode=OneWay}" Foreground="White" RequestedTheme="Dark" VerticalAlignment="Stretch" Height="65" Width="40" Margin="0,0,0,0" />
+                    <AppBarButton Command="{x:Bind ViewModel.TogglePlayPauseCommand}" Foreground="White" Margin="10,0,0,0" RequestedTheme="Dark" Style="{StaticResource RoundAppBarButtonStyle}">
                         <SymbolIcon Symbol="{x:Bind ViewModel.PlaybackState, Mode=OneWay, Converter={StaticResource PlaybackStateToButtonIconConverter}}" />
                     </AppBarButton>
 
-                    <AppBarButton Icon="Next" Command="{x:Bind ViewModel.SkipNextCommand}" IsEnabled="{x:Bind ViewModel.CanSkipNext, Mode=OneWay}" Foreground="White" VerticalAlignment="Stretch" Height="65" Width="40" Margin="10,0,0,0" />
+                    <AppBarButton Icon="Next" Command="{x:Bind ViewModel.SkipNextCommand}" IsEnabled="{x:Bind ViewModel.CanSkipNext, Mode=OneWay}" Foreground="White" RequestedTheme="Dark" VerticalAlignment="Stretch" Height="65" Width="40" Margin="10,0,0,0" />
                 </CommandBar>
             </Grid>
         </Grid>
@@ -246,13 +246,13 @@
         <!-- Player extra commands -->
         <Grid x:Name="playerCommands" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="0,0,4,0">
             <CommandBar HorizontalAlignment="Right" Background="Transparent" OverflowButtonVisibility="Collapsed">
-                <AppBarButton Icon="MusicInfo" Command="{x:Bind ViewModel.OpenListeningCommand}" Foreground="White">
+                <AppBarButton Icon="MusicInfo" Command="{x:Bind ViewModel.OpenListeningCommand}" Foreground="White" RequestedTheme="Dark">
                     <ToolTipService.ToolTip>
                         <TextBlock x:Uid="PlayerCurrentListeningToolTips" Text="Show current playlist" />
                     </ToolTipService.ToolTip>
                 </AppBarButton>
 
-                <AppBarButton x:Name="volume" Foreground="White">
+                <AppBarButton x:Name="volume" Foreground="White" RequestedTheme="Dark">
                     <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="{x:Bind ViewModel.Volume, Mode=OneWay, Converter={StaticResource VolumeToGlyphConverter}}" />
                     <AppBarButton.Flyout>
                         <Flyout>
@@ -266,14 +266,14 @@
                     </AppBarButton.Flyout>
                 </AppBarButton>
 
-                <AppBarButton x:Name="btCompactMode" Command="{x:Bind ViewModel.CompactModeCommand}" Foreground="White">
+                <AppBarButton x:Name="btCompactMode" Command="{x:Bind ViewModel.CompactModeCommand}" Foreground="White" RequestedTheme="Dark">
                     <ToolTipService.ToolTip>
                         <TextBlock x:Uid="PlayerCompactModeToolTips" Text="Compact mode."></TextBlock>
                     </ToolTipService.ToolTip>
                     <SymbolIcon Symbol="StopSlideShow" />
                 </AppBarButton>
 
-                <AppBarButton Command="{x:Bind ViewModel.FullscreenCommand}" Foreground="White">
+                <AppBarButton Command="{x:Bind ViewModel.FullscreenCommand}" Foreground="White" RequestedTheme="Dark">
                     <ToolTipService.ToolTip>
                         <TextBlock x:Uid="PlayerFullscreenToolTips" Text="Full screen mode."></TextBlock>
                     </ToolTipService.ToolTip>
