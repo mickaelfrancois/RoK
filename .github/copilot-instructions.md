@@ -1,8 +1,6 @@
 # GitHub Copilot Instructions for Rok
 
-## Code Language and Documentation
-
-**CRITICAL RULES:**
+## General Guidelines
 - **All code and comments MUST be written in English**
 - **Comments are only added when strictly necessary to understand a specific line of code**
 - **All code MUST compile without warnings**
@@ -10,12 +8,13 @@
 - Self-documenting code is preferred over comments
 - Respect clean code and clean architecture
 
-## Project Overview
+## Code Language and Documentation
+- The user prefers scripting languages like Python or Bash over PowerShell.
 
+## Project Overview
 Rok is a .NET 10 application using C# 13.0 with WinUi3 for listening local music and content management (albums, artists, tracks).
 
 ## Architecture
-
 - **Presentation Layer**: MVVM ViewModels with CommunityToolkit.Mvvm
 - **Application Layer**: Business logic and services
 - **Domain Layer**: Core entities and domain logic
@@ -26,14 +25,12 @@ Rok is a .NET 10 application using C# 13.0 with WinUi3 for listening local music
 ## Code Standards
 
 ### General Conventions
-
 - **Framework**: .NET 10, C# 13.0
 - **Patterns**: MVVM with `ObservableObject`, dependency injection
-- **Collections**: Never use collection expressions (see `.editorconfig`)
+- **Collections**: Never use collection expressions (see `.editorconfig`)					
 - **Warnings**: Code must compile with zero warnings
 
 ### Naming Conventions
-
 - Classes: PascalCase
 - Methods: PascalCase
 - Local variables: camelCase
@@ -43,10 +40,8 @@ Rok is a .NET 10 application using C# 13.0 with WinUi3 for listening local music
 ### Architecture Patterns
 
 #### ViewModels
-
 - The application uses `ResourceManager` for translations in `AlbumsFilterMenuBuilder`.
 - Album tags are stored as a comma-separated string in `AlbumDto.TagsAsString`.
 
 ### Track Management
-
 - The method `shuffleTracks` must shuffle a list of `Track` starting from `_currentIndex`, while distributing artist names in the list to maximize their separation.
