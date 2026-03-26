@@ -32,5 +32,12 @@ public class Migration9 : IMigration
         connection.Execute("CREATE INDEX idx_listeningEvents_artist ON ListeningEvents(ArtistId);");
         connection.Execute("CREATE INDEX idx_listeningEvents_album ON ListeningEvents(AlbumId);");
         connection.Execute("CREATE INDEX idx_listeningEvents_genre ON ListeningEvents(GenreId);");
+
+        connection.Execute("""
+            INSERT INTO ListeningEvents (trackId, artistId, albumId, genreId, playedAt, wasSkipped, durationPlayed, durationTotal)
+            SELECT id, artistId, albumId, genreId, lastListen, 0, duration, duration
+            FROM Tracks
+            WHERE lastListen IS NOT NULL;
+            """);
     }
 }
