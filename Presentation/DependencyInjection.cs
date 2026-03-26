@@ -1,5 +1,6 @@
 ﻿using Microsoft.UI.Dispatching;
 using Rok.Application.Features.Playlists.PlaylistMenu;
+using Rok.Application.Interfaces.Pictures;
 using Rok.Application.Services.Filters;
 using Rok.Application.Services.Grouping;
 using Rok.Services.PlayerCommand;

@@ -75,15 +75,7 @@ public class PlayerService : IPlayerService
     public TrackDto? CurrentTrack
     {
         get => _currentTrack;
-        private set
-        {
-            TrackDto? previousTrack = _currentTrack;
-
-            _currentTrack = value;
-
-            if ((previousTrack == null || previousTrack.Id != _currentTrack?.Id) && _currentTrack != null)
-                Messenger.Send(new MediaChangedMessage(_currentTrack, previousTrack));
-        }
+        private set => _currentTrack = value;
     }
 
     private double _volumeBeforeMute = 50;
@@ -403,13 +395,18 @@ public class PlayerService : IPlayerService
 
     private void LoadFile(TrackDto track)
     {
+        long durationPlayed = (long)_player.Position;
         _player.Stop();
 
         bool res = _player.SetTrack(track);
 
         if (res)
         {
+            TrackDto? previousTrack = CurrentTrack;
             CurrentTrack = track;
+
+            if ((previousTrack == null || previousTrack.Id != _currentTrack?.Id) && _currentTrack != null)
+                Messenger.Send(new MediaChangedMessage(_currentTrack, previousTrack, durationPlayed));
 
             UpdateDiscordPresence(track, isPlaying: false);
         }

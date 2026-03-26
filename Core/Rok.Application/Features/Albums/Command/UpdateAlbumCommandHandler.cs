@@ -1,4 +1,4 @@
-﻿using Rok.Application.Interfaces;
+﻿using Rok.Application.Interfaces.Repositories;
 using Rok.Shared;
 
 namespace Rok.Application.Features.Albums.Command;

@@ -1,6 +1,6 @@
 ﻿using Rok.Application.Features.Playlists.Query;
 
-namespace Rok.Application.Interfaces;
+namespace Rok.Application.Interfaces.Repositories;
 
 public interface IPlaylistTrackGenerateRepository
 {

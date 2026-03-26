@@ -1,3 +1,5 @@
+using Rok.Application.Interfaces.Pictures;
+
 namespace Rok.ViewModels.Playlist.Services;
 
 public class PlaylistPictureService(IArtistPicture artistPicture, ILogger<PlaylistPictureService> logger)

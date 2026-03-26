@@ -1,4 +1,4 @@
-﻿using Rok.Application.Interfaces;
+﻿using Rok.Application.Interfaces.Repositories;
 using Rok.Domain.Interfaces.Entities;
 
 namespace Rok.Application.Features.Search.Query;

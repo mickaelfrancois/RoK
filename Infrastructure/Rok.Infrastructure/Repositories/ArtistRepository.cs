@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Rok.Application.Interfaces;
+using Rok.Application.Interfaces.Repositories;
 using Rok.Domain.Interfaces.Entities;
 using Rok.Shared;
 
