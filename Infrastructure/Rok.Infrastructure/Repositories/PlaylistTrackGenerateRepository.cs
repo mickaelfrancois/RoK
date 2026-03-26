@@ -4,6 +4,7 @@ using Microsoft.Extensions.Logging;
 using Rok.Application.Dto;
 using Rok.Application.Features.Playlists.Query;
 using Rok.Application.Interfaces;
+using Rok.Application.Interfaces.Repositories;
 using Rok.Shared.Enums;
 
 namespace Rok.Infrastructure.Repositories;

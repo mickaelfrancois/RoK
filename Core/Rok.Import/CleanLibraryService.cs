@@ -3,6 +3,7 @@ using System.Transactions;
 using Microsoft.Extensions.Logging;
 using Rok.Application.Dto;
 using Rok.Application.Interfaces;
+using Rok.Application.Interfaces.Repositories;
 using Rok.Domain.Entities;
 
 namespace Rok.Import;

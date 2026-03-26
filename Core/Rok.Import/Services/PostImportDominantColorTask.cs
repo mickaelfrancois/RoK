@@ -1,5 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
 using Rok.Application.Interfaces;
+using Rok.Application.Interfaces.Pictures;
+using Rok.Application.Interfaces.Repositories;
 using Rok.Domain.Entities;
 using Rok.Shared;
 

@@ -1,6 +1,7 @@
 using Rok.Application.Features.Albums.Command;
 using Rok.Application.Features.Artists.Command;
 using Rok.Application.Features.Genres.Command;
+using Rok.Application.Features.ListeningEvents.Command;
 using Rok.Application.Features.Tracks.Command;
 
 namespace Rok.ViewModels.Player.Services;
@@ -54,5 +55,19 @@ public class PlayerListenTracker(IMediator mediator)
 
         await mediator.SendMessageAsync(new UpdateGenretLastListenCommand(genreId));
         _genreUpdatedCache.Add(genreId);
+    }
+
+
+    public async Task UpdateListeningEventsAsync(long trackId, long? artistId, long? albumId, long? genreId, long durationPlayed, long durationTotal)
+    {
+        await mediator.SendMessageAsync(new CreateListeningEventCommand
+        {
+            TrackId = trackId,
+            ArtistId = artistId,
+            AlbumId = albumId,
+            GenreId = genreId,
+            DurationPlayed = durationPlayed,
+            DurationTotal = durationTotal
+        });
     }
 }

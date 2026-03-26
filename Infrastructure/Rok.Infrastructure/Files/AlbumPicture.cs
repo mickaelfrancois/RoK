@@ -1,4 +1,5 @@
 ﻿using Rok.Application.Interfaces;
+using Rok.Application.Interfaces.Pictures;
 
 namespace Rok.Infrastructure.Files;
 

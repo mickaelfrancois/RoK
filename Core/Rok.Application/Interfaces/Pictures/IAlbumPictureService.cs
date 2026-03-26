@@ -1,4 +1,4 @@
-namespace Rok.Application.Interfaces;
+namespace Rok.Application.Interfaces.Pictures;
 
 public interface IAlbumPictureService
 {

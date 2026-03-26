@@ -3,6 +3,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.UI.Dispatching;
 using Rok.Application.Features.Tracks.Query;
+using Rok.Application.Interfaces.Pictures;
 using Windows.Storage;
 using Windows.Storage.AccessCache;
 

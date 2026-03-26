@@ -281,6 +281,14 @@ public partial class PlayerViewModel : ObservableObject, IDisposable
             {
                 previousTrack.Listening = false;
                 previousTrack.Listened = true;
+
+                long duration = message.DurationPlayed ?? 0;
+                await _listenTracker.UpdateListeningEventsAsync(previousTrack.Track.Id,
+                   previousTrack.Track.ArtistId,
+                    previousTrack.Track.AlbumId,
+                    previousTrack.Track.GenreId,
+                    duration,
+                    previousTrack.Track.Duration);
             }
 
             if (message.NewTrack != null)
@@ -341,19 +349,19 @@ public partial class PlayerViewModel : ObservableObject, IDisposable
 
     private async Task UpdateListenCountAsync()
     {
-        if (CurrentTrack != null)
-        {
-            await _listenTracker.UpdateTrackListenAsync(CurrentTrack.Track.Id);
+        if (CurrentTrack == null)
+            return;
 
-            if (CurrentTrack.Track.GenreId.HasValue)
-                await _listenTracker.UpdateGenreListenAsync(CurrentTrack.Track.GenreId.Value);
-        }
+        await _listenTracker.UpdateTrackListenAsync(CurrentTrack.Track.Id);
 
-        if (CurrentAlbum != null)
-            await _listenTracker.UpdateAlbumListenAsync(CurrentAlbum.Album.Id);
+        if (CurrentTrack.Track.GenreId.HasValue)
+            await _listenTracker.UpdateGenreListenAsync(CurrentTrack.Track.GenreId.Value);
 
-        if (CurrentArtist != null)
-            await _listenTracker.UpdateArtistListenAsync(CurrentArtist.Artist.Id);
+        if (CurrentTrack.Track.AlbumId.HasValue)
+            await _listenTracker.UpdateAlbumListenAsync(CurrentTrack.Track.AlbumId.Value);
+
+        if (CurrentTrack.Track.ArtistId.HasValue)
+            await _listenTracker.UpdateArtistListenAsync(CurrentTrack.Track.ArtistId.Value);
     }
 
     private async Task LoadLyricsAsync()

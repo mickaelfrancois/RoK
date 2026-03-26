@@ -1,4 +1,4 @@
-﻿namespace Rok.Application.Interfaces;
+﻿namespace Rok.Application.Interfaces.Repositories;
 
 public interface ICountryRepository : IRepository<CountryEntity>
 {

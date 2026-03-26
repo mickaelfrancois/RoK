@@ -7,20 +7,16 @@ public class Migration9 : IMigration
     public void Apply(IDbConnection connection)
     {
         string query = """
-            CREATE TABLE ListeningEvent (
+            CREATE TABLE ListeningEvents (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            TrackId INTEGER NOT NULL,
-            ArtistId INTEGER NULL,
-            AlbumId INTEGER NULL,
-            GenreId INTEGER NULL,
-            PlayedAt DATETIME NOT NULL,
-            WasSkipped BOOLEAN NOT NULL,
-
-            INDEX idx_playedAt (PlayedAt),
-            INDEX idx_track (TrackId),
-            INDEX idx_artist (ArtistId),
-            INDEX idx_album (AlbumId),
-            INDEX idx_genre (GenreId),
+            trackId INTEGER NOT NULL,
+            artistId INTEGER NULL,
+            albumId INTEGER NULL,
+            genreId INTEGER NULL,
+            playedAt DATETIME NOT NULL,
+            wasSkipped BOOLEAN NOT NULL,
+            durationPlayed INTEGER NOT NULL,
+            durationTotal INTEGER NOT NULL,
 
             FOREIGN KEY (TrackId) REFERENCES Tracks(Id) ON DELETE CASCADE,
             FOREIGN KEY (ArtistId) REFERENCES Artists(Id) ON DELETE SET NULL,
@@ -30,5 +26,11 @@ public class Migration9 : IMigration
             """;
 
         connection.Execute(query);
+
+        connection.Execute("CREATE INDEX idx_listeningEvents_playedAt ON ListeningEvents(PlayedAt);");
+        connection.Execute("CREATE INDEX idx_listeningEvents_track ON ListeningEvents(TrackId);");
+        connection.Execute("CREATE INDEX idx_listeningEvents_artist ON ListeningEvents(ArtistId);");
+        connection.Execute("CREATE INDEX idx_listeningEvents_album ON ListeningEvents(AlbumId);");
+        connection.Execute("CREATE INDEX idx_listeningEvents_genre ON ListeningEvents(GenreId);");
     }
 }

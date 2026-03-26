@@ -2,6 +2,8 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Rok.Application.Interfaces;
+using Rok.Application.Interfaces.Pictures;
+using Rok.Application.Interfaces.Repositories;
 using Rok.Application.Tag;
 using Rok.Infrastructure.Files;
 using Rok.Infrastructure.FileSystem;
@@ -68,6 +70,7 @@ public static class DependencyInjection
         services.AddScoped<IPlaylistHeaderRepository, PlaylistHeaderRepository>();
         services.AddScoped<IPlaylistTrackRepository, PlaylistTrackRepository>();
         services.AddScoped<IPlaylistTrackGenerateRepository, PlaylistTrackGenerateRepository>();
+        services.AddScoped<IListeningEventRepository, ListeningEventRepository>();
 
         services.AddSingleton<ITagService, TagService>();
         services.AddSingleton<IMusicDataApiService, MusicDataApiService>();
