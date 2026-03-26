@@ -1,5 +1,6 @@
 ﻿using System.Transactions;
 using Rok.Application.Interfaces;
+using Rok.Application.Interfaces.Repositories;
 
 namespace Rok.Application.Features.Playlists.Command;
 

@@ -2,6 +2,7 @@ using Microsoft.Extensions.Logging;
 using Rok.Application.Dto.MusicDataApi;
 using Rok.Application.Features.Artists.Command;
 using Rok.Application.Interfaces;
+using Rok.Application.Interfaces.Pictures;
 using Rok.Shared.Extensions;
 
 namespace Rok.Application.Features.Artists.Services;

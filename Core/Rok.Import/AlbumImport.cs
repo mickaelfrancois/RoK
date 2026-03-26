@@ -1,5 +1,6 @@
 ﻿using System.Text.RegularExpressions;
 using Rok.Application.Interfaces;
+using Rok.Application.Interfaces.Repositories;
 using Rok.Application.Tag;
 using Rok.Domain.Entities;
 using Rok.Import.Models;

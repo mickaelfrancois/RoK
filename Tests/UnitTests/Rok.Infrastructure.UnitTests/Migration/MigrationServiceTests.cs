@@ -256,6 +256,38 @@ public class MigrationServiceTests : IDisposable
         migration3.Verify(m => m.Apply(_connection), Times.Once);
     }
 
+    [Fact]
+    public void MigrateToLatest_WithAllRealMigrations_ReachesLatestVersion()
+    {
+        // Arrange
+        IMigration[] migrations = new IMigration[]
+        {
+            new Migration2(),
+            new Migration3(),
+            new Migration4(),
+            new Migration5(),
+            new Migration6(),
+            new Migration7(),
+            new Migration8(),
+            new Migration9()
+        };
+
+        MigrationService sut = new(_connection, migrations, NullLogger<MigrationService>.Instance);
+        sut.Initial();
+
+        // Act
+        sut.MigrateToLatest();
+
+        // Assert
+        Assert.Equal(9, sut.GetDatabaseVersion());
+        AssertColumnExists("Tracks", "getLyricsLastAttempt");
+        AssertColumnExists("Artists", "getMetaDataLastAttempt");
+        AssertColumnExists("Albums", "getMetaDataLastAttempt");
+        AssertColumnExists("Artists", "flickrUrl");
+        AssertColumnExists("Countries", "name");
+        AssertTableExists("ListeningEvent");
+    }
+
     private void AssertTableExists(string tableName)
     {
         string sql = "SELECT COUNT(*) FROM sqlite_master WHERE type='table' AND name=@name";
