@@ -23,7 +23,7 @@
         <StackPanel Padding="24" Spacing="24">
 
             <!-- Hero section -->
-            <TextBlock x:Uid="Insights_HeroTitle"  Text="🎨 Ton mois en musique" Style="{StaticResource HeaderTextBlockStyle}" />
+            <TextBlock x:Uid="Insights_HeroTitle"  Text="🎨 Ton mois en musique" Style="{StaticResource InsightTitleTextBlockStyle}" />
 
             <controls:WrapPanel Orientation="Horizontal" HorizontalSpacing="12" VerticalSpacing="12">
                 
@@ -88,7 +88,7 @@
                 </Border>
             </controls:WrapPanel>
 
-            <TextBlock x:Uid="Insights_HotListeningTimes"  Text="🔥 Quand tu écoutes le plus" Style="{StaticResource HeaderTextBlockStyle}" />
+            <TextBlock x:Uid="Insights_HotListeningTimes"  Text="🔥 Quand tu écoutes le plus" Style="{StaticResource InsightTitleTextBlockStyle}" />
             <Border Style="{StaticResource MetricCardStyle}">
                 <StackPanel Spacing="8">
 
@@ -144,7 +144,7 @@
                 </StackPanel>
             </Border>
 
-            <TextBlock Text="🎧 Tes sessions d'écoute" Style="{StaticResource HeaderTextBlockStyle}" />
+            <TextBlock Text="🎧 Tes sessions d'écoute" Style="{StaticResource InsightTitleTextBlockStyle}" />
             <!--<StackPanel Spacing="16">
 
                 <TextBlock Text="Tes sessions d'écoute"
@@ -168,7 +168,7 @@
 
             </StackPanel>-->
 
-            <TextBlock x:Uid="Insights_ImportantTracks"  Text="🏆 Tes titres les plus importants" Style="{StaticResource HeaderTextBlockStyle}" />
+            <TextBlock x:Uid="Insights_ImportantTracks"  Text="🏆 Tes titres les plus importants" Style="{StaticResource InsightTitleTextBlockStyle}" />
             <Border Style="{StaticResource MetricCardStyle}">
                 <StackPanel Spacing="20">
 
@@ -255,7 +255,7 @@
                 </StackPanel>
             </Border>
 
-            <TextBlock x:Uid="InsightsPage_ListeningProfileHeader"  Text="🧬 Ton profil d'écoute" Style="{StaticResource HeaderTextBlockStyle}" />
+            <TextBlock x:Uid="InsightsPage_ListeningProfileHeader"  Text="🧬 Ton profil d'écoute" Style="{StaticResource InsightTitleTextBlockStyle}" />
 
             <StackPanel Orientation="Horizontal" Spacing="24">
                 <Border Style="{StaticResource MetricCardStyle}" Width="400" MaxWidth="400" HorizontalAlignment="Left">
@@ -311,7 +311,7 @@
             </StackPanel>
 
 
-            <TextBlock x:Uid="Insights_BadgesHeader"  Text="🥇 Tes badges" Style="{StaticResource HeaderTextBlockStyle}" />
+            <TextBlock x:Uid="Insights_BadgesHeader"  Text="🥇 Tes badges" Style="{StaticResource InsightTitleTextBlockStyle}" />
             <ItemsRepeater ItemsSource="{x:Bind ViewModel.Badges, Mode=OneWay}">
                 <ItemsRepeater.Layout>
                     <UniformGridLayout MinColumnSpacing="12" MinRowSpacing="12" MinItemWidth="260" ItemsJustification="Start"/>
