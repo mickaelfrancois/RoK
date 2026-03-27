@@ -21,7 +21,7 @@ public enum ListeningProfile
     Unknown,
     CuriousExplorer,
     FaithfulIntense,
-    Night,
+    NightOwl,
     FocusMode,
     ChannelSurfer
 }

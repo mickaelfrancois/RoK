@@ -486,14 +486,14 @@
   <data name="playlistGroupEntityArtists" xml:space="preserve">
     <value>Artists</value>
   </data>
-  <data name="playlistGroupEntityAlbums" xml:space="preserve">
-    <value>Albums</value>
+  <data name="playlistGroupEntityGenres" xml:space="preserve">
+    <value>Genres</value>
   </data>
   <data name="playlistGroupEntityTracks" xml:space="preserve">
     <value>Tracks</value>
   </data>
-  <data name="playlistGroupEntityGenres" xml:space="preserve">
-    <value>Genres</value>
+  <data name="playlistGroupEntityAlbums" xml:space="preserve">
+    <value>Albums</value>
   </data>
   <data name="playlistGroupEntityCountries" xml:space="preserve">
     <value>Countries</value>
@@ -765,14 +765,14 @@
   <data name="optionsThemeLabel.Text" xml:space="preserve">
     <value>Theme</value>
   </data>
-  <data name="optionsThemeSystemItem.Content" xml:space="preserve">
-    <value>System</value>
+  <data name="optionsThemeDarkItem.Content" xml:space="preserve">
+    <value>Dark</value>
   </data>
   <data name="optionsThemeLightItem.Content" xml:space="preserve">
     <value>Light</value>
   </data>
-  <data name="optionsThemeDarkItem.Content" xml:space="preserve">
-    <value>Dark</value>
+  <data name="optionsThemeSystemItem.Content" xml:space="preserve">
+    <value>System</value>
   </data>
   <data name="optionsLibraryTitle.Text" xml:space="preserve">
     <value>Library</value>
@@ -972,11 +972,11 @@
   <data name="shuffleButton.Label" xml:space="preserve">
     <value>Shuffle</value>
   </data>
-  <data name="NoLibraryFoldersMessage" xml:space="preserve">
-    <value>You have not added any library folders yet. Please add at least one library folder in the settings to refresh the library.</value>
-  </data>
   <data name="NoLibraryFoldersTitleMessage" xml:space="preserve">
     <value>No library</value>
+  </data>
+  <data name="NoLibraryFoldersMessage" xml:space="preserve">
+    <value>You have not added any library folders yet. Please add at least one library folder in the settings to refresh the library.</value>
   </data>
   <data name="albumViewEdit.Label" xml:space="preserve">
     <value>Edit</value>
@@ -1023,17 +1023,17 @@
   <data name="trackLastListenLabel.Text" xml:space="preserve">
     <value>Last listen:</value>
   </data>
-  <data name="trackSkipCountLabel.Text" xml:space="preserve">
-    <value>Skip count:</value>
-  </data>
-  <data name="trackLastSkipLabel.Text" xml:space="preserve">
-    <value>Last skip:</value>
-  </data>
   <data name="trackMusicBrainzIdLabel.Text" xml:space="preserve">
     <value>MusicBrainz ID:</value>
   </data>
   <data name="trackStorageLabel.Text" xml:space="preserve">
     <value>Storage:</value>
+  </data>
+  <data name="trackSkipCountLabel.Text" xml:space="preserve">
+    <value>Skip count:</value>
+  </data>
+  <data name="trackLastSkipLabel.Text" xml:space="preserve">
+    <value>Last skip:</value>
   </data>
   <data name="OptionTabLibrary.Header" xml:space="preserve">
     <value>Library</value>
@@ -1101,11 +1101,11 @@
   <data name="StatListened.Text" xml:space="preserve">
     <value>🔹Listened:</value>
   </data>
-  <data name="ResetListenCountConfirmationTitle" xml:space="preserve">
-    <value>Confirmation</value>
-  </data>
   <data name="ResetListenCountTitleConfirmation" xml:space="preserve">
     <value>Do you want to reset listen count?</value>
+  </data>
+  <data name="ResetListenCountConfirmationTitle" xml:space="preserve">
+    <value>Confirmation</value>
   </data>
   <data name="resetListenCountToolTip.Text" xml:space="preserve">
     <value>Reset listen count</value>
@@ -1206,17 +1206,29 @@
   <data name="CommandTabApiDocTitle.Text" xml:space="preserve">
     <value>Web API</value>
   </data>
+  <data name="CommandTabHeaderTest.Text" xml:space="preserve">
+    <value>Test</value>
+  </data>
+  <data name="CommandTabHeaderDescription.Text" xml:space="preserve">
+    <value>Description</value>
+  </data>
   <data name="CommandTabHeaderMethod.Text" xml:space="preserve">
     <value>Method</value>
   </data>
   <data name="CommandTabHeaderEndpoint.Text" xml:space="preserve">
     <value>Endpoint</value>
   </data>
-  <data name="CommandTabHeaderDescription.Text" xml:space="preserve">
-    <value>Description</value>
+  <data name="CommandTabCliTitle.Text" xml:space="preserve">
+    <value>Command Line</value>
   </data>
-  <data name="CommandTabHeaderTest.Text" xml:space="preserve">
-    <value>Test</value>
+  <data name="CommandTabCliUsage.Text" xml:space="preserve">
+    <value>Usage: rok.exe [command] [argument]</value>
+  </data>
+  <data name="CommandTabHeaderCommand.Text" xml:space="preserve">
+    <value>Command</value>
+  </data>
+  <data name="CommandTabHeaderCommandDescription.Text" xml:space="preserve">
+    <value>Description</value>
   </data>
   <data name="ApiEndpointStatusDesc.Text" xml:space="preserve">
     <value>Returns the current playback status (state, volume, position)</value>
@@ -1247,18 +1259,6 @@
   </data>
   <data name="ApiEndpointMuteDesc.Text" xml:space="preserve">
     <value>Mute the volume</value>
-  </data>
-  <data name="CommandTabCliTitle.Text" xml:space="preserve">
-    <value>Command Line</value>
-  </data>
-  <data name="CommandTabCliUsage.Text" xml:space="preserve">
-    <value>Usage: rok.exe [command] [argument]</value>
-  </data>
-  <data name="CommandTabHeaderCommand.Text" xml:space="preserve">
-    <value>Command</value>
-  </data>
-  <data name="CommandTabHeaderCommandDescription.Text" xml:space="preserve">
-    <value>Description</value>
   </data>
   <data name="CliPlayDesc.Text" xml:space="preserve">
     <value>Start or resume playback</value>
@@ -1304,5 +1304,206 @@
   </data>
   <data name="CliVolumeDesc.Text" xml:space="preserve">
     <value>Set the volume. Value must be between 0 and 100</value>
+  </data>
+  <data name="Insights_ProfileCuriousExplorer" xml:space="preserve">
+    <value>Curious Explorer</value>
+  </data>
+  <data name="Insights_ProfileCuriousExplorerDescription" xml:space="preserve">
+    <value>You constantly explore new artists, rarely lingering on the same tracks.</value>
+  </data>
+  <data name="Insights_ProfileFaithfulIntense" xml:space="preserve">
+    <value>Deep Listener</value>
+  </data>
+  <data name="Insights_ProfileFaithfulIntenseDescription" xml:space="preserve">
+    <value>You listen for long periods, skip little, and often return to the same tracks.</value>
+  </data>
+  <data name="Insights_ProfileNightOwl" xml:space="preserve">
+    <value>Night Owl</value>
+  </data>
+  <data name="Insights_ProfileNightOwlDescription" xml:space="preserve">
+    <value>Your listening sessions are concentrated at night, when silence gives way to music.</value>
+  </data>
+  <data name="Insights_ProfileFocusMode" xml:space="preserve">
+    <value>Focus Mode</value>
+  </data>
+  <data name="Insights_ProfileFocusModeDescription" xml:space="preserve">
+    <value>You listen in depth, with few different artists, and you see your sessions through to the end.</value>
+  </data>
+  <data name="Insights_ProfileChannelSurfer" xml:space="preserve">
+    <value>Skimmer</value>
+  </data>
+  <data name="Insights_ProfileChannelSurferDescription" xml:space="preserve">
+    <value>You explore quickly, skip a lot, always searching for the next perfect track.</value>
+  </data>
+  <data name="Insights_ArtistByMonth" xml:space="preserve">
+    <value>Artists / Month</value>
+  </data>
+  <data name="Insights_BadgeSmoothListenerName" xml:space="preserve">
+    <value>Smooth Listener</value>
+  </data>
+  <data name="Insights_BadgeLowSkipName" xml:space="preserve">
+    <value>Low Skip</value>
+  </data>
+  <data name="Insights_BadgeHyperZapperName" xml:space="preserve">
+    <value>Hyper Zapper</value>
+  </data>
+  <data name="Insights_BadgeZapperName" xml:space="preserve">
+    <value>Zapper</value>
+  </data>
+  <data name="Insights_BadgeObsessedName" xml:space="preserve">
+    <value>Obsessed</value>
+  </data>
+  <data name="Insights_BadgeReplayLoverName" xml:space="preserve">
+    <value>Replay Lover</value>
+  </data>
+  <data name="Insights_BadgeFreshSeekerName" xml:space="preserve">
+    <value>Fresh Seeker</value>
+  </data>
+  <data name="Insights_BadgeExplorerName" xml:space="preserve">
+    <value>Explorer</value>
+  </data>
+  <data name="Insights_BadgeCuriousName" xml:space="preserve">
+    <value>Curious</value>
+  </data>
+  <data name="Insights_BadgeRestrictedCircleName" xml:space="preserve">
+    <value>Restricted Circle</value>
+  </data>
+  <data name="Insights_BadgeUltraFocusName" xml:space="preserve">
+    <value>Ultra Focus</value>
+  </data>
+  <data name="Insights_BadgeDeepListenerName" xml:space="preserve">
+    <value>Deep Listener</value>
+  </data>
+  <data name="Insights_BadgeLongPlayerName " xml:space="preserve">
+    <value>Long Player</value>
+  </data>
+  <data name="Insights_BadgeShortSessionsName" xml:space="preserve">
+    <value>Short Sessions</value>
+  </data>
+  <data name="Insights_BadgeNightOwlName" xml:space="preserve">
+    <value>Night Owl</value>
+  </data>
+  <data name="Insights_BadgeNocturneName" xml:space="preserve">
+    <value>Night</value>
+  </data>
+  <data name="Insights_BadgeEarlyBirdName" xml:space="preserve">
+    <value>Morning</value>
+  </data>
+  <data name="Insights_BadgeAfterworkName" xml:space="preserve">
+    <value>Afterwork</value>
+  </data>
+  <data name="Insights_BadgeUltraLoyalName" xml:space="preserve">
+    <value>Ultra loyal</value>
+  </data>
+  <data name="Insights_BadgeLoyalName" xml:space="preserve">
+    <value>Loyal</value>
+  </data>
+  <data name="Insights_BadgeEclecticName" xml:space="preserve">
+    <value>Eclectic</value>
+  </data>
+  <data name="Insights_BadgeSmoothListenerDescription" xml:space="preserve">
+    <value>Listens smoothly, you always go all the way.</value>
+  </data>
+  <data name="Insights_BadgeLowSkipDescription" xml:space="preserve">
+    <value>You see things through to the end.</value>
+  </data>
+  <data name="Insights_BadgeHyperZapperDescription" xml:space="preserve">
+    <value>Still searching for the right title.</value>
+  </data>
+  <data name="Insights_BadgeZapperDescription" xml:space="preserve">
+    <value>You change songs often.</value>
+  </data>
+  <data name="Insights_BadgeObsessedDescription" xml:space="preserve">
+    <value>You listen to certain songs on repeat.</value>
+  </data>
+  <data name="Insights_BadgeReplayLoverDescription" xml:space="preserve">
+    <value>You often replay your favorites.</value>
+  </data>
+  <data name="Insights_BadgeFreshSeekerDescription" xml:space="preserve">
+    <value>You almost never go back.</value>
+  </data>
+  <data name="Insights_BadgeExplorerDescription" xml:space="preserve">
+    <value>You discover a lot of new artists.</value>
+  </data>
+  <data name="Insights_BadgeCuriousDescription" xml:space="preserve">
+    <value>You explore regularly.</value>
+  </data>
+  <data name="Insights_BadgeRestrictedCircleDescription" xml:space="preserve">
+    <value>You remain in your own world.</value>
+  </data>
+  <data name="Insights_BadgeUltraFocusDescription" xml:space="preserve">
+    <value>You listen to very few different artists.</value>
+  </data>
+  <data name="Insights_BadgeDeepListenerDescription" xml:space="preserve">
+    <value>You really immerse yourself in the music.</value>
+  </data>
+  <data name="Insights_BadgeLongPlayerDescription" xml:space="preserve">
+    <value>You listen for a long time.</value>
+  </data>
+  <data name="Insights_BadgeShortSessionsDescription" xml:space="preserve">
+    <value>You listen in small doses.</value>
+  </data>
+  <data name="Insights_BadgeNightOwlDescription" xml:space="preserve">
+    <value>You live at night.</value>
+  </data>
+  <data name="Insights_BadgeNocturneDescription" xml:space="preserve">
+    <value>You mostly listen at night.</value>
+  </data>
+  <data name="Insights_BadgeEarlyBirdDescription" xml:space="preserve">
+    <value>You start your day with music.</value>
+  </data>
+  <data name="Insights_BadgeAfterworkDescription" xml:space="preserve">
+    <value>You listen at the end of the day.</value>
+  </data>
+  <data name="Insights_BadgeUltraLoyalDescription" xml:space="preserve">
+    <value>You have your favorite songs.</value>
+  </data>
+  <data name="Insights_BadgeLoyalDescription" xml:space="preserve">
+    <value>You remain loyal to your favorites.</value>
+  </data>
+  <data name="Insights_BadgeEclecticDescription" xml:space="preserve">
+    <value>You change your titles often.</value>
+  </data>
+  <data name="Insights_HeroTitle.Text" xml:space="preserve">
+    <value>✨ Your month in music</value>
+  </data>
+  <data name="Insights_TotalPlayDuration.Text" xml:space="preserve">
+    <value>Total listening time</value>
+  </data>
+  <data name="Insights_TotalSessions.Text" xml:space="preserve">
+    <value>Number of sessions</value>
+  </data>
+  <data name="Insights_TotalTracks.Text" xml:space="preserve">
+    <value>Different tracks listened to</value>
+  </data>
+  <data name="Insights_TotalArtists.Text" xml:space="preserve">
+    <value>Different artists listened to</value>
+  </data>
+  <data name="Insights_TotalAlbums.Text" xml:space="preserve">
+    <value>Different albums listened to</value>
+  </data>
+  <data name="Insights_TotalGenres.Text" xml:space="preserve">
+    <value>Different genres listened to</value>
+  </data>
+  <data name="Insights_HotListeningTimes.Text" xml:space="preserve">
+    <value>🔥 When you listen the most</value>
+  </data>
+  <data name="Insights_ImportantTracks.Text" xml:space="preserve">
+    <value>🏆 Your most important titles</value>
+  </data>
+  <data name="Insights_TopAlbums.Text" xml:space="preserve">
+    <value>🏆 Your most important titles</value>
+  </data>
+  <data name="Insights_TopTracks.Text" xml:space="preserve">
+    <value>Top titles</value>
+  </data>
+  <data name="Insights_ListeningProfile.Text" xml:space="preserve">
+    <value>🧬 Your listening profile</value>
+  </data>
+  <data name="Insights_TopGenres.Text" xml:space="preserve">
+    <value>Top genres</value>
+  </data>
+  <data name="Insights_BadgesHeader.Text" xml:space="preserve">
+    <value>🥇 Your badges</value>
   </data>
 </root>

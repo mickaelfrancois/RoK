@@ -23,13 +23,13 @@
         <StackPanel Padding="24" Spacing="24">
 
             <!-- Hero section -->
-            <TextBlock Text="🎨 Ton mois en musique" Style="{StaticResource HeaderTextBlockStyle}" />
+            <TextBlock x:Uid="Insights_HeroTitle"  Text="🎨 Ton mois en musique" Style="{StaticResource HeaderTextBlockStyle}" />
 
             <controls:WrapPanel Orientation="Horizontal" HorizontalSpacing="12" VerticalSpacing="12">
                 
                 <Border Grid.Column="0" Style="{StaticResource MetricCardStyle}">
                     <StackPanel Spacing="4">
-                        <TextBlock Text="Temps total d'écoute" Style="{ThemeResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                        <TextBlock x:Uid="Insights_TotalPlayDuration"  Text="Temps total d'écoute" Style="{ThemeResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
                         <TextBlock Style="{ThemeResource SubtitleTextBlockStyle}">
                             <Run Text="{x:Bind ViewModel.Insights.PlayDuration, Converter={StaticResource SecondsToReadableConverter}}" />
                             <Run Text="{x:Bind ViewModel.PlayDurationDiffText}" Foreground="{x:Bind ViewModel.Insights.DifferencePlayDuration, Converter={StaticResource IntToColorConverter}, Mode=OneWay}" />
@@ -39,7 +39,7 @@
 
                 <Border Style="{StaticResource MetricCardStyle}">
                     <StackPanel Spacing="4">
-                        <TextBlock Text="Nombre de sessions" Style="{ThemeResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                        <TextBlock x:Uid="Insights_TotalSessions"  Text="Nombre de sessions" Style="{ThemeResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
                         <TextBlock Style="{ThemeResource SubtitleTextBlockStyle}">
                             <Run Text="{x:Bind ViewModel.Insights.SessionCount}" />
                             <Run Text="{x:Bind ViewModel.SessionDiffText}" Foreground="{x:Bind ViewModel.Insights.DifferenceSessionCount, Converter={StaticResource IntToColorConverter}, Mode=OneWay}" />
@@ -49,7 +49,7 @@
 
                 <Border Style="{StaticResource MetricCardStyle}">
                     <StackPanel Spacing="4">
-                        <TextBlock Text="Titres différents écoutés" Style="{ThemeResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                        <TextBlock x:Uid="Insights_TotalTracks"  Text="Titres différents écoutés" Style="{ThemeResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
                         <TextBlock Style="{ThemeResource SubtitleTextBlockStyle}">
                             <Run Text="{x:Bind ViewModel.Insights.TracksPlayed}" />
                             <Run Text="{x:Bind ViewModel.TracksPlayedDiffText}" Foreground="{x:Bind ViewModel.Insights.DifferenceTracksPlayed, Converter={StaticResource IntToColorConverter}, Mode=OneWay}" />
@@ -59,7 +59,7 @@
 
                 <Border Style="{StaticResource MetricCardStyle}">
                     <StackPanel Spacing="4">
-                        <TextBlock Text="Artistes différents écoutés" Style="{ThemeResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                        <TextBlock x:Uid="Insights_TotalArtists"  Text="Artistes différents écoutés" Style="{ThemeResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
                         <TextBlock Style="{ThemeResource SubtitleTextBlockStyle}">
                             <Run Text="{x:Bind ViewModel.Insights.ArtistsPlayed}" />
                             <Run Text="{x:Bind ViewModel.ArtistsPlayedDiffText}" Foreground="{x:Bind ViewModel.Insights.DifferenceArtistsPlayed, Converter={StaticResource IntToColorConverter}, Mode=OneWay}" />
@@ -69,7 +69,7 @@
 
                 <Border Style="{StaticResource MetricCardStyle}">
                     <StackPanel Spacing="4">
-                        <TextBlock Text="Albums différents écoutés" Style="{ThemeResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                        <TextBlock x:Uid="Insights_TotalAlbums"  Text="Albums différents écoutés" Style="{ThemeResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
                         <TextBlock Style="{ThemeResource SubtitleTextBlockStyle}">
                             <Run Text="{x:Bind ViewModel.Insights.AlbumsPlayed}" />
                             <Run Text="{x:Bind ViewModel.AlbumsPlayedDiffText}" Foreground="{x:Bind ViewModel.Insights.DifferenceAlbumsPlayed, Converter={StaticResource IntToColorConverter}, Mode=OneWay}" />
@@ -79,7 +79,7 @@
 
                 <Border Style="{StaticResource MetricCardStyle}">
                     <StackPanel Spacing="4">
-                        <TextBlock Text="Genres différents écoutés" Style="{ThemeResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                        <TextBlock x:Uid="Insights_TotalGenres"  Text="Genres différents écoutés" Style="{ThemeResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
                         <TextBlock Style="{ThemeResource SubtitleTextBlockStyle}">
                             <Run Text="{x:Bind ViewModel.Insights.GenresPlayed}" />
                             <Run Text="{x:Bind ViewModel.GenresPlayedDiffText}" Foreground="{x:Bind ViewModel.Insights.DifferenceGenresPlayed, Converter={StaticResource IntToColorConverter}, Mode=OneWay}" />
@@ -88,7 +88,7 @@
                 </Border>
             </controls:WrapPanel>
 
-            <TextBlock Text="🔥 Quand tu écoutes le plus" Style="{StaticResource HeaderTextBlockStyle}" />
+            <TextBlock x:Uid="Insights_HotListeningTimes"  Text="🔥 Quand tu écoutes le plus" Style="{StaticResource HeaderTextBlockStyle}" />
             <Border Style="{StaticResource MetricCardStyle}">
                 <StackPanel Spacing="8">
 
@@ -104,9 +104,7 @@
                             </ItemsRepeater.Layout>
                             <ItemsRepeater.ItemTemplate>
                                 <DataTemplate x:DataType="viewmodels:HourLabelViewModel">
-                                    <TextBlock Text="{x:Bind Label}" Width="20" FontSize="9"
-                                   TextAlignment="Center"
-                                   Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+                                    <TextBlock Text="{x:Bind Label}" Width="20" FontSize="9" TextAlignment="Center" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
                                 </DataTemplate>
                             </ItemsRepeater.ItemTemplate>
                         </ItemsRepeater>
@@ -124,9 +122,7 @@
                                         <ColumnDefinition Width="32"/>
                                         <ColumnDefinition Width="*"/>
                                     </Grid.ColumnDefinitions>
-                                    <TextBlock Grid.Column="0" Text="{x:Bind DayLabel}"
-                                   VerticalAlignment="Center" FontSize="11"
-                                   Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+                                    <TextBlock Grid.Column="0" Text="{x:Bind DayLabel}" VerticalAlignment="Center" FontSize="11" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
                                     <ItemsRepeater Grid.Column="1" ItemsSource="{x:Bind Cells}">
                                         <ItemsRepeater.Layout>
                                             <StackLayout Orientation="Horizontal" Spacing="2"/>
@@ -134,11 +130,8 @@
                                         <ItemsRepeater.ItemTemplate>
                                             <DataTemplate x:DataType="viewmodels:HeatmapCellViewModel">
                                                 <Grid Width="20" Height="20">
-                                                    <Border CornerRadius="3"
-                                                Background="{ThemeResource SubtleFillColorSecondaryBrush}"/>
-                                                    <Border CornerRadius="3"
-                                                Background="{ThemeResource BrandAccentBrush}"
-                                                Opacity="{x:Bind Intensity}"/>
+                                                    <Border CornerRadius="3" Background="{ThemeResource SubtleFillColorSecondaryBrush}"/>
+                                                    <Border CornerRadius="3" Background="{ThemeResource BrandAccentBrush}" Opacity="{x:Bind Intensity}"/>
                                                 </Grid>
                                             </DataTemplate>
                                         </ItemsRepeater.ItemTemplate>
@@ -175,11 +168,11 @@
 
             </StackPanel>-->
 
-            <TextBlock Text="🏆 Tes titres les plus importants" Style="{StaticResource HeaderTextBlockStyle}" />
+            <TextBlock x:Uid="Insights_ImportantTracks"  Text="🏆 Tes titres les plus importants" Style="{StaticResource HeaderTextBlockStyle}" />
             <Border Style="{StaticResource MetricCardStyle}">
                 <StackPanel Spacing="20">
 
-                    <TextBlock Text="Titres" Style="{ThemeResource BodyStrongTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+                    <TextBlock x:Uid="Insights_TopTracks"  Text="Titres" Style="{ThemeResource BodyStrongTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
                     <ScrollViewer HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Disabled"
                                   HorizontalScrollMode="Enabled" VerticalScrollMode="Disabled" ZoomMode="Disabled">
                         <ItemsRepeater ItemsSource="{x:Bind ViewModel.Insights.TopTracks}">
@@ -188,17 +181,11 @@
                             </ItemsRepeater.Layout>
                             <ItemsRepeater.ItemTemplate>
                                 <DataTemplate x:DataType="models:TrackInsightDto">
-                                    <Border Width="200"
-                                            Background="{ThemeResource SubtleFillColorSecondaryBrush}"
-                                            CornerRadius="10" Padding="14">
+                                    <Border Width="200" Background="{ThemeResource SubtleFillColorSecondaryBrush}" CornerRadius="10" Padding="14">
                                         <StackPanel Spacing="10">
                                             <StackPanel Spacing="2">
-                                                <TextBlock Text="{x:Bind Title}"
-                                                           Style="{ThemeResource BodyStrongTextBlockStyle}"
-                                                           TextWrapping="Wrap"/>
-                                                <TextBlock Text="{x:Bind ArtistName}"
-                                                           Style="{ThemeResource CaptionTextBlockStyle}"
-                                                           Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+                                                <TextBlock Text="{x:Bind Title}" Style="{ThemeResource BodyStrongTextBlockStyle}" TextWrapping="Wrap"/>
+                                                <TextBlock Text="{x:Bind ArtistName}" Style="{ThemeResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
                                             </StackPanel>
                                             <StackPanel Spacing="3">
                                                 <TextBlock Style="{ThemeResource CaptionTextBlockStyle}">
@@ -223,26 +210,19 @@
                         </ItemsRepeater>
                     </ScrollViewer>
 
-                    <TextBlock Text="Albums" Style="{ThemeResource BodyStrongTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
-                    <ScrollViewer HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Disabled"
-                                  HorizontalScrollMode="Enabled" VerticalScrollMode="Disabled" ZoomMode="Disabled">
+                    <TextBlock x:Uid="Insights_TopAlbums" Text="Albums" Style="{ThemeResource BodyStrongTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+                    <ScrollViewer HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Disabled" HorizontalScrollMode="Enabled" VerticalScrollMode="Disabled" ZoomMode="Disabled">
                         <ItemsRepeater ItemsSource="{x:Bind ViewModel.Insights.TopAlbums}">
                             <ItemsRepeater.Layout>
                                 <StackLayout Orientation="Horizontal" Spacing="12"/>
                             </ItemsRepeater.Layout>
                             <ItemsRepeater.ItemTemplate>
                                 <DataTemplate x:DataType="models:AlbumInsightDto">
-                                    <Border Width="200"
-                                            Background="{ThemeResource SubtleFillColorSecondaryBrush}"
-                                            CornerRadius="10" Padding="14">
+                                    <Border Width="200" Background="{ThemeResource SubtleFillColorSecondaryBrush}" CornerRadius="10" Padding="14">
                                         <StackPanel Spacing="10">
                                             <StackPanel Spacing="2">
-                                                <TextBlock Text="{x:Bind Title}"
-                                                           Style="{ThemeResource BodyStrongTextBlockStyle}"
-                                                           TextWrapping="Wrap"/>
-                                                <TextBlock Text="{x:Bind ArtistName}"
-                                                           Style="{ThemeResource CaptionTextBlockStyle}"
-                                                           Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+                                                <TextBlock Text="{x:Bind Title}" Style="{ThemeResource BodyStrongTextBlockStyle}" TextWrapping="Wrap"/>
+                                                <TextBlock Text="{x:Bind ArtistName}" Style="{ThemeResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
                                             </StackPanel>
                                             <StackPanel Spacing="3">
                                                 <TextBlock Style="{ThemeResource CaptionTextBlockStyle}">
@@ -275,7 +255,7 @@
                 </StackPanel>
             </Border>
 
-            <TextBlock Text="🧬 Ton profil d'écoute" Style="{StaticResource HeaderTextBlockStyle}" />
+            <TextBlock x:Uid="InsightsPage_ListeningProfileHeader"  Text="🧬 Ton profil d'écoute" Style="{StaticResource HeaderTextBlockStyle}" />
 
             <StackPanel Orientation="Horizontal" Spacing="24">
                 <Border Style="{StaticResource MetricCardStyle}" Width="400" MaxWidth="400" HorizontalAlignment="Left">
@@ -303,7 +283,7 @@
                 </Border>
                 <Border Style="{StaticResource MetricCardStyle}" Width="400" MaxWidth="400" HorizontalAlignment="Left">
                     <StackPanel Spacing="16">
-                        <TextBlock Text="Top Genres" Style="{StaticResource SubtitleTextBlockStyle}" VerticalAlignment="Center"/>
+                        <TextBlock x:Uid="Insights_TopGenres"  Text="Top Genres" Style="{StaticResource SubtitleTextBlockStyle}" VerticalAlignment="Center"/>
                         <ItemsRepeater ItemsSource="{x:Bind ViewModel.Insights.TopGenres, Mode=OneWay}">
                             <ItemsRepeater.Layout>
                                 <StackLayout Orientation="Vertical" Spacing="16"/>
@@ -331,7 +311,7 @@
             </StackPanel>
 
 
-            <TextBlock Text="🥇 Tes badges" Style="{StaticResource HeaderTextBlockStyle}" />
+            <TextBlock x:Uid="Insights_BadgesHeader"  Text="🥇 Tes badges" Style="{StaticResource HeaderTextBlockStyle}" />
             <ItemsRepeater ItemsSource="{x:Bind ViewModel.Badges, Mode=OneWay}">
                 <ItemsRepeater.Layout>
                     <UniformGridLayout MinColumnSpacing="12" MinRowSpacing="12" MinItemWidth="260" ItemsJustification="Start"/>
@@ -371,8 +351,6 @@
                     </DataTemplate>
                 </ItemsRepeater.ItemTemplate>
             </ItemsRepeater>
-
-        </StackPanel>
-        
+        </StackPanel>        
     </ScrollViewer>
 </Page>

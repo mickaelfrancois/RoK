@@ -1,31 +1,20 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+﻿using System.Globalization;
+using CommunityToolkit.Mvvm.ComponentModel;
 using Rok.Application.Features.Insights.Query;
 
 namespace Rok.ViewModels.Insights;
 
-public record HeatmapRowViewModel(string DayLabel, IReadOnlyList<HeatmapCellViewModel> Cells);
-public record HeatmapCellViewModel(int Hour, int Count, double Intensity);
-public record HourLabelViewModel(string Label);
-public record ListeningProfileCardViewModel(
-    string Icon,
-    string Label,
-    string Description,
-    string SkipRateText,
-    string ReplayRateText,
-    string DiversityText
-);
-
-public record BadgeViewModel(string Icon, string Name, string Description);
-
-public partial class InsightsViewModel(IMediator mediator) : ObservableObject
+public partial class InsightsViewModel(IMediator mediator, IResourceService resourceLoader) : ObservableObject
 {
-    private static readonly string[] _dayLabels = new string[] { "Lun", "Mar", "Mer", "Jeu", "Ven", "Sam", "Dim" };
+    private static readonly string[] _dayLabels = Enumerable.Range(1, 7)
+        .Select(i => CultureInfo.CurrentUICulture.DateTimeFormat.AbbreviatedDayNames[i % 7])
+        .ToArray();
 
     public InsightsDto Insights { get; private set; } = new InsightsDto();
 
     public IReadOnlyList<HeatmapRowViewModel> HeatmapRows { get; private set; } = new List<HeatmapRowViewModel>();
 
-    public ListeningProfileCardViewModel ListeningProfileCard { get; private set; } = BuildProfileCard(new InsightsDto());
+    public ListeningProfileCardViewModel ListeningProfileCard { get; private set; } = BuildProfileCard(new InsightsDto(), resourceLoader);
 
     public IReadOnlyList<BadgeViewModel> Badges { get; private set; } = new List<BadgeViewModel>();
 
@@ -68,8 +57,9 @@ public partial class InsightsViewModel(IMediator mediator) : ObservableObject
     {
         Insights = await mediator.SendMessageAsync(new GetInsightsQuery() { Month = DateTime.UtcNow });
         HeatmapRows = BuildHeatmapRows(Insights.HeatmapCells);
-        ListeningProfileCard = BuildProfileCard(Insights);
+        ListeningProfileCard = BuildProfileCard(Insights, resourceLoader);
         Badges = BuildBadgeViewModels(Insights.Badges);
+
         OnPropertyChanged(nameof(Insights));
         OnPropertyChanged(nameof(HeatmapRows));
         OnPropertyChanged(nameof(ListeningProfileCard));
@@ -95,20 +85,25 @@ public partial class InsightsViewModel(IMediator mediator) : ObservableObject
             .ToList();
     }
 
-    private static ListeningProfileCardViewModel BuildProfileCard(InsightsDto insights)
+    private static ListeningProfileCardViewModel BuildProfileCard(InsightsDto insights, IResourceService resourceLoader)
     {
         (string icon, string label, string description) = insights.ListeningProfile switch
         {
-            ListeningProfile.CuriousExplorer => ("🧭", "Explorateur curieux",
-                "Tu explores sans cesse de nouveaux artistes,\ntu t'attardes rarement sur les mêmes morceaux."),
-            ListeningProfile.FaithfulIntense => ("❤️", "Fidèle intense",
-                "Tu écoutes longtemps, tu skippes peu,\net tu reviens souvent sur les mêmes morceaux."),
-            ListeningProfile.Night => ("🌙", "Nocturne",
-                "Tes sessions d'écoute se concentrent la nuit,\nquand le silence laisse place à la musique."),
-            ListeningProfile.FocusMode => ("🎯", "Focus mode",
-                "Tu écoutes en profondeur, peu d'artistes différents,\net tu vas jusqu'au bout de tes sessions."),
-            ListeningProfile.ChannelSurfer => ("⚡", "Zappeur",
-                "Tu explores rapidement, tu skipes beaucoup,\ntoujours à la recherche du prochain morceau parfait."),
+            ListeningProfile.CuriousExplorer => ("🧭", resourceLoader.GetString("Insights_ProfileCuriousExplorer"),
+                resourceLoader.GetString("Insights_ProfileCuriousExplorerDescription")),
+
+            ListeningProfile.FaithfulIntense => ("❤️", resourceLoader.GetString("Insights_ProfileFaithfulIntense"),
+               resourceLoader.GetString("Insights_ProfileFaithfulIntenseDescription")),
+
+            ListeningProfile.NightOwl => ("🌙", resourceLoader.GetString("Insights_ProfileNightOwl"),
+              resourceLoader.GetString("Insights_ProfileNightOwlDescription")),
+
+            ListeningProfile.FocusMode => ("🎯", resourceLoader.GetString("Insights_ProfileFocusMode"),
+               resourceLoader.GetString("Insights_ProfileFocusModeDescription")),
+
+            ListeningProfile.ChannelSurfer => ("⚡", resourceLoader.GetString("Insights_ProfileChannelSurfer"),
+              resourceLoader.GetString("Insights_ProfileChannelSurferDescription")),
+
             _ => ("🎵", string.Empty, string.Empty)
         };
 
@@ -118,37 +113,38 @@ public partial class InsightsViewModel(IMediator mediator) : ObservableObject
             Description: description,
             SkipRateText: $"{insights.SkipRate:F0}%",
             ReplayRateText: $"{insights.ReplayRate:F0}%",
-            DiversityText: $"{insights.ArtistsPlayed} artistes / mois"
+            DiversityText: $"{insights.ArtistsPlayed} " + resourceLoader.GetString("Insights_ArtistByMonth")
         );
     }
-    private static IReadOnlyList<BadgeViewModel> BuildBadgeViewModels(IReadOnlyList<BadgeDto> badges)
+
+    private IReadOnlyList<BadgeViewModel> BuildBadgeViewModels(IReadOnlyList<BadgeDto> badges)
     {
         return badges.Select(b =>
         {
             (string name, string description) = b.Id switch
             {
-                Badge.SmoothListener    => ("Smooth Listener",   "Écoute fluide, tu vas toujours au bout."),
-                Badge.LowSkip           => ("Low Skip",           "Tu vas au bout des choses."),
-                Badge.HyperZapper       => ("Hyper Zappeur",      "Toujours en quête du bon titre."),
-                Badge.Zapper            => ("Zappeur",            "Tu changes souvent de morceau."),
-                Badge.Obsessed          => ("Obsessed",           "Tu écoutes certains titres en boucle."),
-                Badge.ReplayLover       => ("Replay Lover",       "Tu rejoues souvent tes favoris."),
-                Badge.FreshSeeker       => ("Fresh Seeker",       "Tu ne reviens presque jamais en arrière."),
-                Badge.Explorer          => ("Explorateur",        "Tu découvres beaucoup de nouveaux artistes."),
-                Badge.Curious           => ("Curieux",            "Tu explores régulièrement."),
-                Badge.RestrictedCircle  => ("Cercle Restreint",   "Tu restes dans ton univers."),
-                Badge.UltraFocus        => ("Ultra Focus",        "Tu écoutes très peu d'artistes différents."),
-                Badge.DeepListener      => ("Deep Listener",      "Tu te plonges vraiment dans la musique."),
-                Badge.LongPlayer        => ("Long Player",        "Tu écoutes longtemps."),
-                Badge.ShortSessions     => ("Short Sessions",     "Tu écoutes par petites touches."),
-                Badge.NightOwl          => ("Night Owl",          "Tu vis la nuit."),
-                Badge.Nocturne          => ("Nocturne",           "Tu écoutes surtout la nuit."),
-                Badge.EarlyBird         => ("Matinal",            "Tu commences ta journée en musique."),
-                Badge.Afterwork         => ("Afterwork",          "Tu écoutes en fin de journée."),
-                Badge.UltraLoyal        => ("Ultra Fidèle",       "Tu as tes titres fétiches."),
-                Badge.Loyal             => ("Fidèle",             "Tu restes fidèle à tes favoris."),
-                Badge.Eclectic          => ("Éclectique",         "Tu changes souvent de titres."),
-                _                       => (string.Empty,         string.Empty)
+                Badge.SmoothListener => (resourceLoader.GetString("Insights_BadgeSmoothListenerName"), resourceLoader.GetString("Insights_BadgeSmoothListenerDescription")),
+                Badge.LowSkip => (resourceLoader.GetString("Insights_BadgeLowSkipName"), resourceLoader.GetString("Insights_BadgeLowSkipDescription")),
+                Badge.HyperZapper => (resourceLoader.GetString("Insights_BadgeHyperZapperName"), resourceLoader.GetString("Insights_BadgeHyperZapperDescription")),
+                Badge.Zapper => (resourceLoader.GetString("Insights_BadgeZapperName"), resourceLoader.GetString("Insights_BadgeZapperDescription")),
+                Badge.Obsessed => (resourceLoader.GetString("Insights_BadgeObsessedName"), resourceLoader.GetString("Insights_BadgeObsessedDescription")),
+                Badge.ReplayLover => (resourceLoader.GetString("Insights_BadgeReplayLoverName"), resourceLoader.GetString("Insights_BadgeReplayLoverDescription")),
+                Badge.FreshSeeker => (resourceLoader.GetString("Insights_BadgeFreshSeekerName"), resourceLoader.GetString("Insights_BadgeFreshSeekerDescription")),
+                Badge.Explorer => (resourceLoader.GetString("Insights_BadgeExplorerName"), resourceLoader.GetString("Insights_BadgeExplorerDescription")),
+                Badge.Curious => (resourceLoader.GetString("Insights_BadgeCuriousName"), resourceLoader.GetString("Insights_BadgeCuriousDescription")),
+                Badge.RestrictedCircle => (resourceLoader.GetString("Insights_BadgeRestrictedCircleName"), resourceLoader.GetString("Insights_BadgeRestrictedCircleDescription")),
+                Badge.UltraFocus => (resourceLoader.GetString("Insights_BadgeUltraFocusName"), resourceLoader.GetString("Insights_BadgeUltraFocusDescription")),
+                Badge.DeepListener => (resourceLoader.GetString("Insights_BadgeDeepListenerName"), resourceLoader.GetString("Insights_BadgeDeepListenerDescription")),
+                Badge.LongPlayer => (resourceLoader.GetString("Insights_BadgeLongPlayerName"), resourceLoader.GetString("Insights_BadgeLongPlayerDescription")),
+                Badge.ShortSessions => (resourceLoader.GetString("Insights_BadgeShortSessionsName"), resourceLoader.GetString("Insights_BadgeShortSessionsDescription")),
+                Badge.NightOwl => (resourceLoader.GetString("Insights_BadgeNightOwlName"), resourceLoader.GetString("Insights_BadgeNightOwlDescription")),
+                Badge.Nocturne => (resourceLoader.GetString("Insights_BadgeNocturneName"), resourceLoader.GetString("Insights_BadgeNocturneDescription")),
+                Badge.EarlyBird => (resourceLoader.GetString("Insights_BadgeEarlyBirdName"), resourceLoader.GetString("Insights_BadgeEarlyBirdDescription")),
+                Badge.Afterwork => (resourceLoader.GetString("Insights_BadgeAfterworkName"), resourceLoader.GetString("Insights_BadgeAfterworkDescription")),
+                Badge.UltraLoyal => (resourceLoader.GetString("Insights_BadgeUltraLoyalName"), resourceLoader.GetString("Insights_BadgeUltraLoyalDescription")),
+                Badge.Loyal => (resourceLoader.GetString("Insights_BadgeLoyalName"), resourceLoader.GetString("Insights_BadgeLoyalDescription")),
+                Badge.Eclectic => (resourceLoader.GetString("Insights_BadgeEclecticName"), resourceLoader.GetString("Insights_BadgeEclecticDescription")),
+                _ => (string.Empty, string.Empty)
             };
             return new BadgeViewModel(b.Icon, name, description);
         }).ToList();

@@ -201,7 +201,7 @@ public class ListeningEventRepository(IDbConnection connection, [FromKeyedServic
         {
             { ListeningProfile.CuriousExplorer, scoreExplorateur },
             { ListeningProfile.FaithfulIntense, scoreFidele },
-            { ListeningProfile.Night, scoreNocturne },
+            { ListeningProfile.NightOwl, scoreNocturne },
             { ListeningProfile.FocusMode, scoreFocus },
             { ListeningProfile.ChannelSurfer, scoreZappeur }
         };
