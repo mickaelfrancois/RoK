@@ -1,0 +1,31 @@
+using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Navigation;
+using Rok.ViewModels.Insights;
+
+// To learn more about WinUI, the WinUI project structure,
+// and more about our project templates, see: http://aka.ms/winui-project-info.
+
+namespace Rok.Pages;
+/// <summary>
+/// An empty page that can be used on its own or navigated to within a Frame.
+/// </summary>
+public sealed partial class InsightsPage : Page
+{
+    public InsightsViewModel ViewModel { get; set; }
+
+
+    public InsightsPage()
+    {
+        InitializeComponent();
+
+        ViewModel = App.ServiceProvider.GetRequiredService<InsightsViewModel>();
+        DataContext = ViewModel;
+    }
+
+    protected override async void OnNavigatedTo(NavigationEventArgs e)
+    {
+        await ViewModel.LoadDataAsync();
+
+        base.OnNavigatedTo(e);
+    }
+}

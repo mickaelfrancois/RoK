@@ -70,6 +70,7 @@
 		<None Remove="Pages\ArtistsPage.xaml" />
 		<None Remove="Pages\GenrePage.xaml" />
 		<None Remove="Pages\GenresPage.xaml" />
+		<None Remove="Pages\InsightsPage.xaml" />
 		<None Remove="Pages\ListeningPage.xaml" />
 		<None Remove="Pages\OptionsPage.xaml" />
 		<None Remove="Pages\PlayerView.xaml" />
@@ -277,6 +278,9 @@
 	  <None Update="appsettings.json">
 	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 	  </None>
+	  <Page Update="Pages\InsightsPage.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </Page>
 	  <Page Update="Styles\Tokens\Icons.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </Page>
