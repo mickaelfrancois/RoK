@@ -16,6 +16,43 @@ internal class GetInsightsQueryHandler(IListeningEventRepository repository) : I
     }
 }
 
+public enum ListeningProfile
+{
+    Unknown,
+    CuriousExplorer,
+    FaithfulIntense,
+    Night,
+    FocusMode,
+    ChannelSurfer
+}
+
+public enum Badge
+{
+    SmoothListener,
+    LowSkip,
+    HyperZapper,
+    Zapper,
+    Obsessed,
+    ReplayLover,
+    FreshSeeker,
+    Explorer,
+    Curious,
+    RestrictedCircle,
+    UltraFocus,
+    DeepListener,
+    LongPlayer,
+    ShortSessions,
+    NightOwl,
+    Nocturne,
+    EarlyBird,
+    Afterwork,
+    UltraLoyal,
+    Loyal,
+    Eclectic
+}
+
+public record BadgeDto(Badge Id, string Icon);
+
 public record InsightsDto
 {
     public int SessionCount { get; init; }
@@ -42,10 +79,17 @@ public record InsightsDto
     public int PreviousGenresPlayed { get; init; }
     public int DifferenceGenresPlayed => GenresPlayed - PreviousGenresPlayed;
 
+    public double SkipRate { get; init; }
+    public double ReplayRate { get; init; }
+    public int LongSessionCount { get; init; }
+    public int GlobalPeakHour { get; init; }
+    public ListeningProfile ListeningProfile { get; init; } = ListeningProfile.Unknown;
+
     public IReadOnlyList<TrackInsightDto> TopTracks { get; init; } = new List<TrackInsightDto>();
     public IReadOnlyList<AlbumInsightDto> TopAlbums { get; init; } = new List<AlbumInsightDto>();
     public IReadOnlyList<GenreInsightDto> TopGenres { get; init; } = new List<GenreInsightDto>();
     public IReadOnlyList<HeatmapCellDto> HeatmapCells { get; init; } = new List<HeatmapCellDto>();
+    public IReadOnlyList<BadgeDto> Badges { get; init; } = new List<BadgeDto>();
 }
 
 public class TrackInsightDto
@@ -92,7 +136,6 @@ public class GenreInsightDto
         ? $"{PeakHour:D2}h - {(PeakHour + 3) % 24:D2}h"
         : string.Empty;
 }
-
 
 public record HeatmapCellDto
 {

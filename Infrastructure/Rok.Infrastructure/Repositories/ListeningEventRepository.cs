@@ -33,6 +33,12 @@ public class ListeningEventRepository(IDbConnection connection, [FromKeyedServic
         List<GenreInsightDto> topGenres = GetTopGenres(currentEvents, currentSessions);
         List<HeatmapCellDto> heatmapCells = GetHeatmap(currentEvents);
 
+        int artistsPlayed = currentEvents.Where(e => e.ArtistId.HasValue).Select(e => e.ArtistId).Distinct().Count();
+        int longSessionCount = currentSessions.Count(s => s.IsLong);
+        double skipRate = GetSkipRate(currentEvents);
+        double replayRate = GetReplayRate(currentEvents);
+        int globalPeakHour = GetGlobalPeakHour(currentEvents);
+        double fidelityRate = GetFidelityRate(currentEvents);
 
         return new InsightsDto
         {
@@ -52,7 +58,155 @@ public class ListeningEventRepository(IDbConnection connection, [FromKeyedServic
             TopAlbums = topAlbums,
             TopGenres = topGenres,
             HeatmapCells = heatmapCells,
+            SkipRate = skipRate,
+            ReplayRate = replayRate,
+            LongSessionCount = longSessionCount,
+            GlobalPeakHour = globalPeakHour,
+            ListeningProfile = ComputeProfile(skipRate, replayRate, artistsPlayed, longSessionCount, globalPeakHour),
+            Badges = ComputeBadges(skipRate, replayRate, artistsPlayed, longSessionCount, globalPeakHour, fidelityRate)
         };
+    }
+
+    private static double GetSkipRate(List<RawListeningEvent> events)
+    {
+        if (events.Count == 0) return 0;
+        return (double)events.Count(e => e.WasSkipped) / events.Count * 100;
+    }
+
+    private static double GetReplayRate(List<RawListeningEvent> events)
+    {
+        if (events.Count == 0) return 0;
+        int replayCount = 0;
+        for (int i = 1; i < events.Count; i++)
+        {
+            RawListeningEvent current = events[i];
+            for (int j = i - 1; j >= 0; j--)
+            {
+                RawListeningEvent previous = events[j];
+                if ((current.PlayedAt - previous.PlayedAt).TotalHours > 2) break;
+                if (previous.TrackId == current.TrackId)
+                {
+                    replayCount++;
+                    break;
+                }
+            }
+        }
+        return (double)replayCount / events.Count * 100;
+    }
+
+    private static int GetGlobalPeakHour(List<RawListeningEvent> events)
+    {
+        if (events.Count == 0) return -1;
+        return events
+            .GroupBy(e => e.PlayedAt.Hour)
+            .OrderByDescending(g => g.Count())
+            .ThenBy(g => g.Key)
+            .First().Key;
+    }
+
+    private static double GetFidelityRate(List<RawListeningEvent> events)
+    {
+        if (events.Count == 0) return 0;
+        List<IGrouping<long, RawListeningEvent>> trackGroups = events.GroupBy(e => e.TrackId).ToList();
+        if (trackGroups.Count == 0) return 0;
+        int tracksPlayedMoreThan3Times = trackGroups.Count(g => g.Count() > 3);
+        return (double)tracksPlayedMoreThan3Times / trackGroups.Count * 100;
+    }
+
+    private static List<BadgeDto> ComputeBadges(double skipRate, double replayRate, int artistsPlayed, int longSessionCount, int globalPeakHour, double fidelityRate)
+    {
+        List<BadgeDto> badges = new();
+
+        // Skip category — most restrictive wins
+        if (skipRate < 5)
+            badges.Add(new BadgeDto(Badge.SmoothListener, "🎵"));
+        else if (skipRate < 10)
+            badges.Add(new BadgeDto(Badge.LowSkip, "✅"));
+        else if (skipRate > 50)
+            badges.Add(new BadgeDto(Badge.HyperZapper, "⚡⚡"));
+        else if (skipRate > 30)
+            badges.Add(new BadgeDto(Badge.Zapper, "⚡"));
+
+        // Replay category
+        if (replayRate > 25)
+            badges.Add(new BadgeDto(Badge.Obsessed, "🔁"));
+        else if (replayRate > 15)
+            badges.Add(new BadgeDto(Badge.ReplayLover, "❤️"));
+        else if (replayRate < 5)
+            badges.Add(new BadgeDto(Badge.FreshSeeker, "🌱"));
+
+        // Diversity category
+        if (artistsPlayed > 30)
+            badges.Add(new BadgeDto(Badge.Explorer, "🧭"));
+        else if (artistsPlayed > 20)
+            badges.Add(new BadgeDto(Badge.Curious, "🔍"));
+        else if (artistsPlayed < 5)
+            badges.Add(new BadgeDto(Badge.UltraFocus, "🎯"));
+        else if (artistsPlayed < 10)
+            badges.Add(new BadgeDto(Badge.RestrictedCircle, "🔒"));
+
+        // Long session category
+        if (longSessionCount > 15)
+            badges.Add(new BadgeDto(Badge.DeepListener, "🎧"));
+        else if (longSessionCount > 10)
+            badges.Add(new BadgeDto(Badge.LongPlayer, "⏳"));
+        else if (longSessionCount < 3)
+            badges.Add(new BadgeDto(Badge.ShortSessions, "💫"));
+
+        // Peak hour category — NightOwl takes priority over Nocturne for 0h–3h
+        if (globalPeakHour >= 0)
+        {
+            if (globalPeakHour <= 3)
+                badges.Add(new BadgeDto(Badge.NightOwl, "🦉"));
+            else if (globalPeakHour >= 21)
+                badges.Add(new BadgeDto(Badge.Nocturne, "🌙"));
+            else if (globalPeakHour >= 6 && globalPeakHour <= 10)
+                badges.Add(new BadgeDto(Badge.EarlyBird, "🌅"));
+            else if (globalPeakHour >= 17 && globalPeakHour <= 20)
+                badges.Add(new BadgeDto(Badge.Afterwork, "🌆"));
+        }
+
+        // Fidelity category
+        if (fidelityRate > 35)
+            badges.Add(new BadgeDto(Badge.UltraLoyal, "💎"));
+        else if (fidelityRate > 20)
+            badges.Add(new BadgeDto(Badge.Loyal, "🏅"));
+        else if (fidelityRate < 10)
+            badges.Add(new BadgeDto(Badge.Eclectic, "🌈"));
+
+        return badges;
+    }
+
+    private static ListeningProfile ComputeProfile(double skipRate, double replayRate, int artistsPlayed, int longSessionCount, int globalPeakHour)
+    {
+        const int diversiteMax = 50;
+        const int longSessionMax = 20;
+
+        double skipRateNorm = skipRate / 100.0;
+        double replayRateNorm = replayRate / 100.0;
+        double diversiteNorm = Math.Min((double)artistsPlayed / diversiteMax, 1.0);
+        double longSessionNorm = Math.Min((double)longSessionCount / longSessionMax, 1.0);
+        double peakHourNorm = globalPeakHour < 0 ? 0.0
+                            : (globalPeakHour >= 21 || globalPeakHour <= 2) ? 1.0
+                            : globalPeakHour >= 18 ? 0.5
+                            : 0.0;
+
+        double scoreExplorateur = (0.6 * diversiteNorm) + (0.2 * (1 - replayRateNorm)) + (0.2 * (1 - skipRateNorm));
+        double scoreFidele = (0.5 * replayRateNorm) + (0.3 * longSessionNorm) + (0.2 * (1 - skipRateNorm));
+        double scoreNocturne = peakHourNorm;
+        double scoreFocus = (0.5 * longSessionNorm) + (0.3 * (1 - skipRateNorm)) + (0.2 * (1 - diversiteNorm));
+        double scoreZappeur = (0.6 * skipRateNorm) + (0.2 * (1 - longSessionNorm)) + (0.2 * (1 - replayRateNorm));
+
+        Dictionary<ListeningProfile, double> scores = new()
+        {
+            { ListeningProfile.CuriousExplorer, scoreExplorateur },
+            { ListeningProfile.FaithfulIntense, scoreFidele },
+            { ListeningProfile.Night, scoreNocturne },
+            { ListeningProfile.FocusMode, scoreFocus },
+            { ListeningProfile.ChannelSurfer, scoreZappeur }
+        };
+
+        return scores.MaxBy(x => x.Value).Key;
     }
 
     private static List<TrackInsightDto> GetTopArtists(List<RawListeningEvent> currentEvents, List<ListeningSession> currentSessions)

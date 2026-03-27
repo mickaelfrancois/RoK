@@ -265,47 +265,101 @@
             </StackPanel>
 
             <TextBlock Text="🧬 Ton profil d’écoute" Style="{StaticResource HeaderTextBlockStyle}" />
-            <Border Style="{StaticResource MetricCardStyle}" Width="400" MaxWidth="400" HorizontalAlignment="Left">
-                <ItemsRepeater ItemsSource="{x:Bind ViewModel.Insights.TopGenres, Mode=OneWay}">
-                    <ItemsRepeater.Layout>
-                        <StackLayout Orientation="Vertical" Spacing="16"/>
-                    </ItemsRepeater.Layout>
-                    <ItemsRepeater.ItemTemplate>
-                        <DataTemplate x:DataType="models:GenreInsightDto">
-                            <StackPanel Spacing="6">
-                                <Grid>
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="Auto"/>
-                                        <ColumnDefinition Width="*"/>
-                                        <ColumnDefinition Width="Auto"/>
-                                    </Grid.ColumnDefinitions>
-                                    <TextBlock Grid.Column="0" Text="{x:Bind RankText}" Style="{ThemeResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" VerticalAlignment="Center"/>
-                                    <TextBlock Grid.Column="1" Text="{x:Bind GenreName}" Style="{ThemeResource BodyStrongTextBlockStyle}" Margin="8,0,0,0" VerticalAlignment="Center"/>
-                                    <TextBlock Grid.Column="2" Text="{x:Bind PlayPercentageText}" Style="{ThemeResource BodyTextBlockStyle}" Foreground="{ThemeResource BrandAccentBrush}" VerticalAlignment="Center"/>
-                                </Grid>
-                                <ProgressBar Value="{x:Bind PlayPercentage}" Maximum="100" Height="6"/>
-                            </StackPanel>
-                        </DataTemplate>
-                    </ItemsRepeater.ItemTemplate>
-                </ItemsRepeater>
-            </Border>
+
+            <StackPanel Orientation="Horizontal" Spacing="24">
+                <Border Style="{StaticResource MetricCardStyle}" Width="400" MaxWidth="400" HorizontalAlignment="Left">
+                    <StackPanel Spacing="16">
+                        <StackPanel Orientation="Horizontal" Spacing="12" VerticalAlignment="Center">
+                            <TextBlock Text="{x:Bind ViewModel.ListeningProfileCard.Icon, Mode=OneWay}" FontSize="28" VerticalAlignment="Center"/>
+                            <TextBlock Text="{x:Bind ViewModel.ListeningProfileCard.Label, Mode=OneWay}" Style="{StaticResource SubtitleTextBlockStyle}" VerticalAlignment="Center"/>
+                        </StackPanel>
+                        <TextBlock Text="{x:Bind ViewModel.ListeningProfileCard.Description, Mode=OneWay}" Style="{ThemeResource BodyTextBlockStyle}" TextWrapping="Wrap" Opacity="0.8"/>
+                        <StackPanel Spacing="4">
+                            <TextBlock Style="{ThemeResource CaptionTextBlockStyle}">
+                            <Run Text="• Skip rate : "/> 
+                            <Run Text="{x:Bind ViewModel.ListeningProfileCard.SkipRateText, Mode=OneWay}" FontWeight="SemiBold"/>
+                            </TextBlock>
+                            <TextBlock Style="{ThemeResource CaptionTextBlockStyle}">
+                            <Run Text="• Replay rate : "/>
+                            <Run Text="{x:Bind ViewModel.ListeningProfileCard.ReplayRateText, Mode=OneWay}" FontWeight="SemiBold"/>
+                            </TextBlock>
+                            <TextBlock Style="{ThemeResource CaptionTextBlockStyle}">
+                            <Run Text="• Diversité : "/>
+                            <Run Text="{x:Bind ViewModel.ListeningProfileCard.DiversityText, Mode=OneWay}" FontWeight="SemiBold"/>
+                            </TextBlock>
+                        </StackPanel>
+                    </StackPanel>
+                </Border>
+                <Border Style="{StaticResource MetricCardStyle}" Width="400" MaxWidth="400" HorizontalAlignment="Left">
+                    <StackPanel Spacing="16">
+                        <TextBlock Text="Top Genres" Style="{StaticResource SubtitleTextBlockStyle}" VerticalAlignment="Center"/>
+                        <ItemsRepeater ItemsSource="{x:Bind ViewModel.Insights.TopGenres, Mode=OneWay}">
+                            <ItemsRepeater.Layout>
+                                <StackLayout Orientation="Vertical" Spacing="16"/>
+                            </ItemsRepeater.Layout>
+                            <ItemsRepeater.ItemTemplate>
+                                <DataTemplate x:DataType="models:GenreInsightDto">
+                                    <StackPanel Spacing="6">
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="Auto"/>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="Auto"/>
+                                            </Grid.ColumnDefinitions>
+                                            <TextBlock Grid.Column="0" Text="{x:Bind RankText}" Style="{ThemeResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" VerticalAlignment="Center"/>
+                                            <TextBlock Grid.Column="1" Text="{x:Bind GenreName}" Style="{ThemeResource BodyStrongTextBlockStyle}" Margin="8,0,0,0" VerticalAlignment="Center"/>
+                                            <TextBlock Grid.Column="2" Text="{x:Bind PlayPercentageText}" Style="{ThemeResource BodyTextBlockStyle}" Foreground="{ThemeResource BrandAccentBrush}" VerticalAlignment="Center"/>
+                                        </Grid>
+                                        <ProgressBar Value="{x:Bind PlayPercentage}" Maximum="100" Height="6"/>
+                                    </StackPanel>
+                                </DataTemplate>
+                            </ItemsRepeater.ItemTemplate>
+                        </ItemsRepeater>
+                    </StackPanel>
+                </Border>
+            </StackPanel>
 
 
             <TextBlock Text="🥇 Tes badges" Style="{StaticResource HeaderTextBlockStyle}" />
-            <!--<ItemsRepeater ItemsSource="{x:Bind ViewModel.Badges}">
+            <ItemsRepeater ItemsSource="{x:Bind ViewModel.Badges, Mode=OneWay}">
                 <ItemsRepeater.Layout>
-                    <UniformGridLayout MinColumnSpacing="16"
-                                   MinRowSpacing="16"
-                                   ItemsJustification="Center"
-                                   MaximumRowsOrColumns="3" />
+                    <UniformGridLayout MinColumnSpacing="12" MinRowSpacing="12" MinItemWidth="260" ItemsJustification="Start"/>
                 </ItemsRepeater.Layout>
-
                 <ItemsRepeater.ItemTemplate>
-                    <DataTemplate x:DataType="models:Badge">
-                        <local:BadgeCard Badge="{x:Bind}" />
+                    <DataTemplate x:DataType="viewmodels:BadgeViewModel">
+                        <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                                BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                                BorderThickness="1"
+                                CornerRadius="12"
+                                Padding="16">
+                            <Grid ColumnSpacing="14">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <Border Grid.Column="0"
+                                        Width="48" Height="48"
+                                        CornerRadius="24"
+                                        Background="{ThemeResource SubtleFillColorSecondaryBrush}"
+                                        VerticalAlignment="Center">
+                                    <TextBlock Text="{x:Bind Icon}"
+                                               FontSize="24"
+                                               HorizontalAlignment="Center"
+                                               VerticalAlignment="Center"/>
+                                </Border>
+                                <StackPanel Grid.Column="1" Spacing="2" VerticalAlignment="Center">
+                                    <TextBlock Text="{x:Bind Name}"
+                                               Style="{ThemeResource BodyStrongTextBlockStyle}"/>
+                                    <TextBlock Text="{x:Bind Description}"
+                                               Style="{ThemeResource CaptionTextBlockStyle}"
+                                               Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                               TextWrapping="Wrap"/>
+                                </StackPanel>
+                            </Grid>
+                        </Border>
                     </DataTemplate>
                 </ItemsRepeater.ItemTemplate>
-            </ItemsRepeater>-->
+            </ItemsRepeater>
 
         </StackPanel>
         
