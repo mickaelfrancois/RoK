@@ -1563,4 +1563,7 @@
   <data name="welcomeTagline.Text" xml:space="preserve">
     <value>Your music. Your world.</value>
   </data>
+  <data name="AlbumsImported" xml:space="preserve">
+    <value>albums discovered</value>
+  </data>
 </root>
