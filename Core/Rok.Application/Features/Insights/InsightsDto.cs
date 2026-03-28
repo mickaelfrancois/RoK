@@ -37,4 +37,5 @@ public record InsightsDto
     public IReadOnlyList<GenreInsightDto> TopGenres { get; init; } = new List<GenreInsightDto>();
     public IReadOnlyList<HeatmapCellDto> HeatmapCells { get; init; } = new List<HeatmapCellDto>();
     public IReadOnlyList<BadgeDto> Badges { get; init; } = new List<BadgeDto>();
+    public SessionStatsDto SessionStats { get; init; } = new();
 }

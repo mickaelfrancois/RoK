@@ -117,7 +117,7 @@
                             </NavigationViewItem.Icon>
                         </NavigationViewItem>
 
-                        <NavigationViewItem x:Uid="menuInsight" Content="Insights" Tag="Insights" x:Name="insightsItem" Icon="Important" />
+                        <NavigationViewItem x:Uid="menuInsight" Content="Insights" Tag="Insights" x:Name="insightsItem" Icon="OutlineStar" />
 
                     </NavigationView.MenuItems>
 

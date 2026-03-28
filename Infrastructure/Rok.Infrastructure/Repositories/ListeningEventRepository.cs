@@ -18,9 +18,7 @@ public class ListeningEventRepository(IDbConnection connection, [FromKeyedServic
         DateTime endDate = startDate.AddMonths(1).AddTicks(-1);
         DateTime previousStart = startDate.AddMonths(-1);
 
-        IEnumerable<RawListeningEvent> rows = await connection.QueryAsync<RawListeningEvent>(
-            RawListeningEventsSql,
-            new { previousStart, endDate });
+        IEnumerable<RawListeningEvent> rows = await connection.QueryAsync<RawListeningEvent>(RawListeningEventsSql, new { previousStart, endDate });
 
         List<RawListeningEvent> allEvents = rows.ToList();
         List<RawListeningEvent> currentEvents = allEvents.Where(e => e.PlayedAt >= startDate).ToList();
@@ -63,7 +61,8 @@ public class ListeningEventRepository(IDbConnection connection, [FromKeyedServic
             LongSessionCount = longSessionCount,
             GlobalPeakHour = globalPeakHour,
             ListeningProfile = ComputeProfile(skipRate, replayRate, artistsPlayed, longSessionCount, globalPeakHour),
-            Badges = ComputeBadges(skipRate, replayRate, artistsPlayed, longSessionCount, globalPeakHour, fidelityRate)
+            Badges = ComputeBadges(skipRate, replayRate, artistsPlayed, longSessionCount, globalPeakHour, fidelityRate),
+            SessionStats = GetSessionStats(currentSessions)
         };
     }
 
@@ -330,6 +329,51 @@ public class ListeningEventRepository(IDbConnection connection, [FromKeyedServic
         return heatmapCells;
     }
 
+    private static SessionStatsDto GetSessionStats(List<ListeningSession> sessions)
+    {
+        if (sessions.Count == 0)
+            return new SessionStatsDto();
+
+        long maxDuration = sessions.Max(s => s.TotalDurationSeconds);
+        double averageTracks = sessions.Average(s => s.TrackCount);
+
+        int nocturnalCount = sessions.Count(s => s.StartedAt.Hour >= 21 || s.StartedAt.Hour < 6);
+        double nocturnalPercentage = (double)nocturnalCount / sessions.Count * 100;
+
+        int mostCommonStartHour = sessions
+            .GroupBy(s => s.StartedAt.Hour)
+            .OrderByDescending(g => g.Count())
+            .ThenBy(g => g.Key)
+            .First().Key;
+
+        ListeningSession mostIntenseSession = sessions
+            .OrderByDescending(s => s.TrackCount)
+            .ThenByDescending(s => s.TotalDurationSeconds)
+            .First();
+
+        IGrouping<int, ListeningSession> mostActiveDayGroup = sessions
+            .GroupBy(s => ((int)s.StartedAt.DayOfWeek + 6) % 7)
+            .OrderByDescending(g => g.Count())
+            .ThenBy(g => g.Key)
+            .First();
+
+        return new SessionStatsDto
+        {
+            MaxDurationSeconds = maxDuration,
+            AverageTracksPerSession = averageTracks,
+            NocturnalSessionPercentage = nocturnalPercentage,
+            MostCommonStartHour = mostCommonStartHour,
+            MostIntenseSession = new IntenseSessionDto
+            {
+                DurationSeconds = mostIntenseSession.TotalDurationSeconds,
+                TrackCount = mostIntenseSession.TrackCount,
+                DominantGenre = mostIntenseSession.DominantGenre
+            },
+            MostActiveDayOfWeek = mostActiveDayGroup.Key,
+            MostActiveDaySessionCount = mostActiveDayGroup.Count()
+        };
+    }
+
     private static List<ListeningSession> DetectSessions(List<RawListeningEvent> events)
     {
         List<ListeningSession> sessions = new();
@@ -375,8 +419,16 @@ public class ListeningEventRepository(IDbConnection connection, [FromKeyedServic
     {
         private readonly List<RawListeningEvent> _events = new();
 
+        public DateTime StartedAt => _events[0].PlayedAt;
         public DateTime LastPlayedAt => _events[^1].PlayedAt;
         public bool IsLong => _events.Count >= 5;
+        public int TrackCount => _events.Count;
+        public long TotalDurationSeconds => _events.Where(e => !e.WasSkipped).Sum(e => e.DurationPlayed);
+        public string DominantGenre => _events
+            .Where(e => !string.IsNullOrEmpty(e.GenreName))
+            .GroupBy(e => e.GenreName)
+            .OrderByDescending(g => g.Count())
+            .FirstOrDefault()?.Key ?? string.Empty;
 
         public void Add(RawListeningEvent e) => _events.Add(e);
         public bool ContainsTrack(long trackId) => _events.Any(e => e.TrackId == trackId);

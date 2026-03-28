@@ -1506,4 +1506,52 @@
   <data name="Insights_BadgeReplayLoverName" xml:space="preserve">
     <value>Accro aux rediffusions</value>
   </data>
+  <data name="Insights_Sessions_Title.Text" xml:space="preserve">
+    <value>🎧 Tes sessions d'écoute</value>
+  </data>
+  <data name="Insights_Sessions_MaxDuration.Text" xml:space="preserve">
+    <value>Durée max</value>
+  </data>
+  <data name="Insights_Sessions_AvgTracks.Text" xml:space="preserve">
+    <value>Titres par session en moyenne</value>
+  </data>
+  <data name="Insights_Sessions_Nocturnal.Text" xml:space="preserve">
+    <value>Sessions nocturnes</value>
+  </data>
+  <data name="Insights_Sessions_CommonStart.Text" xml:space="preserve">
+    <value>Heure habituelle</value>
+  </data>
+  <data name="Insights_Sessions_MostIntense.Text" xml:space="preserve">
+    <value>Session la plus intense</value>
+  </data>
+  <data name="Insights_Sessions_MostActiveDay.Text" xml:space="preserve">
+    <value>Jour le plus actif</value>
+  </data>
+  <data name="Insights_Sessions_TracksUnit" xml:space="preserve">
+    <value>titres</value>
+  </data>
+  <data name="Insights_Sessions_SessionsUnit" xml:space="preserve">
+    <value>sessions</value>
+  </data>
+  <data name="Insights_TopTracksPlayCount.Text" xml:space="preserve">
+    <value> écoutes ce mois-ci</value>
+  </data>
+  <data name="Insights_TopTracksLongSessionCount.Text" xml:space="preserve">
+    <value> sessions longues</value>
+  </data>
+  <data name="Insights_TopTracksPeakHour.Text" xml:space="preserve">
+    <value>Pic : </value>
+  </data>
+  <data name="Insights_TopAlbumsPlayCount.Text" xml:space="preserve">
+    <value> écoutes ce mois-ci</value>
+  </data>
+  <data name="Insights_TopAlbumsLongSessionCount.Text" xml:space="preserve">
+    <value> sessions longues</value>
+  </data>
+  <data name="Insights_TopAlbumsPeakHour.Text" xml:space="preserve">
+    <value>Pic : </value>
+  </data>
+  <data name="Insights_TopAlbumsDominant.Text" xml:space="preserve">
+    <value>Dominant : </value>
+  </data>
 </root>

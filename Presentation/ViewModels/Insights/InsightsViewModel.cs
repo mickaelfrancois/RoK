@@ -18,6 +18,15 @@ public partial class InsightsViewModel(IMediator mediator, IResourceService reso
 
     public IReadOnlyList<BadgeViewModel> Badges { get; private set; } = new List<BadgeViewModel>();
 
+    public SessionStatsViewModel SessionStats { get; private set; } = new SessionStatsViewModel(
+        MaxDurationText: string.Empty,
+        AvgTracksText: string.Empty,
+        NocturnalText: string.Empty,
+        MostCommonStartHourText: string.Empty,
+        MostIntenseSessionText: string.Empty,
+        MostActiveDayText: string.Empty
+    );
+
     public IReadOnlyList<HourLabelViewModel> HourAxisLabels { get; } = Enumerable.Range(0, 24)
         .Select(h => new HourLabelViewModel(h % 4 == 0 ? $"{h}h" : string.Empty))
         .ToList();
@@ -59,11 +68,13 @@ public partial class InsightsViewModel(IMediator mediator, IResourceService reso
         HeatmapRows = BuildHeatmapRows(Insights.HeatmapCells);
         ListeningProfileCard = BuildProfileCard(Insights, resourceLoader);
         Badges = BuildBadgeViewModels(Insights.Badges);
+        SessionStats = BuildSessionStats(Insights.SessionStats, resourceLoader);
 
         OnPropertyChanged(nameof(Insights));
         OnPropertyChanged(nameof(HeatmapRows));
         OnPropertyChanged(nameof(ListeningProfileCard));
         OnPropertyChanged(nameof(Badges));
+        OnPropertyChanged(nameof(SessionStats));
     }
 
     private static IReadOnlyList<HeatmapRowViewModel> BuildHeatmapRows(IReadOnlyList<HeatmapCellDto> cells)
@@ -148,6 +159,44 @@ public partial class InsightsViewModel(IMediator mediator, IResourceService reso
             };
             return new BadgeViewModel(b.Icon, name, description);
         }).ToList();
+    }
+
+    private static SessionStatsViewModel BuildSessionStats(SessionStatsDto stats, IResourceService resourceLoader)
+    {
+        string maxDurationText = FormatSessionDuration(stats.MaxDurationSeconds);
+        string avgTracksText = $"{stats.AverageTracksPerSession:F0}";
+        string nocturnalText = $"{stats.NocturnalSessionPercentage:F0}%";
+        string mostCommonStartHourText = stats.MostCommonStartHour >= 0
+            ? $"{stats.MostCommonStartHour:D2}h – {(stats.MostCommonStartHour + 2) % 24:D2}h"
+            : string.Empty;
+        string mostIntenseSessionText = stats.MostIntenseSession is { } intense
+            ? $"{FormatSessionDuration(intense.DurationSeconds)} · {intense.TrackCount} {resourceLoader.GetString("Insights_Sessions_TracksUnit")} · {intense.DominantGenre}"
+            : string.Empty;
+
+        string mostActiveDayText = string.Empty;
+        if (stats.MostActiveDayOfWeek >= 0)
+        {
+            string dayName = CultureInfo.CurrentUICulture.DateTimeFormat.DayNames[(stats.MostActiveDayOfWeek + 1) % 7];
+            string capitalizedDay = CultureInfo.CurrentUICulture.TextInfo.ToTitleCase(dayName);
+            mostActiveDayText = $"{capitalizedDay} ({stats.MostActiveDaySessionCount} {resourceLoader.GetString("Insights_Sessions_SessionsUnit")})";
+        }
+
+        return new SessionStatsViewModel(
+            MaxDurationText: maxDurationText,
+            AvgTracksText: avgTracksText,
+            NocturnalText: nocturnalText,
+            MostCommonStartHourText: mostCommonStartHourText,
+            MostIntenseSessionText: mostIntenseSessionText,
+            MostActiveDayText: mostActiveDayText
+        );
+    }
+
+    private static string FormatSessionDuration(long seconds)
+    {
+        TimeSpan t = TimeSpan.FromSeconds(seconds);
+        return t.TotalMinutes < 60
+            ? $"{(int)t.TotalMinutes}min"
+            : $"{(int)t.TotalHours}h{t.Minutes:D2}";
     }
 
     private static string FormatSeconds(double seconds)

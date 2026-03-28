@@ -24,69 +24,70 @@
 
             <!-- Hero section -->
             <TextBlock x:Uid="Insights_HeroTitle"  Text="🎨 Ton mois en musique" Style="{StaticResource InsightTitleTextBlockStyle}" />
+            <Border Style="{StaticResource MetricCardStyle}">
+                <controls:WrapPanel Orientation="Horizontal" HorizontalSpacing="12" VerticalSpacing="12">
 
-            <controls:WrapPanel Orientation="Horizontal" HorizontalSpacing="12" VerticalSpacing="12">
-                
-                <Border Grid.Column="0" Style="{StaticResource MetricCardStyle}">
-                    <StackPanel Spacing="4">
-                        <TextBlock x:Uid="Insights_TotalPlayDuration"  Text="Temps total d'écoute" Style="{ThemeResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
-                        <TextBlock Style="{ThemeResource SubtitleTextBlockStyle}">
+                    <Border Grid.Column="0" Style="{StaticResource MetricCardStyle}">
+                        <StackPanel Spacing="4">
+                            <TextBlock x:Uid="Insights_TotalPlayDuration"  Text="Temps total d'écoute" Style="{ThemeResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                            <TextBlock Style="{ThemeResource SubtitleTextBlockStyle}">
                             <Run Text="{x:Bind ViewModel.Insights.PlayDuration, Converter={StaticResource SecondsToReadableConverter}}" />
                             <Run Text="{x:Bind ViewModel.PlayDurationDiffText}" Foreground="{x:Bind ViewModel.Insights.DifferencePlayDuration, Converter={StaticResource IntToColorConverter}, Mode=OneWay}" />
-                        </TextBlock>
-                    </StackPanel>
-                </Border>
+                            </TextBlock>
+                        </StackPanel>
+                    </Border>
 
-                <Border Style="{StaticResource MetricCardStyle}">
-                    <StackPanel Spacing="4">
-                        <TextBlock x:Uid="Insights_TotalSessions"  Text="Nombre de sessions" Style="{ThemeResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
-                        <TextBlock Style="{ThemeResource SubtitleTextBlockStyle}">
+                    <Border Style="{StaticResource MetricCardStyle}">
+                        <StackPanel Spacing="4">
+                            <TextBlock x:Uid="Insights_TotalSessions"  Text="Nombre de sessions" Style="{ThemeResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                            <TextBlock Style="{ThemeResource SubtitleTextBlockStyle}">
                             <Run Text="{x:Bind ViewModel.Insights.SessionCount}" />
                             <Run Text="{x:Bind ViewModel.SessionDiffText}" Foreground="{x:Bind ViewModel.Insights.DifferenceSessionCount, Converter={StaticResource IntToColorConverter}, Mode=OneWay}" />
-                        </TextBlock>
-                    </StackPanel>
-                </Border>
+                            </TextBlock>
+                        </StackPanel>
+                    </Border>
 
-                <Border Style="{StaticResource MetricCardStyle}">
-                    <StackPanel Spacing="4">
-                        <TextBlock x:Uid="Insights_TotalTracks"  Text="Titres différents écoutés" Style="{ThemeResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
-                        <TextBlock Style="{ThemeResource SubtitleTextBlockStyle}">
+                    <Border Style="{StaticResource MetricCardStyle}">
+                        <StackPanel Spacing="4">
+                            <TextBlock x:Uid="Insights_TotalTracks"  Text="Titres différents écoutés" Style="{ThemeResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                            <TextBlock Style="{ThemeResource SubtitleTextBlockStyle}">
                             <Run Text="{x:Bind ViewModel.Insights.TracksPlayed}" />
                             <Run Text="{x:Bind ViewModel.TracksPlayedDiffText}" Foreground="{x:Bind ViewModel.Insights.DifferenceTracksPlayed, Converter={StaticResource IntToColorConverter}, Mode=OneWay}" />
-                        </TextBlock>
-                    </StackPanel>
-                </Border>
+                            </TextBlock>
+                        </StackPanel>
+                    </Border>
 
-                <Border Style="{StaticResource MetricCardStyle}">
-                    <StackPanel Spacing="4">
-                        <TextBlock x:Uid="Insights_TotalArtists"  Text="Artistes différents écoutés" Style="{ThemeResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
-                        <TextBlock Style="{ThemeResource SubtitleTextBlockStyle}">
+                    <Border Style="{StaticResource MetricCardStyle}">
+                        <StackPanel Spacing="4">
+                            <TextBlock x:Uid="Insights_TotalArtists"  Text="Artistes différents écoutés" Style="{ThemeResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                            <TextBlock Style="{ThemeResource SubtitleTextBlockStyle}">
                             <Run Text="{x:Bind ViewModel.Insights.ArtistsPlayed}" />
                             <Run Text="{x:Bind ViewModel.ArtistsPlayedDiffText}" Foreground="{x:Bind ViewModel.Insights.DifferenceArtistsPlayed, Converter={StaticResource IntToColorConverter}, Mode=OneWay}" />
-                        </TextBlock>
-                    </StackPanel>
-                </Border>
+                            </TextBlock>
+                        </StackPanel>
+                    </Border>
 
-                <Border Style="{StaticResource MetricCardStyle}">
-                    <StackPanel Spacing="4">
-                        <TextBlock x:Uid="Insights_TotalAlbums"  Text="Albums différents écoutés" Style="{ThemeResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
-                        <TextBlock Style="{ThemeResource SubtitleTextBlockStyle}">
+                    <Border Style="{StaticResource MetricCardStyle}">
+                        <StackPanel Spacing="4">
+                            <TextBlock x:Uid="Insights_TotalAlbums"  Text="Albums différents écoutés" Style="{ThemeResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                            <TextBlock Style="{ThemeResource SubtitleTextBlockStyle}">
                             <Run Text="{x:Bind ViewModel.Insights.AlbumsPlayed}" />
                             <Run Text="{x:Bind ViewModel.AlbumsPlayedDiffText}" Foreground="{x:Bind ViewModel.Insights.DifferenceAlbumsPlayed, Converter={StaticResource IntToColorConverter}, Mode=OneWay}" />
-                        </TextBlock>
-                    </StackPanel>
-                </Border>
+                            </TextBlock>
+                        </StackPanel>
+                    </Border>
 
-                <Border Style="{StaticResource MetricCardStyle}">
-                    <StackPanel Spacing="4">
-                        <TextBlock x:Uid="Insights_TotalGenres"  Text="Genres différents écoutés" Style="{ThemeResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
-                        <TextBlock Style="{ThemeResource SubtitleTextBlockStyle}">
+                    <Border Style="{StaticResource MetricCardStyle}">
+                        <StackPanel Spacing="4">
+                            <TextBlock x:Uid="Insights_TotalGenres"  Text="Genres différents écoutés" Style="{ThemeResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                            <TextBlock Style="{ThemeResource SubtitleTextBlockStyle}">
                             <Run Text="{x:Bind ViewModel.Insights.GenresPlayed}" />
                             <Run Text="{x:Bind ViewModel.GenresPlayedDiffText}" Foreground="{x:Bind ViewModel.Insights.DifferenceGenresPlayed, Converter={StaticResource IntToColorConverter}, Mode=OneWay}" />
-                        </TextBlock>
-                    </StackPanel>
-                </Border>
-            </controls:WrapPanel>
+                            </TextBlock>
+                        </StackPanel>
+                    </Border>
+                </controls:WrapPanel>
+            </Border>
 
             <TextBlock x:Uid="Insights_HotListeningTimes"  Text="🔥 Quand tu écoutes le plus" Style="{StaticResource InsightTitleTextBlockStyle}" />
             <Border Style="{StaticResource MetricCardStyle}">
@@ -144,37 +145,53 @@
                 </StackPanel>
             </Border>
 
-            <TextBlock Text="🎧 Tes sessions d'écoute" Style="{StaticResource InsightTitleTextBlockStyle}" />
-            <!--<StackPanel Spacing="16">
-
-                <TextBlock Text="Tes sessions d'écoute"
-                   Style="{StaticResource TitleMedium}" />
-
-                <local:StatCard Title="Durée moyenne"
-                        Value="{x:Bind ViewModel.AverageSessionDuration}" />
-
-                <local:StatCard Title="Session la plus longue"
-                        Value="{x:Bind ViewModel.LongestSession}" />
-
-                <TextBlock Text="Titres qui ouvrent tes sessions"
-                   Style="{StaticResource Subtitle}" />
-
-                <local:TrackListControl Items="{x:Bind ViewModel.SessionStartTracks}" />
-
-                <TextBlock Text="Titres qui terminent tes sessions"
-                   Style="{StaticResource Subtitle}" />
-
-                <local:TrackListControl Items="{x:Bind ViewModel.SessionEndTracks}" />
-
-            </StackPanel>-->
+            <TextBlock x:Uid="Insights_Sessions_Title" Text="🎧 Tes sessions d'écoute" Style="{StaticResource InsightTitleTextBlockStyle}" />
+            <Border Style="{StaticResource MetricCardStyle}">
+                <controls:WrapPanel Orientation="Horizontal" HorizontalSpacing="32" VerticalSpacing="16">
+                    <Border Grid.Column="0" Style="{StaticResource MetricCardStyle}">
+                        <StackPanel Spacing="4">
+                            <TextBlock x:Uid="Insights_Sessions_MaxDuration" Text="Durée max" Style="{ThemeResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                            <TextBlock Text="{x:Bind ViewModel.SessionStats.MaxDurationText, Mode=OneWay}" Style="{ThemeResource SubtitleTextBlockStyle}" />
+                        </StackPanel>
+                    </Border>
+                    <Border Grid.Column="0" Style="{StaticResource MetricCardStyle}">
+                        <StackPanel Spacing="4">
+                            <TextBlock x:Uid="Insights_Sessions_AvgTracks" Text="Titres par session en moyenne" Style="{ThemeResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                            <TextBlock Text="{x:Bind ViewModel.SessionStats.AvgTracksText, Mode=OneWay}" Style="{ThemeResource SubtitleTextBlockStyle}" />
+                        </StackPanel>
+                    </Border>
+                    <Border Grid.Column="0" Style="{StaticResource MetricCardStyle}">
+                        <StackPanel Spacing="4">
+                            <TextBlock x:Uid="Insights_Sessions_Nocturnal" Text="Sessions nocturnes" Style="{ThemeResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                            <TextBlock Text="{x:Bind ViewModel.SessionStats.NocturnalText, Mode=OneWay}" Style="{ThemeResource SubtitleTextBlockStyle}" />
+                        </StackPanel>
+                    </Border>
+                    <Border Grid.Column="0" Style="{StaticResource MetricCardStyle}">
+                        <StackPanel Spacing="4">
+                            <TextBlock x:Uid="Insights_Sessions_CommonStart" Text="Heure habituelle" Style="{ThemeResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                            <TextBlock Text="{x:Bind ViewModel.SessionStats.MostCommonStartHourText, Mode=OneWay}" Style="{ThemeResource SubtitleTextBlockStyle}" />
+                        </StackPanel>
+                    </Border>
+                    <Border Grid.Column="0" Style="{StaticResource MetricCardStyle}">
+                        <StackPanel Spacing="4">
+                            <TextBlock x:Uid="Insights_Sessions_MostIntense" Text="Session la plus intense" Style="{ThemeResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                            <TextBlock Text="{x:Bind ViewModel.SessionStats.MostIntenseSessionText, Mode=OneWay}" Style="{ThemeResource SubtitleTextBlockStyle}" />
+                        </StackPanel>
+                    </Border>
+                    <Border Grid.Column="0" Style="{StaticResource MetricCardStyle}">
+                        <StackPanel Spacing="4">
+                            <TextBlock x:Uid="Insights_Sessions_MostActiveDay" Text="Jour le plus actif" Style="{ThemeResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                            <TextBlock Text="{x:Bind ViewModel.SessionStats.MostActiveDayText, Mode=OneWay}" Style="{ThemeResource SubtitleTextBlockStyle}" />
+                        </StackPanel>
+                    </Border>
+                </controls:WrapPanel>
+            </Border>
 
             <TextBlock x:Uid="Insights_ImportantTracks"  Text="🏆 Tes titres les plus importants" Style="{StaticResource InsightTitleTextBlockStyle}" />
             <Border Style="{StaticResource MetricCardStyle}">
                 <StackPanel Spacing="20">
-
                     <TextBlock x:Uid="Insights_TopTracks"  Text="Titres" Style="{ThemeResource BodyStrongTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
-                    <ScrollViewer HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Disabled"
-                                  HorizontalScrollMode="Enabled" VerticalScrollMode="Disabled" ZoomMode="Disabled">
+                    <ScrollViewer HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Disabled" HorizontalScrollMode="Enabled" VerticalScrollMode="Disabled" ZoomMode="Disabled">
                         <ItemsRepeater ItemsSource="{x:Bind ViewModel.Insights.TopTracks}">
                             <ItemsRepeater.Layout>
                                 <StackLayout Orientation="Horizontal" Spacing="12"/>
@@ -190,16 +207,16 @@
                                             <StackPanel Spacing="3">
                                                 <TextBlock Style="{ThemeResource CaptionTextBlockStyle}">
                                                     <Run Text="{x:Bind PlayCount}" FontWeight="SemiBold"/>
-                                                    <Run Text=" écoutes ce mois-ci"/>
+                                                    <Run x:Uid="Insights_TopTracksPlayCount" Text=" écoutes ce mois-ci"/>
                                                 </TextBlock>
                                                 <TextBlock Style="{ThemeResource CaptionTextBlockStyle}"
                                                            Foreground="{ThemeResource TextFillColorSecondaryBrush}">
                                                     <Run Text="{x:Bind LongSessionCount}"/>
-                                                    <Run Text=" sessions longues"/>
+                                                    <Run x:Uid="Insights_TopTracksLongSessionCount" Text=" sessions longues"/>
                                                 </TextBlock>
                                                 <TextBlock Style="{ThemeResource CaptionTextBlockStyle}"
                                                            Foreground="{ThemeResource TextFillColorSecondaryBrush}">
-                                                    <Run Text="Pic : "/>
+                                                    <Run x:Uid="Insights_TopTracksPeakHour" Text="Pic : "/>
                                                     <Run Text="{x:Bind PeakHourRange}"/>
                                                 </TextBlock>
                                             </StackPanel>
@@ -227,21 +244,21 @@
                                             <StackPanel Spacing="3">
                                                 <TextBlock Style="{ThemeResource CaptionTextBlockStyle}">
                                                     <Run Text="{x:Bind PlayCount}" FontWeight="SemiBold"/>
-                                                    <Run Text=" écoutes ce mois-ci"/>
+                                                    <Run x:Uid="Insights_TopAlbumsPlayCount" Text=" écoutes ce mois-ci"/>
                                                 </TextBlock>
                                                 <TextBlock Style="{ThemeResource CaptionTextBlockStyle}"
                                                            Foreground="{ThemeResource TextFillColorSecondaryBrush}">
                                                     <Run Text="{x:Bind LongSessionCount}"/>
-                                                    <Run Text=" sessions longues"/>
+                                                    <Run x:Uid="Insights_TopAlbumsLongSessionCount" Text=" sessions longues"/>
                                                 </TextBlock>
                                                 <TextBlock Style="{ThemeResource CaptionTextBlockStyle}"
                                                            Foreground="{ThemeResource TextFillColorSecondaryBrush}">
-                                                    <Run Text="Pic : "/>
+                                                    <Run x:Uid="Insights_TopAlbumsPeakHour" Text="Pic : "/>
                                                     <Run Text="{x:Bind PeakHourRange}"/>
                                                 </TextBlock>
                                                 <TextBlock Style="{ThemeResource CaptionTextBlockStyle}"
                                                            Foreground="{ThemeResource TextFillColorSecondaryBrush}">
-                                                    <Run Text="Dominant : "/>
+                                                    <Run x:Uid="Insights_TopAlbumsDominant" Text="Dominant : "/>
                                                     <Run Text="{x:Bind DominantTitle}"/>
                                                 </TextBlock>
                                             </StackPanel>
@@ -256,101 +273,103 @@
             </Border>
 
             <TextBlock x:Uid="InsightsPage_ListeningProfileHeader"  Text="🧬 Ton profil d'écoute" Style="{StaticResource InsightTitleTextBlockStyle}" />
-
-            <StackPanel Orientation="Horizontal" Spacing="24">
-                <Border Style="{StaticResource MetricCardStyle}" Width="400" MaxWidth="400" HorizontalAlignment="Left">
-                    <StackPanel Spacing="16">
-                        <StackPanel Orientation="Horizontal" Spacing="12" VerticalAlignment="Center">
-                            <TextBlock Text="{x:Bind ViewModel.ListeningProfileCard.Icon, Mode=OneWay}" FontSize="28" VerticalAlignment="Center"/>
-                            <TextBlock Text="{x:Bind ViewModel.ListeningProfileCard.Label, Mode=OneWay}" Style="{StaticResource SubtitleTextBlockStyle}" VerticalAlignment="Center"/>
-                        </StackPanel>
-                        <TextBlock Text="{x:Bind ViewModel.ListeningProfileCard.Description, Mode=OneWay}" Style="{ThemeResource BodyTextBlockStyle}" TextWrapping="Wrap" Opacity="0.8"/>
-                        <StackPanel Spacing="4">
-                            <TextBlock Style="{ThemeResource CaptionTextBlockStyle}">
+            <Border Style="{StaticResource MetricCardStyle}">
+                <StackPanel Orientation="Horizontal" Spacing="24">
+                    <Border Style="{StaticResource MetricCardStyle}" Width="400" MaxWidth="400" HorizontalAlignment="Left">
+                        <StackPanel Spacing="16">
+                            <StackPanel Orientation="Horizontal" Spacing="12" VerticalAlignment="Center">
+                                <TextBlock Text="{x:Bind ViewModel.ListeningProfileCard.Icon, Mode=OneWay}" FontSize="28" VerticalAlignment="Center"/>
+                                <TextBlock Text="{x:Bind ViewModel.ListeningProfileCard.Label, Mode=OneWay}" Style="{StaticResource SubtitleTextBlockStyle}" VerticalAlignment="Center"/>
+                            </StackPanel>
+                            <TextBlock Text="{x:Bind ViewModel.ListeningProfileCard.Description, Mode=OneWay}" Style="{ThemeResource BodyTextBlockStyle}" TextWrapping="Wrap" Opacity="0.8"/>
+                            <StackPanel Spacing="4">
+                                <TextBlock Style="{ThemeResource CaptionTextBlockStyle}">
                             <Run Text="• Skip rate : "/> 
                             <Run Text="{x:Bind ViewModel.ListeningProfileCard.SkipRateText, Mode=OneWay}" FontWeight="SemiBold"/>
-                            </TextBlock>
-                            <TextBlock Style="{ThemeResource CaptionTextBlockStyle}">
+                                </TextBlock>
+                                <TextBlock Style="{ThemeResource CaptionTextBlockStyle}">
                             <Run Text="• Replay rate : "/>
                             <Run Text="{x:Bind ViewModel.ListeningProfileCard.ReplayRateText, Mode=OneWay}" FontWeight="SemiBold"/>
-                            </TextBlock>
-                            <TextBlock Style="{ThemeResource CaptionTextBlockStyle}">
+                                </TextBlock>
+                                <TextBlock Style="{ThemeResource CaptionTextBlockStyle}">
                             <Run Text="• Diversité : "/>
                             <Run Text="{x:Bind ViewModel.ListeningProfileCard.DiversityText, Mode=OneWay}" FontWeight="SemiBold"/>
-                            </TextBlock>
+                                </TextBlock>
+                            </StackPanel>
                         </StackPanel>
-                    </StackPanel>
-                </Border>
-                <Border Style="{StaticResource MetricCardStyle}" Width="400" MaxWidth="400" HorizontalAlignment="Left">
-                    <StackPanel Spacing="16">
-                        <TextBlock x:Uid="Insights_TopGenres"  Text="Top Genres" Style="{StaticResource SubtitleTextBlockStyle}" VerticalAlignment="Center"/>
-                        <ItemsRepeater ItemsSource="{x:Bind ViewModel.Insights.TopGenres, Mode=OneWay}">
-                            <ItemsRepeater.Layout>
-                                <StackLayout Orientation="Vertical" Spacing="16"/>
-                            </ItemsRepeater.Layout>
-                            <ItemsRepeater.ItemTemplate>
-                                <DataTemplate x:DataType="models:GenreInsightDto">
-                                    <StackPanel Spacing="6">
-                                        <Grid>
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="Auto"/>
-                                                <ColumnDefinition Width="*"/>
-                                                <ColumnDefinition Width="Auto"/>
-                                            </Grid.ColumnDefinitions>
-                                            <TextBlock Grid.Column="0" Text="{x:Bind RankText}" Style="{ThemeResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" VerticalAlignment="Center"/>
-                                            <TextBlock Grid.Column="1" Text="{x:Bind GenreName}" Style="{ThemeResource BodyStrongTextBlockStyle}" Margin="8,0,0,0" VerticalAlignment="Center"/>
-                                            <TextBlock Grid.Column="2" Text="{x:Bind PlayPercentageText}" Style="{ThemeResource BodyTextBlockStyle}" Foreground="{ThemeResource BrandAccentBrush}" VerticalAlignment="Center"/>
-                                        </Grid>
-                                        <ProgressBar Value="{x:Bind PlayPercentage}" Maximum="100" Height="6"/>
-                                    </StackPanel>
-                                </DataTemplate>
-                            </ItemsRepeater.ItemTemplate>
-                        </ItemsRepeater>
-                    </StackPanel>
-                </Border>
-            </StackPanel>
-
+                    </Border>
+                    <Border Style="{StaticResource MetricCardStyle}" Width="400" MaxWidth="400" HorizontalAlignment="Left">
+                        <StackPanel Spacing="16">
+                            <TextBlock x:Uid="Insights_TopGenres"  Text="Top Genres" Style="{StaticResource SubtitleTextBlockStyle}" VerticalAlignment="Center"/>
+                            <ItemsRepeater ItemsSource="{x:Bind ViewModel.Insights.TopGenres, Mode=OneWay}">
+                                <ItemsRepeater.Layout>
+                                    <StackLayout Orientation="Vertical" Spacing="16"/>
+                                </ItemsRepeater.Layout>
+                                <ItemsRepeater.ItemTemplate>
+                                    <DataTemplate x:DataType="models:GenreInsightDto">
+                                        <StackPanel Spacing="6">
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="Auto"/>
+                                                    <ColumnDefinition Width="*"/>
+                                                    <ColumnDefinition Width="Auto"/>
+                                                </Grid.ColumnDefinitions>
+                                                <TextBlock Grid.Column="0" Text="{x:Bind RankText}" Style="{ThemeResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" VerticalAlignment="Center"/>
+                                                <TextBlock Grid.Column="1" Text="{x:Bind GenreName}" Style="{ThemeResource BodyStrongTextBlockStyle}" Margin="8,0,0,0" VerticalAlignment="Center"/>
+                                                <TextBlock Grid.Column="2" Text="{x:Bind PlayPercentageText}" Style="{ThemeResource BodyTextBlockStyle}" Foreground="{ThemeResource BrandAccentBrush}" VerticalAlignment="Center"/>
+                                            </Grid>
+                                            <ProgressBar Value="{x:Bind PlayPercentage}" Maximum="100" Height="6"/>
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </ItemsRepeater.ItemTemplate>
+                            </ItemsRepeater>
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+            </Border>
 
             <TextBlock x:Uid="Insights_BadgesHeader"  Text="🥇 Tes badges" Style="{StaticResource InsightTitleTextBlockStyle}" />
-            <ItemsRepeater ItemsSource="{x:Bind ViewModel.Badges, Mode=OneWay}">
-                <ItemsRepeater.Layout>
-                    <UniformGridLayout MinColumnSpacing="12" MinRowSpacing="12" MinItemWidth="260" ItemsJustification="Start"/>
-                </ItemsRepeater.Layout>
-                <ItemsRepeater.ItemTemplate>
-                    <DataTemplate x:DataType="viewmodels:BadgeViewModel">
-                        <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+            <Border Style="{StaticResource MetricCardStyle}">
+                <ItemsRepeater ItemsSource="{x:Bind ViewModel.Badges, Mode=OneWay}">
+                    <ItemsRepeater.Layout>
+                        <UniformGridLayout MinColumnSpacing="12" MinRowSpacing="12" MinItemWidth="260" ItemsJustification="Start"/>
+                    </ItemsRepeater.Layout>
+                    <ItemsRepeater.ItemTemplate>
+                        <DataTemplate x:DataType="viewmodels:BadgeViewModel">
+                            <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
                                 BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
                                 BorderThickness="1"
                                 CornerRadius="12"
                                 Padding="16">
-                            <Grid ColumnSpacing="14">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="Auto"/>
-                                    <ColumnDefinition Width="*"/>
-                                </Grid.ColumnDefinitions>
-                                <Border Grid.Column="0"
+                                <Grid ColumnSpacing="14">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <Border Grid.Column="0"
                                         Width="48" Height="48"
                                         CornerRadius="24"
                                         Background="{ThemeResource SubtleFillColorSecondaryBrush}"
                                         VerticalAlignment="Center">
-                                    <TextBlock Text="{x:Bind Icon}"
+                                        <TextBlock Text="{x:Bind Icon}"
                                                FontSize="24"
                                                HorizontalAlignment="Center"
                                                VerticalAlignment="Center"/>
-                                </Border>
-                                <StackPanel Grid.Column="1" Spacing="2" VerticalAlignment="Center">
-                                    <TextBlock Text="{x:Bind Name}"
+                                    </Border>
+                                    <StackPanel Grid.Column="1" Spacing="2" VerticalAlignment="Center">
+                                        <TextBlock Text="{x:Bind Name}"
                                                Style="{ThemeResource BodyStrongTextBlockStyle}"/>
-                                    <TextBlock Text="{x:Bind Description}"
+                                        <TextBlock Text="{x:Bind Description}"
                                                Style="{ThemeResource CaptionTextBlockStyle}"
                                                Foreground="{ThemeResource TextFillColorSecondaryBrush}"
                                                TextWrapping="Wrap"/>
-                                </StackPanel>
-                            </Grid>
-                        </Border>
-                    </DataTemplate>
-                </ItemsRepeater.ItemTemplate>
-            </ItemsRepeater>
+                                    </StackPanel>
+                                </Grid>
+                            </Border>
+                        </DataTemplate>
+                    </ItemsRepeater.ItemTemplate>
+                </ItemsRepeater>
+            </Border>
         </StackPanel>        
     </ScrollViewer>
 </Page>
