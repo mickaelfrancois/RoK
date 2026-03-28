@@ -18,7 +18,25 @@
         </Style>
     </Page.Resources>
 
-    <ScrollViewer>
+    <Grid>
+
+        <!-- Loading state -->
+        <ProgressRing IsActive="{x:Bind ViewModel.IsLoading, Mode=OneWay}"
+                      Visibility="{x:Bind ViewModel.IsLoading, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}"
+                      HorizontalAlignment="Center" VerticalAlignment="Center"
+                      Width="48" Height="48" />
+
+        <!-- Empty state -->
+        <StackPanel Visibility="{x:Bind ViewModel.IsEmpty, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}"
+                    HorizontalAlignment="Center" VerticalAlignment="Center"
+                    Spacing="12">
+            <TextBlock Text="🎵" FontSize="48" HorizontalAlignment="Center" />
+            <TextBlock x:Uid="Insights_EmptyStateTitle" Style="{StaticResource SubtitleTextBlockStyle}" HorizontalAlignment="Center" />
+            <TextBlock x:Uid="Insights_EmptyStateDescription" Style="{ThemeResource BodyTextBlockStyle}" HorizontalAlignment="Center" Opacity="0.7" />
+        </StackPanel>
+
+        <!-- Content -->
+        <ScrollViewer Visibility="{x:Bind ViewModel.HasData, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">
 
         <StackPanel Padding="24" Spacing="24">
 
@@ -372,4 +390,5 @@
             </Border>
         </StackPanel>        
     </ScrollViewer>
+    </Grid>
 </Page>

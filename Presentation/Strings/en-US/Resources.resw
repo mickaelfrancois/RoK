@@ -1554,4 +1554,10 @@
   <data name="Insights_TopAlbumsDominant.Text" xml:space="preserve">
     <value>Dominant : </value>
   </data>
+  <data name="Insights_EmptyStateTitle.Text" xml:space="preserve">
+    <value>No data yet</value>
+  </data>
+  <data name="Insights_EmptyStateDescription.Text" xml:space="preserve">
+    <value>Start listening to music to see your insights for this month.</value>
+  </data>
 </root>

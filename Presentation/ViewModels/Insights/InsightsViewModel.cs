@@ -6,9 +6,14 @@ namespace Rok.ViewModels.Insights;
 
 public partial class InsightsViewModel(IMediator mediator, IResourceService resourceLoader) : ObservableObject
 {
+    private const int MinimumDataThreshold = 10;
     private static readonly string[] _dayLabels = Enumerable.Range(1, 7)
         .Select(i => CultureInfo.CurrentUICulture.DateTimeFormat.AbbreviatedDayNames[i % 7])
         .ToArray();
+
+    public bool IsLoading { get; private set; } = true;
+    public bool HasData { get; private set; }
+    public bool IsEmpty => !IsLoading && !HasData;
 
     public InsightsDto Insights { get; private set; } = new InsightsDto();
 
@@ -64,17 +69,27 @@ public partial class InsightsViewModel(IMediator mediator, IResourceService reso
 
     public async Task LoadDataAsync()
     {
+        IsLoading = true;
+        OnPropertyChanged(nameof(IsLoading));
+        OnPropertyChanged(nameof(IsEmpty));
+
         Insights = await mediator.SendMessageAsync(new GetInsightsQuery() { Month = DateTime.UtcNow });
         HeatmapRows = BuildHeatmapRows(Insights.HeatmapCells);
         ListeningProfileCard = BuildProfileCard(Insights, resourceLoader);
         Badges = BuildBadgeViewModels(Insights.Badges);
         SessionStats = BuildSessionStats(Insights.SessionStats, resourceLoader);
 
+        HasData = Insights.TracksPlayed > MinimumDataThreshold;
+        IsLoading = false;
+
         OnPropertyChanged(nameof(Insights));
         OnPropertyChanged(nameof(HeatmapRows));
         OnPropertyChanged(nameof(ListeningProfileCard));
         OnPropertyChanged(nameof(Badges));
         OnPropertyChanged(nameof(SessionStats));
+        OnPropertyChanged(nameof(HasData));
+        OnPropertyChanged(nameof(IsLoading));
+        OnPropertyChanged(nameof(IsEmpty));
     }
 
     private static IReadOnlyList<HeatmapRowViewModel> BuildHeatmapRows(IReadOnlyList<HeatmapCellDto> cells)
