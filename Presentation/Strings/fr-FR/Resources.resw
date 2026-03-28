@@ -1560,4 +1560,7 @@
   <data name="Insights_EmptyStateDescription.Text" xml:space="preserve">
     <value>Commence à écouter de la musique pour voir tes insights du mois.</value>
   </data>
+  <data name="welcomeTagline.Text" xml:space="preserve">
+    <value>Votre musique. Votre univers.</value>
+  </data>
 </root>

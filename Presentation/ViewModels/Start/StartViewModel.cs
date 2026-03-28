@@ -12,7 +12,11 @@ namespace Rok.ViewModels.Start;
 
 public partial class StartViewModel : ObservableObject
 {
+#if DEBUG
+    private const int KAlbumMinimumBeforeUse = 30000;
+#else
     private const int KAlbumMinimumBeforeUse = 30;
+#endif
 
     private readonly IAlbumPicture _albumPicture;
     private readonly NavigationService _navigationService;
