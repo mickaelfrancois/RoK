@@ -1,5 +1,4 @@
-﻿using System.Threading;
-using CommunityToolkit.Mvvm.ComponentModel;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.UI.Dispatching;
 using Rok.Application.Features.Tracks.Query;
@@ -12,7 +11,8 @@ namespace Rok.ViewModels.Start;
 
 public partial class StartViewModel : ObservableObject
 {
-    private const int KAlbumMinimumBeforeUse = 30;
+    private const int KAlbumMinimumBeforeUse = 60;
+    private const int KDisplayIntervalMs = 300;
 
     private readonly IAlbumPicture _albumPicture;
     private readonly NavigationService _navigationService;
@@ -21,8 +21,10 @@ public partial class StartViewModel : ObservableObject
     private readonly IAppOptions _appOptions;
     private readonly ISettingsFile _settingsFile;
 
-    private readonly Lock _lock = new();
     private readonly DispatcherQueue _dispatcherQueue = DispatcherQueue.GetForCurrentThread();
+    private readonly Queue<AlbumImportedModel> _pendingAlbums = new();
+    private readonly DispatcherQueueTimer _displayTimer;
+    private readonly string _albumsImportedMessage = Guid.NewGuid().ToString();
 
     public RangeObservableCollection<AlbumImportedModel> AlbumsImported { get; } = new();
 
@@ -39,8 +41,7 @@ public partial class StartViewModel : ObservableObject
     public partial double ImportProgress { get; set; } = 0;
 
 
-
-    public StartViewModel(IAlbumPicture albumPicture, ISettingsFile settingsFile, NavigationService navigationService, IMediator mediator, IImport importService, IAppOptions appOptions)
+    public StartViewModel(IAlbumPicture albumPicture, ISettingsFile settingsFile, NavigationService navigationService, IResourceService resourceService, IMediator mediator, IImport importService, IAppOptions appOptions)
     {
         _albumPicture = albumPicture;
         _settingsFile = settingsFile;
@@ -49,6 +50,13 @@ public partial class StartViewModel : ObservableObject
         _importService = importService;
         _appOptions = appOptions;
 
+        _albumsImportedMessage = resourceService.GetString("AlbumsImported");
+
+        _displayTimer = _dispatcherQueue.CreateTimer();
+        _displayTimer.Interval = TimeSpan.FromMilliseconds(KDisplayIntervalMs);
+        _displayTimer.Tick += OnDisplayTimerTick;
+        _displayTimer.Start();
+
         Messenger.Subscribe<LibraryRefreshMessage>(async (message) => await LibraryRefreshChange(message));
         Messenger.Subscribe<AlbumImportedMessage>(AlbumImported);
     }
@@ -56,8 +64,27 @@ public partial class StartViewModel : ObservableObject
 
     private void UnregisterEvents()
     {
+        _displayTimer.Stop();
         Messenger.Unsubscribe<LibraryRefreshMessage>(async (message) => await LibraryRefreshChange(message));
         Messenger.Unsubscribe<AlbumImportedMessage>(AlbumImported);
+    }
+
+
+    private void OnDisplayTimerTick(DispatcherQueueTimer sender, object args)
+    {
+        if (_pendingAlbums.Count == 0)
+            return;
+
+        AlbumImportedModel album = _pendingAlbums.Dequeue();
+        AlbumsImported.Insert(0, album);
+        ImportProgressText = $"{AlbumsImported.Count} {_albumsImportedMessage}";
+        ImportProgress = Math.Min(AlbumsImported.Count * 100.0 / KAlbumMinimumBeforeUse, 100);
+
+        if (AlbumsImported.Count >= KAlbumMinimumBeforeUse)
+        {
+            UnregisterEvents();
+            _navigationService.NavigateToAlbums();
+        }
     }
 
 
@@ -95,10 +122,10 @@ public partial class StartViewModel : ObservableObject
 
     private void AlbumImported(AlbumImportedMessage message)
     {
-        BitmapImage cover;
-
-        _dispatcherQueue.TryEnqueue((DispatcherQueueHandler)(() =>
+        _dispatcherQueue.TryEnqueue(() =>
         {
+            BitmapImage cover;
+
             if (_albumPicture.PictureFileExists(message.AlbumPath))
             {
                 string filePath = _albumPicture.GetPictureFile(message.AlbumPath);
@@ -109,26 +136,14 @@ public partial class StartViewModel : ObservableObject
                 cover = (BitmapImage)Microsoft.UI.Xaml.Application.Current.Resources["albumCoverFallback"];
             }
 
-            lock (_lock)
+            _pendingAlbums.Enqueue(new AlbumImportedModel
             {
-                AlbumsImported.Insert(0, new AlbumImportedModel
-                {
-                    Name = message.Name,
-                    ArtistName = message.ArtistName,
-                    AlbumPath = message.AlbumPath,
-                    Picture = cover
-                });
-
-                this.ImportProgressText = $"{AlbumsImported.Count} albums discovered";
-                ImportProgress = Math.Min(AlbumsImported.Count * 100.0 / KAlbumMinimumBeforeUse, 100);
-
-                if (AlbumsImported.Count >= KAlbumMinimumBeforeUse)
-                {
-                    UnregisterEvents();
-                    _navigationService.NavigateToAlbums();
-                }
-            }
-        }));
+                Name = message.Name,
+                ArtistName = message.ArtistName,
+                AlbumPath = message.AlbumPath,
+                Picture = cover
+            });
+        });
     }
 
 

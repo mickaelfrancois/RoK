@@ -13,9 +13,16 @@
         <Storyboard x:Name="FadeInStoryboard">
             <DoubleAnimation Storyboard.TargetName="mainContent"
                              Storyboard.TargetProperty="Opacity"
-                             From="0"
-                             To="1"
-                             Duration="0:0:0.8">
+                             From="0" To="1"
+                             Duration="0:0:1.0">
+                <DoubleAnimation.EasingFunction>
+                    <CubicEase EasingMode="EaseOut" />
+                </DoubleAnimation.EasingFunction>
+            </DoubleAnimation>
+            <DoubleAnimation Storyboard.TargetName="heroTranslate"
+                             Storyboard.TargetProperty="Y"
+                             From="32" To="0"
+                             Duration="0:0:1.0">
                 <DoubleAnimation.EasingFunction>
                     <CubicEase EasingMode="EaseOut" />
                 </DoubleAnimation.EasingFunction>
@@ -29,103 +36,116 @@
                         Stretch="UniformToFill" />
         </Grid.Background>
 
+        <!-- Cinematic overlay -->
+        <Rectangle>
+            <Rectangle.Fill>
+                <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                    <GradientStop Color="#E0000000" Offset="0.0" />
+                    <GradientStop Color="#73000000" Offset="0.35" />
+                    <GradientStop Color="#B3000000" Offset="1.0" />
+                </LinearGradientBrush>
+            </Rectangle.Fill>
+        </Rectangle>
+
         <Grid x:Name="mainContent" Opacity="0">
-            <StackPanel Orientation="Vertical" Spacing="20">
-                <Grid Background="{ThemeResource AcrylicInAppFillColorDefaultBrush}"
-                      CornerRadius="8"
-                      Margin="20,20,20,0"
-                      Padding="24"
-                      MaxWidth="800"
-                      HorizontalAlignment="Center">
-                    
-                    <StackPanel x:Name="panelWaiting" Spacing="16">
-                        <TextBlock Text="Welcome to Rok"
-                                   FontSize="32"
-                                   FontWeight="SemiBold"
-                                   Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}"
-                                   HorizontalAlignment="Center" />
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
 
-                        <StackPanel Orientation="Horizontal"
-                                    HorizontalAlignment="Center"
-                                    Spacing="12"
-                                    Visibility="{x:Bind ViewModel.LibraryRefreshRunning, Converter={StaticResource BoolToVisibilityConverter}, Mode=OneWay}">
-                            <ProgressRing IsActive="{x:Bind ViewModel.LibraryRefreshRunning, Mode=OneWay}"
-                                          Width="24"
-                                          Height="24" />
-                            <StackPanel Spacing="4">
-                                <TextBlock x:Uid="welcomeWaiting"
-                                           FontSize="16"
-                                           Foreground="{ThemeResource TextFillColorPrimaryBrush}"
-                                           TextWrapping="Wrap" />
-                                <TextBlock Text="{x:Bind ViewModel.ImportProgressText, Mode=OneWay}"
-                                           FontSize="14"
-                                           Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                                           Opacity="0.8" />
-                            </StackPanel>
-                        </StackPanel>
+            <!-- Hero section -->
+            <StackPanel Grid.Row="0"
+                        Padding="40,60,40,28"
+                        Spacing="4"
+                        HorizontalAlignment="Center">
+                <StackPanel.RenderTransform>
+                    <TranslateTransform x:Name="heroTranslate" />
+                </StackPanel.RenderTransform>
 
-                        <ProgressBar IsIndeterminate="False"
-                                     Value="{x:Bind ViewModel.ImportProgress, Mode=OneWay}"
-                                     Maximum="100"
-                                     Visibility="{x:Bind ViewModel.LibraryRefreshRunning, Converter={StaticResource BoolToVisibilityConverter}, Mode=OneWay}"
-                                     Margin="0,8,0,0" />
+                <TextBlock Text="ROK"
+                           FontFamily="{StaticResource FontFamilyBrand}"
+                           FontSize="88"
+                           FontWeight="Bold"
+                           Foreground="White"
+                           HorizontalAlignment="Center"
+                           CharacterSpacing="400" />
+
+                <TextBlock x:Uid="welcomeTagline"
+                           FontSize="{StaticResource FontSizeMedium}"
+                           Foreground="White"
+                           Opacity="0.6"
+                           HorizontalAlignment="Center"
+                           TextAlignment="Center" />
+
+                <StackPanel Margin="0,24,0,0"
+                            Spacing="10"
+                            HorizontalAlignment="Center"
+                            Visibility="{x:Bind ViewModel.LibraryRefreshRunning, Converter={StaticResource BoolToVisibilityConverter}, Mode=OneWay}">
+                    <StackPanel Orientation="Horizontal"
+                                HorizontalAlignment="Center"
+                                Spacing="10">
+                        <ProgressRing IsActive="True" Width="18" Height="18" />
+                        <TextBlock x:Uid="welcomeWaiting"
+                                   FontSize="{StaticResource FontSizeSmall}"
+                                   Foreground="White"
+                                   Opacity="0.85"
+                                   VerticalAlignment="Center" />
                     </StackPanel>
-                </Grid>
+                    <ProgressBar Value="{x:Bind ViewModel.ImportProgress, Mode=OneWay}"
+                                 Maximum="100"
+                                 Width="320"
+                                 HorizontalAlignment="Center" />
+                    <TextBlock Text="{x:Bind ViewModel.ImportProgressText, Mode=OneWay}"
+                               FontSize="{StaticResource FontSizeXSmall}"
+                               Foreground="White"
+                               Opacity="0.55"
+                               HorizontalAlignment="Center" />
+                </StackPanel>
+            </StackPanel>
 
-                <ScrollViewer MaxHeight="600"
-                              VerticalScrollBarVisibility="Auto"
-                              HorizontalScrollBarVisibility="Disabled">
-                    <GridView x:Name="listAlbums"
-                              ItemsSource="{x:Bind ViewModel.AlbumsImported}"
-                              MaxWidth="1400"
-                              Padding="20,0"
-                              SelectionMode="None"
-                              IsItemClickEnabled="False">
+            <!-- Album discovery wall -->
+            <ScrollViewer Grid.Row="1"
+                          VerticalScrollBarVisibility="Hidden"
+                          HorizontalScrollBarVisibility="Disabled">
+                <GridView x:Name="listAlbums"
+                          ItemsSource="{x:Bind ViewModel.AlbumsImported}"
+                          Padding="32,0,32,40"
+                          SelectionMode="None"
+                          IsItemClickEnabled="False">
                     <GridView.ItemsPanel>
                         <ItemsPanelTemplate>
-                            <ItemsWrapGrid Orientation="Horizontal"
-                                           MaximumRowsOrColumns="4" />
+                            <ItemsWrapGrid Orientation="Horizontal" />
                         </ItemsPanelTemplate>
                     </GridView.ItemsPanel>
-                    
                     <GridView.ItemTemplate>
                         <DataTemplate>
-                            <Grid Width="280"
-                                  Height="280"
-                                  Margin="8"
-                                  CornerRadius="8"
-                                  Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
-                                  BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
-                                  BorderThickness="1">
+                            <Grid Width="220" Height="220" Margin="6" CornerRadius="12">
                                 <Grid.Shadow>
                                     <ThemeShadow />
                                 </Grid.Shadow>
-
-                                <Grid CornerRadius="8">
+                                <Grid CornerRadius="12">
                                     <common:PictureControl Cover="{Binding Picture, Mode=OneWay}"
                                                            VerticalAlignment="Center"
                                                            HorizontalAlignment="Center"
                                                            PlayButtonVisibility="Collapsed" />
-
-                                    <Grid VerticalAlignment="Bottom"
-                                          CornerRadius="0,0,8,8">
+                                    <Grid VerticalAlignment="Bottom" CornerRadius="0,0,12,12">
                                         <Grid.Background>
-                                            <media:AcrylicBrush TintColor="Black"
-                                                                TintOpacity="0.7"
-                                                                TintLuminosityOpacity="0.1" />
+                                            <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                                                <GradientStop Color="Transparent" Offset="0" />
+                                                <GradientStop Color="#E6000000" Offset="1" />
+                                            </LinearGradientBrush>
                                         </Grid.Background>
-                                        
-                                        <StackPanel Padding="12,8" Spacing="4">
+                                        <StackPanel Padding="10,20,10,10" Spacing="2">
                                             <TextBlock Text="{Binding Name}"
-                                                       FontSize="16"
+                                                       FontSize="13"
                                                        FontWeight="SemiBold"
-                                                       Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}"
+                                                       Foreground="White"
                                                        TextTrimming="CharacterEllipsis"
                                                        MaxLines="1" />
                                             <TextBlock Text="{Binding ArtistName}"
-                                                       FontSize="14"
+                                                       FontSize="11"
                                                        Foreground="White"
-                                                       Opacity="0.9"
+                                                       Opacity="0.7"
                                                        TextTrimming="CharacterEllipsis"
                                                        MaxLines="1" />
                                         </StackPanel>
@@ -134,37 +154,34 @@
                             </Grid>
                         </DataTemplate>
                     </GridView.ItemTemplate>
-                    
                     <GridView.ItemContainerTransitions>
                         <TransitionCollection>
                             <AddDeleteThemeTransition />
-                            <ContentThemeTransition />
-                            <ReorderThemeTransition />
                             <EntranceThemeTransition IsStaggeringEnabled="True" />
                         </TransitionCollection>
                     </GridView.ItemContainerTransitions>
-                    </GridView>
-                </ScrollViewer>
+                </GridView>
+            </ScrollViewer>
 
-                <Grid x:Name="errorPanel"
-                      Visibility="{x:Bind ViewModel.ErrorOccurred, Converter={StaticResource BoolToVisibilityConverter}, Mode=OneWay}"
-                      Background="{ThemeResource AcrylicInAppFillColorDefaultBrush}"
-                      CornerRadius="8"
-                      Padding="40"
-                      MaxWidth="600"
-                      HorizontalAlignment="Center"
-                      Margin="20">
+            <!-- Error state — centered floating card -->
+            <Grid Grid.Row="0" Grid.RowSpan="2"
+                  Visibility="{x:Bind ViewModel.ErrorOccurred, Converter={StaticResource BoolToVisibilityConverter}, Mode=OneWay}"
+                  HorizontalAlignment="Center"
+                  VerticalAlignment="Center">
+                <Grid Background="{ThemeResource AcrylicInAppFillColorDefaultBrush}"
+                      CornerRadius="16"
+                      Padding="48"
+                      MinWidth="420">
                     <Grid.Shadow>
                         <ThemeShadow />
                     </Grid.Shadow>
-                    
-                    <StackPanel Spacing="20">
-                        <FontIcon Glyph="&#xE7BA;"
-                                  FontSize="72"
-                                  Foreground="{ThemeResource SystemFillColorCriticalBrush}"
+                    <StackPanel Spacing="20" HorizontalAlignment="Center">
+                        <FontIcon Glyph="&#xE8B7;"
+                                  FontSize="56"
+                                  Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}"
                                   HorizontalAlignment="Center" />
                         <TextBlock x:Uid="startViewErrorMessage"
-                                   FontSize="18"
+                                   FontSize="{StaticResource FontSizeMedium}"
                                    HorizontalAlignment="Center"
                                    TextAlignment="Center"
                                    TextWrapping="Wrap"
@@ -179,7 +196,7 @@
                         </Button>
                     </StackPanel>
                 </Grid>
-            </StackPanel>
+            </Grid>
         </Grid>
     </Grid>
 </Page>

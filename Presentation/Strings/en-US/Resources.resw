@@ -1560,4 +1560,10 @@
   <data name="Insights_EmptyStateDescription.Text" xml:space="preserve">
     <value>Start listening to music to see your insights for this month.</value>
   </data>
+  <data name="welcomeTagline.Text" xml:space="preserve">
+    <value>Your music. Your world.</value>
+  </data>
+  <data name="AlbumsImported" xml:space="preserve">
+    <value>albums discovered</value>
+  </data>
 </root>
