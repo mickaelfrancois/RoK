@@ -1,11 +1,28 @@
 ﻿# ChangeLog
 
 
+## [1.8.0] Store – 28 mars 2026  
+
+### Ajouté
+
+- Ajout de la page d'insights avec des statistiques sur les artistes, albums, genres et pays les plus écoutés.
+
+### Modifié  
+
+- Amélioration de la page de bienvenue pour les nouveaux utilisateurs.
+
+
+--
+
+
 ## [1.7.2] Store – 20 mars 2026  
 
 ### Corrigé
 
 - Correction d'un problème de style sur le player en thème sombre.
+
+- 
+--
 
 
 ## [1.7.1] Store – 20 mars 2026  
@@ -16,6 +33,9 @@
 - Unification des commandes API et Terminal
 
 - 
+--
+
+
 ## [1.7.0] Preview – 16 mars 2026  
 
 ### Ajouté
@@ -29,6 +49,9 @@
 - Refonte du design system.
 
 ### Corrigé
+
+
+--
 
 
 ## [1.6.0] StoreRelease – 09 mars 2026  
@@ -47,6 +70,9 @@
 - Correction de l'erreur 'Database is locked' lors de la sauvegarde avant migration des données.
 
 
+--
+
+
 ## [1.5.0] StoreRelease – 28 février 2026
 
 ### Ajouté
@@ -59,6 +85,9 @@
 - Modification de la licence (#182)
 
 ### Corrigé
+
+
+--
 
 
 ## [1.4.0] StoreRelease – 25 février 2026
