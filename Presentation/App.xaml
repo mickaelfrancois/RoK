@@ -29,6 +29,8 @@
             <converters:GridListIconConverter x:Key="GridListIconConverter" />
             <converters:BoolToOpacityConverter x:Key="BoolToOpacityConverter" />
             <converters:NumberToFormattedStringConverter x:Key="NumberToFormattedStringConverter" />
+            <converters:IntToColorConverter x:Key="IntToColorConverter" />
+            <converters:SecondsToReadableConverter x:Key="SecondsToReadableConverter" />
 
             <converters:BoolToColorConverter x:Key="FavoriteToColorConverter">
                 <converters:BoolToColorConverter.TrueBrush>

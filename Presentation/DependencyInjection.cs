@@ -20,6 +20,7 @@ using Rok.ViewModels.Artists.Interfaces;
 using Rok.ViewModels.Artists.Services;
 using Rok.ViewModels.Genre;
 using Rok.ViewModels.Genre.Services;
+using Rok.ViewModels.Insights;
 using Rok.ViewModels.Listening;
 using Rok.ViewModels.Listening.Services;
 using Rok.ViewModels.Main;
@@ -204,6 +205,8 @@ public static class DependencyInjection
             return new PlayerStateManager(dispatcherQueue);
         });
 
+        // Insights ViewModel and services
+        services.AddSingleton<InsightsViewModel>();
 
         // Shared message handlers
         services.AddSingleton<LibraryRefreshMessageHandler>();

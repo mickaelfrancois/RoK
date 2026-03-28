@@ -85,6 +85,12 @@
         <Setter Property="HorizontalAlignment" Value="Center" />
     </Style>
 
+    
+    <!-- Insight -->
+    <Style x:Key="InsightTitleTextBlockStyle" TargetType="TextBlock">
+        <Setter Property="FontSize" Value="{StaticResource FontSizeLarge}" />
+        <Setter Property="FontWeight" Value="SemiBold" />
+    </Style>
 
     <!-- Buttons -->
 

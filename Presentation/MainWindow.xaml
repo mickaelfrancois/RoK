@@ -116,6 +116,9 @@
                                 <SymbolIcon Symbol="Shop" />
                             </NavigationViewItem.Icon>
                         </NavigationViewItem>
+
+                        <NavigationViewItem x:Uid="menuInsight" Content="Insights" Tag="Insights" x:Name="insightsItem" Icon="OutlineStar" />
+
                     </NavigationView.MenuItems>
 
                     <NavigationView.AutoSuggestBox>

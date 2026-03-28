@@ -28,7 +28,7 @@ public partial class App : Microsoft.UI.Xaml.Application
         this.InitializeComponent();
 
 #if DEBUG
-        Windows.Globalization.ApplicationLanguages.PrimaryLanguageOverride = "fr";
+        Windows.Globalization.ApplicationLanguages.PrimaryLanguageOverride = "en";
 #endif
     }
 

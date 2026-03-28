@@ -1305,4 +1305,259 @@
   <data name="CliVolumeDesc.Text" xml:space="preserve">
     <value>Régler le volume. La valeur doit être comprise entre 0 et 100</value>
   </data>
+  <data name="Insights_ProfileCuriousExplorer" xml:space="preserve">
+    <value>Explorateur curieux</value>
+  </data>
+  <data name="Insights_ProfileCuriousExplorerDescription" xml:space="preserve">
+    <value>Tu explores sans cesse de nouveaux artistes, tu t'attardes rarement sur les mêmes morceaux.</value>
+  </data>
+  <data name="Insights_ProfileFaithfulIntense" xml:space="preserve">
+    <value>Fidèle intense</value>
+  </data>
+  <data name="Insights_ProfileFaithfulIntenseDescription" xml:space="preserve">
+    <value>Tu écoutes longtemps, tu skippes peu, et tu reviens souvent sur les mêmes morceaux.</value>
+  </data>
+  <data name="Insights_ProfileNightOwl" xml:space="preserve">
+    <value>Oiseau de nuit</value>
+  </data>
+  <data name="Insights_ProfileNightOwlDescription" xml:space="preserve">
+    <value>Tes sessions d'écoute se concentrent la nuit, quand le silence laisse place à la musique.</value>
+  </data>
+  <data name="Insights_ProfileFocusMode" xml:space="preserve">
+    <value>Mode focus</value>
+  </data>
+  <data name="Insights_ProfileFocusModeDescription" xml:space="preserve">
+    <value>Tu écoutes en profondeur, peu d'artistes différents, et tu vas jusqu'au bout de tes sessions.</value>
+  </data>
+  <data name="Insights_ProfileChannelSurfer" xml:space="preserve">
+    <value>Zappeur</value>
+  </data>
+  <data name="Insights_ProfileChannelSurferDescription" xml:space="preserve">
+    <value>Tu explores rapidement, tu skipes beaucoup, toujours à la recherche du prochain morceau parfait.</value>
+  </data>
+  <data name="Insights_ArtistByMonth" xml:space="preserve">
+    <value>Artistes / mois</value>
+  </data>
+  <data name="Insights_BadgeSmoothListenerName" xml:space="preserve">
+    <value>Écouteur attentif</value>
+  </data>
+  <data name="Insights_BadgeLowSkipName" xml:space="preserve">
+    <value>Faible saut</value>
+  </data>
+  <data name="Insights_BadgeHyperZapperName" xml:space="preserve">
+    <value>Hyper Zappeur</value>
+  </data>
+  <data name="Insights_BadgeZapperName" xml:space="preserve">
+    <value>Zappeur</value>
+  </data>
+  <data name="Insights_BadgeObsessedName" xml:space="preserve">
+    <value>Obsédée</value>
+  </data>
+  <data name="Insights_BadgeFreshSeekerName" xml:space="preserve">
+    <value>Chercheur de nouveautés</value>
+  </data>
+  <data name="Insights_BadgeExplorerName" xml:space="preserve">
+    <value>Explorateur</value>
+  </data>
+  <data name="Insights_BadgeCuriousName" xml:space="preserve">
+    <value>Curieux</value>
+  </data>
+  <data name="Insights_BadgeRestrictedCircleName" xml:space="preserve">
+    <value>Cercle Restreint</value>
+  </data>
+  <data name="Insights_BadgeUltraFocusName" xml:space="preserve">
+    <value>Ultra Focus</value>
+  </data>
+  <data name="Insights_BadgeDeepListenerName" xml:space="preserve">
+    <value>Écoute profonde</value>
+  </data>
+  <data name="Insights_BadgeLongPlayerName " xml:space="preserve">
+    <value>Ecoute longue</value>
+  </data>
+  <data name="Insights_BadgeShortSessionsName" xml:space="preserve">
+    <value>Séances courtes</value>
+  </data>
+  <data name="Insights_BadgeNightOwlName" xml:space="preserve">
+    <value>Noctambule</value>
+  </data>
+  <data name="Insights_BadgeNocturneName" xml:space="preserve">
+    <value>Nocturne</value>
+  </data>
+  <data name="Insights_BadgeEarlyBirdName" xml:space="preserve">
+    <value>Matinal</value>
+  </data>
+  <data name="Insights_BadgeAfterworkName" xml:space="preserve">
+    <value>Après le travail</value>
+  </data>
+  <data name="Insights_BadgeUltraLoyalName" xml:space="preserve">
+    <value>Ultra Fidèle</value>
+  </data>
+  <data name="Insights_BadgeLoyalName" xml:space="preserve">
+    <value>Fidèle</value>
+  </data>
+  <data name="Insights_BadgeEclecticName" xml:space="preserve">
+    <value>Éclectique</value>
+  </data>
+  <data name="Insights_BadgeSmoothListenerDescription" xml:space="preserve">
+    <value>Écoute fluide, tu vas toujours au bout.</value>
+  </data>
+  <data name="Insights_BadgeLowSkipDescription" xml:space="preserve">
+    <value>Tu vas au bout des choses.</value>
+  </data>
+  <data name="Insights_BadgeHyperZapperDescription" xml:space="preserve">
+    <value>Toujours en quête du bon titre.</value>
+  </data>
+  <data name="Insights_BadgeZapperDescription" xml:space="preserve">
+    <value>Tu changes souvent de morceau.</value>
+  </data>
+  <data name="Insights_BadgeObsessedDescription" xml:space="preserve">
+    <value>Tu écoutes certains titres en boucle.</value>
+  </data>
+  <data name="Insights_BadgeReplayLoverDescription" xml:space="preserve">
+    <value>Tu rejoues souvent tes favoris.</value>
+  </data>
+  <data name="Insights_BadgeFreshSeekerDescription" xml:space="preserve">
+    <value>Tu ne reviens presque jamais en arrière.</value>
+  </data>
+  <data name="Insights_BadgeExplorerDescription" xml:space="preserve">
+    <value>Tu découvres beaucoup de nouveaux artistes.</value>
+  </data>
+  <data name="Insights_BadgeCuriousDescription" xml:space="preserve">
+    <value>Tu explores régulièrement.</value>
+  </data>
+  <data name="Insights_BadgeRestrictedCircleDescription" xml:space="preserve">
+    <value>Tu restes dans ton univers.</value>
+  </data>
+  <data name="Insights_BadgeUltraFocusDescription" xml:space="preserve">
+    <value>Tu écoutes très peu d'artistes différents.</value>
+  </data>
+  <data name="Insights_BadgeDeepListenerDescription" xml:space="preserve">
+    <value>Tu te plonges vraiment dans la musique.</value>
+  </data>
+  <data name="Insights_BadgeLongPlayerDescription" xml:space="preserve">
+    <value>Tu écoutes longtemps.</value>
+  </data>
+  <data name="Insights_BadgeShortSessionsDescription" xml:space="preserve">
+    <value>Tu écoutes par petites touches.</value>
+  </data>
+  <data name="Insights_BadgeNightOwlDescription" xml:space="preserve">
+    <value>Tu vis la nuit.</value>
+  </data>
+  <data name="Insights_BadgeNocturneDescription" xml:space="preserve">
+    <value>Tu écoutes surtout la nuit.</value>
+  </data>
+  <data name="Insights_BadgeEarlyBirdDescription" xml:space="preserve">
+    <value>Tu commences ta journée en musique.</value>
+  </data>
+  <data name="Insights_BadgeAfterworkDescription" xml:space="preserve">
+    <value>Tu écoutes en fin de journée.</value>
+  </data>
+  <data name="Insights_BadgeUltraLoyalDescription" xml:space="preserve">
+    <value>Tu as tes titres fétiches.</value>
+  </data>
+  <data name="Insights_BadgeLoyalDescription" xml:space="preserve">
+    <value>Tu restes fidèle à tes favoris.</value>
+  </data>
+  <data name="Insights_BadgeEclecticDescription" xml:space="preserve">
+    <value>Tu changes souvent de titres.</value>
+  </data>
+  <data name="Insights_HeroTitle.Text" xml:space="preserve">
+    <value>✨ Ton mois en musique</value>
+  </data>
+  <data name="Insights_TotalPlayDuration.Text" xml:space="preserve">
+    <value>Temps total d'écoute</value>
+  </data>
+  <data name="Insights_TotalSessions.Text" xml:space="preserve">
+    <value>Nombre de sessions</value>
+  </data>
+  <data name="Insights_TotalTracks.Text" xml:space="preserve">
+    <value>Titres différents écoutés</value>
+  </data>
+  <data name="Insights_TotalArtists.Text" xml:space="preserve">
+    <value>Artistes différents écoutés</value>
+  </data>
+  <data name="Insights_TotalAlbums.Text" xml:space="preserve">
+    <value>Albums différents écoutés</value>
+  </data>
+  <data name="Insights_TotalGenres.Text" xml:space="preserve">
+    <value>Genres différents écoutés</value>
+  </data>
+  <data name="Insights_HotListeningTimes.Text" xml:space="preserve">
+    <value>🔥 Quand tu écoutes le plus</value>
+  </data>
+  <data name="Insights_ImportantTracks.Text" xml:space="preserve">
+    <value>🏆 Tes titres les plus importants</value>
+  </data>
+  <data name="Insights_TopAlbums.Text" xml:space="preserve">
+    <value>Top albums</value>
+  </data>
+  <data name="Insights_TopTracks.Text" xml:space="preserve">
+    <value>Top titres</value>
+  </data>
+  <data name="Insights_ListeningProfile.Text" xml:space="preserve">
+    <value>🧬 Ton profil d'écoute</value>
+  </data>
+  <data name="Insights_TopGenres.Text" xml:space="preserve">
+    <value>Top genres</value>
+  </data>
+  <data name="Insights_BadgesHeader.Text" xml:space="preserve">
+    <value>🥇 Tes badges</value>
+  </data>
+  <data name="Insights_BadgeReplayLoverName" xml:space="preserve">
+    <value>Accro aux rediffusions</value>
+  </data>
+  <data name="Insights_Sessions_Title.Text" xml:space="preserve">
+    <value>🎧 Tes sessions d'écoute</value>
+  </data>
+  <data name="Insights_Sessions_MaxDuration.Text" xml:space="preserve">
+    <value>Durée max</value>
+  </data>
+  <data name="Insights_Sessions_AvgTracks.Text" xml:space="preserve">
+    <value>Titres par session en moyenne</value>
+  </data>
+  <data name="Insights_Sessions_Nocturnal.Text" xml:space="preserve">
+    <value>Sessions nocturnes</value>
+  </data>
+  <data name="Insights_Sessions_CommonStart.Text" xml:space="preserve">
+    <value>Heure habituelle</value>
+  </data>
+  <data name="Insights_Sessions_MostIntense.Text" xml:space="preserve">
+    <value>Session la plus intense</value>
+  </data>
+  <data name="Insights_Sessions_MostActiveDay.Text" xml:space="preserve">
+    <value>Jour le plus actif</value>
+  </data>
+  <data name="Insights_Sessions_TracksUnit" xml:space="preserve">
+    <value>titres</value>
+  </data>
+  <data name="Insights_Sessions_SessionsUnit" xml:space="preserve">
+    <value>sessions</value>
+  </data>
+  <data name="Insights_TopTracksPlayCount.Text" xml:space="preserve">
+    <value> écoutes ce mois-ci</value>
+  </data>
+  <data name="Insights_TopTracksLongSessionCount.Text" xml:space="preserve">
+    <value> sessions longues</value>
+  </data>
+  <data name="Insights_TopTracksPeakHour.Text" xml:space="preserve">
+    <value>Pic : </value>
+  </data>
+  <data name="Insights_TopAlbumsPlayCount.Text" xml:space="preserve">
+    <value> écoutes ce mois-ci</value>
+  </data>
+  <data name="Insights_TopAlbumsLongSessionCount.Text" xml:space="preserve">
+    <value> sessions longues</value>
+  </data>
+  <data name="Insights_TopAlbumsPeakHour.Text" xml:space="preserve">
+    <value>Pic : </value>
+  </data>
+  <data name="Insights_TopAlbumsDominant.Text" xml:space="preserve">
+    <value>Dominant : </value>
+  </data>
+  <data name="Insights_EmptyStateTitle.Text" xml:space="preserve">
+    <value>Aucune donnée pour l'instant</value>
+  </data>
+  <data name="Insights_EmptyStateDescription.Text" xml:space="preserve">
+    <value>Commence à écouter de la musique pour voir tes insights du mois.</value>
+  </data>
 </root>
