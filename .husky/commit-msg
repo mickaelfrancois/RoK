@@ -1,0 +1,15 @@
+#!/bin/sh
+. "$(dirname "$0")/_/husky.sh"
+
+commit_msg=$(tr -d '\r' < "$1")
+pattern='^(feat|fix|docs|style|refactor|test|chore|build|ci|perf|revert)(\(.+\))?!?: .{1,100}$'
+
+if ! echo "$commit_msg" | grep -qE "$pattern"; then
+  echo ""
+  echo "❌ Invalid commit message format."
+  echo "   Expected : <type>(<scope>): <description>"
+  echo "   Types    : feat, fix, docs, style, refactor, test, chore, build, ci, perf, revert"
+  echo "   Example  : feat(player): add shuffle mode"
+  echo ""
+  exit 1
+fi
