@@ -1,0 +1,24 @@
+{
+   "$schema": "https://alirezanet.github.io/Husky.Net/schema.json",
+	"tasks": [
+		{
+			"name": "dotnet-build",
+			"group": "pre-commit-operations",
+			"command": "dotnet",
+			"args": [ "build", "--no-restore", "-v", "quiet" ]
+		},
+		{
+			"name": "dotnet-format-staged-files",
+			"group": "pre-commit-operations",
+			"command": "dotnet",
+			"args": [ "format", "--include", "${staged}" ],
+			"include": [ "**/*.cs" ]
+		},
+		{
+			"name": "dotnet-test",
+			"group": "pre-push-operations",
+			"command": "dotnet",
+			"args": [ "test", "--filter", "Category=Unit", "--no-build" ]
+		}		
+	]
+}
