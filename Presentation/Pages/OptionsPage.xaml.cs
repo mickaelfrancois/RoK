@@ -182,7 +182,7 @@ public sealed partial class OptionsPage : Page
         ContentDialogResult result = await dialog.ShowAsync();
 
         if (result == ContentDialogResult.Primary && StatisticsViewModel.ResetListenCountCommand.CanExecute(null))
-            StatisticsViewModel.ResetListenCountCommand.Execute(null);
+            await StatisticsViewModel.ResetListenCountCommand.ExecuteAsync(null);
     }
 
     private void SupportButton_Click(object sender, RoutedEventArgs e)
