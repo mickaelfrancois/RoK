@@ -5,13 +5,13 @@
 			"name": "dotnet-build",
 			"group": "pre-commit-operations",
 			"command": "dotnet",
-			"args": [ "build", "--no-restore", "-v", "quiet" ]
+			"args": [ "build", "--no-restore", "-v", "quiet", "/p:Platform=x64" ]
 		},
 		{
 			"name": "dotnet-format-staged-files",
 			"group": "pre-commit-operations",
 			"command": "dotnet",
-			"args": [ "format", "--include", "${staged}" ],
+			"args": [ "format", "--include", "${staged}", "/p:Platform=x64" ],
 			"include": [ "**/*.cs" ]
 		},
 		{

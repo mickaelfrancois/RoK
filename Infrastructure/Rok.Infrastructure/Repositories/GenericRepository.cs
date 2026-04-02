@@ -1,5 +1,4 @@
-﻿using System.Buffers;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.Text.Json;
 using Dapper.Contrib.Extensions;
 using Microsoft.Extensions.DependencyInjection;
@@ -12,7 +11,6 @@ public partial class GenericRepository<T>(IDbConnection db, [FromKeyedServices("
                                 : IRepository<T> where T : class
 {
     private const int SlowQueryThresholdMilliseconds = 1000;
-    private const int StackAllocThreshold = 256;
 
     protected readonly IDbConnection _connection = db ?? throw new ArgumentNullException(nameof(db));
     protected readonly IDbConnection _backgroundConnection = backgroundDb ?? throw new ArgumentNullException(nameof(backgroundDb));
@@ -190,71 +188,17 @@ public partial class GenericRepository<T>(IDbConnection db, [FromKeyedServices("
 
     private void LogQuery(RepositoryConnectionKind kind, string sql, Stopwatch stopwatch, object? param = null)
     {
-        string normalizedSql = NormalizeSql(sql);
         string serializedParams = SerializeParams(param);
 
         if (stopwatch.ElapsedMilliseconds > SlowQueryThresholdMilliseconds)
         {
             _logger.LogWarning("Slow SQL execution detected ({Kind}): {Sql} | Params: {Params} | Elapsed: {ElapsedMilliseconds}ms",
-                               kind, normalizedSql, serializedParams, stopwatch.ElapsedMilliseconds);
+                               kind, sql, serializedParams, stopwatch.ElapsedMilliseconds);
             return;
         }
 
-        _logger.LogInformation("Executed SQL ({Kind}): {Sql} | Params: {Params} | Elapsed: {ElapsedMilliseconds}ms",
-                               kind, normalizedSql, serializedParams, stopwatch.ElapsedMilliseconds);
-    }
-
-    private static string NormalizeSql(string sql)
-    {
-        if (string.IsNullOrWhiteSpace(sql))
-        {
-            return string.Empty;
-        }
-
-        char[]? rentedArray = null;
-
-        try
-        {
-            Span<char> buffer = sql.Length <= StackAllocThreshold
-                ? stackalloc char[sql.Length]
-                : rentedArray = ArrayPool<char>.Shared.Rent(sql.Length);
-
-            int writeIndex = 0;
-            bool previousWasWhitespace = false;
-
-            for (int i = 0; i < sql.Length; i++)
-            {
-                char c = sql[i];
-
-                if (char.IsWhiteSpace(c))
-                {
-                    if (!previousWasWhitespace && writeIndex > 0)
-                    {
-                        buffer[writeIndex++] = ' ';
-                        previousWasWhitespace = true;
-                    }
-                }
-                else
-                {
-                    buffer[writeIndex++] = c;
-                    previousWasWhitespace = false;
-                }
-            }
-
-            if (writeIndex > 0 && buffer[writeIndex - 1] == ' ')
-            {
-                writeIndex--;
-            }
-
-            return new string(buffer.Slice(0, writeIndex));
-        }
-        finally
-        {
-            if (rentedArray is not null)
-            {
-                ArrayPool<char>.Shared.Return(rentedArray);
-            }
-        }
+        _logger.LogDebug("Executed SQL ({Kind}): {Sql} | Params: {Params} | Elapsed: {ElapsedMilliseconds}ms",
+                               kind, sql, serializedParams, stopwatch.ElapsedMilliseconds);
     }
 
     private string SerializeParams(object? param)

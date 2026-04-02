@@ -3,7 +3,6 @@ using Microsoft.Extensions.Logging;
 using Rok.Application.Interfaces;
 using Rok.Application.Interfaces.Repositories;
 using Rok.Domain.Interfaces.Entities;
-using Rok.Shared;
 
 namespace Rok.Infrastructure.Repositories;
 
@@ -116,14 +115,5 @@ public class ArtistRepository(IDbConnection connection, [FromKeyedServices("Back
     public override string GetTableName()
     {
         return "artists";
-    }
-
-
-    private static void ApplyPatch<T>(PatchField<T>? wrapper, Action<T?> setter)
-    {
-        if (wrapper?.IsSet == true)
-        {
-            setter(wrapper.Value);
-        }
     }
 }
