@@ -18,7 +18,7 @@ public class ListeningEventRepository(IDbConnection connection, [FromKeyedServic
         DateTime endDate = startDate.AddMonths(1).AddTicks(-1);
         DateTime previousStart = startDate.AddMonths(-1);
 
-        IEnumerable<RawListeningEvent> rows = await connection.QueryAsync<RawListeningEvent>(RawListeningEventsSql, new { previousStart, endDate });
+        IEnumerable<RawListeningEvent> rows = await _connection.QueryAsync<RawListeningEvent>(RawListeningEventsSql, new { previousStart, endDate });
 
         List<RawListeningEvent> allEvents = rows.ToList();
         List<RawListeningEvent> currentEvents = allEvents.Where(e => e.PlayedAt >= startDate).ToList();
@@ -116,64 +116,67 @@ public class ListeningEventRepository(IDbConnection connection, [FromKeyedServic
     {
         List<BadgeDto> badges = new();
 
-        // Skip category — most restrictive wins
-        if (skipRate < 5)
-            badges.Add(new BadgeDto(Badge.SmoothListener, "🎵"));
-        else if (skipRate < 10)
-            badges.Add(new BadgeDto(Badge.LowSkip, "✅"));
-        else if (skipRate > 50)
-            badges.Add(new BadgeDto(Badge.HyperZapper, "⚡⚡"));
-        else if (skipRate > 30)
-            badges.Add(new BadgeDto(Badge.Zapper, "⚡"));
-
-        // Replay category
-        if (replayRate > 25)
-            badges.Add(new BadgeDto(Badge.Obsessed, "🔁"));
-        else if (replayRate > 15)
-            badges.Add(new BadgeDto(Badge.ReplayLover, "❤️"));
-        else if (replayRate < 5)
-            badges.Add(new BadgeDto(Badge.FreshSeeker, "🌱"));
-
-        // Diversity category
-        if (artistsPlayed > 30)
-            badges.Add(new BadgeDto(Badge.Explorer, "🧭"));
-        else if (artistsPlayed > 20)
-            badges.Add(new BadgeDto(Badge.Curious, "🔍"));
-        else if (artistsPlayed < 5)
-            badges.Add(new BadgeDto(Badge.UltraFocus, "🎯"));
-        else if (artistsPlayed < 10)
-            badges.Add(new BadgeDto(Badge.RestrictedCircle, "🔒"));
-
-        // Long session category
-        if (longSessionCount > 15)
-            badges.Add(new BadgeDto(Badge.DeepListener, "🎧"));
-        else if (longSessionCount > 10)
-            badges.Add(new BadgeDto(Badge.LongPlayer, "⏳"));
-        else if (longSessionCount < 3)
-            badges.Add(new BadgeDto(Badge.ShortSessions, "💫"));
-
-        // Peak hour category — NightOwl takes priority over Nocturne for 0h–3h
-        if (globalPeakHour >= 0)
-        {
-            if (globalPeakHour <= 3)
-                badges.Add(new BadgeDto(Badge.NightOwl, "🦉"));
-            else if (globalPeakHour >= 21)
-                badges.Add(new BadgeDto(Badge.Nocturne, "🌙"));
-            else if (globalPeakHour >= 6 && globalPeakHour <= 10)
-                badges.Add(new BadgeDto(Badge.EarlyBird, "🌅"));
-            else if (globalPeakHour >= 17 && globalPeakHour <= 20)
-                badges.Add(new BadgeDto(Badge.Afterwork, "🌆"));
-        }
-
-        // Fidelity category
-        if (fidelityRate > 35)
-            badges.Add(new BadgeDto(Badge.UltraLoyal, "💎"));
-        else if (fidelityRate > 20)
-            badges.Add(new BadgeDto(Badge.Loyal, "🏅"));
-        else if (fidelityRate < 10)
-            badges.Add(new BadgeDto(Badge.Eclectic, "🌈"));
+        if (GetSkipBadge(skipRate) is { } skipBadge) badges.Add(skipBadge);
+        if (GetReplayBadge(replayRate) is { } replayBadge) badges.Add(replayBadge);
+        if (GetDiversityBadge(artistsPlayed) is { } diversityBadge) badges.Add(diversityBadge);
+        if (GetLongSessionBadge(longSessionCount) is { } sessionBadge) badges.Add(sessionBadge);
+        if (GetPeakHourBadge(globalPeakHour) is { } peakBadge) badges.Add(peakBadge);
+        if (GetFidelityBadge(fidelityRate) is { } fidelityBadge) badges.Add(fidelityBadge);
 
         return badges;
+    }
+
+    private static BadgeDto? GetSkipBadge(double skipRate)
+    {
+        if (skipRate < 5) return new BadgeDto(Badge.SmoothListener, "🎵");
+        if (skipRate < 10) return new BadgeDto(Badge.LowSkip, "✅");
+        if (skipRate > 50) return new BadgeDto(Badge.HyperZapper, "⚡⚡");
+        if (skipRate > 30) return new BadgeDto(Badge.Zapper, "⚡");
+        return null;
+    }
+
+    private static BadgeDto? GetReplayBadge(double replayRate)
+    {
+        if (replayRate > 25) return new BadgeDto(Badge.Obsessed, "🔁");
+        if (replayRate > 15) return new BadgeDto(Badge.ReplayLover, "❤️");
+        if (replayRate < 5) return new BadgeDto(Badge.FreshSeeker, "🌱");
+        return null;
+    }
+
+    private static BadgeDto? GetDiversityBadge(int artistsPlayed)
+    {
+        if (artistsPlayed > 30) return new BadgeDto(Badge.Explorer, "🧭");
+        if (artistsPlayed > 20) return new BadgeDto(Badge.Curious, "🔍");
+        if (artistsPlayed < 5) return new BadgeDto(Badge.UltraFocus, "🎯");
+        if (artistsPlayed < 10) return new BadgeDto(Badge.RestrictedCircle, "🔒");
+        return null;
+    }
+
+    private static BadgeDto? GetLongSessionBadge(int longSessionCount)
+    {
+        if (longSessionCount > 15) return new BadgeDto(Badge.DeepListener, "🎧");
+        if (longSessionCount > 10) return new BadgeDto(Badge.LongPlayer, "⏳");
+        if (longSessionCount < 3) return new BadgeDto(Badge.ShortSessions, "💫");
+        return null;
+    }
+
+    // NightOwl takes priority over Nocturne for 0h–3h
+    private static BadgeDto? GetPeakHourBadge(int globalPeakHour)
+    {
+        if (globalPeakHour < 0) return null;
+        if (globalPeakHour <= 3) return new BadgeDto(Badge.NightOwl, "🦉");
+        if (globalPeakHour >= 21) return new BadgeDto(Badge.Nocturne, "🌙");
+        if (globalPeakHour >= 6 && globalPeakHour <= 10) return new BadgeDto(Badge.EarlyBird, "🌅");
+        if (globalPeakHour >= 17 && globalPeakHour <= 20) return new BadgeDto(Badge.Afterwork, "🌆");
+        return null;
+    }
+
+    private static BadgeDto? GetFidelityBadge(double fidelityRate)
+    {
+        if (fidelityRate > 35) return new BadgeDto(Badge.UltraLoyal, "💎");
+        if (fidelityRate > 20) return new BadgeDto(Badge.Loyal, "🏅");
+        if (fidelityRate < 10) return new BadgeDto(Badge.Eclectic, "🌈");
+        return null;
     }
 
     private static ListeningProfile ComputeProfile(double skipRate, double replayRate, int artistsPlayed, int longSessionCount, int globalPeakHour)
@@ -185,10 +188,16 @@ public class ListeningEventRepository(IDbConnection connection, [FromKeyedServic
         double replayRateNorm = replayRate / 100.0;
         double diversiteNorm = Math.Min((double)artistsPlayed / diversiteMax, 1.0);
         double longSessionNorm = Math.Min((double)longSessionCount / longSessionMax, 1.0);
-        double peakHourNorm = globalPeakHour < 0 ? 0.0
-                            : (globalPeakHour >= 21 || globalPeakHour <= 2) ? 1.0
-                            : globalPeakHour >= 18 ? 0.5
-                            : 0.0;
+
+        double peakHourNorm;
+        if (globalPeakHour < 0)
+            peakHourNorm = 0.0;
+        else if (globalPeakHour >= 21 || globalPeakHour <= 2)
+            peakHourNorm = 1.0;
+        else if (globalPeakHour >= 18)
+            peakHourNorm = 0.5;
+        else
+            peakHourNorm = 0.0;
 
         double scoreExplorateur = (0.6 * diversiteNorm) + (0.2 * (1 - replayRateNorm)) + (0.2 * (1 - skipRateNorm));
         double scoreFidele = (0.5 * replayRateNorm) + (0.3 * longSessionNorm) + (0.2 * (1 - skipRateNorm));
@@ -438,16 +447,16 @@ public class ListeningEventRepository(IDbConnection connection, [FromKeyedServic
 
     private sealed record RawListeningEvent
     {
-        public long TrackId { get; init; }
-        public long? ArtistId { get; init; }
-        public long? AlbumId { get; init; }
-        public long? GenreId { get; init; }
-        public DateTime PlayedAt { get; init; }
-        public bool WasSkipped { get; init; }
-        public long DurationPlayed { get; init; }
-        public string Title { get; init; } = string.Empty;
-        public string ArtistName { get; init; } = string.Empty;
-        public string AlbumName { get; init; } = string.Empty;
-        public string GenreName { get; init; } = string.Empty;
+        public long TrackId { get; set; } = default;
+        public long? ArtistId { get; set; } = null;
+        public long? AlbumId { get; set; } = null;
+        public long? GenreId { get; set; } = null;
+        public DateTime PlayedAt { get; set; } = DateTime.MinValue;
+        public bool WasSkipped { get; set; } = false;
+        public long DurationPlayed { get; set; } = 0;
+        public string Title { get; set; } = string.Empty;
+        public string ArtistName { get; set; } = string.Empty;
+        public string AlbumName { get; set; } = string.Empty;
+        public string GenreName { get; set; } = string.Empty;
     }
 }

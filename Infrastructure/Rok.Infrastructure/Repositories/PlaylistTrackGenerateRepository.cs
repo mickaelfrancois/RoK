@@ -42,9 +42,6 @@ public class PlaylistTrackGenerateRepository(IDbConnection db, [FromKeyedService
 
         List<TrackEntity> rows = (await ExecuteQueryAsync(query.ToString(), kind, parameters)).ToList();
 
-        //if (rows.Count > 0)
-        //    rows.Shuffle();
-
         return rows;
     }
 
