@@ -4,6 +4,7 @@ using Windows.ApplicationModel;
 using Windows.Storage;
 using Windows.Storage.AccessCache;
 using Windows.Storage.Pickers;
+using Windows.System;
 using WinRT.Interop;
 
 
@@ -208,6 +209,11 @@ public sealed partial class OptionsPage : Page
     {
         Uri uri = new("https://rok.fpc-france.com");
         _ = Windows.System.Launcher.LaunchUriAsync(uri);
+    }
+
+    private async void OnLeaveReviewClicked(object sender, RoutedEventArgs e)
+    {
+        await Launcher.LaunchUriAsync(new Uri($"ms-windows-store://review/?ProductId=9NX19R28Q92S"));
     }
 }
 

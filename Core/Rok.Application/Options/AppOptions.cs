@@ -64,6 +64,12 @@ public class AppOptions : IAppOptions
 
     public List<string> TracksFilterByTags { get; set; } = [];
 
+    public int SessionsCount { get; set; } = 0;
+
+    public bool HasRated { get; set; } = false;
+
+    public DateTimeOffset? ReviewLastPromptDate { get; set; } = null;
+
     public AppOptions()
     {
     }
@@ -113,5 +119,9 @@ public class AppOptions : IAppOptions
 
         TracksGroupBy = options.TracksGroupBy;
         TracksFilterBy = options.TracksFilterBy;
+
+        SessionsCount = options.SessionsCount;
+        HasRated = options.HasRated;
+        ReviewLastPromptDate = options.ReviewLastPromptDate;
     }
 }

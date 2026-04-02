@@ -44,6 +44,7 @@ public partial class App : Microsoft.UI.Xaml.Application
         ServiceProvider = ConfigureServices();
 
         IAppOptions options = await LoadOptionsAsync();
+        options.SessionsCount++;
 
         IAppDbContext appDbContext = ServiceProvider.GetRequiredService<IAppDbContext>();
         appDbContext.GetOpenConnection();
@@ -51,10 +52,11 @@ public partial class App : Microsoft.UI.Xaml.Application
 
         NavigationService navigationService = ServiceProvider.GetRequiredService<NavigationService>();
         ResourceLoader resourceLoader = ServiceProvider.GetRequiredService<ResourceLoader>();
+        IReviewPromptEligibilityService reviewPromptEligibilityService = ServiceProvider.GetRequiredService<IReviewPromptEligibilityService>();
 
         string iconPath = Path.Combine(AppContext.BaseDirectory, "Assets/Square44x44Logo.ico");
 
-        MainWindow = new MainWindow(navigationService, resourceLoader, appDbContext, options);
+        MainWindow = new MainWindow(navigationService, resourceLoader, appDbContext, options, reviewPromptEligibilityService);
         MainWindow.AppWindow.SetIcon(iconPath);
         MainWindow.Title = "RoK";
 #if DEBUG
@@ -208,9 +210,10 @@ public partial class App : Microsoft.UI.Xaml.Application
             logger?.LogError(e.Exception, "Unhandler exception: {Message}", e.Exception.Message);
 
 #if DEBUG
-            // handle to avoid crash:
             e.Handled = true;
 #else
+            CrashStore.IncrementCrashCount();
+
             ITelemetryClient telemetry = ServiceProvider.GetRequiredService<ITelemetryClient>();
             _ = telemetry.CaptureExceptionAsync(e.Exception);
 #endif
@@ -239,6 +242,8 @@ public partial class App : Microsoft.UI.Xaml.Application
 #if !DEBUG
             if (e.ExceptionObject is Exception ex)
             {
+                CrashStore.IncrementCrashCount();
+
                 ITelemetryClient telemetry = ServiceProvider.GetRequiredService<ITelemetryClient>();
                 telemetry.CaptureExceptionAsync(ex);
                 System.Threading.Thread.Sleep(500); // Give some time to send the telemetry before exiting
