@@ -203,6 +203,12 @@ public sealed partial class OptionsPage : Page
         Uri uri = new(url);
         await Windows.System.Launcher.LaunchUriAsync(uri);
     }
+
+    private void OfficialPageButton_Click(object sender, RoutedEventArgs e)
+    {
+        Uri uri = new("https://rok.fpc-france.com");
+        _ = Windows.System.Launcher.LaunchUriAsync(uri);
+    }
 }
 
 public class PathItem(string key, string value)
