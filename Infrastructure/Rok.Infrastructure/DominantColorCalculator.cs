@@ -131,17 +131,17 @@ public class DominantColorCalculator : IDominantColorCalculator
         double delta = max - min;
 
         v = max;
-        s = max == 0 ? 0 : delta / max;
+        s = max < double.Epsilon ? 0 : delta / max;
 
-        if (delta == 0)
+        if (delta < double.Epsilon)
         {
             h = 0;
             return;
         }
 
-        if (max == red)
+        if (Math.Abs(max - red) < double.Epsilon)
             h = (green - blue) / delta % 6;
-        else if (max == green)
+        else if (Math.Abs(max - green) < double.Epsilon)
             h = ((blue - red) / delta) + 2;
         else
             h = ((red - green) / delta) + 4;
