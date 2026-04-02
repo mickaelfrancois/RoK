@@ -1566,4 +1566,43 @@
   <data name="AlbumsImported" xml:space="preserve">
     <value>albums découverts</value>
   </data>
+  <data name="reviewSentimentGateTitle" xml:space="preserve">
+    <value>Vous aimez RoK ?</value>
+  </data>
+  <data name="reviewSentimentGateContent" xml:space="preserve">
+    <value>RoK est conçu avec soin pour ceux qui possèdent vraiment leur musique. Votre avis aide à façonner l'avenir de l'application.</value>
+  </data>
+  <data name="reviewSentimentGateYes" xml:space="preserve">
+    <value>Oui, j'aime !</value>
+  </data>
+  <data name="reviewSentimentGateNo" xml:space="preserve">
+    <value>Pas vraiment</value>
+  </data>
+  <data name="reviewPositiveTitle" xml:space="preserve">
+    <value>Merci !</value>
+  </data>
+  <data name="reviewPositiveContent" xml:space="preserve">
+    <value>Un court avis sur le Microsoft Store aide RoK à toucher davantage de personnes qui tiennent à posséder leur musique.</value>
+  </data>
+  <data name="reviewPositiveLeave" xml:space="preserve">
+    <value>Laisser un avis</value>
+  </data>
+  <data name="reviewPositiveLater" xml:space="preserve">
+    <value>Peut-être plus tard</value>
+  </data>
+  <data name="reviewNegativeTitle" xml:space="preserve">
+    <value>Merci pour votre honnêteté</value>
+  </data>
+  <data name="reviewNegativeContent" xml:space="preserve">
+    <value>J'aimerais savoir ce qui n'a pas été satisfaisant pour améliorer l'expérience. Chaque message aide à améliorer RoK.</value>
+  </data>
+  <data name="reviewNegativeSend" xml:space="preserve">
+    <value>Envoyer un retour</value>
+  </data>
+  <data name="reviewNegativeClose" xml:space="preserve">
+    <value>Fermer</value>
+  </data>
+  <data name="StoreReviewButton.Text" xml:space="preserve">
+    <value>Laissez un avis</value>
+  </data>
 </root>

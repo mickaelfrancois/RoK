@@ -88,6 +88,10 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <None Remove="Commons\ReviewPromptControl.xaml" />
+	</ItemGroup>
+
+	<ItemGroup>
 		<Content Include="Assets\SplashScreen.scale-200.png" />
 		<Content Include="Assets\LockScreenLogo.scale-200.png" />
 		<Content Include="Assets\Square150x150Logo.scale-200.png" />
@@ -173,7 +177,12 @@
 	</ItemGroup>
 	<ItemGroup>
 	  <Page Update="Commons\CompactPlayerControl.xaml">
-	    <Generator>MSBuild:Compile</Generator>
+		<Generator>MSBuild:Compile</Generator>
+	  </Page>
+	</ItemGroup>
+	<ItemGroup>
+	  <Page Update="Commons\ReviewPromptControl.xaml">
+		<Generator>MSBuild:Compile</Generator>
 	  </Page>
 	</ItemGroup>
 	<ItemGroup>
@@ -281,6 +290,9 @@
 	<ItemGroup>
 	  <None Update="appsettings.json">
 	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </None>
+	  <None Update="Commons\ReviewPromptControl.xaml">
+	    <Generator>MSBuild:Compile</Generator>
 	  </None>
 	  <None Update="Pages\InsightsPage.xaml">
 	    <Generator>MSBuild:Compile</Generator>

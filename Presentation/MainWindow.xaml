@@ -193,6 +193,7 @@
             </Grid>
 
             <c:SplashScreenControl x:Name="SplashScreen" Visibility="Visible" />
+            <c:ReviewPromptControl x:Name="ReviewPrompt" />
         </Grid>
 
         <c:NotificationControl x:Name="notificationControl" VerticalAlignment="Top" HorizontalAlignment="Right" Canvas.ZIndex="9999" Margin="0,20,20,0" />

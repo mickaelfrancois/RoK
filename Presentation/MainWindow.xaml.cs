@@ -1,4 +1,3 @@
-using Microsoft.UI.Dispatching;
 using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
@@ -7,11 +6,16 @@ using Microsoft.UI.Xaml.Navigation;
 using Rok.Infrastructure;
 using Rok.ViewModels.Main;
 using Windows.Graphics;
+using Windows.System;
 
 namespace Rok;
 
 public sealed partial class MainWindow : Window
 {
+    private const int KMaxTrackListenedBeforeReviewPrompt = 10;
+    private const int KMinSessionBeforeReviewPrompt = 3;
+    private const int KMinDaysBeforeReviewPrompt = 45;
+
     private readonly NavigationService _navigationService;
 
     private readonly ResourceLoader _resourceLoader;
@@ -25,6 +29,10 @@ public sealed partial class MainWindow : Window
     private readonly IAppDbContext _dbContext;
 
     private readonly IAppOptions _appOptions;
+
+    private readonly IReviewPromptEligibilityService _reviewPromptEligibilityService;
+
+    private int _tracksListenedCount = 0;
 
     private MainViewModel? _viewModel;
     public MainViewModel? ViewModel
@@ -40,7 +48,7 @@ public sealed partial class MainWindow : Window
         set => _viewModel = value;
     }
 
-    private readonly DispatcherQueue _dispatcherQueue = DispatcherQueue.GetForCurrentThread();
+    private readonly Microsoft.UI.Dispatching.DispatcherQueue _dispatcherQueue = Microsoft.UI.Dispatching.DispatcherQueue.GetForCurrentThread();
 
     private static readonly Dictionary<string, Type> PageMap = new()
     {
@@ -52,12 +60,13 @@ public sealed partial class MainWindow : Window
 
 
 
-    public MainWindow(NavigationService navigationService, ResourceLoader resourceLoader, IAppDbContext dbContext, IAppOptions appOptions)
+    public MainWindow(NavigationService navigationService, ResourceLoader resourceLoader, IAppDbContext dbContext, IAppOptions appOptions, IReviewPromptEligibilityService reviewPromptEligibilityService)
     {
         _navigationService = Guard.Against.Null(navigationService);
         _resourceLoader = Guard.Against.Null(resourceLoader);
         _dbContext = Guard.Against.Null(dbContext);
         _appOptions = Guard.Against.Null(appOptions);
+        _reviewPromptEligibilityService = Guard.Against.Null(reviewPromptEligibilityService);
 
         this.InitializeComponent();
 
@@ -176,7 +185,6 @@ public sealed partial class MainWindow : Window
     }
 
 
-
     private void ToggleCompactMode()
     {
         if (_compactModeEnabled)
@@ -220,6 +228,13 @@ public sealed partial class MainWindow : Window
         _dispatcherQueue.TryEnqueue(async () =>
         {
             await fullscreen.TrackChangedAsync(message.NewTrack, message.PreviousTrack);
+
+            if (message.NewTrack != null)
+            {
+                _tracksListenedCount++;
+                if (_tracksListenedCount == KMaxTrackListenedBeforeReviewPrompt)
+                    await TryShowReviewPromptAsync();
+            }
         });
     }
 
@@ -233,7 +248,7 @@ public sealed partial class MainWindow : Window
 
     private void LibraryRefreshHandle(LibraryRefreshMessage msg)
     {
-        DispatcherQueue? dispatcherQueue = _navigationService?.MainFrame?.DispatcherQueue;
+        Microsoft.UI.Dispatching.DispatcherQueue? dispatcherQueue = _navigationService?.MainFrame?.DispatcherQueue;
         if (dispatcherQueue == null || libraryRefreshButton == null || IconRotation == null || _resourceLoader == null)
             return;
 
@@ -333,8 +348,6 @@ public sealed partial class MainWindow : Window
     }
 
 
-
-
     private void ContentFrame_Navigated(object sender, NavigationEventArgs e)
     {
         if (e.Content is Pages.OptionsPage)
@@ -375,5 +388,62 @@ public sealed partial class MainWindow : Window
     {
         Storyboard storyboard = (Storyboard)navMenu.Resources["AppLogoExitStoryboard"];
         storyboard.Begin();
+    }
+
+
+    private async Task TryShowReviewPromptAsync()
+    {
+        if (_reviewPromptEligibilityService.ShouldShowReviewPrompt(
+            _tracksListenedCount,
+            KMaxTrackListenedBeforeReviewPrompt,
+            KMinSessionBeforeReviewPrompt,
+            KMinDaysBeforeReviewPrompt))
+        {
+            await ShowReviewPromptAsync();
+        }
+    }
+
+    private async Task ShowReviewPromptAsync()
+    {
+        _appOptions.ReviewLastPromptDate = DateTimeOffset.UtcNow;
+
+        bool? result = await ReviewPrompt.ShowAsync(
+            "\uE734",
+            _resourceLoader.GetString("reviewSentimentGateTitle"),
+            _resourceLoader.GetString("reviewSentimentGateContent"),
+            _resourceLoader.GetString("reviewSentimentGateYes"),
+            _resourceLoader.GetString("reviewSentimentGateNo"));
+
+        if (result == null)
+            return;
+
+        if (result == true)
+        {
+            _appOptions.HasRated = true;
+
+            bool? reviewResult = await ReviewPrompt.ShowAsync(
+                "\uE735",
+                _resourceLoader.GetString("reviewPositiveTitle"),
+                _resourceLoader.GetString("reviewPositiveContent"),
+                _resourceLoader.GetString("reviewPositiveLeave"),
+                _resourceLoader.GetString("reviewPositiveLater"));
+
+            if (reviewResult == true)
+            {
+                await Launcher.LaunchUriAsync(new Uri($"ms-windows-store://review/?ProductId=9NX19R28Q92S"));
+            }
+        }
+        else
+        {
+            bool? feedbackResult = await ReviewPrompt.ShowAsync(
+                "\uE939",
+                _resourceLoader.GetString("reviewNegativeTitle"),
+                _resourceLoader.GetString("reviewNegativeContent"),
+                _resourceLoader.GetString("reviewNegativeSend"),
+                _resourceLoader.GetString("reviewNegativeClose"));
+
+            if (feedbackResult == true)
+                await Launcher.LaunchUriAsync(new Uri("https://github.com/mickaelfrancois/RoK/issues/new"));
+        }
     }
 }

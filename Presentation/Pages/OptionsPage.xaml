@@ -806,28 +806,23 @@
                                        Foreground="{ThemeResource AccentFillColorDefaultBrush}" />
                         </StackPanel>
 
-                        <StackPanel Orientation="Horizontal"
-                                    Spacing="16"
-                                    Margin="0,0,0,8">
-
-                            <Button x:Uid="SupportProjectButton"
-                                    Click="SupportButton_Click">
+                        <StackPanel Orientation="Horizontal" Spacing="16" Margin="0,0,0,8">
+                            
+                            <Button x:Uid="SupportProjectButton" Click="SupportButton_Click">
                                 <Button.Content>
-                                    <StackPanel Orientation="Horizontal"
-                                                Spacing="6">
+                                    <StackPanel Orientation="Horizontal" Spacing="6">
                                         <FontIcon Glyph="&#xE006;"></FontIcon>
-                                        <TextBlock x:Uid="SupportProjectButtonText"
-                                                   Text="Support the project"></TextBlock>
+                                        <TextBlock x:Uid="SupportProjectButtonText" Text="Support the project"></TextBlock>
                                     </StackPanel>
                                 </Button.Content>
                             </Button>
 
-                            <Button Click="StorePageButton_Click">
+                            <Button  Click="OnLeaveReviewClicked">
                                 <Button.Content>
                                     <StackPanel Orientation="Horizontal"
                                                 Spacing="6">
-                                        <SymbolIcon Symbol="Shop"></SymbolIcon>
-                                        <TextBlock Text="Store page"></TextBlock>
+                                        <FontIcon Glyph="&#xE19F;" />
+                                        <TextBlock x:Uid="StoreReviewButton" Text="Store page"></TextBlock>
                                     </StackPanel>
                                 </Button.Content>
                             </Button>

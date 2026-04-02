@@ -62,6 +62,12 @@ public interface IAppOptions
 
     List<long> TracksFilterByGenresId { get; set; }
 
+    int SessionsCount { get; set; }
+
+    bool HasRated { get; set; }
+
+    DateTimeOffset? ReviewLastPromptDate { get; set; }
+
     void SetCachePath(string path);
 
     void CopyFrom(IAppOptions options);
