@@ -832,6 +832,15 @@
                                 </Button.Content>
                             </Button>
 
+                            <Button Click="OfficialPageButton_Click">
+                                <Button.Content>
+                                    <StackPanel Orientation="Horizontal" Spacing="6">
+                                        <SymbolIcon Symbol="Globe"></SymbolIcon>
+                                        <TextBlock Text="Official page"></TextBlock>
+                                    </StackPanel>
+                                </Button.Content>
+                            </Button>
+
                             <Button Click="GitHubPageButton_Click">
                                 <Button.Content>
                                     <StackPanel Orientation="Horizontal"
