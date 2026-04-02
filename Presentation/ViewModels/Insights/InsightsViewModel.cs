@@ -217,6 +217,6 @@ public partial class InsightsViewModel(IMediator mediator, IResourceService reso
     private static string FormatSeconds(double seconds)
     {
         TimeSpan t = TimeSpan.FromSeconds(Math.Abs(seconds));
-        return $"{(int)t.TotalDays:D2}:{t.Hours:D2}:{t.Minutes:D2}";
+        return $"{(int)t.TotalMinutes:D2}min.";
     }
 }

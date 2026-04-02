@@ -8,7 +8,8 @@ public sealed class SecondsToReadableConverter : IValueConverter
             return value;
 
         TimeSpan t = TimeSpan.FromSeconds(Math.Abs(System.Convert.ToDouble(convertible)));
-        return $"{(int)t.TotalDays:D2}:{t.Hours:D2}:{t.Minutes:D2}";
+
+        return $"{(int)t.TotalMinutes:D2}min.";
     }
 
     public object ConvertBack(object value, Type targetType, object parameter, string language)
