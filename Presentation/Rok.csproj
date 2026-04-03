@@ -378,5 +378,5 @@
 		<PlatformTarget>AnyCPU</PlatformTarget>
 		<ApplicationIcon>Assets\Square44x44Logo.ico</ApplicationIcon>
 	</PropertyGroup>
-	  
+	
 </Project>

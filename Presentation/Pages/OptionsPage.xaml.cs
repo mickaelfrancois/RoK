@@ -215,6 +215,32 @@ public sealed partial class OptionsPage : Page
     {
         await Launcher.LaunchUriAsync(new Uri($"ms-windows-store://review/?ProductId=9NX19R28Q92S"));
     }
+
+    public string SelectedLanguage
+    {
+        get => Options.Language ?? "System";
+        set
+        {
+            if (value == "System")
+            {
+                Options.Language = null;
+                Windows.Globalization.ApplicationLanguages.PrimaryLanguageOverride = string.Empty;
+            }
+            else
+            {
+                Options.Language = value;
+                Windows.Globalization.ApplicationLanguages.PrimaryLanguageOverride = value;
+            }
+        }
+    }
+
+    public List<string> AvailableLanguages { get; } = new()
+    {
+        "System", // System language
+        "en-US", // English
+        "fr-FR", // French
+        "es-ES" // Spanish (Automatic Translation)
+    };
 }
 
 public class PathItem(string key, string value)

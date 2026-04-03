@@ -36,6 +36,8 @@ public interface IAppOptions
 
     bool DiscordRichPresenceEnabled { get; set; }
 
+    string? Language { get; set; }
+
     string CachePath { get; set; }
 
     string ArtistsGroupBy { get; set; }

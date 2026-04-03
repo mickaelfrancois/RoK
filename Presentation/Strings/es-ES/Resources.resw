@@ -1,691 +1,574 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <root>
-  <!-- 
-    Microsoft ResX Schema 
-    
-    Version 2.0
-    
-    The primary goals of this format is to allow a simple XML format 
-    that is mostly human readable. The generation and parsing of the 
-    various data types are done through the TypeConverter classes 
-    associated with the data types.
-    
-    Example:
-    
-    ... ado.net/XML headers & schema ...
-    <resheader name="resmimetype">text/microsoft-resx</resheader>
-    <resheader name="version">2.0</resheader>
-    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
-    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
-    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
-    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
-    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
-        <value>[base64 mime encoded serialized .NET Framework object]</value>
-    </data>
-    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
-        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
-        <comment>This is a comment</comment>
-    </data>
-                
-    There are any number of "resheader" rows that contain simple 
-    name/value pairs.
-    
-    Each data row contains a name, and value. The row also contains a 
-    type or mimetype. Type corresponds to a .NET class that support 
-    text/value conversion through the TypeConverter architecture. 
-    Classes that don't support this are serialized and stored with the 
-    mimetype set.
-    
-    The mimetype is used for serialized objects, and tells the 
-    ResXResourceReader how to depersist the object. This is currently not 
-    extensible. For a given mimetype the value must be set accordingly:
-    
-    Note - application/x-microsoft.net.object.binary.base64 is the format 
-    that the ResXResourceWriter will generate, however the reader can 
-    read any of the formats listed below.
-    
-    mimetype: application/x-microsoft.net.object.binary.base64
-    value   : The object must be serialized with 
-            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
-            : and then encoded with base64 encoding.
-    
-    mimetype: application/x-microsoft.net.object.soap.base64
-    value   : The object must be serialized with 
-            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
-            : and then encoded with base64 encoding.
-
-    mimetype: application/x-microsoft.net.object.bytearray.base64
-    value   : The object must be serialized into a byte array 
-            : using a System.ComponentModel.TypeConverter
-            : and then encoded with base64 encoding.
-    -->
-  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
-    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
-    <xsd:element name="root" msdata:IsDataSet="true">
-      <xsd:complexType>
-        <xsd:choice maxOccurs="unbounded">
-          <xsd:element name="metadata">
-            <xsd:complexType>
-              <xsd:sequence>
-                <xsd:element name="value" type="xsd:string" minOccurs="0" />
-              </xsd:sequence>
-              <xsd:attribute name="name" use="required" type="xsd:string" />
-              <xsd:attribute name="type" type="xsd:string" />
-              <xsd:attribute name="mimetype" type="xsd:string" />
-              <xsd:attribute ref="xml:space" />
-            </xsd:complexType>
-          </xsd:element>
-          <xsd:element name="assembly">
-            <xsd:complexType>
-              <xsd:attribute name="alias" type="xsd:string" />
-              <xsd:attribute name="name" type="xsd:string" />
-            </xsd:complexType>
-          </xsd:element>
-          <xsd:element name="data">
-            <xsd:complexType>
-              <xsd:sequence>
-                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
-                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
-              </xsd:sequence>
-              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
-              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
-              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
-              <xsd:attribute ref="xml:space" />
-            </xsd:complexType>
-          </xsd:element>
-          <xsd:element name="resheader">
-            <xsd:complexType>
-              <xsd:sequence>
-                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
-              </xsd:sequence>
-              <xsd:attribute name="name" type="xsd:string" use="required" />
-            </xsd:complexType>
-          </xsd:element>
-        </xsd:choice>
-      </xsd:complexType>
-    </xsd:element>
-  </xsd:schema>
-  <resheader name="resmimetype">
-    <value>text/microsoft-resx</value>
-  </resheader>
-  <resheader name="version">
-    <value>2.0</value>
-  </resheader>
-  <resheader name="reader">
-    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </resheader>
-  <resheader name="writer">
-    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </resheader>
   <data name="menuAlbums.Content" xml:space="preserve">
-    <value>Albums</value>
+    <value>Álbumes</value>
   </data>
   <data name="menuArtists.Content" xml:space="preserve">
-    <value>Artists</value>
+    <value>Artistas</value>
   </data>
   <data name="artistsPageTitle.Text" xml:space="preserve">
-    <value>Artists</value>
+    <value>Artistas</value>
   </data>
   <data name="albums" xml:space="preserve">
-    <value>albums</value>
+    <value>Álbumes</value>
   </data>
   <data name="album" xml:space="preserve">
-    <value>album</value>
+    <value>álbum</value>
   </data>
   <data name="track" xml:space="preserve">
-    <value>track</value>
+    <value>Ancho de vía</value>
   </data>
   <data name="tracks" xml:space="preserve">
-    <value>tracks</value>
+    <value>temas</value>
   </data>
   <data name="artistsViewListen.Text" xml:space="preserve">
-    <value> listen</value>
+    <value> escuchar</value>
   </data>
   <data name="artistsViewGroupBy.Text" xml:space="preserve">
-    <value>Sort by</value>
+    <value>Ordenar por</value>
   </data>
   <data name="artistsViewGroupByYearMenu.Text" xml:space="preserve">
-    <value>year</value>
+    <value>año</value>
   </data>
   <data name="artistsViewGroupByCountryMenu.Text" xml:space="preserve">
-    <value>country</value>
+    <value>país</value>
   </data>
   <data name="artistsViewGroupByCreatDateMenu.Text" xml:space="preserve">
-    <value>last added</value>
+    <value>Más antiguos</value>
   </data>
   <data name="artistsViewGroupByArtistMenu.Text" xml:space="preserve">
-    <value>artists</value>
+    <value>artistas</value>
   </data>
   <data name="artistsViewGroupByLastListenMenu.Text" xml:space="preserve">
-    <value>last listen</value>
+    <value>última escucha</value>
   </data>
   <data name="artistsViewGroupByListenCountMenu.Text" xml:space="preserve">
-    <value>most listen</value>
+    <value>la mayoría escucha</value>
   </data>
   <data name="artistsViewGroupByYear" xml:space="preserve">
-    <value>year</value>
+    <value>año</value>
   </data>
   <data name="artistsViewGroupByCountry" xml:space="preserve">
-    <value>country</value>
+    <value>país</value>
   </data>
   <data name="artistsViewGroupByCreatDate" xml:space="preserve">
-    <value>last added</value>
+    <value>Más antiguos</value>
   </data>
   <data name="artistsViewGroupByArtist" xml:space="preserve">
-    <value>artists</value>
+    <value>artistas</value>
   </data>
   <data name="artistsViewGroupByLastListen" xml:space="preserve">
-    <value>last listen</value>
+    <value>última escucha</value>
   </data>
   <data name="artistsViewGroupByListenCount" xml:space="preserve">
-    <value>most listen</value>
+    <value>la mayoría escucha</value>
   </data>
   <data name="artistsViewFilterBy.Text" xml:space="preserve">
-    <value>Filter by</value>
+    <value>Filtrar por</value>
   </data>
   <data name="artistsViewFilterByAllMenu.Text" xml:space="preserve">
-    <value>all</value>
+    <value>todo</value>
   </data>
   <data name="artistsViewFilterByFavoriteArtistMenu.Text" xml:space="preserve">
-    <value>favorites artists</value>
+    <value>artistas favoritos</value>
   </data>
   <data name="artistsViewFilterByFavoriteGenre" xml:space="preserve">
-    <value>favorites genres</value>
+    <value>géneros favoritos</value>
   </data>
   <data name="artistsViewFilterByFavoriteGenreMenu.Text" xml:space="preserve">
-    <value>favorites genres</value>
+    <value>géneros favoritos</value>
   </data>
   <data name="artistsViewFilterNone" xml:space="preserve">
-    <value>all</value>
+    <value>todo</value>
   </data>
   <data name="albumsPageTitle.Text" xml:space="preserve">
-    <value>Albums</value>
+    <value>Álbumes</value>
   </data>
   <data name="ArtistViewSong.Text" xml:space="preserve">
-    <value>tracks, </value>
+    <value>pistas, </value>
   </data>
   <data name="ArtistViewAlbums.Text" xml:space="preserve">
-    <value>albums, </value>
+    <value>álbumes, </value>
   </data>
   <data name="ArtistViewBestof.Text" xml:space="preserve">
-    <value>best of, </value>
+    <value>lo mejor de, </value>
   </data>
   <data name="ArtistViewLive.Text" xml:space="preserve">
-    <value>live, </value>
+    <value>en directo, </value>
   </data>
   <data name="ArtistViewCompilation.Text" xml:space="preserve">
     <value>compilations, </value>
   </data>
   <data name="ArtistViewDuration.Text" xml:space="preserve">
-    <value>duration: </value>
+    <value>duración: </value>
   </data>
   <data name="artistViewListenCount.Text" xml:space="preserve">
-    <value>Listened</value>
+    <value>Escuchado</value>
   </data>
   <data name="artistViewListenCountTimes.Text" xml:space="preserve">
-    <value>time</value>
+    <value>hora</value>
   </data>
   <data name="artistViewLastListen.Text" xml:space="preserve">
-    <value>last listened on</value>
+    <value>escuchado por última vez el</value>
   </data>
   <data name="artistViewListen.Label" xml:space="preserve">
-    <value>Listen</value>
+    <value>Escuchar</value>
   </data>
   <data name="artistViewLike.Label" xml:space="preserve">
-    <value>Like</value>
+    <value>Me gusta</value>
   </data>
   <data name="artistWikipedia.Content" xml:space="preserve">
     <value>Wikipedia</value>
   </data>
   <data name="artistOfficialSite.Content" xml:space="preserve">
-    <value>Official site</value>
+    <value>Sitio oficial</value>
   </data>
   <data name="artistViewGenre.Text" xml:space="preserve">
-    <value>Genre:</value>
+    <value>Género:</value>
   </data>
   <data name="artistsViewGroupByDecadeMenu.Text" xml:space="preserve">
-    <value>decade</value>
+    <value>década</value>
   </data>
   <data name="artistsViewGroupByDecade" xml:space="preserve">
-    <value>decade</value>
+    <value>década</value>
   </data>
   <data name="artistsViewFilterByNeverListenedMenu.Text" xml:space="preserve">
-    <value>never listened</value>
+    <value>nunca escuchó</value>
   </data>
   <data name="artistsViewFilterByNeverListened" xml:space="preserve">
-    <value>never listened</value>
+    <value>nunca escuchó</value>
   </data>
   <data name="tracksViewGroupByTitle" xml:space="preserve">
     <value>titles</value>
   </data>
   <data name="tracksViewGroupByYear" xml:space="preserve">
-    <value>year</value>
+    <value>año</value>
   </data>
   <data name="tracksViewGroupByCountry" xml:space="preserve">
-    <value>country</value>
+    <value>país</value>
   </data>
   <data name="tracksViewGroupByCreatDate" xml:space="preserve">
-    <value>last added</value>
+    <value>Más antiguos</value>
   </data>
   <data name="tracksViewGroupByLastListen" xml:space="preserve">
-    <value>last listen</value>
+    <value>última escucha</value>
   </data>
   <data name="tracksViewGroupByListenCount" xml:space="preserve">
-    <value>most listen</value>
+    <value>la mayoría escucha</value>
   </data>
   <data name="tracksViewGroupBy.Text" xml:space="preserve">
-    <value>Sort by</value>
+    <value>Ordenar por</value>
   </data>
   <data name="tracksViewGroupByCountryMenu.Text" xml:space="preserve">
-    <value>country</value>
+    <value>país</value>
   </data>
   <data name="tracksViewGroupByCreatDateMenu.Text" xml:space="preserve">
-    <value>last added</value>
+    <value>Más antiguos</value>
   </data>
   <data name="tracksViewGroupByLastListenMenu.Text" xml:space="preserve">
-    <value>last listen</value>
+    <value>última escucha</value>
   </data>
   <data name="tracksViewGroupByListenCountMenu.Text" xml:space="preserve">
-    <value>most listen</value>
+    <value>la mayoría escucha</value>
   </data>
   <data name="groupBytitle" xml:space="preserve">
     <value>titles</value>
   </data>
   <data name="tracksViewGroupByYearMenu.Text" xml:space="preserve">
-    <value>year</value>
+    <value>año</value>
   </data>
   <data name="tracksViewListen.Text" xml:space="preserve">
-    <value> listen</value>
+    <value> escuchar</value>
   </data>
   <data name="tracksViewFilterByAllMenu.Text" xml:space="preserve">
-    <value>all</value>
+    <value>todo</value>
   </data>
   <data name="tracksViewFilterByFavoriteAlbumMenu.Text" xml:space="preserve">
-    <value>favorites albums</value>
+    <value>álbumes favoritos</value>
   </data>
   <data name="tracksViewFilterByFavoriteArtistMenu.Text" xml:space="preserve">
-    <value>favorites artists</value>
+    <value>artistas favoritos</value>
   </data>
   <data name="tracksViewFilterByFavoriteGenreMenu.Text" xml:space="preserve">
-    <value>favorites genres</value>
+    <value>géneros favoritos</value>
   </data>
   <data name="tracksViewFilterByFavoriteTrackMenu.Text" xml:space="preserve">
-    <value>favorites tracks</value>
+    <value>pistas favoritas</value>
   </data>
   <data name="tracksViewFilterBy.Text" xml:space="preserve">
-    <value>Filter by</value>
+    <value>Filtrar por</value>
   </data>
   <data name="tracksViewFilterNone" xml:space="preserve">
-    <value>all</value>
+    <value>todo</value>
   </data>
   <data name="tracksViewFilterByAll" xml:space="preserve">
-    <value>all</value>
+    <value>todo</value>
   </data>
   <data name="tracksViewFilterByFavoriteAlbum" xml:space="preserve">
-    <value>favorites albums</value>
+    <value>álbumes favoritos</value>
   </data>
   <data name="tracksViewFilterByFavoriteArtist" xml:space="preserve">
-    <value>favorites artists</value>
+    <value>artistas favoritos</value>
   </data>
   <data name="tracksViewFilterByFavoriteGenre" xml:space="preserve">
-    <value>favorites genres</value>
+    <value>géneros favoritos</value>
   </data>
   <data name="tracksViewFilterByFavoriteTrack" xml:space="preserve">
-    <value>favorites tracks</value>
+    <value>pistas favoritas</value>
   </data>
   <data name="albumsViewGroupByDecade" xml:space="preserve">
-    <value>decade</value>
+    <value>década</value>
   </data>
   <data name="groupBydecade" xml:space="preserve">
-    <value>decade</value>
+    <value>década</value>
   </data>
   <data name="albumsViewFilterBy.Text" xml:space="preserve">
-    <value>Filter by</value>
+    <value>Filtrar por</value>
   </data>
   <data name="artistsViewFilterByFavoriteArtist" xml:space="preserve">
-    <value>favorites artists</value>
+    <value>artistas favoritos</value>
   </data>
   <data name="albumsViewFilterByAllMenu.Text" xml:space="preserve">
-    <value>all</value>
+    <value>todo</value>
   </data>
   <data name="albumsViewFilterByFavoriteArtist" xml:space="preserve">
-    <value>favorites artists</value>
+    <value>artistas favoritos</value>
   </data>
   <data name="albumsViewFilterByFavoriteArtistMenu.Text" xml:space="preserve">
-    <value>favorites artists</value>
+    <value>artistas favoritos</value>
   </data>
   <data name="albumsViewFilterByFavoriteAlbum" xml:space="preserve">
-    <value>favorites albums</value>
+    <value>álbumes favoritos</value>
   </data>
   <data name="albumsViewFilterByFavoriteAlbumMenu.Text" xml:space="preserve">
-    <value>favorites albums</value>
+    <value>álbumes favoritos</value>
   </data>
   <data name="albumsViewFilterByFavoriteGenre" xml:space="preserve">
-    <value>favorites genres</value>
+    <value>géneros favoritos</value>
   </data>
   <data name="albumsViewFilterByFavoriteGenreMenu.Text" xml:space="preserve">
-    <value>favorites genres</value>
+    <value>géneros favoritos</value>
   </data>
   <data name="albumsViewFilterByNeverListened" xml:space="preserve">
-    <value>never listened</value>
+    <value>nunca escuchó</value>
   </data>
   <data name="albumsViewFilterByNeverListenedMenu.Text" xml:space="preserve">
-    <value>never listened</value>
+    <value>nunca escuchó</value>
   </data>
   <data name="albumsViewFilterNone" xml:space="preserve">
-    <value>all</value>
+    <value>todo</value>
   </data>
   <data name="albumsViewGroupBy.Text" xml:space="preserve">
-    <value>Sort by</value>
+    <value>Ordenar por</value>
   </data>
   <data name="albumsViewGroupByArtist" xml:space="preserve">
-    <value>artists</value>
+    <value>artistas</value>
   </data>
   <data name="groupByartistname" xml:space="preserve">
-    <value>artists</value>
+    <value>artistas</value>
   </data>
   <data name="groupBycountry" xml:space="preserve">
-    <value>country</value>
+    <value>país</value>
   </data>
   <data name="albumsViewGroupByCountry" xml:space="preserve">
-    <value>country</value>
+    <value>país</value>
   </data>
   <data name="albumsViewGroupByCreatDate" xml:space="preserve">
-    <value>last added</value>
+    <value>Más antiguos</value>
   </data>
   <data name="groupBycreatdate" xml:space="preserve">
-    <value>last added</value>
+    <value>Más antiguos</value>
   </data>
   <data name="albumsViewGroupByLastListen" xml:space="preserve">
-    <value>last listen</value>
+    <value>última escucha</value>
   </data>
   <data name="groupBylastlisten" xml:space="preserve">
-    <value>last listen</value>
+    <value>última escucha</value>
   </data>
   <data name="albumsViewGroupByListenCount" xml:space="preserve">
-    <value>most listen</value>
+    <value>la mayoría escucha</value>
   </data>
   <data name="groupBylistencount" xml:space="preserve">
-    <value>most listen</value>
+    <value>la mayoría escucha</value>
   </data>
   <data name="albumsViewGroupByYear" xml:space="preserve">
-    <value>year</value>
+    <value>año</value>
   </data>
   <data name="groupByyear" xml:space="preserve">
-    <value>year</value>
+    <value>año</value>
   </data>
   <data name="albumsViewListen.Text" xml:space="preserve">
-    <value> listen</value>
+    <value> escuchar</value>
   </data>
   <data name="albumsViewGroupByAlbum" xml:space="preserve">
-    <value>albums</value>
+    <value>Álbumes</value>
   </data>
   <data name="groupByalbumname" xml:space="preserve">
-    <value>albums</value>
+    <value>Álbumes</value>
   </data>
   <data name="searchArtistHeader.Text" xml:space="preserve">
-    <value>Artists</value>
+    <value>Artistas</value>
   </data>
   <data name="searchAlbumHeader.Text" xml:space="preserve">
-    <value>Albums</value>
+    <value>Álbumes</value>
   </data>
   <data name="searchTrackHeader.Text" xml:space="preserve">
-    <value>Songs</value>
+    <value>Canciones</value>
   </data>
   <data name="searchViewTitle.Text" xml:space="preserve">
-    <value>Search results</value>
+    <value>Resultados de la búsqueda</value>
   </data>
   <data name="menuPlaylists.Content" xml:space="preserve">
-    <value>Playlists</value>
+    <value>Listas de reproducción</value>
   </data>
   <data name="groupDefaultName" xml:space="preserve">
-    <value>New group</value>
+    <value>Nuevo grupo</value>
   </data>
   <data name="artists" xml:space="preserve">
-    <value>artists</value>
+    <value>artistas</value>
   </data>
   <data name="artist" xml:space="preserve">
-    <value>artist</value>
+    <value>artista</value>
   </data>
   <data name="DeleteConfirmationTitle" xml:space="preserve">
-    <value>Delete confirmation</value>
+    <value>Eliminar confirmación</value>
   </data>
   <data name="DeletePlaylistConfirmation" xml:space="preserve">
-    <value>Do you want to delete this playlist?</value>
+    <value>¿De verdad quiere borrar esta lista de reproducción?</value>
   </data>
   <data name="YesButton" xml:space="preserve">
-    <value>Yes</value>
+    <value>Sí</value>
   </data>
   <data name="CancelButton" xml:space="preserve">
-    <value>Cancel</value>
+    <value>Cancelar</value>
   </data>
   <data name="newPlaylist" xml:space="preserve">
-    <value>New playlist</value>
+    <value>Nueva lista de reproducción</value>
   </data>
   <data name="defaultRadioPlaylistName" xml:space="preserve">
     <value>Radio</value>
   </data>
   <data name="defaultBestofPlaylistName" xml:space="preserve">
-    <value>Best of</value>
+    <value>Lo mejor de</value>
   </data>
   <data name="defaultAlbumOfTheYearfPlaylistName" xml:space="preserve">
-    <value>Albums of the year</value>
+    <value>Álbumes del año</value>
   </data>
   <data name="tracksViewListenListGroup.Text" xml:space="preserve">
-    <value>listen</value>
+    <value>escuchar</value>
   </data>
   <data name="artistsViewListenListGroup.Text" xml:space="preserve">
-    <value>listen</value>
+    <value>escuchar</value>
   </data>
   <data name="menuTracks.Content" xml:space="preserve">
-    <value>Songs</value>
+    <value>Canciones</value>
   </data>
   <data name="searchBox.PlaceholderText" xml:space="preserve">
-    <value>Search for songs, artists, albums</value>
+    <value>Buscar canciones, artistas y álbumes</value>
   </data>
   <data name="playlistGroupEntityArtists" xml:space="preserve">
-    <value>Artists</value>
+    <value>Artistas</value>
   </data>
   <data name="playlistGroupEntityGenres" xml:space="preserve">
-    <value>Genres</value>
+    <value>Género</value>
   </data>
   <data name="playlistGroupEntityTracks" xml:space="preserve">
-    <value>Tracks</value>
+    <value>Pistas</value>
   </data>
   <data name="playlistGroupEntityAlbums" xml:space="preserve">
-    <value>Albums</value>
+    <value>Álbumes</value>
   </data>
   <data name="playlistGroupEntityCountries" xml:space="preserve">
-    <value>Countries</value>
+    <value>Países</value>
   </data>
   <data name="playlistGroupFieldScore" xml:space="preserve">
-    <value>Score</value>
+    <value>Puntuación</value>
   </data>
   <data name="playlistGroupFieldListenCount" xml:space="preserve">
-    <value>Listen count</value>
+    <value>Recuento de escuchas</value>
   </data>
   <data name="playlistGroupFieldLive" xml:space="preserve">
-    <value>Is live</value>
+    <value>Está en directo</value>
   </data>
   <data name="playlistGroupFieldAddDate" xml:space="preserve">
-    <value>Date add</value>
+    <value>Fecha de entrada</value>
   </data>
   <data name="playlistGroupFieldBitrate" xml:space="preserve">
-    <value>Bitrate</value>
+    <value>Tasa de bits</value>
   </data>
   <data name="playlistGroupFieldLastListen" xml:space="preserve">
     <value>LastListen</value>
   </data>
   <data name="playlistGroupFieldSkipCount" xml:space="preserve">
-    <value>Skip count</value>
+    <value>Omitir recuento</value>
   </data>
   <data name="playlistGroupFieldName" xml:space="preserve">
-    <value>Name</value>
+    <value>Nombre</value>
   </data>
   <data name="playlistGroupFieldFavorite" xml:space="preserve">
-    <value>Favorite</value>
+    <value>Favorito</value>
   </data>
   <data name="playlistGroupFieldAlbumCount" xml:space="preserve">
-    <value>Studio album</value>
+    <value>Álbum de estudio</value>
   </data>
   <data name="playlistGroupFieldBestofCount" xml:space="preserve">
-    <value>Best of</value>
+    <value>Lo mejor de</value>
   </data>
   <data name="playlistGroupFieldCompilationCount" xml:space="preserve">
-    <value>Compilation</value>
+    <value>Compilación</value>
   </data>
   <data name="playlistGroupFieldTrackCount" xml:space="preserve">
-    <value>Track count</value>
+    <value>Recuento de pistas</value>
   </data>
   <data name="playlistGroupFieldYear" xml:space="preserve">
-    <value>Year</value>
+    <value>Año</value>
   </data>
   <data name="playlistGroupFieldReleaseDate" xml:space="preserve">
-    <value>Release date</value>
+    <value>Fecha de lanzamiento</value>
   </data>
   <data name="playlistGroupFieldArtistCount" xml:space="preserve">
-    <value>Artist count</value>
+    <value>Recuento de artistas</value>
   </data>
   <data name="playlistGroupOperatorEquals" xml:space="preserve">
-    <value>Equals</value>
+    <value>Iguales</value>
   </data>
   <data name="playlistGroupOperatorNotEquals" xml:space="preserve">
-    <value>Not equals</value>
+    <value>No es igual a</value>
   </data>
   <data name="playlistGroupOperatorGreaterThan" xml:space="preserve">
-    <value>Greater than</value>
+    <value>Mayor que</value>
   </data>
   <data name="playlistGroupOperatorLessThan" xml:space="preserve">
-    <value>Less than</value>
+    <value>Menor que</value>
   </data>
   <data name="playlistGroupOperatorContains" xml:space="preserve">
-    <value>Contains</value>
+    <value>Contiene</value>
   </data>
   <data name="playlistGroupOperatorNotContains" xml:space="preserve">
-    <value>Not contains</value>
+    <value>No contiene</value>
   </data>
   <data name="playlistGroupOperatorStartWith" xml:space="preserve">
-    <value>Start with</value>
+    <value>Empezar con</value>
   </data>
   <data name="playlistGroupOperatorEndsWith" xml:space="preserve">
-    <value>Ends with</value>
+    <value>Termina en</value>
   </data>
   <data name="playlistGroupOperatorBetween" xml:space="preserve">
-    <value>Between</value>
+    <value>Entre</value>
   </data>
   <data name="playlistGroupValueTrue" xml:space="preserve">
-    <value>True</value>
+    <value>Verdadero</value>
   </data>
   <data name="playlistGroupValueFalse" xml:space="preserve">
-    <value>False</value>
+    <value>Falso</value>
   </data>
   <data name="playlistGroupSortRandom" xml:space="preserve">
-    <value>Random</value>
+    <value>Aleatorio</value>
   </data>
   <data name="playlistGroupSortMostPlayed" xml:space="preserve">
-    <value>Most played</value>
+    <value>Más jugados</value>
   </data>
   <data name="playlistGroupSortLeastPlayed" xml:space="preserve">
-    <value>Least played</value>
+    <value>Menos jugados</value>
   </data>
   <data name="playlistGroupSortMostRecent" xml:space="preserve">
-    <value>Most recent</value>
+    <value>Más recientes</value>
   </data>
   <data name="playlistGroupSortLeastRecent" xml:space="preserve">
-    <value>Least recent</value>
+    <value>Menos Reciente</value>
   </data>
   <data name="playlistGroupSortHighestRated" xml:space="preserve">
-    <value>Highest rated</value>
+    <value>Mejor puntuado</value>
   </data>
   <data name="playlistGroupSortLowestRated" xml:space="preserve">
-    <value>Lowest rated</value>
+    <value>Peor valorado</value>
   </data>
   <data name="playlistGroupSortOldest" xml:space="preserve">
-    <value>Oldest</value>
+    <value>Más antiguos</value>
   </data>
   <data name="playlistGroupSortNewest" xml:space="preserve">
-    <value>Newest</value>
+    <value>La más reciente</value>
   </data>
   <data name="playlistGroupGroupName.Text" xml:space="preserve">
-    <value>Group name</value>
+    <value>Nombre del grupo</value>
   </data>
   <data name="playlistGroupMaximumSongs.Text" xml:space="preserve">
-    <value>Maximum songs</value>
+    <value>Máximo de canciones</value>
   </data>
   <data name="playlistGroupSortBy.Text" xml:space="preserve">
-    <value>Sort by</value>
+    <value>Ordenar por</value>
   </data>
   <data name="genSearchNoResult" xml:space="preserve">
-    <value>No result</value>
+    <value>Sin resultados</value>
   </data>
   <data name="gridHeaderTitle.Text" xml:space="preserve">
-    <value>Title</value>
+    <value>Título</value>
   </data>
   <data name="gridHeaderAlbum.Text" xml:space="preserve">
-    <value>Album</value>
+    <value>Álbum</value>
   </data>
   <data name="gridHeaderArtist.Text" xml:space="preserve">
-    <value>Artist</value>
+    <value>Pintora</value>
   </data>
   <data name="gridHeaderScore.Text" xml:space="preserve">
-    <value>Score</value>
+    <value>Puntuación</value>
   </data>
   <data name="selectPicture.ToolTipService.ToolTip" xml:space="preserve">
-    <value>Select a new picture</value>
+    <value>Seleccione una fotografía</value>
   </data>
   <data name="lyricsTag.Content" xml:space="preserve">
-    <value>lyrics</value>
+    <value>letras de canciones</value>
   </data>
   <data name="artistViewBiography.Label" xml:space="preserve">
-    <value>Biography</value>
+    <value>Biografía</value>
   </data>
   <data name="artistViewEdit.Label" xml:space="preserve">
-    <value>Edit</value>
+    <value>Editar</value>
   </data>
   <data name="artistViewPlaylist.Label" xml:space="preserve">
-    <value>Playlist</value>
+    <value>Lista de reproducción</value>
   </data>
   <data name="artistViewTabTracks.Header" xml:space="preserve">
-    <value>Songs</value>
+    <value>Canciones</value>
   </data>
   <data name="artistViewTabAlbums.Header" xml:space="preserve">
-    <value>Albums</value>
+    <value>Álbumes</value>
   </data>
   <data name="artistViewOfficialSite.Content" xml:space="preserve">
-    <value>Official site</value>
+    <value>Sitio oficial</value>
   </data>
   <data name="artistViewWikipedia.Content" xml:space="preserve">
     <value>Wikipedia</value>
   </data>
   <data name="bestOf" xml:space="preserve">
-    <value>Best of</value>
+    <value>Lo mejor de</value>
   </data>
   <data name="live" xml:space="preserve">
-    <value>Live</value>
+    <value>En directo</value>
   </data>
   <data name="compilation" xml:space="preserve">
-    <value>Compilation</value>
+    <value>Compilación</value>
   </data>
   <data name="duration" xml:space="preserve">
-    <value>duration: </value>
+    <value>duración: </value>
   </data>
   <data name="listenCount" xml:space="preserve">
-    <value>Listened</value>
+    <value>Escuchado</value>
   </data>
   <data name="listenCountTimes" xml:space="preserve">
-    <value>times</value>
+    <value>veces</value>
   </data>
   <data name="lastListen" xml:space="preserve">
-    <value>last listen</value>
+    <value>última escucha</value>
   </data>
   <data name="released" xml:space="preserve">
-    <value>Released:</value>
+    <value>Lanzamiento:</value>
   </data>
   <data name="albumViewListen.Label" xml:space="preserve">
-    <value>Listen</value>
+    <value>Escuchar</value>
   </data>
   <data name="albumViewLike.Label" xml:space="preserve">
-    <value>Like</value>
+    <value>Me gusta</value>
   </data>
   <data name="albumsViewFilterByLiveMenu.Text" xml:space="preserve">
     <value>lives</value>
@@ -694,10 +577,10 @@
     <value>lives</value>
   </data>
   <data name="albumsViewFilterByBestofMenu.Text" xml:space="preserve">
-    <value>best of</value>
+    <value>Lo mejor de</value>
   </data>
   <data name="albumsViewFilterByBestof" xml:space="preserve">
-    <value>best of</value>
+    <value>Lo mejor de</value>
   </data>
   <data name="albumsViewFilterByCompilationMenu.Text" xml:space="preserve">
     <value>compilations</value>
@@ -706,349 +589,349 @@
     <value>compilations</value>
   </data>
   <data name="albumsViewFilterByAlbumMenu.Text" xml:space="preserve">
-    <value>albums</value>
+    <value>Álbumes</value>
   </data>
   <data name="albumsViewFilterByAlbum" xml:space="preserve">
-    <value>albums</value>
+    <value>Álbumes</value>
   </data>
   <data name="artistViewWebSite.ToolTipService.ToolTip" xml:space="preserve">
-    <value>Open official site</value>
+    <value>Sitio oficial</value>
   </data>
   <data name="hideBiography.Content" xml:space="preserve">
-    <value>Close</value>
+    <value>Cerrar</value>
   </data>
   <data name="artistViewBiography.ToolTipService.ToolTip" xml:space="preserve">
-    <value>Show biography</value>
+    <value>Mostrar biografía</value>
   </data>
   <data name="tracksViewGroupByArtistMenu.Text" xml:space="preserve">
-    <value>artists</value>
+    <value>artistas</value>
   </data>
   <data name="tracksViewGroupByAlbumMenu.Text" xml:space="preserve">
-    <value>albums</value>
+    <value>Álbumes</value>
   </data>
   <data name="groupBygenrename" xml:space="preserve">
-    <value>genres</value>
+    <value>generos</value>
   </data>
   <data name="tracksViewGroupByArtist" xml:space="preserve">
-    <value>artists</value>
+    <value>artistas</value>
   </data>
   <data name="tracksViewGroupByAlbum" xml:space="preserve">
-    <value>albums</value>
+    <value>Álbumes</value>
   </data>
   <data name="tracksViewGroupByGenre" xml:space="preserve">
-    <value>genres</value>
+    <value>generos</value>
   </data>
   <data name="Close" xml:space="preserve">
-    <value>Close</value>
+    <value>Cerrar</value>
   </data>
   <data name="trackFlyoutArtist.Text" xml:space="preserve">
-    <value>Show artist</value>
+    <value>Mostrar artista</value>
   </data>
   <data name="trackFlyoutAlbum.Text" xml:space="preserve">
-    <value>Show album</value>
+    <value>Mostrar álbum</value>
   </data>
   <data name="trackFlyoutLyrics.Text" xml:space="preserve">
-    <value>Show lyrics</value>
+    <value>Mostrar letra</value>
   </data>
   <data name="trackFlyoutListen.Text" xml:space="preserve">
-    <value>Listen</value>
+    <value>Escuchar</value>
   </data>
   <data name="toggleTheme.ToolTipService.ToolTip" xml:space="preserve">
-    <value>Toggle theme</value>
+    <value>Alternar tema</value>
   </data>
   <data name="libraryRefreshButton.ToolTipService.ToolTip" xml:space="preserve">
-    <value>Refresh library</value>
+    <value>Actualizar biblioteca</value>
   </data>
   <data name="optionsAppearanceTitle.Text" xml:space="preserve">
-    <value>Appearance</value>
+    <value>Apariencia</value>
   </data>
   <data name="optionsThemeLabel.Text" xml:space="preserve">
-    <value>Theme</value>
+    <value>Tema</value>
   </data>
   <data name="optionsThemeDarkItem.Content" xml:space="preserve">
-    <value>Dark</value>
+    <value>Oscuro</value>
   </data>
   <data name="optionsThemeLightItem.Content" xml:space="preserve">
-    <value>Light</value>
+    <value>Claro</value>
   </data>
   <data name="optionsThemeSystemItem.Content" xml:space="preserve">
-    <value>System</value>
+    <value>Sistema</value>
   </data>
   <data name="optionsLibraryTitle.Text" xml:space="preserve">
-    <value>Library</value>
+    <value>Biblioteca</value>
   </data>
   <data name="optionsRefreshAtStartupSwitch.Header" xml:space="preserve">
-    <value>Automatically update the library when the application starts</value>
+    <value>Actualizar automáticamente la biblioteca cuando se inicie la aplicación</value>
   </data>
   <data name="LibraryFoldersLabel.Text" xml:space="preserve">
-    <value>Library folders</value>
+    <value>Carpetas de biblioteca</value>
   </data>
   <data name="AddLibraryFolderButton.Content" xml:space="preserve">
     <value>Add folder</value>
   </data>
   <data name="RemoveLibraryFolderButton.Content" xml:space="preserve">
-    <value>Remove selected folder</value>
+    <value>Eliminar carpeta seleccionada</value>
   </data>
   <data name="CachePathLabel.Text" xml:space="preserve">
-    <value>Cache path for storing artists pictures</value>
+    <value>Ruta de caché para almacenar imágenes de artistas</value>
   </data>
   <data name="BrowseCachePathButton.Content" xml:space="preserve">
-    <value>Browse</value>
+    <value>Examinar</value>
   </data>
   <data name="OptionsHideArtistsSwitch.Header" xml:space="preserve">
-    <value>Hide artists without albums from the artist list</value>
+    <value>Ocultar artistas sin álbumes de la lista de artistas</value>
   </data>
   <data name="OptionsImportWithArtistGenreSwitch.Header" xml:space="preserve">
-    <value>When importing songs, use the genre defined for the artist</value>
+    <value>Al importar canciones, utilice el género definido para el artista</value>
   </data>
   <data name="trackFlyoutAddMoreFromArtist.Text" xml:space="preserve">
-    <value>Add more songs from this artist</value>
+    <value>Añade más canciones de este artista</value>
   </data>
   <data name="welcomeWaiting.Text" xml:space="preserve">
-    <value>Just a moment longer, we are preparing your data...</value>
+    <value>Un momento más, estamos preparando sus datos...</value>
   </data>
   <data name="startViewErrorMessage.Text" xml:space="preserve">
-    <value>No albums could be found in your music folder.</value>
+    <value>No se han encontrado álbumes en tu carpeta de música.</value>
   </data>
   <data name="startViewAddFolder.Text" xml:space="preserve">
-    <value>Select a folder</value>
+    <value>Selecciona una carpeta</value>
   </data>
   <data name="noTitle" xml:space="preserve">
-    <value>{no title}</value>
+    <value>Sin título</value>
   </data>
   <data name="ListeningViewTitle.Text" xml:space="preserve">
-    <value>Currently listening</value>
+    <value>Escuchando actualmente</value>
   </data>
   <data name="ListeningViewTitleCount.Text" xml:space="preserve">
-    <value>songs, </value>
+    <value>canciones, </value>
   </data>
   <data name="PlayerFullScreenLyricsToolTips.Text" xml:space="preserve">
-    <value>Show lyrics</value>
+    <value>Mostrar letra</value>
   </data>
   <data name="PlayerFullScreenToolTips.Text" xml:space="preserve">
-    <value>Exit fullscreen</value>
+    <value>&amp;amp; Sale del modo de pantalla completa</value>
   </data>
   <data name="PlayerFullScreenCurrentListeningToolTips.Text" xml:space="preserve">
-    <value>Show current playlist</value>
+    <value>Lista de reproducción actual</value>
   </data>
   <data name="AlbumViewListenCount.Text" xml:space="preserve">
-    <value>Listened to</value>
+    <value>escuchados</value>
   </data>
   <data name="AlbumViewListenCountTimes.Text" xml:space="preserve">
-    <value>times</value>
+    <value>veces</value>
   </data>
   <data name="AlbumViewLastListen.Text" xml:space="preserve">
-    <value>, last listen:</value>
+    <value>, escucha por última vez:</value>
   </data>
   <data name="playlistsAdd.Label" xml:space="preserve">
-    <value>New playlist</value>
+    <value>Nueva lista de reproducción</value>
   </data>
   <data name="playlistsSmartAdd.Label" xml:space="preserve">
-    <value>New smart playlist</value>
+    <value>Lista de reproducción inteligente</value>
   </data>
   <data name="playlistListen.Label" xml:space="preserve">
-    <value>Listen</value>
+    <value>Escuchar</value>
   </data>
   <data name="playlistDelete.Label" xml:space="preserve">
-    <value>Delete</value>
+    <value>Eliminar</value>
   </data>
   <data name="MenuFlyout_AddTo_Text" xml:space="preserve">
-    <value>Add to</value>
+    <value>Añadir a</value>
   </data>
   <data name="MenuFlyout_NewPlaylist_Text" xml:space="preserve">
-    <value>New playlist</value>
+    <value>Nueva lista de reproducción</value>
   </data>
   <data name="NewPlaylistDialog_Title" xml:space="preserve">
-    <value>New playlist</value>
+    <value>Nueva lista de reproducción</value>
   </data>
   <data name="NewPlaylistDialog_Description_Text" xml:space="preserve">
-    <value>Enter the name of your new playlist:</value>
+    <value>Introduce el nombre de tu nueva lista de reproducción:</value>
   </data>
   <data name="NewPlaylistDialog_TextBox_PlaceholderText" xml:space="preserve">
-    <value>Playlist name</value>
+    <value>Nombre de lista de reproducción</value>
   </data>
   <data name="NewPlaylistDialog_PrimaryButton" xml:space="preserve">
-    <value>Create</value>
+    <value>Crear</value>
   </data>
   <data name="NewPlaylistDialog_CloseButton" xml:space="preserve">
-    <value>Cancel</value>
+    <value>Cancelar</value>
   </data>
   <data name="notification_playlist_track_add" xml:space="preserve">
-    <value>Song added to playlist</value>
+    <value>﻿Añadido a la lista</value>
   </data>
   <data name="notification_playlist_track_add_error" xml:space="preserve">
-    <value>Can't add song to playlist</value>
+    <value>No se puede añadir la canción a la lista de reproducción</value>
   </data>
   <data name="notification_playlist_track_add_duplicate" xml:space="preserve">
-    <value>The song is already in this playlist</value>
+    <value>La canción ya está en esta lista de reproducción</value>
   </data>
   <data name="trackFlyoutRemoveFromPlaylist.Text" xml:space="preserve">
-    <value>Remove</value>
+    <value>Eliminar</value>
   </data>
   <data name="commonClose.Content" xml:space="preserve">
-    <value>Close</value>
+    <value>Cerrar</value>
   </data>
   <data name="playlistRefresh.Label" xml:space="preserve">
-    <value>Refresh</value>
+    <value>Actualizar</value>
   </data>
   <data name="playlistSave.Text" xml:space="preserve">
-    <value>Save</value>
+    <value>Guardar</value>
   </data>
   <data name="playlistGroupNew.Text" xml:space="preserve">
-    <value>New group</value>
+    <value>Nuevo grupo</value>
   </data>
   <data name="playlistViewTabConfiguration.Header" xml:space="preserve">
-    <value>Configuration</value>
+    <value>Configuración</value>
   </data>
   <data name="playlistViewTabTracks.Header" xml:space="preserve">
-    <value>Songs</value>
+    <value>Canciones</value>
   </data>
   <data name="filterByGenreMenu.Text" xml:space="preserve">
-    <value>genres</value>
+    <value>generos</value>
   </data>
   <data name="filterAllGenres.Text" xml:space="preserve">
-    <value>All</value>
+    <value>Todo</value>
   </data>
   <data name="filterall" xml:space="preserve">
-    <value>All</value>
+    <value>Todo</value>
   </data>
   <data name="filtergenre" xml:space="preserve">
-    <value>Genres</value>
+    <value>Género</value>
   </data>
   <data name="filtergenreall" xml:space="preserve">
-    <value>All</value>
+    <value>Todo</value>
   </data>
   <data name="filteralbumfavorite" xml:space="preserve">
-    <value>Albums</value>
+    <value>Álbumes</value>
   </data>
   <data name="filterartistfavorite" xml:space="preserve">
-    <value>Artists</value>
+    <value>Artistas</value>
   </data>
   <data name="filtergenrefavorite" xml:space="preserve">
-    <value>Genres</value>
+    <value>Género</value>
   </data>
   <data name="filterlive" xml:space="preserve">
-    <value>Lives</value>
+    <value>Vidas</value>
   </data>
   <data name="filterbestof" xml:space="preserve">
-    <value>Best of</value>
+    <value>Lo mejor de</value>
   </data>
   <data name="filtercompilation" xml:space="preserve">
     <value>Compilations</value>
   </data>
   <data name="filteralbum" xml:space="preserve">
-    <value>Albums</value>
+    <value>Álbumes</value>
   </data>
   <data name="filterneverlistened" xml:space="preserve">
-    <value>Never listened</value>
+    <value>Nunca escuché</value>
   </data>
   <data name="filterfavorite" xml:space="preserve">
-    <value>Favorites</value>
+    <value>Favoritos</value>
   </data>
   <data name="filtertype" xml:space="preserve">
-    <value>Types</value>
+    <value>Tipos</value>
   </data>
   <data name="filtertrackfavorite" xml:space="preserve">
-    <value>Songs</value>
+    <value>Canciones</value>
   </data>
   <data name="tracksViewFilterByLive" xml:space="preserve">
-    <value>Live</value>
+    <value>En directo</value>
   </data>
   <data name="tracksViewFilterByNeverListened" xml:space="preserve">
-    <value>Never listened</value>
+    <value>Nunca escuché</value>
   </data>
   <data name="OptionsNovaApiTitle.Text" xml:space="preserve">
-    <value>Services</value>
+    <value>Servicios</value>
   </data>
   <data name="OptionsNovaApiEnabledSwitch.Header" xml:space="preserve">
-    <value>Allow retrieval of data on artists and albums (cover art, images, biography, lyrics)</value>
+    <value>Permitir la recuperación de datos sobre artistas y álbumes (arte de portada, imágenes, biografía, letras)</value>
   </data>
   <data name="OptionsTelemetryEnabledSwitch.Header" xml:space="preserve">
-    <value>Allow telemetry information about the use of the application to be sent in order to enable its improvement</value>
+    <value>Permitir que se envíe información de telemetría sobre el uso de la aplicación para permitir su mejora</value>
   </data>
   <data name="OptionsCrossFadeSwitch.Header" xml:space="preserve">
-    <value>Enable crossfade between two songs</value>
+    <value>Habilitar el fundido cruzado entre dos canciones</value>
   </data>
   <data name="shuffleButton.Label" xml:space="preserve">
-    <value>Shuffle</value>
+    <value>Barajar</value>
   </data>
   <data name="NoLibraryFoldersTitleMessage" xml:space="preserve">
-    <value>No library</value>
+    <value>No se encuentra la biblioteca</value>
   </data>
   <data name="NoLibraryFoldersMessage" xml:space="preserve">
-    <value>You have not added any library folders yet. Please add at least one library folder in the settings to refresh the library.</value>
+    <value>Aún no ha añadido ninguna carpeta de biblioteca. Añade al menos una carpeta de biblioteca en la configuración para actualizar la biblioteca.</value>
   </data>
   <data name="albumViewEdit.Label" xml:space="preserve">
-    <value>Edit</value>
+    <value>Editar</value>
   </data>
   <data name="EditAlbumDialog.Title" xml:space="preserve">
-    <value>Album edit</value>
+    <value>Editar álbum</value>
   </data>
   <data name="EditAlbumDialog.PrimaryButtonText" xml:space="preserve">
-    <value>Save</value>
+    <value>Guardar</value>
   </data>
   <data name="EditAlbumDialog.CloseButtonText" xml:space="preserve">
-    <value>Cancel</value>
+    <value>Cancelar</value>
   </data>
   <data name="liveSwitch.OnContent" xml:space="preserve">
-    <value>Live</value>
+    <value>En directo</value>
   </data>
   <data name="liveSwitch.OffContent" xml:space="preserve">
-    <value>Live</value>
+    <value>En directo</value>
   </data>
   <data name="bestOfSwitch.OnContent" xml:space="preserve">
-    <value>Best of</value>
+    <value>Lo mejor de</value>
   </data>
   <data name="bestOfSwitch.OffContent" xml:space="preserve">
-    <value>Best of</value>
+    <value>Lo mejor de</value>
   </data>
   <data name="compilationSwitch.OnContent" xml:space="preserve">
-    <value>Compilation</value>
+    <value>Compilación</value>
   </data>
   <data name="compilationSwitch.OffContent" xml:space="preserve">
-    <value>Compilation</value>
+    <value>Compilación</value>
   </data>
   <data name="trackFlyoutTrack.Text" xml:space="preserve">
-    <value>Show track</value>
+    <value>Mostrar información de la vía</value>
   </data>
   <data name="genByLabel.Text" xml:space="preserve">
-    <value>By</value>
+    <value>Por</value>
   </data>
   <data name="genOnLabel.Text" xml:space="preserve">
-    <value>On</value>
+    <value>En/Sobre</value>
   </data>
   <data name="trackListenCountLabel.Text" xml:space="preserve">
-    <value>Listent count:</value>
+    <value>Recuento de listados:</value>
   </data>
   <data name="trackLastListenLabel.Text" xml:space="preserve">
-    <value>Last listen:</value>
+    <value>Última escucha:</value>
   </data>
   <data name="trackMusicBrainzIdLabel.Text" xml:space="preserve">
-    <value>MusicBrainz ID:</value>
+    <value>ID de MusicBrainz:</value>
   </data>
   <data name="trackStorageLabel.Text" xml:space="preserve">
-    <value>Storage:</value>
+    <value>Almacenamiento:</value>
   </data>
   <data name="trackSkipCountLabel.Text" xml:space="preserve">
-    <value>Skip count:</value>
+    <value>Omitir recuento:</value>
   </data>
   <data name="trackLastSkipLabel.Text" xml:space="preserve">
-    <value>Last skip:</value>
+    <value>Último salto:</value>
   </data>
   <data name="OptionTabLibrary.Header" xml:space="preserve">
-    <value>Library</value>
+    <value>Biblioteca</value>
   </data>
   <data name="OptionTabAbout.Header" xml:space="preserve">
-    <value>About</value>
+    <value>Acerca de</value>
   </data>
   <data name="OptionTabOptions.Header" xml:space="preserve">
-    <value>Options</value>
+    <value>Opciones</value>
   </data>
   <data name="albumViewBiography.Label" xml:space="preserve">
-    <value>Biography</value>
+    <value>Biografía</value>
   </data>
   <data name="albumViewPlaylist.Label" xml:space="preserve">
-    <value>Playlists</value>
+    <value>Listas de reproducción</value>
   </data>
   <data name="groupByscore" xml:space="preserve">
     <value>score</value>
@@ -1057,292 +940,292 @@
     <value>score</value>
   </data>
   <data name="OptionTabStatistics.Header" xml:space="preserve">
-    <value>Statistics</value>
+    <value>Estadísticas</value>
   </data>
   <data name="StatGenres.Text" xml:space="preserve">
-    <value>🔹Genres: </value>
+    <value>🔹Géneros: </value>
   </data>
   <data name="StatArtists.Text" xml:space="preserve">
-    <value>🔹Artists: </value>
+    <value>🔹Astista: </value>
   </data>
   <data name="StatAlbums.Text" xml:space="preserve">
-    <value>🔹Albums: </value>
+    <value>🔹Álbumes: </value>
   </data>
   <data name="StatSongs.Text" xml:space="preserve">
-    <value>🔹Songs: </value>
+    <value>🔹Temas: </value>
   </data>
   <data name="StatTotalDurations.Text" xml:space="preserve">
-    <value>🔹Total durations: </value>
+    <value>🔹Duraciones totales: </value>
   </data>
   <data name="StatTotalSize.Text" xml:space="preserve">
-    <value>🔹Total size: </value>
+    <value>🔹Tamaño total: </value>
   </data>
   <data name="StatTopGenres.Text" xml:space="preserve">
-    <value>🏅 Top Genres</value>
+    <value>🏅 Principales géneros</value>
   </data>
   <data name="StatTopArtists.Text" xml:space="preserve">
-    <value>🏅 Top Artists</value>
+    <value>🏅 Artistas principales</value>
   </data>
   <data name="StatTopAlbums.Text" xml:space="preserve">
-    <value>🏅 Top Albums</value>
+    <value>🏅 álbumes principales</value>
   </data>
   <data name="StatTopSongs.Text" xml:space="preserve">
-    <value>🏅 Top Songs</value>
+    <value>🏅 Canciones principales</value>
   </data>
   <data name="StartTracksByFileType.Title" xml:space="preserve">
-    <value>Tracks by file type</value>
+    <value>Pistas por tipo de archivo</value>
   </data>
   <data name="StartAlbumsByType.Title" xml:space="preserve">
-    <value>Albums by type</value>
+    <value>Álbumes por</value>
   </data>
   <data name="StartArtistsByGenre.Title" xml:space="preserve">
-    <value>Artists by genre</value>
+    <value>Artistas por género</value>
   </data>
   <data name="StatListened.Text" xml:space="preserve">
-    <value>🔹Listened:</value>
+    <value>🔹Escuchado:</value>
   </data>
   <data name="ResetListenCountTitleConfirmation" xml:space="preserve">
-    <value>Do you want to reset listen count?</value>
+    <value>¿Desea restablecer el recuento de escuchas?</value>
   </data>
   <data name="ResetListenCountConfirmationTitle" xml:space="preserve">
-    <value>Confirmation</value>
+    <value>Confirmación</value>
   </data>
   <data name="resetListenCountToolTip.Text" xml:space="preserve">
-    <value>Reset listen count</value>
+    <value>Restablecer el recuento de escuchas</value>
   </data>
   <data name="resetListenCount.Label" xml:space="preserve">
-    <value>Reset listen count</value>
+    <value>Restablecer el recuento de escuchas</value>
   </data>
   <data name="playlistHeader.Text" xml:space="preserve">
-    <value>Playlists</value>
+    <value>Listas de reproducción</value>
   </data>
   <data name="smartPlaylistHeader.Text" xml:space="preserve">
-    <value>Smart playlists</value>
+    <value>Listas de reproducción inteligentes</value>
   </data>
   <data name="Translate" xml:space="preserve">
-    <value>Translate</value>
+    <value>Traducir</value>
   </data>
   <data name="Original" xml:space="preserve">
     <value>Original</value>
   </data>
   <data name="playlistGroupFieldUnitDays" xml:space="preserve">
-    <value>days</value>
+    <value>días</value>
   </data>
   <data name="gridHeaderGenre.Text" xml:space="preserve">
-    <value>Style</value>
+    <value>Estilo</value>
   </data>
   <data name="compilations" xml:space="preserve">
     <value>compilations</value>
   </data>
   <data name="StatTotalRawLyrics.Text" xml:space="preserve">
-    <value>🔹Lyrics:</value>
+    <value>Letra de la canción:</value>
   </data>
   <data name="StatTotalSyncLyrics.Text" xml:space="preserve">
-    <value>🔹Synchronized lyrics:</value>
+    <value>Letra 🔹sincronizada:</value>
   </data>
   <data name="TagsBox.PlaceholderText" xml:space="preserve">
-    <value>+ add tag</value>
+    <value>+ Agregar etiqueta</value>
   </data>
   <data name="MenuFlyout_CurrentListening_Text" xml:space="preserve">
-    <value>Current listening</value>
+    <value>Escucha actual</value>
   </data>
   <data name="SupportProjectButtonText.Text" xml:space="preserve">
-    <value>Support the project, buy me a coffee</value>
+    <value>Apoya el proyecto, cómprame un café</value>
   </data>
   <data name="hours.Text" xml:space="preserve">
-    <value>hours</value>
+    <value>horas</value>
   </data>
   <data name="artistsViewArtists.Text" xml:space="preserve">
-    <value>artists</value>
+    <value>artistas</value>
   </data>
   <data name="albumsViewAlbums.Text" xml:space="preserve">
-    <value>albums</value>
+    <value>Álbumes</value>
   </data>
   <data name="tracksPageTracks.Text" xml:space="preserve">
-    <value>tracks</value>
+    <value>temas</value>
   </data>
   <data name="artistsPageArtists.Text" xml:space="preserve">
-    <value>artists</value>
+    <value>artistas</value>
   </data>
   <data name="albumsViewNoData.Message" xml:space="preserve">
-    <value>No albums found</value>
+    <value>No se encontraron álbumes</value>
   </data>
   <data name="artistsViewNoData.Message" xml:space="preserve">
-    <value>No artists found</value>
+    <value>No se encontraron artistas</value>
   </data>
   <data name="tracksViewNoData.Message" xml:space="preserve">
-    <value>No songs found</value>
+    <value>No se encontraron canciones</value>
   </data>
   <data name="badgeNew.Text" xml:space="preserve">
-    <value>new</value>
+    <value>nuevos</value>
   </data>
   <data name="badgeCompilation.Text" xml:space="preserve">
-    <value>compil</value>
+    <value>compilar</value>
   </data>
   <data name="badgeBestof.Text" xml:space="preserve">
-    <value>best of</value>
+    <value>Lo mejor de</value>
   </data>
   <data name="badgeLive.Text" xml:space="preserve">
-    <value>live</value>
+    <value>vivo</value>
   </data>
   <data name="OptionsPauseOnCall.Header" xml:space="preserve">
-    <value>Pause when receiving a call</value>
+    <value>Pausa al recibir una llamada</value>
   </data>
   <data name="inlineListSearch.PlaceholderText" xml:space="preserve">
-    <value>Search</value>
+    <value>Buscar</value>
   </data>
   <data name="OptionTabCommand.Header" xml:space="preserve">
     <value>API</value>
   </data>
   <data name="CommandTabApiConfigTitle.Text" xml:space="preserve">
-    <value>API Configuration</value>
+    <value>Configuración de la API</value>
   </data>
   <data name="OptionsHideEnableWebApi.Header" xml:space="preserve">
-    <value>Enable Web API</value>
+    <value>Habilitar web</value>
   </data>
   <data name="OptionsWebApiPort.Header" xml:space="preserve">
-    <value>Web API Port</value>
+    <value>Puerto web de API</value>
   </data>
   <data name="CommandTabApiDocTitle.Text" xml:space="preserve">
-    <value>Web API</value>
+    <value>API Web</value>
   </data>
   <data name="CommandTabHeaderTest.Text" xml:space="preserve">
-    <value>Test</value>
+    <value>Prueba</value>
   </data>
   <data name="CommandTabHeaderDescription.Text" xml:space="preserve">
-    <value>Description</value>
+    <value>Descripción</value>
   </data>
   <data name="CommandTabHeaderMethod.Text" xml:space="preserve">
-    <value>Method</value>
+    <value>Método</value>
   </data>
   <data name="CommandTabHeaderEndpoint.Text" xml:space="preserve">
-    <value>Endpoint</value>
+    <value>Punto final</value>
   </data>
   <data name="CommandTabCliTitle.Text" xml:space="preserve">
-    <value>Command Line</value>
+    <value>Ejecución de órdenesComment</value>
   </data>
   <data name="CommandTabCliUsage.Text" xml:space="preserve">
-    <value>Usage: rok.exe [command] [argument]</value>
+    <value>Uso: rok.exe [comando] [argumento]</value>
   </data>
   <data name="CommandTabHeaderCommand.Text" xml:space="preserve">
-    <value>Command</value>
+    <value>Comando</value>
   </data>
   <data name="CommandTabHeaderCommandDescription.Text" xml:space="preserve">
-    <value>Description</value>
+    <value>Descripción</value>
   </data>
   <data name="ApiEndpointStatusDesc.Text" xml:space="preserve">
-    <value>Returns the current playback status (state, volume, position)</value>
+    <value>Devuelve el estado de reproducción actual (estado, volumen, posición)</value>
   </data>
   <data name="ApiEndpointCurrentDesc.Text" xml:space="preserve">
-    <value>Returns information about the current track (title, artist, album, duration)</value>
+    <value>Devuelve información sobre la pista actual (título, artista, álbum, duración)</value>
   </data>
   <data name="ApiEndpointQueueDesc.Text" xml:space="preserve">
-    <value>Returns the current playback queue</value>
+    <value>Devuelve la cola de reproducción actual</value>
   </data>
   <data name="ApiEndpointPlayDesc.Text" xml:space="preserve">
-    <value>Start or resume playback</value>
+    <value>Iniciar o reanudar la reproducción</value>
   </data>
   <data name="ApiEndpointPauseDesc.Text" xml:space="preserve">
-    <value>Pause playback</value>
+    <value>Pausar la reproducciónMedia controller element</value>
   </data>
   <data name="ApiEndpointStopDesc.Text" xml:space="preserve">
-    <value>Stop playback</value>
+    <value>Detiene la reproducción</value>
   </data>
   <data name="ApiEndpointNextDesc.Text" xml:space="preserve">
-    <value>Skip to the next track</value>
+    <value>Para saltar a la pista siguiente</value>
   </data>
   <data name="ApiEndpointPreviousDesc.Text" xml:space="preserve">
-    <value>Go to the previous track</value>
+    <value>Ir a la pista anterior</value>
   </data>
   <data name="ApiEndpointVolumeDesc.Text" xml:space="preserve">
-    <value>Set the volume. Value must be between 0 and 100</value>
+    <value>Establecer el volumen. El valor debe estar entre 0 y 100</value>
   </data>
   <data name="ApiEndpointMuteDesc.Text" xml:space="preserve">
-    <value>Mute the volume</value>
+    <value>Silenciar el volumen</value>
   </data>
   <data name="CliPlayDesc.Text" xml:space="preserve">
-    <value>Start or resume playback</value>
+    <value>Iniciar o reanudar la reproducción</value>
   </data>
   <data name="CliPauseDesc.Text" xml:space="preserve">
-    <value>Pause playback</value>
+    <value>Pausar la reproducciónMedia controller element</value>
   </data>
   <data name="CliStopDesc.Text" xml:space="preserve">
-    <value>Stop playback</value>
+    <value>Detiene la reproducción</value>
   </data>
   <data name="CliNextDesc.Text" xml:space="preserve">
-    <value>Skip to the next track</value>
+    <value>Para saltar a la pista siguiente</value>
   </data>
   <data name="CliPrevDesc.Text" xml:space="preserve">
-    <value>Go to the previous track</value>
+    <value>Ir a la pista anterior</value>
   </data>
   <data name="ApiEndpointPlayPlaylistDesc.Text" xml:space="preserve">
-    <value>Start listen a playlist</value>
+    <value>Empieza a escuchar una lista de reproducción</value>
   </data>
   <data name="ApiEndpointPlayGenreDesc.Text" xml:space="preserve">
-    <value>Start listen a genre</value>
+    <value>Empieza a escuchar un género</value>
   </data>
   <data name="ApiEndpointPlayArtistDesc.Text" xml:space="preserve">
-    <value>Start listen an artist</value>
+    <value>Empieza a escuchar a un artista</value>
   </data>
   <data name="ApiEndpointPlayAlbumDesc.Text" xml:space="preserve">
-    <value>Start listen an album</value>
+    <value>Empezar a escuchar un álbum</value>
   </data>
   <data name="CliListenGenreDesc.Text" xml:space="preserve">
-    <value>Start listen a genre</value>
+    <value>Empieza a escuchar un género</value>
   </data>
   <data name="CliListenArtistDesc.Text" xml:space="preserve">
-    <value>Start listen an artist</value>
+    <value>Empieza a escuchar a un artista</value>
   </data>
   <data name="CliListenAlbumDesc.Text" xml:space="preserve">
-    <value>Start listen an album</value>
+    <value>Empezar a escuchar un álbum</value>
   </data>
   <data name="CliListenPlaylistDesc.Text" xml:space="preserve">
-    <value>Start listen a playlist</value>
+    <value>Empieza a escuchar una lista de reproducción</value>
   </data>
   <data name="CliMuteDesc.Text" xml:space="preserve">
-    <value>Mute the volume</value>
+    <value>Silenciar el volumen</value>
   </data>
   <data name="CliVolumeDesc.Text" xml:space="preserve">
-    <value>Set the volume. Value must be between 0 and 100</value>
+    <value>Establecer el volumen. El valor debe estar entre 0 y 100</value>
   </data>
   <data name="Insights_ProfileCuriousExplorer" xml:space="preserve">
-    <value>Curious Explorer</value>
+    <value>Explorador curioso</value>
   </data>
   <data name="Insights_ProfileCuriousExplorerDescription" xml:space="preserve">
-    <value>You constantly explore new artists, rarely lingering on the same tracks.</value>
+    <value>Constantemente exploras nuevos artistas, rara vez te quedas en las mismas pistas.</value>
   </data>
   <data name="Insights_ProfileFaithfulIntense" xml:space="preserve">
     <value>Deep Listener</value>
   </data>
   <data name="Insights_ProfileFaithfulIntenseDescription" xml:space="preserve">
-    <value>You listen for long periods, skip little, and often return to the same tracks.</value>
+    <value>Escuchas durante largos períodos, te saltas poco y, a menudo, vuelves a las mismas pistas.</value>
   </data>
   <data name="Insights_ProfileNightOwl" xml:space="preserve">
-    <value>Night Owl</value>
+    <value>Búho nocturno</value>
   </data>
   <data name="Insights_ProfileNightOwlDescription" xml:space="preserve">
-    <value>Your listening sessions are concentrated at night, when silence gives way to music.</value>
+    <value>Tus sesiones de escucha se concentran por la noche, cuando el silencio da paso a la música.</value>
   </data>
   <data name="Insights_ProfileFocusMode" xml:space="preserve">
-    <value>Focus Mode</value>
+    <value>Modo Focus</value>
   </data>
   <data name="Insights_ProfileFocusModeDescription" xml:space="preserve">
-    <value>You listen in depth, with few different artists, and you see your sessions through to the end.</value>
+    <value>Escuchas en profundidad, con pocos artistas diferentes, y ves tus sesiones hasta el final.</value>
   </data>
   <data name="Insights_ProfileChannelSurfer" xml:space="preserve">
     <value>Skimmer</value>
   </data>
   <data name="Insights_ProfileChannelSurferDescription" xml:space="preserve">
-    <value>You explore quickly, skip a lot, always searching for the next perfect track.</value>
+    <value>Exploras rápidamente, te saltas muchas cosas, siempre buscando la siguiente pista perfecta.</value>
   </data>
   <data name="Insights_ArtistByMonth" xml:space="preserve">
-    <value>Artists / Month</value>
+    <value>Artistas / Mes</value>
   </data>
   <data name="Insights_BadgeSmoothListenerName" xml:space="preserve">
     <value>Smooth Listener</value>
   </data>
   <data name="Insights_BadgeLowSkipName" xml:space="preserve">
-    <value>Low Skip</value>
+    <value>Salto bajo</value>
   </data>
   <data name="Insights_BadgeHyperZapperName" xml:space="preserve">
     <value>Hyper Zapper</value>
@@ -1360,13 +1243,13 @@
     <value>Fresh Seeker</value>
   </data>
   <data name="Insights_BadgeExplorerName" xml:space="preserve">
-    <value>Explorer</value>
+    <value>Explorar</value>
   </data>
   <data name="Insights_BadgeCuriousName" xml:space="preserve">
-    <value>Curious</value>
+    <value>Curioso</value>
   </data>
   <data name="Insights_BadgeRestrictedCircleName" xml:space="preserve">
-    <value>Restricted Circle</value>
+    <value>Círculo restringido</value>
   </data>
   <data name="Insights_BadgeUltraFocusName" xml:space="preserve">
     <value>Ultra Focus</value>
@@ -1375,234 +1258,234 @@
     <value>Deep Listener</value>
   </data>
   <data name="Insights_BadgeLongPlayerName " xml:space="preserve">
-    <value>Long Player</value>
+    <value>Jugador largo</value>
   </data>
   <data name="Insights_BadgeShortSessionsName" xml:space="preserve">
-    <value>Short Sessions</value>
+    <value>Sesiones cortas</value>
   </data>
   <data name="Insights_BadgeNightOwlName" xml:space="preserve">
-    <value>Night Owl</value>
+    <value>Búho nocturno</value>
   </data>
   <data name="Insights_BadgeNocturneName" xml:space="preserve">
-    <value>Night</value>
+    <value>Noche</value>
   </data>
   <data name="Insights_BadgeEarlyBirdName" xml:space="preserve">
-    <value>Morning</value>
+    <value>Mañana</value>
   </data>
   <data name="Insights_BadgeAfterworkName" xml:space="preserve">
     <value>Afterwork</value>
   </data>
   <data name="Insights_BadgeUltraLoyalName" xml:space="preserve">
-    <value>Ultra loyal</value>
+    <value>Ultra leal</value>
   </data>
   <data name="Insights_BadgeLoyalName" xml:space="preserve">
-    <value>Loyal</value>
+    <value>Leal</value>
   </data>
   <data name="Insights_BadgeEclecticName" xml:space="preserve">
-    <value>Eclectic</value>
+    <value>Ecléctico</value>
   </data>
   <data name="Insights_BadgeSmoothListenerDescription" xml:space="preserve">
-    <value>Listens smoothly, you always go all the way.</value>
+    <value>Escucha sin problemas, siempre vas hasta el final.</value>
   </data>
   <data name="Insights_BadgeLowSkipDescription" xml:space="preserve">
-    <value>You see things through to the end.</value>
+    <value>Ves las cosas hasta el final.</value>
   </data>
   <data name="Insights_BadgeHyperZapperDescription" xml:space="preserve">
-    <value>Still searching for the right title.</value>
+    <value>Todavía estoy buscando el título correcto.</value>
   </data>
   <data name="Insights_BadgeZapperDescription" xml:space="preserve">
-    <value>You change songs often.</value>
+    <value>Cambias de canciones a menudo.</value>
   </data>
   <data name="Insights_BadgeObsessedDescription" xml:space="preserve">
-    <value>You listen to certain songs on repeat.</value>
+    <value>Escuchas ciertas canciones una y otra vez.</value>
   </data>
   <data name="Insights_BadgeReplayLoverDescription" xml:space="preserve">
-    <value>You often replay your favorites.</value>
+    <value>A menudo reproduces tus favoritos.</value>
   </data>
   <data name="Insights_BadgeFreshSeekerDescription" xml:space="preserve">
-    <value>You almost never go back.</value>
+    <value>Casi nunca regresas.</value>
   </data>
   <data name="Insights_BadgeExplorerDescription" xml:space="preserve">
-    <value>You discover a lot of new artists.</value>
+    <value>Descubren muchos artistas nuevos.</value>
   </data>
   <data name="Insights_BadgeCuriousDescription" xml:space="preserve">
-    <value>You explore regularly.</value>
+    <value>Exploras con regularidad.</value>
   </data>
   <data name="Insights_BadgeRestrictedCircleDescription" xml:space="preserve">
-    <value>You remain in your own world.</value>
+    <value>Permaneces en tu propio mundo.</value>
   </data>
   <data name="Insights_BadgeUltraFocusDescription" xml:space="preserve">
-    <value>You listen to very few different artists.</value>
+    <value>Escuchas a muy pocos artistas diferentes.</value>
   </data>
   <data name="Insights_BadgeDeepListenerDescription" xml:space="preserve">
-    <value>You really immerse yourself in the music.</value>
+    <value>Realmente te sumerges en la música.</value>
   </data>
   <data name="Insights_BadgeLongPlayerDescription" xml:space="preserve">
-    <value>You listen for a long time.</value>
+    <value>Escuchas durante mucho tiempo.</value>
   </data>
   <data name="Insights_BadgeShortSessionsDescription" xml:space="preserve">
-    <value>You listen in small doses.</value>
+    <value>Escuchas en pequeñas dosis.</value>
   </data>
   <data name="Insights_BadgeNightOwlDescription" xml:space="preserve">
-    <value>You live at night.</value>
+    <value>Vives de noche.</value>
   </data>
   <data name="Insights_BadgeNocturneDescription" xml:space="preserve">
-    <value>You mostly listen at night.</value>
+    <value>Escuchas principalmente por la noche.</value>
   </data>
   <data name="Insights_BadgeEarlyBirdDescription" xml:space="preserve">
-    <value>You start your day with music.</value>
+    <value>Empiezas el día con música.</value>
   </data>
   <data name="Insights_BadgeAfterworkDescription" xml:space="preserve">
-    <value>You listen at the end of the day.</value>
+    <value>Escuchas al final del día.</value>
   </data>
   <data name="Insights_BadgeUltraLoyalDescription" xml:space="preserve">
-    <value>You have your favorite songs.</value>
+    <value>Tienes tus canciones favoritas.</value>
   </data>
   <data name="Insights_BadgeLoyalDescription" xml:space="preserve">
-    <value>You remain loyal to your favorites.</value>
+    <value>Te mantienes fiel a tus favoritos.</value>
   </data>
   <data name="Insights_BadgeEclecticDescription" xml:space="preserve">
-    <value>You change your titles often.</value>
+    <value>Cambia sus títulos a menudo.</value>
   </data>
   <data name="Insights_HeroTitle.Text" xml:space="preserve">
-    <value>✨ Your month in music</value>
+    <value>✨ Tu mes en la música</value>
   </data>
   <data name="Insights_TotalPlayDuration.Text" xml:space="preserve">
-    <value>Total listening time</value>
+    <value>Tiempo total de escucha</value>
   </data>
   <data name="Insights_TotalSessions.Text" xml:space="preserve">
-    <value>Number of sessions</value>
+    <value>Número de sesiones</value>
   </data>
   <data name="Insights_TotalTracks.Text" xml:space="preserve">
-    <value>Different tracks listened to</value>
+    <value>Diferentes pistas escuchadas</value>
   </data>
   <data name="Insights_TotalArtists.Text" xml:space="preserve">
-    <value>Different artists listened to</value>
+    <value>Diferentes artistas escucharon</value>
   </data>
   <data name="Insights_TotalAlbums.Text" xml:space="preserve">
-    <value>Different albums listened to</value>
+    <value>Diferentes álbumes escuchados</value>
   </data>
   <data name="Insights_TotalGenres.Text" xml:space="preserve">
-    <value>Different genres listened to</value>
+    <value>Diferentes géneros escuchados</value>
   </data>
   <data name="Insights_HotListeningTimes.Text" xml:space="preserve">
-    <value>🔥 When you listen the most</value>
+    <value>🔥 Cuando escuchas más</value>
   </data>
   <data name="Insights_ImportantTracks.Text" xml:space="preserve">
-    <value>🏆 Your most important titles</value>
+    <value>🏆 Tus títulos más importantes</value>
   </data>
   <data name="Insights_TopAlbums.Text" xml:space="preserve">
-    <value>🏆 Your most important titles</value>
+    <value>🏆 Tus títulos más importantes</value>
   </data>
   <data name="Insights_TopTracks.Text" xml:space="preserve">
-    <value>Top titles</value>
+    <value>Títulos principales</value>
   </data>
   <data name="Insights_ListeningProfile.Text" xml:space="preserve">
-    <value>🧬 Your listening profile</value>
+    <value>🧬 Tu perfil de escucha</value>
   </data>
   <data name="Insights_TopGenres.Text" xml:space="preserve">
-    <value>Top genres</value>
+    <value>Los mejores géneros</value>
   </data>
   <data name="Insights_BadgesHeader.Text" xml:space="preserve">
-    <value>🥇 Your badges</value>
+    <value>Tus insignias</value>
   </data>
   <data name="Insights_Sessions_Title.Text" xml:space="preserve">
-    <value>🎧 Your listening sessions</value>
+    <value>🎧 Sesiones de escucha</value>
   </data>
   <data name="Insights_Sessions_MaxDuration.Text" xml:space="preserve">
-    <value>Max duration</value>
+    <value>Duración máxima</value>
   </data>
   <data name="Insights_Sessions_AvgTracks.Text" xml:space="preserve">
-    <value>Tracks per session on average</value>
+    <value>Tracks por sesión de media</value>
   </data>
   <data name="Insights_Sessions_Nocturnal.Text" xml:space="preserve">
-    <value>Night sessions</value>
+    <value>Sesiones nocturnas</value>
   </data>
   <data name="Insights_Sessions_CommonStart.Text" xml:space="preserve">
-    <value>Usual start time</value>
+    <value>Hora de inicio habitual</value>
   </data>
   <data name="Insights_Sessions_MostIntense.Text" xml:space="preserve">
-    <value>Most intense session</value>
+    <value>Sesión más intensa</value>
   </data>
   <data name="Insights_Sessions_MostActiveDay.Text" xml:space="preserve">
-    <value>Most active day</value>
+    <value>Día más activo</value>
   </data>
   <data name="Insights_Sessions_TracksUnit" xml:space="preserve">
-    <value>tracks</value>
+    <value>temas</value>
   </data>
   <data name="Insights_Sessions_SessionsUnit" xml:space="preserve">
-    <value>sessions</value>
+    <value>en grupo reducido</value>
   </data>
   <data name="Insights_TopTracksPlayCount.Text" xml:space="preserve">
-    <value> listens this month</value>
+    <value> escucha este mes</value>
   </data>
   <data name="Insights_TopTracksLongSessionCount.Text" xml:space="preserve">
-    <value> long sessions</value>
+    <value> sesiones largas</value>
   </data>
   <data name="Insights_TopTracksPeakHour.Text" xml:space="preserve">
-    <value>Peak hour: </value>
+    <value>Hora punta: </value>
   </data>
   <data name="Insights_TopAlbumsPlayCount.Text" xml:space="preserve">
-    <value> listens this month</value>
+    <value> escucha este mes</value>
   </data>
   <data name="Insights_TopAlbumsLongSessionCount.Text" xml:space="preserve">
-    <value> long sessions</value>
+    <value> sesiones largas</value>
   </data>
   <data name="Insights_TopAlbumsPeakHour.Text" xml:space="preserve">
-    <value>Peak hour: </value>
+    <value>Hora punta: </value>
   </data>
   <data name="Insights_TopAlbumsDominant.Text" xml:space="preserve">
-    <value>Dominant: </value>
+    <value>Dominante: </value>
   </data>
   <data name="Insights_EmptyStateTitle.Text" xml:space="preserve">
-    <value>No data yet</value>
+    <value>Aún no hay datos</value>
   </data>
   <data name="Insights_EmptyStateDescription.Text" xml:space="preserve">
-    <value>Start listening to music to see your insights for this month.</value>
+    <value>Empieza a escuchar música para ver tus ideas para este mes.</value>
   </data>
   <data name="welcomeTagline.Text" xml:space="preserve">
-    <value>Your music. Your world.</value>
+    <value>Tu música. Tu mundo.</value>
   </data>
   <data name="AlbumsImported" xml:space="preserve">
-    <value>albums discovered</value>
+    <value>álbumes descubiertos</value>
   </data>
   <data name="reviewSentimentGateTitle" xml:space="preserve">
-    <value>Enjoying RoK?</value>
+    <value>¿Te gusta Corea del Sur?</value>
   </data>
   <data name="reviewSentimentGateContent" xml:space="preserve">
-    <value>RoK is crafted with care for people who truly own their music. Your feedback helps shape the future of the app.</value>
+    <value>Corea del Sur está hecha con cuidado para las personas que realmente son dueñas de su música. Tus comentarios ayudan a dar forma al futuro de la app.</value>
   </data>
   <data name="reviewSentimentGateYes" xml:space="preserve">
-    <value>Yes, I like it!</value>
+    <value>¡Sí, me gusta!</value>
   </data>
   <data name="reviewSentimentGateNo" xml:space="preserve">
-    <value>Not really</value>
+    <value>Realmente, no</value>
   </data>
   <data name="reviewPositiveTitle" xml:space="preserve">
-    <value>Thank you!</value>
+    <value>Gracias !</value>
   </data>
   <data name="reviewPositiveContent" xml:space="preserve">
-    <value>A short review on the Microsoft Store helps RoK reach more people who still care about owning their music.</value>
+    <value>Una breve reseña en Microsoft Store ayuda a Corea del Sur a llegar a más personas que todavía se preocupan por poseer su música.</value>
   </data>
   <data name="reviewPositiveLeave" xml:space="preserve">
-    <value>Leave a review</value>
+    <value>Dejar un comentario</value>
   </data>
   <data name="reviewPositiveLater" xml:space="preserve">
-    <value>Maybe later</value>
+    <value>Quizás más tarde</value>
   </data>
   <data name="reviewNegativeTitle" xml:space="preserve">
-    <value>Thanks for your honesty</value>
+    <value>Gracias por su honestidad</value>
   </data>
   <data name="reviewNegativeContent" xml:space="preserve">
-    <value>I would love to hear what did not feel right so I can improve the experience. Every message helps make RoK better.</value>
+    <value>Me encantaría escuchar lo que no me pareció bien para poder mejorar la experiencia. Cada mensaje ayuda a mejorar Corea del Sur.</value>
   </data>
   <data name="reviewNegativeSend" xml:space="preserve">
-    <value>Send feedback</value>
+    <value>Enviar comentarios</value>
   </data>
   <data name="reviewNegativeClose" xml:space="preserve">
-    <value>Close</value>
+    <value>Cerrar</value>
   </data>
   <data name="StoreReviewButton.Text" xml:space="preserve">
-    <value>Leave a review</value>
+    <value>Dejar un comentario</value>
   </data>
 </root>

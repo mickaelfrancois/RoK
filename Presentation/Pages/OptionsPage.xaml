@@ -24,6 +24,19 @@
                                 <ComboBoxItem x:Uid="optionsThemeLightItem" Tag="Light" Content="Clair" />
                                 <ComboBoxItem x:Uid="optionsThemeDarkItem" Tag="Dark" Content="Sombre" />
                             </ComboBox>
+
+                            <!-- Language Selection -->
+                            <TextBlock Text="Language" VerticalAlignment="Center" />
+                            <ComboBox Width="220" ItemsSource="{x:Bind AvailableLanguages}" SelectedValue="{x:Bind SelectedLanguage, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+                                <ComboBox.ItemTemplate>
+                                    <DataTemplate>
+                                        <StackPanel Orientation="Horizontal">
+                                            <TextBlock Text="{Binding}" />
+                                            <TextBlock Text=" (Automatic Translation)" Visibility="{Binding Converter={StaticResource LanguageAutoTranslationConverter}}" />
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </ComboBox.ItemTemplate>
+                            </ComboBox>
                         </StackPanel>
 
                         <ToggleSwitch x:Uid="OptionsHideArtistsSwitch"
@@ -206,7 +219,7 @@
                                                 <ColumnDefinition Width="*" />
                                                 <ColumnDefinition Width="120" />
                                             </Grid.ColumnDefinitions>
-                                            <TextBlock Grid.Column="0" Text="GET" FontFamily="Consolas" FontSize="12" FontWeight="SemiBold" Foreground="{ThemeResource SystemFillColorSuccessBrush}" VerticalAlignment="Center" />
+                                            <TextBlock Grid.Column="0" Text="GET" FontFamily="Consolas" FontSize="12" FontWeight="SemiBold" Foreground="{ThemeResource SystemFillColorSuccess}" VerticalAlignment="Center" />
                                             <TextBlock Grid.Column="1" Text="/toggle" FontFamily="Consolas" FontSize="12" VerticalAlignment="Center" />
                                             <TextBlock Grid.Column="2" x:Uid="ApiEndpointToggleDesc" Text="Stop playback" FontSize="12" VerticalAlignment="Center" TextWrapping="Wrap" />
                                             <Button Grid.Column="3" Tag="/toggle" Click="TestEndpoint_Click" Content="▶ Test" FontSize="11" Padding="8,3" HorizontalAlignment="Center" VerticalAlignment="Center" />
@@ -220,7 +233,7 @@
                                                 <ColumnDefinition Width="*" />
                                                 <ColumnDefinition Width="120" />
                                             </Grid.ColumnDefinitions>
-                                            <TextBlock Grid.Column="0" Text="GET" FontFamily="Consolas" FontSize="12" FontWeight="SemiBold" Foreground="{ThemeResource SystemFillColorSuccessBrush}" VerticalAlignment="Center" />
+                                            <TextBlock Grid.Column="0" Text="GET" FontFamily="Consolas" FontSize="12" FontWeight="SemiBold" Foreground="{ThemeResource SystemFillColorSuccess}" VerticalAlignment="Center" />
                                             <TextBlock Grid.Column="1" Text="/next" FontFamily="Consolas" FontSize="12" VerticalAlignment="Center" />
                                             <TextBlock Grid.Column="2" x:Uid="ApiEndpointNextDesc" Text="Skip to the next track" FontSize="12" VerticalAlignment="Center" TextWrapping="Wrap" />
                                             <Button Grid.Column="3" Tag="/next" Click="TestEndpoint_Click" Content="▶ Test" FontSize="11" Padding="8,3" HorizontalAlignment="Center" VerticalAlignment="Center" />
@@ -234,7 +247,7 @@
                                                 <ColumnDefinition Width="*" />
                                                 <ColumnDefinition Width="120" />
                                             </Grid.ColumnDefinitions>
-                                            <TextBlock Grid.Column="0" Text="GET" FontFamily="Consolas" FontSize="12" FontWeight="SemiBold" Foreground="{ThemeResource SystemFillColorSuccessBrush}" VerticalAlignment="Center" />
+                                            <TextBlock Grid.Column="0" Text="GET" FontFamily="Consolas" FontSize="12" FontWeight="SemiBold" Foreground="{ThemeResource SystemFillColorSuccess}" VerticalAlignment="Center" />
                                             <TextBlock Grid.Column="1" Text="/previous" FontFamily="Consolas" FontSize="12" VerticalAlignment="Center" />
                                             <TextBlock Grid.Column="2" x:Uid="ApiEndpointPreviousDesc" Text="Go to the previous track" FontSize="12" VerticalAlignment="Center" TextWrapping="Wrap" />
                                             <Button Grid.Column="3" Tag="/previous" Click="TestEndpoint_Click" Content="▶ Test" FontSize="11" Padding="8,3" HorizontalAlignment="Center" VerticalAlignment="Center" />
@@ -248,7 +261,7 @@
                                                 <ColumnDefinition Width="*" />
                                                 <ColumnDefinition Width="120" />
                                             </Grid.ColumnDefinitions>
-                                            <TextBlock Grid.Column="0" Text="GET" FontFamily="Consolas" FontSize="12" FontWeight="SemiBold" Foreground="{ThemeResource SystemFillColorSuccessBrush}" VerticalAlignment="Center" />
+                                            <TextBlock Grid.Column="0" Text="GET" FontFamily="Consolas" FontSize="12" FontWeight="SemiBold" Foreground="{ThemeResource SystemFillColorSuccess}" VerticalAlignment="Center" />
                                             <TextBlock Grid.Column="1" Text="/listen/playlist/{name}" FontFamily="Consolas" FontSize="12" VerticalAlignment="Center" />
                                             <TextBlock Grid.Column="2" x:Uid="ApiEndpointPlayPlaylistDesc" Text="Start listen a playlist" FontSize="12" VerticalAlignment="Center" TextWrapping="Wrap" />
                                             <Button Grid.Column="3" Tag="/listen/playlist/radio" Click="TestEndpoint_Click" Content="▶ Test" FontSize="11" Padding="8,3" HorizontalAlignment="Center" VerticalAlignment="Center" />
@@ -262,7 +275,7 @@
                                                 <ColumnDefinition Width="*" />
                                                 <ColumnDefinition Width="120" />
                                             </Grid.ColumnDefinitions>
-                                            <TextBlock Grid.Column="0" Text="GET" FontFamily="Consolas" FontSize="12" FontWeight="SemiBold" Foreground="{ThemeResource SystemFillColorSuccessBrush}" VerticalAlignment="Center" />
+                                            <TextBlock Grid.Column="0" Text="GET" FontFamily="Consolas" FontSize="12" FontWeight="SemiBold" Foreground="{ThemeResource SystemFillColorSuccess}" VerticalAlignment="Center" />
                                             <TextBlock Grid.Column="1" Text="/listen/album/{name}" FontFamily="Consolas" FontSize="12" VerticalAlignment="Center" />
                                             <TextBlock Grid.Column="2" x:Uid="ApiEndpointPlayAlbumDesc" Text="Start listen an album" FontSize="12" VerticalAlignment="Center" TextWrapping="Wrap" />
                                             <Button Grid.Column="3" Tag="/listen/album/thriller" Click="TestEndpoint_Click" Content="▶ Test" FontSize="11" Padding="8,3" HorizontalAlignment="Center" VerticalAlignment="Center" />
@@ -276,7 +289,7 @@
                                                 <ColumnDefinition Width="*" />
                                                 <ColumnDefinition Width="120" />
                                             </Grid.ColumnDefinitions>
-                                            <TextBlock Grid.Column="0" Text="GET" FontFamily="Consolas" FontSize="12" FontWeight="SemiBold" Foreground="{ThemeResource SystemFillColorSuccessBrush}" VerticalAlignment="Center" />
+                                            <TextBlock Grid.Column="0" Text="GET" FontFamily="Consolas" FontSize="12" FontWeight="SemiBold" Foreground="{ThemeResource SystemFillColorSuccess}" VerticalAlignment="Center" />
                                             <TextBlock Grid.Column="1" Text="/listen/artist/{name}" FontFamily="Consolas" FontSize="12" VerticalAlignment="Center" />
                                             <TextBlock Grid.Column="2" x:Uid="ApiEndpointPlayArtistDesc" Text="Start listen an artist" FontSize="12" VerticalAlignment="Center" TextWrapping="Wrap" />
                                             <Button Grid.Column="3" Tag="/listen/artist/madonna" Click="TestEndpoint_Click" Content="▶ Test" FontSize="11" Padding="8,3" HorizontalAlignment="Center" VerticalAlignment="Center" />
@@ -290,7 +303,7 @@
                                                 <ColumnDefinition Width="*" />
                                                 <ColumnDefinition Width="120" />
                                             </Grid.ColumnDefinitions>
-                                            <TextBlock Grid.Column="0" Text="GET" FontFamily="Consolas" FontSize="12" FontWeight="SemiBold" Foreground="{ThemeResource SystemFillColorSuccessBrush}" VerticalAlignment="Center" />
+                                            <TextBlock Grid.Column="0" Text="GET" FontFamily="Consolas" FontSize="12" FontWeight="SemiBold" Foreground="{ThemeResource SystemFillColorSuccess}" VerticalAlignment="Center" />
                                             <TextBlock Grid.Column="1" Text="/listen/genre/{name}" FontFamily="Consolas" FontSize="12" VerticalAlignment="Center" />
                                             <TextBlock Grid.Column="2" x:Uid="ApiEndpointPlayGenreDesc" Text="Start listen a genre" FontSize="12" VerticalAlignment="Center" TextWrapping="Wrap" />
                                             <Button Grid.Column="3" Tag="/listen/genre/rock" Click="TestEndpoint_Click" Content="▶ Test" FontSize="11" Padding="8,3" HorizontalAlignment="Center" VerticalAlignment="Center" />
@@ -304,7 +317,7 @@
                                                 <ColumnDefinition Width="*" />
                                                 <ColumnDefinition Width="120" />
                                             </Grid.ColumnDefinitions>
-                                            <TextBlock Grid.Column="0" Text="GET" FontFamily="Consolas" FontSize="12" FontWeight="SemiBold" Foreground="{ThemeResource SystemFillColorSuccessBrush}" VerticalAlignment="Center" />
+                                            <TextBlock Grid.Column="0" Text="GET" FontFamily="Consolas" FontSize="12" FontWeight="SemiBold" Foreground="{ThemeResource SystemFillColorSuccess}" VerticalAlignment="Center" />
                                             <TextBlock Grid.Column="1" Text="/volume/{value}" FontFamily="Consolas" FontSize="12" VerticalAlignment="Center" />
                                             <TextBlock Grid.Column="2" x:Uid="ApiEndpointVolumeDesc" Text="Set the volume. Value must be between 0 and 100" FontSize="12" VerticalAlignment="Center" TextWrapping="Wrap" />
                                             <Button Grid.Column="3" Tag="/volume/20" Click="TestEndpoint_Click" Content="▶ Test" FontSize="11" Padding="8,3" HorizontalAlignment="Center" VerticalAlignment="Center" />
@@ -318,7 +331,7 @@
                                                 <ColumnDefinition Width="*" />
                                                 <ColumnDefinition Width="120" />
                                             </Grid.ColumnDefinitions>
-                                            <TextBlock Grid.Column="0" Text="GET" FontFamily="Consolas" FontSize="12" FontWeight="SemiBold" Foreground="{ThemeResource SystemFillColorSuccessBrush}" VerticalAlignment="Center" />
+                                            <TextBlock Grid.Column="0" Text="GET" FontFamily="Consolas" FontSize="12" FontWeight="SemiBold" Foreground="{ThemeResource SystemFillColorSuccess}" VerticalAlignment="Center" />
                                             <TextBlock Grid.Column="1" Text="/mute/" FontFamily="Consolas" FontSize="12" VerticalAlignment="Center" />
                                             <TextBlock Grid.Column="2" x:Uid="ApiEndpointMuteDesc" Text="Mute the volume" FontSize="12" VerticalAlignment="Center" TextWrapping="Wrap" />
                                             <Button Grid.Column="3" Tag="/mute/" Click="TestEndpoint_Click" Content="▶ Test" FontSize="11" Padding="8,3" HorizontalAlignment="Center" VerticalAlignment="Center" />
