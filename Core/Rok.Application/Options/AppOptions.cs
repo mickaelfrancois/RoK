@@ -38,6 +38,8 @@ public class AppOptions : IAppOptions
 
     public bool DiscordRichPresenceEnabled { get; set; } = true;
 
+    public string? Language { get; set; } = null;
+
     public string CachePath { get; set; } = string.Empty;
 
     public string ArtistsGroupBy { get; set; } = string.Empty;
@@ -103,6 +105,7 @@ public class AppOptions : IAppOptions
         CachePath = options.CachePath;
 
         Theme = options.Theme;
+        Language = options.Language;
         RefreshLibraryAtStartup = options.RefreshLibraryAtStartup;
         HideArtistsWithoutAlbum = options.HideArtistsWithoutAlbum;
         TelemetryEnabled = options.TelemetryEnabled;

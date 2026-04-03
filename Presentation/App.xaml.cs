@@ -26,10 +26,6 @@ public partial class App : Microsoft.UI.Xaml.Application
         this.UnhandledException += Application_UnhandledException;
 
         this.InitializeComponent();
-
-#if DEBUG
-        Windows.Globalization.ApplicationLanguages.PrimaryLanguageOverride = "en";
-#endif
     }
 
 
@@ -45,6 +41,8 @@ public partial class App : Microsoft.UI.Xaml.Application
 
         IAppOptions options = await LoadOptionsAsync();
         options.SessionsCount++;
+
+        SetLanguage(options);
 
         IAppDbContext appDbContext = ServiceProvider.GetRequiredService<IAppDbContext>();
         appDbContext.GetOpenConnection();
@@ -81,6 +79,25 @@ public partial class App : Microsoft.UI.Xaml.Application
 
         if (options.EnableWebApi)
             ServiceProvider.GetRequiredService<PlayerWebApiService>().Start();
+    }
+
+    private static void SetLanguage(IAppOptions options)
+    {
+        string? userLanguage = options.Language;
+
+        if (string.IsNullOrEmpty(userLanguage) || userLanguage == "System")
+        {
+            Windows.Globalization.ApplicationLanguages.PrimaryLanguageOverride = string.Empty;
+        }
+        else
+        {
+            string[] supportedLanguages = new[] { "en-US", "fr-FR", "es-ES" };
+
+            if (supportedLanguages.Contains(userLanguage))
+                Windows.Globalization.ApplicationLanguages.PrimaryLanguageOverride = userLanguage;
+            else
+                Windows.Globalization.ApplicationLanguages.PrimaryLanguageOverride = "en-US";
+        }
     }
 
 
