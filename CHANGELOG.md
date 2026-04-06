@@ -1,5 +1,21 @@
 ﻿# ChangeLog
 
+## [1.8.1] Store – 06 avril 2026  
+
+### Ajouté
+
+- Ajout des traductions en Espagnol.
+- Ajout d'un bouton vers le site officiel dans la page des options.
+- Ajout d'un mécanisme de feeboack pour les utilisateurs.
+
+### Modifié
+
+- Correction de warnings divers
+- Insights : changement du format du total d'écoutes pour les rendre plus lisibles.
+
+
+--
+
 
 ## [1.8.0] Store – 28 mars 2026  
 
