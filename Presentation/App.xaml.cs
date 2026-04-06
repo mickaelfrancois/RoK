@@ -229,7 +229,8 @@ public partial class App : Microsoft.UI.Xaml.Application
 #if DEBUG
             e.Handled = true;
 #else
-            CrashStore.IncrementCrashCount();
+            CrashStore crashStore = new();
+            crashStore.IncrementCrashCount();
 
             ITelemetryClient telemetry = ServiceProvider.GetRequiredService<ITelemetryClient>();
             _ = telemetry.CaptureExceptionAsync(e.Exception);
@@ -259,7 +260,8 @@ public partial class App : Microsoft.UI.Xaml.Application
 #if !DEBUG
             if (e.ExceptionObject is Exception ex)
             {
-                CrashStore.IncrementCrashCount();
+                CrashStore crashStore = new();
+                crashStore.IncrementCrashCount();
 
                 ITelemetryClient telemetry = ServiceProvider.GetRequiredService<ITelemetryClient>();
                 telemetry.CaptureExceptionAsync(ex);
