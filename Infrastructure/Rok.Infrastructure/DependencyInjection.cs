@@ -12,6 +12,7 @@ using Rok.Infrastructure.Localization;
 using Rok.Infrastructure.Lyrics;
 using Rok.Infrastructure.Migration;
 using Rok.Infrastructure.MusicData;
+using Rok.Infrastructure.Player;
 using Rok.Infrastructure.Repositories;
 using Rok.Infrastructure.Social;
 using Rok.Infrastructure.Tag;
@@ -45,7 +46,7 @@ public static class DependencyInjection
         services.AddSingleton<IDominantColorCalculator, DominantColorCalculator>();
         services.AddSingleton<ICallDetectionService, CallDetectionService>();
 
-        services.AddSingleton<IPlayerEngine, WinUIMediaPlayer>();
+        services.AddSingleton<IPlayerEngine, NAudioMediaPlayer>();
         services.AddSingleton<ILyricsService, LyricsService>();
         services.AddSingleton<ILyricsParser, LyricsParser>();
 
