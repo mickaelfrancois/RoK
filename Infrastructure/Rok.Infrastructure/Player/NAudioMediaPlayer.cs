@@ -14,6 +14,7 @@ public class NAudioMediaPlayer : IPlayerEngine, IDisposable
 
     private IWavePlayer? _outputDevice;
     private AudioFileReader? _audioFileReader;
+    private Equalizer? _equalizer;
     private readonly System.Timers.Timer _positionTimer;
 
     private readonly int _crossfadeDelay = 5;
@@ -91,6 +92,8 @@ public class NAudioMediaPlayer : IPlayerEngine, IDisposable
             _audioFileReader = null;
         }
 
+        _equalizer = null;
+
         Length = 0;
         _aboutToEndRaised = false;
 
@@ -131,9 +134,25 @@ public class NAudioMediaPlayer : IPlayerEngine, IDisposable
                 ? _audioFileReader.TotalTime.TotalSeconds
                 : 1;
 
+            EqualizerBand[] bands = new[]
+            {
+                new EqualizerBand(32f, 1f, _audioFileReader.WaveFormat.Channels),
+                new EqualizerBand(64f, 1f, _audioFileReader.WaveFormat.Channels),
+                new EqualizerBand(125f, 1f, _audioFileReader.WaveFormat.Channels),
+                new EqualizerBand(250f, 1f, _audioFileReader.WaveFormat.Channels),
+                new EqualizerBand(500f, 1f, _audioFileReader.WaveFormat.Channels),
+                new EqualizerBand(1000f, 1f, _audioFileReader.WaveFormat.Channels),
+                new EqualizerBand(2000f, 1f, _audioFileReader.WaveFormat.Channels),
+                new EqualizerBand(4000f, 1f, _audioFileReader.WaveFormat.Channels),
+                new EqualizerBand(8000f, 1f, _audioFileReader.WaveFormat.Channels),
+                new EqualizerBand(16000f, 1f, _audioFileReader.WaveFormat.Channels)
+            };
+
+            _equalizer = new Equalizer(_audioFileReader, bands);
+
             _outputDevice = new WaveOutEvent();
             _outputDevice.PlaybackStopped += OutputDevice_PlaybackStopped;
-            _outputDevice.Init(_audioFileReader);
+            _outputDevice.Init(_equalizer);
 
             _aboutToEndRaised = false;
 
@@ -156,8 +175,20 @@ public class NAudioMediaPlayer : IPlayerEngine, IDisposable
                 _outputDevice = null;
             }
 
+            _equalizer = null;
+
             return false;
         }
+    }
+
+    public void SetEqualizerBand(int bandIndex, float gain)
+    {
+        _equalizer?.UpdateBand(bandIndex, gain);
+    }
+
+    public EqualizerBand[]? GetEqualizerBands()
+    {
+        return _equalizer?.GetBands();
     }
 
     private void OutputDevice_PlaybackStopped(object? sender, StoppedEventArgs e)

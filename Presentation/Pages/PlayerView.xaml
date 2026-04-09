@@ -6,9 +6,12 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:commons="using:Rok.Commons"
+             xmlns:converters="using:Rok.Converters"
+             xmlns:controls="using:Rok.Commons"
              mc:Ignorable="d">
 
     <UserControl.Resources>
+        <converters:FloatToStringConverter x:Key="FloatToStringConverter" />
 
         <Style x:Key="MiniLinkStyle" TargetType="HyperlinkButton">
             <Setter Property="Background" Value="Transparent"/>
@@ -245,14 +248,14 @@
 
         <!-- Player extra commands -->
         <Grid x:Name="playerCommands" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="0,0,4,0">
-            <CommandBar HorizontalAlignment="Right" Background="Transparent" OverflowButtonVisibility="Collapsed">
-                <AppBarButton Icon="MusicInfo" Command="{x:Bind ViewModel.OpenListeningCommand}" Foreground="White" RequestedTheme="Dark">
+            <CommandBar HorizontalAlignment="Right" Background="Transparent" DefaultLabelPosition="Collapsed" RequestedTheme="Dark">
+                <AppBarButton Icon="MusicInfo" Command="{x:Bind ViewModel.OpenListeningCommand}" Foreground="White">
                     <ToolTipService.ToolTip>
                         <TextBlock x:Uid="PlayerCurrentListeningToolTips" Text="Show current playlist" />
                     </ToolTipService.ToolTip>
                 </AppBarButton>
 
-                <AppBarButton x:Name="volume" Foreground="White" RequestedTheme="Dark">
+                <AppBarButton x:Name="volume" Foreground="White">
                     <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="{x:Bind ViewModel.Volume, Mode=OneWay, Converter={StaticResource VolumeToGlyphConverter}}" />
                     <AppBarButton.Flyout>
                         <Flyout>
@@ -266,19 +269,25 @@
                     </AppBarButton.Flyout>
                 </AppBarButton>
 
-                <AppBarButton x:Name="btCompactMode" Command="{x:Bind ViewModel.CompactModeCommand}" Foreground="White" RequestedTheme="Dark">
-                    <ToolTipService.ToolTip>
-                        <TextBlock x:Uid="PlayerCompactModeToolTips" Text="Compact mode."></TextBlock>
-                    </ToolTipService.ToolTip>
-                    <SymbolIcon Symbol="StopSlideShow" />
-                </AppBarButton>
+                <CommandBar.SecondaryCommands>
+                    <AppBarButton x:Uid="playerEqualizerAppBarButton" x:Name="btEqualizer" Command="{x:Bind ViewModel.ToggleEqualizerCommand}">
+                        <AppBarButton.Icon>
+                            <FontIcon Glyph="&#xE9E9;" FontSize="16" />
+                        </AppBarButton.Icon>
+                    </AppBarButton>
 
-                <AppBarButton Command="{x:Bind ViewModel.FullscreenCommand}" Foreground="White" RequestedTheme="Dark">
-                    <ToolTipService.ToolTip>
-                        <TextBlock x:Uid="PlayerFullscreenToolTips" Text="Full screen mode."></TextBlock>
-                    </ToolTipService.ToolTip>
-                    <SymbolIcon Symbol="FullScreen"></SymbolIcon>
-                </AppBarButton>
+                    <AppBarButton x:Uid="playerCompactModeAppBarButton" x:Name="btCompactMode" Command="{x:Bind ViewModel.CompactModeCommand}">
+                        <AppBarButton.Icon>
+                            <SymbolIcon Symbol="StopSlideShow" />
+                        </AppBarButton.Icon>
+                    </AppBarButton>
+
+                    <AppBarButton x:Uid="playerFullscreenAppBarButton" Command="{x:Bind ViewModel.FullscreenCommand}">
+                        <AppBarButton.Icon>
+                            <SymbolIcon Symbol="FullScreen" />
+                        </AppBarButton.Icon>
+                    </AppBarButton>
+                </CommandBar.SecondaryCommands>
             </CommandBar>
         </Grid>
     </Grid>

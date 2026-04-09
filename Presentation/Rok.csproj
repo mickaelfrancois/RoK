@@ -47,6 +47,13 @@
 	</Target>
 
 	<ItemGroup>
+	  <Compile Remove="Commons\Extensions\**" />
+	  <EmbeddedResource Remove="Commons\Extensions\**" />
+	  <None Remove="Commons\Extensions\**" />
+	  <Page Remove="Commons\Extensions\**" />
+	</ItemGroup>
+
+	<ItemGroup>
 		<None Remove="Assets\BadgeLogo.scale-100.png" />
 		<None Remove="Assets\BadgeLogo.scale-125.png" />
 		<None Remove="Assets\BadgeLogo.scale-150.png" />
@@ -284,7 +291,6 @@
 		</Page>
 	</ItemGroup>
 	<ItemGroup>
-	  <Folder Include="Commons\Extensions\" />
 	  <Folder Include="Styles\Templates\" />
 	</ItemGroup>
 	<ItemGroup>
@@ -378,5 +384,8 @@
 		<PlatformTarget>AnyCPU</PlatformTarget>
 		<ApplicationIcon>Assets\Square44x44Logo.ico</ApplicationIcon>
 	</PropertyGroup>
+	<ItemGroup>
+	  <PRIResource Remove="Commons\Extensions\**" />
+	</ItemGroup>
 	
 </Project>

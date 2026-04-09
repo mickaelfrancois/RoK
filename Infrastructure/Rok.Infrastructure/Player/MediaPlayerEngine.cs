@@ -128,6 +128,10 @@ public class WinUIMediaPlayer : IPlayerEngine, IDisposable
         }
     }
 
+    public void SetEqualizerBand(int bandIndex, float gain)
+    {
+    }
+
     private void Player_MediaOpened(MediaPlayer sender, object args)
     {
         TimeSpan duration = sender.PlaybackSession?.NaturalDuration ?? TimeSpan.Zero;

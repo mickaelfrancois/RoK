@@ -61,6 +61,7 @@ public static class DependencyInjection
         services.AddSingleton<IMigration, Migration7>();
         services.AddSingleton<IMigration, Migration8>();
         services.AddSingleton<IMigration, Migration9>();
+        services.AddSingleton<IMigration, Migration10>();
 
         services.AddScoped<IArtistRepository, ArtistRepository>();
         services.AddScoped<IAlbumRepository, AlbumRepository>();
@@ -72,6 +73,7 @@ public static class DependencyInjection
         services.AddScoped<IPlaylistTrackRepository, PlaylistTrackRepository>();
         services.AddScoped<IPlaylistTrackGenerateRepository, PlaylistTrackGenerateRepository>();
         services.AddScoped<IListeningEventRepository, ListeningEventRepository>();
+        services.AddScoped<IEqualizerPresetRepository, EqualizerPresetRepository>();
 
         services.AddSingleton<ITagService, TagService>();
         services.AddSingleton<IMusicDataApiService, MusicDataApiService>();
