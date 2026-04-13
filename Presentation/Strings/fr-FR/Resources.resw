@@ -1605,4 +1605,103 @@
   <data name="StoreReviewButton.Text" xml:space="preserve">
     <value>Laissez un avis</value>
   </data>
+  <data name="EqualizeWindowsTitle" xml:space="preserve">
+    <value>RoK - Égaliseur</value>
+  </data>
+  <data name="EqualizeWindowsDescription" xml:space="preserve">
+    <value>Ajustez les fréquences audio pour une expérience d'écoute optimale. Les modifications sont appliquées en temps réel.</value>
+  </data>
+  <data name="EqualizeWindowsResetButton" xml:space="preserve">
+    <value>Réinitialiser</value>
+  </data>
+  <data name="playerEqualizerAppBarButton.Label" xml:space="preserve">
+    <value>Égaliseur</value>
+  </data>
+  <data name="playerCompactModeAppBarButton.Label" xml:space="preserve">
+    <value>Mode compact</value>
+  </data>
+  <data name="playerFullscreenAppBarButton.Label" xml:space="preserve">
+    <value>Plein écran</value>
+  </data>
+  <data name="EqualizerSavePanelTitle" xml:space="preserve">
+    <value>Enregistrer ce réglage ?</value>
+  </data>
+  <data name="EqualizerSaveScopeTrack" xml:space="preserve">
+    <value>Ce morceau</value>
+  </data>
+  <data name="EqualizerSaveScopeAlbum" xml:space="preserve">
+    <value>Cet album</value>
+  </data>
+  <data name="EqualizerSaveScopeArtist" xml:space="preserve">
+    <value>Cet artiste</value>
+  </data>
+  <data name="EqualizerSaveScopeGenre" xml:space="preserve">
+    <value>Ce genre</value>
+  </data>
+  <data name="EqualizerActivePresetDefault" xml:space="preserve">
+    <value>Aucun réglage sauvegardé</value>
+  </data>
+  <data name="EqualizerActivePresetTrack" xml:space="preserve">
+    <value>Réglage actif : morceau</value>
+  </data>
+  <data name="EqualizerActivePresetAlbum" xml:space="preserve">
+    <value>Réglage actif : album</value>
+  </data>
+  <data name="EqualizerActivePresetArtist" xml:space="preserve">
+    <value>Réglage actif : artiste</value>
+  </data>
+  <data name="EqualizerActivePresetGenre" xml:space="preserve">
+    <value>Réglage actif : genre</value>
+  </data>
+  <data name="EqualizerRemovePresetButton" xml:space="preserve">
+    <value>Supprimer ce réglage</value>
+  </data>
+  <data name="EqualizerBuiltin_Flat" xml:space="preserve">
+    <value>Plat</value>
+  </data>
+  <data name="EqualizerBuiltin_Rock" xml:space="preserve">
+    <value>Rock</value>
+  </data>
+  <data name="EqualizerBuiltin_Metal" xml:space="preserve">
+    <value>Metal</value>
+  </data>
+  <data name="EqualizerBuiltin_Pop" xml:space="preserve">
+    <value>Pop</value>
+  </data>
+  <data name="EqualizerBuiltin_HipHop" xml:space="preserve">
+    <value>Hip-Hop</value>
+  </data>
+  <data name="EqualizerBuiltin_RnB" xml:space="preserve">
+    <value>R&amp;B</value>
+  </data>
+  <data name="EqualizerBuiltin_Electronic" xml:space="preserve">
+    <value>Électronique</value>
+  </data>
+  <data name="EqualizerBuiltin_Classical" xml:space="preserve">
+    <value>Classique</value>
+  </data>
+  <data name="EqualizerBuiltin_Jazz" xml:space="preserve">
+    <value>Jazz</value>
+  </data>
+  <data name="EqualizerBuiltin_Blues" xml:space="preserve">
+    <value>Blues</value>
+  </data>
+  <data name="EqualizerBuiltin_Acoustic" xml:space="preserve">
+    <value>Acoustique</value>
+  </data>
+  <data name="EqualizerBuiltin_Vocal" xml:space="preserve">
+    <value>Voix</value>
+  </data>
+  <data name="EqualizerBuiltin_BassBoost" xml:space="preserve">
+    <value>Graves</value>
+  </data>
+  <data name="EqualizerBuiltin_TrebleBoost" xml:space="preserve">
+    <value>Aigus</value>
+  </data>
+  <data name="EqualizerBuiltin_Loudness" xml:space="preserve">
+    <value>Volume</value>
+  </data>
+  <data name="EqualizerBuiltin_Latin" xml:space="preserve">
+    <value>Latin</value>
+  </data>
 </root>

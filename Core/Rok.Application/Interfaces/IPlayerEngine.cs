@@ -27,4 +27,6 @@ public interface IPlayerEngine
     void SetVolume(double volume);
 
     bool SetTrack(TrackDto track);
+
+    void SetEqualizerBand(int bandIndex, float gain);
 }

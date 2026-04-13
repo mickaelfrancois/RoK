@@ -4,7 +4,7 @@ using Rok.Application.Interfaces;
 using Windows.Media.Core;
 using Windows.Media.Playback;
 
-namespace Rok.Infrastructure;
+namespace Rok.Infrastructure.Player;
 
 public class WinUIMediaPlayer : IPlayerEngine, IDisposable
 {
@@ -126,6 +126,10 @@ public class WinUIMediaPlayer : IPlayerEngine, IDisposable
         {
             return false;
         }
+    }
+
+    public void SetEqualizerBand(int bandIndex, float gain)
+    {
     }
 
     private void Player_MediaOpened(MediaPlayer sender, object args)

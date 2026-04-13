@@ -4,6 +4,7 @@ using CommunityToolkit.Mvvm.Input;
 using Rok.Application.Dto.Lyrics;
 using Rok.Application.Features.Tracks.Command;
 using Rok.Application.Player;
+using Rok.Commons.Equalizer;
 using Rok.ViewModels.Album;
 using Rok.ViewModels.Artist;
 using Rok.ViewModels.Player.Services;
@@ -14,6 +15,7 @@ namespace Rok.ViewModels.Player;
 public partial class PlayerViewModel : ObservableObject, IDisposable
 {
     private readonly IPlayerService _player;
+    private readonly ResourceLoader _resourceLoader;
     private readonly IMediator _mediator;
     private readonly NavigationService _navigationService;
     private readonly ILogger<PlayerViewModel> _logger;
@@ -26,6 +28,7 @@ public partial class PlayerViewModel : ObservableObject, IDisposable
     private readonly PlayerStateManager _stateManager;
 
     private bool _isFullScreen;
+    private EqualizerWindow? _equalizerWindow;
 
     public TrackViewModel? CurrentTrack => _stateManager.CurrentTrack;
     public ArtistViewModel? CurrentArtist => _stateManager.CurrentArtist;
@@ -121,6 +124,8 @@ public partial class PlayerViewModel : ObservableObject, IDisposable
 
     private bool IsPlaying => _player.PlaybackState == EPlaybackState.Playing;
 
+    public EqualizerViewModel EqualizerViewModel { get; }
+
     // Lyrics
     public bool LyricsExist => _stateManager.LyricsExist;
     public ObservableCollection<LyricLine> LyricsLines => _stateManager.LyricsLines;
@@ -140,6 +145,8 @@ public partial class PlayerViewModel : ObservableObject, IDisposable
         PlayerListenTracker listenTracker,
         PlayerTimerManager timerManager,
         PlayerStateManager stateManager,
+        EqualizerViewModel equalizerViewModel,
+        ResourceLoader resourceLoader,
         ILogger<PlayerViewModel> logger)
     {
         _player = Guard.Against.Null(player);
@@ -150,6 +157,8 @@ public partial class PlayerViewModel : ObservableObject, IDisposable
         _listenTracker = Guard.Against.Null(listenTracker);
         _timerManager = Guard.Against.Null(timerManager);
         _stateManager = Guard.Against.Null(stateManager);
+        EqualizerViewModel = Guard.Against.Null(equalizerViewModel);
+        _resourceLoader = Guard.Against.Null(resourceLoader);
         _logger = Guard.Against.Null(logger);
 
         _stateManager.PropertyChanged += OnStateManagerPropertyChanged;
@@ -302,6 +311,8 @@ public partial class PlayerViewModel : ObservableObject, IDisposable
 
                 _stateManager.ResetLyrics();
                 await LoadLyricsAsync();
+
+                await EqualizerViewModel.ApplyPresetAsync(message.NewTrack);
 
                 if (CurrentArtist != null && CurrentArtist != previousArtist)
                     LoadBackdrop();
@@ -466,6 +477,20 @@ public partial class PlayerViewModel : ObservableObject, IDisposable
         IsMuted = !IsMuted;
     }
 
+    [RelayCommand]
+    private void ToggleEqualizer()
+    {
+        if (_equalizerWindow != null)
+        {
+            _equalizerWindow.Activate();
+            return;
+        }
+
+        _equalizerWindow = new EqualizerWindow(EqualizerViewModel, _resourceLoader);
+        _equalizerWindow.Closed += (_, _) => _equalizerWindow = null;
+        _equalizerWindow.Activate();
+    }
+
 
 
     public void Dispose()
@@ -485,6 +510,7 @@ public partial class PlayerViewModel : ObservableObject, IDisposable
                 _stateManager.PropertyChanged -= OnStateManagerPropertyChanged;
 
             _timerManager?.Dispose();
+            _equalizerWindow?.Close();
         }
 
         _disposed = true;

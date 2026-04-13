@@ -1488,4 +1488,103 @@
   <data name="StoreReviewButton.Text" xml:space="preserve">
     <value>Dejar un comentario</value>
   </data>
+  <data name="EqualizeWindowsTitle" xml:space="preserve">
+    <value>RoK - Igualada</value>
+  </data>
+  <data name="EqualizeWindowsDescription" xml:space="preserve">
+    <value>Ajusta las frecuencias de audio para mejorar tu experiencia auditiva. Los cambios se aplican en tiempo real.</value>
+  </data>
+  <data name="EqualizeWindowsResetButton" xml:space="preserve">
+    <value>Reiniciar</value>
+  </data>
+  <data name="playerEqualizerAppBarButton.Label" xml:space="preserve">
+    <value>Igualada</value>
+  </data>
+  <data name="playerCompactModeAppBarButton.Label" xml:space="preserve">
+    <value>Modo compacto</value>
+  </data>
+  <data name="playerFullscreenAppBarButton.Label" xml:space="preserve">
+    <value>Pantalla completa</value>
+  </data>
+  <data name="EqualizerSavePanelTitle" xml:space="preserve">
+    <value>¿Guardar este ajuste preestablecido?</value>
+  </data>
+  <data name="EqualizerSaveScopeTrack" xml:space="preserve">
+    <value>Esta pista</value>
+  </data>
+  <data name="EqualizerSaveScopeAlbum" xml:space="preserve">
+    <value>Este álbum</value>
+  </data>
+  <data name="EqualizerSaveScopeArtist" xml:space="preserve">
+    <value>Este artista</value>
+  </data>
+  <data name="EqualizerSaveScopeGenre" xml:space="preserve">
+    <value>Este género</value>
+  </data>
+  <data name="EqualizerActivePresetDefault" xml:space="preserve">
+    <value>Sin preset activo</value>
+  </data>
+  <data name="EqualizerActivePresetTrack" xml:space="preserve">
+    <value>Preset activo: pista</value>
+  </data>
+  <data name="EqualizerActivePresetAlbum" xml:space="preserve">
+    <value>Preset activo: álbum</value>
+  </data>
+  <data name="EqualizerActivePresetArtist" xml:space="preserve">
+    <value>Preset activo: artista</value>
+  </data>
+  <data name="EqualizerActivePresetGenre" xml:space="preserve">
+    <value>Preset activo: género</value>
+  </data>
+  <data name="EqualizerRemovePresetButton" xml:space="preserve">
+    <value>Eliminar este ajuste</value>
+  </data>
+  <data name="EqualizerBuiltin_Flat" xml:space="preserve">
+    <value>Plano</value>
+  </data>
+  <data name="EqualizerBuiltin_Rock" xml:space="preserve">
+    <value>Rock</value>
+  </data>
+  <data name="EqualizerBuiltin_Metal" xml:space="preserve">
+    <value>Metal</value>
+  </data>
+  <data name="EqualizerBuiltin_Pop" xml:space="preserve">
+    <value>Pop</value>
+  </data>
+  <data name="EqualizerBuiltin_HipHop" xml:space="preserve">
+    <value>Hip-Hop</value>
+  </data>
+  <data name="EqualizerBuiltin_RnB" xml:space="preserve">
+    <value>R&amp;B</value>
+  </data>
+  <data name="EqualizerBuiltin_Electronic" xml:space="preserve">
+    <value>Electrónica</value>
+  </data>
+  <data name="EqualizerBuiltin_Classical" xml:space="preserve">
+    <value>Clásica</value>
+  </data>
+  <data name="EqualizerBuiltin_Jazz" xml:space="preserve">
+    <value>Jazz</value>
+  </data>
+  <data name="EqualizerBuiltin_Blues" xml:space="preserve">
+    <value>Blues</value>
+  </data>
+  <data name="EqualizerBuiltin_Acoustic" xml:space="preserve">
+    <value>Acústico</value>
+  </data>
+  <data name="EqualizerBuiltin_Vocal" xml:space="preserve">
+    <value>Vocal</value>
+  </data>
+  <data name="EqualizerBuiltin_BassBoost" xml:space="preserve">
+    <value>Graves</value>
+  </data>
+  <data name="EqualizerBuiltin_TrebleBoost" xml:space="preserve">
+    <value>Agudos</value>
+  </data>
+  <data name="EqualizerBuiltin_Loudness" xml:space="preserve">
+    <value>Volumen</value>
+  </data>
+  <data name="EqualizerBuiltin_Latin" xml:space="preserve">
+    <value>Latino</value>
+  </data>
 </root>

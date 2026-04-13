@@ -12,6 +12,7 @@ using Rok.Infrastructure.Localization;
 using Rok.Infrastructure.Lyrics;
 using Rok.Infrastructure.Migration;
 using Rok.Infrastructure.MusicData;
+using Rok.Infrastructure.Player;
 using Rok.Infrastructure.Repositories;
 using Rok.Infrastructure.Social;
 using Rok.Infrastructure.Tag;
@@ -45,7 +46,7 @@ public static class DependencyInjection
         services.AddSingleton<IDominantColorCalculator, DominantColorCalculator>();
         services.AddSingleton<ICallDetectionService, CallDetectionService>();
 
-        services.AddSingleton<IPlayerEngine, WinUIMediaPlayer>();
+        services.AddSingleton<IPlayerEngine, NAudioMediaPlayer>();
         services.AddSingleton<ILyricsService, LyricsService>();
         services.AddSingleton<ILyricsParser, LyricsParser>();
 
@@ -60,6 +61,7 @@ public static class DependencyInjection
         services.AddSingleton<IMigration, Migration7>();
         services.AddSingleton<IMigration, Migration8>();
         services.AddSingleton<IMigration, Migration9>();
+        services.AddSingleton<IMigration, Migration10>();
 
         services.AddScoped<IArtistRepository, ArtistRepository>();
         services.AddScoped<IAlbumRepository, AlbumRepository>();
@@ -71,6 +73,7 @@ public static class DependencyInjection
         services.AddScoped<IPlaylistTrackRepository, PlaylistTrackRepository>();
         services.AddScoped<IPlaylistTrackGenerateRepository, PlaylistTrackGenerateRepository>();
         services.AddScoped<IListeningEventRepository, ListeningEventRepository>();
+        services.AddScoped<IEqualizerPresetRepository, EqualizerPresetRepository>();
 
         services.AddSingleton<ITagService, TagService>();
         services.AddSingleton<IMusicDataApiService, MusicDataApiService>();

@@ -894,6 +894,7 @@
                             <ItemsControl.Items>
                                 <TextBlock Text="🔹Dapper (Sam Saffron, Marc Gravell, Nick Craver)" />
                                 <TextBlock Text="🔹DiscordRichPresence (Lachee)" />
+                                <TextBlock Text="🔹NAudio (Mark Heath)" />
                                 <TextBlock Text="🔹TagLibSharp (Brian Nickel, Gabriel Burt, Stephen Shaw, etc.)" />
                                 <TextBlock Text="🔹Moq (Daniel Cazzulino, kzu)" />
                                 <TextBlock Text="🔹Serilog" />
