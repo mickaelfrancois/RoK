@@ -167,12 +167,21 @@ public sealed partial class EqualizerViewModel : ObservableObject
     }
 
     [RelayCommand]
-    public void ApplyBuiltinPreset(EqualizerBuiltinPreset preset)
+    public async Task ApplyBuiltinPreset(EqualizerBuiltinPreset preset)
     {
         _suppressClearBuiltinPreset = true;
         Apply(preset.Bands);
         _suppressClearBuiltinPreset = false;
         ActiveBuiltinPreset = preset;
+
+        if (_activePresetScope == EqualizerScope.Default)
+            await _mediator.SendMessageAsync(new SaveEqualizerPresetCommand
+            {
+                Scope = EqualizerScope.Default,
+                ScopeId = null,
+                BuiltinPresetKey = preset.Key,
+                Bands = GetCurrentBands()
+            });
     }
 
     [RelayCommand]
@@ -194,8 +203,17 @@ public sealed partial class EqualizerViewModel : ObservableObject
         if (preset is not null)
             _logger.LogInformation("Applying equalizer preset (Scope: {Scope}, ScopeId: {ScopeId}) for track '{TrackTitle}'", preset.Scope, preset.ScopeId, track.Title);
 
-        Apply(preset?.Bands ?? new float[10]);
-        ActivePresetScope = preset?.Scope ?? EqualizerScope.Default;
+        float[] bands = preset?.Bands ?? new float[10];
+
+        _suppressClearBuiltinPreset = true;
+        Apply(bands);
+        _suppressClearBuiltinPreset = false;
+
+        EqualizerScope resolvedScope = preset?.Scope ?? EqualizerScope.Default;
+        ActivePresetScope = resolvedScope;
+        ActiveBuiltinPreset = resolvedScope == EqualizerScope.Default && preset?.BuiltinPresetKey is not null
+            ? EqualizerBuiltinPresets.All.FirstOrDefault(p => p.Key == preset.BuiltinPresetKey)
+            : null;
 
         OnPropertyChanged(nameof(CanSaveForTrack));
         OnPropertyChanged(nameof(CanSaveForAlbum));
