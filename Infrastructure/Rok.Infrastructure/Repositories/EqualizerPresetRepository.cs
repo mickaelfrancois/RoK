@@ -15,9 +15,21 @@ public class EqualizerPresetRepository(IDbConnection db, [FromKeyedServices("Bac
         LIMIT 1
         """;
 
+    private const string FindDefaultSql = """
+        SELECT Id, Scope, ScopeId, Band0, Band1, Band2, Band3, Band4, Band5, Band6, Band7, Band8, Band9
+        FROM EqualizerPreset
+        WHERE (Scope = 'Default' OR Scope LIKE 'Default_%') AND ScopeId IS NULL
+        LIMIT 1
+        """;
+
     private const string DeleteSql = """
         DELETE FROM EqualizerPreset
         WHERE Scope = @scope AND ((@scopeId IS NULL AND ScopeId IS NULL) OR ScopeId = @scopeId)
+        """;
+
+    private const string DeleteDefaultSql = """
+        DELETE FROM EqualizerPreset
+        WHERE (Scope = 'Default' OR Scope LIKE 'Default_%') AND ScopeId IS NULL
         """;
 
     private const string InsertSql = """
@@ -27,8 +39,12 @@ public class EqualizerPresetRepository(IDbConnection db, [FromKeyedServices("Bac
 
     public async Task<EqualizerPresetEntity?> FindAsync(EqualizerScope scope, long? scopeId)
     {
-        EqualizerPresetRow? row = await _connection.QueryFirstOrDefaultAsync<EqualizerPresetRow>(
-            FindSql, new { scope = scope.ToString(), scopeId });
+        EqualizerPresetRow? row;
+
+        if (scope == EqualizerScope.Default)
+            row = await _connection.QueryFirstOrDefaultAsync<EqualizerPresetRow>(FindDefaultSql);
+        else
+            row = await _connection.QueryFirstOrDefaultAsync<EqualizerPresetRow>(FindSql, new { scope = scope.ToString(), scopeId });
 
         return row is null ? null : MapToEntity(row);
     }
@@ -40,7 +56,11 @@ public class EqualizerPresetRepository(IDbConnection db, [FromKeyedServices("Bac
 
         using IDbTransaction transaction = _connection.BeginTransaction();
 
-        await ExecuteNonQueryAsync(DeleteSql, transaction, new { scope = preset.Scope.ToString(), scopeId = preset.ScopeId });
+        if (preset.Scope == EqualizerScope.Default)
+            await ExecuteNonQueryAsync(DeleteDefaultSql, transaction, new { });
+        else
+            await ExecuteNonQueryAsync(DeleteSql, transaction, new { scope = preset.Scope.ToString(), scopeId = preset.ScopeId });
+
         await ExecuteNonQueryAsync(InsertSql, transaction, BuildBandParams(preset));
 
         transaction.Commit();
@@ -48,7 +68,10 @@ public class EqualizerPresetRepository(IDbConnection db, [FromKeyedServices("Bac
 
     public async Task DeleteAsync(EqualizerScope scope, long? scopeId)
     {
-        await _connection.ExecuteAsync(DeleteSql, new { scope = scope.ToString(), scopeId });
+        if (scope == EqualizerScope.Default)
+            await _connection.ExecuteAsync(DeleteDefaultSql);
+        else
+            await _connection.ExecuteAsync(DeleteSql, new { scope = scope.ToString(), scopeId });
     }
 
     public override string GetSelectQuery(string? whereParam = null)
@@ -64,17 +87,32 @@ public class EqualizerPresetRepository(IDbConnection db, [FromKeyedServices("Bac
         return query;
     }
 
-    private static EqualizerPresetEntity MapToEntity(EqualizerPresetRow row) => new()
+    private static EqualizerPresetEntity MapToEntity(EqualizerPresetRow row)
     {
-        Id = row.Id,
-        Scope = Enum.Parse<EqualizerScope>(row.Scope),
-        ScopeId = row.ScopeId,
-        Bands = new float[] { row.Band0, row.Band1, row.Band2, row.Band3, row.Band4, row.Band5, row.Band6, row.Band7, row.Band8, row.Band9 }
-    };
+        string scopeStr = row.Scope;
+        string? builtinKey = null;
+
+        if (scopeStr.StartsWith("Default_", StringComparison.Ordinal))
+        {
+            builtinKey = scopeStr["Default_".Length..];
+            scopeStr = "Default";
+        }
+
+        return new()
+        {
+            Id = row.Id,
+            Scope = Enum.Parse<EqualizerScope>(scopeStr),
+            BuiltinPresetKey = builtinKey,
+            ScopeId = row.ScopeId,
+            Bands = new float[] { row.Band0, row.Band1, row.Band2, row.Band3, row.Band4, row.Band5, row.Band6, row.Band7, row.Band8, row.Band9 }
+        };
+    }
 
     private static object BuildBandParams(EqualizerPresetEntity preset) => new
     {
-        Scope = preset.Scope.ToString(),
+        Scope = preset.Scope == EqualizerScope.Default && preset.BuiltinPresetKey is not null
+            ? $"Default_{preset.BuiltinPresetKey}"
+            : preset.Scope.ToString(),
         preset.ScopeId,
         Band0 = preset.Bands[0],
         Band1 = preset.Bands[1],

@@ -8,6 +8,8 @@ public class EqualizerPresetDto
 
     public EqualizerScope Scope { get; set; }
 
+    public string? BuiltinPresetKey { get; set; }
+
     public long? ScopeId { get; set; }
 
     public float[] Bands { get; set; } = new float[10];

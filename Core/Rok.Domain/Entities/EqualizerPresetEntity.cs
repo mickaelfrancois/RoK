@@ -9,6 +9,8 @@ public class EqualizerPresetEntity
 
     public EqualizerScope Scope { get; init; }
 
+    public string? BuiltinPresetKey { get; init; }
+
     public long? ScopeId { get; init; }
 
     public float[] Bands { get; init; } = new float[10];

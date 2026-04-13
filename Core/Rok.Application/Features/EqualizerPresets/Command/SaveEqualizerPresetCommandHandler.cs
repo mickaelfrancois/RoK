@@ -8,6 +8,8 @@ public class SaveEqualizerPresetCommand : ICommand<Result<bool>>
     [Required]
     public EqualizerScope Scope { get; set; }
 
+    public string? BuiltinPresetKey { get; set; }
+
     public long? ScopeId { get; set; }
 
     [Required]
