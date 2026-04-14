@@ -1587,4 +1587,13 @@
   <data name="EqualizerBuiltin_Latin" xml:space="preserve">
     <value>Latino</value>
   </data>
+  <data name="playerSleepModeAppBarButton.Label" xml:space="preserve">
+    <value>Temporizador de apagado</value>
+  </data>
+  <data name="notification_sleepTimer_Start" xml:space="preserve">
+    <value>El temporizador de apagado automático está activado: RoK detendrá la reproducción automáticamente</value>
+  </data>
+  <data name="notification_sleepTimer_Stop" xml:space="preserve">
+    <value>Temporizador de apagado desactivado: tu música sigue encendida</value>
+  </data>
 </root>

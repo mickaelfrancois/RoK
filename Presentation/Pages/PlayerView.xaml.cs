@@ -1,5 +1,7 @@
+using Microsoft.UI;
 using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Media.Animation;
 using Rok.Application.Player;
 using Rok.ViewModels.Player;
 
@@ -13,7 +15,7 @@ public sealed partial class PlayerView : UserControl
     public PlayerViewModel ViewModel { get; set; }
 
     private readonly DispatcherTimer _progressionTimer;
-
+    private Storyboard? _sleepModeStoryboard;
 
     public PlayerView()
     {
@@ -31,12 +33,68 @@ public sealed partial class PlayerView : UserControl
         InitProgressionTimer();
 
         Messenger.Subscribe<MediaChangedMessage>((message) => MediaChanged(message));
+
+        Loaded += OnLoaded;
+        Unloaded += OnUnloaded;
     }
 
     private void InitProgressionTimer()
     {
         _progressionTimer.Tick += ProgresionTimer_Tick;
         _progressionTimer.Start();
+    }
+
+    private void OnLoaded(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
+    {
+        ViewModel.PropertyChanged += OnViewModelPropertyChanged;
+        SetupSleepModeAnimation();
+    }
+
+    private void OnUnloaded(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
+    {
+        ViewModel.PropertyChanged -= OnViewModelPropertyChanged;
+        _sleepModeStoryboard?.Stop();
+    }
+
+    private void SetupSleepModeAnimation()
+    {
+        _sleepModeStoryboard = new Storyboard
+        {
+            RepeatBehavior = RepeatBehavior.Forever,
+            AutoReverse = true
+        };
+
+        DoubleAnimation opacityAnimation = new()
+        {
+            From = 0.0,
+            To = 0.4,
+            Duration = new Duration(TimeSpan.FromMilliseconds(1500)),
+            EasingFunction = new SineEase { EasingMode = EasingMode.EaseInOut }
+        };
+
+        Storyboard.SetTarget(opacityAnimation, sleepModeHalo);
+        Storyboard.SetTargetProperty(opacityAnimation, "Opacity");
+        _sleepModeStoryboard.Children.Add(opacityAnimation);
+
+        if (ViewModel.IsSleepModeActive)
+            _sleepModeStoryboard.Begin();
+    }
+
+    private void OnViewModelPropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName == nameof(ViewModel.IsSleepModeActive))
+        {
+            if (ViewModel.IsSleepModeActive)
+                _sleepModeStoryboard?.Begin();
+            else
+                _sleepModeStoryboard?.Stop();
+        }
+        else if (e.PropertyName == nameof(ViewModel.RemainingSleepTime))
+        {
+            sleepModeHalo.Background = ViewModel.RemainingSleepTime < 60
+                ? new SolidColorBrush(Colors.Red)
+                : new SolidColorBrush(Colors.White);
+        }
     }
 
     public Symbol GetIconFromPlaybackState(EPlaybackState state)

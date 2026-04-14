@@ -1704,4 +1704,13 @@
   <data name="EqualizerBuiltin_Latin" xml:space="preserve">
     <value>Latin</value>
   </data>
+  <data name="playerSleepModeAppBarButton.Label" xml:space="preserve">
+    <value>Minuteur de sommeil</value>
+  </data>
+  <data name="notification_sleepTimer_Start" xml:space="preserve">
+    <value>La minuterie de mise en veille est activée — RoK arrêtera automatiquement la lecture</value>
+  </data>
+  <data name="notification_sleepTimer_Stop" xml:space="preserve">
+    <value>Minuteur de mise en veille désactivé — votre musique continue</value>
+  </data>
 </root>
