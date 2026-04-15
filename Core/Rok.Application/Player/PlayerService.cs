@@ -311,14 +311,22 @@ public class PlayerService : IPlayerService
 
     public void Play()
     {
-        Volume = _volume;
+        try
+        {
+            Volume = _volume;
 
-        _player.Play();
+            _player.Play();
 
-        PlaybackState = EPlaybackState.Playing;
+            PlaybackState = EPlaybackState.Playing;
 
-        if (CurrentTrack != null)
-            UpdateDiscordPresence(CurrentTrack, isPlaying: true);
+            if (CurrentTrack != null)
+                UpdateDiscordPresence(CurrentTrack, isPlaying: true);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to resume playback, audio device may be unavailable");
+            PlaybackState = EPlaybackState.Stopped;
+        }
     }
 
     public void Stop(bool firePlaybackStateChange)

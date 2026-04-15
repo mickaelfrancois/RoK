@@ -1,4 +1,6 @@
 using System.Timers;
+using Microsoft.Extensions.Logging;
+using NAudio;
 using NAudio.Wave;
 using Rok.Application.Dto;
 using Rok.Application.Interfaces;
@@ -16,6 +18,7 @@ public class NAudioMediaPlayer : IPlayerEngine, IDisposable
     private AudioFileReader? _audioFileReader;
     private Equalizer? _equalizer;
     private readonly System.Timers.Timer _positionTimer;
+    private readonly ILogger<NAudioMediaPlayer> _logger;
 
     private readonly int _crossfadeDelay = 5;
     private readonly int _aboutToEndDelay = 15;
@@ -40,8 +43,10 @@ public class NAudioMediaPlayer : IPlayerEngine, IDisposable
         set => _length = value;
     }
 
-    public NAudioMediaPlayer()
+    public NAudioMediaPlayer(ILogger<NAudioMediaPlayer> logger)
     {
+        _logger = logger;
+
         _positionTimer = new System.Timers.Timer(250)
         {
             AutoReset = true,
@@ -65,13 +70,45 @@ public class NAudioMediaPlayer : IPlayerEngine, IDisposable
     {
         if (_outputDevice is not null && _outputDevice.PlaybackState != PlaybackState.Playing)
         {
-            _outputDevice.Play();
+            try
+            {
+                _outputDevice.Play();
+            }
+            catch (MmException ex)
+            {
+                _logger.LogWarning(ex, "Audio device lost (NoDriver), attempting to reinitialize");
+                ReinitializeOutputDevice();
+                _outputDevice?.Play();
+            }
 
             if (!_positionTimer.Enabled)
                 _positionTimer.Start();
 
             OnMediaStateChanged?.Invoke(this, EventArgs.Empty);
         }
+    }
+
+    private void ReinitializeOutputDevice()
+    {
+        if (_equalizer is null || _audioFileReader is null)
+            return;
+
+        double currentPosition = _audioFileReader.CurrentTime.TotalSeconds;
+
+        if (_outputDevice is not null)
+        {
+            _outputDevice.PlaybackStopped -= OutputDevice_PlaybackStopped;
+            _outputDevice.Dispose();
+            _outputDevice = null;
+        }
+
+        _outputDevice = new WaveOutEvent();
+        _outputDevice.PlaybackStopped += OutputDevice_PlaybackStopped;
+        _outputDevice.Init(_equalizer);
+
+        _audioFileReader.CurrentTime = TimeSpan.FromSeconds(currentPosition);
+
+        _logger.LogInformation("Audio device reinitialized, position restored to {Position}s", currentPosition);
     }
 
     public void Stop()
