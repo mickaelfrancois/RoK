@@ -18,6 +18,11 @@ public sealed partial class ListeningPage : Page, IDisposable
         DataContext = ViewModel;
     }
 
+    private void SleepFlyout_Opening(object sender, object e)
+    {
+        ViewModel.RefreshSleepTime();
+    }
+
     private void ListeningPage_Loaded(object sender, RoutedEventArgs e)
     {
         TrackViewModel? listeningTrack = ViewModel.Tracks.FirstOrDefault(track => track.Listening);

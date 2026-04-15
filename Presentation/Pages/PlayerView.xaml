@@ -13,6 +13,8 @@
     <UserControl.Resources>
         <converters:FloatToStringConverter x:Key="FloatToStringConverter" />
 
+
+
         <Style x:Key="MiniLinkStyle" TargetType="HyperlinkButton">
             <Setter Property="Background" Value="Transparent"/>
             <Setter Property="Padding" Value="0" />
@@ -54,6 +56,105 @@
         <DataTemplate x:Key="EllipsisTemplate">
             <TextBlock Text="{Binding}" TextTrimming="CharacterEllipsis" VerticalAlignment="Center" />
         </DataTemplate>
+
+        <Style x:Key="PlayPauseButtonStyle" TargetType="AppBarButton">
+            <Setter Property="Width" Value="42" />
+            <Setter Property="Height" Value="42" />
+            <Setter Property="Background" Value="#33000000" />
+            <Setter Property="Foreground" Value="White" />
+            <Setter Property="BorderBrush" Value="Transparent" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="HorizontalAlignment" Value="Center" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+            <Setter Property="Padding" Value="0" />
+            <Setter Property="UseSystemFocusVisuals" Value="False" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="AppBarButton">
+                        <Grid x:Name="Root" Background="Transparent">
+                            <Border x:Name="Circle"
+                                    Width="{TemplateBinding Width}"
+                                    Height="{TemplateBinding Height}"
+                                    Background="{TemplateBinding Background}"
+                                    CornerRadius="1000"
+                                    BorderBrush="{TemplateBinding BorderBrush}"
+                                    BorderThickness="{TemplateBinding BorderThickness}">
+                                <Grid RenderTransformOrigin="0.5,0.5">
+                                    <Grid.RenderTransform>
+                                        <ScaleTransform x:Name="ScaleT" ScaleX="1" ScaleY="1" />
+                                    </Grid.RenderTransform>
+                                    <ContentPresenter x:Name="IconPresenter"
+                                                      Content="{TemplateBinding Icon}"
+                                                      HorizontalAlignment="Center"
+                                                      VerticalAlignment="Center"
+                                                      Foreground="{TemplateBinding Foreground}" />
+                                    <TextBlock x:Name="LabelText"
+                                               Text="{TemplateBinding Label}"
+                                               Foreground="{TemplateBinding Foreground}"
+                                               FontSize="10"
+                                               HorizontalAlignment="Center"
+                                               VerticalAlignment="Bottom"
+                                               Margin="0,0,0,4"
+                                               Opacity="0"
+                                               IsHitTestVisible="False" />
+                                </Grid>
+                            </Border>
+                            <Border x:Name="FocusRing"
+                                    Width="{TemplateBinding Width}"
+                                    Height="{TemplateBinding Height}"
+                                    CornerRadius="1000"
+                                    BorderBrush="White"
+                                    BorderThickness="2"
+                                    Opacity="0"
+                                    IsHitTestVisible="False" />
+                            <VisualStateManager.VisualStateGroups>
+                                <VisualStateGroup x:Name="CommonStates">
+                                    <VisualState x:Name="Normal" />
+                                    <VisualState x:Name="PointerOver">
+                                        <Storyboard>
+                                            <ObjectAnimationUsingKeyFrames Storyboard.TargetName="Circle" Storyboard.TargetProperty="Background">
+                                                <DiscreteObjectKeyFrame KeyTime="0" Value="{ThemeResource ButtonBackgroundPointerOver}" />
+                                            </ObjectAnimationUsingKeyFrames>
+                                        </Storyboard>
+                                    </VisualState>
+                                    <VisualState x:Name="Pressed">
+                                        <Storyboard>
+                                            <ObjectAnimationUsingKeyFrames Storyboard.TargetName="Circle" Storyboard.TargetProperty="Background">
+                                                <DiscreteObjectKeyFrame KeyTime="0" Value="{ThemeResource ButtonBackgroundPressed}" />
+                                            </ObjectAnimationUsingKeyFrames>
+                                            <DoubleAnimation Storyboard.TargetName="ScaleT" Storyboard.TargetProperty="ScaleX" To="0.90" Duration="0:0:0.08" />
+                                            <DoubleAnimation Storyboard.TargetName="ScaleT" Storyboard.TargetProperty="ScaleY" To="0.90" Duration="0:0:0.08" />
+                                        </Storyboard>
+                                    </VisualState>
+                                    <VisualState x:Name="Disabled">
+                                        <Storyboard>
+                                            <DoubleAnimation Storyboard.TargetName="Root" Storyboard.TargetProperty="Opacity" To="0.4" Duration="0:0:0" />
+                                        </Storyboard>
+                                    </VisualState>
+                                </VisualStateGroup>
+                                <VisualStateGroup x:Name="FocusStates">
+                                    <VisualState x:Name="Focused">
+                                        <Storyboard>
+                                            <DoubleAnimation Storyboard.TargetName="FocusRing" Storyboard.TargetProperty="Opacity" To="1" Duration="0:0:0.1" />
+                                        </Storyboard>
+                                    </VisualState>
+                                    <VisualState x:Name="PointerFocused" />
+                                    <VisualState x:Name="Unfocused" />
+                                </VisualStateGroup>
+                                <VisualStateGroup x:Name="DisplayModeStates">
+                                    <VisualState x:Name="Compact" />
+                                    <VisualState x:Name="FullSize">
+                                        <Storyboard>
+                                            <DoubleAnimation Storyboard.TargetName="LabelText" Storyboard.TargetProperty="Opacity" To="1" Duration="0:0:0.15" />
+                                        </Storyboard>
+                                    </VisualState>
+                                </VisualStateGroup>
+                            </VisualStateManager.VisualStateGroups>
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
 
     </UserControl.Resources>
 
@@ -233,16 +334,24 @@
 
 
             <!-- Player commands -->
-            <Grid Grid.Row="0" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="0">
-                <CommandBar VerticalAlignment="Center" HorizontalAlignment="Center" Background="Transparent" IsDynamicOverflowEnabled="False" OverflowButtonVisibility="Collapsed">
-                    <AppBarButton Icon="Previous" Command="{x:Bind ViewModel.SkipPreviousCommand}" IsEnabled="{x:Bind ViewModel.CanSkipPrevious, Mode=OneWay}" Foreground="White" RequestedTheme="Dark" VerticalAlignment="Stretch" Height="65" Width="40" Margin="0,0,0,0" />
-                    <AppBarButton Command="{x:Bind ViewModel.TogglePlayPauseCommand}" Foreground="White" Margin="10,0,0,0" RequestedTheme="Dark" Style="{StaticResource RoundAppBarButtonStyle}">
+            <StackPanel Grid.Row="0" Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Center">
+                <AppBarButton Icon="Previous" Command="{x:Bind ViewModel.SkipPreviousCommand}" IsEnabled="{x:Bind ViewModel.CanSkipPrevious, Mode=OneWay}" Foreground="White" RequestedTheme="Dark" VerticalAlignment="Center" Width="40" Margin="0" />
+                <Grid VerticalAlignment="Center" Margin="10,0,0,0">
+                    <Border x:Name="sleepModeHalo"
+                            Width="48"
+                            Height="48"
+                            CornerRadius="24"
+                            Background="White"
+                            Opacity="0"
+                            IsHitTestVisible="False"
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center" />
+                    <AppBarButton x:Name="playPauseButton" Command="{x:Bind ViewModel.TogglePlayPauseCommand}" Foreground="White" Margin="0" RequestedTheme="Dark" Style="{StaticResource PlayPauseButtonStyle}" HorizontalAlignment="Center" VerticalAlignment="Center">
                         <SymbolIcon Symbol="{x:Bind ViewModel.PlaybackState, Mode=OneWay, Converter={StaticResource PlaybackStateToButtonIconConverter}}" />
                     </AppBarButton>
-
-                    <AppBarButton Icon="Next" Command="{x:Bind ViewModel.SkipNextCommand}" IsEnabled="{x:Bind ViewModel.CanSkipNext, Mode=OneWay}" Foreground="White" RequestedTheme="Dark" VerticalAlignment="Stretch" Height="65" Width="40" Margin="10,0,0,0" />
-                </CommandBar>
-            </Grid>
+                </Grid>
+                <AppBarButton Icon="Next" Command="{x:Bind ViewModel.SkipNextCommand}" IsEnabled="{x:Bind ViewModel.CanSkipNext, Mode=OneWay}" Foreground="White" RequestedTheme="Dark" VerticalAlignment="Center" Width="40" Margin="10,0,0,0" />
+            </StackPanel>
         </Grid>
 
 
@@ -286,6 +395,30 @@
                         <AppBarButton.Icon>
                             <SymbolIcon Symbol="FullScreen" />
                         </AppBarButton.Icon>
+                    </AppBarButton>
+
+                    <AppBarButton x:Uid="playerSleepModeAppBarButton">
+                        <AppBarButton.Icon>
+                            <SymbolIcon Symbol="Clock"/>
+                        </AppBarButton.Icon>
+
+                        <AppBarButton.Flyout>
+                            <MenuFlyout Placement="Top" Opening="SleepFlyout_Opening">
+                                <MenuFlyoutItem IsEnabled="False" Text="{x:Bind ViewModel.RemainingSleepTime, Mode=OneWay, Converter={StaticResource SecondsToReadableConverter}}" Visibility="{x:Bind ViewModel.IsSleepModeActive, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" />
+                                <MenuFlyoutItem Text="Off" Command="{x:Bind ViewModel.StopSleepTimerCommand}" Visibility="{x:Bind ViewModel.IsSleepModeActive, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">
+                                    <MenuFlyoutItem.Icon>
+                                        <SymbolIcon Symbol="Cancel" />
+                                    </MenuFlyoutItem.Icon>
+                                </MenuFlyoutItem>
+                                <MenuFlyoutSeparator Visibility="{x:Bind ViewModel.IsSleepModeActive, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" />
+                                <MenuFlyoutItem Text="5 minutes" Command="{x:Bind ViewModel.SetSleepTimerCommand}" CommandParameter="{StaticResource SleepTimer5}" />
+                                <MenuFlyoutItem Text="10 minutes" Command="{x:Bind ViewModel.SetSleepTimerCommand}" CommandParameter="{StaticResource SleepTimer10}" />
+                                <MenuFlyoutItem Text="15 minutes" Command="{x:Bind ViewModel.SetSleepTimerCommand}" CommandParameter="{StaticResource SleepTimer15}" />
+                                <MenuFlyoutItem Text="30 minutes" Command="{x:Bind ViewModel.SetSleepTimerCommand}" CommandParameter="{StaticResource SleepTimer30}" />
+                                <MenuFlyoutItem Text="45 minutes" Command="{x:Bind ViewModel.SetSleepTimerCommand}" CommandParameter="{StaticResource SleepTimer45}" />
+                                <MenuFlyoutItem Text="60 minutes" Command="{x:Bind ViewModel.SetSleepTimerCommand}" CommandParameter="{StaticResource SleepTimer60}" />
+                            </MenuFlyout>
+                        </AppBarButton.Flyout>
                     </AppBarButton>
                 </CommandBar.SecondaryCommands>
             </CommandBar>

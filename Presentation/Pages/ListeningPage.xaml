@@ -148,6 +148,26 @@
         <RelativePanel Grid.Row="2" Margin="6,0,0,0">
             <CommandBar RelativePanel.AlignBottomWithPanel="True" Style="{StaticResource HeaderCommandBarStyle}">
                 <AppBarButton x:Uid="shuffleButton" Style="{StaticResource AppBarButtonCompactStyle}" Icon="Shuffle" Command="{x:Bind ViewModel.ShufflePlaylistCommand}" />
+
+                <AppBarButton x:Uid="playerSleepModeAppBarButton" Style="{StaticResource AppBarButtonCompactStyle}" Icon="Clock">
+                    <AppBarButton.Flyout>
+                        <MenuFlyout Placement="Top" Opening="SleepFlyout_Opening">
+                            <MenuFlyoutItem IsEnabled="False" Text="{x:Bind ViewModel.RemainingSleepTime, Mode=OneWay, Converter={StaticResource SecondsToReadableConverter}}" Visibility="{x:Bind ViewModel.IsSleepModeActive, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" />
+                            <MenuFlyoutItem Text="Off" Command="{x:Bind ViewModel.StopSleepTimerCommand}" Visibility="{x:Bind ViewModel.IsSleepModeActive, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">
+                                <MenuFlyoutItem.Icon>
+                                    <SymbolIcon Symbol="Cancel" />
+                                </MenuFlyoutItem.Icon>
+                            </MenuFlyoutItem>
+                            <MenuFlyoutSeparator Visibility="{x:Bind ViewModel.IsSleepModeActive, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" />
+                            <MenuFlyoutItem Text="5 minutes" Command="{x:Bind ViewModel.SetSleepTimerCommand}" CommandParameter="{StaticResource SleepTimer5}" />
+                            <MenuFlyoutItem Text="10 minutes" Command="{x:Bind ViewModel.SetSleepTimerCommand}" CommandParameter="{StaticResource SleepTimer10}" />
+                            <MenuFlyoutItem Text="15 minutes" Command="{x:Bind ViewModel.SetSleepTimerCommand}" CommandParameter="{StaticResource SleepTimer15}" />
+                            <MenuFlyoutItem Text="30 minutes" Command="{x:Bind ViewModel.SetSleepTimerCommand}" CommandParameter="{StaticResource SleepTimer30}" />
+                            <MenuFlyoutItem Text="45 minutes" Command="{x:Bind ViewModel.SetSleepTimerCommand}" CommandParameter="{StaticResource SleepTimer45}" />
+                            <MenuFlyoutItem Text="60 minutes" Command="{x:Bind ViewModel.SetSleepTimerCommand}" CommandParameter="{StaticResource SleepTimer60}" />
+                        </MenuFlyout>
+                    </AppBarButton.Flyout>
+                </AppBarButton>
             </CommandBar>
         </RelativePanel>
 

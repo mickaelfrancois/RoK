@@ -18,6 +18,7 @@ public partial class PlayerViewModel : ObservableObject, IDisposable
     private readonly ResourceLoader _resourceLoader;
     private readonly IMediator _mediator;
     private readonly NavigationService _navigationService;
+    private readonly IPlayerSleepModeService _playerSleepModeService;
     private readonly ILogger<PlayerViewModel> _logger;
     private bool _disposed;
 
@@ -48,6 +49,9 @@ public partial class PlayerViewModel : ObservableObject, IDisposable
         get => _stateManager.PlaybackState;
         set => _stateManager.PlaybackState = value;
     }
+
+    public bool IsSleepModeActive => _playerSleepModeService.IsSleepTimerActive;
+    public int RemainingSleepTime => _playerSleepModeService.GetRemainingSleepTimeInSeconds();
 
     public bool RepeatAll
     {
@@ -147,6 +151,7 @@ public partial class PlayerViewModel : ObservableObject, IDisposable
         PlayerStateManager stateManager,
         EqualizerViewModel equalizerViewModel,
         ResourceLoader resourceLoader,
+        IPlayerSleepModeService playerSleepModeService,
         ILogger<PlayerViewModel> logger)
     {
         _player = Guard.Against.Null(player);
@@ -159,9 +164,11 @@ public partial class PlayerViewModel : ObservableObject, IDisposable
         _stateManager = Guard.Against.Null(stateManager);
         EqualizerViewModel = Guard.Against.Null(equalizerViewModel);
         _resourceLoader = Guard.Against.Null(resourceLoader);
+        _playerSleepModeService = Guard.Against.Null(playerSleepModeService);
         _logger = Guard.Against.Null(logger);
 
         _stateManager.PropertyChanged += OnStateManagerPropertyChanged;
+        _playerSleepModeService.SleepTimerStateChanged += OnSleepTimerStateChanged;
 
         SubscribeToMessages();
         SubscribeToTimers();
@@ -176,6 +183,11 @@ public partial class PlayerViewModel : ObservableObject, IDisposable
             return;
 
         OnPropertyChanged(e.PropertyName);
+    }
+
+    private void OnSleepTimerStateChanged(object? sender, bool isActive)
+    {
+        _stateManager.ExecuteOnUIThread(() => OnPropertyChanged(nameof(IsSleepModeActive)));
     }
 
 
@@ -213,6 +225,8 @@ public partial class PlayerViewModel : ObservableObject, IDisposable
             OnPropertyChanged(nameof(CurrentArtist));
     }
 
+    public void RefreshSleepTime() => OnPropertyChanged(nameof(RemainingSleepTime));
+
     private void OnUpdateTimerTick(object? sender, EventArgs e)
     {
         if (IsPlaying)
@@ -234,6 +248,7 @@ public partial class PlayerViewModel : ObservableObject, IDisposable
     }
 
     #endregion
+
 
     #region Message Handlers
 
@@ -351,6 +366,7 @@ public partial class PlayerViewModel : ObservableObject, IDisposable
 
     #endregion
 
+
     private void LoadBackdrop()
     {
         _timerManager.StopBackdropTimer();
@@ -401,6 +417,20 @@ public partial class PlayerViewModel : ObservableObject, IDisposable
     }
 
 
+    [RelayCommand]
+    public void SetSleepTimer(int minutes)
+    {
+        _playerSleepModeService.StartSleepTimer(minutes);
+        Messenger.Send(new ShowNotificationMessage() { Message = _resourceLoader.GetString("notification_sleepTimer_Start")!, Type = NotificationType.Informational });
+    }
+
+    [RelayCommand]
+    public void StopSleepTimer()
+    {
+        _playerSleepModeService.StopSleepTimer();
+
+        Messenger.Send(new ShowNotificationMessage() { Message = _resourceLoader.GetString("notification_sleepTimer_Stop")!, Type = NotificationType.Informational });
+    }
 
     [RelayCommand]
     public void TogglePlayPause()
@@ -508,6 +538,8 @@ public partial class PlayerViewModel : ObservableObject, IDisposable
         {
             if (_stateManager != null)
                 _stateManager.PropertyChanged -= OnStateManagerPropertyChanged;
+
+            _playerSleepModeService.SleepTimerStateChanged -= OnSleepTimerStateChanged;
 
             _timerManager?.Dispose();
             _equalizerWindow?.Close();

@@ -1704,4 +1704,13 @@
   <data name="EqualizerBuiltin_Latin" xml:space="preserve">
     <value>Latin</value>
   </data>
+  <data name="playerSleepModeAppBarButton.Label" xml:space="preserve">
+    <value>Sleep timer</value>
+  </data>
+  <data name="notification_sleepTimer_Start" xml:space="preserve">
+    <value>Sleep timer is on — RoK will stop playback automatically</value>
+  </data>
+  <data name="notification_sleepTimer_Stop" xml:space="preserve">
+    <value>Sleep timer dismissed — your music stays on</value>
+  </data>
 </root>
