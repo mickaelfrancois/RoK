@@ -21,6 +21,8 @@ public class PlayerService : IPlayerService
 
     private bool _callingPaused = false;
 
+    private volatile bool _isCrossfadeRunning;
+
     public EPlaybackState PlaybackState
     {
         get => _playerState;
@@ -199,7 +201,7 @@ public class PlayerService : IPlayerService
     {
         _logger.LogDebug("Event Media ended fired.");
 
-        if (_isCrossfadeEnabled)
+        if (_isCrossfadeEnabled && _isCrossfadeRunning)
             return;
 
         if (CurrentTrack != null)
@@ -223,7 +225,10 @@ public class PlayerService : IPlayerService
             Messenger.Send(new MediaAboutToEndEvent(CurrentTrack));
 
         if (_isCrossfadeEnabled)
+        {
+            _isCrossfadeRunning = true;
             _ = Task.Run(() => CrossfadeToNextTrackAsync());
+        }
     }
 
     #endregion
@@ -540,6 +545,8 @@ public class PlayerService : IPlayerService
         }
         finally
         {
+            _isCrossfadeRunning = false;
+
             if (_crossfadeCts != null && _crossfadeCts.IsCancellationRequested)
             {
                 _crossfadeCts.Dispose();

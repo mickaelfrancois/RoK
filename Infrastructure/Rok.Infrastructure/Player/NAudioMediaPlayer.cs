@@ -117,8 +117,8 @@ public class NAudioMediaPlayer : IPlayerEngine, IDisposable
 
         if (_outputDevice is not null)
         {
-            _outputDevice.Stop();
             _outputDevice.PlaybackStopped -= OutputDevice_PlaybackStopped;
+            _outputDevice.Stop();
             _outputDevice.Dispose();
             _outputDevice = null;
         }
@@ -230,11 +230,12 @@ public class NAudioMediaPlayer : IPlayerEngine, IDisposable
 
     private void OutputDevice_PlaybackStopped(object? sender, StoppedEventArgs e)
     {
-        if (e.Exception is null)
-        {
-            _positionTimer.Stop();
-            OnMediaEnded?.Invoke(this, EventArgs.Empty);
-        }
+        _positionTimer.Stop();
+
+        if (e.Exception is not null)
+            _logger.LogWarning(e.Exception, "Playback stopped unexpectedly at position {Position}s.", Position);
+
+        OnMediaEnded?.Invoke(this, EventArgs.Empty);
     }
 
     private void PositionTimer_Elapsed(object? s, ElapsedEventArgs e)
