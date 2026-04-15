@@ -13,12 +13,7 @@
     <UserControl.Resources>
         <converters:FloatToStringConverter x:Key="FloatToStringConverter" />
 
-        <x:Int32 x:Key="SleepTimer5">5</x:Int32>
-        <x:Int32 x:Key="SleepTimer10">10</x:Int32>
-        <x:Int32 x:Key="SleepTimer15">15</x:Int32>
-        <x:Int32 x:Key="SleepTimer30">30</x:Int32>
-        <x:Int32 x:Key="SleepTimer45">45</x:Int32>
-        <x:Int32 x:Key="SleepTimer60">60</x:Int32>
+
 
         <Style x:Key="MiniLinkStyle" TargetType="HyperlinkButton">
             <Setter Property="Background" Value="Transparent"/>
@@ -408,13 +403,9 @@
                         </AppBarButton.Icon>
 
                         <AppBarButton.Flyout>
-                            <MenuFlyout Placement="Top">
-                                <MenuFlyoutItem IsEnabled="False"
-                                               Text="{x:Bind ViewModel.RemainingSleepTime, Mode=OneWay, Converter={StaticResource SecondsToReadableConverter}}"
-                                               Visibility="{x:Bind ViewModel.IsSleepModeActive, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" />
-                                <MenuFlyoutItem Text="Off"
-                                               Command="{x:Bind ViewModel.StopSleepTimerCommand}"
-                                               Visibility="{x:Bind ViewModel.IsSleepModeActive, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">
+                            <MenuFlyout Placement="Top" Opening="SleepFlyout_Opening">
+                                <MenuFlyoutItem IsEnabled="False" Text="{x:Bind ViewModel.RemainingSleepTime, Mode=OneWay, Converter={StaticResource SecondsToReadableConverter}}" Visibility="{x:Bind ViewModel.IsSleepModeActive, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" />
+                                <MenuFlyoutItem Text="Off" Command="{x:Bind ViewModel.StopSleepTimerCommand}" Visibility="{x:Bind ViewModel.IsSleepModeActive, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">
                                     <MenuFlyoutItem.Icon>
                                         <SymbolIcon Symbol="Cancel" />
                                     </MenuFlyoutItem.Icon>

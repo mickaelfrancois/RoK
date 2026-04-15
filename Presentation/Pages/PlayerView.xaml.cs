@@ -97,6 +97,11 @@ public sealed partial class PlayerView : UserControl
         }
     }
 
+    private void SleepFlyout_Opening(object sender, object e)
+    {
+        ViewModel.RefreshSleepTime();
+    }
+
     public Symbol GetIconFromPlaybackState(EPlaybackState state)
     {
         if (state == EPlaybackState.Playing)

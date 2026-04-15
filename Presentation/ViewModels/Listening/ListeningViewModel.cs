@@ -3,7 +3,9 @@ using CommunityToolkit.Mvvm.Input;
 using Rok.Application.Player;
 using Rok.ViewModels.Artist;
 using Rok.ViewModels.Listening.Services;
+using Rok.ViewModels.Player.Services;
 using Rok.ViewModels.Track;
+using ResourceLoader = Windows.ApplicationModel.Resources.ResourceLoader;
 
 namespace Rok.ViewModels.Listening;
 
@@ -11,27 +13,38 @@ public partial class ListeningViewModel : ObservableObject
 {
     private readonly ILogger<ListeningViewModel> _logger;
     private readonly IPlayerService _playerService;
+    private readonly ResourceLoader _resourceLoader;
     private readonly ListeningPlaylistManager _playlistManager;
     private readonly ListeningPlaybackService _playbackService;
     private readonly NavigationService _navigationService;
+    private readonly IPlayerSleepModeService _playerSleepModeService;
+    private readonly PlayerStateManager _stateManager;
 
     public int TrackCount => _playlistManager.TrackCount;
     public long Duration => _playlistManager.Duration;
     public ArtistViewModel? Artist => _playlistManager.Artist;
     public RangeObservableCollection<TrackViewModel> Tracks => _playlistManager.Tracks;
     public TrackViewModel? CurrentTrack => _playlistManager.CurrentTrack;
+    public bool IsSleepModeActive => _playerSleepModeService.IsSleepTimerActive;
+    public int RemainingSleepTime => _playerSleepModeService.GetRemainingSleepTimeInSeconds();
 
     public ListeningViewModel(
         IPlayerService playerService,
         ListeningPlaylistManager playlistManager,
         ListeningPlaybackService playbackService,
         NavigationService navigationService,
+        PlayerStateManager stateManager,
+        IPlayerSleepModeService playerSleepModeService,
+         ResourceLoader resourceLoader,
         ILogger<ListeningViewModel> logger)
     {
         _playerService = Guard.Against.Null(playerService);
         _playlistManager = Guard.Against.Null(playlistManager);
         _playbackService = Guard.Against.Null(playbackService);
+        _playerSleepModeService = Guard.Against.Null(playerSleepModeService);
+        _stateManager = Guard.Against.Null(stateManager);
         _navigationService = Guard.Against.Null(navigationService);
+        _resourceLoader = Guard.Against.Null(resourceLoader);
         _logger = Guard.Against.Null(logger);
 
         SubscribeToMessages();
@@ -51,7 +64,10 @@ public partial class ListeningViewModel : ObservableObject
     {
         _playlistManager.PlaylistChanged += OnPlaylistChanged;
         _playlistManager.CurrentTrackChanged += OnCurrentTrackChanged;
+        _playerSleepModeService.SleepTimerStateChanged += OnSleepTimerStateChanged;
     }
+
+    public void RefreshSleepTime() => OnPropertyChanged(nameof(RemainingSleepTime));
 
     private void InitializeFromPlayerService()
     {
@@ -62,6 +78,11 @@ public partial class ListeningViewModel : ObservableObject
             _playlistManager.SetCurrentTrackAsync(_playerService.CurrentTrack);
 #pragma warning restore CS4014
         }
+    }
+
+    private void OnSleepTimerStateChanged(object? sender, bool isActive)
+    {
+        _stateManager.ExecuteOnUIThread(() => OnPropertyChanged(nameof(IsSleepModeActive)));
     }
 
     private void OnPlaylistChanged(object? sender, EventArgs e)
@@ -94,6 +115,21 @@ public partial class ListeningViewModel : ObservableObject
     {
         IEnumerable<long> currentTrackIds = Tracks.Select(t => t.Track.Id);
         await _playbackService.AddMoreFromArtistAsync(track, currentTrackIds);
+    }
+
+    [RelayCommand]
+    public void SetSleepTimer(int minutes)
+    {
+        _playerSleepModeService.StartSleepTimer(minutes);
+        Messenger.Send(new ShowNotificationMessage() { Message = _resourceLoader.GetString("notification_sleepTimer_Start")!, Type = NotificationType.Informational });
+    }
+
+    [RelayCommand]
+    public void StopSleepTimer()
+    {
+        _playerSleepModeService.StopSleepTimer();
+
+        Messenger.Send(new ShowNotificationMessage() { Message = _resourceLoader.GetString("notification_sleepTimer_Stop")!, Type = NotificationType.Informational });
     }
 
     [RelayCommand]

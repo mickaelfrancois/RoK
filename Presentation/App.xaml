@@ -10,7 +10,14 @@
             <BitmapImage x:Key='albumCoverFallback' UriSource='Assets/albumFallback.png' />
             
             <x:String x:Key="ArtistFallbackPictureUri">ms-appx:///Assets/artistFallback.png</x:String>
-            
+
+            <x:Int32 x:Key="SleepTimer5">5</x:Int32>
+            <x:Int32 x:Key="SleepTimer10">10</x:Int32>
+            <x:Int32 x:Key="SleepTimer15">15</x:Int32>
+            <x:Int32 x:Key="SleepTimer30">30</x:Int32>
+            <x:Int32 x:Key="SleepTimer45">45</x:Int32>
+            <x:Int32 x:Key="SleepTimer60">60</x:Int32>
+
             <converters:BoolToGridLengthAutoConverter x:Key="BoolToGridLengthAutoConverter" />
             <converters:ColorToBrushConverter x:Key="ColorToBrushConverter" />
             <converters:ColorToGradientBrushConverter x:Key="ColorToGradientBrushConverter" />

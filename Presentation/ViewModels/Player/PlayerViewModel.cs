@@ -225,6 +225,8 @@ public partial class PlayerViewModel : ObservableObject, IDisposable
             OnPropertyChanged(nameof(CurrentArtist));
     }
 
+    public void RefreshSleepTime() => OnPropertyChanged(nameof(RemainingSleepTime));
+
     private void OnUpdateTimerTick(object? sender, EventArgs e)
     {
         if (IsPlaying)
@@ -235,9 +237,6 @@ public partial class PlayerViewModel : ObservableObject, IDisposable
             OnPropertyChanged(nameof(ListenDuration));
             OnPropertyChanged(nameof(ListenDurationStr));
         }
-
-        if (IsSleepModeActive)
-            OnPropertyChanged(nameof(RemainingSleepTime));
     }
 
     private void OnLyricTimerTick(object? sender, EventArgs e)
