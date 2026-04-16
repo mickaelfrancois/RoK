@@ -17,7 +17,7 @@ public sealed partial class MainWindow : Window
     private const int KMinDaysBeforeReviewPrompt = 45;
 
     private readonly NavigationService _navigationService;
-
+    private readonly ITelemetryClient _telemetryClient;
     private readonly ResourceLoader _resourceLoader;
 
     private PointInt32? _compactModeAppPosition;
@@ -60,9 +60,10 @@ public sealed partial class MainWindow : Window
 
 
 
-    public MainWindow(NavigationService navigationService, ResourceLoader resourceLoader, IAppDbContext dbContext, IAppOptions appOptions, IReviewPromptEligibilityService reviewPromptEligibilityService)
+    public MainWindow(NavigationService navigationService, ITelemetryClient telemetryClient, ResourceLoader resourceLoader, IAppDbContext dbContext, IAppOptions appOptions, IReviewPromptEligibilityService reviewPromptEligibilityService)
     {
         _navigationService = Guard.Against.Null(navigationService);
+        _telemetryClient = Guard.Against.Null(telemetryClient);
         _resourceLoader = Guard.Against.Null(resourceLoader);
         _dbContext = Guard.Against.Null(dbContext);
         _appOptions = Guard.Against.Null(appOptions);
@@ -78,6 +79,7 @@ public sealed partial class MainWindow : Window
 
         SplashScreen.Completed += SplashScreen_Completed;
         SplashScreen.Start();
+        _ = SendMetricsAsync();
 
         Messenger.Subscribe<FullScreenMessage>((message) => FullScreenHandle(message));
         Messenger.Subscribe<MediaChangedMessage>((message) => MediaChanged(message));
@@ -98,6 +100,12 @@ public sealed partial class MainWindow : Window
             SystemBackdrop = new MicaBackdrop();
         }
 #endif
+    }
+
+
+    private async Task SendMetricsAsync()
+    {
+        await _telemetryClient.CaptureEventAsync("Event", "Start");
     }
 
 
