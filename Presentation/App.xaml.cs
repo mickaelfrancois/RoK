@@ -50,11 +50,12 @@ public partial class App : Microsoft.UI.Xaml.Application
 
         NavigationService navigationService = ServiceProvider.GetRequiredService<NavigationService>();
         ResourceLoader resourceLoader = ServiceProvider.GetRequiredService<ResourceLoader>();
+        ITelemetryClient telemetryClient = ServiceProvider.GetRequiredService<ITelemetryClient>();
         IReviewPromptEligibilityService reviewPromptEligibilityService = ServiceProvider.GetRequiredService<IReviewPromptEligibilityService>();
 
         string iconPath = Path.Combine(AppContext.BaseDirectory, "Assets/Square44x44Logo.ico");
 
-        MainWindow = new MainWindow(navigationService, resourceLoader, appDbContext, options, reviewPromptEligibilityService);
+        MainWindow = new MainWindow(navigationService, telemetryClient, resourceLoader, appDbContext, options, reviewPromptEligibilityService);
         MainWindow.AppWindow.SetIcon(iconPath);
         MainWindow.Title = "RoK";
 #if DEBUG

@@ -20,16 +20,12 @@ public class NavigationService(ITelemetryClient telemetryClient)
 
     public void NavigateTo(Type pageType, object? parameter)
     {
-        _ = telemetryClient.CaptureScreenAsync(pageType.Name);
-
         MainFrame.Navigate(pageType, parameter);
     }
 
     public void NavigateToArtist(long artistId)
     {
         Guard.Against.NegativeOrZero(artistId);
-
-        _ = telemetryClient.CaptureScreenAsync("ArtistPage");
 
         MainFrame.Navigate(typeof(ArtistPage), new ArtistOpenArgs(artistId));
     }
@@ -46,16 +42,12 @@ public class NavigationService(ITelemetryClient telemetryClient)
     {
         Guard.Against.NegativeOrZero(albumId);
 
-        _ = telemetryClient.CaptureScreenAsync("AlbumPage");
-
         MainFrame.Navigate(typeof(AlbumPage), new AlbumOpenArgs(albumId));
     }
 
     public void NavigateToGenre(long genreId)
     {
         Guard.Against.NegativeOrZero(genreId);
-
-        _ = telemetryClient.CaptureScreenAsync("GenrePage");
 
         MainFrame.Navigate(typeof(GenrePage), new GenreOpenArgs(genreId));
     }
@@ -65,23 +57,17 @@ public class NavigationService(ITelemetryClient telemetryClient)
     {
         Guard.Against.NegativeOrZero(trackId);
 
-        _ = telemetryClient.CaptureScreenAsync("TrackPage");
-
         MainFrame.Navigate(typeof(TrackPage), new TrackOpenArgs(trackId));
     }
 
 
     public void NavigateToSmartPlaylist(long playlistId)
     {
-        _ = telemetryClient.CaptureScreenAsync("SmartPlaylistPage");
-
         MainFrame.Navigate(typeof(SmartPlaylistPage), new PlaylistOpenArgs(playlistId));
     }
 
     public void NavigateToPlaylist(long playlistId)
     {
-        _ = telemetryClient.CaptureScreenAsync("PlaylistPage");
-
         MainFrame.Navigate(typeof(PlaylistPage), new PlaylistOpenArgs(playlistId));
     }
 
