@@ -1,5 +1,40 @@
 ﻿# ChangeLog
 
+## [1.9.0] Store – 16 avril 2026  
+
+### Modifié
+
+- Utilisation de la nouvelle API de télémétrie pour le suivi des événements et des erreurs. 
+
+
+--
+
+
+## [1.8.3] Preview – 16 avril 2026  
+
+### Ajouté
+
+- Ajout du minuteur de sommeil pour arrêter la lecture après un certain temps.
+
+### Corrigé
+
+- Correction d'un problème de lecture de certaines pistes avec le moteur NAudio.
+- Correction d'un problème lorsque l'utilisateur en mets en pause la lecture pendant longtemps, la lecture ne reprenait pas correctement après la pause.
+
+--
+
+
+## [1.8.2] Preview – 13 avril 2026  
+
+### Ajouté
+
+- Utilisation du moteur NAudio.
+- Ajout d'un equaliseur graphique avec 10 bandes.
+
+
+--
+
+
 ## [1.8.1] Store – 06 avril 2026  
 
 ### Ajouté
@@ -37,7 +72,7 @@
 
 - Correction d'un problème de style sur le player en thème sombre.
 
-- 
+
 --
 
 
