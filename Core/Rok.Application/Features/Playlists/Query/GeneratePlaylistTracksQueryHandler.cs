@@ -1,4 +1,5 @@
 ﻿using Rok.Application.Interfaces.Repositories;
+using Rok.Application.Randomizer;
 
 namespace Rok.Application.Features.Playlists.Query;
 
@@ -15,6 +16,8 @@ public class GeneratePlaylistTracksQueryHandler(IPlaylistTrackGenerateRepository
     {
         List<TrackEntity> tracks = await _repository.GenerateAsync(request);
 
-        return tracks.Select(a => TrackDtoMapping.Map(a));
+        var trackDto = tracks.Select(a => TrackDtoMapping.Map(a)).ToList();
+        TracksRandomizer.ArtistBalancedTrackRandomize(trackDto, 0);
+        return trackDto;
     }
 }
