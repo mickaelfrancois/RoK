@@ -16,7 +16,6 @@ public class TrackRepository(IDbConnection db, [FromKeyedServices("BackgroundCon
     private const string UpdateGetLyricsLastAttemptSql = "UPDATE tracks SET getLyricsLastAttempt = @lastAttemptDate WHERE id = @id";
     private const string DefaultGroupBy = " GROUP BY tracks.id ";
 
-
     public async Task<IEnumerable<TrackEntity>> SearchAsync(string name, RepositoryConnectionKind kind = RepositoryConnectionKind.Foreground)
     {
         if (string.IsNullOrWhiteSpace(name))
@@ -34,7 +33,8 @@ public class TrackRepository(IDbConnection db, [FromKeyedServices("BackgroundCon
 
         string sql = GetSelectQuery() +
                      "INNER JOIN playlisttracks AS pt ON pt.trackId = tracks.id AND pt.playlistId = @playlistId " +
-                     DefaultGroupBy;
+                     DefaultGroupBy +
+                     " ORDER BY pt.position";
 
         return await ExecuteQueryAsync(sql, kind, new { playlistId });
     }
@@ -44,7 +44,6 @@ public class TrackRepository(IDbConnection db, [FromKeyedServices("BackgroundCon
         string sql = GetSelectQuery("title") + DefaultGroupBy;
         return await QuerySingleOrDefaultAsync(sql, kind, new { title = name });
     }
-
 
     public async Task<IEnumerable<TrackEntity>> GetByGenreIdAsync(long genreId, RepositoryConnectionKind kind = RepositoryConnectionKind.Foreground)
     {
@@ -69,7 +68,7 @@ public class TrackRepository(IDbConnection db, [FromKeyedServices("BackgroundCon
         if (artistIds == null)
             return Enumerable.Empty<TrackEntity>();
 
-        List<long> idsList = artistIds.ToList();
+        var idsList = artistIds.ToList();
         if (idsList.Count == 0)
             return Enumerable.Empty<TrackEntity>();
 
@@ -100,7 +99,7 @@ public class TrackRepository(IDbConnection db, [FromKeyedServices("BackgroundCon
         if (albumIds == null)
             return Enumerable.Empty<TrackEntity>();
 
-        List<long> idsList = albumIds.ToList();
+        var idsList = albumIds.ToList();
         if (idsList.Count == 0)
             return Enumerable.Empty<TrackEntity>();
 
@@ -142,7 +141,6 @@ public class TrackRepository(IDbConnection db, [FromKeyedServices("BackgroundCon
         return await ExecuteUpdateAsync(UpdateSkipCountSql, new { lastSkip = DateTime.UtcNow, id }, kind);
     }
 
-
     public async Task<bool> UpdateFileDateAsync(long id, DateTime fileDate, RepositoryConnectionKind kind = RepositoryConnectionKind.Foreground)
     {
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(id);
@@ -156,7 +154,6 @@ public class TrackRepository(IDbConnection db, [FromKeyedServices("BackgroundCon
 
         return await ExecuteUpdateAsync(UpdateGetLyricsLastAttemptSql, new { lastAttemptDate = DateTime.UtcNow, id }, kind);
     }
-
 
     public override string GetSelectQuery(string? whereParam = null)
     {
@@ -186,7 +183,6 @@ public class TrackRepository(IDbConnection db, [FromKeyedServices("BackgroundCon
     {
         return DefaultGroupBy;
     }
-
 
     public override string GetTableName()
     {
