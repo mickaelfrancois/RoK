@@ -1713,4 +1713,10 @@
   <data name="notification_sleepTimer_Stop" xml:space="preserve">
     <value>Sleep timer dismissed — your music stays on</value>
   </data>
+  <data name="SmartPlaylist_EmptyTracksTitle.Text" xml:space="preserve">
+    <value>No tracks yet</value>
+  </data>
+  <data name="SmartPlaylist_EmptyTracksDescription.Text" xml:space="preserve">
+    <value>Set up your playlist criteria and click Refresh to see matching tracks.</value>
+  </data>
 </root>
