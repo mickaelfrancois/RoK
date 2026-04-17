@@ -1596,4 +1596,10 @@
   <data name="notification_sleepTimer_Stop" xml:space="preserve">
     <value>Temporizador de apagado desactivado: tu música sigue encendida</value>
   </data>
+  <data name="SmartPlaylist_EmptyTracksTitle.Text" xml:space="preserve">
+    <value>Sin pistas por el momento</value>
+  </data>
+  <data name="SmartPlaylist_EmptyTracksDescription.Text" xml:space="preserve">
+    <value>Configura los criterios de tu playlist y haz clic en Generar para ver las pistas correspondientes.</value>
+  </data>
 </root>

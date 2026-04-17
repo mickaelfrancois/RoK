@@ -24,6 +24,8 @@ public partial class PlaylistViewModel : ObservableObject
     public PlaylistHeaderDto Playlist { get; private set; } = new();
     public RangeObservableCollection<TrackViewModel> Tracks { get; set; } = [];
 
+    public bool IsTracksEmpty => Tracks.Count == 0;
+
     private IEnumerable<TrackDto>? _tracks = null;
 
     public int TrackMaximum
@@ -114,6 +116,7 @@ public partial class PlaylistViewModel : ObservableObject
         _updateService = Guard.Against.Null(updateService);
         _generationService = Guard.Against.Null(generationService);
         _logger = Guard.Against.Null(logger);
+        Tracks.CollectionChanged += (_, _) => OnPropertyChanged(nameof(IsTracksEmpty));
     }
 
     public void SetData(PlaylistHeaderDto playlist)

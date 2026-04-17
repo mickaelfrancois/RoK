@@ -21,9 +21,6 @@ public class PlaylistGenerationService(
 
     private async Task SaveTracksAsync(long playlistId, List<TrackDto> tracks)
     {
-        if (tracks == null || tracks.Count == 0)
-            return;
-
         int index = 1;
         CreatePlaylistTracksCommand command = new() { PlaylistId = playlistId };
 

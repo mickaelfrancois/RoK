@@ -1713,4 +1713,10 @@
   <data name="notification_sleepTimer_Stop" xml:space="preserve">
     <value>Minuteur de mise en veille désactivé — votre musique continue</value>
   </data>
+  <data name="SmartPlaylist_EmptyTracksTitle.Text" xml:space="preserve">
+    <value>Aucun titre pour le moment</value>
+  </data>
+  <data name="SmartPlaylist_EmptyTracksDescription.Text" xml:space="preserve">
+    <value>Configurez les critères de votre playlist et cliquez sur Actualiser pour afficher les titres correspondants.</value>
+  </data>
 </root>
