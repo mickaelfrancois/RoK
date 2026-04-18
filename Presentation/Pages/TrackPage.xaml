@@ -3,6 +3,7 @@
       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:local="using:Rok.Pages"
+      xmlns:common="using:Rok.Commons"
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
       xmlns:winui="using:Microsoft.UI.Xaml.Controls"
@@ -11,7 +12,7 @@
 
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition x:Name="headerRow" Height="110" />
+            <RowDefinition x:Name="headerRow" Height="150" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
@@ -23,21 +24,31 @@
 
         <!-- Header -->
         <StackPanel Grid.Row="0" Orientation="Vertical" Padding="6" Spacing="4">
-            <TextBlock Text="{x:Bind ViewModel.Track.Title}" FontSize="{StaticResource FontSizeLarge}" FontWeight="Bold" Foreground="{ThemeResource BrandAccentBrush }" />
+            <TextBlock x:Uid="trackTitle" x:Name="trackTitle" Text="{x:Bind ViewModel.Track.Title}" FontSize="{StaticResource FontSizeLarge}" FontWeight="Bold" Foreground="{ThemeResource BrandAccentBrush }" />
 
             <StackPanel Orientation="Horizontal">
                 <TextBlock x:Uid="genByLabel" FontSize="{StaticResource FontSizeMedium}" Margin="0,0,6,0" />
-                <TextBlock Text="{x:Bind ViewModel.ArtistName}" FontSize="{StaticResource FontSizeMedium}" FontWeight="SemiBold" />
+                <HyperlinkButton x:Name="artistName" Content="{x:Bind ViewModel.ArtistName, Mode=OneWay}" Command="{x:Bind ViewModel.ArtistOpenCommand}" FontSize="{StaticResource FontSizeMedium}" FontWeight="SemiBold" Padding="0" Margin="0" Foreground="White" Style="{StaticResource HeaderHyperlinkStyle}" />
             </StackPanel>
 
             <StackPanel Orientation="Horizontal">
                 <TextBlock x:Uid="genOnLabel" FontSize="{StaticResource FontSizeXMedium}" Margin="0,0,6,0" />
-                <TextBlock Text="{x:Bind ViewModel.AlbumName}" FontSize="{StaticResource FontSizeXMedium}" FontStyle="Italic" />
+                <HyperlinkButton x:Name="albumName" Content="{x:Bind ViewModel.AlbumName, Mode=OneWay}" Command="{x:Bind ViewModel.AlbumOpenCommand}" FontSize="{StaticResource FontSizeXMedium}" FontStyle="Italic" Padding="0" Margin="0" Foreground="White" Style="{StaticResource HeaderHyperlinkStyle}" />
             </StackPanel>
+
+            <CommandBar Style="{StaticResource HeaderCommandBarStyle}" HorizontalAlignment="Left">
+                <AppBarButton x:Uid="albumViewListen" Style="{StaticResource ListenAppBarButtonStyle}" Command="{x:Bind ViewModel.ListenCommand}" Margin="0,0,8,0" />
+                <AppBarButton x:Uid="albumViewPlaylist" Style="{StaticResource HeaderGenericButtonStyle}" Icon="Add">
+                    <AppBarButton.Flyout>
+                        <MenuFlyout x:Name="albumPlaylistFlyout" common:MenuFlyoutExtensions.PlaylistMenuService="{x:Bind ViewModel.PlaylistMenuService}" common:MenuFlyoutExtensions.TrackId="{x:Bind ViewModel.Track.Id}" common:MenuFlyoutExtensions.FlattenPlaylistMenu="True" />
+                    </AppBarButton.Flyout>
+                </AppBarButton>
+            </CommandBar>
         </StackPanel>
 
+        
         <!-- Content -->
-        <Grid Grid.Row="2" Style="{StaticResource FileGridStyle}" Padding="10">
+        <Grid Grid.Row="1" Style="{StaticResource FileGridStyle}" Padding="10">
             <StackPanel>
                 <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingLarge}">
                     <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingSmall}">
