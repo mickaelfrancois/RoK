@@ -79,7 +79,7 @@ public class FileSystemService(ILogger<FileSystemService> logger)
         return files;
     }
 
-    private bool IsValidMusicFile(string filePath)
+    private static bool IsValidMusicFile(string filePath)
     {
         if (!ValidExtensions.Contains(Path.GetExtension(filePath)))
             return false;

@@ -170,7 +170,7 @@ public class MigrationServiceTests : IDisposable
     public void MigrateToLatest_WithRealMigration2_AppliesSuccessfully()
     {
         // Arrange
-        IMigration[] migrations = new IMigration[] { new Migration2() };
+        var migrations = new IMigration[] { new Migration2() };
         MigrationService sut = new(_connection, migrations, NullLogger<MigrationService>.Instance);
         sut.Initial();
 
@@ -260,7 +260,7 @@ public class MigrationServiceTests : IDisposable
     public void MigrateToLatest_WithAllRealMigrations_ReachesLatestVersion()
     {
         // Arrange
-        IMigration[] migrations = new IMigration[]
+        var migrations = new IMigration[]
         {
             new Migration2(),
             new Migration3(),
@@ -269,7 +269,8 @@ public class MigrationServiceTests : IDisposable
             new Migration6(),
             new Migration7(),
             new Migration8(),
-            new Migration9()
+            new Migration9(),
+            new Migration10()
         };
 
         MigrationService sut = new(_connection, migrations, NullLogger<MigrationService>.Instance);
@@ -279,13 +280,13 @@ public class MigrationServiceTests : IDisposable
         sut.MigrateToLatest();
 
         // Assert
-        Assert.Equal(9, sut.GetDatabaseVersion());
+        Assert.Equal(10, sut.GetDatabaseVersion());
         AssertColumnExists("Tracks", "getLyricsLastAttempt");
         AssertColumnExists("Artists", "getMetaDataLastAttempt");
         AssertColumnExists("Albums", "getMetaDataLastAttempt");
         AssertColumnExists("Artists", "flickrUrl");
         AssertColumnExists("Countries", "name");
-        AssertTableExists("ListeningEvent");
+        AssertTableExists("ListeningEvents");
     }
 
     private void AssertTableExists(string tableName)
