@@ -1,0 +1,14 @@
+{
+    "version": 1,
+    "ignore": [
+        "bin/**",
+        "obj/**",
+        "**/*.g.cs"
+    ],
+    "instructions": {
+        "style": "Follow .editorconfig and project rules",
+        "language": "C#",
+        "framework": ".NET 10",
+        "architecture": "WinUI 3 MVVM modular"
+    }
+}
