@@ -1,5 +1,19 @@
 ﻿# ChangeLog
 
+## [1.9.1] Store – 18 avril 2026  
+
+### Ajouté
+
+- Affichage d'un message lorsqu'il n'y a aucune piste dans une playlist intelligente.
+
+### Corrigé
+
+- Les titres d'une playlist intelligente sont triées par position.
+
+
+--
+
+
 ## [1.9.0] Store – 16 avril 2026  
 
 ### Modifié
