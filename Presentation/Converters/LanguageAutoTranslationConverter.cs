@@ -4,7 +4,7 @@ public class LanguageAutoTranslationConverter : IValueConverter
 {
     public object Convert(object value, Type targetType, object parameter, string language)
     {
-        if (value is string languageCode && (languageCode == "es-ES"))
+        if (value is string languageCode && (languageCode == "es-ES" || languageCode == "uk-UA"))
         {
             return Visibility.Visible;
         }

@@ -239,7 +239,8 @@ public sealed partial class OptionsPage : Page
         "System", // System language
         "en-US", // English
         "fr-FR", // French
-        "es-ES" // Spanish (Automatic Translation)
+        "es-ES", // Spanish (Automatic Translation)
+        "uk-UA" // Ukrainian (Automatic Translation)
     };
 }
 
