@@ -1,0 +1,1663 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="menuAlbums.Content" xml:space="preserve">
+    <value>Альбоми</value>
+  </data>
+  <data name="menuArtists.Content" xml:space="preserve">
+    <value>Виконавці</value>
+  </data>
+  <data name="artistsPageTitle.Text" xml:space="preserve">
+    <value>Виконавці</value>
+  </data>
+  <data name="albums" xml:space="preserve">
+    <value>альбоми</value>
+  </data>
+  <data name="album" xml:space="preserve">
+    <value>альбом</value>
+  </data>
+  <data name="track" xml:space="preserve">
+    <value>трек</value>
+  </data>
+  <data name="tracks" xml:space="preserve">
+    <value>треки</value>
+  </data>
+  <data name="artistsViewListen.Text" xml:space="preserve">
+    <value> слухати</value>
+  </data>
+  <data name="artistsViewGroupBy.Text" xml:space="preserve">
+    <value>Сортувати за</value>
+  </data>
+  <data name="artistsViewGroupByYearMenu.Text" xml:space="preserve">
+    <value>роком</value>
+  </data>
+  <data name="artistsViewGroupByCountryMenu.Text" xml:space="preserve">
+    <value>країною</value>
+  </data>
+  <data name="artistsViewGroupByCreatDateMenu.Text" xml:space="preserve">
+    <value>нещодавно додані</value>
+  </data>
+  <data name="artistsViewGroupByArtistMenu.Text" xml:space="preserve">
+    <value>виконавцями</value>
+  </data>
+  <data name="artistsViewGroupByLastListenMenu.Text" xml:space="preserve">
+    <value>останнє прослуховування</value>
+  </data>
+  <data name="artistsViewGroupByListenCountMenu.Text" xml:space="preserve">
+    <value>найпопулярніші</value>
+  </data>
+  <data name="artistsViewGroupByYear" xml:space="preserve">
+    <value>рік</value>
+  </data>
+  <data name="artistsViewGroupByCountry" xml:space="preserve">
+    <value>країна</value>
+  </data>
+  <data name="artistsViewGroupByCreatDate" xml:space="preserve">
+    <value>нещодавно додані</value>
+  </data>
+  <data name="artistsViewGroupByArtist" xml:space="preserve">
+    <value>виконавці</value>
+  </data>
+  <data name="artistsViewGroupByLastListen" xml:space="preserve">
+    <value>останнє прослуховування</value>
+  </data>
+  <data name="artistsViewGroupByListenCount" xml:space="preserve">
+    <value>найпопулярніші</value>
+  </data>
+  <data name="artistsViewFilterBy.Text" xml:space="preserve">
+    <value>Фільтрувати за</value>
+  </data>
+  <data name="artistsViewFilterByAllMenu.Text" xml:space="preserve">
+    <value>всі</value>
+  </data>
+  <data name="artistsViewFilterByFavoriteArtistMenu.Text" xml:space="preserve">
+    <value>улюблені виконавці</value>
+  </data>
+  <data name="artistsViewFilterByFavoriteGenre" xml:space="preserve">
+    <value>улюблені жанри</value>
+  </data>
+  <data name="artistsViewFilterByFavoriteGenreMenu.Text" xml:space="preserve">
+    <value>улюблені жанри</value>
+  </data>
+  <data name="artistsViewFilterNone" xml:space="preserve">
+    <value>всі</value>
+  </data>
+  <data name="albumsPageTitle.Text" xml:space="preserve">
+    <value>Альбоми</value>
+  </data>
+  <data name="ArtistViewSong.Text" xml:space="preserve">
+    <value>треки, </value>
+  </data>
+  <data name="ArtistViewAlbums.Text" xml:space="preserve">
+    <value>альбоми, </value>
+  </data>
+  <data name="ArtistViewBestof.Text" xml:space="preserve">
+    <value>найкращі, </value>
+  </data>
+  <data name="ArtistViewLive.Text" xml:space="preserve">
+    <value>живий, </value>
+  </data>
+  <data name="ArtistViewCompilation.Text" xml:space="preserve">
+    <value>збірники, </value>
+  </data>
+  <data name="ArtistViewDuration.Text" xml:space="preserve">
+    <value>тривалість: </value>
+  </data>
+  <data name="artistViewListenCount.Text" xml:space="preserve">
+    <value>Прослухано</value>
+  </data>
+  <data name="artistViewListenCountTimes.Text" xml:space="preserve">
+    <value>раз</value>
+  </data>
+  <data name="artistViewLastListen.Text" xml:space="preserve">
+    <value>останнє прослуховування</value>
+  </data>
+  <data name="artistViewListen.Label" xml:space="preserve">
+    <value>Слухати</value>
+  </data>
+  <data name="artistViewLike.Label" xml:space="preserve">
+    <value>Подобається</value>
+  </data>
+  <data name="artistWikipedia.Content" xml:space="preserve">
+    <value>Вікіпедія</value>
+  </data>
+  <data name="artistOfficialSite.Content" xml:space="preserve">
+    <value>Офіційний сайт</value>
+  </data>
+  <data name="artistViewGenre.Text" xml:space="preserve">
+    <value>Жанр:</value>
+  </data>
+  <data name="artistsViewGroupByDecadeMenu.Text" xml:space="preserve">
+    <value>десятиліттям</value>
+  </data>
+  <data name="artistsViewGroupByDecade" xml:space="preserve">
+    <value>десятиліття</value>
+  </data>
+  <data name="artistsViewFilterByNeverListenedMenu.Text" xml:space="preserve">
+    <value>ніколи не слухав</value>
+  </data>
+  <data name="artistsViewFilterByNeverListened" xml:space="preserve">
+    <value>ніколи не слухав</value>
+  </data>
+  <data name="tracksViewGroupByTitle" xml:space="preserve">
+    <value>назви</value>
+  </data>
+  <data name="tracksViewGroupByYear" xml:space="preserve">
+    <value>рік</value>
+  </data>
+  <data name="tracksViewGroupByCountry" xml:space="preserve">
+    <value>країна</value>
+  </data>
+  <data name="tracksViewGroupByCreatDate" xml:space="preserve">
+    <value>нещодавно додані</value>
+  </data>
+  <data name="tracksViewGroupByLastListen" xml:space="preserve">
+    <value>останнє прослуховування</value>
+  </data>
+  <data name="tracksViewGroupByListenCount" xml:space="preserve">
+    <value>найпопулярніші</value>
+  </data>
+  <data name="tracksViewGroupBy.Text" xml:space="preserve">
+    <value>Сортувати за</value>
+  </data>
+  <data name="tracksViewGroupByCountryMenu.Text" xml:space="preserve">
+    <value>країною</value>
+  </data>
+  <data name="tracksViewGroupByCreatDateMenu.Text" xml:space="preserve">
+    <value>нещодавно додані</value>
+  </data>
+  <data name="tracksViewGroupByLastListenMenu.Text" xml:space="preserve">
+    <value>останнє прослуховування</value>
+  </data>
+  <data name="tracksViewGroupByListenCountMenu.Text" xml:space="preserve">
+    <value>найпопулярніші</value>
+  </data>
+  <data name="groupBytitle" xml:space="preserve">
+    <value>назви</value>
+  </data>
+  <data name="tracksViewGroupByYearMenu.Text" xml:space="preserve">
+    <value>роком</value>
+  </data>
+  <data name="tracksViewListen.Text" xml:space="preserve">
+    <value> слухати</value>
+  </data>
+  <data name="tracksViewFilterByAllMenu.Text" xml:space="preserve">
+    <value>всі</value>
+  </data>
+  <data name="tracksViewFilterByFavoriteAlbumMenu.Text" xml:space="preserve">
+    <value>улюблені альбоми</value>
+  </data>
+  <data name="tracksViewFilterByFavoriteArtistMenu.Text" xml:space="preserve">
+    <value>улюблені виконавці</value>
+  </data>
+  <data name="tracksViewFilterByFavoriteGenreMenu.Text" xml:space="preserve">
+    <value>улюблені жанри</value>
+  </data>
+  <data name="tracksViewFilterByFavoriteTrackMenu.Text" xml:space="preserve">
+    <value>улюблені треки</value>
+  </data>
+  <data name="tracksViewFilterBy.Text" xml:space="preserve">
+    <value>Фільтрувати за</value>
+  </data>
+  <data name="tracksViewFilterNone" xml:space="preserve">
+    <value>всі</value>
+  </data>
+  <data name="tracksViewFilterByAll" xml:space="preserve">
+    <value>всі</value>
+  </data>
+  <data name="tracksViewFilterByFavoriteAlbum" xml:space="preserve">
+    <value>улюблені альбоми</value>
+  </data>
+  <data name="tracksViewFilterByFavoriteArtist" xml:space="preserve">
+    <value>улюблені виконавці</value>
+  </data>
+  <data name="tracksViewFilterByFavoriteGenre" xml:space="preserve">
+    <value>улюблені жанри</value>
+  </data>
+  <data name="tracksViewFilterByFavoriteTrack" xml:space="preserve">
+    <value>улюблені треки</value>
+  </data>
+  <data name="albumsViewGroupByDecade" xml:space="preserve">
+    <value>десятиліття</value>
+  </data>
+  <data name="groupBydecade" xml:space="preserve">
+    <value>десятиліття</value>
+  </data>
+  <data name="albumsViewFilterBy.Text" xml:space="preserve">
+    <value>Фільтрувати за</value>
+  </data>
+  <data name="artistsViewFilterByFavoriteArtist" xml:space="preserve">
+    <value>улюблені виконавці</value>
+  </data>
+  <data name="albumsViewFilterByAllMenu.Text" xml:space="preserve">
+    <value>всі</value>
+  </data>
+  <data name="albumsViewFilterByFavoriteArtist" xml:space="preserve">
+    <value>улюблені виконавці</value>
+  </data>
+  <data name="albumsViewFilterByFavoriteArtistMenu.Text" xml:space="preserve">
+    <value>улюблені виконавці</value>
+  </data>
+  <data name="albumsViewFilterByFavoriteAlbum" xml:space="preserve">
+    <value>улюблені альбоми</value>
+  </data>
+  <data name="albumsViewFilterByFavoriteAlbumMenu.Text" xml:space="preserve">
+    <value>улюблені альбоми</value>
+  </data>
+  <data name="albumsViewFilterByFavoriteGenre" xml:space="preserve">
+    <value>улюблені жанри</value>
+  </data>
+  <data name="albumsViewFilterByFavoriteGenreMenu.Text" xml:space="preserve">
+    <value>улюблені жанри</value>
+  </data>
+  <data name="albumsViewFilterByNeverListened" xml:space="preserve">
+    <value>ніколи не слухав</value>
+  </data>
+  <data name="albumsViewFilterByNeverListenedMenu.Text" xml:space="preserve">
+    <value>ніколи не слухав</value>
+  </data>
+  <data name="albumsViewFilterNone" xml:space="preserve">
+    <value>всі</value>
+  </data>
+  <data name="albumsViewGroupBy.Text" xml:space="preserve">
+    <value>Сортувати за</value>
+  </data>
+  <data name="albumsViewGroupByArtist" xml:space="preserve">
+    <value>виконавці</value>
+  </data>
+  <data name="groupByartistname" xml:space="preserve">
+    <value>виконавці</value>
+  </data>
+  <data name="groupBycountry" xml:space="preserve">
+    <value>країна</value>
+  </data>
+  <data name="albumsViewGroupByCountry" xml:space="preserve">
+    <value>країна</value>
+  </data>
+  <data name="albumsViewGroupByCreatDate" xml:space="preserve">
+    <value>нещодавно додані</value>
+  </data>
+  <data name="groupBycreatdate" xml:space="preserve">
+    <value>нещодавно додані</value>
+  </data>
+  <data name="albumsViewGroupByLastListen" xml:space="preserve">
+    <value>останнє прослуховування</value>
+  </data>
+  <data name="groupBylastlisten" xml:space="preserve">
+    <value>останнє прослуховування</value>
+  </data>
+  <data name="albumsViewGroupByListenCount" xml:space="preserve">
+    <value>найпопулярніші</value>
+  </data>
+  <data name="groupBylistencount" xml:space="preserve">
+    <value>найпопулярніші</value>
+  </data>
+  <data name="albumsViewGroupByYear" xml:space="preserve">
+    <value>рік</value>
+  </data>
+  <data name="groupByyear" xml:space="preserve">
+    <value>рік</value>
+  </data>
+  <data name="albumsViewListen.Text" xml:space="preserve">
+    <value> слухати</value>
+  </data>
+  <data name="albumsViewGroupByAlbum" xml:space="preserve">
+    <value>альбоми</value>
+  </data>
+  <data name="groupByalbumname" xml:space="preserve">
+    <value>альбоми</value>
+  </data>
+  <data name="searchArtistHeader.Text" xml:space="preserve">
+    <value>Виконавці</value>
+  </data>
+  <data name="searchAlbumHeader.Text" xml:space="preserve">
+    <value>Альбоми</value>
+  </data>
+  <data name="searchTrackHeader.Text" xml:space="preserve">
+    <value>Пісні</value>
+  </data>
+  <data name="searchViewTitle.Text" xml:space="preserve">
+    <value>Результати пошуку</value>
+  </data>
+  <data name="menuPlaylists.Content" xml:space="preserve">
+    <value>Плейлисти</value>
+  </data>
+  <data name="groupDefaultName" xml:space="preserve">
+    <value>Нова група</value>
+  </data>
+  <data name="artists" xml:space="preserve">
+    <value>виконавці</value>
+  </data>
+  <data name="artist" xml:space="preserve">
+    <value>виконавець</value>
+  </data>
+  <data name="DeleteConfirmationTitle" xml:space="preserve">
+    <value>Підтвердження видалення</value>
+  </data>
+  <data name="DeletePlaylistConfirmation" xml:space="preserve">
+    <value>Ви хочете видалити цей плейлист?</value>
+  </data>
+  <data name="YesButton" xml:space="preserve">
+    <value>Так</value>
+  </data>
+  <data name="CancelButton" xml:space="preserve">
+    <value>Скасувати</value>
+  </data>
+  <data name="newPlaylist" xml:space="preserve">
+    <value>Новий плейлист</value>
+  </data>
+  <data name="defaultRadioPlaylistName" xml:space="preserve">
+    <value>Радіо</value>
+  </data>
+  <data name="defaultBestofPlaylistName" xml:space="preserve">
+    <value>Найкращі</value>
+  </data>
+  <data name="defaultAlbumOfTheYearfPlaylistName" xml:space="preserve">
+    <value>Альбоми року</value>
+  </data>
+  <data name="tracksViewListenListGroup.Text" xml:space="preserve">
+    <value>слухати</value>
+  </data>
+  <data name="artistsViewListenListGroup.Text" xml:space="preserve">
+    <value>слухати</value>
+  </data>
+  <data name="menuTracks.Content" xml:space="preserve">
+    <value>Пісні</value>
+  </data>
+  <data name="searchBox.PlaceholderText" xml:space="preserve">
+    <value>Пошук пісень, виконавців, альбомів</value>
+  </data>
+  <data name="playlistGroupEntityArtists" xml:space="preserve">
+    <value>Виконавці</value>
+  </data>
+  <data name="playlistGroupEntityGenres" xml:space="preserve">
+    <value>Жанри</value>
+  </data>
+  <data name="playlistGroupEntityTracks" xml:space="preserve">
+    <value>Треки</value>
+  </data>
+  <data name="playlistGroupEntityAlbums" xml:space="preserve">
+    <value>Альбоми</value>
+  </data>
+  <data name="playlistGroupEntityCountries" xml:space="preserve">
+    <value>Країни</value>
+  </data>
+  <data name="playlistGroupFieldScore" xml:space="preserve">
+    <value>Рахунок</value>
+  </data>
+  <data name="playlistGroupFieldListenCount" xml:space="preserve">
+    <value>Кількість прослуховувань</value>
+  </data>
+  <data name="playlistGroupFieldLive" xml:space="preserve">
+    <value>Є в прямому ефірі</value>
+  </data>
+  <data name="playlistGroupFieldAddDate" xml:space="preserve">
+    <value>Дата додавання</value>
+  </data>
+  <data name="playlistGroupFieldBitrate" xml:space="preserve">
+    <value>Швидкість передачі</value>
+  </data>
+  <data name="playlistGroupFieldLastListen" xml:space="preserve">
+    <value>LastListen</value>
+  </data>
+  <data name="playlistGroupFieldSkipCount" xml:space="preserve">
+    <value>Кількість пропущених замовлень</value>
+  </data>
+  <data name="playlistGroupFieldName" xml:space="preserve">
+    <value>НАЗВА</value>
+  </data>
+  <data name="playlistGroupFieldFavorite" xml:space="preserve">
+    <value>Обране</value>
+  </data>
+  <data name="playlistGroupFieldAlbumCount" xml:space="preserve">
+    <value>Студійний альбом</value>
+  </data>
+  <data name="playlistGroupFieldBestofCount" xml:space="preserve">
+    <value>Найкраще</value>
+  </data>
+  <data name="playlistGroupFieldCompilationCount" xml:space="preserve">
+    <value>Компільовані</value>
+  </data>
+  <data name="playlistGroupFieldTrackCount" xml:space="preserve">
+    <value>Лічильник треків</value>
+  </data>
+  <data name="playlistGroupFieldYear" xml:space="preserve">
+    <value>Роки</value>
+  </data>
+  <data name="playlistGroupFieldReleaseDate" xml:space="preserve">
+    <value>Дата випуску</value>
+  </data>
+  <data name="playlistGroupFieldArtistCount" xml:space="preserve">
+    <value>Кількість виконавців</value>
+  </data>
+  <data name="playlistGroupOperatorEquals" xml:space="preserve">
+    <value>Дорівнює</value>
+  </data>
+  <data name="playlistGroupOperatorNotEquals" xml:space="preserve">
+    <value>не дорівнює</value>
+  </data>
+  <data name="playlistGroupOperatorGreaterThan" xml:space="preserve">
+    <value>Більше ніж</value>
+  </data>
+  <data name="playlistGroupOperatorLessThan" xml:space="preserve">
+    <value>Менше за</value>
+  </data>
+  <data name="playlistGroupOperatorContains" xml:space="preserve">
+    <value>Містить</value>
+  </data>
+  <data name="playlistGroupOperatorNotContains" xml:space="preserve">
+    <value>Не містить</value>
+  </data>
+  <data name="playlistGroupOperatorStartWith" xml:space="preserve">
+    <value>Почати з</value>
+  </data>
+  <data name="playlistGroupOperatorEndsWith" xml:space="preserve">
+    <value>Закінчується на</value>
+  </data>
+  <data name="playlistGroupOperatorBetween" xml:space="preserve">
+    <value>між</value>
+  </data>
+  <data name="playlistGroupValueTrue" xml:space="preserve">
+    <value>Так</value>
+  </data>
+  <data name="playlistGroupValueFalse" xml:space="preserve">
+    <value>Ні</value>
+  </data>
+  <data name="playlistGroupSortRandom" xml:space="preserve">
+    <value>Випадково</value>
+  </data>
+  <data name="playlistGroupSortMostPlayed" xml:space="preserve">
+    <value>Найпопулярніші</value>
+  </data>
+  <data name="playlistGroupSortLeastPlayed" xml:space="preserve">
+    <value>Найменше зіграно</value>
+  </data>
+  <data name="playlistGroupSortMostRecent" xml:space="preserve">
+    <value>Останні</value>
+  </data>
+  <data name="playlistGroupSortLeastRecent" xml:space="preserve">
+    <value>Найменш недавні</value>
+  </data>
+  <data name="playlistGroupSortHighestRated" xml:space="preserve">
+    <value>З найвищою оцінкою</value>
+  </data>
+  <data name="playlistGroupSortLowestRated" xml:space="preserve">
+    <value>Найнижчі оцінки</value>
+  </data>
+  <data name="playlistGroupSortOldest" xml:space="preserve">
+    <value>Найдавніший</value>
+  </data>
+  <data name="playlistGroupSortNewest" xml:space="preserve">
+    <value>Найновіші</value>
+  </data>
+  <data name="playlistGroupGroupName.Text" xml:space="preserve">
+    <value>Назва групи</value>
+  </data>
+  <data name="playlistGroupMaximumSongs.Text" xml:space="preserve">
+    <value>Максимум пісень</value>
+  </data>
+  <data name="playlistGroupSortBy.Text" xml:space="preserve">
+    <value>Впорядкувати за</value>
+  </data>
+  <data name="genSearchNoResult" xml:space="preserve">
+    <value>Немає результату</value>
+  </data>
+  <data name="gridHeaderTitle.Text" xml:space="preserve">
+    <value>Заголовок</value>
+  </data>
+  <data name="gridHeaderAlbum.Text" xml:space="preserve">
+    <value>альбом</value>
+  </data>
+  <data name="gridHeaderArtist.Text" xml:space="preserve">
+    <value>Артист</value>
+  </data>
+  <data name="gridHeaderScore.Text" xml:space="preserve">
+    <value>Рахунок</value>
+  </data>
+  <data name="selectPicture.ToolTipService.ToolTip" xml:space="preserve">
+    <value>Виберіть нове зображення</value>
+  </data>
+  <data name="lyricsTag.Content" xml:space="preserve">
+    <value>Тексти пісень</value>
+  </data>
+  <data name="artistViewBiography.Label" xml:space="preserve">
+    <value>Біограма</value>
+  </data>
+  <data name="artistViewEdit.Label" xml:space="preserve">
+    <value>Редагувати</value>
+  </data>
+  <data name="artistViewPlaylist.Label" xml:space="preserve">
+    <value>Список відтворення</value>
+  </data>
+  <data name="artistViewTabTracks.Header" xml:space="preserve">
+    <value>Пісня</value>
+  </data>
+  <data name="artistViewTabAlbums.Header" xml:space="preserve">
+    <value>Альбоми</value>
+  </data>
+  <data name="artistViewOfficialSite.Content" xml:space="preserve">
+    <value>Офіційний сайт</value>
+  </data>
+  <data name="artistViewWikipedia.Content" xml:space="preserve">
+    <value>Wikipedia</value>
+  </data>
+  <data name="bestOf" xml:space="preserve">
+    <value>Найкраще</value>
+  </data>
+  <data name="live" xml:space="preserve">
+    <value>Live</value>
+  </data>
+  <data name="compilation" xml:space="preserve">
+    <value>Компільовані</value>
+  </data>
+  <data name="duration" xml:space="preserve">
+    <value>Тривалість:</value>
+  </data>
+  <data name="listenCount" xml:space="preserve">
+    <value>Слухали</value>
+  </data>
+  <data name="listenCountTimes" xml:space="preserve">
+    <value>рази</value>
+  </data>
+  <data name="lastListen" xml:space="preserve">
+    <value>останнє прослуховування</value>
+  </data>
+  <data name="released" xml:space="preserve">
+    <value>Рік:</value>
+  </data>
+  <data name="albumViewListen.Label" xml:space="preserve">
+    <value>Прослухати</value>
+  </data>
+  <data name="albumViewLike.Label" xml:space="preserve">
+    <value>Подобається</value>
+  </data>
+  <data name="albumsViewFilterByLiveMenu.Text" xml:space="preserve">
+    <value>LiVES</value>
+  </data>
+  <data name="albumsViewFilterByLive" xml:space="preserve">
+    <value>LiVES</value>
+  </data>
+  <data name="albumsViewFilterByBestofMenu.Text" xml:space="preserve">
+    <value>найкраще з</value>
+  </data>
+  <data name="albumsViewFilterByBestof" xml:space="preserve">
+    <value>найкраще з</value>
+  </data>
+  <data name="albumsViewFilterByCompilationMenu.Text" xml:space="preserve">
+    <value>компіляції</value>
+  </data>
+  <data name="albumsViewFilterByCompilation" xml:space="preserve">
+    <value>компіляції</value>
+  </data>
+  <data name="albumsViewFilterByAlbumMenu.Text" xml:space="preserve">
+    <value>альбомів</value>
+  </data>
+  <data name="albumsViewFilterByAlbum" xml:space="preserve">
+    <value>альбомів</value>
+  </data>
+  <data name="artistViewWebSite.ToolTipService.ToolTip" xml:space="preserve">
+    <value>Відкрити офіційний сайт</value>
+  </data>
+  <data name="hideBiography.Content" xml:space="preserve">
+    <value>Закрити</value>
+  </data>
+  <data name="artistViewBiography.ToolTipService.ToolTip" xml:space="preserve">
+    <value>Біографія</value>
+  </data>
+  <data name="tracksViewGroupByArtistMenu.Text" xml:space="preserve">
+    <value>Митці</value>
+  </data>
+  <data name="tracksViewGroupByAlbumMenu.Text" xml:space="preserve">
+    <value>альбомів</value>
+  </data>
+  <data name="groupBygenrename" xml:space="preserve">
+    <value>Напрям</value>
+  </data>
+  <data name="tracksViewGroupByArtist" xml:space="preserve">
+    <value>Митці</value>
+  </data>
+  <data name="tracksViewGroupByAlbum" xml:space="preserve">
+    <value>альбомів</value>
+  </data>
+  <data name="tracksViewGroupByGenre" xml:space="preserve">
+    <value>Напрям</value>
+  </data>
+  <data name="Close" xml:space="preserve">
+    <value>Закрити</value>
+  </data>
+  <data name="trackFlyoutArtist.Text" xml:space="preserve">
+    <value>Показати виконавця</value>
+  </data>
+  <data name="trackFlyoutAlbum.Text" xml:space="preserve">
+    <value>Показувати дату альбому</value>
+  </data>
+  <data name="trackFlyoutLyrics.Text" xml:space="preserve">
+    <value>Показати текст пісні</value>
+  </data>
+  <data name="trackFlyoutListen.Text" xml:space="preserve">
+    <value>Прослухати</value>
+  </data>
+  <data name="toggleTheme.ToolTipService.ToolTip" xml:space="preserve">
+    <value>Перемкнути тему</value>
+  </data>
+  <data name="libraryRefreshButton.ToolTipService.ToolTip" xml:space="preserve">
+    <value>Оновити бібліотеку</value>
+  </data>
+  <data name="optionsAppearanceTitle.Text" xml:space="preserve">
+    <value>Зовнішній вигляд</value>
+  </data>
+  <data name="optionsThemeLabel.Text" xml:space="preserve">
+    <value>Тема</value>
+  </data>
+  <data name="optionsThemeDarkItem.Content" xml:space="preserve">
+    <value>Темна</value>
+  </data>
+  <data name="optionsThemeLightItem.Content" xml:space="preserve">
+    <value>Світло</value>
+  </data>
+  <data name="optionsThemeSystemItem.Content" xml:space="preserve">
+    <value>Система</value>
+  </data>
+  <data name="optionsLibraryTitle.Text" xml:space="preserve">
+    <value>Бібліотека</value>
+  </data>
+  <data name="optionsRefreshAtStartupSwitch.Header" xml:space="preserve">
+    <value>Автоматично оновлювати бібліотеку під час запуску програми</value>
+  </data>
+  <data name="LibraryFoldersLabel.Text" xml:space="preserve">
+    <value>Папки бібліотеки</value>
+  </data>
+  <data name="AddLibraryFolderButton.Content" xml:space="preserve">
+    <value>Könyvtár hozzáadása</value>
+  </data>
+  <data name="RemoveLibraryFolderButton.Content" xml:space="preserve">
+    <value>Видалити вибрану папку</value>
+  </data>
+  <data name="CachePathLabel.Text" xml:space="preserve">
+    <value>Шлях до кешу для зберігання фотографій художників</value>
+  </data>
+  <data name="BrowseCachePathButton.Content" xml:space="preserve">
+    <value>Відкрити</value>
+  </data>
+  <data name="OptionsHideArtistsSwitch.Header" xml:space="preserve">
+    <value>Приховати виконавців без альбомів зі списку виконавців</value>
+  </data>
+  <data name="OptionsImportWithArtistGenreSwitch.Header" xml:space="preserve">
+    <value>При імпорті пісень використовуйте жанр, визначений для виконавця</value>
+  </data>
+  <data name="trackFlyoutAddMoreFromArtist.Text" xml:space="preserve">
+    <value>Додати ще пісні цього виконавця</value>
+  </data>
+  <data name="welcomeWaiting.Text" xml:space="preserve">
+    <value>Ще хвилинку, ми готуємо ваші дані...</value>
+  </data>
+  <data name="startViewErrorMessage.Text" xml:space="preserve">
+    <value>Не вдалося знайти жодного альбому у вашій папці з музикою.</value>
+  </data>
+  <data name="startViewAddFolder.Text" xml:space="preserve">
+    <value>Оберіть теку:</value>
+  </data>
+  <data name="noTitle" xml:space="preserve">
+    <value>Без назви</value>
+  </data>
+  <data name="ListeningViewTitle.Text" xml:space="preserve">
+    <value>Наразі слухаю:</value>
+  </data>
+  <data name="ListeningViewTitleCount.Text" xml:space="preserve">
+    <value>Пісня</value>
+  </data>
+  <data name="PlayerFullScreenLyricsToolTips.Text" xml:space="preserve">
+    <value>Показати текст пісні</value>
+  </data>
+  <data name="PlayerFullScreenToolTips.Text" xml:space="preserve">
+    <value>&amp; Звичайний режим</value>
+  </data>
+  <data name="PlayerFullScreenCurrentListeningToolTips.Text" xml:space="preserve">
+    <value>Поточний список композицій</value>
+  </data>
+  <data name="AlbumViewListenCount.Text" xml:space="preserve">
+    <value>&lt;g id="1"&gt;Слухали:&lt;/g&gt; </value>
+  </data>
+  <data name="AlbumViewListenCountTimes.Text" xml:space="preserve">
+    <value>рази</value>
+  </data>
+  <data name="AlbumViewLastListen.Text" xml:space="preserve">
+    <value>, останнє прослуховування:</value>
+  </data>
+  <data name="playlistsAdd.Label" xml:space="preserve">
+    <value>Створити список відтворення...</value>
+  </data>
+  <data name="playlistsSmartAdd.Label" xml:space="preserve">
+    <value>Кмітливий список композицій</value>
+  </data>
+  <data name="playlistListen.Label" xml:space="preserve">
+    <value>Прослухати</value>
+  </data>
+  <data name="playlistDelete.Label" xml:space="preserve">
+    <value>Видалити</value>
+  </data>
+  <data name="MenuFlyout_AddTo_Text" xml:space="preserve">
+    <value>Додати до списку</value>
+  </data>
+  <data name="MenuFlyout_NewPlaylist_Text" xml:space="preserve">
+    <value>Створити список відтворення...</value>
+  </data>
+  <data name="NewPlaylistDialog_Title" xml:space="preserve">
+    <value>Створити список відтворення...</value>
+  </data>
+  <data name="NewPlaylistDialog_Description_Text" xml:space="preserve">
+    <value>Введіть назву нового списку відтворення:</value>
+  </data>
+  <data name="NewPlaylistDialog_TextBox_PlaceholderText" xml:space="preserve">
+    <value>Назва списку відтворення</value>
+  </data>
+  <data name="NewPlaylistDialog_PrimaryButton" xml:space="preserve">
+    <value>Створити</value>
+  </data>
+  <data name="NewPlaylistDialog_CloseButton" xml:space="preserve">
+    <value>Скасувати</value>
+  </data>
+  <data name="notification_playlist_track_add" xml:space="preserve">
+    <value>Пісню додано до списку відтворення</value>
+  </data>
+  <data name="notification_playlist_track_add_error" xml:space="preserve">
+    <value>Не вдається додати пісню до списку відтворення</value>
+  </data>
+  <data name="notification_playlist_track_add_duplicate" xml:space="preserve">
+    <value>Пісня вже в цьому списку відтворення</value>
+  </data>
+  <data name="trackFlyoutRemoveFromPlaylist.Text" xml:space="preserve">
+    <value>Видалити</value>
+  </data>
+  <data name="commonClose.Content" xml:space="preserve">
+    <value>Закрити</value>
+  </data>
+  <data name="playlistRefresh.Label" xml:space="preserve">
+    <value>Оновити</value>
+  </data>
+  <data name="playlistSave.Text" xml:space="preserve">
+    <value>Зберегти</value>
+  </data>
+  <data name="playlistGroupNew.Text" xml:space="preserve">
+    <value>Нова група</value>
+  </data>
+  <data name="playlistViewTabConfiguration.Header" xml:space="preserve">
+    <value>Конфігурація</value>
+  </data>
+  <data name="playlistViewTabTracks.Header" xml:space="preserve">
+    <value>Пісня</value>
+  </data>
+  <data name="filterByGenreMenu.Text" xml:space="preserve">
+    <value>Напрям</value>
+  </data>
+  <data name="filterAllGenres.Text" xml:space="preserve">
+    <value>Всі</value>
+  </data>
+  <data name="filterall" xml:space="preserve">
+    <value>Всі</value>
+  </data>
+  <data name="filtergenre" xml:space="preserve">
+    <value>Напрям</value>
+  </data>
+  <data name="filtergenreall" xml:space="preserve">
+    <value>Всі</value>
+  </data>
+  <data name="filteralbumfavorite" xml:space="preserve">
+    <value>Альбоми</value>
+  </data>
+  <data name="filterartistfavorite" xml:space="preserve">
+    <value>Митці</value>
+  </data>
+  <data name="filtergenrefavorite" xml:space="preserve">
+    <value>Напрям</value>
+  </data>
+  <data name="filterlive" xml:space="preserve">
+    <value>LiVES</value>
+  </data>
+  <data name="filterbestof" xml:space="preserve">
+    <value>Найкраще</value>
+  </data>
+  <data name="filtercompilation" xml:space="preserve">
+    <value>Компіляції</value>
+  </data>
+  <data name="filteralbum" xml:space="preserve">
+    <value>Альбоми</value>
+  </data>
+  <data name="filterneverlistened" xml:space="preserve">
+    <value>Ніколи не слухав (-ла)</value>
+  </data>
+  <data name="filterfavorite" xml:space="preserve">
+    <value>Обране</value>
+  </data>
+  <data name="filtertype" xml:space="preserve">
+    <value>Типи</value>
+  </data>
+  <data name="filtertrackfavorite" xml:space="preserve">
+    <value>Пісня</value>
+  </data>
+  <data name="tracksViewFilterByLive" xml:space="preserve">
+    <value>Live</value>
+  </data>
+  <data name="tracksViewFilterByNeverListened" xml:space="preserve">
+    <value>Ніколи не слухав (-ла)</value>
+  </data>
+  <data name="OptionsNovaApiTitle.Text" xml:space="preserve">
+    <value>Послуги</value>
+  </data>
+  <data name="OptionsNovaApiEnabledSwitch.Header" xml:space="preserve">
+    <value>Дозволити пошук даних про виконавців та альбоми (обкладинка, зображення, біографія, тексти пісень)</value>
+  </data>
+  <data name="OptionsTelemetryEnabledSwitch.Header" xml:space="preserve">
+    <value>Дозволити надсилання телеметричної інформації про використання програми з метою її вдосконалення</value>
+  </data>
+  <data name="OptionsCrossFadeSwitch.Header" xml:space="preserve">
+    <value>Увімкнути кросфейд між двома піснями</value>
+  </data>
+  <data name="shuffleButton.Label" xml:space="preserve">
+    <value>Перемішати</value>
+  </data>
+  <data name="NoLibraryFoldersTitleMessage" xml:space="preserve">
+    <value>Немає бібліотеки</value>
+  </data>
+  <data name="NoLibraryFoldersMessage" xml:space="preserve">
+    <value>Ви ще не додали жодної папки бібліотеки. Додайте принаймні одну папку бібліотеки в налаштуваннях, щоб оновити бібліотеку.</value>
+  </data>
+  <data name="albumViewEdit.Label" xml:space="preserve">
+    <value>Редагувати</value>
+  </data>
+  <data name="EditAlbumDialog.Title" xml:space="preserve">
+    <value>Редагування альбому</value>
+  </data>
+  <data name="EditAlbumDialog.PrimaryButtonText" xml:space="preserve">
+    <value>Зберегти</value>
+  </data>
+  <data name="EditAlbumDialog.CloseButtonText" xml:space="preserve">
+    <value>Скасувати</value>
+  </data>
+  <data name="liveSwitch.OnContent" xml:space="preserve">
+    <value>Live</value>
+  </data>
+  <data name="liveSwitch.OffContent" xml:space="preserve">
+    <value>Live</value>
+  </data>
+  <data name="bestOfSwitch.OnContent" xml:space="preserve">
+    <value>Найкраще</value>
+  </data>
+  <data name="bestOfSwitch.OffContent" xml:space="preserve">
+    <value>Найкраще</value>
+  </data>
+  <data name="compilationSwitch.OnContent" xml:space="preserve">
+    <value>Компільовані</value>
+  </data>
+  <data name="compilationSwitch.OffContent" xml:space="preserve">
+    <value>Компільовані</value>
+  </data>
+  <data name="trackFlyoutTrack.Text" xml:space="preserve">
+    <value>Показати доріжку</value>
+  </data>
+  <data name="genByLabel.Text" xml:space="preserve">
+    <value>Підписав:</value>
+  </data>
+  <data name="genOnLabel.Text" xml:space="preserve">
+    <value>Увімк.</value>
+  </data>
+  <data name="trackListenCountLabel.Text" xml:space="preserve">
+    <value>Кількість слухачів:</value>
+  </data>
+  <data name="trackLastListenLabel.Text" xml:space="preserve">
+    <value>Останнє прослуховування:</value>
+  </data>
+  <data name="trackMusicBrainzIdLabel.Text" xml:space="preserve">
+    <value>Ідентифікатор MusicBrainz:</value>
+  </data>
+  <data name="trackStorageLabel.Text" xml:space="preserve">
+    <value>Зберігання:</value>
+  </data>
+  <data name="trackSkipCountLabel.Text" xml:space="preserve">
+    <value>Кількість пропущених замовлень:</value>
+  </data>
+  <data name="trackLastSkipLabel.Text" xml:space="preserve">
+    <value>Останній перехід:</value>
+  </data>
+  <data name="OptionTabLibrary.Header" xml:space="preserve">
+    <value>Бібліотека</value>
+  </data>
+  <data name="OptionTabAbout.Header" xml:space="preserve">
+    <value>Про плагін</value>
+  </data>
+  <data name="OptionTabOptions.Header" xml:space="preserve">
+    <value>Варіанти</value>
+  </data>
+  <data name="albumViewBiography.Label" xml:space="preserve">
+    <value>Біограма</value>
+  </data>
+  <data name="albumViewPlaylist.Label" xml:space="preserve">
+    <value>Плейлісти</value>
+  </data>
+  <data name="groupByscore" xml:space="preserve">
+    <value>рахунок</value>
+  </data>
+  <data name="tracksViewGroupByScore" xml:space="preserve">
+    <value>рахунок</value>
+  </data>
+  <data name="OptionTabStatistics.Header" xml:space="preserve">
+    <value>Статистика</value>
+  </data>
+  <data name="StatGenres.Text" xml:space="preserve">
+    <value>Напрям</value>
+  </data>
+  <data name="StatArtists.Text" xml:space="preserve">
+    <value>Митці</value>
+  </data>
+  <data name="StatAlbums.Text" xml:space="preserve">
+    <value>Альбоми</value>
+  </data>
+  <data name="StatSongs.Text" xml:space="preserve">
+    <value>Пісні:</value>
+  </data>
+  <data name="StatTotalDurations.Text" xml:space="preserve">
+    <value>🔹Загальна тривалість:</value>
+  </data>
+  <data name="StatTotalSize.Text" xml:space="preserve">
+    <value>Загальний розмір:</value>
+  </data>
+  <data name="StatTopGenres.Text" xml:space="preserve">
+    <value>🏅 Найпопулярніші жанри</value>
+  </data>
+  <data name="StatTopArtists.Text" xml:space="preserve">
+    <value>🏅 Найкращі виконавці</value>
+  </data>
+  <data name="StatTopAlbums.Text" xml:space="preserve">
+    <value>🏅 Найпопулярніші альбоми</value>
+  </data>
+  <data name="StatTopSongs.Text" xml:space="preserve">
+    <value>🏅 Найпопулярніші пісні</value>
+  </data>
+  <data name="StartTracksByFileType.Title" xml:space="preserve">
+    <value>Відстежує за типом файлу</value>
+  </data>
+  <data name="StartAlbumsByType.Title" xml:space="preserve">
+    <value>Альбоми виконавця</value>
+  </data>
+  <data name="StartArtistsByGenre.Title" xml:space="preserve">
+    <value>Виконавці за жанром</value>
+  </data>
+  <data name="StatListened.Text" xml:space="preserve">
+    <value>🔹Слухали:</value>
+  </data>
+  <data name="ResetListenCountTitleConfirmation" xml:space="preserve">
+    <value>Скинути кількість прослуховувань?</value>
+  </data>
+  <data name="ResetListenCountConfirmationTitle" xml:space="preserve">
+    <value>Підтвердження</value>
+  </data>
+  <data name="resetListenCountToolTip.Text" xml:space="preserve">
+    <value>Скинути кількість прослуховувань</value>
+  </data>
+  <data name="resetListenCount.Label" xml:space="preserve">
+    <value>Скинути кількість прослуховувань</value>
+  </data>
+  <data name="playlistHeader.Text" xml:space="preserve">
+    <value>Плейлісти</value>
+  </data>
+  <data name="smartPlaylistHeader.Text" xml:space="preserve">
+    <value>Розумні списки відтворення</value>
+  </data>
+  <data name="Translate" xml:space="preserve">
+    <value>Перекласти</value>
+  </data>
+  <data name="Original" xml:space="preserve">
+    <value>Оригінал </value>
+  </data>
+  <data name="playlistGroupFieldUnitDays" xml:space="preserve">
+    <value>днів</value>
+  </data>
+  <data name="gridHeaderGenre.Text" xml:space="preserve">
+    <value>Стиль</value>
+  </data>
+  <data name="compilations" xml:space="preserve">
+    <value>компіляції</value>
+  </data>
+  <data name="StatTotalRawLyrics.Text" xml:space="preserve">
+    <value>Лірика.</value>
+  </data>
+  <data name="StatTotalSyncLyrics.Text" xml:space="preserve">
+    <value>🔹Синхронізовані тексти пісень:</value>
+  </data>
+  <data name="TagsBox.PlaceholderText" xml:space="preserve">
+    <value>Додати мітку</value>
+  </data>
+  <data name="MenuFlyout_CurrentListening_Text" xml:space="preserve">
+    <value>Поточне прослуховування</value>
+  </data>
+  <data name="SupportProjectButtonText.Text" xml:space="preserve">
+    <value>Підтримай проект, купи мені каву</value>
+  </data>
+  <data name="hours.Text" xml:space="preserve">
+    <value>години</value>
+  </data>
+  <data name="artistsViewArtists.Text" xml:space="preserve">
+    <value>Митці</value>
+  </data>
+  <data name="albumsViewAlbums.Text" xml:space="preserve">
+    <value>альбомів</value>
+  </data>
+  <data name="tracksPageTracks.Text" xml:space="preserve">
+    <value>треки</value>
+  </data>
+  <data name="artistsPageArtists.Text" xml:space="preserve">
+    <value>Митці</value>
+  </data>
+  <data name="albumsViewNoData.Message" xml:space="preserve">
+    <value>Альбомів не знайдено</value>
+  </data>
+  <data name="artistsViewNoData.Message" xml:space="preserve">
+    <value>Нічого не знайдено</value>
+  </data>
+  <data name="tracksViewNoData.Message" xml:space="preserve">
+    <value>Пісень не знайдено</value>
+  </data>
+  <data name="badgeNew.Text" xml:space="preserve">
+    <value>new</value>
+  </data>
+  <data name="badgeCompilation.Text" xml:space="preserve">
+    <value>компіляція</value>
+  </data>
+  <data name="badgeBestof.Text" xml:space="preserve">
+    <value>найкраще з</value>
+  </data>
+  <data name="badgeLive.Text" xml:space="preserve">
+    <value>наживо</value>
+  </data>
+  <data name="OptionsPauseOnCall.Header" xml:space="preserve">
+    <value>Призупинити прийом дзвінка</value>
+  </data>
+  <data name="inlineListSearch.PlaceholderText" xml:space="preserve">
+    <value>Пошук</value>
+  </data>
+  <data name="OptionTabCommand.Header" xml:space="preserve">
+    <value>API</value>
+  </data>
+  <data name="CommandTabApiConfigTitle.Text" xml:space="preserve">
+    <value>Конфігурація API</value>
+  </data>
+  <data name="OptionsHideEnableWebApi.Header" xml:space="preserve">
+    <value>Увімкнути веб-API</value>
+  </data>
+  <data name="OptionsWebApiPort.Header" xml:space="preserve">
+    <value>Порт веб-API</value>
+  </data>
+  <data name="CommandTabApiDocTitle.Text" xml:space="preserve">
+    <value>Web API</value>
+  </data>
+  <data name="CommandTabHeaderTest.Text" xml:space="preserve">
+    <value>Test</value>
+  </data>
+  <data name="CommandTabHeaderDescription.Text" xml:space="preserve">
+    <value>Опис</value>
+  </data>
+  <data name="CommandTabHeaderMethod.Text" xml:space="preserve">
+    <value>Спосіб</value>
+  </data>
+  <data name="CommandTabHeaderEndpoint.Text" xml:space="preserve">
+    <value>Критерій оцінки</value>
+  </data>
+  <data name="CommandTabCliTitle.Text" xml:space="preserve">
+    <value>Командний рядок</value>
+  </data>
+  <data name="CommandTabCliUsage.Text" xml:space="preserve">
+    <value>Використання: rok.exe [команда] [аргумент]</value>
+  </data>
+  <data name="CommandTabHeaderCommand.Text" xml:space="preserve">
+    <value>Наказ</value>
+  </data>
+  <data name="CommandTabHeaderCommandDescription.Text" xml:space="preserve">
+    <value>Опис</value>
+  </data>
+  <data name="ApiEndpointStatusDesc.Text" xml:space="preserve">
+    <value>Повертає поточний стан відтворення (стан, гучність, положення)</value>
+  </data>
+  <data name="ApiEndpointCurrentDesc.Text" xml:space="preserve">
+    <value>Повертає інформацію про поточну композицію (назву, виконавця, альбом, тривалість)</value>
+  </data>
+  <data name="ApiEndpointQueueDesc.Text" xml:space="preserve">
+    <value>Повертає поточну чергу відтворення</value>
+  </data>
+  <data name="ApiEndpointPlayDesc.Text" xml:space="preserve">
+    <value>Почати або відновити відтворення</value>
+  </data>
+  <data name="ApiEndpointPauseDesc.Text" xml:space="preserve">
+    <value>ÐÑÐ¸Ð·ÑÐ¿Ð¸Ð½Ð¸ÑÐ¸ Ð²ÑÐ´ÑÐ²Ð¾ÑÐµÐ½Ð½ÑMedia controller element</value>
+  </data>
+  <data name="ApiEndpointStopDesc.Text" xml:space="preserve">
+    <value>Зупинити відтворення</value>
+  </data>
+  <data name="ApiEndpointNextDesc.Text" xml:space="preserve">
+    <value>Перейти до наступної доріжки</value>
+  </data>
+  <data name="ApiEndpointPreviousDesc.Text" xml:space="preserve">
+    <value>Перейти до попередньої доріжки</value>
+  </data>
+  <data name="ApiEndpointVolumeDesc.Text" xml:space="preserve">
+    <value>Встановіть гучність. Значення має бути від 0 до 100</value>
+  </data>
+  <data name="ApiEndpointMuteDesc.Text" xml:space="preserve">
+    <value>Вимкнути звук</value>
+  </data>
+  <data name="CliPlayDesc.Text" xml:space="preserve">
+    <value>Почати або відновити відтворення</value>
+  </data>
+  <data name="CliPauseDesc.Text" xml:space="preserve">
+    <value>ÐÑÐ¸Ð·ÑÐ¿Ð¸Ð½Ð¸ÑÐ¸ Ð²ÑÐ´ÑÐ²Ð¾ÑÐµÐ½Ð½ÑMedia controller element</value>
+  </data>
+  <data name="CliStopDesc.Text" xml:space="preserve">
+    <value>Зупинити відтворення</value>
+  </data>
+  <data name="CliNextDesc.Text" xml:space="preserve">
+    <value>Перейти до наступної доріжки</value>
+  </data>
+  <data name="CliPrevDesc.Text" xml:space="preserve">
+    <value>Перейти до попередньої доріжки</value>
+  </data>
+  <data name="ApiEndpointPlayPlaylistDesc.Text" xml:space="preserve">
+    <value>Почати прослуховування списку відтворення</value>
+  </data>
+  <data name="ApiEndpointPlayGenreDesc.Text" xml:space="preserve">
+    <value>Почати прослуховування жанру</value>
+  </data>
+  <data name="ApiEndpointPlayArtistDesc.Text" xml:space="preserve">
+    <value>Почніть слухати виконавця</value>
+  </data>
+  <data name="ApiEndpointPlayAlbumDesc.Text" xml:space="preserve">
+    <value>Почати прослуховування альбому</value>
+  </data>
+  <data name="CliListenGenreDesc.Text" xml:space="preserve">
+    <value>Почати прослуховування жанру</value>
+  </data>
+  <data name="CliListenArtistDesc.Text" xml:space="preserve">
+    <value>Почніть слухати виконавця</value>
+  </data>
+  <data name="CliListenAlbumDesc.Text" xml:space="preserve">
+    <value>Почати прослуховування альбому</value>
+  </data>
+  <data name="CliListenPlaylistDesc.Text" xml:space="preserve">
+    <value>Почати прослуховування списку відтворення</value>
+  </data>
+  <data name="CliMuteDesc.Text" xml:space="preserve">
+    <value>Вимкнути звук</value>
+  </data>
+  <data name="CliVolumeDesc.Text" xml:space="preserve">
+    <value>Встановіть гучність. Значення має бути від 0 до 100</value>
+  </data>
+  <data name="Insights_ProfileCuriousExplorer" xml:space="preserve">
+    <value>Допитливий дослідник</value>
+  </data>
+  <data name="Insights_ProfileCuriousExplorerDescription" xml:space="preserve">
+    <value>Ви постійно досліджуєте нових виконавців, рідко затримуючись на одних і тих же доріжках.</value>
+  </data>
+  <data name="Insights_ProfileFaithfulIntense" xml:space="preserve">
+    <value>Глибокий слухач</value>
+  </data>
+  <data name="Insights_ProfileFaithfulIntenseDescription" xml:space="preserve">
+    <value>Ви слухаєте тривалий час, мало пропускаєте і часто повертаєтеся до одних і тих же треків.</value>
+  </data>
+  <data name="Insights_ProfileNightOwl" xml:space="preserve">
+    <value>Нічна Сова</value>
+  </data>
+  <data name="Insights_ProfileNightOwlDescription" xml:space="preserve">
+    <value>Ваші сеанси слухання зосереджені вночі, коли тиша поступається місцем музиці.</value>
+  </data>
+  <data name="Insights_ProfileFocusMode" xml:space="preserve">
+    <value>Режим фокусування</value>
+  </data>
+  <data name="Insights_ProfileFocusModeDescription" xml:space="preserve">
+    <value>Ви слухаєте глибоко, з кількома різними митцями, і ви бачите свої сесії до кінця.</value>
+  </data>
+  <data name="Insights_ProfileChannelSurfer" xml:space="preserve">
+    <value>Скиммер</value>
+  </data>
+  <data name="Insights_ProfileChannelSurferDescription" xml:space="preserve">
+    <value>Ви швидко досліджуєте, багато пропускаєте, завжди шукаєте наступну ідеальну доріжку.</value>
+  </data>
+  <data name="Insights_ArtistByMonth" xml:space="preserve">
+    <value>Виконавців / місяць</value>
+  </data>
+  <data name="Insights_BadgeSmoothListenerName" xml:space="preserve">
+    <value>Гладкий слухач</value>
+  </data>
+  <data name="Insights_BadgeLowSkipName" xml:space="preserve">
+    <value>Низький пропуск</value>
+  </data>
+  <data name="Insights_BadgeHyperZapperName" xml:space="preserve">
+    <value>Hyper Zapper</value>
+  </data>
+  <data name="Insights_BadgeZapperName" xml:space="preserve">
+    <value>Zapper</value>
+  </data>
+  <data name="Insights_BadgeObsessedName" xml:space="preserve">
+    <value>Одержимі</value>
+  </data>
+  <data name="Insights_BadgeReplayLoverName" xml:space="preserve">
+    <value>Коханець повторного відтворення</value>
+  </data>
+  <data name="Insights_BadgeFreshSeekerName" xml:space="preserve">
+    <value>Fresh Seeker</value>
+  </data>
+  <data name="Insights_BadgeExplorerName" xml:space="preserve">
+    <value>Explorer</value>
+  </data>
+  <data name="Insights_BadgeCuriousName" xml:space="preserve">
+    <value>Жадібний(а) до знань</value>
+  </data>
+  <data name="Insights_BadgeRestrictedCircleName" xml:space="preserve">
+    <value>Обмежене коло</value>
+  </data>
+  <data name="Insights_BadgeUltraFocusName" xml:space="preserve">
+    <value>Ultra Focus</value>
+  </data>
+  <data name="Insights_BadgeDeepListenerName" xml:space="preserve">
+    <value>Глибокий слухач</value>
+  </data>
+  <data name="Insights_BadgeLongPlayerName " xml:space="preserve">
+    <value>Довгий гравець</value>
+  </data>
+  <data name="Insights_BadgeShortSessionsName" xml:space="preserve">
+    <value>Короткі сесії</value>
+  </data>
+  <data name="Insights_BadgeNightOwlName" xml:space="preserve">
+    <value>Нічна Сова</value>
+  </data>
+  <data name="Insights_BadgeNocturneName" xml:space="preserve">
+    <value>Темний час доби</value>
+  </data>
+  <data name="Insights_BadgeEarlyBirdName" xml:space="preserve">
+    <value>Ранок</value>
+  </data>
+  <data name="Insights_BadgeAfterworkName" xml:space="preserve">
+    <value>Післяробота</value>
+  </data>
+  <data name="Insights_BadgeUltraLoyalName" xml:space="preserve">
+    <value>Ультралояльний</value>
+  </data>
+  <data name="Insights_BadgeLoyalName" xml:space="preserve">
+    <value>ЛОЯЛЬНІ</value>
+  </data>
+  <data name="Insights_BadgeEclecticName" xml:space="preserve">
+    <value>Еклектика</value>
+  </data>
+  <data name="Insights_BadgeSmoothListenerDescription" xml:space="preserve">
+    <value>Слухає гладко, ви завжди йдете до кінця.</value>
+  </data>
+  <data name="Insights_BadgeLowSkipDescription" xml:space="preserve">
+    <value>Ви бачите речі до кінця.</value>
+  </data>
+  <data name="Insights_BadgeHyperZapperDescription" xml:space="preserve">
+    <value>Досі шукаю потрібну назву.</value>
+  </data>
+  <data name="Insights_BadgeZapperDescription" xml:space="preserve">
+    <value>Ви часто міняєте пісні.</value>
+  </data>
+  <data name="Insights_BadgeObsessedDescription" xml:space="preserve">
+    <value>Ви слухаєте певні пісні на повторі.</value>
+  </data>
+  <data name="Insights_BadgeReplayLoverDescription" xml:space="preserve">
+    <value>Ви часто відтворюєте улюблене.</value>
+  </data>
+  <data name="Insights_BadgeFreshSeekerDescription" xml:space="preserve">
+    <value>Ви майже ніколи не повертаєтеся.</value>
+  </data>
+  <data name="Insights_BadgeExplorerDescription" xml:space="preserve">
+    <value>Ви відкриваєте для себе багато нових митців.</value>
+  </data>
+  <data name="Insights_BadgeCuriousDescription" xml:space="preserve">
+    <value>Ви регулярно досліджуєте.</value>
+  </data>
+  <data name="Insights_BadgeRestrictedCircleDescription" xml:space="preserve">
+    <value>Ви залишаєтеся у своєму власному світі.</value>
+  </data>
+  <data name="Insights_BadgeUltraFocusDescription" xml:space="preserve">
+    <value>Ви слухаєте дуже мало різних художників.</value>
+  </data>
+  <data name="Insights_BadgeDeepListenerDescription" xml:space="preserve">
+    <value>Ви дійсно занурюєтеся в музику.</value>
+  </data>
+  <data name="Insights_BadgeLongPlayerDescription" xml:space="preserve">
+    <value>Ви слухаєте довго.</value>
+  </data>
+  <data name="Insights_BadgeShortSessionsDescription" xml:space="preserve">
+    <value>Ви слухаєте в малих дозах.</value>
+  </data>
+  <data name="Insights_BadgeNightOwlDescription" xml:space="preserve">
+    <value>Ти живеш вночі.</value>
+  </data>
+  <data name="Insights_BadgeNocturneDescription" xml:space="preserve">
+    <value>Ви в основному слухаєте вночі.</value>
+  </data>
+  <data name="Insights_BadgeEarlyBirdDescription" xml:space="preserve">
+    <value>Ви починаєте свій день з музики.</value>
+  </data>
+  <data name="Insights_BadgeAfterworkDescription" xml:space="preserve">
+    <value>Ви слухаєте в кінці дня.</value>
+  </data>
+  <data name="Insights_BadgeUltraLoyalDescription" xml:space="preserve">
+    <value>У вас є улюблені пісні.</value>
+  </data>
+  <data name="Insights_BadgeLoyalDescription" xml:space="preserve">
+    <value>Ви залишаєтеся вірними своїм улюбленим.</value>
+  </data>
+  <data name="Insights_BadgeEclecticDescription" xml:space="preserve">
+    <value>Ви часто змінюєте назви.</value>
+  </data>
+  <data name="Insights_HeroTitle.Text" xml:space="preserve">
+    <value>✨ Ваш місяць у музиці</value>
+  </data>
+  <data name="Insights_TotalPlayDuration.Text" xml:space="preserve">
+    <value>Загальний час прослуховування</value>
+  </data>
+  <data name="Insights_TotalSessions.Text" xml:space="preserve">
+    <value>Кількість сесій</value>
+  </data>
+  <data name="Insights_TotalTracks.Text" xml:space="preserve">
+    <value>Прослуховування різних треків</value>
+  </data>
+  <data name="Insights_TotalArtists.Text" xml:space="preserve">
+    <value>Різні митці слухали</value>
+  </data>
+  <data name="Insights_TotalAlbums.Text" xml:space="preserve">
+    <value>Прослуховування різних альбомів</value>
+  </data>
+  <data name="Insights_TotalGenres.Text" xml:space="preserve">
+    <value>Прослуховування різних жанрів</value>
+  </data>
+  <data name="Insights_HotListeningTimes.Text" xml:space="preserve">
+    <value>🔥 Коли ви слухаєте найбільше</value>
+  </data>
+  <data name="Insights_ImportantTracks.Text" xml:space="preserve">
+    <value>🏆 Ваші найважливіші назви</value>
+  </data>
+  <data name="Insights_TopAlbums.Text" xml:space="preserve">
+    <value>🏆 Ваші найважливіші назви</value>
+  </data>
+  <data name="Insights_TopTracks.Text" xml:space="preserve">
+    <value>Найпопулярніші назви</value>
+  </data>
+  <data name="Insights_ListeningProfile.Text" xml:space="preserve">
+    <value>🧬 Ваш профіль прослуховування</value>
+  </data>
+  <data name="Insights_TopGenres.Text" xml:space="preserve">
+    <value>Найкращі жанри</value>
+  </data>
+  <data name="Insights_BadgesHeader.Text" xml:space="preserve">
+    <value>Ваші значки</value>
+  </data>
+  <data name="Insights_Sessions_Title.Text" xml:space="preserve">
+    <value>🎧 Ваші сеанси слухання</value>
+  </data>
+  <data name="Insights_Sessions_MaxDuration.Text" xml:space="preserve">
+    <value>Максимальна тривалість</value>
+  </data>
+  <data name="Insights_Sessions_AvgTracks.Text" xml:space="preserve">
+    <value>В середньому доріжок на сеанс</value>
+  </data>
+  <data name="Insights_Sessions_Nocturnal.Text" xml:space="preserve">
+    <value>Нічні сеанси</value>
+  </data>
+  <data name="Insights_Sessions_CommonStart.Text" xml:space="preserve">
+    <value>Звичайний час початку</value>
+  </data>
+  <data name="Insights_Sessions_MostIntense.Text" xml:space="preserve">
+    <value>Найбільш інтенсивна сесія</value>
+  </data>
+  <data name="Insights_Sessions_MostActiveDay.Text" xml:space="preserve">
+    <value>Найактивніші</value>
+  </data>
+  <data name="Insights_Sessions_TracksUnit" xml:space="preserve">
+    <value>треки</value>
+  </data>
+  <data name="Insights_Sessions_SessionsUnit" xml:space="preserve">
+    <value>cесії</value>
+  </data>
+  <data name="Insights_TopTracksPlayCount.Text" xml:space="preserve">
+    <value>слухає цього місяця</value>
+  </data>
+  <data name="Insights_TopTracksLongSessionCount.Text" xml:space="preserve">
+    <value>довгі сесії</value>
+  </data>
+  <data name="Insights_TopTracksPeakHour.Text" xml:space="preserve">
+    <value>Година пік:</value>
+  </data>
+  <data name="Insights_TopAlbumsPlayCount.Text" xml:space="preserve">
+    <value>слухає цього місяця</value>
+  </data>
+  <data name="Insights_TopAlbumsLongSessionCount.Text" xml:space="preserve">
+    <value>довгі сесії</value>
+  </data>
+  <data name="Insights_TopAlbumsPeakHour.Text" xml:space="preserve">
+    <value>Година пік:</value>
+  </data>
+  <data name="Insights_TopAlbumsDominant.Text" xml:space="preserve">
+    <value>Домінанта</value>
+  </data>
+  <data name="Insights_EmptyStateTitle.Text" xml:space="preserve">
+    <value>Немає даних</value>
+  </data>
+  <data name="Insights_EmptyStateDescription.Text" xml:space="preserve">
+    <value>Почніть слухати музику, щоб переглянути свої аналітичні дані за цей місяць.</value>
+  </data>
+  <data name="welcomeTagline.Text" xml:space="preserve">
+    <value>Твоя музика. Твій світ.</value>
+  </data>
+  <data name="AlbumsImported" xml:space="preserve">
+    <value>знайдено альбомів</value>
+  </data>
+  <data name="reviewSentimentGateTitle" xml:space="preserve">
+    <value>Насолоджуєтесь Росією?</value>
+  </data>
+  <data name="reviewSentimentGateContent" xml:space="preserve">
+    <value>РК створена з турботою про людей, які по-справжньому володіють своєю музикою. Ваш відгук допоможе сформувати майбутнє додатка.</value>
+  </data>
+  <data name="reviewSentimentGateYes" xml:space="preserve">
+    <value>Так, мені подобається!</value>
+  </data>
+  <data name="reviewSentimentGateNo" xml:space="preserve">
+    <value>Не дуже. </value>
+  </data>
+  <data name="reviewPositiveTitle" xml:space="preserve">
+    <value>Дякую!</value>
+  </data>
+  <data name="reviewPositiveContent" xml:space="preserve">
+    <value>Короткий огляд у Microsoft Store допомагає охопити більше людей, які все ще дбають про володіння своєю музикою.</value>
+  </data>
+  <data name="reviewPositiveLeave" xml:space="preserve">
+    <value>Залишити відгук</value>
+  </data>
+  <data name="reviewPositiveLater" xml:space="preserve">
+    <value>Можливо пізніше</value>
+  </data>
+  <data name="reviewNegativeTitle" xml:space="preserve">
+    <value>Дякуємо за чесність</value>
+  </data>
+  <data name="reviewNegativeContent" xml:space="preserve">
+    <value>Я хотів би почути те, що мені здалося неправильним, щоб я міг покращити враження. Кожне повідомлення допомагає зробити РК кращим.</value>
+  </data>
+  <data name="reviewNegativeSend" xml:space="preserve">
+    <value>Надіслати відгук</value>
+  </data>
+  <data name="reviewNegativeClose" xml:space="preserve">
+    <value>Закрити</value>
+  </data>
+  <data name="StoreReviewButton.Text" xml:space="preserve">
+    <value>Залишити відгук</value>
+  </data>
+  <data name="EqualizeWindowsTitle" xml:space="preserve">
+    <value>РК - еквалайзер</value>
+  </data>
+  <data name="EqualizeWindowsDescription" xml:space="preserve">
+    <value>Налаштуйте звукові частоти, щоб покращити враження від прослуховування. Зміни застосовуються в режимі реального часу.</value>
+  </data>
+  <data name="EqualizeWindowsResetButton" xml:space="preserve">
+    <value>Reset (Скид)</value>
+  </data>
+  <data name="playerEqualizerAppBarButton.Label" xml:space="preserve">
+    <value>Еквалайзер</value>
+  </data>
+  <data name="playerCompactModeAppBarButton.Label" xml:space="preserve">
+    <value>Компактний режим перегляду</value>
+  </data>
+  <data name="playerFullscreenAppBarButton.Label" xml:space="preserve">
+    <value>Повноекранний режим</value>
+  </data>
+  <data name="EqualizerSavePanelTitle" xml:space="preserve">
+    <value>Зберегти це попереднє налаштування?</value>
+  </data>
+  <data name="EqualizerSaveScopeTrack" xml:space="preserve">
+    <value>Заборонити цю композицію</value>
+  </data>
+  <data name="EqualizerSaveScopeAlbum" xml:space="preserve">
+    <value>Цей альбом</value>
+  </data>
+  <data name="EqualizerSaveScopeArtist" xml:space="preserve">
+    <value>Цей художник</value>
+  </data>
+  <data name="EqualizerSaveScopeGenre" xml:space="preserve">
+    <value>Цей жанр</value>
+  </data>
+  <data name="EqualizerActivePresetDefault" xml:space="preserve">
+    <value>Немає активних попередніх налаштувань</value>
+  </data>
+  <data name="EqualizerActivePresetTrack" xml:space="preserve">
+    <value>Активне попереднє налаштування: доріжка</value>
+  </data>
+  <data name="EqualizerActivePresetAlbum" xml:space="preserve">
+    <value>Активне попереднє налаштування: альбом</value>
+  </data>
+  <data name="EqualizerActivePresetArtist" xml:space="preserve">
+    <value>Активне попереднє налаштування: виконавець</value>
+  </data>
+  <data name="EqualizerActivePresetGenre" xml:space="preserve">
+    <value>Активне попереднє налаштування: жанр</value>
+  </data>
+  <data name="EqualizerRemovePresetButton" xml:space="preserve">
+    <value>Видалити це попереднє налаштування</value>
+  </data>
+  <data name="EqualizerBuiltin_Flat" xml:space="preserve">
+    <value>Плоский</value>
+  </data>
+  <data name="EqualizerBuiltin_Rock" xml:space="preserve">
+    <value>Камінь</value>
+  </data>
+  <data name="EqualizerBuiltin_Metal" xml:space="preserve">
+    <value>Метал</value>
+  </data>
+  <data name="EqualizerBuiltin_Pop" xml:space="preserve">
+    <value>Поп</value>
+  </data>
+  <data name="EqualizerBuiltin_HipHop" xml:space="preserve">
+    <value>Хіп- хоп</value>
+  </data>
+  <data name="EqualizerBuiltin_RnB" xml:space="preserve">
+    <value>Р, Б</value>
+  </data>
+  <data name="EqualizerBuiltin_Electronic" xml:space="preserve">
+    <value>Електронний</value>
+  </data>
+  <data name="EqualizerBuiltin_Classical" xml:space="preserve">
+    <value>Класична</value>
+  </data>
+  <data name="EqualizerBuiltin_Jazz" xml:space="preserve">
+    <value>Джаз</value>
+  </data>
+  <data name="EqualizerBuiltin_Blues" xml:space="preserve">
+    <value>Блюз</value>
+  </data>
+  <data name="EqualizerBuiltin_Acoustic" xml:space="preserve">
+    <value>Акустика</value>
+  </data>
+  <data name="EqualizerBuiltin_Vocal" xml:space="preserve">
+    <value>Постанов.</value>
+  </data>
+  <data name="EqualizerBuiltin_BassBoost" xml:space="preserve">
+    <value>ÐÑÐ´ÑÐ¸Ð»Ð¸ÑÐ¸ Ð±Ð°ÑÐ¸Phonon:: MMF:: EffectFactory</value>
+  </data>
+  <data name="EqualizerBuiltin_TrebleBoost" xml:space="preserve">
+    <value>Підвищення балів</value>
+  </data>
+  <data name="EqualizerBuiltin_Loudness" xml:space="preserve">
+    <value>ÐÑÑÐ½ÑÑÑÑPhonon:: MMF:: EffectFactory</value>
+  </data>
+  <data name="EqualizerBuiltin_Latin" xml:space="preserve">
+    <value>Латинська</value>
+  </data>
+  <data name="playerSleepModeAppBarButton.Label" xml:space="preserve">
+    <value>Sleep Timer (Таймер сну)</value>
+  </data>
+  <data name="notification_sleepTimer_Start" xml:space="preserve">
+    <value>Таймер сну ввімкнено — РК автоматично припинить відтворення</value>
+  </data>
+  <data name="notification_sleepTimer_Stop" xml:space="preserve">
+    <value>Таймер сну заблоковано — ваша музика залишається ввімкненою</value>
+  </data>
+  <data name="SmartPlaylist_EmptyTracksTitle.Text" xml:space="preserve">
+    <value>Ще немає треків</value>
+  </data>
+  <data name="SmartPlaylist_EmptyTracksDescription.Text" xml:space="preserve">
+    <value>Налаштуйте критерії списку відтворення та натисніть Оновити, щоб переглянути відповідні композиції.</value>
+  </data>
+</root>

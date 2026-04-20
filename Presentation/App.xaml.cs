@@ -28,9 +28,6 @@ public partial class App : Microsoft.UI.Xaml.Application
         this.InitializeComponent();
     }
 
-
-
-
     /// <summary>
     /// Invoked when the application is launched.
     /// </summary>
@@ -66,7 +63,6 @@ public partial class App : Microsoft.UI.Xaml.Application
 
         MainWindowHandle = WindowNative.GetWindowHandle(MainWindow);
 
-
 #if DEBUG
         TryEnableXamlDiagnostics();
 #endif
@@ -92,7 +88,7 @@ public partial class App : Microsoft.UI.Xaml.Application
         }
         else
         {
-            string[] supportedLanguages = new[] { "en-US", "fr-FR", "es-ES" };
+            string[] supportedLanguages = new[] { "en-US", "fr-FR", "es-ES", "uk-UA" };
 
             if (supportedLanguages.Contains(userLanguage))
                 Windows.Globalization.ApplicationLanguages.PrimaryLanguageOverride = userLanguage;
@@ -100,7 +96,6 @@ public partial class App : Microsoft.UI.Xaml.Application
                 Windows.Globalization.ApplicationLanguages.PrimaryLanguageOverride = "en-US";
         }
     }
-
 
     private void OnInstanceActivated(object? sender, AppActivationArguments args)
     {
@@ -116,7 +111,6 @@ public partial class App : Microsoft.UI.Xaml.Application
         IPlayerCommandHandler handler = ServiceProvider.GetRequiredService<IPlayerCommandHandler>();
         MainWindow?.DispatcherQueue.TryEnqueue(() => handler.HandleAsync(arguments));
     }
-
 
     [Conditional("DEBUG")]
     private void TryEnableXamlDiagnostics()
@@ -139,7 +133,6 @@ public partial class App : Microsoft.UI.Xaml.Application
             Debug.WriteLine("Activation diagnostics XAML échouée: " + ex);
         }
     }
-
 
     private static ServiceProvider ConfigureServices()
     {
@@ -169,7 +162,6 @@ public partial class App : Microsoft.UI.Xaml.Application
 
         return services.BuildServiceProvider();
     }
-
 
     private static async Task<IAppOptions> LoadOptionsAsync()
     {
@@ -206,7 +198,6 @@ public partial class App : Microsoft.UI.Xaml.Application
         return options;
     }
 
-
     private async void MainWindow_Closed(object sender, WindowEventArgs args)
     {
         IAppOptions options = ServiceProvider.GetRequiredService<IAppOptions>();
@@ -218,7 +209,6 @@ public partial class App : Microsoft.UI.Xaml.Application
 
         await Log.CloseAndFlushAsync();
     }
-
 
     private void Application_UnhandledException(object sender, Microsoft.UI.Xaml.UnhandledExceptionEventArgs e)
     {
