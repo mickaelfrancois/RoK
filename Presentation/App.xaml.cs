@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Windows.AppLifecycle;
 using Rok.Application.Options;
+using Rok.Application.Player;
 using Rok.Import;
 using Rok.Infrastructure;
 using Rok.Services.PlayerCommand.Terminal;
@@ -76,6 +77,10 @@ public partial class App : Microsoft.UI.Xaml.Application
 
         if (options.EnableWebApi)
             ServiceProvider.GetRequiredService<PlayerWebApiService>().Start();
+
+        ISystemMediaTransportControlsService smtc = ServiceProvider.GetRequiredService<ISystemMediaTransportControlsService>();
+        smtc.SetPlayerService(ServiceProvider.GetRequiredService<IPlayerService>());
+        smtc.Initialize();
     }
 
     private static void SetLanguage(IAppOptions options)

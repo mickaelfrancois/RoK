@@ -3,6 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Rok.Application.Interfaces;
 using Rok.Application.Interfaces.Pictures;
+using Rok.Application.Player;
 using Rok.Application.Interfaces.Repositories;
 using Rok.Application.Tag;
 using Rok.Infrastructure.Files;
@@ -45,6 +46,7 @@ public static class DependencyInjection
         services.AddSingleton<IBackdropPicture, BackdropPicture>();
         services.AddSingleton<IDominantColorCalculator, DominantColorCalculator>();
         services.AddSingleton<ICallDetectionService, CallDetectionService>();
+        services.AddSingleton<ISystemMediaTransportControlsService, SystemMediaTransportControlsService>();
 
         services.AddSingleton<IPlayerEngine, NAudioMediaPlayer>();
         services.AddSingleton<ILyricsService, LyricsService>();
