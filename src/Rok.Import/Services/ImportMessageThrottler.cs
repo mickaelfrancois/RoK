@@ -15,7 +15,7 @@ public class ImportMessageThrottler
 
         _albumMessagesSent++;
 
-        if (_albumMessagesSent >= MaxMessagesBeforeThrottle)
+        if (_albumMessagesSent > MaxMessagesBeforeThrottle)
         {
             _isAlbumThrottled = true;
             return false;
@@ -31,7 +31,7 @@ public class ImportMessageThrottler
 
         _artistMessagesSent++;
 
-        if (_artistMessagesSent >= MaxMessagesBeforeThrottle)
+        if (_artistMessagesSent > MaxMessagesBeforeThrottle)
         {
             _isArtistThrottled = true;
             return false;
