@@ -9,14 +9,7 @@ public class TrackFileProcessor(ITagService _tagService, ILogger<TrackFileProces
     {
         foreach (TrackFile file in files)
         {
-            try
-            {
-                _tagService.FillMusicProperties(file.FullPath, file);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "An exception occurred while reading music properties '{File}'", file.FullPath);
-            }
+            _tagService.FillMusicProperties(file.FullPath, file);
         }
     }
 
