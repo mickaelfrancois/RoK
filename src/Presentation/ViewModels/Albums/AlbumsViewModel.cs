@@ -7,7 +7,6 @@ using Rok.ViewModels.Albums.Services;
 
 namespace Rok.ViewModels.Albums;
 
-
 public partial class AlbumsViewModel : ObservableObject, IDisposable
 {
     private readonly ILogger<AlbumsViewModel> _logger;
@@ -66,8 +65,6 @@ public partial class AlbumsViewModel : ObservableObject, IDisposable
     public string GroupById => SelectedGroupBy;
     public string GroupByText => _albumProvider.GetGroupByLabel(SelectedGroupBy);
 
-
-
     public AlbumsViewModel(TagsProvider tagProvider, IAlbumProvider albumProvider, IAlbumLibraryMonitor libraryMonitor, AlbumsSelectionManager selectionManager, AlbumsStateManager stateManager, AlbumsPlaybackService playbackService, ILogger<AlbumsViewModel> logger)
     {
         _tagsProvider = tagProvider;
@@ -87,7 +84,6 @@ public partial class AlbumsViewModel : ObservableObject, IDisposable
         _libraryUpdated = true;
         _dispatcherQueue.TryEnqueue(() => FilterAndSort());
     }
-
 
     public async Task LoadDataAsync(bool forceReload)
     {
@@ -155,8 +151,6 @@ public partial class AlbumsViewModel : ObservableObject, IDisposable
         _stateManager.Save();
     }
 
-
-
     [RelayCommand]
     private void ToggleDisplayMode()
     {
@@ -222,7 +216,7 @@ public partial class AlbumsViewModel : ObservableObject, IDisposable
         AlbumProviderResult result = _albumProvider.GetProcessedData(_stateManager.GroupBy, _stateManager.SelectedFilters, _stateManager.SelectedGenreFilters, _stateManager.SelectedTagFilters);
 
         _filteredAlbums = result.FilteredItems;
-        List<AlbumsGroupCategoryViewModel> groups = result.Groups.ToList();
+        var groups = result.Groups.ToList();
 
         if (!string.IsNullOrWhiteSpace(SearchText))
         {
@@ -265,7 +259,7 @@ public partial class AlbumsViewModel : ObservableObject, IDisposable
     [RelayCommand]
     private async Task ListenGroupAsync(AlbumsGroupCategoryViewModel group)
     {
-        List<long> albumIds = group.Items.Select(album => album.Album.Id).ToList();
+        var albumIds = group.Items.Select(album => album.Album.Id).ToList();
         await _playbackService.PlayAlbumsAsync(albumIds);
     }
 
@@ -279,7 +273,19 @@ public partial class AlbumsViewModel : ObservableObject, IDisposable
         await _playbackService.PlayAlbumsAsync(albumIds);
     }
 
+    [RelayCommand]
+    private async Task SurpriseMeAsync()
+    {
+        IReadOnlyList<AlbumViewModel> pool = Selected.Count == 0
+            ? _filteredAlbums
+            : SelectedItems;
 
+        if (pool.Count == 0)
+            return;
+
+        long randomAlbumId = pool[Random.Shared.Next(pool.Count)].Album.Id;
+        await _playbackService.PlayAlbumsAsync([randomAlbumId]);
+    }
 
     #region IDisposable Support
 

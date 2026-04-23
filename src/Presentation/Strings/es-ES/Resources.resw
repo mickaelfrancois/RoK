@@ -114,6 +114,12 @@
   <data name="artistViewListen.Label" xml:space="preserve">
     <value>Escuchar</value>
   </data>
+  <data name="artistsViewSurpriseMe.Label" xml:space="preserve">
+    <value>Sorpréndeme</value>
+  </data>
+  <data name="artistsViewSurpriseMe.ToolTipService.ToolTip" xml:space="preserve">
+    <value>Reproducir un artista al azar de la lista</value>
+  </data>
   <data name="artistViewLike.Label" xml:space="preserve">
     <value>Me gusta</value>
   </data>

@@ -172,6 +172,12 @@
   <data name="artistViewListen.Label" xml:space="preserve">
     <value>Слухати</value>
   </data>
+  <data name="artistsViewSurpriseMe.Label" xml:space="preserve">
+    <value>Здивуй мене</value>
+  </data>
+  <data name="artistsViewSurpriseMe.ToolTipService.ToolTip" xml:space="preserve">
+    <value>Відтворити випадкового виконавця зі списку</value>
+  </data>
   <data name="artistViewLike.Label" xml:space="preserve">
     <value>Подобається</value>
   </data>

@@ -276,6 +276,20 @@ public partial class ArtistsViewModel : ObservableObject, IDisposable
         await _playbackService.PlayArtistsAsync(artistIds);
     }
 
+    [RelayCommand]
+    private async Task SurpriseMeAsync()
+    {
+        IReadOnlyList<ArtistViewModel> pool = Selected.Count == 0
+            ? _filteredArtists
+            : SelectedItems;
+
+        if (pool.Count == 0)
+            return;
+
+        long randomArtistId = pool[Random.Shared.Next(pool.Count)].Artist.Id;
+        await _playbackService.PlayArtistsAsync([randomArtistId]);
+    }
+
 
 
     #region IDisposable Support

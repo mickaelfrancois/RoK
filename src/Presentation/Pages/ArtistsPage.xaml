@@ -140,6 +140,12 @@
 
                     <AppBarButton x:Uid="artistViewListen" Style="{StaticResource ListenAppBarButtonCompactStyle}" Command="{x:Bind ViewModel.ListenCommand}" />
 
+                    <AppBarButton x:Uid="artistsViewSurpriseMe" MinWidth="150" Width="auto" Style="{StaticResource HeaderGenericButtonStyle}" Command="{x:Bind ViewModel.SurpriseMeCommand}">
+                        <AppBarButton.Icon>
+                            <FontIcon Glyph="&#xF158;" />
+                        </AppBarButton.Icon>
+                    </AppBarButton>
+
                     <SplitButton x:Name="groupBySplitButton" VerticalAlignment="Center">
                         <SplitButton.Content>
                             <StackPanel Style="{StaticResource CommandBarSplitButtonPanelStyle}" AutomationProperties.Name="{x:Bind ViewModel.GroupByText, Mode=OneWay}" ToolTipService.ToolTip="{x:Bind ViewModel.GroupByText, Mode=OneWay}">
