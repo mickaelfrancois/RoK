@@ -12,8 +12,8 @@
 		<PublishProfile>win-$(Platform).pubxml</PublishProfile>
 		<UseWinUI>true</UseWinUI>
 		<EnableMsixTooling>true</EnableMsixTooling>
-		<Nullable>enable</Nullable>
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+		<ImplicitUsings>disable</ImplicitUsings>
 		<WindowsAppSDKSelfContained>true</WindowsAppSDKSelfContained>
 		<NoWarn>$(NoWarn);DEP0840</NoWarn>
 	    <UserSecretsId>d0581b7b-fae8-471b-96ec-491f08740dcb</UserSecretsId>
