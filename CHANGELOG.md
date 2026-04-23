@@ -1,5 +1,28 @@
 ﻿# ChangeLog
 
+## [1.10.0] Store – 23 avril 2026  
+
+### Ajouté
+
+- Ajout d'un bouton Surprise pour lancer la lecture d'un album aléatoire dans la page des albums, artistes
+- Ajout d'un bouton Surprise pour lancer la lecture d'un artiste aléatoire dans la page des artistes
+- Gestion des commandes multimédia (Play, Pause, Next, Previous) via le clavier ou les périphériques externes.
+
+### Modifié
+
+- Modification de la structure de la solution
+
+### Corrigé
+
+- Remplacement de l'appel `ContinueWith` en fire-and-forget par une méthode async structurée lors de l'import (#256)
+- Meilleure gestion des erreurs lors de la lecture des tags audio (#255)
+- Protection contre le cas où `FindIndex` retourne -1 lors du démarrage de la lecture (#254)
+- Correction du seuil de limitation : exactement `MaxMessagesBeforeThrottle` messages sont désormais autorisés avant le throttling
+
+
+--
+
+
 ## [1.9.1] Store – 18 avril 2026  
 
 ### Ajouté
