@@ -265,7 +265,7 @@ public sealed class DialogService(ResourceLoader resourceLoader, ITranslateServi
 
         TaskCompletionSource<object?> tcs = new(TaskCreationOptions.RunContinuationsAsynchronously);
 
-        _ = App.MainWindow.DispatcherQueue.TryEnqueue(() =>
+        bool enqueued = App.MainWindow.DispatcherQueue.TryEnqueue(() =>
         {
             Task task = func();
             task.ContinueWith(t =>
@@ -278,6 +278,9 @@ public sealed class DialogService(ResourceLoader resourceLoader, ITranslateServi
                     tcs.SetResult(null);
             }, TaskScheduler.Default);
         });
+
+        if (!enqueued)
+            tcs.SetCanceled();
 
         return tcs.Task;
     }
