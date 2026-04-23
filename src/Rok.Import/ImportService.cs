@@ -68,25 +68,31 @@ ILogger<ImportService> logger) : IImport
         _messageThrottler.Reset();
 
         _progressService.ReportRunning();
-        Stopwatch stopwatch = Stopwatch.StartNew();
+        var stopwatch = Stopwatch.StartNew();
 
-        Task.Run(async () =>
+        _ = RunImportAsync(delayInSeconds, stopwatch);
+    }
+
+    private async Task RunImportAsync(int delayInSeconds, Stopwatch stopwatch)
+    {
+        try
         {
             if (delayInSeconds > 0)
-                await Task.Delay(delayInSeconds);
+                await Task.Delay(delayInSeconds, _cancellationToken!.Token);
 
-            await ImportAsync(_cancellationToken.Token);
-
-        }, _cancellationToken.Token)
-        .ContinueWith(async c =>
+            await ImportAsync(_cancellationToken!.Token);
+        }
+        catch (OperationCanceledException)
         {
-            if (c.IsFaulted)
-            {
-                _logger.LogCritical(c.Exception, "An exception occurred while refreshing library: {Message}",
-                    c.Exception.Message);
-                await telemetryClient.CaptureExceptionAsync(c.Exception);
-            }
-
+            // Expected exception when cancelling the import process, no action needed.
+        }
+        catch (Exception ex)
+        {
+            _logger.LogCritical(ex, "An exception occurred while refreshing library: {Message}", ex.Message);
+            await telemetryClient.CaptureExceptionAsync(ex);
+        }
+        finally
+        {
             _logger.LogTrace("Files read: {FilesRead}, Tracks imported: {TracksImported}, Albums imported: {AlbumImported}, Artists imported: {ArtistImported}, Genres imported: {GenreImported}. End of refresh library in {ElapsedMilliseconds} ms.",
                 Statistics.FilesRead, Statistics.TracksImported, Statistics.AlbumsImported,
                 Statistics.ArtistsImported, Statistics.GenresImported, stopwatch.ElapsedMilliseconds);
@@ -94,8 +100,8 @@ ILogger<ImportService> logger) : IImport
             UpdateInProgress = false;
             _progressService.ReportStopped(Statistics);
 
-            _cancellationToken.Dispose();
-        });
+            _cancellationToken?.Dispose();
+        }
     }
 
     public async Task ImportAsync(CancellationToken cancellationToken)
