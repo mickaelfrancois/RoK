@@ -2,7 +2,7 @@ namespace Rok.Import.Services;
 
 public class ImportMessageThrottler
 {
-    private const int MaxMessagesBeforeThrottle = 40;
+    public const int MaxMessagesBeforeThrottle = 100;
     private int _albumMessagesSent = 0;
     private bool _isAlbumThrottled = false;
     private int _artistMessagesSent = 0;

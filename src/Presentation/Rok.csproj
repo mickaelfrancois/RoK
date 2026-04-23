@@ -141,10 +141,10 @@
 		<PackageReference Include="MiF.RelayCommand" Version="1.0.0" />
 	</ItemGroup>
 	<ItemGroup>
-		<ProjectReference Include="..\Core\Rok.Application\Rok.Application.csproj" />
-		<ProjectReference Include="..\Core\Rok.Import\Rok.Import.csproj" />
-		<ProjectReference Include="..\Core\Rok.Shared\Rok.Shared.csproj" />
-		<ProjectReference Include="..\Infrastructure\Rok.Infrastructure\Rok.Infrastructure.csproj" />
+		<ProjectReference Include="..\Rok.Application\Rok.Application.csproj" />
+		<ProjectReference Include="..\Rok.Import\Rok.Import.csproj" />
+		<ProjectReference Include="..\Rok.Shared\Rok.Shared.csproj" />
+		<ProjectReference Include="..\Rok.Infrastructure\Rok.Infrastructure.csproj" />
 	</ItemGroup>
 	<ItemGroup>
 	  <Content Update="Assets\albumFallback.png">

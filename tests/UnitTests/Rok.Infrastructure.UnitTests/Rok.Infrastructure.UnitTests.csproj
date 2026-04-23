@@ -21,7 +21,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\..\..\Infrastructure\Rok.Infrastructure\Rok.Infrastructure.csproj" />
+	  <ProjectReference Include="..\..\..\src\Rok.Infrastructure\Rok.Infrastructure.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>

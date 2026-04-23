@@ -3,6 +3,7 @@ using CommunityToolkit.Mvvm.Input;
 using Microsoft.UI.Dispatching;
 using Rok.Application.Features.Tracks.Query;
 using Rok.Application.Interfaces.Pictures;
+using Rok.Import.Services;
 using Windows.Storage;
 using Windows.Storage.AccessCache;
 
@@ -11,7 +12,6 @@ namespace Rok.ViewModels.Start;
 
 public partial class StartViewModel : ObservableObject
 {
-    private const int KAlbumMinimumBeforeUse = 60;
     private const int KDisplayIntervalMs = 300;
 
     private readonly IAlbumPicture _albumPicture;
@@ -78,9 +78,9 @@ public partial class StartViewModel : ObservableObject
         AlbumImportedModel album = _pendingAlbums.Dequeue();
         AlbumsImported.Insert(0, album);
         ImportProgressText = $"{AlbumsImported.Count} {_albumsImportedMessage}";
-        ImportProgress = Math.Min(AlbumsImported.Count * 100.0 / KAlbumMinimumBeforeUse, 100);
+        ImportProgress = Math.Min(AlbumsImported.Count * 100.0 / ImportMessageThrottler.MaxMessagesBeforeThrottle, 100);
 
-        if (AlbumsImported.Count >= KAlbumMinimumBeforeUse)
+        if (AlbumsImported.Count >= ImportMessageThrottler.MaxMessagesBeforeThrottle)
         {
             UnregisterEvents();
             _navigationService.NavigateToAlbums();
