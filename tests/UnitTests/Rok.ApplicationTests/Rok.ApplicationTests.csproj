@@ -22,7 +22,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\..\..\Core\Rok.Application\Rok.Application.csproj" />
+	  <ProjectReference Include="..\..\..\src\Rok.Application\Rok.Application.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>

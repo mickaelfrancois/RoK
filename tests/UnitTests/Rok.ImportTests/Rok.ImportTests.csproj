@@ -20,7 +20,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\Core\Rok.Import\Rok.Import.csproj" />
+    <ProjectReference Include="..\..\..\src\Rok.Import\Rok.Import.csproj" />
   </ItemGroup>
 
   <ItemGroup>

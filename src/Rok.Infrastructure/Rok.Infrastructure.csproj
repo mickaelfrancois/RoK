@@ -24,7 +24,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\..\Core\Rok.Application\Rok.Application.csproj" />
+		<ProjectReference Include="..\Rok.Application\Rok.Application.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>
