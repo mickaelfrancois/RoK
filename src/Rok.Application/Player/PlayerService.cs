@@ -248,7 +248,7 @@ public class PlayerService : IPlayerService
         if (_isCrossfadeEnabled)
         {
             _isCrossfadeRunning = true;
-            _ = Task.Run(() => CrossfadeToNextTrackAsync());
+            _ = CrossfadeToNextTrackAsync();
         }
     }
 
@@ -379,6 +379,7 @@ public class PlayerService : IPlayerService
     {
         // Cancel any ongoing crossfade
         _crossfadeCts?.Cancel();
+        _isCrossfadeRunning = false;
 
         if (_currentIndex + 1 >= Playlist.Count)
         {
@@ -618,7 +619,7 @@ public class PlayerService : IPlayerService
             cancellationToken.ThrowIfCancellationRequested();
 
             double progress = Math.Clamp((double)i / steps, 0.0, 1.0);
-            double volume = minVolume + AudioRamping.DbInterpolate(progress, masterVolume);
+            double volume = Math.Max(minVolume, AudioRamping.DbInterpolate(progress, masterVolume));
             if (Math.Abs(volume - lastVolume) > 0.01)
             {
                 _player.SetVolume(volume);
