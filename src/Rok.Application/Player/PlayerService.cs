@@ -316,6 +316,9 @@ public class PlayerService : IPlayerService
         else
             _currentIndex = Playlist.FindIndex(c => c.Id == startTrack.Id);
 
+        if (_currentIndex < 0)
+            return;
+
         LoadFile(Playlist[_currentIndex]);
 
         Play();
