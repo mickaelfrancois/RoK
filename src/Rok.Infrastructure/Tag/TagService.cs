@@ -1,8 +1,9 @@
-﻿using Rok.Application.Tag;
+﻿using Microsoft.Extensions.Logging;
+using Rok.Application.Tag;
 
 namespace Rok.Infrastructure.Tag;
 
-public class TagService : ITagService
+public class TagService(ILogger<TagService> logger) : ITagService
 {
     public void FillProperties(string file, TrackFile track)
     {
@@ -24,22 +25,37 @@ public class TagService : ITagService
 
     public void FillMusicProperties(string file, TrackFile track)
     {
-        using TagLib.File tag = TagLib.File.Create(file);
+        try
+        {
+            using TagLib.File tag = TagLib.File.Create(file);
 
-        track.Title = tag.Tag.Title?.Trim() ?? "";
-        track.Artist = tag.Tag.FirstAlbumArtist?.Trim() ?? tag.Tag.FirstPerformer?.Trim() ?? "";
-        track.Album = tag.Tag.Album?.Trim() ?? "";
-        track.Genre = tag.Tag.FirstGenre?.Trim() ?? "";
-        track.Year = tag.Tag.Year > 0 ? (int)tag.Tag.Year : null;
-        track.TrackNumber = (int)tag.Tag.Track;
-        track.Duration = tag.Properties.Duration;
-        track.Bitrate = tag.Properties.AudioBitrate * 1000;
+            track.Title = tag.Tag.Title?.Trim() ?? "";
+            track.Artist = tag.Tag.FirstAlbumArtist?.Trim() ?? tag.Tag.FirstPerformer?.Trim() ?? "";
+            track.Album = tag.Tag.Album?.Trim() ?? "";
+            track.Genre = tag.Tag.FirstGenre?.Trim() ?? "";
+            track.Year = tag.Tag.Year > 0 ? (int)tag.Tag.Year : null;
+            track.TrackNumber = (int)tag.Tag.Track;
+            track.Duration = tag.Properties.Duration;
+            track.Bitrate = tag.Properties.AudioBitrate * 1000;
 
-        track.MusicbrainzAlbumID = tag.Tag.MusicBrainzDiscId;
-        track.MusicbrainzArtistID = tag.Tag.MusicBrainzArtistId;
-        track.MusicbrainzTrackID = tag.Tag.MusicBrainzTrackId;
+            track.MusicbrainzAlbumID = tag.Tag.MusicBrainzDiscId;
+            track.MusicbrainzArtistID = tag.Tag.MusicBrainzArtistId;
+            track.MusicbrainzTrackID = tag.Tag.MusicBrainzTrackId;
 
-        track.Lyrics = tag.Tag.Lyrics;
+            track.Lyrics = tag.Tag.Lyrics;
+        }
+        catch (TagLib.CorruptFileException ex)
+        {
+            logger.LogWarning(ex, "Corrupt tag data in file: {File}", file);
+        }
+        catch (TagLib.UnsupportedFormatException ex)
+        {
+            logger.LogWarning(ex, "Unsupported format for file: {File}", file);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Unexpected error reading tags from file: {File}", file);
+        }
     }
 
 
