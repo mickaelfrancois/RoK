@@ -4,19 +4,19 @@
     <Platform Name="x64" />
     <Platform Name="x86" />
   </Configurations>
-  <Folder Name="/src/" Id="146195df-61ee-4287-9e47-7cba0e9ff0f2">
-    <Project Path="src/Rok.Application/Rok.Application.csproj" Id="34286433-1d42-40c0-bdb5-e5250ee1641b" />
-    <Project Path="src/Rok.Domain/Rok.Domain.csproj" Id="9bbba40e-f027-4e67-88a0-9cac176ed986" />
-    <Project Path="src/Rok.Import/Rok.Import.csproj" Id="60b6b0db-da95-4e34-8575-ecc901ce61fe" />
-    <Project Path="src/Rok.Shared/Rok.Shared.csproj" Id="ed68b8fa-0ff7-4c55-8fa6-ed5241eb3aab" />
+  
+	<Project Path="src/Rok.Application/Rok.Application.csproj" Id="34286433-1d42-40c0-bdb5-e5250ee1641b" />
+	<Project Path="src/Rok.Domain/Rok.Domain.csproj" Id="9bbba40e-f027-4e67-88a0-9cac176ed986" />
+	<Project Path="src/Rok.Import/Rok.Import.csproj" Id="60b6b0db-da95-4e34-8575-ecc901ce61fe" />
+	<Project Path="src/Rok.Shared/Rok.Shared.csproj" Id="ed68b8fa-0ff7-4c55-8fa6-ed5241eb3aab" />
 	<Project Path="src/Rok.Infrastructure/Rok.Infrastructure.csproj" Id="4e901456-0119-4ead-a5a9-aa09f5a2e145" />
 	<Project Path="src/Presentation/Rok.csproj">
-      <Platform Solution="*|ARM64" Project="ARM64" />
-      <Platform Solution="*|x64" Project="x64" />
-      <Platform Solution="*|x86" Project="x86" />
-      <Deploy />
-    </Project>
-  </Folder>
+	  <Platform Solution="*|ARM64" Project="ARM64" />
+	  <Platform Solution="*|x64" Project="x64" />
+	  <Platform Solution="*|x86" Project="x86" />
+	  <Deploy />
+	</Project>
+  
   <Folder Name="/docs/">  
   </Folder>
   <Folder Name="/Solution Items/">
