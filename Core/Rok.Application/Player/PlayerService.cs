@@ -17,6 +17,8 @@ public class PlayerService : IPlayerService
 
     private readonly ICallDetectionService _callDetectionService;
 
+    private readonly ISystemMediaTransportControlsService? _smtcService;
+
     private readonly IAppOptions _appOptions;
 
     private bool _callingPaused = false;
@@ -131,13 +133,13 @@ public class PlayerService : IPlayerService
 
     private readonly ILogger<PlayerService> _logger;
 
-
-    public PlayerService(ICallDetectionService callDetectionService, IPlayerEngine player, IAppOptions appOptions, IDiscordRichPresenceService? discordService, ILogger<PlayerService> logger)
+    public PlayerService(ICallDetectionService callDetectionService, IPlayerEngine player, IAppOptions appOptions, IDiscordRichPresenceService? discordService, ISystemMediaTransportControlsService? smtcService, ILogger<PlayerService> logger)
     {
         _callDetectionService = Guard.Against.Null(callDetectionService, nameof(callDetectionService));
         _player = Guard.Against.Null(player, nameof(player));
         _appOptions = Guard.Against.Null(appOptions, nameof(appOptions));
         _discordService = discordService;
+        _smtcService = smtcService;
         _logger = Guard.Against.Null(logger, nameof(logger));
 
         _isCrossfadeEnabled = appOptions.CrossFade;
@@ -152,7 +154,6 @@ public class PlayerService : IPlayerService
         _volume = 100;
 #endif
     }
-
 
     public void InitEvents()
     {
@@ -188,14 +189,36 @@ public class PlayerService : IPlayerService
         _callDetectionService.Start();
     }
 
-
     #region Events
+
+    public void HandleMediaControlCommand(MediaControlCommandMessage message)
+    {
+        _logger.LogInformation("PlayerService: received media control command {Command}", message.Command);
+
+        switch (message.Command)
+        {
+            case MediaControlCommandMessage.CommandType.Play:
+                Play();
+                break;
+            case MediaControlCommandMessage.CommandType.Pause:
+                Pause();
+                break;
+            case MediaControlCommandMessage.CommandType.Next:
+                Next();
+                break;
+            case MediaControlCommandMessage.CommandType.Previous:
+                Previous();
+                break;
+            case MediaControlCommandMessage.CommandType.Stop:
+                Stop(true);
+                break;
+        }
+    }
 
     private void OnMediaStateChanged(object? sender, EventArgs e)
     {
         // Not used currently        
     }
-
 
     private void OnMediaEnded(object? sender, EventArgs e)
     {
@@ -210,12 +233,10 @@ public class PlayerService : IPlayerService
         Next();
     }
 
-
     private void OnMediaChanged(object? sender, EventArgs e)
     {
         // Not used currently
     }
-
 
     private void OnMediaAboutToEnd(object? sender, EventArgs e)
     {
@@ -232,7 +253,6 @@ public class PlayerService : IPlayerService
     }
 
     #endregion
-
 
     public void LoadPlaylist(List<TrackDto> tracks, TrackDto? startTrack = null)
     {
@@ -252,12 +272,10 @@ public class PlayerService : IPlayerService
         Messenger.Send(new PlaylistChanged(Playlist));
     }
 
-
     public List<TrackDto> GetQueue()
     {
         return Playlist.Skip(_currentIndex + 1).ToList();
     }
-
 
     public void AddTracksToPlaylist(List<TrackDto> tracks)
     {
@@ -272,7 +290,6 @@ public class PlayerService : IPlayerService
 
         Messenger.Send(new PlaylistChanged(Playlist));
     }
-
 
     public void InsertTracksToPlaylist(List<TrackDto> tracks, int? index = null)
     {
@@ -291,7 +308,6 @@ public class PlayerService : IPlayerService
 
         Messenger.Send(new PlaylistChanged(Playlist));
     }
-
 
     public void Start(TrackDto? startTrack = null)
     {
@@ -312,6 +328,7 @@ public class PlayerService : IPlayerService
         _player.Pause();
 
         _discordService?.ClearPresence();
+        _smtcService?.UpdatePlaybackState(false);
     }
 
     public void Play()
@@ -325,7 +342,11 @@ public class PlayerService : IPlayerService
             PlaybackState = EPlaybackState.Playing;
 
             if (CurrentTrack != null)
+            {
                 UpdateDiscordPresence(CurrentTrack, isPlaying: true);
+                _smtcService?.UpdateTrackInfo(CurrentTrack);
+                _smtcService?.UpdatePlaybackState(true);
+            }
         }
         catch (Exception ex)
         {
@@ -336,7 +357,6 @@ public class PlayerService : IPlayerService
 
     public void Stop(bool firePlaybackStateChange)
     {
-        // Cancel any ongoing crossfade
         _crossfadeCts?.Cancel();
         _player.Stop();
 
@@ -344,6 +364,7 @@ public class PlayerService : IPlayerService
             PlaybackState = EPlaybackState.Stopped;
 
         _discordService?.ClearPresence();
+        _smtcService?.UpdatePlaybackState(false);
     }
 
     public void Skip()
@@ -395,14 +416,12 @@ public class PlayerService : IPlayerService
         Play();
     }
 
-
     public void ShuffleTracks()
     {
         TracksRandomizer.ArtistBalancedTrackRandomize(Playlist, _currentIndex);
 
         Messenger.Send(new PlaylistChanged(Playlist));
     }
-
 
     #region Engine
 
@@ -452,7 +471,6 @@ public class PlayerService : IPlayerService
             _logger.LogError(ex, "Erreur lors de la mise à jour Discord Presence");
         }
     }
-
 
     private async Task CrossfadeToNextTrackAsync()
     {
@@ -519,7 +537,7 @@ public class PlayerService : IPlayerService
 
             double masterVolume = _volume;
             const int intervalMs = 50;
-            TimeSpan duration = TimeSpan.FromSeconds(crossfadeDurationSeconds);
+            var duration = TimeSpan.FromSeconds(crossfadeDurationSeconds);
             int steps = Math.Max(1, (int)(duration.TotalMilliseconds / intervalMs));
 
             await FadeOut(masterVolume, intervalMs, steps, cancellationToken);
@@ -583,7 +601,6 @@ public class PlayerService : IPlayerService
 
         _player.SetVolume(masterVolume);
     }
-
 
     private async Task FadeOut(double masterVolume, int intervalMs, int steps, CancellationToken cancellationToken)
     {

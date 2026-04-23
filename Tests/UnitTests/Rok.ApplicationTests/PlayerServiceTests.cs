@@ -16,7 +16,6 @@ public class PlayerServiceTests
 
     public PlayerServiceTests()
     {
-        // Setup commun pour tous les tests
         mockPlayerEngine = new Mock<IPlayerEngine>();
         mockAppOptions = new Mock<IAppOptions>();
         mockLogger = new Mock<ILogger<PlayerService>>();
@@ -25,7 +24,7 @@ public class PlayerServiceTests
         mockPlayerEngine.Setup(o => o.SetTrack(It.IsAny<TrackDto>())).Returns(true);
         mockAppOptions.SetupGet(o => o.CrossFade).Returns(false);
 
-        playerService = new PlayerService(mockCallDetectionService.Object, mockPlayerEngine.Object, mockAppOptions.Object, null, mockLogger.Object);
+        playerService = new PlayerService(mockCallDetectionService.Object, mockPlayerEngine.Object, mockAppOptions.Object, null, null, mockLogger.Object);
     }
 
     [Fact]

@@ -1,4 +1,6 @@
-﻿namespace Rok.Application.Player;
+﻿using Rok.Application.Messages;
+
+namespace Rok.Application.Player;
 
 public interface IPlayerService
 {
@@ -47,4 +49,6 @@ public interface IPlayerService
     void ShuffleTracks();
 
     List<TrackDto> GetQueue();
+
+    void HandleMediaControlCommand(MediaControlCommandMessage message);
 }
