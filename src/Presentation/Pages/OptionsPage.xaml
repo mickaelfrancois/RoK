@@ -16,7 +16,8 @@
         <Pivot>
             <PivotItem x:Uid="OptionTabOptions">
                 <Border Background="{ThemeResource CardBackgroundFillColorDefault}" Padding="4" CornerRadius="12" Margin="8">
-                    <StackPanel Spacing="10" Margin="6,12,0,0">
+                    <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <StackPanel Spacing="10" Margin="6,12,0,12">
                         <StackPanel Orientation="Vertical" Spacing="12" VerticalAlignment="Center">
                             <TextBlock x:Uid="optionsThemeLabel" VerticalAlignment="Center" />
                             <ComboBox Width="220" SelectedValuePath="Tag" SelectedValue="{x:Bind ThemeString, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
@@ -59,6 +60,7 @@
                                       IsOn="{x:Bind Options.TelemetryEnabled, Mode=TwoWay}" />
 
                     </StackPanel>
+                    </ScrollViewer>
                 </Border>
             </PivotItem>
 
@@ -770,7 +772,7 @@
                         Padding="4"
                         CornerRadius="12"
                         Margin="8">
-
+                    <ScrollViewer VerticalScrollBarVisibility="Auto">
                     <StackPanel Spacing="16"
                                 Margin="24,18,24,18">
                         <StackPanel Orientation="Horizontal"
@@ -902,6 +904,7 @@
                             </ItemsControl.Items>
                         </ItemsControl>
                     </StackPanel>
+                    </ScrollViewer>
                 </Border>
             </PivotItem>
         </Pivot>
