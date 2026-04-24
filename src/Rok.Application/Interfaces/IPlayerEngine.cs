@@ -29,4 +29,7 @@ public interface IPlayerEngine
     bool SetTrack(TrackDto track);
 
     void SetEqualizerBand(int bandIndex, float gain);
+
+    /// <summary>Performs a simultaneous crossfade from the current track to <paramref name="nextTrack"/>.</summary>
+    Task CrossfadeToAsync(TrackDto nextTrack, double durationSeconds, double masterVolume, CancellationToken ct);
 }

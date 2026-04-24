@@ -497,14 +497,8 @@ public class PlayerService : IPlayerService
             _crossfadeCts = new CancellationTokenSource();
             CancellationToken cancellationToken = _crossfadeCts.Token;
 
-            int nextIndex = _currentIndex + 1;
-            if (nextIndex >= Playlist.Count)
-            {
-                if (IsLoopingEnabled)
-                    nextIndex = 0;
-                else
-                    return; // nothing to do
-            }
+            if (!TryGetNextIndex(out int nextIndex))
+                return;
 
             TrackDto nextTrack = Playlist[nextIndex];
             double trackLength = _player.Length;
@@ -515,6 +509,7 @@ public class PlayerService : IPlayerService
                 _logger.LogDebug("No crossfade between two live albums");
 
                 double timeToWait = Math.Max(0, trackLength - currentPosition);
+
                 if (timeToWait > 0)
                     await Task.Delay(TimeSpan.FromSeconds(timeToWait), cancellationToken);
 
@@ -522,40 +517,7 @@ public class PlayerService : IPlayerService
                 return;
             }
 
-            double remainingTime = Math.Max(0, trackLength - currentPosition);
-            double crossfadeDurationSeconds = Math.Min(_player.CrossfadeDelay, remainingTime);
-
-            if (crossfadeDurationSeconds <= 0)
-            {
-                _logger.LogDebug("No crossfade possible, remaining time: {RemainingTime}s", remainingTime);
-                if (remainingTime > 0)
-                    await Task.Delay(TimeSpan.FromSeconds(remainingTime), cancellationToken);
-
-                Next();
-                return;
-            }
-
-            double timeToWaitBeforeCrossfade = Math.Max(0, trackLength - currentPosition - crossfadeDurationSeconds);
-            if (timeToWaitBeforeCrossfade > 0)
-                await Task.Delay(TimeSpan.FromSeconds(timeToWaitBeforeCrossfade), cancellationToken);
-
-            double masterVolume = _volume;
-            const int intervalMs = 50;
-            var duration = TimeSpan.FromSeconds(crossfadeDurationSeconds);
-            int steps = Math.Max(1, (int)(duration.TotalMilliseconds / intervalMs));
-
-            await FadeOut(masterVolume, intervalMs, steps, cancellationToken);
-
-            // Load and start next track with zero volume            
-            LoadFile(nextTrack);
-            _player.SetVolume(0);
-            _currentIndex = nextIndex;
-            _player.Play();
-            PlaybackState = EPlaybackState.Playing;
-
-            await FadeIn(masterVolume, intervalMs, steps, cancellationToken);
-
-            UpdateDiscordPresence(nextTrack, isPlaying: true);
+            await RunCrossfadeAsync(nextIndex, nextTrack, trackLength, currentPosition, cancellationToken);
         }
         catch (OperationCanceledException)
         {
@@ -577,62 +539,60 @@ public class PlayerService : IPlayerService
         }
     }
 
-    private async Task FadeIn(double masterVolume, int intervalMs, int steps, CancellationToken cancellationToken)
+    private bool TryGetNextIndex(out int nextIndex)
     {
-        double lastVolume = -1;
-        double minVolume = 0.05 * masterVolume;
+        nextIndex = _currentIndex + 1;
 
-        _logger.LogDebug("Starting fade-in over {Steps} steps with interval {Interval}ms", steps, intervalMs);
+        if (nextIndex < Playlist.Count)
+            return true;
 
-        for (int i = 0; i <= steps; i++)
-        {
-            cancellationToken.ThrowIfCancellationRequested();
+        if (!IsLoopingEnabled)
+            return false;
 
-            double progress = Math.Clamp((double)i / steps, 0.0, 1.0);
-            double volume = AudioRamping.DbInterpolate(1.0 - progress, masterVolume);
-
-            if (volume < minVolume)
-                volume = minVolume;
-
-            if (Math.Abs(volume - lastVolume) > 0.01)
-            {
-                _player.SetVolume(volume);
-                lastVolume = volume;
-            }
-
-            await Task.Delay(intervalMs, cancellationToken);
-        }
-
-        _player.SetVolume(masterVolume);
+        nextIndex = 0;
+        return true;
     }
 
-    private async Task FadeOut(double masterVolume, int intervalMs, int steps, CancellationToken cancellationToken)
+    private async Task RunCrossfadeAsync(int nextIndex, TrackDto nextTrack, double trackLength, double currentPosition, CancellationToken cancellationToken)
     {
-        double lastVolume = -1;
-        double minVolume = 0.05 * masterVolume;
+        double remainingTime = Math.Max(0, trackLength - currentPosition);
+        double crossfadeDurationSeconds = Math.Min(_player.CrossfadeDelay, remainingTime);
 
-        _logger.LogDebug("Starting fade-out over {Steps} steps with interval {Interval}ms", steps, intervalMs);
-
-        // Fade-out current (use dB interpolation for perceptual linearity)
-        for (int i = 0; i <= steps; i++)
+        if (crossfadeDurationSeconds <= 0)
         {
-            cancellationToken.ThrowIfCancellationRequested();
+            _logger.LogDebug("No crossfade possible, remaining time: {RemainingTime}s", remainingTime);
 
-            double progress = Math.Clamp((double)i / steps, 0.0, 1.0);
-            double volume = Math.Max(minVolume, AudioRamping.DbInterpolate(progress, masterVolume));
-            if (Math.Abs(volume - lastVolume) > 0.01)
-            {
-                _player.SetVolume(volume);
-                lastVolume = volume;
-            }
+            if (remainingTime > 0)
+                await Task.Delay(TimeSpan.FromSeconds(remainingTime), cancellationToken);
 
-            if (volume <= 0.1)
-                break;
-
-            await Task.Delay(intervalMs, cancellationToken);
+            Next();
+            return;
         }
 
-        _player.SetVolume(0);
+        double timeToWaitBeforeCrossfade = Math.Max(0, trackLength - currentPosition - crossfadeDurationSeconds);
+
+        if (timeToWaitBeforeCrossfade > 0)
+            await Task.Delay(TimeSpan.FromSeconds(timeToWaitBeforeCrossfade), cancellationToken);
+
+        _logger.LogDebug("Starting simultaneous crossfade to {Track} over {Duration}s", nextTrack.Title, crossfadeDurationSeconds);
+
+        TrackDto? previousTrack = CurrentTrack;
+        long durationPlayed = (long)_player.Position;
+
+        await _player.CrossfadeToAsync(nextTrack, crossfadeDurationSeconds, _volume, cancellationToken);
+
+        cancellationToken.ThrowIfCancellationRequested();
+
+        _currentIndex = nextIndex;
+        CurrentTrack = nextTrack;
+
+        if (previousTrack == null || previousTrack.Id != nextTrack.Id)
+            Messenger.Send(new MediaChangedMessage(nextTrack, previousTrack, durationPlayed));
+
+        PlaybackState = EPlaybackState.Playing;
+        UpdateDiscordPresence(nextTrack, isPlaying: true);
+        _smtcService?.UpdateTrackInfo(nextTrack);
+        _smtcService?.UpdatePlaybackState(true);
     }
 
     #endregion
