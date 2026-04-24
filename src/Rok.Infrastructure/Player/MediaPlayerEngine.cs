@@ -132,6 +132,16 @@ public class WinUIMediaPlayer : IPlayerEngine, IDisposable
     {
     }
 
+    /// <inheritdoc />
+    public Task CrossfadeToAsync(TrackDto nextTrack, double durationSeconds, double masterVolume, CancellationToken ct)
+    {
+        // WinUI MediaPlayer does not support simultaneous dual-track playback; fall back to instant switch.
+        SetTrack(nextTrack);
+        SetVolume(masterVolume);
+        Play();
+        return Task.CompletedTask;
+    }
+
     private void Player_MediaOpened(MediaPlayer sender, object args)
     {
         TimeSpan duration = sender.PlaybackSession?.NaturalDuration ?? TimeSpan.Zero;

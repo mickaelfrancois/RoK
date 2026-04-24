@@ -223,9 +223,114 @@ public class NAudioMediaPlayer : IPlayerEngine, IDisposable
         _equalizer?.UpdateBand(bandIndex, gain);
     }
 
+    /// <inheritdoc />
+    public async Task CrossfadeToAsync(TrackDto nextTrack, double durationSeconds, double masterVolume, CancellationToken ct)
+    {
+        AudioFileReader nextReader;
+        try
+        {
+            nextReader = new AudioFileReader(nextTrack.MusicFile);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Crossfade: failed to open next track {File}", nextTrack.MusicFile);
+            return;
+        }
+
+        // Build the full equalizer chain upfront so the next device plays continuously without restart
+        EqualizerBand[] nextBands = new[]
+        {
+            new EqualizerBand(32f, 1f, nextReader.WaveFormat.Channels),
+            new EqualizerBand(64f, 1f, nextReader.WaveFormat.Channels),
+            new EqualizerBand(125f, 1f, nextReader.WaveFormat.Channels),
+            new EqualizerBand(250f, 1f, nextReader.WaveFormat.Channels),
+            new EqualizerBand(500f, 1f, nextReader.WaveFormat.Channels),
+            new EqualizerBand(1000f, 1f, nextReader.WaveFormat.Channels),
+            new EqualizerBand(2000f, 1f, nextReader.WaveFormat.Channels),
+            new EqualizerBand(4000f, 1f, nextReader.WaveFormat.Channels),
+            new EqualizerBand(8000f, 1f, nextReader.WaveFormat.Channels),
+            new EqualizerBand(16000f, 1f, nextReader.WaveFormat.Channels)
+        };
+
+        Equalizer nextEqualizer = new(nextReader, nextBands);
+
+        WaveOutEvent nextDevice = new();
+
+        try
+        {
+            nextDevice.Init(nextEqualizer);
+            nextReader.Volume = 0f;
+            nextDevice.Play();
+
+            const int intervalMs = 50;
+            int steps = Math.Max(1, (int)(durationSeconds * 1000 / intervalMs));
+
+            for (int i = 0; i <= steps; i++)
+            {
+                ct.ThrowIfCancellationRequested();
+
+                double progress = Math.Clamp((double)i / steps, 0.0, 1.0);
+
+                double fadeOutVolume = Math.Max(0, DbInterpolate(progress, masterVolume));
+                SetVolume(fadeOutVolume);
+
+                double fadeInVolume = Math.Max(0, DbInterpolate(1.0 - progress, masterVolume));
+                nextReader.Volume = (float)Math.Clamp(fadeInVolume / 100.0, 0.0, 1.0);
+
+                await Task.Delay(intervalMs, ct);
+            }
+
+            // Promote nextDevice as the main player — no Stop/Init/Play, just wire events and swap state
+            _positionTimer.Stop();
+
+            if (_outputDevice is not null)
+            {
+                _outputDevice.PlaybackStopped -= OutputDevice_PlaybackStopped;
+                _outputDevice.Stop();
+                _outputDevice.Dispose();
+            }
+
+            _audioFileReader?.Dispose();
+
+            _audioFileReader = nextReader;
+            _equalizer = nextEqualizer;
+            _length = nextReader.TotalTime.TotalSeconds > 0 ? nextReader.TotalTime.TotalSeconds : 1;
+            nextReader.Volume = (float)Math.Clamp(masterVolume / 100.0, 0.0, 1.0);
+            _aboutToEndRaised = false;
+
+            _outputDevice = nextDevice;
+            _outputDevice.PlaybackStopped += OutputDevice_PlaybackStopped;
+
+            _positionTimer.Start();
+
+            OnMediaChanged?.Invoke(this, EventArgs.Empty);
+        }
+        catch (OperationCanceledException)
+        {
+            nextDevice?.Stop();
+            nextDevice?.Dispose();
+            nextReader.Dispose();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Crossfade: unexpected error");
+            nextDevice?.Stop();
+            nextDevice?.Dispose();
+            nextReader.Dispose();
+        }
+    }
+
     public EqualizerBand[]? GetEqualizerBands()
     {
         return _equalizer?.GetBands();
+    }
+
+    private static double DbInterpolate(double t, double masterVolumePercent, double minDb = -80.0)
+    {
+        double curDb = 0.0 * (1.0 - t) + minDb * t;
+        double gain = Math.Pow(10.0, curDb / 20.0);
+        double v = gain * masterVolumePercent;
+        return double.IsNaN(v) || double.IsInfinity(v) ? 0.0 : Math.Clamp(v, 0.0, 100.0);
     }
 
     private void OutputDevice_PlaybackStopped(object? sender, StoppedEventArgs e)
