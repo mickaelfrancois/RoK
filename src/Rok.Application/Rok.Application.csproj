@@ -18,4 +18,8 @@
     <ProjectReference Include="..\Rok.Domain\Rok.Domain.csproj" />
     <ProjectReference Include="..\Rok.Shared\Rok.Shared.csproj" />
   </ItemGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="Rok.ApplicationTests" />
+  </ItemGroup>
 </Project>

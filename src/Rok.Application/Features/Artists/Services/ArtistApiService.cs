@@ -117,7 +117,8 @@ public class ArtistApiService(
         if (artist.TwitterUrl.AreDifferents(artistApi.Twitter)) return true;
         if (artist.OfficialSiteUrl.AreDifferents(artistApi.Website)) return true;
         if (artist.FacebookUrl.AreDifferents(artistApi.Facebook)) return true;
-        if (artist.ThreadsUrl.AreDifferents(artistApi.Threads)) return true;
+        if (artist.WikipediaUrl.AreDifferents(artistApi.Wikipedia)) return true;
+        if (artist.MusicBrainzID.AreDifferents(artistApi.MusicBrainzID)) return true;
         if (artist.BornYear.AreDifferents(artistApi.BeginYear)) return true;
         if (artist.DiedYear.AreDifferents(artistApi.EndYear)) return true;
         if (artist.Disbanded != artistApi.Disbanded) return true;

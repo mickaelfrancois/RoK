@@ -1,0 +1,23 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(rtk dotnet *)",
+      "Bash(dotnet test *)",
+      "Bash(xargs grep *)",
+      "Bash(find /d/Development/MF/Rok -path \"*/obj\" -prune -o -name \"*.cs\" -type f -exec grep -l \"public.*Result<T>\" {} \\\\;)",
+      "Bash(find /d/Development/MF/Rok/src -name \"*.cs\" -exec grep -l \"public.*Result<T>.*Success\\\\|public static.*Result.*Success\" {} \\\\;)",
+      "Bash(find /d/Development/MF/Rok -path \"*/obj\" -prune -o -name \"*.cs\" -type f -exec grep -l \"static Result\" {} \\\\;)",
+      "Bash(dotnet --version)",
+      "Bash(dotnet build *)",
+      "Bash(python /tmp/coverage_by_class.py)",
+      "Bash(dotnet tool *)",
+      "Bash(nuget --version)",
+      "Bash(powershell -Command '[System.Reflection.Assembly]::LoadFrom\\('\\\\''__TRACKED_VAR__\\\\MiF.Mediator.dll'\\\\''\\).GetTypes\\(\\) | ? { $_.IsInterface -and $_.Name -eq '\\\\''IMediator'\\\\'' } | % { $_.GetMethods\\(\\) } | % { $_.ToString\\(\\) }')",
+      "PowerShell($asm = [System.Reflection.Assembly]::LoadFile\\(\"C:\\\\Users\\\\micka\\\\.nuget\\\\packages\\\\mif.mediator\\\\1.2.0\\\\lib\\\\net9.0\\\\MiF.Mediator.dll\"\\); $asm.GetTypes\\(\\) | Where-Object { $_.IsInterface -and $_.Name -eq 'IMediator' } | ForEach-Object { $_.GetMethods\\(\\) } | ForEach-Object { $_.ToString\\(\\) })",
+      "PowerShell($asm = [System.Reflection.Assembly]::LoadFile\\(\"C:\\\\Users\\\\micka\\\\.nuget\\\\packages\\\\mif.mediator\\\\1.2.0\\\\lib\\\\net9.0\\\\MiF.Mediator.dll\"\\); try { $asm.GetTypes\\(\\) } catch { $_.Exception.LoaderExceptions[0].Message })",
+      "PowerShell($asm = [System.Reflection.Assembly]::LoadFile\\(\"C:\\\\Users\\\\micka\\\\.nuget\\\\packages\\\\mif.mediator\\\\1.2.0\\\\lib\\\\net9.0\\\\MiF.Mediator.dll\"\\); try { $asm.GetTypes\\(\\) } catch { $_.Exception | Select-Object -ExpandProperty LoaderExceptions | Select-Object -First 2 | ForEach-Object { $_.Message } })",
+      "PowerShell($bytes = [System.IO.File]::ReadAllBytes\\(\"C:\\\\Users\\\\micka\\\\.nuget\\\\packages\\\\mif.mediator\\\\1.2.0\\\\lib\\\\net9.0\\\\MiF.Mediator.dll\"\\); $text = [System.Text.Encoding]::ASCII.GetString\\($bytes\\); \\($text -split \"`0\" | Where-Object { $_ -match \"Send|IMediator|IQuery|IRequest|IPublish\" -and $_.Length -lt 80 -and $_.Length -gt 4 }\\) | Select-Object -First 30)",
+      "Bash(xargs -I{} grep -l \"class PlaylistTrackGenerateRepositoryTests\" {})"
+    ]
+  }
+}

@@ -1,0 +1,123 @@
+<div style="font-family: Arial, sans-serif; padding: 20px; border: 1px solid #ccc; border-radius: 8px; background-color: #f9f9f9;">
+
+<h2 style="color: #cc0000;">⚠️ Rapport de Sécurité et de Bugs : Couche Application</h2>
+<p style="font-size: 0.9em; color: #555;">Cette analyse se concentre sur la manière dont le flux métier est orchestré et représente le niveau de risque le plus élevé, car c'est ici que les différentes pièces du puzzle (Domain, Infrastructure, Presentation) interagissent.</p>
+
+<h3 style="color: #cc0000;">🐞 1. Mauvaise gestion des transactions ou des états (State Management & Transactions)</h3>
+<p style="font-size: 0.9em; color: #555;"><strong>Risque : Élevé.</strong> L'échec d'une étape peut entraîner un état incohérent si la transaction n'est pas atomique.</p>
+<table style="width: 100%; border-collapse: collapse; margin: 15px 0;">
+    <thead style="background-color: #eee;">
+        <tr>
+            <th style="padding: 10px; border: 1px solid #ddd; text-align: left; width: 20%;">Concern</th>
+            <th style="padding: 10px; border: 1px solid #ddd; text-align: left; width: 30%;">Flaw Potentiel</th>
+            <th style="padding: 10px; border: 1px solid #ddd; text-align: left; width: 20%;">Exemple de Fichier/Contexte</th>
+            <th style="padding: 10px; border: 1px solid #ddd; text-align: left; width: 30%;">Correction Recommandée</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td style="padding: 10px; border: 1px solid #ddd;">Inconsistent State</td>
+            <td style="padding: 10px; border: 1px solid #ddd;">Un handler effectue plusieurs opérations dépendantes sans portée transactionnelle unique. En cas d'échec après la première sauvegarde, l'état devient incohérent.</td>
+            <td style="padding: 10px; border: 1px solid #ddd;"><code>*CommandHandler.cs</code> (opérations multiples)</td>
+            <td style="padding: 10px; border: 1px solid #ddd;"><strong>Forcer Unit of Work :</strong> L'Application Layer doit encapsuler toutes les opérations dépendantes dans un <code>IDbContextTransaction</code> unique. Tout échec doit entraîner un <code>ROLLBACK</code> total.</td>
+        </tr>
+        <tr>
+            <td style="padding: 10px; border: 1px solid #ddd;">Race Conditions</td>
+            <td style="padding: 10px; border: 1px solid #ddd;">Les opérations de type Lecture-Modification-Écriture (ex: incrément de compteur) sont vulnérables aux conditions de concurrence si elles ne sont pas gérées.</td>
+            <td style="padding: 10px; border: 1px solid #ddd;">`*Update...CommandHandler.cs`</td>
+            <td style="padding: 10px; border: 1px solid #ddd;"><strong>Utiliser Versioning :</strong> Ajouter des versions (<code>version: int</code>) ou des horodatages sur les entités agrégats. L'update doit vérifier que la version lue correspond à celle en base avant de commiter.</td>
+        </tr>
+    </tbody>
+</table>
+
+<h3 style="color: #cc0000;">🔒 2. Failles de sécurité de logique (Security & Authorization)</h3>
+<p style="font-size: 0.9em; color: #555;"><strong>Risque : Critique.</strong> Cette couche est le point de contrôle des permissions. Une erreur ici est un accès non autorisé.</p>
+<table style="width: 100%; border-collapse: collapse; margin: 15px 0;">
+    <thead style="background-color: #eee;">
+        <tr>
+            <th style="padding: 10px; border: 1px solid #ddd; text-align: left; width: 20%;">Concern</th>
+            <th style="padding: 10px; border: 1px solid #ddd; text-align: left; width: 30%;">Flaw Potentiel</th>
+            <th style="padding: 10px; border: 1px solid #ddd; text-align: left; width: 20%;">Exemple de Fichier/Contexte</th>
+            <th style="padding: 10px; border: 1px solid #ddd; text-align: left; width: 30%;">Correction Recommandée</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td style="padding: 10px; border: 1px solid #ddd;">Missing Authorization</td>
+            <td style="padding: 10px; border: 1px solid #ddd;">Les handlers supposent que l'utilisateur est autorisé en fonction du point d'entrée (API). Un appel direct au handler peut contourner ces vérifications.</td>
+            <td style="padding: 10px; border: 1px solid #ddd;">`*QueryHandler.cs` (récupération par ID)</td>
+            <td style="padding: 10px; border: 1px solid #ddd;"><strong>Vérification Systématique :</strong> Chaque handler doit accepter le `UserContext` et vérifier explicitement : 1. Si l'utilisateur est le propriétaire du ressource (`IsOwner`). 2. Si le rôle/capability est suffisant (`HasCapability("Playlist:Write")`).</td>
+        </tr>
+        <tr>
+            <td style="padding: 10px; border: 1px solid #ddd;">Mass Assignment</td>
+            <td style="padding: 10px; border: 1px solid #ddd;">Les DTOs peuvent exposer des informations sensibles (IDs internes, clés) non nécessaires au client.</td>
+            <td style="padding: 10px; border: 1px solid #ddd;">`*QueryHandler.cs` et `*Dto.cs`</td>
+            <td style="padding: 10px; border: 1px solid #ddd;"><strong>Principe du Moindre Privilège (Données) :</strong> Les DTOs doivent ne contenir *que* les champs strictement nécessaires pour le cas d'usage spécifique.</td>
+        </tr>
+        <tr>
+            <td style="padding: 10px; border: 1px solid #ddd;">Injection de commandes</td>
+            <td style="padding: 10px; border: 1px solid #ddd;">Si des requêtes DB ou des appels API externes sont construits à partir de chaînes de caractères utilisateurs (ex: recherche par nom), c'est un risque.</td>
+            <td style="padding: 10px; border: 1px solid #ddd;">Handler acceptant des chaînes de recherche.</td>
+            <td style="padding: 10px; border: 1px solid #ddd;"><strong>Paramétrisation Obligatoire :</strong> Ne jamais concaténer l'entrée utilisateur dans les requêtes. Utiliser toujours les paramètres de l'ORM (ex: `@param`).</td>
+        </tr>
+    </tbody>
+</table>
+
+<h3 style="color: #cc0000;">🧩 3. Dépendances et Couplage (Coupling)</h3>
+<p style="font-size: 0.9em; color: #555;"><strong>Risque : Modéré à Élevé.</strong> Le but de cette couche est de découpler. Les violations du pattern sont une source de bugs difficile à tracer.</p>
+<table style="width: 100%; border-collapse: collapse; margin: 15px 0;">
+    <thead style="background-color: #eee;">
+        <tr>
+            <th style="padding: 10px; border: 1px solid #ddd; text-align: left; width: 20%;">Concern</th>
+            <th style="padding: 10px; border: 1px solid #ddd; text-align: left; width: 30%;">Flaw Potentiel</th>
+            <th style="padding: 10px; border: 1px solid #ddd; text-align: left; width: 20%;">Exemple de Fichier/Contexte</th>
+            <th style="padding: 10px; border: 1px solid #ddd; text-align: left; width: 30%;">Correction Recommandée</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td style="padding: 10px; border: 1px solid #ddd;">Dépendance Infra directe</td>
+            <td style="padding: 10px; border: 1px solid #ddd;">Le handler appelle une classe concrète de l'infrastructure (ex: `new SqlConnector()`) plutôt que d'utiliser une interface.</td>
+            <td style="padding: 10px; border: 1px solid #ddd;">Handler faisant des appels I/O directs.</td>
+            <td style="padding: 10px; border: 1px solid #ddd;"><strong>Injection par Interfaces :</strong> Toutes les dépendances externes doivent être injectées via des interfaces (`I...Repository`, `I...Client`) définies dans la couche Domain.</td>
+        </tr>
+        <tr>
+            <td style="padding: 10px; border: 1px solid #ddd;">Fuite du modèle Presentation</td>
+            <td style="padding: 10px; border: 1px solid #ddd;">Le service utilise des types ou des constantes spécifiques à la couche Présentation (Front-end).</td>
+            <td style="padding: 10px; border: 1px solid #ddd;">DTOs qui dépendent de types front-end.</td>
+            <td style="padding: 10px; border: 1px solid #ddd;"><strong>Isolation de Domaine :</strong> Le cœur métier et les DTOs de communication entre Application/Domain doivent dépendre uniquement des types de la couche `Domain`.</td>
+        </tr>
+    </tbody>
+</table>
+
+<h3 style="color: #cc0000;">🛠️ 4. Gestion des erreurs (Error Handling)</h3>
+<p style="font-size: 0.9em; color: #555;"><strong>Risque : Modéré.</strong> Une mauvaise gestion peut cacher des bugs ou divulguer des informations système. </p>
+<table style="width: 100%; border-collapse: collapse; margin: 15px 0;">
+    <thead style="background-color: #eee;">
+        <tr>
+            <th style="padding: 10px; border: 1px solid #ddd; text-align: left; width: 20%;">Concern</th>
+            <th style="padding: 10px; border: 1px solid #ddd; text-align: left; width: 30%;">Flaw Potentiel</th>
+            <th style="padding: 10px; border: 1px solid #ddd; text-align: left; width: 20%;">Exemple de Fichier/Contexte</th>
+            <th style="padding: 10px; border: 1px solid #ddd; text-align: left; width: 30%;">Correction Recommandée</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td style="padding: 10px; border: 1px solid #ddd;">Exception Générique</td>
+            <td style="padding: 10px; border: 1px solid #ddd;">Le bloc <code>try...catch (Exception ex)</code> masque l'exception réelle et retourne un message utilisateur générique.</td>
+            <td style="padding: 10px; border: 1px solid #ddd;">Tout bloc <code>try...catch</code> dans les handlers.</td>
+            <td style="padding: 10px; border: 1px solid #ddd;"><strong>Capturer Spécifiquement :</strong> Ne capturer que les exceptions métier attendues (`NotFoundException`, `ConcurrencyConflictException`). Relancer une exception d'Application standardisée (`AppException`).</td>
+        </tr>
+        <tr>
+            <td style="padding: 10px; border: 1px solid #ddd;">Divulgation de Stack Trace</td>
+            <td style="padding: 10px; border: 1px solid #ddd;">En cas d'erreur non gérée, le système renvoie une trace complète (chemins de fichiers, noms de librairies, etc.) au client.</td>
+            <td style="padding: 10px; border: 1px solid #ddd;">Gestion des erreurs non traitées.</td>
+            <td style="padding: 10px; border: 1px solid #ddd;"><strong>Sanitisation :</strong> Mettre en place un gestionnaire d'erreurs final qui intercepte toutes les exceptions inattendues pour renvoyer uniquement un code d'erreur abstrait et un message utilisateur sûr.</td>
+        </tr>
+    </tbody>
+</table>
+
+<h3 style="color: green; margin-top: 30px;">✅ Synthèse de l'Analyse :</h3>
+<p>L'architecture est solide. Le travail de maintenance et d'amélioration doit se concentrer sur le <strong>renforcement des contrats</strong> entre les couches. L'ajout de <strong>versioning</strong> et de <strong>vérification d'autorisation obligatoire</strong> dans chaque handler est la priorité absolue.</p>
+
+</div>

@@ -89,8 +89,24 @@ public sealed partial class PlayerWebApiService(
 
     public void Stop()
     {
-        _cts?.Cancel();
-        _listener?.Stop();
+        if (_disposed)
+            return;
+
+        try
+        {
+            _cts?.Cancel();
+        }
+        catch (ObjectDisposedException)
+        {
+        }
+
+        try
+        {
+            _listener?.Stop();
+        }
+        catch (ObjectDisposedException)
+        {
+        }
     }
 
 

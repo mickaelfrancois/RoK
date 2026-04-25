@@ -18,7 +18,7 @@ public sealed class ListenArtistRouteHandler(IPlayerCommandService commandServic
 
         dispatch(async () =>
         {
-            try { tcs.SetResult(await commandService.ListenAlbumAsync(artistName)); }
+            try { tcs.SetResult(await commandService.ListenArtistAsync(artistName)); }
             catch (Exception ex)
             {
                 logger.LogError(ex, "Failed to listen artist {Name}", artistName);

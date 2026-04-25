@@ -29,6 +29,8 @@ public static class DependencyInjection
 {
     public static IServiceCollection AddInfrastructure(this IServiceCollection services, string applicationLocalPath)
     {
+        SqlMapper.AddTypeHandler(new DateOnlyTypeHandler());
+
         string connectionString = "Data Source=database.sqlite;Mode=ReadWriteCreate;Cache=Shared;Pooling=True;";
 
         services.AddSingleton<IDbConnection>(c =>

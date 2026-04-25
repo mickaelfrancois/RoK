@@ -18,7 +18,7 @@ public sealed class ListenGenreRouteHandler(IPlayerCommandService commandService
 
         dispatch(async () =>
         {
-            try { tcs.SetResult(await commandService.ListenAlbumAsync(genreName)); }
+            try { tcs.SetResult(await commandService.ListenGenreAsync(genreName)); }
             catch (Exception ex)
             {
                 logger.LogError(ex, "Failed to listen genre {Name}", genreName);
