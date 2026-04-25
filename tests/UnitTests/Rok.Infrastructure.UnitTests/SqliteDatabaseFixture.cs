@@ -3,11 +3,17 @@ using Dapper;
 using Microsoft.Data.Sqlite;
 using Microsoft.Extensions.Logging.Abstractions;
 using Rok.Infrastructure.Migration;
+using Rok.Infrastructure.Repositories;
 
 namespace Rok.Infrastructure.UnitTests;
 
 public class SqliteDatabaseFixture : IDisposable
 {
+    static SqliteDatabaseFixture()
+    {
+        SqlMapper.AddTypeHandler(new DateOnlyTypeHandler());
+    }
+
     public IDbConnection Connection { get; }
     private readonly SqliteConnection _sqliteConnection;
 
