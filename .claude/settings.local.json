@@ -16,7 +16,8 @@
       "PowerShell($asm = [System.Reflection.Assembly]::LoadFile\\(\"C:\\\\Users\\\\micka\\\\.nuget\\\\packages\\\\mif.mediator\\\\1.2.0\\\\lib\\\\net9.0\\\\MiF.Mediator.dll\"\\); $asm.GetTypes\\(\\) | Where-Object { $_.IsInterface -and $_.Name -eq 'IMediator' } | ForEach-Object { $_.GetMethods\\(\\) } | ForEach-Object { $_.ToString\\(\\) })",
       "PowerShell($asm = [System.Reflection.Assembly]::LoadFile\\(\"C:\\\\Users\\\\micka\\\\.nuget\\\\packages\\\\mif.mediator\\\\1.2.0\\\\lib\\\\net9.0\\\\MiF.Mediator.dll\"\\); try { $asm.GetTypes\\(\\) } catch { $_.Exception.LoaderExceptions[0].Message })",
       "PowerShell($asm = [System.Reflection.Assembly]::LoadFile\\(\"C:\\\\Users\\\\micka\\\\.nuget\\\\packages\\\\mif.mediator\\\\1.2.0\\\\lib\\\\net9.0\\\\MiF.Mediator.dll\"\\); try { $asm.GetTypes\\(\\) } catch { $_.Exception | Select-Object -ExpandProperty LoaderExceptions | Select-Object -First 2 | ForEach-Object { $_.Message } })",
-      "PowerShell($bytes = [System.IO.File]::ReadAllBytes\\(\"C:\\\\Users\\\\micka\\\\.nuget\\\\packages\\\\mif.mediator\\\\1.2.0\\\\lib\\\\net9.0\\\\MiF.Mediator.dll\"\\); $text = [System.Text.Encoding]::ASCII.GetString\\($bytes\\); \\($text -split \"`0\" | Where-Object { $_ -match \"Send|IMediator|IQuery|IRequest|IPublish\" -and $_.Length -lt 80 -and $_.Length -gt 4 }\\) | Select-Object -First 30)"
+      "PowerShell($bytes = [System.IO.File]::ReadAllBytes\\(\"C:\\\\Users\\\\micka\\\\.nuget\\\\packages\\\\mif.mediator\\\\1.2.0\\\\lib\\\\net9.0\\\\MiF.Mediator.dll\"\\); $text = [System.Text.Encoding]::ASCII.GetString\\($bytes\\); \\($text -split \"`0\" | Where-Object { $_ -match \"Send|IMediator|IQuery|IRequest|IPublish\" -and $_.Length -lt 80 -and $_.Length -gt 4 }\\) | Select-Object -First 30)",
+      "Bash(xargs -I{} grep -l \"class PlaylistTrackGenerateRepositoryTests\" {})"
     ]
   }
 }

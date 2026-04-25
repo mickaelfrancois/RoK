@@ -210,8 +210,6 @@ public partial class App : Microsoft.UI.Xaml.Application
 
         await settingFileService.SaveAsync(options);
 
-        ServiceProvider.GetRequiredService<PlayerWebApiService>().Stop();
-
         await Log.CloseAndFlushAsync();
     }
 

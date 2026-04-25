@@ -5,18 +5,6 @@
     <Platform Name="x86" />
   </Configurations>
   
-	<Project Path="src/Rok.Application/Rok.Application.csproj" Id="34286433-1d42-40c0-bdb5-e5250ee1641b" />
-	<Project Path="src/Rok.Domain/Rok.Domain.csproj" Id="9bbba40e-f027-4e67-88a0-9cac176ed986" />
-	<Project Path="src/Rok.Import/Rok.Import.csproj" Id="60b6b0db-da95-4e34-8575-ecc901ce61fe" />
-	<Project Path="src/Rok.Shared/Rok.Shared.csproj" Id="ed68b8fa-0ff7-4c55-8fa6-ed5241eb3aab" />
-	<Project Path="src/Rok.Infrastructure/Rok.Infrastructure.csproj" Id="4e901456-0119-4ead-a5a9-aa09f5a2e145" />
-	<Project Path="src/Presentation/Rok.csproj">
-	  <Platform Solution="*|ARM64" Project="ARM64" />
-	  <Platform Solution="*|x64" Project="x64" />
-	  <Platform Solution="*|x86" Project="x86" />
-	  <Deploy />
-	</Project>
-  
   <Folder Name="/docs/">  
   </Folder>
   <Folder Name="/Solution Items/">
@@ -32,5 +20,19 @@
     <Project Path="tests/UnitTests/Rok.ApplicationTests/Rok.ApplicationTests.csproj" Id="6e136894-8609-4546-8336-1f7cf7e5f288" />
     <Project Path="tests/UnitTests/Rok.ImportTests/Rok.ImportTests.csproj" Id="c3e68afd-476f-49dd-b401-36875140cb7f" />
     <Project Path="tests/UnitTests/Rok.Infrastructure.UnitTests/Rok.Infrastructure.UnitTests.csproj" Id="179c2a02-8034-4e18-9ed9-8d575d58e8f4" />
-  </Folder>  
+    <Project Path="tests/UnitTests/Rok.PresentationTests/Rok.PresentationTests.csproj">
+      <Platform Solution="Debug|x64" Project="x64" />
+    </Project>
+  </Folder>
+  <Project Path="src/Presentation/Rok.csproj">
+    <Platform Solution="*|ARM64" Project="ARM64" />
+    <Platform Solution="*|x64" Project="x64" />
+    <Platform Solution="*|x86" Project="x86" />
+    <Deploy />
+  </Project>
+  <Project Path="src/Rok.Application/Rok.Application.csproj" Id="34286433-1d42-40c0-bdb5-e5250ee1641b" />
+  <Project Path="src/Rok.Domain/Rok.Domain.csproj" Id="9bbba40e-f027-4e67-88a0-9cac176ed986" />
+  <Project Path="src/Rok.Import/Rok.Import.csproj" Id="60b6b0db-da95-4e34-8575-ecc901ce61fe" />
+  <Project Path="src/Rok.Infrastructure/Rok.Infrastructure.csproj" Id="4e901456-0119-4ead-a5a9-aa09f5a2e145" />
+  <Project Path="src/Rok.Shared/Rok.Shared.csproj" Id="ed68b8fa-0ff7-4c55-8fa6-ed5241eb3aab" />
 </Solution>
