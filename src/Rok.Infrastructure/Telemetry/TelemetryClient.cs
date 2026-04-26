@@ -21,6 +21,9 @@ public class TelemetryClient : ITelemetryClient
 
     private string _appVersion = string.Empty;
 
+    private readonly string _correlationId;
+
+    private readonly string _applicationId;
 
     public TelemetryClient(HttpClient httpClient, IAppOptions appOptions, IOptions<TelemetryOptions> telemetryOptions, ILogger<TelemetryClient> logger)
     {
@@ -29,9 +32,11 @@ public class TelemetryClient : ITelemetryClient
         _telemetryOptions = telemetryOptions.Value;
         _logger = logger;
 
+        _applicationId = appOptions.Id.ToString();
+        _correlationId = Guid.NewGuid().ToString();
+
         ConfigureHttpClient();
     }
-
 
     private void ConfigureHttpClient()
     {
@@ -53,13 +58,11 @@ public class TelemetryClient : ITelemetryClient
         _httpClient.Timeout = TimeSpan.FromSeconds(10);
     }
 
-
     private static string GetAppVersion()
     {
         PackageVersion version = Package.Current.Id.Version;
         return $"{version.Major}.{version.Minor}.{version.Build}.{version.Revision}";
     }
-
 
     public async Task CaptureScreenAsync(string screenName)
     {
@@ -68,7 +71,8 @@ public class TelemetryClient : ITelemetryClient
 
         EventDto eventDto = new()
         {
-            ApplicationId = _appOptions.Id.ToString(),
+            ApplicationId = _applicationId,
+            CorrelationId = _correlationId,
             EventType = "screen",
             EventName = screenName,
             AppVersion = _appVersion,
@@ -89,7 +93,6 @@ public class TelemetryClient : ITelemetryClient
         }
     }
 
-
     public async Task CaptureEventAsync(string eventType, string eventName, Dictionary<string, object>? properties = null)
     {
         if (!_isEnabled)
@@ -97,7 +100,8 @@ public class TelemetryClient : ITelemetryClient
 
         EventDto eventDto = new()
         {
-            ApplicationId = _appOptions.Id.ToString(),
+            ApplicationId = _applicationId,
+            CorrelationId = _correlationId,
             EventType = eventType,
             EventName = eventName,
             AppVersion = _appVersion,
@@ -123,7 +127,6 @@ public class TelemetryClient : ITelemetryClient
         }
     }
 
-
     public async Task CaptureExceptionAsync(Exception ex)
     {
         if (!_isEnabled)
@@ -131,7 +134,8 @@ public class TelemetryClient : ITelemetryClient
 
         ExceptionDto exceptionDto = new()
         {
-            ApplicationId = _appOptions.Id.ToString(),
+            ApplicationId = _applicationId,
+            CorrelationId = _correlationId,
             Type = ex.GetType().FullName ?? ex.GetType().Name,
             Message = BuildFullMessage(ex),
             StackTrace = BuildFullStackTrace(ex),
@@ -185,6 +189,7 @@ public class TelemetryClient : ITelemetryClient
     private sealed record EventDto
     {
         public string ApplicationId { get; init; } = string.Empty;
+        public string CorrelationId { get; init; } = string.Empty;
         public string EventType { get; init; } = string.Empty;
         public string EventName { get; init; } = string.Empty;
         public string AppVersion { get; init; } = string.Empty;
@@ -197,6 +202,7 @@ public class TelemetryClient : ITelemetryClient
     private sealed record ExceptionDto
     {
         public string ApplicationId { get; init; } = string.Empty;
+        public string CorrelationId { get; init; } = string.Empty;
         public string Type { get; init; } = string.Empty;
         public string Message { get; init; } = string.Empty;
         public string StackTrace { get; init; } = string.Empty;
