@@ -46,7 +46,6 @@ public class MusicDataApiService : IMusicDataApiService, IDisposable
         PropertyNameCaseInsensitive = true
     };
 
-
     public MusicDataApiService(HttpClient httpClient, IAppOptions appOptions, IOptions<MusicDataApiOptions> musicDataApiOptions, ILogger<MusicDataApiService> logger)
     {
         _httpClient = httpClient;
@@ -58,7 +57,6 @@ public class MusicDataApiService : IMusicDataApiService, IDisposable
 
         ConfigureHttpClient();
     }
-
 
     private void ConfigureHttpClient()
     {
@@ -80,13 +78,11 @@ public class MusicDataApiService : IMusicDataApiService, IDisposable
         _httpClient.DefaultRequestHeaders.Add("X-Api-Key", _musicDataApiOptions.ApiKey);
     }
 
-
     private static string GetAppVersion()
     {
         Assembly assembly = Assembly.GetEntryAssembly() ?? Assembly.GetExecutingAssembly();
         return assembly.GetName().Version?.ToString() ?? "0.0.0";
     }
-
 
     public async Task<MusicDataArtistDto?> GetArtistAsync(string artistName, string? musicBrainzId)
     {
@@ -113,7 +109,6 @@ public class MusicDataApiService : IMusicDataApiService, IDisposable
 
         return artist;
     }
-
 
     public async Task<MusicDataAlbumDto?> GetAlbumAsync(string albumName, string artistName, string? albumMusicBrainzId, string? artistMusicBrainzId)
     {
@@ -149,7 +144,6 @@ public class MusicDataApiService : IMusicDataApiService, IDisposable
         return album;
     }
 
-
     public async Task<MusicDataLyricsDto?> GetLyricsAsync(string artistName, string albumName, string title, long duration)
     {
         if (!IsEnable)
@@ -166,7 +160,7 @@ public class MusicDataApiService : IMusicDataApiService, IDisposable
 
         if (!_lyricsCache.TryGetValue(key, out lyrics))
         {
-            string url = $"v1/lyrics/artistName={Uri.EscapeDataString(artistName)}&albumName={Uri.EscapeDataString(albumName)}&title={Uri.EscapeDataString(title)}&duration={duration}";
+            string url = $"v1/lyrics?artistName={Uri.EscapeDataString(artistName)}&albumName={Uri.EscapeDataString(albumName)}&title={Uri.EscapeDataString(title)}&duration={duration}";
             lyrics = await GetASync<MusicDataLyricsDto>(url);
 
             SaveLyricsToCache(key, lyrics);
@@ -174,7 +168,6 @@ public class MusicDataApiService : IMusicDataApiService, IDisposable
 
         return lyrics;
     }
-
 
     public async Task DownloadArtistPictureAsync(MusicDataArtistDto artist, string artistFile, CancellationToken cancellationToken)
     {
@@ -193,7 +186,6 @@ public class MusicDataApiService : IMusicDataApiService, IDisposable
             _logger.LogError(ex, "Error downloading artist picture {Url}", artistFile);
         }
     }
-
 
     public async Task DownloadArtistBackdropsAsync(MusicDataArtistDto artist, string artistFolder, CancellationToken cancellationToken)
     {
@@ -215,7 +207,6 @@ public class MusicDataApiService : IMusicDataApiService, IDisposable
         if (urls.Count == 0)
             return;
 
-
         foreach (string pictureUrl in urls)
         {
             string fileName = Path.Combine(artistFolder, "backdrop" + Guid.NewGuid().ToString("d") + ".jpg");
@@ -230,7 +221,6 @@ public class MusicDataApiService : IMusicDataApiService, IDisposable
             }
         }
     }
-
 
     public async Task DownloadCoverAsync(MusicDataAlbumDto album, string coverFile, CancellationToken cancellationToken)
     {
@@ -250,7 +240,6 @@ public class MusicDataApiService : IMusicDataApiService, IDisposable
         }
     }
 
-
     public bool IsApiRetryAllowed(DateTime? lastAttempt)
     {
         if (!lastAttempt.HasValue)
@@ -259,7 +248,6 @@ public class MusicDataApiService : IMusicDataApiService, IDisposable
         DateTime threshold = lastAttempt.Value.AddDays(KMinApiDelayDays);
         return DateTime.UtcNow >= threshold;
     }
-
 
     private async Task DownloadFileAsync(string url, string targetFile, CancellationToken cancellationToken)
     {
@@ -274,7 +262,6 @@ public class MusicDataApiService : IMusicDataApiService, IDisposable
         await responseStream.CopyToAsync(fileStream, cancellationToken);
     }
 
-
     private void SaveArtistToCache(string key, MusicDataArtistDto? artist)
     {
         using ICacheEntry entry = _artistCache.CreateEntry(key);
@@ -282,7 +269,6 @@ public class MusicDataApiService : IMusicDataApiService, IDisposable
         entry.Value = artist;
         entry.AbsoluteExpiration = DateTime.UtcNow.AddMinutes(KCacheDelayMinutes);
     }
-
 
     private void SaveAlbumToCache(string key, MusicDataAlbumDto? album)
     {
@@ -292,7 +278,6 @@ public class MusicDataApiService : IMusicDataApiService, IDisposable
         entry.AbsoluteExpiration = DateTime.UtcNow.AddMinutes(KCacheDelayMinutes);
     }
 
-
     private void SaveLyricsToCache(string key, MusicDataLyricsDto? lyrics)
     {
         using ICacheEntry entry = _lyricsCache.CreateEntry(key);
@@ -300,7 +285,6 @@ public class MusicDataApiService : IMusicDataApiService, IDisposable
         entry.Value = lyrics;
         entry.AbsoluteExpiration = DateTime.UtcNow.AddMinutes(KCacheDelayMinutes);
     }
-
 
     private async Task<T?> GetASync<T>(string url, CancellationToken cancellationToken = default)
     {
@@ -369,7 +353,6 @@ public class MusicDataApiService : IMusicDataApiService, IDisposable
         return result;
     }
 
-
     private void HandleErrorResponse(HttpResponseMessage response)
     {
         if (response.StatusCode == System.Net.HttpStatusCode.Forbidden || response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
@@ -391,7 +374,6 @@ public class MusicDataApiService : IMusicDataApiService, IDisposable
         }
     }
 
-
     private bool IsRateLimitActive(out DateTime until)
     {
         DateTime? snapshot;
@@ -410,10 +392,9 @@ public class MusicDataApiService : IMusicDataApiService, IDisposable
         return false;
     }
 
-
     private void DeterminateRateLimitReset(HttpResponseMessage response)
     {
-        TimeSpan ignoreDuration = TimeSpan.FromSeconds(RateLimitIgnoreSeconds);
+        var ignoreDuration = TimeSpan.FromSeconds(RateLimitIgnoreSeconds);
 
         if (response.Headers.RetryAfter != null)
         {
@@ -439,7 +420,6 @@ public class MusicDataApiService : IMusicDataApiService, IDisposable
         }
     }
 
-
     protected virtual void Dispose(bool disposing)
     {
         if (!_disposedValue)
@@ -447,7 +427,6 @@ public class MusicDataApiService : IMusicDataApiService, IDisposable
             _disposedValue = true;
         }
     }
-
 
     public void Dispose()
     {
