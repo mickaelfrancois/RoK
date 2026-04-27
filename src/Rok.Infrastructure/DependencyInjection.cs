@@ -49,6 +49,7 @@ public static class DependencyInjection
         services.AddSingleton<IDominantColorCalculator, DominantColorCalculator>();
         services.AddSingleton<ICallDetectionService, CallDetectionService>();
         services.AddSingleton<ISystemMediaTransportControlsService, SystemMediaTransportControlsService>();
+        services.AddSingleton(TimeProvider.System);
 
         services.AddSingleton<IPlayerEngine, NAudioMediaPlayer>();
         services.AddSingleton<ILyricsService, LyricsService>();

@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Time.Testing;
 using Moq;
-using Rok.Application.Dto;
-using Rok.Application.Interfaces;
+using Rok.Application.Messages;
 using Rok.Application.Player;
 
 namespace Rok.ApplicationTests;
@@ -12,6 +12,7 @@ public class PlayerServiceTests
     private readonly Mock<ICallDetectionService> mockCallDetectionService;
     private readonly Mock<IAppOptions> mockAppOptions;
     private readonly Mock<ILogger<PlayerService>> mockLogger;
+    private readonly FakeTimeProvider fakeTimeProvider;
     private readonly PlayerService playerService;
 
     public PlayerServiceTests()
@@ -20,11 +21,12 @@ public class PlayerServiceTests
         mockAppOptions = new Mock<IAppOptions>();
         mockLogger = new Mock<ILogger<PlayerService>>();
         mockCallDetectionService = new Mock<ICallDetectionService>();
+        fakeTimeProvider = new FakeTimeProvider();
 
         mockPlayerEngine.Setup(o => o.SetTrack(It.IsAny<TrackDto>())).Returns(true);
         mockAppOptions.SetupGet(o => o.CrossFade).Returns(false);
 
-        playerService = new PlayerService(mockCallDetectionService.Object, mockPlayerEngine.Object, mockAppOptions.Object, null, null, mockLogger.Object);
+        playerService = new PlayerService(mockCallDetectionService.Object, mockPlayerEngine.Object, mockAppOptions.Object, null, null, fakeTimeProvider, mockLogger.Object);
     }
 
     [Fact]
@@ -305,5 +307,108 @@ public class PlayerServiceTests
 
         // Assert
         Assert.Equal(50, playerService.Volume);
+    }
+
+    [Fact]
+    public void CallStateChanged_ShouldPauseAndResume_WhenPlaying()
+    {
+        // Arrange
+        mockAppOptions.SetupGet(o => o.PauseOnCall).Returns(true);
+        TrackDto track = new() { Id = 1, Title = "Track 1" };
+        playerService.LoadPlaylist(new List<TrackDto> { track });
+
+        // Act
+        mockCallDetectionService.Raise(c => c.CallStateChanged += null, this, true);
+        EPlaybackState pausedState = playerService.PlaybackState;
+        mockCallDetectionService.Raise(c => c.CallStateChanged += null, this, false);
+
+        // Assert
+        Assert.Equal(EPlaybackState.Paused, pausedState);
+        Assert.Equal(EPlaybackState.Playing, playerService.PlaybackState);
+    }
+
+    [Fact]
+    public void CallStateChanged_ShouldResume_WhenSmtcPausePrecedesCall()
+    {
+        // Arrange
+        mockAppOptions.SetupGet(o => o.PauseOnCall).Returns(true);
+        TrackDto track = new() { Id = 1, Title = "Track 1" };
+        playerService.LoadPlaylist(new List<TrackDto> { track });
+        playerService.HandleMediaControlCommand(new MediaControlCommandMessage(MediaControlCommandMessage.CommandType.Pause));
+
+        // Act
+        mockCallDetectionService.Raise(c => c.CallStateChanged += null, this, true);
+        mockCallDetectionService.Raise(c => c.CallStateChanged += null, this, false);
+
+        // Assert
+        Assert.Equal(EPlaybackState.Playing, playerService.PlaybackState);
+    }
+
+    [Fact]
+    public void CallStateChanged_ShouldNotResume_WhenSmtcPauseTooOld()
+    {
+        // Arrange
+        mockAppOptions.SetupGet(o => o.PauseOnCall).Returns(true);
+        TrackDto track = new() { Id = 1, Title = "Track 1" };
+        playerService.LoadPlaylist(new List<TrackDto> { track });
+        playerService.HandleMediaControlCommand(new MediaControlCommandMessage(MediaControlCommandMessage.CommandType.Pause));
+        fakeTimeProvider.Advance(TimeSpan.FromSeconds(4));
+
+        // Act
+        mockCallDetectionService.Raise(c => c.CallStateChanged += null, this, true);
+        mockCallDetectionService.Raise(c => c.CallStateChanged += null, this, false);
+
+        // Assert
+        Assert.Equal(EPlaybackState.Paused, playerService.PlaybackState);
+    }
+
+    [Fact]
+    public void CallStateChanged_ShouldNotResume_WhenUserPausedManually()
+    {
+        // Arrange
+        mockAppOptions.SetupGet(o => o.PauseOnCall).Returns(true);
+        TrackDto track = new() { Id = 1, Title = "Track 1" };
+        playerService.LoadPlaylist(new List<TrackDto> { track });
+        playerService.Pause();
+
+        // Act
+        mockCallDetectionService.Raise(c => c.CallStateChanged += null, this, true);
+        mockCallDetectionService.Raise(c => c.CallStateChanged += null, this, false);
+
+        // Assert
+        Assert.Equal(EPlaybackState.Paused, playerService.PlaybackState);
+    }
+
+    [Fact]
+    public void CallStateChanged_ShouldDoNothing_WhenPauseOnCallDisabled()
+    {
+        // Arrange
+        mockAppOptions.SetupGet(o => o.PauseOnCall).Returns(false);
+        TrackDto track = new() { Id = 1, Title = "Track 1" };
+        playerService.LoadPlaylist(new List<TrackDto> { track });
+
+        // Act
+        mockCallDetectionService.Raise(c => c.CallStateChanged += null, this, true);
+
+        // Assert
+        Assert.Equal(EPlaybackState.Playing, playerService.PlaybackState);
+    }
+
+    [Fact]
+    public void Play_ShouldClearPauseReason()
+    {
+        // Arrange
+        mockAppOptions.SetupGet(o => o.PauseOnCall).Returns(true);
+        TrackDto track = new() { Id = 1, Title = "Track 1" };
+        playerService.LoadPlaylist(new List<TrackDto> { track });
+        playerService.HandleMediaControlCommand(new MediaControlCommandMessage(MediaControlCommandMessage.CommandType.Pause));
+        playerService.Play();
+
+        // Act
+        mockCallDetectionService.Raise(c => c.CallStateChanged += null, this, true);
+        mockCallDetectionService.Raise(c => c.CallStateChanged += null, this, false);
+
+        // Assert
+        Assert.Equal(EPlaybackState.Playing, playerService.PlaybackState);
     }
 }
