@@ -419,19 +419,25 @@ public partial class AlbumViewModel : ObservableObject, IFilterableAlbum, IGroup
     {
         CancellationToken token = _navigationCts.Token;
 
-        bool updated = await _apiService.GetAndUpdateAlbumDataAsync(Album, _pictureService);
+        AlbumApiUpdateResult result = await _apiService.GetAndUpdateAlbumDataAsync(Album, _pictureService);
 
-        if (!updated || token.IsCancellationRequested)
+        if (token.IsCancellationRequested)
             return;
 
-        if (_pictureService.PictureExists(Album.AlbumPath))
+        if (result.PictureDownloaded)
+        {
             LoadPicture();
+            Messenger.Send(new AlbumUpdateMessage(Album.Id, ActionType.Picture));
+        }
 
-        AlbumDto? refreshedAlbum = await _dataLoader.ReloadAlbumAsync(Album.Id);
-        if (refreshedAlbum != null)
-            Album = refreshedAlbum;
+        if (result.DataUpdated)
+        {
+            AlbumDto? refreshedAlbum = await _dataLoader.ReloadAlbumAsync(Album.Id);
+            if (refreshedAlbum != null)
+                Album = refreshedAlbum;
 
-        Messenger.Send(new AlbumUpdateMessage(Album.Id, ActionType.Update));
+            Messenger.Send(new AlbumUpdateMessage(Album.Id, ActionType.Update));
+        }
     }
 
     [RelayCommand]

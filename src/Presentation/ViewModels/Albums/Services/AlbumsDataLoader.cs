@@ -81,6 +81,20 @@ public class AlbumsDataLoader(IMediator mediator, IAlbumViewModelFactory albumVi
         }
     }
 
+    public void RefreshAlbumPicture(long id)
+    {
+        AlbumViewModel? albumToUpdate = ViewModels.FirstOrDefault(c => c.Album.Id == id);
+
+        if (albumToUpdate != null)
+        {
+            albumToUpdate.LoadPicture();
+        }
+        else
+        {
+            logger.LogWarning("Album {Id} not found for picture refresh.", id);
+        }
+    }
+
     public void RemoveAlbum(long id)
     {
         ViewModels.RemoveAll(c => c.Album.Id == id);

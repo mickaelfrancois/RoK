@@ -456,19 +456,28 @@ public partial class ArtistViewModel : ObservableObject, IFilterableArtist, IGro
     {
         CancellationToken token = _navigationCts.Token;
 
-        bool updated = await _apiService.GetAndUpdateArtistDataAsync(Artist, _pictureService, _backdropPicture);
+        ArtistApiUpdateResult result = await _apiService.GetAndUpdateArtistDataAsync(Artist, _pictureService, _backdropPicture);
 
-        if (!updated || token.IsCancellationRequested)
+        if (token.IsCancellationRequested)
             return;
 
-        if (_pictureService.PictureExists(Artist.Name))
+        if (result.PictureDownloaded)
+        {
             LoadPicture();
+            Messenger.Send(new ArtistUpdateMessage(Artist.Id, ActionType.Picture));
+        }
 
-        ArtistDto? refreshedArtist = await _dataLoader.ReloadArtistAsync(Artist.Id);
-        if (refreshedArtist != null)
-            Artist = refreshedArtist;
+        if (result.BackdropsDownloaded)
+            LoadBackdrop();
 
-        Messenger.Send(new ArtistUpdateMessage(Artist.Id, ActionType.Update));
+        if (result.DataUpdated)
+        {
+            ArtistDto? refreshedArtist = await _dataLoader.ReloadArtistAsync(Artist.Id);
+            if (refreshedArtist != null)
+                Artist = refreshedArtist;
+
+            Messenger.Send(new ArtistUpdateMessage(Artist.Id, ActionType.Update));
+        }
     }
 
 

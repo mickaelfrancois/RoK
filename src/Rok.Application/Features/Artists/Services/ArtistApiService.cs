@@ -12,54 +12,59 @@ public class ArtistApiService(
     IMusicDataApiService musicDataApiService,
     ILogger<ArtistApiService> logger)
 {
-    public async Task<bool> GetAndUpdateArtistDataAsync(ArtistDto artist, IArtistPictureService pictureService, IBackdropPicture backdropPicture)
+    public async Task<ArtistApiUpdateResult> GetAndUpdateArtistDataAsync(ArtistDto artist, IArtistPictureService pictureService, IBackdropPicture backdropPicture)
     {
         if (string.IsNullOrEmpty(artist.Name))
-            return false;
+            return ArtistApiUpdateResult.None;
 
         if (!musicDataApiService.IsApiRetryAllowed(artist.GetMetaDataLastAttempt))
-            return false;
+            return ArtistApiUpdateResult.None;
 
         await mediator.SendMessageAsync(new UpdateArtistGetMetaDataLastAttemptCommand(artist.Id));
         artist.GetMetaDataLastAttempt = DateTime.UtcNow;
 
         MusicDataArtistDto? artistApi = await musicDataApiService.GetArtistAsync(artist.Name, artist.MusicBrainzID);
         if (artistApi == null)
-            return false;
+            return ArtistApiUpdateResult.None;
 
-        if (!string.IsNullOrEmpty(artistApi.MusicBrainzID))
-        {
-            await DownloadPictureIfNeededAsync(artist, artistApi, pictureService, CancellationToken.None);
-            await DownloadBackdropsIfNeededAsync(artist, artistApi, backdropPicture, CancellationToken.None);
+        if (string.IsNullOrEmpty(artistApi.MusicBrainzID))
+            return ArtistApiUpdateResult.None;
 
-            if (CompareArtistFromApi(artist, artistApi))
-                return await UpdateArtistDataIfNeededAsync(artist, artistApi);
-        }
+        bool pictureDownloaded = await DownloadPictureIfNeededAsync(artist, artistApi, pictureService, CancellationToken.None);
+        bool backdropsDownloaded = await DownloadBackdropsIfNeededAsync(artist, artistApi, backdropPicture, CancellationToken.None);
 
-        return false;
+        bool dataUpdated = false;
+        if (CompareArtistFromApi(artist, artistApi))
+            dataUpdated = await UpdateArtistDataIfNeededAsync(artist, artistApi);
+
+        return new ArtistApiUpdateResult(dataUpdated, pictureDownloaded, backdropsDownloaded);
     }
 
-    private async Task DownloadPictureIfNeededAsync(ArtistDto artist, MusicDataArtistDto artistApi, IArtistPictureService pictureService, CancellationToken cancellationToken)
+    private async Task<bool> DownloadPictureIfNeededAsync(ArtistDto artist, MusicDataArtistDto artistApi, IArtistPictureService pictureService, CancellationToken cancellationToken)
     {
         if (pictureService.PictureExists(artist.Name))
-            return;
+            return false;
 
         if (string.IsNullOrWhiteSpace(artistApi.PictureUrl))
-            return;
+            return false;
 
         string picturePath = pictureService.GetPictureFilePath(artist.Name);
 
         await musicDataApiService.DownloadArtistPictureAsync(artistApi, picturePath, cancellationToken);
+
+        return pictureService.PictureExists(artist.Name);
     }
 
-    private async Task DownloadBackdropsIfNeededAsync(ArtistDto artist, MusicDataArtistDto artistApi, IBackdropPicture backdropPicture, CancellationToken cancellationToken)
+    private async Task<bool> DownloadBackdropsIfNeededAsync(ArtistDto artist, MusicDataArtistDto artistApi, IBackdropPicture backdropPicture, CancellationToken cancellationToken)
     {
         if (backdropPicture.HasBackdrops(artist.Name))
-            return;
+            return false;
 
         string backdropFolder = backdropPicture.GetArtistPictureFolder(artist.Name);
 
         await musicDataApiService.DownloadArtistBackdropsAsync(artistApi, backdropFolder, cancellationToken);
+
+        return backdropPicture.HasBackdrops(artist.Name);
     }
 
     private async Task<bool> UpdateArtistDataIfNeededAsync(ArtistDto artist, MusicDataArtistDto artistApi)
