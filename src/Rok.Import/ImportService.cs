@@ -80,7 +80,7 @@ ILogger<ImportService> logger) : IImport
             if (delayInSeconds > 0)
                 await Task.Delay(delayInSeconds, _cancellationToken!.Token);
 
-            await ImportAsync(_cancellationToken!.Token);
+            await Task.Run(() => ImportAsync(_cancellationToken!.Token), _cancellationToken!.Token);
         }
         catch (OperationCanceledException)
         {
