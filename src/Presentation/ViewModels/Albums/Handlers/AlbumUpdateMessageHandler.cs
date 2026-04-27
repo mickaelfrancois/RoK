@@ -51,6 +51,11 @@ public class AlbumUpdateMessageHandler(AlbumsDataLoader dataLoader, ILogger<Albu
                 dataLoader.RemoveAlbum(message.Id);
                 logger.LogTrace("Album {Id} viewmodel removed.", message.Id);
                 break;
+
+            case ActionType.Picture:
+                dataLoader.RefreshAlbumPicture(message.Id);
+                logger.LogTrace("Album {Id} picture updated.", message.Id);
+                break;
         }
 
         DataChanged?.Invoke(this, EventArgs.Empty);

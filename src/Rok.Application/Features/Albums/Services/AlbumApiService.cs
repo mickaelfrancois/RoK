@@ -12,42 +12,45 @@ public class AlbumApiService(
     IMusicDataApiService musicDataApiService,
     ILogger<AlbumApiService> logger)
 {
-    public async Task<bool> GetAndUpdateAlbumDataAsync(AlbumDto album, IAlbumPictureService pictureService)
+    public async Task<AlbumApiUpdateResult> GetAndUpdateAlbumDataAsync(AlbumDto album, IAlbumPictureService pictureService)
     {
         if (string.IsNullOrEmpty(album.Name) || string.IsNullOrEmpty(album.ArtistName))
-            return false;
+            return AlbumApiUpdateResult.None;
 
         if (!musicDataApiService.IsApiRetryAllowed(album.GetMetaDataLastAttempt))
-            return false;
+            return AlbumApiUpdateResult.None;
 
         await mediator.SendMessageAsync(new UpdateAlbumGetMetaDataLastAttemptCommand(album.Id));
         album.GetMetaDataLastAttempt = DateTime.UtcNow;
 
         MusicDataAlbumDto? albumApi = await musicDataApiService.GetAlbumAsync(album.Name, album.ArtistName, album.MusicBrainzID, album.ArtistMusicBrainzID);
         if (albumApi == null)
-            return false;
-
-        if (!string.IsNullOrEmpty(albumApi.MusicBrainzID))
-        {
-            await DownloadPictureIfNeededAsync(album, albumApi, pictureService, CancellationToken.None);
-
-            if (CompareAlbumFromApi(album, albumApi))
-                return await UpdateAlbumDataIfNeededAsync(album, albumApi);
-        }
-
-        return false;
-    }
-
-    private async Task DownloadPictureIfNeededAsync(AlbumDto album, MusicDataAlbumDto albumApi, IAlbumPictureService pictureService, CancellationToken cancellationToken)
-    {
-        if (pictureService.PictureExists(album.AlbumPath))
-            return;
+            return AlbumApiUpdateResult.None;
 
         if (string.IsNullOrEmpty(albumApi.MusicBrainzID))
-            return;
+            return AlbumApiUpdateResult.None;
+
+        bool pictureDownloaded = await DownloadPictureIfNeededAsync(album, albumApi, pictureService, CancellationToken.None);
+
+        bool dataUpdated = false;
+        if (CompareAlbumFromApi(album, albumApi))
+            dataUpdated = await UpdateAlbumDataIfNeededAsync(album, albumApi);
+
+        return new AlbumApiUpdateResult(dataUpdated, pictureDownloaded);
+    }
+
+    private async Task<bool> DownloadPictureIfNeededAsync(AlbumDto album, MusicDataAlbumDto albumApi, IAlbumPictureService pictureService, CancellationToken cancellationToken)
+    {
+        if (pictureService.PictureExists(album.AlbumPath))
+            return false;
+
+        if (string.IsNullOrEmpty(albumApi.MusicBrainzID))
+            return false;
 
         string picturePath = pictureService.GetPictureFilePath(album.AlbumPath);
         await musicDataApiService.DownloadCoverAsync(albumApi, picturePath, cancellationToken);
+
+        return pictureService.PictureExists(album.AlbumPath);
     }
 
     private async Task<bool> UpdateAlbumDataIfNeededAsync(AlbumDto album, MusicDataAlbumDto albumApi)
