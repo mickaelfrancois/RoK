@@ -20,7 +20,7 @@ public class PlayerServiceCrossfadeTests
         _appOptions.SetupGet(o => o.CrossFade).Returns(true);
     }
 
-    private PlayerService BuildService() => new(_callDetection.Object, _engine.Object, _appOptions.Object, null, null, _logger.Object);
+    private PlayerService BuildService() => new(_callDetection.Object, _engine.Object, _appOptions.Object, null, null, TimeProvider.System, _logger.Object);
 
     private static TrackDto BuildTrack(long id, bool isLive = false) => new() { Id = id, Title = $"t{id}", IsAlbumLive = isLive };
 

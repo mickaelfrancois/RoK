@@ -21,7 +21,15 @@ public class PlayerService : IPlayerService
 
     private readonly IAppOptions _appOptions;
 
-    private bool _callingPaused = false;
+    private readonly TimeProvider _timeProvider;
+
+    private enum PauseReason { None, User, Call, Smtc }
+
+    private PauseReason _pauseReason = PauseReason.None;
+
+    private DateTime _pauseTimestampUtc = DateTime.MinValue;
+
+    private static readonly TimeSpan KCallReconciliationWindow = TimeSpan.FromSeconds(3);
 
     private volatile bool _isCrossfadeRunning;
 
@@ -133,13 +141,14 @@ public class PlayerService : IPlayerService
 
     private readonly ILogger<PlayerService> _logger;
 
-    public PlayerService(ICallDetectionService callDetectionService, IPlayerEngine player, IAppOptions appOptions, IDiscordRichPresenceService? discordService, ISystemMediaTransportControlsService? smtcService, ILogger<PlayerService> logger)
+    public PlayerService(ICallDetectionService callDetectionService, IPlayerEngine player, IAppOptions appOptions, IDiscordRichPresenceService? discordService, ISystemMediaTransportControlsService? smtcService, TimeProvider timeProvider, ILogger<PlayerService> logger)
     {
         _callDetectionService = Guard.Against.Null(callDetectionService, nameof(callDetectionService));
         _player = Guard.Against.Null(player, nameof(player));
         _appOptions = Guard.Against.Null(appOptions, nameof(appOptions));
         _discordService = discordService;
         _smtcService = smtcService;
+        _timeProvider = Guard.Against.Null(timeProvider, nameof(timeProvider));
         _logger = Guard.Against.Null(logger, nameof(logger));
 
         _isCrossfadeEnabled = appOptions.CrossFade;
@@ -167,22 +176,27 @@ public class PlayerService : IPlayerService
             if (!_appOptions.PauseOnCall)
                 return;
 
-            _logger.LogInformation("Call state changed, in call: {InCall}", inCall);
+            _logger.LogInformation("Call state changed, in call: {InCall}, current state: {State}, pause reason: {Reason}", inCall, PlaybackState, _pauseReason);
 
             if (inCall)
             {
                 if (PlaybackState == EPlaybackState.Playing)
                 {
-                    Pause();
-                    _callingPaused = true;
+                    Pause(PauseReason.Call);
+                }
+                else if (PlaybackState == EPlaybackState.Paused
+                         && _pauseReason == PauseReason.Smtc
+                         && _timeProvider.GetUtcNow().UtcDateTime - _pauseTimestampUtc <= KCallReconciliationWindow)
+                {
+                    _logger.LogInformation("Reclassifying recent SMTC pause as call-driven");
+                    _pauseReason = PauseReason.Call;
                 }
             }
             else
             {
-                if (PlaybackState == EPlaybackState.Paused && _callingPaused)
+                if (PlaybackState == EPlaybackState.Paused && _pauseReason == PauseReason.Call)
                 {
                     Play();
-                    _callingPaused = false;
                 }
             }
         };
@@ -201,7 +215,7 @@ public class PlayerService : IPlayerService
                 Play();
                 break;
             case MediaControlCommandMessage.CommandType.Pause:
-                Pause();
+                Pause(PauseReason.Smtc);
                 break;
             case MediaControlCommandMessage.CommandType.Next:
                 Next();
@@ -324,9 +338,13 @@ public class PlayerService : IPlayerService
         Play();
     }
 
-    public void Pause()
+    public void Pause() => Pause(PauseReason.User);
+
+    private void Pause(PauseReason reason)
     {
         PlaybackState = EPlaybackState.Paused;
+        _pauseReason = reason;
+        _pauseTimestampUtc = _timeProvider.GetUtcNow().UtcDateTime;
 
         _player.Pause();
 
@@ -343,6 +361,7 @@ public class PlayerService : IPlayerService
             _player.Play();
 
             PlaybackState = EPlaybackState.Playing;
+            _pauseReason = PauseReason.None;
 
             if (CurrentTrack != null)
             {
@@ -365,6 +384,8 @@ public class PlayerService : IPlayerService
 
         if (firePlaybackStateChange)
             PlaybackState = EPlaybackState.Stopped;
+
+        _pauseReason = PauseReason.None;
 
         _discordService?.ClearPresence();
         _smtcService?.UpdatePlaybackState(false);
