@@ -1,6 +1,23 @@
 ﻿# ChangeLog
 
-## [1.10.1] Store – 27 avril 2026
+## [1.10.2] Store – 27 avril 2026
+
+### Ajouté
+
+- Extension du suivi de session et de navigation pour la télémétrie (#268).
+- Mise en pause et reprise de la lecture lors d'un appel entrant (#267).
+
+### Modifié
+
+### Corrigé
+
+- Mise à jour des données et des photos d'artiste depuis l'API (#270).
+- L'import de la bibliothèque bloquait le thread UI (#269).
+
+
+--
+
+## [1.10.1] Store – 26 avril 2026
 
 ### Ajouté
 
@@ -18,7 +35,6 @@
 - L'URL de récupération des paroles était incorrecte (#263).
 
 --
-
 
 ## [1.10.0] Store – 23 avril 2026  
 
