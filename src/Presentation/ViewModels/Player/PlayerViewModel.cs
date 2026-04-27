@@ -20,6 +20,7 @@ public partial class PlayerViewModel : ObservableObject, IDisposable
     private readonly NavigationService _navigationService;
     private readonly IPlayerSleepModeService _playerSleepModeService;
     private readonly ILogger<PlayerViewModel> _logger;
+    private readonly ITelemetryClient _telemetryClient;
     private bool _disposed;
 
     private readonly PlayerDataLoader _dataLoader;
@@ -139,7 +140,6 @@ public partial class PlayerViewModel : ObservableObject, IDisposable
     public bool IsSynchronizedLyrics => _stateManager.IsSynchronizedLyrics;
     public string? PlainLyrics => _stateManager.PlainLyrics;
 
-
     public PlayerViewModel(
         IPlayerService player,
         NavigationService navigationService,
@@ -152,6 +152,7 @@ public partial class PlayerViewModel : ObservableObject, IDisposable
         EqualizerViewModel equalizerViewModel,
         ResourceLoader resourceLoader,
         IPlayerSleepModeService playerSleepModeService,
+        ITelemetryClient telemetryClient,
         ILogger<PlayerViewModel> logger)
     {
         _player = Guard.Against.Null(player);
@@ -165,6 +166,7 @@ public partial class PlayerViewModel : ObservableObject, IDisposable
         EqualizerViewModel = Guard.Against.Null(equalizerViewModel);
         _resourceLoader = Guard.Against.Null(resourceLoader);
         _playerSleepModeService = Guard.Against.Null(playerSleepModeService);
+        _telemetryClient = Guard.Against.Null(telemetryClient);
         _logger = Guard.Against.Null(logger);
 
         _stateManager.PropertyChanged += OnStateManagerPropertyChanged;
@@ -175,7 +177,6 @@ public partial class PlayerViewModel : ObservableObject, IDisposable
 
         _timerManager.Start();
     }
-
 
     private void OnStateManagerPropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
@@ -189,7 +190,6 @@ public partial class PlayerViewModel : ObservableObject, IDisposable
     {
         _stateManager.ExecuteOnUIThread(() => OnPropertyChanged(nameof(IsSleepModeActive)));
     }
-
 
     private void SubscribeToMessages()
     {
@@ -249,7 +249,6 @@ public partial class PlayerViewModel : ObservableObject, IDisposable
 
     #endregion
 
-
     #region Message Handlers
 
     private void OnTrackScoreUpdated(TrackScoreUpdateMessage message)
@@ -280,6 +279,8 @@ public partial class PlayerViewModel : ObservableObject, IDisposable
     private async Task OnMediaChangedAsync(MediaChangedMessage message)
     {
         _logger.LogDebug("Player VM handle media changed: title {Title}.", message.NewTrack.Title);
+
+        await _telemetryClient.CaptureEventAsync("Player", "TrackChanged");
 
         TrackViewModel trackViewModel = _dataLoader.CreateTrackViewModel(message.NewTrack);
 
@@ -366,7 +367,6 @@ public partial class PlayerViewModel : ObservableObject, IDisposable
 
     #endregion
 
-
     private void LoadBackdrop()
     {
         _timerManager.StopBackdropTimer();
@@ -415,7 +415,6 @@ public partial class PlayerViewModel : ObservableObject, IDisposable
         OnPropertyChanged(nameof(IsSynchronizedLyrics));
         OnPropertyChanged(nameof(PlainLyrics));
     }
-
 
     [RelayCommand]
     public void SetSleepTimer(int minutes)
@@ -520,8 +519,6 @@ public partial class PlayerViewModel : ObservableObject, IDisposable
         _equalizerWindow.Closed += (_, _) => _equalizerWindow = null;
         _equalizerWindow.Activate();
     }
-
-
 
     public void Dispose()
     {
