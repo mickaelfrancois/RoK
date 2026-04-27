@@ -18,7 +18,7 @@
 			"name": "dotnet-test",
 			"group": "pre-push-operations",
 			"command": "dotnet",
-			"args": [ "test", "--filter", "Category=Unit", "--no-build" ]
-		}		
+			"args": [ "test", "--no-build", "/p:Platform=x64" ]
+		}
 	]
 }

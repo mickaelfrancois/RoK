@@ -1,5 +1,25 @@
 ﻿# ChangeLog
 
+## [1.10.1] Store – 27 avril 2026
+
+### Ajouté
+
+- Amélioration du fondu enchaîné avec NAudio (#261).
+- Ajout d'un identifiant de corrélation pour la télémétrie (#265).
+
+### Modifié
+
+- Meilleure gestion des erreurs lors de la lecture des tags audio (#255).
+- Modification mineure du fichier de solution (#258).
+- Ajout de la documentation d'architecture (#260).
+
+### Corrigé
+
+- L'URL de récupération des paroles était incorrecte (#263).
+
+--
+
+
 ## [1.10.0] Store – 23 avril 2026  
 
 ### Ajouté

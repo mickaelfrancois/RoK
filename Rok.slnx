@@ -21,7 +21,9 @@
     <Project Path="tests/UnitTests/Rok.ImportTests/Rok.ImportTests.csproj" Id="c3e68afd-476f-49dd-b401-36875140cb7f" />
     <Project Path="tests/UnitTests/Rok.Infrastructure.UnitTests/Rok.Infrastructure.UnitTests.csproj" Id="179c2a02-8034-4e18-9ed9-8d575d58e8f4" />
     <Project Path="tests/UnitTests/Rok.PresentationTests/Rok.PresentationTests.csproj">
-      <Platform Solution="Debug|x64" Project="x64" />
+      <Platform Solution="*|ARM64" Project="ARM64" />
+      <Platform Solution="*|x64" Project="x64" />
+      <Platform Solution="*|x86" Project="x86" />
     </Project>
   </Folder>
   <Project Path="src/Presentation/Rok.csproj">
