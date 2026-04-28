@@ -1,5 +1,7 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+﻿using System.Threading;
+using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Rok.Application.Features.Playlists.Messages;
 using Rok.ViewModels.Playlist;
 using Rok.ViewModels.Playlists.Handlers;
 using Rok.ViewModels.Playlists.Services;
@@ -12,7 +14,9 @@ public partial class PlaylistsViewModel : ObservableObject, IDisposable
 
     private readonly PlaylistsDataLoader _dataLoader;
     private readonly PlaylistCreationService _creationService;
+    private readonly PlaylistImportService _importService;
     private readonly PlaylistUpdateMessageHandler _updateHandler;
+    private readonly PlaylistImportedMessageHandler _importedHandler;
     private readonly IAppOptions _appOptions;
 
     public RangeObservableCollection<PlaylistViewModel> Playlists { get; private set; } = [];
@@ -30,13 +34,17 @@ public partial class PlaylistsViewModel : ObservableObject, IDisposable
     public PlaylistsViewModel(
         PlaylistsDataLoader dataLoader,
         PlaylistCreationService creationService,
+        PlaylistImportService importService,
         PlaylistUpdateMessageHandler updateHandler,
+        PlaylistImportedMessageHandler importedHandler,
         IAppOptions appOptions,
         ILogger<PlaylistsViewModel> logger)
     {
         _dataLoader = Guard.Against.Null(dataLoader);
         _creationService = Guard.Against.Null(creationService);
+        _importService = Guard.Against.Null(importService);
         _updateHandler = Guard.Against.Null(updateHandler);
+        _importedHandler = Guard.Against.Null(importedHandler);
         _appOptions = Guard.Against.Null(appOptions);
         _logger = Guard.Against.Null(logger);
 
@@ -48,11 +56,13 @@ public partial class PlaylistsViewModel : ObservableObject, IDisposable
     private void SubscribeToMessages()
     {
         Messenger.Subscribe<PlaylistUpdatedMessage>(async (message) => await _updateHandler.HandleAsync(message));
+        Messenger.Subscribe<PlaylistImportedMessage>(async (message) => await _importedHandler.HandleAsync(message));
     }
 
     private void SubscribeToEvents()
     {
         _updateHandler.DataChanged += OnDataChanged;
+        _importedHandler.DataChanged += OnDataChanged;
     }
 
     private void OnDataChanged(object? sender, EventArgs e)
@@ -105,6 +115,19 @@ public partial class PlaylistsViewModel : ObservableObject, IDisposable
         await _creationService.CreateClassicPlaylistAsync();
     }
 
+    [RelayCommand]
+    private async Task ImportPlaylistsAsync()
+    {
+        try
+        {
+            await _importService.RunAsync(CancellationToken.None);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Playlist import failed");
+        }
+    }
+
 
     #region IDisposable Support
 
@@ -117,6 +140,7 @@ public partial class PlaylistsViewModel : ObservableObject, IDisposable
             if (disposing)
             {
                 _updateHandler.DataChanged -= OnDataChanged;
+                _importedHandler.DataChanged -= OnDataChanged;
                 _dataLoader.Clear();
                 Playlists.Clear();
             }

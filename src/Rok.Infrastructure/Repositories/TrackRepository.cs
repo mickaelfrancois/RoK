@@ -155,6 +155,17 @@ public class TrackRepository(IDbConnection db, [FromKeyedServices("BackgroundCon
         return await ExecuteUpdateAsync(UpdateGetLyricsLastAttemptSql, new { lastAttemptDate = DateTime.UtcNow, id }, kind);
     }
 
+    public async Task<TrackEntity?> GetByFilePathAsync(string filePath, CancellationToken cancellationToken)
+    {
+        if (string.IsNullOrWhiteSpace(filePath))
+            return null;
+
+        string sql = GetSelectQuery() + " WHERE tracks.musicFile = @filePath COLLATE NOCASE " + DefaultGroupBy + " LIMIT 1";
+
+        IDbConnection localConnection = ResolveConnection(RepositoryConnectionKind.Foreground);
+        return await localConnection.QueryFirstOrDefaultAsync<TrackEntity>(new CommandDefinition(sql, new { filePath }, cancellationToken: cancellationToken));
+    }
+
     public override string GetSelectQuery(string? whereParam = null)
     {
         string query = """

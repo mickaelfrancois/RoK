@@ -1,4 +1,5 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+﻿using System.Threading;
+using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Rok.Application.Player;
 using Rok.ViewModels.Playlist.Services;
@@ -18,6 +19,7 @@ public partial class PlaylistViewModel : ObservableObject
     private readonly PlaylistPictureService _pictureService;
     private readonly PlaylistUpdateService _updateService;
     private readonly PlaylistGenerationService _generationService;
+    private readonly PlaylistExportService _exportService;
 
     private List<TrackViewModel> _originalTracks = [];
 
@@ -105,6 +107,7 @@ public partial class PlaylistViewModel : ObservableObject
         PlaylistPictureService pictureService,
         PlaylistUpdateService updateService,
         PlaylistGenerationService generationService,
+        PlaylistExportService exportService,
         ILogger<PlaylistViewModel> logger)
     {
         _backdropLoader = Guard.Against.Null(backdropLoader);
@@ -115,6 +118,7 @@ public partial class PlaylistViewModel : ObservableObject
         _pictureService = Guard.Against.Null(pictureService);
         _updateService = Guard.Against.Null(updateService);
         _generationService = Guard.Against.Null(generationService);
+        _exportService = Guard.Against.Null(exportService);
         _logger = Guard.Against.Null(logger);
         Tracks.CollectionChanged += (_, _) => OnPropertyChanged(nameof(IsTracksEmpty));
     }
@@ -273,6 +277,22 @@ public partial class PlaylistViewModel : ObservableObject
             return;
 
         Tracks.Shuffle();
+    }
+
+    [RelayCommand]
+    private async Task ExportPlaylistAsync()
+    {
+        if (Playlist.Id <= 0)
+            return;
+
+        try
+        {
+            await _exportService.RunAsync(Playlist, CancellationToken.None);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Playlist export failed for {Id}", Playlist.Id);
+        }
     }
 
     [RelayCommand]

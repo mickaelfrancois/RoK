@@ -185,6 +185,9 @@ public static class DependencyInjection
         services.AddSingleton<PlaylistsDataLoader>();
         services.AddSingleton<PlaylistCreationService>();
         services.AddSingleton<PlaylistUpdateMessageHandler>();
+        services.AddSingleton<PlaylistImportedMessageHandler>();
+        services.AddSingleton<IPlaylistFilePickerService, PlaylistFilePickerService>();
+        services.AddTransient<PlaylistImportService>();
         services.AddTransient<IPlaylistViewModelFactory, PlaylistViewModelFactory>();
 
         // Playlist detail (for PlaylistViewModel - single playlist)
@@ -193,6 +196,8 @@ public static class DependencyInjection
         services.AddTransient<PlaylistPictureService>();
         services.AddTransient<PlaylistUpdateService>();
         services.AddTransient<PlaylistGenerationService>();
+        services.AddTransient<IPlaylistExportPrompts, PlaylistExportPrompts>();
+        services.AddTransient<PlaylistExportService>();
 
         // Player ViewModel and services
         services.AddSingleton<PlayerViewModel>();

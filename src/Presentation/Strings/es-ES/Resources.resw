@@ -1608,4 +1608,25 @@
   <data name="SmartPlaylist_EmptyTracksDescription.Text" xml:space="preserve">
     <value>Configura los criterios de tu playlist y haz clic en Generar para ver las pistas correspondientes.</value>
   </data>
+  <data name="ExportSmartPlaylistMessage" xml:space="preserve">
+    <value>La lista de reproducción se exportará tal cual está. Sus reglas inteligentes no se conservarán en el archivo.</value>
+  </data>
+  <data name="ExportSmartPlaylistTitle" xml:space="preserve">
+    <value>Exportar lista de reproducción inteligente</value>
+  </data>
+  <data name="playlistFlyoutExport.Text" xml:space="preserve">
+    <value>Exportar…</value>
+  </data>
+  <data name="playlistExport.ToolTipService.ToolTip" xml:space="preserve">
+    <value>Exporta esta lista de reproducción como M3U8</value>
+  </data>
+  <data name="playlistExport.Label" xml:space="preserve">
+    <value>Exportar</value>
+  </data>
+  <data name="playlistsImport.ToolTipService.ToolTip" xml:space="preserve">
+    <value>Importar archivos de lista de reproducción</value>
+  </data>
+  <data name="playlistsImport.Label" xml:space="preserve">
+    <value>Importar…</value>
+  </data>
 </root>
