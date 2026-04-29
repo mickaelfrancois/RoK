@@ -1,5 +1,22 @@
 ﻿# ChangeLog
 
+## [1.10.3] Store – 29 avril 2026
+
+### Ajouté
+
+- Ajout d'une fonction d'import/export d'une playlist.
+
+### Modifié
+
+- La lecture d'un album conserve l'ordre des pistes de l'album.
+
+### Corrigé
+
+- La lecture des statistiques utilisait la mauvaise connection de base de données.
+- Correction d'une erreur pouvant survenir lors l'affichage d'un album/artist/genre.
+
+--
+
 ## [1.10.2] Store – 27 avril 2026
 
 ### Ajouté
@@ -13,7 +30,6 @@
 
 - Mise à jour des données et des photos d'artiste depuis l'API (#270).
 - L'import de la bibliothèque bloquait le thread UI (#269).
-
 
 --
 
