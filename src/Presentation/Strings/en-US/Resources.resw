@@ -1725,4 +1725,25 @@
   <data name="SmartPlaylist_EmptyTracksDescription.Text" xml:space="preserve">
     <value>Set up your playlist criteria and click Refresh to see matching tracks.</value>
   </data>
+  <data name="playlistsImport.Label" xml:space="preserve">
+    <value>Import…</value>
+  </data>
+  <data name="playlistsImport.ToolTipService.ToolTip" xml:space="preserve">
+    <value>Import playlist files</value>
+  </data>
+  <data name="playlistExport.Label" xml:space="preserve">
+    <value>Export</value>
+  </data>
+  <data name="playlistExport.ToolTipService.ToolTip" xml:space="preserve">
+    <value>Export this playlist as M3U8</value>
+  </data>
+  <data name="playlistFlyoutExport.Text" xml:space="preserve">
+    <value>Export…</value>
+  </data>
+  <data name="ExportSmartPlaylistTitle" xml:space="preserve">
+    <value>Export smart playlist</value>
+  </data>
+  <data name="ExportSmartPlaylistMessage" xml:space="preserve">
+    <value>The playlist will be exported as it currently is. Its smart rules will not be preserved in the file.</value>
+  </data>
 </root>

@@ -41,6 +41,7 @@
                     <AppBarButton x:Uid="playlistListen" Style="{StaticResource ListenAppBarButtonStyle}" Command="{x:Bind ViewModel.ListenCommand}" />
                     <AppBarButton x:Uid="playlistRefresh" Style="{StaticResource AppBarButtonCompactStyle}" Icon="Refresh" Command="{x:Bind ViewModel.GenerateCommand}" />
                     <AppBarButton x:Uid="playlistDelete" Style="{StaticResource AppBarButtonCompactStyle}" Icon="Delete" Click="DeleteButton_Click" />
+                    <AppBarButton x:Uid="playlistExport" Style="{StaticResource AppBarButtonCompactStyle}" Icon="Save" Command="{x:Bind ViewModel.ExportPlaylistCommand}" />
                 </CommandBar>
             </RelativePanel>
         </Grid>

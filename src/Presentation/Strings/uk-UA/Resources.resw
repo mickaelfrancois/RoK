@@ -788,10 +788,10 @@
     <value>, останнє прослуховування:</value>
   </data>
   <data name="playlistsAdd.Label" xml:space="preserve">
-    <value>Створити список відтворення...</value>
+    <value>Новий плейлист</value>
   </data>
   <data name="playlistsSmartAdd.Label" xml:space="preserve">
-    <value>Кмітливий список композицій</value>
+    <value>Новий розумний плейлист</value>
   </data>
   <data name="playlistListen.Label" xml:space="preserve">
     <value>Прослухати</value>
@@ -803,10 +803,10 @@
     <value>Додати до списку</value>
   </data>
   <data name="MenuFlyout_NewPlaylist_Text" xml:space="preserve">
-    <value>Створити список відтворення...</value>
+    <value>Новий плейлист</value>
   </data>
   <data name="NewPlaylistDialog_Title" xml:space="preserve">
-    <value>Створити список відтворення...</value>
+    <value>Новий плейлист</value>
   </data>
   <data name="NewPlaylistDialog_Description_Text" xml:space="preserve">
     <value>Введіть назву нового списку відтворення:</value>
@@ -1665,5 +1665,26 @@
   </data>
   <data name="SmartPlaylist_EmptyTracksDescription.Text" xml:space="preserve">
     <value>Налаштуйте критерії списку відтворення та натисніть Оновити, щоб переглянути відповідні композиції.</value>
+  </data>
+  <data name="ExportSmartPlaylistMessage" xml:space="preserve">
+    <value>Список відтворення буде експортовано в поточному вигляді. Його розумні правила не будуть збережені у файлі.</value>
+  </data>
+  <data name="ExportSmartPlaylistTitle" xml:space="preserve">
+    <value>Exportar lista de reproducción inteligente</value>
+  </data>
+  <data name="playlistFlyoutExport.Text" xml:space="preserve">
+    <value>Експорт…</value>
+  </data>
+  <data name="playlistExport.ToolTipService.ToolTip" xml:space="preserve">
+    <value>Експортувати цей плейлист у форматі M3U8</value>
+  </data>
+  <data name="playlistExport.Label" xml:space="preserve">
+    <value>Експорт</value>
+  </data>
+  <data name="playlistsImport.ToolTipService.ToolTip" xml:space="preserve">
+    <value>Імпорт файлів відтворення</value>
+  </data>
+  <data name="playlistsImport.Label" xml:space="preserve">
+    <value>Імпорт…</value>
   </data>
 </root>

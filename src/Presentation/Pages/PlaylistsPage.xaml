@@ -12,6 +12,16 @@
     <Page.Resources>
         <DataTemplate x:Key="PlaylistGridTemplate" x:DataType="a:PlaylistViewModel">
             <Grid Style="{StaticResource MainGridCoverStyle}">
+                <Grid.ContextFlyout>
+                    <MenuFlyout>
+                        <MenuFlyoutItem x:Uid="playlistFlyoutExport"
+                                        Command="{x:Bind ExportPlaylistCommand}">
+                            <MenuFlyoutItem.Icon>
+                                <FontIcon Glyph="&#xE74E;" />
+                            </MenuFlyoutItem.Icon>
+                        </MenuFlyoutItem>
+                    </MenuFlyout>
+                </Grid.ContextFlyout>
                 <Border CornerRadius="{StaticResource CornerRadiusMediumValue}">
                     <common:PictureControl Style="{StaticResource PictureCoverStyle}" Cover="{x:Bind Picture, Mode=OneWay}" x:Phase="2" PlayButtonVisibility="Visible" Command="{x:Bind ListenCommand}" />
                 </Border>
@@ -30,7 +40,16 @@
 
         <DataTemplate x:Key="PlaylistListTemplate" x:DataType="a:PlaylistViewModel">
             <Grid Padding="12,4" HorizontalAlignment="Stretch" Background="Transparent">
-
+                <Grid.ContextFlyout>
+                    <MenuFlyout>
+                        <MenuFlyoutItem x:Uid="playlistFlyoutExport"
+                                        Command="{x:Bind ExportPlaylistCommand}">
+                            <MenuFlyoutItem.Icon>
+                                <FontIcon Glyph="&#xE74E;" />
+                            </MenuFlyoutItem.Icon>
+                        </MenuFlyoutItem>
+                    </MenuFlyout>
+                </Grid.ContextFlyout>
                 <Border CornerRadius="{StaticResource CornerRadiusMediumValue}" Width="{StaticResource ListCoverWidth}" Height="{StaticResource ListCoverHeight}" VerticalAlignment="Center">
                     <common:PictureControl Cover="{x:Bind Picture, Mode=OneWay}" PlayButtonVisibility="Visible" Command="{x:Bind ListenCommand}" />
                 </Border>
@@ -58,6 +77,10 @@
                     <AppBarButton x:Uid="playlistsAdd"
                                   Style="{StaticResource AppBarButtonCompactStyle}" Icon="Add" Command="{x:Bind ViewModel.NewPlaylistCommand}" />
                     <AppBarButton x:Uid="playlistsSmartAdd" Style="{StaticResource AppBarButtonCompactStyle}" Icon="OutlineStar" Command="{x:Bind ViewModel.NewSmartPlaylistCommand}" />
+                    <AppBarButton x:Uid="playlistsImport"
+                                  Style="{StaticResource AppBarButtonCompactStyle}"
+                                  Icon="OpenFile"
+                                  Command="{x:Bind ViewModel.ImportPlaylistsCommand}" />
                     <AppBarSeparator />
                     <AppBarButton Icon="{x:Bind ViewModel.IsGridView, Mode=OneWay, Converter={StaticResource GridListIconConverter}}" Style="{StaticResource AppBarButtonCompactStyle}" Command="{x:Bind ViewModel.ToggleDisplayModeCommand}" />
                 </StackPanel>

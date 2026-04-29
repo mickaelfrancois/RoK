@@ -36,6 +36,12 @@
 #*.wwaproj   merge=binary
 
 ###############################################################################
+# M3U/M3U8 playlist test fixtures — preserve exact bytes (BOM + line endings)
+###############################################################################
+*.m3u    binary
+*.m3u8   binary
+
+###############################################################################
 # behavior for image files
 #
 # image files are treated as binary by default.

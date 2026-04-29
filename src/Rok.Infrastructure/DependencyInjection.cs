@@ -1,6 +1,7 @@
 ﻿using Microsoft.Data.Sqlite;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Rok.Application.Features.Playlists.IO;
 using Rok.Application.Interfaces;
 using Rok.Application.Interfaces.Pictures;
 using Rok.Application.Player;
@@ -14,6 +15,8 @@ using Rok.Infrastructure.Lyrics;
 using Rok.Infrastructure.Migration;
 using Rok.Infrastructure.MusicData;
 using Rok.Infrastructure.Player;
+using Rok.Infrastructure.Playlists;
+using Rok.Infrastructure.Playlists.Formats;
 using Rok.Infrastructure.Repositories;
 using Rok.Infrastructure.Social;
 using Rok.Infrastructure.Tag;
@@ -79,6 +82,10 @@ public static class DependencyInjection
         services.AddScoped<IPlaylistTrackGenerateRepository, PlaylistTrackGenerateRepository>();
         services.AddScoped<IListeningEventRepository, ListeningEventRepository>();
         services.AddScoped<IEqualizerPresetRepository, EqualizerPresetRepository>();
+
+        services.AddSingleton<IPlaylistFormatReader, M3u8PlaylistReader>();
+        services.AddSingleton<IPlaylistFormatWriter, M3u8PlaylistWriter>();
+        services.AddSingleton<IPlaylistFormatResolver, PlaylistFormatResolver>();
 
         services.AddSingleton<ITagService, TagService>();
         services.AddSingleton<IMusicDataApiService, MusicDataApiService>();

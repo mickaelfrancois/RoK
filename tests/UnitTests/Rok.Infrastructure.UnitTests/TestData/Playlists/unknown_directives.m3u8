@@ -1,0 +1,5 @@
+#EXTM3U
+#PLAYLIST:My weird playlist
+#EXTGRP:Rock
+#EXTINF:200,Foo - Bar
+D:\Music\foo.mp3
