@@ -73,3 +73,14 @@ Rok is a .NET 10 application using C# 13.0 with WinUi3 for listening local music
 - No synchronous I/O.
 - No static service locators.
 - No code-behind logic in WinUI pages if it can be avoided.
+
+# Available Skills
+Here is a list of skills that contain domain specific knowledge on a variety of topics.
+Each skill comes with a description of the topic and a file path that contains the detailed instructions.
+When a user asks you to perform a task that falls within the domain of a skill, use the get_file tool to acquire the full instructions from the file URI.
+
+- **git-commit-messages**: Rules and patterns for writing standard Git commit messages following the Conventional Commits specification. Activate when the user asks to write
+  - File: `D:\Development\MF\Rok\.github\skills\git-commit-messages\SKILL.md`
+
+- **msbuild-antipatterns**: Catalog of MSBuild anti-patterns with detection rules and fix recipes. Only activate in MSBuild/.NET build context. USE FOR: reviewing
+  - File: `D:\Development\MF\Rok\.github\skills\msbuild-antipatterns\SKILL.md`
