@@ -21,6 +21,8 @@ public partial class GenreViewModel : ObservableObject
     private readonly ArtistPictureService _pictureService;
     private readonly GenreEditService _editService;
 
+    private CancellationTokenSource _navigationCts = new();
+
     public RangeObservableCollection<AlbumViewModel> Albums { get; set; } = [];
     public GenreDto Genre { get; private set; } = new();
 
@@ -156,16 +158,36 @@ public partial class GenreViewModel : ObservableObject
 
     public async Task LoadDataAsync(long genreId, bool loadAlbums = true, bool loadTracks = true)
     {
+        CancellationToken cancellationToken = InitNavigationCancellation();
+
         Stopwatch stopwatch = new();
         stopwatch.Start();
 
         await LoadGenreAsync(genreId);
-        await LoadAlbumsAsync(genreId);
+
+        if (cancellationToken.IsCancellationRequested)
+            return;
+
+        await LoadAlbumsAsync(genreId, cancellationToken);
 
         stopwatch.Stop();
 
         _logger.LogInformation("Genre {GenreId} loaded in {ElapsedMilliseconds} ms (albums: {LoadAlbums}, tracks: {LoadTracks})",
                                 genreId, stopwatch.ElapsedMilliseconds, loadAlbums, loadTracks);
+    }
+
+    public void OnNavigatedFrom()
+    {
+        InitNavigationCancellation();
+        Backdrop = null;
+    }
+
+    private CancellationToken InitNavigationCancellation()
+    {
+        _navigationCts.Cancel();
+        _navigationCts.Dispose();
+        _navigationCts = new CancellationTokenSource();
+        return _navigationCts.Token;
     }
 
 
@@ -178,21 +200,24 @@ public partial class GenreViewModel : ObservableObject
     }
 
 
-    private async Task LoadAlbumsAsync(long genreId)
+    private async Task LoadAlbumsAsync(long genreId, CancellationToken cancellationToken)
     {
         List<AlbumViewModel> albums = await _dataLoader.LoadAlbumsAsync(genreId);
 
-        if (albums.Count > 0)
-        {
-            Albums.AddRange(albums);
+        if (cancellationToken.IsCancellationRequested)
+            return;
 
-            List<AlbumViewModel> albumsWithArtist = albums.Where(a => !string.IsNullOrEmpty(a.Album.ArtistName)).ToList();
-            int index = Random.Shared.Next(albumsWithArtist.Count);
-            AlbumViewModel randomAlbum = albumsWithArtist[index];
+        Albums.InitWithAddRange(albums);
 
-            LoadPicture(randomAlbum.Album.ArtistName);
-            LoadBackdrop(randomAlbum.Album.ArtistName);
-        }
+        if (albums.Count == 0)
+            return;
+
+        List<AlbumViewModel> albumsWithArtist = albums.Where(a => !string.IsNullOrEmpty(a.Album.ArtistName)).ToList();
+        int index = Random.Shared.Next(albumsWithArtist.Count);
+        AlbumViewModel randomAlbum = albumsWithArtist[index];
+
+        LoadPicture(randomAlbum.Album.ArtistName);
+        LoadBackdrop(randomAlbum.Album.ArtistName, cancellationToken);
     }
 
 
@@ -202,11 +227,12 @@ public partial class GenreViewModel : ObservableObject
     }
 
 
-    public void LoadBackdrop(string artistName)
+    public void LoadBackdrop(string artistName, CancellationToken cancellationToken = default)
     {
         _backdropLoader.LoadBackdrop(artistName, (BitmapImage? backdropImage) =>
         {
-            Backdrop = backdropImage;
+            if (!cancellationToken.IsCancellationRequested)
+                Backdrop = backdropImage;
         });
     }
 

@@ -40,7 +40,6 @@ public partial class AlbumViewModel : ObservableObject, IFilterableAlbum, IGroup
     public AlbumDto Album { get; private set; } = new();
     public IPlaylistMenuService PlaylistMenuService { get; }
 
-
     public ObservableCollection<string> EditableTags { get; set; } = new();
 
     public ObservableCollection<string> SuggestedTags { get; set; } = new();
@@ -85,7 +84,6 @@ public partial class AlbumViewModel : ObservableObject, IFilterableAlbum, IGroup
     string? IGroupable.CountryCode => Album.CountryCode;
     DateTime IGroupable.CreatDate => Album.CreatDate;
     DateTime? IGroupable.LastListen => Album.LastListen;
-
 
     [ObservableProperty]
     public partial BitmapImage? Backdrop { get; set; }
@@ -144,7 +142,7 @@ public partial class AlbumViewModel : ObservableObject, IFilterableAlbum, IGroup
     {
         get
         {
-            TimeSpan time = TimeSpan.FromSeconds(Album.Duration);
+            var time = TimeSpan.FromSeconds(Album.Duration);
             int roundedMinutes = (int)Math.Round(time.TotalMinutes);
             return roundedMinutes.ToString();
         }
@@ -162,8 +160,6 @@ public partial class AlbumViewModel : ObservableObject, IFilterableAlbum, IGroup
         }
         set => SetProperty(ref _picture, value);
     }
-
-
 
     public AlbumViewModel(
         IBackdropLoader backdropLoader,
@@ -200,9 +196,6 @@ public partial class AlbumViewModel : ObservableObject, IFilterableAlbum, IGroup
         _logger = Guard.Against.Null(logger);
     }
 
-
-
-
     public void SetData(AlbumDto album)
     {
         Album = Guard.Against.Null(album);
@@ -225,7 +218,7 @@ public partial class AlbumViewModel : ObservableObject, IFilterableAlbum, IGroup
         if (cancellationToken.IsCancellationRequested)
             return;
 
-        await LoadTracksAsync(albumId);
+        await LoadTracksAsync(albumId, cancellationToken);
 
         if (cancellationToken.IsCancellationRequested)
             return;
@@ -257,7 +250,6 @@ public partial class AlbumViewModel : ObservableObject, IFilterableAlbum, IGroup
         Backdrop = null;
     }
 
-
     private CancellationToken InitNavigationCancellation()
     {
         _navigationCts.Cancel();
@@ -266,12 +258,15 @@ public partial class AlbumViewModel : ObservableObject, IFilterableAlbum, IGroup
         return _navigationCts.Token;
     }
 
-
-    private async Task LoadTracksAsync(long albumId)
+    private async Task LoadTracksAsync(long albumId, CancellationToken cancellationToken)
     {
         List<TrackViewModel> tracks = await _dataLoader.LoadTracksAsync(albumId);
+
+        if (cancellationToken.IsCancellationRequested)
+            return;
+
         _tracks = tracks.Select(t => t.Track);
-        Tracks.AddRange(tracks);
+        Tracks.InitWithAddRange(tracks);
     }
 
     private async Task LoadAlbumAsync(long albumId)
@@ -301,7 +296,6 @@ public partial class AlbumViewModel : ObservableObject, IFilterableAlbum, IGroup
         }
     }
 
-
     private void LoadBackrop()
     {
         CancellationToken token = _navigationCts.Token;
@@ -312,7 +306,6 @@ public partial class AlbumViewModel : ObservableObject, IFilterableAlbum, IGroup
                 Backdrop = backdropImage;
         });
     }
-
 
     private async Task CalculatePictureDominantColorAsync()
     {
@@ -373,7 +366,6 @@ public partial class AlbumViewModel : ObservableObject, IFilterableAlbum, IGroup
             Messenger.Send(new AlbumUpdateMessage(Album.Id, ActionType.Update));
     }
 
-
     [RelayCommand]
     private void AlbumOpen()
     {
@@ -398,7 +390,7 @@ public partial class AlbumViewModel : ObservableObject, IFilterableAlbum, IGroup
     private async Task ListenAsync(TrackViewModel? startTrack = null)
     {
         if (_tracks == null)
-            await LoadTracksAsync(Album.Id);
+            await LoadTracksAsync(Album.Id, CancellationToken.None);
 
         if (_tracks?.Any() == true)
             _playerService.LoadPlaylist(_tracks.ToList(), startTrack?.Track);
