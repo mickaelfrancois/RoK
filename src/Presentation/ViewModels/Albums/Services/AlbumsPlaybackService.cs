@@ -14,11 +14,9 @@ public class AlbumsPlaybackService(IMediator mediator, IPlayerService playerServ
             return;
         }
 
-        List<TrackDto> tracks = (await mediator.SendMessageAsync(new GetTracksByAlbumListQuery { AlbumsId = albumIds.ToList() })).ToList();
+        var tracks = (await mediator.SendMessageAsync(new GetTracksByAlbumListQuery { AlbumsId = albumIds.ToList() })).ToList();
 
-        if (albumIds.Count() == 1)
-            TracksRandomizer.Randomize(tracks);
-        else
+        if (albumIds.Count() > 1)
             TracksRandomizer.ArtistBalancedTrackRandomize(tracks, 0);
 
         playerService.LoadPlaylist(tracks.ToList());

@@ -289,14 +289,17 @@ public partial class ArtistViewModel : ObservableObject, IFilterableArtist, IGro
 
         await LoadArtistAsync(artistId);
 
+        if (cancellationToken.IsCancellationRequested)
+            return;
+
         if (loadAlbums)
-            await LoadAlbumsAsync(artistId);
+            await LoadAlbumsAsync(artistId, cancellationToken);
 
         if (cancellationToken.IsCancellationRequested)
             return;
 
         if (loadTracks)
-            await LoadTracksAsync(artistId);
+            await LoadTracksAsync(artistId, cancellationToken);
 
         if (cancellationToken.IsCancellationRequested)
             return;
@@ -401,17 +404,25 @@ public partial class ArtistViewModel : ObservableObject, IFilterableArtist, IGro
         }
     }
 
-    private async Task LoadAlbumsAsync(long artistId)
+    private async Task LoadAlbumsAsync(long artistId, CancellationToken cancellationToken)
     {
         List<AlbumViewModel> albums = await _dataLoader.LoadAlbumsAsync(artistId);
-        Albums.AddRange(albums);
+
+        if (cancellationToken.IsCancellationRequested)
+            return;
+
+        Albums.InitWithAddRange(albums);
     }
 
-    private async Task LoadTracksAsync(long artistId)
+    private async Task LoadTracksAsync(long artistId, CancellationToken cancellationToken)
     {
         List<TrackViewModel> tracks = await _dataLoader.LoadTracksAsync(artistId);
+
+        if (cancellationToken.IsCancellationRequested)
+            return;
+
         _tracks = tracks.Select(t => t.Track);
-        Tracks.AddRange(tracks);
+        Tracks.InitWithAddRange(tracks);
 
         OnPropertyChanged(nameof(DurationTotal));
     }
@@ -499,7 +510,7 @@ public partial class ArtistViewModel : ObservableObject, IFilterableArtist, IGro
     private async Task ListenAsync()
     {
         if (_tracks == null)
-            await LoadTracksAsync(Artist.Id);
+            await LoadTracksAsync(Artist.Id, CancellationToken.None);
 
         if (_tracks?.Any() == true)
         {
