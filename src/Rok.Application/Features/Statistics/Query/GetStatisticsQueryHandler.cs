@@ -1,8 +1,6 @@
-﻿using Rok.Application.Interfaces;
-using Rok.Application.Interfaces.Repositories;
+﻿using Rok.Application.Interfaces.Repositories;
 
 namespace Rok.Application.Features.Statistics.Query;
-
 
 public class GetStatisticsQuery : IQuery<UserStatisticsDto>
 {
@@ -12,15 +10,15 @@ public class GetStatisticsQueryHandler(ITrackRepository _trackRepository, IAlbum
 {
     public async Task<UserStatisticsDto> HandleAsync(GetStatisticsQuery request, CancellationToken cancellationToken)
     {
-        IEnumerable<TrackEntity> tracksEnum = await _trackRepository.GetAllAsync(RepositoryConnectionKind.Background);
-        IEnumerable<AlbumEntity> albumsEnum = await _albumRepository.GetAllAsync(RepositoryConnectionKind.Background);
-        IEnumerable<ArtistEntity> artistsEnum = await _artistRepository.GetAllAsync(RepositoryConnectionKind.Background);
-        IEnumerable<GenreEntity> genresEnum = await _genreRepository.GetAllAsync(RepositoryConnectionKind.Background);
+        IEnumerable<TrackEntity> tracksEnum = await _trackRepository.GetAllAsync();
+        IEnumerable<AlbumEntity> albumsEnum = await _albumRepository.GetAllAsync();
+        IEnumerable<ArtistEntity> artistsEnum = await _artistRepository.GetAllAsync();
+        IEnumerable<GenreEntity> genresEnum = await _genreRepository.GetAllAsync();
 
-        List<TrackEntity> tracks = tracksEnum.ToList();
-        List<AlbumEntity> albums = albumsEnum.ToList();
-        List<ArtistEntity> artists = artistsEnum.ToList();
-        List<GenreEntity> genres = genresEnum.ToList();
+        var tracks = tracksEnum.ToList();
+        var albums = albumsEnum.ToList();
+        var artists = artistsEnum.ToList();
+        var genres = genresEnum.ToList();
 
         UserStatisticsDto dto = new()
         {
@@ -48,7 +46,7 @@ public class GetStatisticsQueryHandler(ITrackRepository _trackRepository, IAlbum
 
     private static void ComputeTrackTypes(UserStatisticsDto dto, List<TrackEntity> tracks)
     {
-        List<NamedCount> fileTypeGroups = tracks
+        var fileTypeGroups = tracks
              .Where(t => !string.IsNullOrWhiteSpace(t.MusicFile))
              .Select(t =>
              {
@@ -78,7 +76,7 @@ public class GetStatisticsQueryHandler(ITrackRepository _trackRepository, IAlbum
 
     private static void ComputeArtistsByGenre(UserStatisticsDto dto, List<GenreEntity> genres)
     {
-        List<NamedCount> artistsByGenre = genres
+        var artistsByGenre = genres
             .Select(g => new NamedCount { Name = string.IsNullOrWhiteSpace(g.Name) ? "unknown" : g.Name, Count = g.ArtistCount })
             .OrderByDescending(x => x.Count)
             .Take(10)

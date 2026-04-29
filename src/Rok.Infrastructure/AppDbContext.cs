@@ -25,11 +25,13 @@ public class AppDbContext(IDbConnection connection, [FromKeyedServices("Backgrou
         _migrationService.MigrateToLatest();
     }
 
-
     public IDbConnection GetOpenConnection()
     {
         if (Connection.State != ConnectionState.Open)
             Connection.Open();
+
+        if (BackgroundConnection.State != ConnectionState.Open)
+            BackgroundConnection.Open();
 
         return Connection;
     }
@@ -47,7 +49,6 @@ public class AppDbContext(IDbConnection connection, [FromKeyedServices("Backgrou
             disposedValue = true;
         }
     }
-
 
     public void Dispose()
     {
