@@ -1687,4 +1687,91 @@
   <data name="playlistsImport.Label" xml:space="preserve">
     <value>Імпорт…</value>
   </data>
+  <data name="KeyboardShortcut_Action_PlayPause" xml:space="preserve">
+    <value>Відтворити / Пауза</value>
+  </data>
+  <data name="KeyboardShortcut_Action_Next" xml:space="preserve">
+    <value>Наступний трек</value>
+  </data>
+  <data name="KeyboardShortcut_Action_Previous" xml:space="preserve">
+    <value>Попередній трек</value>
+  </data>
+  <data name="KeyboardShortcut_Action_VolumeUp" xml:space="preserve">
+    <value>Гучніше</value>
+  </data>
+  <data name="KeyboardShortcut_Action_VolumeDown" xml:space="preserve">
+    <value>Тихіше</value>
+  </data>
+  <data name="KeyboardShortcut_Action_Mute" xml:space="preserve">
+    <value>Без звуку</value>
+  </data>
+  <data name="KeyboardShortcut_Action_Shuffle" xml:space="preserve">
+    <value>Випадковий порядок</value>
+  </data>
+  <data name="KeyboardShortcut_Action_Repeat" xml:space="preserve">
+    <value>Повтор</value>
+  </data>
+  <data name="KeyboardShortcut_Action_SeekForward" xml:space="preserve">
+    <value>Уперед на 5 секунд</value>
+  </data>
+  <data name="KeyboardShortcut_Action_SeekBackward" xml:space="preserve">
+    <value>Назад на 5 секунд</value>
+  </data>
+  <data name="KeyboardShortcut_Action_OpenAlbums" xml:space="preserve">
+    <value>Альбоми</value>
+  </data>
+  <data name="KeyboardShortcut_Action_OpenArtists" xml:space="preserve">
+    <value>Виконавці</value>
+  </data>
+  <data name="KeyboardShortcut_Action_OpenTracks" xml:space="preserve">
+    <value>Треки</value>
+  </data>
+  <data name="KeyboardShortcut_Action_OpenPlaylists" xml:space="preserve">
+    <value>Списки відтворення</value>
+  </data>
+  <data name="KeyboardShortcut_Action_OpenInsights" xml:space="preserve">
+    <value>Аналітика</value>
+  </data>
+  <data name="KeyboardShortcut_Action_OpenListening" xml:space="preserve">
+    <value>Зараз грає</value>
+  </data>
+  <data name="KeyboardShortcut_Action_FocusSearch" xml:space="preserve">
+    <value>Пошук</value>
+  </data>
+  <data name="KeyboardShortcut_Action_Back" xml:space="preserve">
+    <value>Назад</value>
+  </data>
+  <data name="KeyboardShortcut_Action_ToggleFullScreen" xml:space="preserve">
+    <value>Повний екран</value>
+  </data>
+  <data name="KeyboardShortcut_Action_ToggleCompact" xml:space="preserve">
+    <value>Компактний режим</value>
+  </data>
+  <data name="KeyboardShortcut_Action_Help" xml:space="preserve">
+    <value>Показати скорочення</value>
+  </data>
+  <data name="KeyboardShortcut_Dialog_Title" xml:space="preserve">
+    <value>Клавіатурні скорочення</value>
+  </data>
+  <data name="KeyboardShortcut_Dialog_Group_Playback" xml:space="preserve">
+    <value>Відтворення</value>
+  </data>
+  <data name="KeyboardShortcut_Dialog_Group_Navigation" xml:space="preserve">
+    <value>Навігація</value>
+  </data>
+  <data name="KeyboardShortcut_Dialog_Group_Modes" xml:space="preserve">
+    <value>Режими</value>
+  </data>
+  <data name="KeyboardShortcut_Dialog_Group_Help" xml:space="preserve">
+    <value>Довідка</value>
+  </data>
+  <data name="OptionTabShortcuts.Header" xml:space="preserve">
+    <value>Клавіатурні скорочення</value>
+  </data>
+  <data name="KeyboardShortcutsDialog.Title" xml:space="preserve">
+    <value>Клавіатурні скорочення</value>
+  </data>
+  <data name="KeyboardShortcutsDialog.PrimaryButtonText" xml:space="preserve">
+    <value>Закрити</value>
+  </data>
 </root>

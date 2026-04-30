@@ -3,6 +3,7 @@ using Rok.Application.Features.Playlists.PlaylistMenu;
 using Rok.Application.Interfaces.Pictures;
 using Rok.Application.Services.Filters;
 using Rok.Application.Services.Grouping;
+using Rok.Services;
 using Rok.Services.PlayerCommand;
 using Rok.Services.PlayerCommand.Api;
 using Rok.Services.PlayerCommand.Terminal;
@@ -233,6 +234,7 @@ public static class DependencyInjection
         services.AddTransient<StartViewModel>();
         services.AddTransient<StatisticsViewModel>();
 
+        services.AddSingleton<KeyboardShortcutInstaller>();
 
         return services;
     }

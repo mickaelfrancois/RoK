@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Time.Testing;
 using Moq;
+using Rok.Application.Interfaces.Pictures;
 using Rok.Application.Messages;
 using Rok.Application.Player;
 
@@ -11,6 +12,7 @@ public class PlayerServiceTests
     private readonly Mock<IPlayerEngine> mockPlayerEngine;
     private readonly Mock<ICallDetectionService> mockCallDetectionService;
     private readonly Mock<IAppOptions> mockAppOptions;
+    private readonly Mock<IAlbumPicture> mockAlbumPicture;
     private readonly Mock<ILogger<PlayerService>> mockLogger;
     private readonly FakeTimeProvider fakeTimeProvider;
     private readonly PlayerService playerService;
@@ -21,12 +23,13 @@ public class PlayerServiceTests
         mockAppOptions = new Mock<IAppOptions>();
         mockLogger = new Mock<ILogger<PlayerService>>();
         mockCallDetectionService = new Mock<ICallDetectionService>();
+        mockAlbumPicture = new Mock<IAlbumPicture>();
         fakeTimeProvider = new FakeTimeProvider();
 
         mockPlayerEngine.Setup(o => o.SetTrack(It.IsAny<TrackDto>())).Returns(true);
         mockAppOptions.SetupGet(o => o.CrossFade).Returns(false);
 
-        playerService = new PlayerService(mockCallDetectionService.Object, mockPlayerEngine.Object, mockAppOptions.Object, null, null, fakeTimeProvider, mockLogger.Object);
+        playerService = new PlayerService(mockCallDetectionService.Object, mockPlayerEngine.Object, mockAppOptions.Object, null, null, mockAlbumPicture.Object, fakeTimeProvider, mockLogger.Object);
     }
 
     [Fact]

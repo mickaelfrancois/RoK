@@ -2,6 +2,7 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using Rok.Application.Dto;
 using Rok.Application.Interfaces;
+using Rok.Application.Interfaces.Pictures;
 using Rok.Application.Player;
 
 namespace Rok.ApplicationTests;
@@ -11,6 +12,7 @@ public class PlayerServiceCrossfadeTests
     private readonly Mock<IPlayerEngine> _engine = new();
     private readonly Mock<IAppOptions> _appOptions = new();
     private readonly Mock<ICallDetectionService> _callDetection = new();
+    private readonly Mock<IAlbumPicture> _albumPicture = new();
     private readonly Mock<ILogger<PlayerService>> _logger = new();
 
     public PlayerServiceCrossfadeTests()
@@ -20,7 +22,7 @@ public class PlayerServiceCrossfadeTests
         _appOptions.SetupGet(o => o.CrossFade).Returns(true);
     }
 
-    private PlayerService BuildService() => new(_callDetection.Object, _engine.Object, _appOptions.Object, null, null, TimeProvider.System, _logger.Object);
+    private PlayerService BuildService() => new(_callDetection.Object, _engine.Object, _appOptions.Object, null, null, _albumPicture.Object, TimeProvider.System, _logger.Object);
 
     private static TrackDto BuildTrack(long id, bool isLive = false) => new() { Id = id, Title = $"t{id}", IsAlbumLive = isLive };
 

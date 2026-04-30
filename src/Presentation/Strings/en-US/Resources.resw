@@ -1746,4 +1746,91 @@
   <data name="ExportSmartPlaylistMessage" xml:space="preserve">
     <value>The playlist will be exported as it currently is. Its smart rules will not be preserved in the file.</value>
   </data>
+  <data name="KeyboardShortcut_Action_PlayPause" xml:space="preserve">
+    <value>Play / Pause</value>
+  </data>
+  <data name="KeyboardShortcut_Action_Next" xml:space="preserve">
+    <value>Next track</value>
+  </data>
+  <data name="KeyboardShortcut_Action_Previous" xml:space="preserve">
+    <value>Previous track</value>
+  </data>
+  <data name="KeyboardShortcut_Action_VolumeUp" xml:space="preserve">
+    <value>Volume up</value>
+  </data>
+  <data name="KeyboardShortcut_Action_VolumeDown" xml:space="preserve">
+    <value>Volume down</value>
+  </data>
+  <data name="KeyboardShortcut_Action_Mute" xml:space="preserve">
+    <value>Mute</value>
+  </data>
+  <data name="KeyboardShortcut_Action_Shuffle" xml:space="preserve">
+    <value>Shuffle</value>
+  </data>
+  <data name="KeyboardShortcut_Action_Repeat" xml:space="preserve">
+    <value>Repeat</value>
+  </data>
+  <data name="KeyboardShortcut_Action_SeekForward" xml:space="preserve">
+    <value>Skip forward 5 seconds</value>
+  </data>
+  <data name="KeyboardShortcut_Action_SeekBackward" xml:space="preserve">
+    <value>Skip backward 5 seconds</value>
+  </data>
+  <data name="KeyboardShortcut_Action_OpenAlbums" xml:space="preserve">
+    <value>Albums</value>
+  </data>
+  <data name="KeyboardShortcut_Action_OpenArtists" xml:space="preserve">
+    <value>Artists</value>
+  </data>
+  <data name="KeyboardShortcut_Action_OpenTracks" xml:space="preserve">
+    <value>Tracks</value>
+  </data>
+  <data name="KeyboardShortcut_Action_OpenPlaylists" xml:space="preserve">
+    <value>Playlists</value>
+  </data>
+  <data name="KeyboardShortcut_Action_OpenInsights" xml:space="preserve">
+    <value>Insights</value>
+  </data>
+  <data name="KeyboardShortcut_Action_OpenListening" xml:space="preserve">
+    <value>Now playing</value>
+  </data>
+  <data name="KeyboardShortcut_Action_FocusSearch" xml:space="preserve">
+    <value>Focus search</value>
+  </data>
+  <data name="KeyboardShortcut_Action_Back" xml:space="preserve">
+    <value>Back</value>
+  </data>
+  <data name="KeyboardShortcut_Action_ToggleFullScreen" xml:space="preserve">
+    <value>Full screen</value>
+  </data>
+  <data name="KeyboardShortcut_Action_ToggleCompact" xml:space="preserve">
+    <value>Compact mode</value>
+  </data>
+  <data name="KeyboardShortcut_Action_Help" xml:space="preserve">
+    <value>Show keyboard shortcuts</value>
+  </data>
+  <data name="KeyboardShortcut_Dialog_Title" xml:space="preserve">
+    <value>Keyboard shortcuts</value>
+  </data>
+  <data name="KeyboardShortcut_Dialog_Group_Playback" xml:space="preserve">
+    <value>Playback</value>
+  </data>
+  <data name="KeyboardShortcut_Dialog_Group_Navigation" xml:space="preserve">
+    <value>Navigation</value>
+  </data>
+  <data name="KeyboardShortcut_Dialog_Group_Modes" xml:space="preserve">
+    <value>Modes</value>
+  </data>
+  <data name="KeyboardShortcut_Dialog_Group_Help" xml:space="preserve">
+    <value>Help</value>
+  </data>
+  <data name="OptionTabShortcuts.Header" xml:space="preserve">
+    <value>Keyboard shortcuts</value>
+  </data>
+  <data name="KeyboardShortcutsDialog.Title" xml:space="preserve">
+    <value>Keyboard shortcuts</value>
+  </data>
+  <data name="KeyboardShortcutsDialog.PrimaryButtonText" xml:space="preserve">
+    <value>Close</value>
+  </data>
 </root>

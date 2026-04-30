@@ -3,7 +3,10 @@ using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media.Animation;
 using Microsoft.UI.Xaml.Navigation;
+using Rok.Application.Player;
+using Rok.Dialogs;
 using Rok.Infrastructure;
+using Rok.Services.Accessibility;
 using Rok.ViewModels.Main;
 using Windows.Graphics;
 using Windows.System;
@@ -160,6 +163,8 @@ public sealed partial class MainWindow : Window
             if (_appOptions.RefreshLibraryAtStartup)
                 LibraryRefreshButton_Tapped(this, new TappedRoutedEventArgs());
         }
+
+        AttachGlobalShortcuts();
     }
 
 
@@ -371,6 +376,7 @@ public sealed partial class MainWindow : Window
             typeof(Pages.AlbumsPage),
             typeof(Pages.TracksPage),
             typeof(Pages.PlaylistsPage),
+            typeof(Pages.InsightsPage),
             typeof(Pages.OptionsPage),
             typeof(Pages.ListeningPage)
         ];
@@ -453,5 +459,163 @@ public sealed partial class MainWindow : Window
             if (feedbackResult == true)
                 await Launcher.LaunchUriAsync(new Uri("https://github.com/mickaelfrancois/RoK/issues/new"));
         }
+    }
+
+
+    private void AttachGlobalShortcuts()
+    {
+        KeyboardShortcutInstaller installer = App.ServiceProvider.GetRequiredService<KeyboardShortcutInstaller>();
+
+        albumsItem.KeyboardAccelerators.Add(installer.Build(ShortcutId.OpenAlbums, OnOpenAlbumsAccelerator));
+        artistsItem.KeyboardAccelerators.Add(installer.Build(ShortcutId.OpenArtists, OnOpenArtistsAccelerator));
+        tracksItem.KeyboardAccelerators.Add(installer.Build(ShortcutId.OpenTracks, OnOpenTracksAccelerator));
+        playlistItem.KeyboardAccelerators.Add(installer.Build(ShortcutId.OpenPlaylists, OnOpenPlaylistsAccelerator));
+        insightsItem.KeyboardAccelerators.Add(installer.Build(ShortcutId.OpenInsights, OnOpenInsightsAccelerator));
+
+        if (Content is FrameworkElement root)
+        {
+            root.KeyboardAccelerators.Add(installer.Build(ShortcutId.OpenListening, OnOpenListeningAccelerator));
+            root.KeyboardAccelerators.Add(installer.Build(ShortcutId.FocusSearch, OnFocusSearchAccelerator));
+            root.KeyboardAccelerators.Add(installer.Build(ShortcutId.Help, OnHelpAccelerator));
+            root.KeyboardAccelerators.Add(installer.Build(ShortcutId.ToggleFullScreen, OnToggleFullScreenAccelerator));
+            root.KeyboardAccelerators.Add(installer.Build(ShortcutId.ToggleCompact, OnToggleCompactAccelerator));
+            root.KeyboardAccelerators.Add(installer.Build(ShortcutId.Back, OnBackAccelerator));
+        }
+    }
+
+
+    private bool IsInFullScreenMode() => FullScreenGrid.Visibility == Visibility.Visible;
+
+
+    private bool IsInCompactMode() => gridCompactScreen.Visibility == Visibility.Visible;
+
+
+    private void EnsureNormalMode()
+    {
+        if (IsInFullScreenMode())
+            Messenger.Send(new FullScreenMessage(false));
+
+        if (IsInCompactMode())
+            Messenger.Send(new CompactModeMessage());
+    }
+
+
+    private void NavigateToPage(Type pageType, NavigationViewItem? menuItem)
+    {
+        EnsureNormalMode();
+
+        if (menuItem != null)
+            navMenu.SelectedItem = menuItem;
+
+        _navigationService.NavigateTo(pageType);
+    }
+
+
+    private void OnOpenAlbumsAccelerator(KeyboardAccelerator sender, KeyboardAcceleratorInvokedEventArgs args)
+    {
+        args.Handled = true;
+        NavigateToPage(typeof(Pages.AlbumsPage), albumsItem);
+    }
+
+
+    private void OnOpenArtistsAccelerator(KeyboardAccelerator sender, KeyboardAcceleratorInvokedEventArgs args)
+    {
+        args.Handled = true;
+        NavigateToPage(typeof(Pages.ArtistsPage), artistsItem);
+    }
+
+
+    private void OnOpenTracksAccelerator(KeyboardAccelerator sender, KeyboardAcceleratorInvokedEventArgs args)
+    {
+        args.Handled = true;
+        NavigateToPage(typeof(Pages.TracksPage), tracksItem);
+    }
+
+
+    private void OnOpenPlaylistsAccelerator(KeyboardAccelerator sender, KeyboardAcceleratorInvokedEventArgs args)
+    {
+        args.Handled = true;
+        NavigateToPage(typeof(Pages.PlaylistsPage), playlistItem);
+    }
+
+
+    private void OnOpenInsightsAccelerator(KeyboardAccelerator sender, KeyboardAcceleratorInvokedEventArgs args)
+    {
+        args.Handled = true;
+        NavigateToPage(typeof(Pages.InsightsPage), insightsItem);
+    }
+
+
+    private void OnOpenListeningAccelerator(KeyboardAccelerator sender, KeyboardAcceleratorInvokedEventArgs args)
+    {
+        args.Handled = true;
+
+        IPlayerService playerService = App.ServiceProvider.GetRequiredService<IPlayerService>();
+
+        if (playerService.CurrentTrack == null)
+            return;
+
+        NavigateToPage(typeof(Pages.ListeningPage), menuItem: null);
+    }
+
+
+    private void OnFocusSearchAccelerator(KeyboardAccelerator sender, KeyboardAcceleratorInvokedEventArgs args)
+    {
+        args.Handled = true;
+        EnsureNormalMode();
+        searchBox.Focus(FocusState.Keyboard);
+    }
+
+
+    private async void OnHelpAccelerator(KeyboardAccelerator sender, KeyboardAcceleratorInvokedEventArgs args)
+    {
+        args.Handled = true;
+
+        KeyboardShortcutsDialog dialog = new()
+        {
+            XamlRoot = Content.XamlRoot
+        };
+        await dialog.ShowAsync();
+    }
+
+
+    private void OnToggleFullScreenAccelerator(KeyboardAccelerator sender, KeyboardAcceleratorInvokedEventArgs args)
+    {
+        args.Handled = true;
+        Messenger.Send(new FullScreenMessage(!IsInFullScreenMode()));
+    }
+
+
+    private void OnToggleCompactAccelerator(KeyboardAccelerator sender, KeyboardAcceleratorInvokedEventArgs args)
+    {
+        args.Handled = true;
+        Messenger.Send(new CompactModeMessage());
+    }
+
+
+    private void OnBackAccelerator(KeyboardAccelerator sender, KeyboardAcceleratorInvokedEventArgs args)
+    {
+        if (IsInFullScreenMode())
+        {
+            Messenger.Send(new FullScreenMessage(false));
+            args.Handled = true;
+            return;
+        }
+
+        if (IsInCompactMode())
+        {
+            Messenger.Send(new CompactModeMessage());
+            args.Handled = true;
+            return;
+        }
+
+        if (ContentFrame.CanGoBack)
+        {
+            ContentFrame.GoBack();
+            args.Handled = true;
+            return;
+        }
+
+        args.Handled = false;
     }
 }

@@ -1629,4 +1629,91 @@
   <data name="playlistsImport.Label" xml:space="preserve">
     <value>Importar…</value>
   </data>
+  <data name="KeyboardShortcut_Action_PlayPause" xml:space="preserve">
+    <value>Reproducir / Pausar</value>
+  </data>
+  <data name="KeyboardShortcut_Action_Next" xml:space="preserve">
+    <value>Pista siguiente</value>
+  </data>
+  <data name="KeyboardShortcut_Action_Previous" xml:space="preserve">
+    <value>Pista anterior</value>
+  </data>
+  <data name="KeyboardShortcut_Action_VolumeUp" xml:space="preserve">
+    <value>Subir volumen</value>
+  </data>
+  <data name="KeyboardShortcut_Action_VolumeDown" xml:space="preserve">
+    <value>Bajar volumen</value>
+  </data>
+  <data name="KeyboardShortcut_Action_Mute" xml:space="preserve">
+    <value>Silenciar</value>
+  </data>
+  <data name="KeyboardShortcut_Action_Shuffle" xml:space="preserve">
+    <value>Reproducción aleatoria</value>
+  </data>
+  <data name="KeyboardShortcut_Action_Repeat" xml:space="preserve">
+    <value>Repetir</value>
+  </data>
+  <data name="KeyboardShortcut_Action_SeekForward" xml:space="preserve">
+    <value>Avanzar 5 segundos</value>
+  </data>
+  <data name="KeyboardShortcut_Action_SeekBackward" xml:space="preserve">
+    <value>Retroceder 5 segundos</value>
+  </data>
+  <data name="KeyboardShortcut_Action_OpenAlbums" xml:space="preserve">
+    <value>Álbumes</value>
+  </data>
+  <data name="KeyboardShortcut_Action_OpenArtists" xml:space="preserve">
+    <value>Artistas</value>
+  </data>
+  <data name="KeyboardShortcut_Action_OpenTracks" xml:space="preserve">
+    <value>Pistas</value>
+  </data>
+  <data name="KeyboardShortcut_Action_OpenPlaylists" xml:space="preserve">
+    <value>Listas</value>
+  </data>
+  <data name="KeyboardShortcut_Action_OpenInsights" xml:space="preserve">
+    <value>Estadísticas</value>
+  </data>
+  <data name="KeyboardShortcut_Action_OpenListening" xml:space="preserve">
+    <value>Reproduciendo</value>
+  </data>
+  <data name="KeyboardShortcut_Action_FocusSearch" xml:space="preserve">
+    <value>Buscar</value>
+  </data>
+  <data name="KeyboardShortcut_Action_Back" xml:space="preserve">
+    <value>Atrás</value>
+  </data>
+  <data name="KeyboardShortcut_Action_ToggleFullScreen" xml:space="preserve">
+    <value>Pantalla completa</value>
+  </data>
+  <data name="KeyboardShortcut_Action_ToggleCompact" xml:space="preserve">
+    <value>Modo compacto</value>
+  </data>
+  <data name="KeyboardShortcut_Action_Help" xml:space="preserve">
+    <value>Mostrar atajos</value>
+  </data>
+  <data name="KeyboardShortcut_Dialog_Title" xml:space="preserve">
+    <value>Atajos de teclado</value>
+  </data>
+  <data name="KeyboardShortcut_Dialog_Group_Playback" xml:space="preserve">
+    <value>Reproducción</value>
+  </data>
+  <data name="KeyboardShortcut_Dialog_Group_Navigation" xml:space="preserve">
+    <value>Navegación</value>
+  </data>
+  <data name="KeyboardShortcut_Dialog_Group_Modes" xml:space="preserve">
+    <value>Modos</value>
+  </data>
+  <data name="KeyboardShortcut_Dialog_Group_Help" xml:space="preserve">
+    <value>Ayuda</value>
+  </data>
+  <data name="OptionTabShortcuts.Header" xml:space="preserve">
+    <value>Atajos de teclado</value>
+  </data>
+  <data name="KeyboardShortcutsDialog.Title" xml:space="preserve">
+    <value>Atajos de teclado</value>
+  </data>
+  <data name="KeyboardShortcutsDialog.PrimaryButtonText" xml:space="preserve">
+    <value>Cerrar</value>
+  </data>
 </root>

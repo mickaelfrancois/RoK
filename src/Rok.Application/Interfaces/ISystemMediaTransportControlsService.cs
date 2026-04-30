@@ -1,3 +1,5 @@
+using Rok.Application.Dto;
+
 namespace Rok.Application.Interfaces;
 
 /// <summary>
@@ -10,7 +12,9 @@ public interface ISystemMediaTransportControlsService : IDisposable
 
     void Initialize();
 
-    void UpdatePlaybackState(bool isPlaying);
+    void UpdatePlaybackState(Player.PlaybackStatus status);
 
-    void UpdateTrackInfo(TrackDto track);
+    void UpdateTrackInfo(TrackDto track, string? coverPath);
+
+    void UpdateTimeline(TimeSpan position, TimeSpan duration);
 }

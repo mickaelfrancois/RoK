@@ -62,6 +62,18 @@
                 </Border>
             </PivotItem>
 
+            <PivotItem x:Uid="OptionTabShortcuts">
+                <Border Background="{ThemeResource CardBackgroundFillColorDefault}"
+                        Padding="4"
+                        CornerRadius="12"
+                        Margin="8">
+                    <ScrollViewer VerticalScrollBarVisibility="Auto"
+                                  Padding="6,12,12,12">
+                        <controls:KeyboardShortcutsView />
+                    </ScrollViewer>
+                </Border>
+            </PivotItem>
+
             <PivotItem x:Uid="OptionTabLibrary">
                 <Border Background="{ThemeResource CardBackgroundFillColorDefault}"
                         Padding="4"

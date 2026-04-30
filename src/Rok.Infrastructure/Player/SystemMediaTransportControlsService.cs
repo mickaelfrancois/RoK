@@ -5,6 +5,8 @@ using Rok.Application.Messages;
 using Rok.Application.Player;
 using Windows.Media;
 using Windows.Media.Playback;
+using Windows.Storage;
+using Windows.Storage.Streams;
 
 namespace Rok.Infrastructure.Player;
 
@@ -99,7 +101,7 @@ public sealed class SystemMediaTransportControlsService(ILogger<SystemMediaTrans
         }
     }
 
-    public void UpdatePlaybackState(bool isPlaying)
+    public void UpdatePlaybackState(PlaybackStatus status)
     {
         if (_smtc is null)
         {
@@ -109,9 +111,14 @@ public sealed class SystemMediaTransportControlsService(ILogger<SystemMediaTrans
 
         try
         {
-            MediaPlaybackStatus newStatus = isPlaying
-                ? MediaPlaybackStatus.Playing
-                : MediaPlaybackStatus.Paused;
+            MediaPlaybackStatus newStatus = status switch
+            {
+                PlaybackStatus.Playing => MediaPlaybackStatus.Playing,
+                PlaybackStatus.Paused => MediaPlaybackStatus.Paused,
+                PlaybackStatus.Stopped => MediaPlaybackStatus.Stopped,
+                PlaybackStatus.Closed => MediaPlaybackStatus.Closed,
+                _ => MediaPlaybackStatus.Stopped
+            };
 
             logger.LogInformation("SMTC: Updating playback state from {OldStatus} to {NewStatus}", _smtc.PlaybackStatus, newStatus);
 
@@ -119,8 +126,6 @@ public sealed class SystemMediaTransportControlsService(ILogger<SystemMediaTrans
 
             _smtc.IsPlayEnabled = true;
             _smtc.IsPauseEnabled = true;
-
-            logger.LogDebug("SMTC: Play and Pause buttons re-enabled");
         }
         catch (Exception ex)
         {
@@ -128,7 +133,7 @@ public sealed class SystemMediaTransportControlsService(ILogger<SystemMediaTrans
         }
     }
 
-    public void UpdateTrackInfo(TrackDto track)
+    public async void UpdateTrackInfo(TrackDto track, string? coverPath)
     {
         if (_smtc is null)
             return;
@@ -140,6 +145,25 @@ public sealed class SystemMediaTransportControlsService(ILogger<SystemMediaTrans
             updater.MusicProperties.Title = track.Title;
             updater.MusicProperties.Artist = track.ArtistName;
             updater.MusicProperties.AlbumTitle = track.AlbumName;
+
+            if (!string.IsNullOrEmpty(coverPath))
+            {
+                try
+                {
+                    StorageFile coverFile = await StorageFile.GetFileFromPathAsync(coverPath);
+                    updater.Thumbnail = RandomAccessStreamReference.CreateFromFile(coverFile);
+                }
+                catch (Exception coverEx)
+                {
+                    logger.LogDebug(coverEx, "SMTC: failed to load cover from {CoverPath}", coverPath);
+                    updater.Thumbnail = null;
+                }
+            }
+            else
+            {
+                updater.Thumbnail = null;
+            }
+
             updater.Update();
 
             logger.LogDebug("SMTC: Updated track info — {Title} by {Artist}", track.Title, track.ArtistName);
@@ -147,6 +171,30 @@ public sealed class SystemMediaTransportControlsService(ILogger<SystemMediaTrans
         catch (Exception ex)
         {
             logger.LogWarning(ex, "Failed to update SMTC track info");
+        }
+    }
+
+    public void UpdateTimeline(TimeSpan position, TimeSpan duration)
+    {
+        if (_smtc is null)
+            return;
+
+        try
+        {
+            SystemMediaTransportControlsTimelineProperties timeline = new()
+            {
+                StartTime = TimeSpan.Zero,
+                EndTime = duration,
+                Position = position,
+                MinSeekTime = TimeSpan.Zero,
+                MaxSeekTime = duration
+            };
+
+            _smtc.UpdateTimelineProperties(timeline);
+        }
+        catch (Exception ex)
+        {
+            logger.LogDebug(ex, "Failed to update SMTC timeline");
         }
     }
 

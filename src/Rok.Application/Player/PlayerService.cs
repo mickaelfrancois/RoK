@@ -2,6 +2,7 @@
 using MiF.Guard;
 using MiF.SimpleMessenger;
 using Rok.Application.Interfaces;
+using Rok.Application.Interfaces.Pictures;
 using Rok.Application.Messages;
 using Rok.Application.Randomizer;
 using Rok.Infrastructure.Social;
@@ -19,6 +20,8 @@ public class PlayerService : IPlayerService
 
     private readonly ISystemMediaTransportControlsService? _smtcService;
 
+    private readonly IAlbumPicture _albumPicture;
+
     private readonly IAppOptions _appOptions;
 
     private readonly TimeProvider _timeProvider;
@@ -32,6 +35,8 @@ public class PlayerService : IPlayerService
     private static readonly TimeSpan KCallReconciliationWindow = TimeSpan.FromSeconds(3);
 
     private volatile bool _isCrossfadeRunning;
+
+    private ITimer? _smtcTimelineTimer;
 
     public EPlaybackState PlaybackState
     {
@@ -141,13 +146,14 @@ public class PlayerService : IPlayerService
 
     private readonly ILogger<PlayerService> _logger;
 
-    public PlayerService(ICallDetectionService callDetectionService, IPlayerEngine player, IAppOptions appOptions, IDiscordRichPresenceService? discordService, ISystemMediaTransportControlsService? smtcService, TimeProvider timeProvider, ILogger<PlayerService> logger)
+    public PlayerService(ICallDetectionService callDetectionService, IPlayerEngine player, IAppOptions appOptions, IDiscordRichPresenceService? discordService, ISystemMediaTransportControlsService? smtcService, IAlbumPicture albumPicture, TimeProvider timeProvider, ILogger<PlayerService> logger)
     {
         _callDetectionService = Guard.Against.Null(callDetectionService, nameof(callDetectionService));
         _player = Guard.Against.Null(player, nameof(player));
         _appOptions = Guard.Against.Null(appOptions, nameof(appOptions));
         _discordService = discordService;
         _smtcService = smtcService;
+        _albumPicture = Guard.Against.Null(albumPicture, nameof(albumPicture));
         _timeProvider = Guard.Against.Null(timeProvider, nameof(timeProvider));
         _logger = Guard.Against.Null(logger, nameof(logger));
 
@@ -342,6 +348,8 @@ public class PlayerService : IPlayerService
 
     private void Pause(PauseReason reason)
     {
+        StopSmtcTimelineTimer();
+
         PlaybackState = EPlaybackState.Paused;
         _pauseReason = reason;
         _pauseTimestampUtc = _timeProvider.GetUtcNow().UtcDateTime;
@@ -349,7 +357,7 @@ public class PlayerService : IPlayerService
         _player.Pause();
 
         _discordService?.ClearPresence();
-        _smtcService?.UpdatePlaybackState(false);
+        _smtcService?.UpdatePlaybackState(PlaybackStatus.Paused);
     }
 
     public void Play()
@@ -366,8 +374,9 @@ public class PlayerService : IPlayerService
             if (CurrentTrack != null)
             {
                 UpdateDiscordPresence(CurrentTrack, isPlaying: true);
-                _smtcService?.UpdateTrackInfo(CurrentTrack);
-                _smtcService?.UpdatePlaybackState(true);
+                _smtcService?.UpdateTrackInfo(CurrentTrack, ResolveCoverPath(CurrentTrack));
+                _smtcService?.UpdatePlaybackState(PlaybackStatus.Playing);
+                StartSmtcTimelineTimer();
             }
         }
         catch (Exception ex)
@@ -379,6 +388,8 @@ public class PlayerService : IPlayerService
 
     public void Stop(bool firePlaybackStateChange)
     {
+        StopSmtcTimelineTimer();
+
         _crossfadeCts?.Cancel();
         _player.Stop();
 
@@ -388,7 +399,7 @@ public class PlayerService : IPlayerService
         _pauseReason = PauseReason.None;
 
         _discordService?.ClearPresence();
-        _smtcService?.UpdatePlaybackState(false);
+        _smtcService?.UpdatePlaybackState(PlaybackStatus.Paused);
     }
 
     public void Skip()
@@ -412,6 +423,8 @@ public class PlayerService : IPlayerService
             {
                 // Playlist ended
                 PlaybackState = EPlaybackState.Stopped;
+                _smtcService?.UpdatePlaybackState(PlaybackStatus.Stopped);
+                StopSmtcTimelineTimer();
                 return;
             }
         }
@@ -612,8 +625,50 @@ public class PlayerService : IPlayerService
 
         PlaybackState = EPlaybackState.Playing;
         UpdateDiscordPresence(nextTrack, isPlaying: true);
-        _smtcService?.UpdateTrackInfo(nextTrack);
-        _smtcService?.UpdatePlaybackState(true);
+        _smtcService?.UpdateTrackInfo(nextTrack, ResolveCoverPath(nextTrack));
+        _smtcService?.UpdatePlaybackState(PlaybackStatus.Playing);
+    }
+
+    private string? ResolveCoverPath(TrackDto track)
+    {
+        if (string.IsNullOrEmpty(track.MusicFile))
+            return null;
+
+        string? albumDir = Path.GetDirectoryName(track.MusicFile);
+
+        if (string.IsNullOrEmpty(albumDir))
+            return null;
+
+        return _albumPicture.PictureFileExists(albumDir)
+            ? _albumPicture.GetPictureFile(albumDir)
+            : null;
+    }
+
+    private void StartSmtcTimelineTimer()
+    {
+        _smtcTimelineTimer?.Dispose();
+        _smtcTimelineTimer = _timeProvider.CreateTimer(
+            _ => OnSmtcTimelineTick(),
+            state: null,
+            dueTime: TimeSpan.FromSeconds(1),
+            period: TimeSpan.FromSeconds(1));
+    }
+
+    private void StopSmtcTimelineTimer()
+    {
+        _smtcTimelineTimer?.Dispose();
+        _smtcTimelineTimer = null;
+    }
+
+    private void OnSmtcTimelineTick()
+    {
+        if (_smtcService is null || CurrentTrack is null)
+            return;
+
+        TimeSpan position = TimeSpan.FromSeconds(_player.Position);
+        TimeSpan duration = TimeSpan.FromMilliseconds(CurrentTrack.Duration);
+
+        _smtcService.UpdateTimeline(position, duration);
     }
 
     #endregion
