@@ -347,37 +347,10 @@
                     Padding="28"
                     CornerRadius="14"
                     MaxWidth="1400">
-                <StackPanel Orientation="Vertical"
-                            HorizontalAlignment="Center"
-                            Width="Auto"
-                            MaxWidth="1200">
-
-                    <!-- Current centered lyric (large, bold) -->
-                    <ContentControl x:Name="CenteredLyricContent"
-                                    Visibility="{x:Bind PlayerViewModel.CurrentLyric.Lyric, Mode=OneWay, Converter={StaticResource StringToVisibilityConverter}}"
-                                    Content="{x:Bind PlayerViewModel.CurrentLyric.Lyric, Mode=OneWay}"
-                                    HorizontalAlignment="Center"
-                                    Margin="0">
-                        <ContentControl.Transitions>
-                            <TransitionCollection>
-                                <ContentThemeTransition />
-                            </TransitionCollection>
-                        </ContentControl.Transitions>
-
-                        <ContentControl.ContentTemplate>
-                            <DataTemplate>
-                                <TextBlock Text="{Binding}"
-                                           Foreground="White"
-                                           FontSize="52"
-                                           FontFamily="Segoe UI Variable"
-                                           FontWeight="SemiBold"
-                                           TextAlignment="Center"
-                                           TextWrapping="Wrap"
-                                           MaxWidth="1200" />
-                            </DataTemplate>
-                        </ContentControl.ContentTemplate>
-                    </ContentControl>
-                </StackPanel>
+                <local:LyricText Text="{x:Bind PlayerViewModel.CurrentLyric.Lyric, Mode=OneWay}"
+                                 LyricColor="{x:Bind PlayerViewModel.CurrentLyricIndex, Mode=OneWay, Converter={StaticResource LyricColorConverter}}"
+                                 Visibility="{x:Bind PlayerViewModel.CurrentLyric.Lyric, Mode=OneWay, Converter={StaticResource StringToVisibilityConverter}}"
+                                 HorizontalAlignment="Center" />
             </Border>
         </Grid>
 

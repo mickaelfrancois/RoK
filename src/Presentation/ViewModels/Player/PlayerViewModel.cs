@@ -139,6 +139,7 @@ public partial class PlayerViewModel : ObservableObject, IDisposable
     public string NextLyric => _stateManager.NextLyric;
     public bool IsSynchronizedLyrics => _stateManager.IsSynchronizedLyrics;
     public string? PlainLyrics => _stateManager.PlainLyrics;
+    public int CurrentLyricIndex => _stateManager.CurrentLyricIndex;
 
     public PlayerViewModel(
         IPlayerService player,
