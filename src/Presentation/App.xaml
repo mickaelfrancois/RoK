@@ -39,6 +39,7 @@
             <converters:IntToColorConverter x:Key="IntToColorConverter" />
             <converters:SecondsToReadableConverter x:Key="SecondsToReadableConverter" />
             <converters:LanguageAutoTranslationConverter x:Key="LanguageAutoTranslationConverter" />
+            <converters:LyricColorConverter x:Key="LyricColorConverter" />
             
             <converters:BoolToColorConverter x:Key="FavoriteToColorConverter">
                 <converters:BoolToColorConverter.TrueBrush>

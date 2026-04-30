@@ -89,6 +89,8 @@ public partial class PlayerStateManager : ObservableObject
 
     private int _lyricsCurrentIndex = 0;
 
+    public int CurrentLyricIndex => _lyricsCurrentIndex;
+
     public bool LyricsExist { get; set; } = false;
 
     public SyncLyricsModel SyncLyrics { get; set; } = new();
@@ -164,6 +166,7 @@ public partial class PlayerStateManager : ObservableObject
         NextLyric = string.Empty;
 
         OnPropertyChanged(nameof(CurrentLyric));
+        OnPropertyChanged(nameof(CurrentLyricIndex));
         OnPropertyChanged(nameof(LyricsLines));
         OnPropertyChanged(nameof(LyricsExist));
     }
@@ -173,6 +176,7 @@ public partial class PlayerStateManager : ObservableObject
         if (SyncLyrics == null)
             return;
 
+        int previousIndex = _lyricsCurrentIndex;
         int start = _lyricsCurrentIndex + 1;
 
         for (int i = start; i < SyncLyrics.Time.Count; i++)
@@ -183,6 +187,9 @@ public partial class PlayerStateManager : ObservableObject
                 break;
             }
         }
+
+        if (_lyricsCurrentIndex != previousIndex)
+            OnPropertyChanged(nameof(CurrentLyricIndex));
 
         if (_lyricsCurrentIndex < 0 || _lyricsCurrentIndex >= LyricsLines.Count)
             CurrentLyric = new();
