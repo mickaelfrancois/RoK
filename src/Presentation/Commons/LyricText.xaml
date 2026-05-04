@@ -63,23 +63,7 @@
                 <TranslateTransform X="2" Y="2" />
             </TextBlock.RenderTransform>
         </TextBlock>
-
-        <!-- Glow layer: same font size, slight scale via RenderTransform to avoid layout differences -->
-        <TextBlock Text="{x:Bind Text, Mode=OneWay}"
-                   Foreground="White"
-                   Opacity="0.18"
-                   FontSize="52"
-                   FontFamily="Segoe UI Variable"
-                   FontWeight="Black"
-                   TextAlignment="Center"
-                   TextWrapping="Wrap"
-                   MaxWidth="1200"
-                   RenderTransformOrigin="0.5,0.5">
-            <TextBlock.RenderTransform>
-                <ScaleTransform ScaleX="1.04" ScaleY="1.04" />
-            </TextBlock.RenderTransform>
-        </TextBlock>
-
+      
         <!-- Main text layer -->
         <TextBlock Text="{x:Bind Text, Mode=OneWay}"
                    Foreground="{x:Bind LyricColor, Mode=OneWay}"
