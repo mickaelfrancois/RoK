@@ -160,27 +160,7 @@
                 </Grid.Background>
             </Grid>
         </Grid>
-
-        <!-- Lyrics raw -->
-        <Grid Margin="0,85,00,130"
-              Opacity="0.7"
-              Visibility="{x:Bind PlayerViewModel.CurrentTrack.LyricsExists, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">
-            <ScrollViewer Background="Black"
-                          Visibility="{Binding ElementName=displayLyricsToggle, Mode=OneWay, Path=IsChecked}"
-                          HorizontalContentAlignment="Stretch">
-                <TextBlock x:Name="LyricsStatic"
-                           Foreground="White"
-                           Text="{x:Bind PlayerViewModel.PlainLyrics, Mode=OneWay}"
-                           FontSize="16"
-                           VerticalAlignment="Stretch"
-                           HorizontalAlignment="Center"
-                           HorizontalTextAlignment="Center"
-                           TextAlignment="Center"
-                           ScrollViewer.VerticalScrollBarVisibility="Visible"
-                           ScrollViewer.VerticalScrollMode="Auto" />
-            </ScrollViewer>
-        </Grid>
-
+       
         <!-- Top line -->
         <Grid Margin="0,10,0,0"
               VerticalAlignment="Top"
@@ -343,15 +323,34 @@
         <Grid VerticalAlignment="Center"
               HorizontalAlignment="Center"
               Visibility="{x:Bind PlayerViewModel.IsSynchronizedLyrics, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">
-            <Border Background="#80000000"
-                    Padding="28"
-                    CornerRadius="14"
-                    MaxWidth="1400">
-                <local:LyricText Text="{x:Bind PlayerViewModel.CurrentLyric.Lyric, Mode=OneWay}"
+            <local:LyricText Text="{x:Bind PlayerViewModel.CurrentLyric.Lyric, Mode=OneWay}"
                                  LyricColor="{x:Bind PlayerViewModel.CurrentLyricIndex, Mode=OneWay, Converter={StaticResource LyricColorConverter}}"
                                  Visibility="{x:Bind PlayerViewModel.CurrentLyric.Lyric, Mode=OneWay, Converter={StaticResource StringToVisibilityConverter}}"
                                  HorizontalAlignment="Center" />
-            </Border>
+        </Grid>
+
+        <!-- Lyrics raw -->
+        <Grid Margin="0,85,0,130"
+                Opacity="0.7"
+                MaxWidth="700"
+                HorizontalAlignment="Center"
+                 Visibility="{x:Bind PlayerViewModel.CurrentTrack.LyricsExists, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">
+            <ScrollViewer Background="Black"
+                  Visibility="{Binding ElementName=displayLyricsToggle, Mode=OneWay, Path=IsChecked}"
+                  HorizontalContentAlignment="Stretch"
+                  CornerRadius="12"
+                  Padding="16">
+                <TextBlock x:Name="LyricsStatic"
+                   Foreground="White"
+                   Text="{x:Bind PlayerViewModel.PlainLyrics, Mode=OneWay}"
+                   FontSize="16"
+                   VerticalAlignment="Stretch"
+                   HorizontalAlignment="Center"
+                   HorizontalTextAlignment="Center"
+                   TextAlignment="Center"
+                   ScrollViewer.VerticalScrollBarVisibility="Visible"
+                   ScrollViewer.VerticalScrollMode="Auto" />
+            </ScrollViewer>
         </Grid>
 
         <!-- Album cover with animation -->
