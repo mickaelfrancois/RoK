@@ -55,17 +55,17 @@ public class TrackImport(ITrackRepository _trackRepository)
     }
 
 
-    public async Task UpdateTrackAsync(TrackEntity track)
+    public Task UpdateTrackAsync(TrackEntity track)
     {
-        await _trackRepository.UpdateAsync(track, RepositoryConnectionKind.Background);
+        return _trackRepository.UpdateAsync(track, RepositoryConnectionKind.Background);
     }
 
 
-    public async Task UpdateTrackFileDateAsync(long trackId, DateTime fileDate)
+    public Task UpdateTrackFileDateAsync(long trackId, DateTime fileDate)
     {
         Guard.Against.NegativeOrZero(trackId);
 
-        await _trackRepository.UpdateFileDateAsync(trackId, fileDate, RepositoryConnectionKind.Background);
+        return _trackRepository.UpdateFileDateAsync(trackId, fileDate, RepositoryConnectionKind.Background);
     }
 
 

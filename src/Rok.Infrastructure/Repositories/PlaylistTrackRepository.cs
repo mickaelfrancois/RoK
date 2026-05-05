@@ -38,10 +38,10 @@ public class PlaylistTrackRepository(IDbConnection connection, [FromKeyedService
         return await localConnection.ExecuteScalarAsync<int>(SelectSql, new { playlistId, trackId });
     }
 
-    public async Task<IEnumerable<PlaylistTrackEntity>> GetAsync(long playlistId, RepositoryConnectionKind kind = RepositoryConnectionKind.Foreground)
+    public Task<IEnumerable<PlaylistTrackEntity>> GetAsync(long playlistId, RepositoryConnectionKind kind = RepositoryConnectionKind.Foreground)
     {
         IDbConnection localConnection = ResolveConnection(kind);
-        return await localConnection.QueryAsync<PlaylistTrackEntity>(SelectTracksSql, new { playlistId });
+        return localConnection.QueryAsync<PlaylistTrackEntity>(SelectTracksSql, new { playlistId });
     }
 
     public async Task<long> UpdatePositionAsync(long id, int position, RepositoryConnectionKind kind = RepositoryConnectionKind.Foreground)

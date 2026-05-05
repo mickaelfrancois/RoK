@@ -31,19 +31,19 @@ public class ListeningEventRepositoryTests
             new { trackId, artistId, albumId, genreId, playedAt, wasSkipped, durationPlayed, durationTotal });
     }
 
-    private static async Task SeedExtraTrackAsync(SqliteDatabaseFixture fixture, long trackId, long albumId, long artistId)
+    private static Task SeedExtraTrackAsync(SqliteDatabaseFixture fixture, long trackId, long albumId, long artistId)
     {
         DateTime now = DateTime.UtcNow;
-        await fixture.Connection.ExecuteAsync(@"
+        return fixture.Connection.ExecuteAsync(@"
             INSERT INTO Tracks(id, title, duration, size, bitrate, musicFile, fileDate, isLive, score, listenCount, skipCount, creatDate, albumId, artistId, trackNumber)
             VALUES (@id, @title, 180, 1000, 128, @file, @now, 0, 0, 0, 0, @now, @albumId, @artistId, 1)",
             new { id = trackId, title = $"track_{trackId}", file = $"/f{trackId}", now, albumId, artistId });
     }
 
-    private static async Task SeedExtraArtistAsync(SqliteDatabaseFixture fixture, long artistId, string name)
+    private static Task SeedExtraArtistAsync(SqliteDatabaseFixture fixture, long artistId, string name)
     {
         DateTime now = DateTime.UtcNow;
-        await fixture.Connection.ExecuteAsync(@"
+        return fixture.Connection.ExecuteAsync(@"
             INSERT INTO Artists(id, name, trackCount, albumCount, liveCount, compilationCount, bestofCount, totalDurationSeconds, disbanded, isFavorite, listenCount, creatDate)
             VALUES (@id, @name, 0, 0, 0, 0, 0, 0, 0, 0, 0, @now)",
             new { id = artistId, name, now });

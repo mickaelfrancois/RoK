@@ -11,7 +11,7 @@ public class PlaylistsSeed(IMediator _mediator, ResourceLoader _resourceLoader)
         await InitAlbumsOfTheYearPlaylistsAsync();
     }
 
-    private async Task InitRadioPlaylistsAsync()
+    private Task InitRadioPlaylistsAsync()
     {
         CreatePlaylistCommand playlist = new()
         {
@@ -58,10 +58,10 @@ public class PlaylistsSeed(IMediator _mediator, ResourceLoader _resourceLoader)
 
         playlist.Groups.AddRange(group1, group2);
 
-        await _mediator.SendMessageAsync(playlist);
+        return _mediator.SendMessageAsync(playlist);
     }
 
-    private async Task InitBestofPlaylistsAsync()
+    private Task InitBestofPlaylistsAsync()
     {
         CreatePlaylistCommand playlist = new()
         {
@@ -108,10 +108,10 @@ public class PlaylistsSeed(IMediator _mediator, ResourceLoader _resourceLoader)
 
         playlist.Groups.AddRange(group1, group2);
 
-        await _mediator.SendMessageAsync(playlist);
+        return _mediator.SendMessageAsync(playlist);
     }
 
-    private async Task InitAlbumsOfTheYearPlaylistsAsync()
+    private Task InitAlbumsOfTheYearPlaylistsAsync()
     {
         CreatePlaylistCommand playlist = new()
         {
@@ -140,6 +140,6 @@ public class PlaylistsSeed(IMediator _mediator, ResourceLoader _resourceLoader)
 
         playlist.Groups.Add(group1);
 
-        await _mediator.SendMessageAsync(playlist);
+        return _mediator.SendMessageAsync(playlist);
     }
 }

@@ -48,13 +48,13 @@ public class RemoveTrackFromPlaylistCommandHandler(IPlaylistTrackRepository _rep
     }
 
 
-    private async Task RemoveTrackFromPlaylistAsync(long playlistId, long trackId)
+    private Task RemoveTrackFromPlaylistAsync(long playlistId, long trackId)
     {
-        await _repository.DeleteAsync(playlistId, trackId);
+        return _repository.DeleteAsync(playlistId, trackId);
     }
 
 
-    private async Task UpdatePlaylistHeaderAsync(PlaylistHeaderEntity playlistHeader, TrackEntity track)
+    private Task UpdatePlaylistHeaderAsync(PlaylistHeaderEntity playlistHeader, TrackEntity track)
     {
         long trackDuration = Math.Max(0L, track.Duration);
 
@@ -63,7 +63,7 @@ public class RemoveTrackFromPlaylistCommandHandler(IPlaylistTrackRepository _rep
 
         playlistHeader.EditDate = DateTime.UtcNow;
 
-        await _playlistHeaderRepository.UpdateAsync(playlistHeader);
+        return _playlistHeaderRepository.UpdateAsync(playlistHeader);
     }
 }
 

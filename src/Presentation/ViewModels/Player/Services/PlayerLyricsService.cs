@@ -10,9 +10,9 @@ public class PlayerLyricsService(ILyricsService lyricsService)
         return lyricsService.CheckLyricsFileExists(musicFile) != ELyricsType.None;
     }
 
-    public async Task<LyricsModel?> LoadLyricsAsync(string musicFile)
+    public Task<LyricsModel?> LoadLyricsAsync(string musicFile)
     {
-        return await lyricsService.LoadLyricsAsync(musicFile);
+        return lyricsService.LoadLyricsAsync(musicFile);
     }
 
     public SyncLyricsModel ParseSynchronizedLyrics(string synchronizedLyrics)

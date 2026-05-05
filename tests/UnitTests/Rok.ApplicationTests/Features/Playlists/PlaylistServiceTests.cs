@@ -29,13 +29,13 @@ public class PlaylistServiceTests
     }
 
     [Fact(DisplayName = "GenerateAsync should throw when playlist is null")]
-    public async Task GenerateAsync_ShouldThrow_WhenPlaylistIsNull()
+    public Task GenerateAsync_ShouldThrow_WhenPlaylistIsNull()
     {
         // Arrange
         PlaylistService sut = new(Mock.Of<IMediator>());
 
         // Act & Assert
-        await Assert.ThrowsAsync<ArgumentNullException>(() => sut.GenerateAsync(null!));
+        return Assert.ThrowsAsync<ArgumentNullException>(() => sut.GenerateAsync(null!));
     }
 
     [Fact(DisplayName = "GenerateAsync should return empty result when playlist has no groups")]

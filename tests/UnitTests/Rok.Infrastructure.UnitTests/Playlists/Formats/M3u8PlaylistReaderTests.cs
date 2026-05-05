@@ -92,7 +92,7 @@ public class M3u8PlaylistReaderTests
     {
         // Arrange — write a tmp file inline so we can interleave blanks
         string tmp = Path.GetTempFileName();
-        File.WriteAllText(tmp, "#EXTM3U\n\n\nD:\\foo.mp3\n\n");
+        await File.WriteAllTextAsync(tmp, "#EXTM3U\n\n\nD:\\foo.mp3\n\n");
         try
         {
             M3u8PlaylistReader reader = new();

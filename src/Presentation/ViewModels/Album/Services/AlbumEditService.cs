@@ -61,13 +61,13 @@ public class AlbumEditService(IMediator mediator)
         album.IsFavorite = isFavorite;
     }
 
-    public async Task UpdateTagsAsync(long id, IEnumerable<string> tags)
+    public Task UpdateTagsAsync(long id, IEnumerable<string> tags)
     {
-        await mediator.SendMessageAsync(new UpdateAlbumTagsCommand(id, tags));
+        return mediator.SendMessageAsync(new UpdateAlbumTagsCommand(id, tags));
     }
 
-    public async Task UpdatePictureDominantColorAsync(long id, long? colorValue)
+    public Task UpdatePictureDominantColorAsync(long id, long? colorValue)
     {
-        await mediator.SendMessageAsync(new UpdateAlbumPictureDominantColorCommand(id, colorValue));
+        return mediator.SendMessageAsync(new UpdateAlbumPictureDominantColorCommand(id, colorValue));
     }
 }

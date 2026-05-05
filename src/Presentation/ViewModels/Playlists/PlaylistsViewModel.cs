@@ -104,15 +104,15 @@ public partial class PlaylistsViewModel : ObservableObject, IDisposable
     }
 
     [RelayCommand]
-    private async Task NewSmartPlaylistAsync()
+    private Task NewSmartPlaylistAsync()
     {
-        await _creationService.CreateSmartPlaylistAsync();
+        return _creationService.CreateSmartPlaylistAsync();
     }
 
     [RelayCommand]
-    private async Task NewPlaylistAsync()
+    private Task NewPlaylistAsync()
     {
-        await _creationService.CreateClassicPlaylistAsync();
+        return _creationService.CreateClassicPlaylistAsync();
     }
 
     [RelayCommand]

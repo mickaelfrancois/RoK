@@ -162,7 +162,7 @@ public class SettingsFileServiceTests
     }
 
     [Fact]
-    public async Task SaveAsync_WithNullOptions_ThrowsArgumentNullException()
+    public Task SaveAsync_WithNullOptions_ThrowsArgumentNullException()
     {
         // Arrange
         Mock<IFileSystem> fs = CreateFileSystemMock();
@@ -170,7 +170,7 @@ public class SettingsFileServiceTests
         SettingsFileService sut = new(ApplicationPath, resolver.Object, fs.Object);
 
         // Act & Assert
-        await Assert.ThrowsAsync<ArgumentNullException>(() => sut.SaveAsync(null!));
+        return Assert.ThrowsAsync<ArgumentNullException>(() => sut.SaveAsync(null!));
     }
 
     [Fact]
@@ -202,7 +202,7 @@ public class SettingsFileServiceTests
     }
 
     [Fact]
-    public async Task RemoveInvalidLibraryTokensAsync_WithNullOptions_ThrowsArgumentNullException()
+    public Task RemoveInvalidLibraryTokensAsync_WithNullOptions_ThrowsArgumentNullException()
     {
         // Arrange
         Mock<IFileSystem> fs = CreateFileSystemMock();
@@ -210,7 +210,7 @@ public class SettingsFileServiceTests
         SettingsFileService sut = new(ApplicationPath, resolver.Object, fs.Object);
 
         // Act & Assert
-        await Assert.ThrowsAsync<ArgumentNullException>(() => sut.RemoveInvalidLibraryTokensAsync(null!));
+        return Assert.ThrowsAsync<ArgumentNullException>(() => sut.RemoveInvalidLibraryTokensAsync(null!));
     }
 
     [Fact]

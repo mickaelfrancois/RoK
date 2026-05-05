@@ -26,11 +26,11 @@ public class DefaultFileSystem : IFileSystem
 
     public void DirectoryCreate(string path) => Directory.CreateDirectory(path);
 
-    public async Task<byte[]> ReadAllBytesAsync(string path, CancellationToken cancellationToken = default)
+    public Task<byte[]> ReadAllBytesAsync(string path, CancellationToken cancellationToken = default)
     {
         ValidateFile(path);
 
-        return await File.ReadAllBytesAsync(path, cancellationToken).ConfigureAwait(false);
+        return File.ReadAllBytesAsync(path, cancellationToken);
     }
 
     public async Task<string> ReadAllTextAsync(string path, CancellationToken cancellationToken = default)

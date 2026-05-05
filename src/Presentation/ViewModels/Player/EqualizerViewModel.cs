@@ -167,7 +167,7 @@ public sealed partial class EqualizerViewModel : ObservableObject
     }
 
     [RelayCommand]
-    public async Task ApplyBuiltinPreset(EqualizerBuiltinPreset preset)
+    public async Task ApplyBuiltinPresetAsync(EqualizerBuiltinPreset preset)
     {
         _suppressClearBuiltinPreset = true;
         Apply(preset.Bands);

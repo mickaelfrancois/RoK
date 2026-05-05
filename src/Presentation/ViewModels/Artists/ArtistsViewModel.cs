@@ -260,20 +260,20 @@ public partial class ArtistsViewModel : ObservableObject, IDisposable
     }
 
     [RelayCommand]
-    private async Task ListenGroupAsync(ArtistsGroupCategoryViewModel group)
+    private Task ListenGroupAsync(ArtistsGroupCategoryViewModel group)
     {
         List<long> artistIds = group.Items.Select(artist => artist.Artist.Id).ToList();
-        await _playbackService.PlayArtistsAsync(artistIds);
+        return _playbackService.PlayArtistsAsync(artistIds);
     }
 
     [RelayCommand]
-    private async Task ListenAsync()
+    private Task ListenAsync()
     {
         List<long> artistIds = Selected.Count == 0
             ? _filteredArtists.Select(artist => artist.Artist.Id).ToList()
             : SelectedItems.Select(artist => artist.Artist.Id).ToList();
 
-        await _playbackService.PlayArtistsAsync(artistIds);
+        return _playbackService.PlayArtistsAsync(artistIds);
     }
 
     [RelayCommand]

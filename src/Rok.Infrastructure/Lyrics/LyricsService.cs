@@ -88,11 +88,11 @@ public partial class LyricsService(IFileSystem fileSystem) : ILyricsService
         return null;
     }
 
-    public async Task SaveLyricsAsync(LyricsModel lyrics)
+    public Task SaveLyricsAsync(LyricsModel lyrics)
     {
         Guard.Against.Null(lyrics);
 
-        await fileSystem.WriteAllTextAsync(lyrics.File, lyrics.PlainLyrics);
+        return fileSystem.WriteAllTextAsync(lyrics.File, lyrics.PlainLyrics);
     }
 
     public static string GetRawLyrics(string text)

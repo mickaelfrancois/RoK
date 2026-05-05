@@ -127,7 +127,7 @@ public static class MenuFlyoutExtensions
         if (e.NewValue is IPlaylistMenuService newService)
         {
             AddMenuFlyoutForService(newService, menuFlyout);
-            await UpdatePlaylistMenuItems(menuFlyout, newService);
+            await UpdatePlaylistMenuItemsAsync(menuFlyout, newService);
         }
     }
 
@@ -136,9 +136,9 @@ public static class MenuFlyoutExtensions
         if (d is MenuFlyout menuFlyout && GetPlaylistMenuService(menuFlyout) is { } service)
         {
             if (menuFlyout.DispatcherQueue.HasThreadAccess)
-                _ = UpdatePlaylistMenuItems(menuFlyout, service);
+                _ = UpdatePlaylistMenuItemsAsync(menuFlyout, service);
             else
-                menuFlyout.DispatcherQueue.TryEnqueue(() => _ = UpdatePlaylistMenuItems(menuFlyout, service));
+                menuFlyout.DispatcherQueue.TryEnqueue(() => _ = UpdatePlaylistMenuItemsAsync(menuFlyout, service));
         }
     }
 
@@ -203,9 +203,9 @@ public static class MenuFlyoutExtensions
             if (wr.TryGetTarget(out MenuFlyout? mf))
             {
                 if (mf.DispatcherQueue.HasThreadAccess)
-                    _ = UpdatePlaylistMenuItems(mf, service);
+                    _ = UpdatePlaylistMenuItemsAsync(mf, service);
                 else
-                    mf.DispatcherQueue.TryEnqueue(() => _ = UpdatePlaylistMenuItems(mf, service));
+                    mf.DispatcherQueue.TryEnqueue(() => _ = UpdatePlaylistMenuItemsAsync(mf, service));
             }
         }
     }
@@ -269,7 +269,7 @@ public static class MenuFlyoutExtensions
         }
     }
 
-    private static async Task UpdatePlaylistMenuItems(MenuFlyout menuFlyout, IPlaylistMenuService service)
+    private static async Task UpdatePlaylistMenuItemsAsync(MenuFlyout menuFlyout, IPlaylistMenuService service)
     {
         ResourceLoader resourceLoader = ResourceLoader.GetForViewIndependentUse();
 
@@ -500,7 +500,7 @@ public static class MenuFlyoutExtensions
             {
                 Children = { descriptionText, textBox }
             },
-            PrimaryButtonText = resourceLoader.GetString("NewPlaylistDialog_PrimaryButton") ?? "Créer",
+            PrimaryButtonText = resourceLoader.GetString("NewPlaylistDialog_PrimaryButton") ?? "Crï¿½er",
             CloseButtonText = resourceLoader.GetString("NewPlaylistDialog_CloseButton") ?? "Annuler",
             DefaultButton = ContentDialogButton.Primary,
             XamlRoot = xamlRoot

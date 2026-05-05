@@ -231,7 +231,7 @@ public class ImportPlaylistCommandHandlerTests : IDisposable
             ImportPlaylistCommandHandler sut = BuildHandler();
 
             using CancellationTokenSource cts = new();
-            cts.Cancel();
+            await cts.CancelAsync();
 
             // Act + Assert
             await Assert.ThrowsAsync<OperationCanceledException>(() => sut.HandleAsync(new ImportPlaylistCommand(path), cts.Token));

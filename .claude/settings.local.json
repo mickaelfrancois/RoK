@@ -72,7 +72,13 @@
       "Bash(cd D:\\\\\\\\Development\\\\\\\\MF\\\\\\\\Rok)",
       "Bash(xargs -I {} cat \"{}\")",
       "Bash(cd /d)",
-      "Bash(powershell -NoProfile -Command \"cd 'D:\\\\Development\\\\MF\\\\Rok' && dotnet build /p:Platform=x64 2>&1 | Select-String '\\(error|warning|succeeded|FAILED\\)' | head -30\")"
+      "Bash(powershell -NoProfile -Command \"cd 'D:\\\\Development\\\\MF\\\\Rok' && dotnet build /p:Platform=x64 2>&1 | Select-String '\\(error|warning|succeeded|FAILED\\)' | head -30\")",
+      "Bash(python3 -c \"import sys,json; v=[x for x in json.load\\(sys.stdin\\)['versions'] if not '-' in x]; print\\(v[-5:]\\)\")",
+      "Bash(python3 -c ' *)",
+      "Bash(/usr/bin/dotnet restore *)",
+      "Bash(cmd.exe /c \"dotnet restore D:\\\\Development\\\\MF\\\\Rok\\\\Rok.slnx /p:Platform=x64\")",
+      "Bash(cmd.exe /c \"dotnet build D:\\\\Development\\\\MF\\\\Rok\\\\Rok.slnx /p:Platform=x64 --no-restore -v quiet\")",
+      "Bash(cmd.exe /c \"dotnet build D:\\\\Development\\\\MF\\\\Rok\\\\Rok.slnx /p:Platform=x64 --no-restore -v quiet 2>&1\")"
     ],
     "deny": [
       "Bash(rm -rf *)",

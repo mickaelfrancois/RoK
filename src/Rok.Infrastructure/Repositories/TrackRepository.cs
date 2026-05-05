@@ -39,10 +39,10 @@ public class TrackRepository(IDbConnection db, [FromKeyedServices("BackgroundCon
         return await ExecuteQueryAsync(sql, kind, new { playlistId });
     }
 
-    public new async Task<TrackEntity?> GetByNameAsync(string name, RepositoryConnectionKind kind = RepositoryConnectionKind.Foreground)
+    public new Task<TrackEntity?> GetByNameAsync(string name, RepositoryConnectionKind kind = RepositoryConnectionKind.Foreground)
     {
         string sql = GetSelectQuery("title") + DefaultGroupBy;
-        return await QuerySingleOrDefaultAsync(sql, kind, new { title = name });
+        return QuerySingleOrDefaultAsync(sql, kind, new { title = name });
     }
 
     public async Task<IEnumerable<TrackEntity>> GetByGenreIdAsync(long genreId, RepositoryConnectionKind kind = RepositoryConnectionKind.Foreground)
@@ -114,44 +114,44 @@ public class TrackRepository(IDbConnection db, [FromKeyedServices("BackgroundCon
         return await ExecuteQueryAsync(sql, kind, new { sampledAlbumIds, limit });
     }
 
-    public async Task<bool> UpdateScoreAsync(long id, int score, RepositoryConnectionKind kind = RepositoryConnectionKind.Foreground)
+    public Task<bool> UpdateScoreAsync(long id, int score, RepositoryConnectionKind kind = RepositoryConnectionKind.Foreground)
     {
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(id);
 
-        return await ExecuteUpdateAsync(UpdateScoreSql, new { score, id }, kind);
+        return ExecuteUpdateAsync(UpdateScoreSql, new { score, id }, kind);
     }
 
-    public async Task<bool> UpdateLastListenAsync(long id, RepositoryConnectionKind kind = RepositoryConnectionKind.Foreground)
+    public Task<bool> UpdateLastListenAsync(long id, RepositoryConnectionKind kind = RepositoryConnectionKind.Foreground)
     {
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(id);
 
-        return await ExecuteUpdateAsync(UpdateLastListenSql, new { lastListen = DateTime.UtcNow, id }, kind);
+        return ExecuteUpdateAsync(UpdateLastListenSql, new { lastListen = DateTime.UtcNow, id }, kind);
     }
 
-    public async Task<bool> ResetListenCountAsync(RepositoryConnectionKind kind = RepositoryConnectionKind.Foreground)
+    public Task<bool> ResetListenCountAsync(RepositoryConnectionKind kind = RepositoryConnectionKind.Foreground)
     {
-        return await ExecuteUpdateAsync(ResetListenCountSql, kind);
+        return ExecuteUpdateAsync(ResetListenCountSql, kind);
     }
 
-    public async Task<bool> UpdateSkipCountAsync(long id, RepositoryConnectionKind kind = RepositoryConnectionKind.Foreground)
-    {
-        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(id);
-
-        return await ExecuteUpdateAsync(UpdateSkipCountSql, new { lastSkip = DateTime.UtcNow, id }, kind);
-    }
-
-    public async Task<bool> UpdateFileDateAsync(long id, DateTime fileDate, RepositoryConnectionKind kind = RepositoryConnectionKind.Foreground)
+    public Task<bool> UpdateSkipCountAsync(long id, RepositoryConnectionKind kind = RepositoryConnectionKind.Foreground)
     {
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(id);
 
-        return await ExecuteUpdateAsync(UpdateFileDateSql, new { fileDate, id }, kind);
+        return ExecuteUpdateAsync(UpdateSkipCountSql, new { lastSkip = DateTime.UtcNow, id }, kind);
     }
 
-    public async Task<bool> UpdateGetLyricsLastAttemptAsync(long id, RepositoryConnectionKind kind = RepositoryConnectionKind.Foreground)
+    public Task<bool> UpdateFileDateAsync(long id, DateTime fileDate, RepositoryConnectionKind kind = RepositoryConnectionKind.Foreground)
     {
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(id);
 
-        return await ExecuteUpdateAsync(UpdateGetLyricsLastAttemptSql, new { lastAttemptDate = DateTime.UtcNow, id }, kind);
+        return ExecuteUpdateAsync(UpdateFileDateSql, new { fileDate, id }, kind);
+    }
+
+    public Task<bool> UpdateGetLyricsLastAttemptAsync(long id, RepositoryConnectionKind kind = RepositoryConnectionKind.Foreground)
+    {
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(id);
+
+        return ExecuteUpdateAsync(UpdateGetLyricsLastAttemptSql, new { lastAttemptDate = DateTime.UtcNow, id }, kind);
     }
 
     public async Task<TrackEntity?> GetByFilePathAsync(string filePath, CancellationToken cancellationToken)

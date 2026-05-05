@@ -17,7 +17,7 @@ public sealed partial class ReviewPromptControl : UserControl
     /// Shows the dialog and waits for a user interaction.
     /// Returns true (primary), false (secondary), or null (dismissed).
     /// </summary>
-    public async Task<bool?> ShowAsync(string icon, string title, string body, string primaryText, string secondaryText)
+    public Task<bool?> ShowAsync(string icon, string title, string body, string primaryText, string secondaryText)
     {
         IconGlyph.Glyph = icon;
         TitleBlock.Text = title;
@@ -29,7 +29,7 @@ public sealed partial class ReviewPromptControl : UserControl
         ((Storyboard)Resources["ShowStoryboard"]).Begin();
 
         _tcs = new TaskCompletionSource<bool?>();
-        return await _tcs.Task;
+        return _tcs.Task;
     }
 
     private async Task HideAsync()

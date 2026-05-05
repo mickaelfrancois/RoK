@@ -14,35 +14,35 @@ public class GenreRepository(IDbConnection connection, [FromKeyedServices("Backg
     private const string DeleteOrphansSql = "DELETE FROM genres WHERE id NOT IN (SELECT DISTINCT genreId FROM tracks WHERE genreId IS NOT NULL)";
 
 
-    public async Task<bool> UpdateFavoriteAsync(long id, bool isFavorite, RepositoryConnectionKind kind = RepositoryConnectionKind.Foreground)
+    public Task<bool> UpdateFavoriteAsync(long id, bool isFavorite, RepositoryConnectionKind kind = RepositoryConnectionKind.Foreground)
     {
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(id);
 
-        return await ExecuteUpdateAsync(UpdateFavoriteSql, new { isFavorite, id }, kind);
+        return ExecuteUpdateAsync(UpdateFavoriteSql, new { isFavorite, id }, kind);
     }
 
-    public async Task<bool> UpdateLastListenAsync(long id, RepositoryConnectionKind kind = RepositoryConnectionKind.Foreground)
+    public Task<bool> UpdateLastListenAsync(long id, RepositoryConnectionKind kind = RepositoryConnectionKind.Foreground)
     {
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(id);
 
-        return await ExecuteUpdateAsync(UpdateLastListenSql, new { lastListen = DateTime.UtcNow, id }, kind);
+        return ExecuteUpdateAsync(UpdateLastListenSql, new { lastListen = DateTime.UtcNow, id }, kind);
     }
 
-    public async Task<bool> ResetListenCountAsync(RepositoryConnectionKind kind = RepositoryConnectionKind.Foreground)
+    public Task<bool> ResetListenCountAsync(RepositoryConnectionKind kind = RepositoryConnectionKind.Foreground)
     {
-        return await ExecuteUpdateAsync(ResetListenCountSql, kind);
+        return ExecuteUpdateAsync(ResetListenCountSql, kind);
     }
 
-    public async Task<int> DeleteOrphansAsync(RepositoryConnectionKind kind = RepositoryConnectionKind.Foreground)
+    public Task<int> DeleteOrphansAsync(RepositoryConnectionKind kind = RepositoryConnectionKind.Foreground)
     {
-        return await ExecuteNonQueryAsync(DeleteOrphansSql);
+        return ExecuteNonQueryAsync(DeleteOrphansSql);
     }
 
-    public async Task<bool> UpdateStatisticsAsync(long id, int trackCount, int artistCount, int albumCount, int bestOfCount, int liveCount, int compilationCount, long totalDurationSeconds, RepositoryConnectionKind kind = RepositoryConnectionKind.Foreground)
+    public Task<bool> UpdateStatisticsAsync(long id, int trackCount, int artistCount, int albumCount, int bestOfCount, int liveCount, int compilationCount, long totalDurationSeconds, RepositoryConnectionKind kind = RepositoryConnectionKind.Foreground)
     {
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(id);
 
-        return await ExecuteUpdateAsync(UpdateStatisticsSql, new { trackCount, artistCount, albumCount, bestOfCount, liveCount, compilationCount, totalDurationSeconds, id });
+        return ExecuteUpdateAsync(UpdateStatisticsSql, new { trackCount, artistCount, albumCount, bestOfCount, liveCount, compilationCount, totalDurationSeconds, id });
     }
 
 
