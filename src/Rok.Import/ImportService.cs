@@ -221,9 +221,9 @@ ILogger<ImportService> logger) : IImport
         }
     }
 
-    private async Task SendMetricsAsync()
+    private Task SendMetricsAsync()
     {
-        await telemetryClient.CaptureEventAsync("metrics", "library", new Dictionary<string, object>
+        return telemetryClient.CaptureEventAsync("metrics", "library", new Dictionary<string, object>
         {
             ["tracks"] = _importTrack.CountInCache,
             ["artists"] = _importArtist.CountInCache,

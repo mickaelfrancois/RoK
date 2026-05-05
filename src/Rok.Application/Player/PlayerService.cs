@@ -10,7 +10,7 @@ using Rok.Services.Player;
 
 namespace Rok.Application.Player;
 
-public class PlayerService : IPlayerService
+public class PlayerService : IPlayerService, IDisposable
 {
     private EPlaybackState _playerState = EPlaybackState.Stopped;
 
@@ -658,6 +658,14 @@ public class PlayerService : IPlayerService
     {
         _smtcTimelineTimer?.Dispose();
         _smtcTimelineTimer = null;
+    }
+
+    public void Dispose()
+    {
+        _smtcTimelineTimer?.Dispose();
+        _smtcTimelineTimer = null;
+        _crossfadeCts?.Dispose();
+        _crossfadeCts = null;
     }
 
     private void OnSmtcTimelineTick()

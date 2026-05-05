@@ -31,18 +31,18 @@ public partial class GenericRepository<T>(IDbConnection db, [FromKeyedServices("
         return await localConnection.InsertAsync<T>(entity, _transaction);
     }
 
-    public async Task<bool> UpdateAsync(T entity, RepositoryConnectionKind kind = RepositoryConnectionKind.Foreground)
+    public Task<bool> UpdateAsync(T entity, RepositoryConnectionKind kind = RepositoryConnectionKind.Foreground)
     {
         IDbConnection localConnection = ResolveConnection(kind);
 
-        return await localConnection.UpdateAsync<T>(entity, _transaction);
+        return localConnection.UpdateAsync<T>(entity, _transaction);
     }
 
-    public async Task<bool> DeleteAsync(T entity, RepositoryConnectionKind kind = RepositoryConnectionKind.Foreground)
+    public Task<bool> DeleteAsync(T entity, RepositoryConnectionKind kind = RepositoryConnectionKind.Foreground)
     {
         IDbConnection localConnection = ResolveConnection(kind);
 
-        return await localConnection.DeleteAsync<T>(entity, _transaction);
+        return localConnection.DeleteAsync<T>(entity, _transaction);
     }
 
     public async Task<IEnumerable<T>> GetAllAsync(RepositoryConnectionKind kind = RepositoryConnectionKind.Foreground)
@@ -52,24 +52,24 @@ public partial class GenericRepository<T>(IDbConnection db, [FromKeyedServices("
         return await ExecuteQueryAsync(sql, kind);
     }
 
-    public async Task<int> CountAsync(RepositoryConnectionKind kind = RepositoryConnectionKind.Foreground)
+    public Task<int> CountAsync(RepositoryConnectionKind kind = RepositoryConnectionKind.Foreground)
     {
         string sql = $"SELECT COUNT(*) FROM {GetTableName()}";
         IDbConnection localConnection = ResolveConnection(kind);
 
-        return await localConnection.ExecuteScalarAsync<int>(sql);
+        return localConnection.ExecuteScalarAsync<int>(sql);
     }
 
-    public async Task<T?> GetByIdAsync(long id, RepositoryConnectionKind kind = RepositoryConnectionKind.Foreground)
+    public Task<T?> GetByIdAsync(long id, RepositoryConnectionKind kind = RepositoryConnectionKind.Foreground)
     {
         string sql = GetSelectQuery("id") + GetDefaultGroupBy();
-        return await QuerySingleOrDefaultAsync(sql, kind, new { id });
+        return QuerySingleOrDefaultAsync(sql, kind, new { id });
     }
 
-    public async Task<T?> GetByNameAsync(string name, RepositoryConnectionKind kind = RepositoryConnectionKind.Foreground)
+    public Task<T?> GetByNameAsync(string name, RepositoryConnectionKind kind = RepositoryConnectionKind.Foreground)
     {
         string sql = GetSelectQuery("name") + GetDefaultGroupBy();
-        return await QuerySingleOrDefaultAsync(sql, kind, new { name });
+        return QuerySingleOrDefaultAsync(sql, kind, new { name });
     }
 
     public virtual string GetSelectQuery(string? whereParam = null)

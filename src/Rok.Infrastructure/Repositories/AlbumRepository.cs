@@ -47,49 +47,49 @@ public class AlbumRepository(IDbConnection connection, [FromKeyedServices("Backg
     }
 
 
-    public async Task<bool> UpdateFavoriteAsync(long id, bool isFavorite, RepositoryConnectionKind kind = RepositoryConnectionKind.Foreground)
+    public Task<bool> UpdateFavoriteAsync(long id, bool isFavorite, RepositoryConnectionKind kind = RepositoryConnectionKind.Foreground)
     {
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(id);
 
-        return await ExecuteUpdateAsync(UpdateFavoriteSql, new { isFavorite, id }, kind);
+        return ExecuteUpdateAsync(UpdateFavoriteSql, new { isFavorite, id }, kind);
     }
 
-    public async Task<bool> UpdateLastListenAsync(long id, RepositoryConnectionKind kind = RepositoryConnectionKind.Foreground)
+    public Task<bool> UpdateLastListenAsync(long id, RepositoryConnectionKind kind = RepositoryConnectionKind.Foreground)
     {
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(id);
 
-        return await ExecuteUpdateAsync(UpdateLastListenSql, new { lastListen = DateTime.UtcNow, id }, kind);
+        return ExecuteUpdateAsync(UpdateLastListenSql, new { lastListen = DateTime.UtcNow, id }, kind);
     }
 
-    public async Task<bool> UpdatePictureDominantColorAsync(long id, long? colorValue, RepositoryConnectionKind kind = RepositoryConnectionKind.Foreground)
+    public Task<bool> UpdatePictureDominantColorAsync(long id, long? colorValue, RepositoryConnectionKind kind = RepositoryConnectionKind.Foreground)
     {
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(id);
 
-        return await ExecuteUpdateAsync(UpdateDominantColorSql, new { colorValue, id }, kind);
+        return ExecuteUpdateAsync(UpdateDominantColorSql, new { colorValue, id }, kind);
     }
 
-    public async Task<bool> ResetListenCountAsync(RepositoryConnectionKind kind = RepositoryConnectionKind.Foreground)
+    public Task<bool> ResetListenCountAsync(RepositoryConnectionKind kind = RepositoryConnectionKind.Foreground)
     {
-        return await ExecuteUpdateAsync(ResetListenCountSql, kind);
+        return ExecuteUpdateAsync(ResetListenCountSql, kind);
     }
 
-    public async Task<bool> UpdateStatisticsAsync(long id, int trackCount, long duration, RepositoryConnectionKind kind = RepositoryConnectionKind.Foreground)
-    {
-        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(id);
-
-        return await ExecuteUpdateAsync(UpdateStatisticsSql, new { trackCount, duration, id });
-    }
-
-    public async Task<bool> UpdateGetMetaDataLastAttemptAsync(long id, RepositoryConnectionKind kind = RepositoryConnectionKind.Foreground)
+    public Task<bool> UpdateStatisticsAsync(long id, int trackCount, long duration, RepositoryConnectionKind kind = RepositoryConnectionKind.Foreground)
     {
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(id);
 
-        return await ExecuteUpdateAsync(UpdateMetadataAttemptSql, new { lastAttemptDate = DateTime.UtcNow, id });
+        return ExecuteUpdateAsync(UpdateStatisticsSql, new { trackCount, duration, id });
     }
 
-    public async Task<int> DeleteOrphansAsync(RepositoryConnectionKind kind = RepositoryConnectionKind.Foreground)
+    public Task<bool> UpdateGetMetaDataLastAttemptAsync(long id, RepositoryConnectionKind kind = RepositoryConnectionKind.Foreground)
     {
-        return await ExecuteNonQueryAsync(DeleteOrphansSql);
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(id);
+
+        return ExecuteUpdateAsync(UpdateMetadataAttemptSql, new { lastAttemptDate = DateTime.UtcNow, id });
+    }
+
+    public Task<int> DeleteOrphansAsync(RepositoryConnectionKind kind = RepositoryConnectionKind.Foreground)
+    {
+        return ExecuteNonQueryAsync(DeleteOrphansSql);
     }
 
 

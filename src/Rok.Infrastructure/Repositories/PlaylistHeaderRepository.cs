@@ -12,11 +12,11 @@ public class PlaylistHeaderRepository(IDbConnection connection, [FromKeyedServic
     private const string DeletePlaylistTracksSql = "DELETE FROM playlisttracks WHERE playlistid = @id";
 
 
-    public async Task<bool> UpdatePictureAsync(long id, string picture, RepositoryConnectionKind kind = RepositoryConnectionKind.Foreground)
+    public Task<bool> UpdatePictureAsync(long id, string picture, RepositoryConnectionKind kind = RepositoryConnectionKind.Foreground)
     {
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(id);
 
-        return await ExecuteUpdateAsync(UpdatePictureSql, new { picture, id }, kind);
+        return ExecuteUpdateAsync(UpdatePictureSql, new { picture, id }, kind);
     }
 
     public async Task<int> DeleteAsync(long id, RepositoryConnectionKind kind = RepositoryConnectionKind.Foreground)

@@ -48,13 +48,13 @@ public class ArtistEditService(IMediator mediator, ILogger<ArtistEditService> lo
         }
     }
 
-    public async Task UpdateTagsAsync(long id, IEnumerable<string> tags)
+    public Task UpdateTagsAsync(long id, IEnumerable<string> tags)
     {
-        await mediator.SendMessageAsync(new UpdateArtistTagsCommand(id, tags));
+        return mediator.SendMessageAsync(new UpdateArtistTagsCommand(id, tags));
     }
 
-    public async Task UpdatePictureDominantColorAsync(long id, long? colorValue)
+    public Task UpdatePictureDominantColorAsync(long id, long? colorValue)
     {
-        await mediator.SendMessageAsync(new UpdateArtistPictureDominantColorCommand(id, colorValue));
+        return mediator.SendMessageAsync(new UpdateArtistPictureDominantColorCommand(id, colorValue));
     }
 }

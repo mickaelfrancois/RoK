@@ -19,7 +19,7 @@ public class PlaylistGenerationService(
         return playlistTracks.Tracks;
     }
 
-    private async Task SaveTracksAsync(long playlistId, List<TrackDto> tracks)
+    private Task SaveTracksAsync(long playlistId, List<TrackDto> tracks)
     {
         int index = 1;
         CreatePlaylistTracksCommand command = new() { PlaylistId = playlistId };
@@ -27,6 +27,6 @@ public class PlaylistGenerationService(
         foreach (TrackDto track in tracks)
             command.Tracks.Add(new CreatePlaylistTracksDto { TrackId = track.Id, Position = index++ });
 
-        await mediator.SendMessageAsync(command);
+        return mediator.SendMessageAsync(command);
     }
 }

@@ -236,9 +236,9 @@ public partial class TrackViewModel : ObservableObject, IDisposable, IFilterable
         OnPropertyChanged(nameof(Score));
     }
 
-    private async Task SetScoreAsync(int score)
+    private Task SetScoreAsync(int score)
     {
-        await _scoreService.UpdateScoreAsync(Track.Id, score);
+        return _scoreService.UpdateScoreAsync(Track.Id, score);
     }
 
     public async Task LoadLyricsAsync()

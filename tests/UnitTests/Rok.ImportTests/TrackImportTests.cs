@@ -85,12 +85,12 @@ public class TrackImportTests
     }
 
     [Fact(DisplayName = "UpdateTrackFileDateAsync should throw when track id is not greater than zero")]
-    public async Task UpdateTrackFileDateAsync_ShouldThrow_WhenTrackIdIsNotGreaterThanZero()
+    public Task UpdateTrackFileDateAsync_ShouldThrow_WhenTrackIdIsNotGreaterThanZero()
     {
         // Arrange
         TrackImport import = new(Mock.Of<ITrackRepository>());
 
         // Act & Assert
-        await Assert.ThrowsAsync<ArgumentException>(() => import.UpdateTrackFileDateAsync(0, DateTime.UtcNow));
+        return Assert.ThrowsAsync<ArgumentException>(() => import.UpdateTrackFileDateAsync(0, DateTime.UtcNow));
     }
 }

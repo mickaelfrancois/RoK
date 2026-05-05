@@ -96,7 +96,7 @@ internal sealed class EqualizerWindow : Window
                 CornerRadius = new CornerRadius(16),
                 MinWidth = 0
             };
-            chip.Click += async (_, _) => await viewModel.ApplyBuiltinPreset(preset);
+            chip.Click += async (_, _) => await viewModel.ApplyBuiltinPresetAsync(preset);
             chipByKey[preset.Key] = chip;
             stack.Children.Add(chip);
         }

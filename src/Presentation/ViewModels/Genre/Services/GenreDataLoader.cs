@@ -26,8 +26,8 @@ public class GenreDataLoader(IMediator mediator, IAlbumViewModelFactory albumVie
     }
 
 
-    public async Task<IEnumerable<TrackDto>> LoadTracksAsync(long genreId)
+    public Task<IEnumerable<TrackDto>> LoadTracksAsync(long genreId)
     {
-        return await mediator.SendMessageAsync(new GetTracksByGenreIdQuery(genreId));
+        return mediator.SendMessageAsync(new GetTracksByGenreIdQuery(genreId));
     }
 }

@@ -58,9 +58,9 @@ public class PlayerListenTracker(IMediator mediator)
     }
 
 
-    public async Task UpdateListeningEventsAsync(long trackId, long? artistId, long? albumId, long? genreId, long durationPlayed, long durationTotal)
+    public Task UpdateListeningEventsAsync(long trackId, long? artistId, long? albumId, long? genreId, long durationPlayed, long durationTotal)
     {
-        await mediator.SendMessageAsync(new CreateListeningEventCommand
+        return mediator.SendMessageAsync(new CreateListeningEventCommand
         {
             TrackId = trackId,
             ArtistId = artistId,

@@ -40,7 +40,7 @@ public sealed class ImportPlaylistCommandHandler(
         PlaylistFileModel model;
         try
         {
-            await using FileStream fs = File.OpenRead(command.FilePath);
+            await using FileStream fs = new(command.FilePath, FileMode.Open, FileAccess.Read);
             model = await reader.ReadAsync(fs, Path.GetFileName(command.FilePath), cancellationToken);
         }
         catch (OperationCanceledException)

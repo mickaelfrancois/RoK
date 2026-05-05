@@ -14,9 +14,9 @@ public class TrackLyricsService(IMediator mediator, ILyricsService lyricsService
     }
 
 
-    public async Task<LyricsModel?> LoadLyricsAsync(string musicFile)
+    public Task<LyricsModel?> LoadLyricsAsync(string musicFile)
     {
-        return await lyricsService.LoadLyricsAsync(musicFile);
+        return lyricsService.LoadLyricsAsync(musicFile);
     }
 
 

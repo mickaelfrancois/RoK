@@ -10,8 +10,8 @@ public class GetInsightsQuery : IQuery<InsightsDto>
 
 internal class GetInsightsQueryHandler(IListeningEventRepository repository) : IQueryHandler<GetInsightsQuery, InsightsDto>
 {
-    public async Task<InsightsDto> HandleAsync(GetInsightsQuery request, CancellationToken cancellationToken)
+    public Task<InsightsDto> HandleAsync(GetInsightsQuery request, CancellationToken cancellationToken)
     {
-        return await repository.GetInsightsAsync(request.Month);
+        return repository.GetInsightsAsync(request.Month);
     }
 }

@@ -66,12 +66,12 @@ public class EqualizerPresetRepository(IDbConnection db, [FromKeyedServices("Bac
         transaction.Commit();
     }
 
-    public async Task DeleteAsync(EqualizerScope scope, long? scopeId)
+    public Task DeleteAsync(EqualizerScope scope, long? scopeId)
     {
         if (scope == EqualizerScope.Default)
-            await _connection.ExecuteAsync(DeleteDefaultSql);
+            return _connection.ExecuteAsync(DeleteDefaultSql);
         else
-            await _connection.ExecuteAsync(DeleteSql, new { scope = scope.ToString(), scopeId });
+            return _connection.ExecuteAsync(DeleteSql, new { scope = scope.ToString(), scopeId });
     }
 
     public override string GetSelectQuery(string? whereParam = null)

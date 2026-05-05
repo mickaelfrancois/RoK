@@ -8,7 +8,7 @@ namespace Rok.Services;
 
 public sealed class DialogService(ResourceLoader resourceLoader, ITranslateService translateService) : IDialogService
 {
-    public async Task ShowTextAsync(string title, string content, bool showTranslateButton = false, string targetLanguage = "fr")
+    public Task ShowTextAsync(string title, string content, bool showTranslateButton = false, string targetLanguage = "fr")
     {
         string closeButtonText = resourceLoader.GetString("Close");
         string translateButtonText = resourceLoader.GetString("Translate");
@@ -162,7 +162,7 @@ public sealed class DialogService(ResourceLoader resourceLoader, ITranslateServi
             }
         };
 
-        await RunOnUiAsync(show);
+        return RunOnUiAsync(show);
     }
 
 

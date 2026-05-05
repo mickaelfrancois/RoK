@@ -97,24 +97,24 @@ public partial class ListeningViewModel : ObservableObject
         OnPropertyChanged(nameof(Artist));
     }
 
-    private async Task MediaChangedAsync(MediaChangedMessage message)
+    private Task MediaChangedAsync(MediaChangedMessage message)
     {
         _logger.LogDebug("Listening VM handle media changed, title {Message}.", message.NewTrack.Title);
-        await _playlistManager.SetCurrentTrackAsync(message.NewTrack);
+        return _playlistManager.SetCurrentTrackAsync(message.NewTrack);
     }
 
-    private async Task PlaylistChangedAsync(PlaylistChanged message)
+    private Task PlaylistChangedAsync(PlaylistChanged message)
     {
         _logger.LogDebug("Listening VM handle playlist changed.");
         _playlistManager.LoadTracksList(message.Tracks);
-        await _playlistManager.SetCurrentTrackAsync(_playerService.CurrentTrack);
+        return _playlistManager.SetCurrentTrackAsync(_playerService.CurrentTrack);
     }
 
     [RelayCommand]
-    private async Task AddMoreFromArtistAsync(TrackViewModel track)
+    private Task AddMoreFromArtistAsync(TrackViewModel track)
     {
         IEnumerable<long> currentTrackIds = Tracks.Select(t => t.Track.Id);
-        await _playbackService.AddMoreFromArtistAsync(track, currentTrackIds);
+        return _playbackService.AddMoreFromArtistAsync(track, currentTrackIds);
     }
 
     [RelayCommand]

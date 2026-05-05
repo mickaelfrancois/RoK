@@ -40,7 +40,6 @@ public class AddTrackToPlaylistCommandHandler(IPlaylistTrackRepository _reposito
         }
         catch (Exception)
         {
-            scope.Dispose();
             return Result<long>.Fail("Failed to add track to playlist due to an error.");
         }
 
@@ -52,7 +51,7 @@ public class AddTrackToPlaylistCommandHandler(IPlaylistTrackRepository _reposito
     }
 
 
-    private async Task<long> AddTrackToPlaylistAsync(long playlistId, long trackId)
+    private Task<long> AddTrackToPlaylistAsync(long playlistId, long trackId)
     {
         PlaylistTrackEntity playlistTrackEntity = new()
         {
@@ -60,16 +59,16 @@ public class AddTrackToPlaylistCommandHandler(IPlaylistTrackRepository _reposito
             TrackId = trackId
         };
 
-        return await _repository.AddAsync(playlistTrackEntity);
+        return _repository.AddAsync(playlistTrackEntity);
     }
 
 
-    private async Task UpdatePlaylistHeaderAsync(PlaylistHeaderEntity playlistHeader, TrackEntity track)
+    private Task UpdatePlaylistHeaderAsync(PlaylistHeaderEntity playlistHeader, TrackEntity track)
     {
         playlistHeader.Duration += track.Duration;
         playlistHeader.TrackCount += 1;
         playlistHeader.EditDate = DateTime.UtcNow;
 
-        await _playlistHeaderRepository.UpdateAsync(playlistHeader);
+        return _playlistHeaderRepository.UpdateAsync(playlistHeader);
     }
 }

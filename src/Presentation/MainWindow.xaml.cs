@@ -106,9 +106,9 @@ public sealed partial class MainWindow : Window
     }
 
 
-    private async Task SendMetricsAsync()
+    private Task SendMetricsAsync()
     {
-        await _telemetryClient.CaptureEventAsync("Event", "Start");
+        return _telemetryClient.CaptureEventAsync("Event", "Start");
     }
 
 

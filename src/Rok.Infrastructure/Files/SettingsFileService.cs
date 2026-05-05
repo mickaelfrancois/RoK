@@ -36,13 +36,13 @@ public class SettingsFileService(string applicationPath, IFolderResolver folderR
         }
     }
 
-    public async Task SaveAsync(IAppOptions options)
+    public Task SaveAsync(IAppOptions options)
     {
         Guard.Against.Null(options, nameof(options));
 
         string jsonString = JsonSerializer.Serialize(options, _jsonOptions);
 
-        await fileSystem.WriteAllTextAsync(_path, jsonString);
+        return fileSystem.WriteAllTextAsync(_path, jsonString);
     }
 
     public async Task RemoveInvalidLibraryTokensAsync(IAppOptions options)

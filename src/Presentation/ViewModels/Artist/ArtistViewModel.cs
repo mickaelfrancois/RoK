@@ -531,9 +531,9 @@ public partial class ArtistViewModel : ObservableObject, IFilterableArtist, IGro
     }
 
     [RelayCommand]
-    private async Task OpenOfficialSiteAsync()
+    private Task OpenOfficialSiteAsync()
     {
-        await _editService.OpenOfficialSiteAsync(Artist);
+        return _editService.OpenOfficialSiteAsync(Artist);
     }
 
     [RelayCommand]

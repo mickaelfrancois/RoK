@@ -28,6 +28,7 @@ public sealed class PlayerSleepModeService : IDisposable, IPlayerSleepModeServic
 
         _sleepRemaining = TimeSpan.FromMinutes(minutes);
         _isActive = true;
+        _sleepTimer?.Dispose();
         _sleepTimer = _timeProvider.CreateTimer(OnTimerTick, null, TimeSpan.FromSeconds(1), TimeSpan.FromSeconds(1));
         SleepTimerStateChanged?.Invoke(this, true);
     }

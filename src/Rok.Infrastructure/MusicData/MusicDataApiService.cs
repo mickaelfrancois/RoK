@@ -102,7 +102,7 @@ public class MusicDataApiService : IMusicDataApiService, IDisposable
             else
                 url = $"v1/artists/bymbid/{Uri.EscapeDataString(musicBrainzId)}";
 
-            artist = await GetASync<MusicDataArtistDto>(url);
+            artist = await GetAsync<MusicDataArtistDto>(url);
 
             SaveArtistToCache(artistName, artist);
         }
@@ -136,7 +136,7 @@ public class MusicDataApiService : IMusicDataApiService, IDisposable
             else
                 url = $"v1/albums/bymbid/{Uri.EscapeDataString(artistMusicBrainzId!)}/{Uri.EscapeDataString(albumMusicBrainzId)}";
 
-            album = await GetASync<MusicDataAlbumDto>(url);
+            album = await GetAsync<MusicDataAlbumDto>(url);
 
             SaveAlbumToCache(key, album);
         }
@@ -161,7 +161,7 @@ public class MusicDataApiService : IMusicDataApiService, IDisposable
         if (!_lyricsCache.TryGetValue(key, out lyrics))
         {
             string url = $"v1/lyrics?artistName={Uri.EscapeDataString(artistName)}&albumName={Uri.EscapeDataString(albumName)}&title={Uri.EscapeDataString(title)}&duration={duration}";
-            lyrics = await GetASync<MusicDataLyricsDto>(url);
+            lyrics = await GetAsync<MusicDataLyricsDto>(url);
 
             SaveLyricsToCache(key, lyrics);
         }
@@ -286,7 +286,7 @@ public class MusicDataApiService : IMusicDataApiService, IDisposable
         entry.AbsoluteExpiration = DateTime.UtcNow.AddMinutes(KCacheDelayMinutes);
     }
 
-    private async Task<T?> GetASync<T>(string url, CancellationToken cancellationToken = default)
+    private async Task<T?> GetAsync<T>(string url, CancellationToken cancellationToken = default)
     {
         T? result = default;
 

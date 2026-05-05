@@ -257,20 +257,20 @@ public partial class AlbumsViewModel : ObservableObject, IDisposable
     }
 
     [RelayCommand]
-    private async Task ListenGroupAsync(AlbumsGroupCategoryViewModel group)
+    private Task ListenGroupAsync(AlbumsGroupCategoryViewModel group)
     {
         var albumIds = group.Items.Select(album => album.Album.Id).ToList();
-        await _playbackService.PlayAlbumsAsync(albumIds);
+        return _playbackService.PlayAlbumsAsync(albumIds);
     }
 
     [RelayCommand]
-    private async Task ListenAsync()
+    private Task ListenAsync()
     {
         List<long> albumIds = Selected.Count == 0
             ? _filteredAlbums.Select(album => album.Album.Id).ToList()
             : SelectedItems.Select(album => album.Album.Id).ToList();
 
-        await _playbackService.PlayAlbumsAsync(albumIds);
+        return _playbackService.PlayAlbumsAsync(albumIds);
     }
 
     [RelayCommand]
