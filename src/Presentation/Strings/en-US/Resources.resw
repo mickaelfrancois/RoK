@@ -817,7 +817,22 @@
     <value>No albums could be found in your music folder.</value>
   </data>
   <data name="startViewAddFolder.Text" xml:space="preserve">
-    <value>Select a folder</value>
+    <value>Choose a music folder</value>
+  </data>
+  <data name="startViewErrorAccessDenied" xml:space="preserve">
+    <value>Access denied to this folder. Try a different folder or check your permissions.</value>
+  </data>
+  <data name="startViewErrorNoAudio" xml:space="preserve">
+    <value>This folder contains no compatible audio files (MP3, FLAC).</value>
+  </data>
+  <data name="startViewExplanation.Text" xml:space="preserve">
+    <value>Rok plays music stored locally on your PC. No audio files were found in your folder.</value>
+  </data>
+  <data name="startViewFormats.Text" xml:space="preserve">
+    <value>MP3 · FLAC</value>
+  </data>
+  <data name="startViewTagline.Text" xml:space="preserve">
+    <value>Local music player</value>
   </data>
   <data name="noTitle" xml:space="preserve">
     <value>{no title}</value>

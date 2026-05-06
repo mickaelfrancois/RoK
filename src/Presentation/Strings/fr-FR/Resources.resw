@@ -817,7 +817,22 @@
     <value>Aucun album n'a pu être trouvé dans votre dossier musique.</value>
   </data>
   <data name="startViewAddFolder.Text" xml:space="preserve">
-    <value>Sélectionner un dossier</value>
+    <value>Choisir un dossier de musique</value>
+  </data>
+  <data name="startViewErrorAccessDenied" xml:space="preserve">
+    <value>Accès refusé à ce dossier. Essayez un autre dossier ou vérifiez les permissions.</value>
+  </data>
+  <data name="startViewErrorNoAudio" xml:space="preserve">
+    <value>Ce dossier ne contient aucun fichier audio compatible (MP3, FLAC).</value>
+  </data>
+  <data name="startViewExplanation.Text" xml:space="preserve">
+    <value>Rok joue votre musique stockée localement sur ce PC. Aucun fichier audio n'a été trouvé dans votre dossier.</value>
+  </data>
+  <data name="startViewFormats.Text" xml:space="preserve">
+    <value>MP3 · FLAC</value>
+  </data>
+  <data name="startViewTagline.Text" xml:space="preserve">
+    <value>Lecteur de musique locale</value>
   </data>
   <data name="noTitle" xml:space="preserve">
     <value>{sans titre}</value>
