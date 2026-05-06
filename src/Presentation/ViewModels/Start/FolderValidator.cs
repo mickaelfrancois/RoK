@@ -37,5 +37,9 @@ public static class FolderValidator
             {
                 return FolderValidationResult.AccessDenied;
             }
+            catch (IOException)
+            {
+                return FolderValidationResult.AccessDenied;
+            }
         });
 }
