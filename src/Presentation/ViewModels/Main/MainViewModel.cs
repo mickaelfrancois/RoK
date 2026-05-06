@@ -64,7 +64,7 @@ public partial class MainViewModel : ObservableObject
     private void RefreshLibrary()
     {
         if (CanRefreshLibrary())
-            _importService.StartAsync(0);
+            _importService.Start(0);
     }
 
     [RelayCommand]

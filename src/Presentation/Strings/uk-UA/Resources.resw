@@ -754,11 +754,24 @@
   <data name="welcomeWaiting.Text" xml:space="preserve">
     <value>Ще хвилинку, ми готуємо ваші дані...</value>
   </data>
-  <data name="startViewErrorMessage.Text" xml:space="preserve">
-    <value>Не вдалося знайти жодного альбому у вашій папці з музикою.</value>
-  </data>
+
   <data name="startViewAddFolder.Text" xml:space="preserve">
-    <value>Оберіть теку:</value>
+    <value>Вибрати папку з музикою</value>
+  </data>
+  <data name="startViewErrorAccessDenied" xml:space="preserve">
+    <value>Доступ до цієї папки заборонено. Спробуйте іншу папку або перевірте права доступу.</value>
+  </data>
+  <data name="startViewErrorNoAudio" xml:space="preserve">
+    <value>Ця папка не містить сумісних аудіофайлів (MP3, FLAC).</value>
+  </data>
+  <data name="startViewExplanation.Text" xml:space="preserve">
+    <value>Rok відтворює музику, збережену локально на вашому ПК. У вашій папці не знайдено аудіофайлів.</value>
+  </data>
+  <data name="startViewFormats.Text" xml:space="preserve">
+    <value>MP3 · FLAC</value>
+  </data>
+  <data name="startViewTagline.Text" xml:space="preserve">
+    <value>Локальний музичний плеєр</value>
   </data>
   <data name="noTitle" xml:space="preserve">
     <value>Без назви</value>

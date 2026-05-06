@@ -696,11 +696,24 @@
   <data name="welcomeWaiting.Text" xml:space="preserve">
     <value>Un momento más, estamos preparando sus datos...</value>
   </data>
-  <data name="startViewErrorMessage.Text" xml:space="preserve">
-    <value>No se han encontrado álbumes en tu carpeta de música.</value>
-  </data>
+
   <data name="startViewAddFolder.Text" xml:space="preserve">
-    <value>Selecciona una carpeta</value>
+    <value>Elegir una carpeta de música</value>
+  </data>
+  <data name="startViewErrorAccessDenied" xml:space="preserve">
+    <value>Acceso denegado a esta carpeta. Intenta con otra carpeta o verifica los permisos.</value>
+  </data>
+  <data name="startViewErrorNoAudio" xml:space="preserve">
+    <value>Esta carpeta no contiene archivos de audio compatibles (MP3, FLAC).</value>
+  </data>
+  <data name="startViewExplanation.Text" xml:space="preserve">
+    <value>Rok reproduce música almacenada localmente en tu PC. No se encontraron archivos de audio en tu carpeta.</value>
+  </data>
+  <data name="startViewFormats.Text" xml:space="preserve">
+    <value>MP3 · FLAC</value>
+  </data>
+  <data name="startViewTagline.Text" xml:space="preserve">
+    <value>Reproductor de música local</value>
   </data>
   <data name="noTitle" xml:space="preserve">
     <value>Sin título</value>

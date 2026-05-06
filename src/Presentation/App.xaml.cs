@@ -51,6 +51,9 @@ public partial class App : Microsoft.UI.Xaml.Application
         ITelemetryClient telemetryClient = ServiceProvider.GetRequiredService<ITelemetryClient>();
         IReviewPromptEligibilityService reviewPromptEligibilityService = ServiceProvider.GetRequiredService<IReviewPromptEligibilityService>();
 
+        if (options.SessionsCount == 1)
+            _ = telemetryClient.CaptureEventAsync("Event", "FirstStart");
+
         string iconPath = Path.Combine(AppContext.BaseDirectory, "Assets/Square44x44Logo.ico");
 
         MainWindow = new MainWindow(navigationService, telemetryClient, resourceLoader, appDbContext, options, reviewPromptEligibilityService);
@@ -190,7 +193,7 @@ public partial class App : Microsoft.UI.Xaml.Application
         {
             try
             {
-                string token = StorageApplicationPermissions.FutureAccessList.Add(KnownFolders.MusicLibrary);
+                string token = StorageApplicationPermissions.FutureAccessList.Add(KnownFolders.Objects3D);
                 options.LibraryTokens.Add(token);
             }
             catch (Exception ex)

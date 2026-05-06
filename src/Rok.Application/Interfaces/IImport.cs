@@ -4,7 +4,7 @@ public interface IImport
 {
     bool UpdateInProgress { get; }
 
-    void StartAsync(int delayInSeconds);
+    void Start(int delayInSeconds);
 
     /// <summary>Cancels the import in progress and waits for it to complete.</summary>
     Task StopAsync();

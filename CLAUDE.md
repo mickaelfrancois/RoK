@@ -129,3 +129,14 @@ From `.github/copilot-instructions.md` and `.editorconfig`:
 ## Conventional Commits (enforced)
 
 `<type>(<scope>): <description>` — types: `feat, fix, docs, style, refactor, test, chore, build, ci, perf, revert`. Breaking changes need a `BREAKING CHANGE:` footer. The commit-msg hook will reject anything else.
+
+## Branch policy
+
+**Never commit directly to `master` or `main`.** Before making any code change, check the current branch with `git branch --show-current`. If on `master` or `main`, create a feature branch first:
+
+```bash
+git checkout -b <type>/<short-description>
+# e.g. git checkout -b feat/onboarding-error-state
+```
+
+Ask the user for a branch name if unsure, or propose one based on the work at hand.

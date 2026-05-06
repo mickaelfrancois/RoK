@@ -1,5 +1,4 @@
 using Microsoft.UI.Xaml.Controls;
-using Rok.ViewModels.Main;
 using Rok.ViewModels.Start;
 using Windows.Storage;
 using Windows.Storage.Pickers;
@@ -11,42 +10,34 @@ namespace Rok.Pages;
 public sealed partial class WelcomePage : Page
 {
     public StartViewModel ViewModel { get; set; }
-    public MainViewModel MainViewModel { get; set; }
 
     public WelcomePage()
     {
         InitializeComponent();
 
         ViewModel = App.ServiceProvider.GetRequiredService<StartViewModel>();
-        MainViewModel = App.ServiceProvider.GetRequiredService<MainViewModel>();
     }
 
 
     private async void Button_Click(object sender, RoutedEventArgs e)
     {
-        try
+        FolderPicker folderPicker = new()
         {
-            FolderPicker folderPicker = new()
-            {
-                ViewMode = PickerViewMode.List,
-                SuggestedStartLocation = PickerLocationId.MusicLibrary
-            };
+            ViewMode = PickerViewMode.List,
+            SuggestedStartLocation = PickerLocationId.MusicLibrary
+        };
 
-            InitializeWithWindow.Initialize(folderPicker, Rok.App.MainWindowHandle);
+        InitializeWithWindow.Initialize(folderPicker, Rok.App.MainWindowHandle);
 
-            StorageFolder? folder = await folderPicker.PickSingleFolderAsync();
+        StorageFolder? folder = await folderPicker.PickSingleFolderAsync();
 
-            if (folder is not null)
-                ViewModel.AddLibraryFolderCommand.Execute(folder);
-        }
-        catch
-        {
-        }
+        if (folder is not null)
+            ViewModel.AddLibraryFolderCommand.Execute(folder);
     }
 
     private void Grid_Loaded(object sender, RoutedEventArgs e)
     {
         FadeInStoryboard.Begin();
-        MainViewModel.RefreshLibraryCommand.Execute(this);
+        ViewModel.StartInitialScan();
     }
 }

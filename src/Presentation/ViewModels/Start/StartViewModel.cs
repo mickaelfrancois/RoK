@@ -9,7 +9,6 @@ using Windows.Storage.AccessCache;
 
 namespace Rok.ViewModels.Start;
 
-
 public partial class StartViewModel : ObservableObject
 {
     private const int KDisplayIntervalMs = 300;
@@ -25,6 +24,7 @@ public partial class StartViewModel : ObservableObject
     private readonly IImport _importService;
     private readonly IAppOptions _appOptions;
     private readonly ISettingsFile _settingsFile;
+    private readonly ITelemetryClient _telemetryClient;
 
     private readonly DispatcherQueue _dispatcherQueue = DispatcherQueue.GetForCurrentThread();
     private readonly Queue<AlbumImportedModel> _pendingAlbums = new();
@@ -32,6 +32,8 @@ public partial class StartViewModel : ObservableObject
     private readonly string _albumsImportedMessage;
     private readonly string _importBackgroundTitle;
     private readonly string _importBackgroundMessage;
+    private readonly string _errorAccessDenied;
+    private readonly string _errorNoAudioFiles;
 
     public RangeObservableCollection<AlbumImportedModel> AlbumsImported { get; } = new();
 
@@ -47,8 +49,10 @@ public partial class StartViewModel : ObservableObject
     [ObservableProperty]
     public partial double ImportProgress { get; set; } = 0;
 
+    [ObservableProperty]
+    public partial string? ErrorBannerMessage { get; set; }
 
-    public StartViewModel(IAlbumPicture albumPicture, ISettingsFile settingsFile, NavigationService navigationService, IResourceService resourceService, IMediator mediator, IImport importService, IAppOptions appOptions)
+    public StartViewModel(IAlbumPicture albumPicture, ISettingsFile settingsFile, NavigationService navigationService, IResourceService resourceService, IMediator mediator, IImport importService, IAppOptions appOptions, ITelemetryClient telemetryClient)
     {
         Debug.Assert(
             ImportMessageThrottler.MaxMessagesBeforeThrottle >= KMinAlbumsToUnlockApp,
@@ -60,10 +64,13 @@ public partial class StartViewModel : ObservableObject
         _mediator = mediator;
         _importService = importService;
         _appOptions = appOptions;
+        _telemetryClient = telemetryClient;
 
         _albumsImportedMessage = resourceService.GetString("AlbumsImported");
         _importBackgroundTitle = resourceService.GetString("notification_import_background_title");
         _importBackgroundMessage = resourceService.GetString("notification_import_background_message");
+        _errorAccessDenied = resourceService.GetString("startViewErrorAccessDenied");
+        _errorNoAudioFiles = resourceService.GetString("startViewErrorNoAudio");
 
         _displayTimer = _dispatcherQueue.CreateTimer();
         _displayTimer.Interval = TimeSpan.FromMilliseconds(KDisplayIntervalMs);
@@ -74,14 +81,12 @@ public partial class StartViewModel : ObservableObject
         Messenger.Subscribe<AlbumImportedMessage>(AlbumImported);
     }
 
-
     private void UnregisterEvents()
     {
         _displayTimer.Stop();
         Messenger.Unsubscribe<LibraryRefreshMessage>(async (message) => await LibraryRefreshChangeAsync(message));
         Messenger.Unsubscribe<AlbumImportedMessage>(AlbumImported);
     }
-
 
     private void OnDisplayTimerTick(DispatcherQueueTimer sender, object args)
     {
@@ -106,7 +111,6 @@ public partial class StartViewModel : ObservableObject
         }
     }
 
-
     private async Task LibraryRefreshChangeAsync(LibraryRefreshMessage message)
     {
         if (message.ProcessState == LibraryRefreshMessage.EState.Running)
@@ -128,6 +132,11 @@ public partial class StartViewModel : ObservableObject
                 if (trackCount == 0)
                 {
                     ErrorOccurred = true;
+                    if (_appOptions.LibraryTokens.Count > 0)
+                    {
+                        ErrorBannerMessage = _errorNoAudioFiles;
+                        _ = _telemetryClient.CaptureEventAsync("Onboarding", "NoAudioFiles");
+                    }
                 }
                 else
                 {
@@ -137,7 +146,6 @@ public partial class StartViewModel : ObservableObject
             });
         }
     }
-
 
     private void AlbumImported(AlbumImportedMessage message)
     {
@@ -165,23 +173,52 @@ public partial class StartViewModel : ObservableObject
         });
     }
 
+    public void StartInitialScan()
+    {
+        if (_appOptions.LibraryTokens.Count == 0)
+        {
+            LibraryRefreshRunning = false;
+            ErrorOccurred = true;
+            _ = _telemetryClient.CaptureEventAsync("Onboarding", "NoFolderConfigured");
+            return;
+        }
+
+        _importService.Start(0);
+    }
 
     [RelayCommand]
     private async Task AddLibraryFolderAsync(StorageFolder folder)
     {
+        FolderValidationResult validationResult = await FolderValidator.ValidateAsync(folder.Path);
+
+        if (validationResult == FolderValidationResult.AccessDenied)
+        {
+            _dispatcherQueue.TryEnqueue(() => ErrorBannerMessage = _errorAccessDenied);
+            _ = _telemetryClient.CaptureEventAsync("Onboarding", "FolderAccessDenied");
+            return;
+        }
+
+        if (validationResult == FolderValidationResult.NoAudioFiles)
+        {
+            _dispatcherQueue.TryEnqueue(() => ErrorBannerMessage = _errorNoAudioFiles);
+            _ = _telemetryClient.CaptureEventAsync("Onboarding", "FolderNoAudioFiles");
+            return;
+        }
+
         string token = Guid.NewGuid().ToString();
         StorageApplicationPermissions.FutureAccessList.AddOrReplace(token, folder);
 
-        if (!_appOptions.LibraryTokens.Contains(token))
-        {
-            _appOptions.LibraryTokens.Clear(); // In start process, we clear all library path as we haven't found music in.
-            _appOptions.LibraryTokens.Add(token);
-            await _settingsFile.SaveAsync(_appOptions);
+        _appOptions.LibraryTokens.Clear();
+        _appOptions.LibraryTokens.Add(token);
+        await _settingsFile.SaveAsync(_appOptions);
 
+        _dispatcherQueue.TryEnqueue(() =>
+        {
+            ErrorBannerMessage = null;
             ErrorOccurred = false;
             LibraryRefreshRunning = true;
+        });
 
-            _importService.StartAsync(0);
-        }
+        _importService.Start(0);
     }
 }
