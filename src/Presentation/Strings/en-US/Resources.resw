@@ -813,9 +813,7 @@
   <data name="welcomeWaiting.Text" xml:space="preserve">
     <value>Just a moment longer, we are preparing your data...</value>
   </data>
-  <data name="startViewErrorMessage.Text" xml:space="preserve">
-    <value>No albums could be found in your music folder.</value>
-  </data>
+
   <data name="startViewAddFolder.Text" xml:space="preserve">
     <value>Choose a music folder</value>
   </data>

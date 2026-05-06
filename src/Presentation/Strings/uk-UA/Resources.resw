@@ -754,9 +754,7 @@
   <data name="welcomeWaiting.Text" xml:space="preserve">
     <value>Ще хвилинку, ми готуємо ваші дані...</value>
   </data>
-  <data name="startViewErrorMessage.Text" xml:space="preserve">
-    <value>Не вдалося знайти жодного альбому у вашій папці з музикою.</value>
-  </data>
+
   <data name="startViewAddFolder.Text" xml:space="preserve">
     <value>Вибрати папку з музикою</value>
   </data>

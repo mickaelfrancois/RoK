@@ -24,24 +24,18 @@ public sealed partial class WelcomePage : Page
 
     private async void Button_Click(object sender, RoutedEventArgs e)
     {
-        try
+        FolderPicker folderPicker = new()
         {
-            FolderPicker folderPicker = new()
-            {
-                ViewMode = PickerViewMode.List,
-                SuggestedStartLocation = PickerLocationId.MusicLibrary
-            };
+            ViewMode = PickerViewMode.List,
+            SuggestedStartLocation = PickerLocationId.MusicLibrary
+        };
 
-            InitializeWithWindow.Initialize(folderPicker, Rok.App.MainWindowHandle);
+        InitializeWithWindow.Initialize(folderPicker, Rok.App.MainWindowHandle);
 
-            StorageFolder? folder = await folderPicker.PickSingleFolderAsync();
+        StorageFolder? folder = await folderPicker.PickSingleFolderAsync();
 
-            if (folder is not null)
-                ViewModel.AddLibraryFolderCommand.Execute(folder);
-        }
-        catch
-        {
-        }
+        if (folder is not null)
+            ViewModel.AddLibraryFolderCommand.Execute(folder);
     }
 
     private void Grid_Loaded(object sender, RoutedEventArgs e)

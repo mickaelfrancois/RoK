@@ -696,9 +696,7 @@
   <data name="welcomeWaiting.Text" xml:space="preserve">
     <value>Un momento más, estamos preparando sus datos...</value>
   </data>
-  <data name="startViewErrorMessage.Text" xml:space="preserve">
-    <value>No se han encontrado álbumes en tu carpeta de música.</value>
-  </data>
+
   <data name="startViewAddFolder.Text" xml:space="preserve">
     <value>Elegir una carpeta de música</value>
   </data>
