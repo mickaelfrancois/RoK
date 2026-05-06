@@ -1513,6 +1513,12 @@
   <data name="AlbumsImported" xml:space="preserve">
     <value>знайдено альбомів</value>
   </data>
+  <data name="notification_import_background_title" xml:space="preserve">
+    <value>Імпорт триває</value>
+  </data>
+  <data name="notification_import_background_message" xml:space="preserve">
+    <value>Ваші перші альбоми готові. Імпорт продовжується у фоновому режимі.</value>
+  </data>
   <data name="reviewSentimentGateTitle" xml:space="preserve">
     <value>Насолоджуєтесь Росією?</value>
   </data>
