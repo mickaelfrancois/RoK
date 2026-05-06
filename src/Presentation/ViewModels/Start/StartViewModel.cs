@@ -32,6 +32,8 @@ public partial class StartViewModel : ObservableObject
     private readonly string _albumsImportedMessage;
     private readonly string _importBackgroundTitle;
     private readonly string _importBackgroundMessage;
+    private readonly string _errorAccessDenied;
+    private readonly string _errorNoAudioFiles;
 
     public RangeObservableCollection<AlbumImportedModel> AlbumsImported { get; } = new();
 
@@ -46,6 +48,9 @@ public partial class StartViewModel : ObservableObject
 
     [ObservableProperty]
     public partial double ImportProgress { get; set; } = 0;
+
+    [ObservableProperty]
+    public partial string? ErrorBannerMessage { get; set; }
 
 
     public StartViewModel(IAlbumPicture albumPicture, ISettingsFile settingsFile, NavigationService navigationService, IResourceService resourceService, IMediator mediator, IImport importService, IAppOptions appOptions)
@@ -64,6 +69,8 @@ public partial class StartViewModel : ObservableObject
         _albumsImportedMessage = resourceService.GetString("AlbumsImported");
         _importBackgroundTitle = resourceService.GetString("notification_import_background_title");
         _importBackgroundMessage = resourceService.GetString("notification_import_background_message");
+        _errorAccessDenied = resourceService.GetString("startViewErrorAccessDenied");
+        _errorNoAudioFiles = resourceService.GetString("startViewErrorNoAudio");
 
         _displayTimer = _dispatcherQueue.CreateTimer();
         _displayTimer.Interval = TimeSpan.FromMilliseconds(KDisplayIntervalMs);
@@ -128,6 +135,7 @@ public partial class StartViewModel : ObservableObject
                 if (trackCount == 0)
                 {
                     ErrorOccurred = true;
+                    ErrorBannerMessage = _errorNoAudioFiles;
                 }
                 else
                 {
@@ -169,19 +177,34 @@ public partial class StartViewModel : ObservableObject
     [RelayCommand]
     private async Task AddLibraryFolderAsync(StorageFolder folder)
     {
+        FolderValidationResult validationResult = await FolderValidator.ValidateAsync(folder.Path);
+
+        if (validationResult == FolderValidationResult.AccessDenied)
+        {
+            _dispatcherQueue.TryEnqueue(() => ErrorBannerMessage = _errorAccessDenied);
+            return;
+        }
+
+        if (validationResult == FolderValidationResult.NoAudioFiles)
+        {
+            _dispatcherQueue.TryEnqueue(() => ErrorBannerMessage = _errorNoAudioFiles);
+            return;
+        }
+
         string token = Guid.NewGuid().ToString();
         StorageApplicationPermissions.FutureAccessList.AddOrReplace(token, folder);
 
-        if (!_appOptions.LibraryTokens.Contains(token))
-        {
-            _appOptions.LibraryTokens.Clear(); // In start process, we clear all library path as we haven't found music in.
-            _appOptions.LibraryTokens.Add(token);
-            await _settingsFile.SaveAsync(_appOptions);
+        _appOptions.LibraryTokens.Clear();
+        _appOptions.LibraryTokens.Add(token);
+        await _settingsFile.SaveAsync(_appOptions);
 
+        _dispatcherQueue.TryEnqueue(() =>
+        {
+            ErrorBannerMessage = null;
             ErrorOccurred = false;
             LibraryRefreshRunning = true;
+        });
 
-            _importService.StartAsync(0);
-        }
+        _importService.StartAsync(0);
     }
 }
