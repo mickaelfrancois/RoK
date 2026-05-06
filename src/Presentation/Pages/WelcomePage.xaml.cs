@@ -1,5 +1,4 @@
 using Microsoft.UI.Xaml.Controls;
-using Rok.ViewModels.Main;
 using Rok.ViewModels.Start;
 using Windows.Storage;
 using Windows.Storage.Pickers;
@@ -11,14 +10,12 @@ namespace Rok.Pages;
 public sealed partial class WelcomePage : Page
 {
     public StartViewModel ViewModel { get; set; }
-    public MainViewModel MainViewModel { get; set; }
 
     public WelcomePage()
     {
         InitializeComponent();
 
         ViewModel = App.ServiceProvider.GetRequiredService<StartViewModel>();
-        MainViewModel = App.ServiceProvider.GetRequiredService<MainViewModel>();
     }
 
 
@@ -41,6 +38,6 @@ public sealed partial class WelcomePage : Page
     private void Grid_Loaded(object sender, RoutedEventArgs e)
     {
         FadeInStoryboard.Begin();
-        MainViewModel.RefreshLibraryCommand.Execute(this);
+        ViewModel.StartInitialScan();
     }
 }

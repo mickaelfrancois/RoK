@@ -168,6 +168,18 @@ public partial class StartViewModel : ObservableObject
         });
     }
 
+    public void StartInitialScan()
+    {
+        if (_appOptions.LibraryTokens.Count == 0)
+        {
+            LibraryRefreshRunning = false;
+            ErrorOccurred = true;
+            return;
+        }
+
+        _importService.Start(0);
+    }
+
     [RelayCommand]
     private async Task AddLibraryFolderAsync(StorageFolder folder)
     {
