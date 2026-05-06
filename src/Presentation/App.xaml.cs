@@ -193,7 +193,7 @@ public partial class App : Microsoft.UI.Xaml.Application
         {
             try
             {
-                string token = StorageApplicationPermissions.FutureAccessList.Add(KnownFolders.Objects3D);
+                string token = StorageApplicationPermissions.FutureAccessList.Add(KnownFolders.MusicLibrary);
                 options.LibraryTokens.Add(token);
             }
             catch (Exception ex)
