@@ -50,7 +50,7 @@ ILogger<ImportService> logger) : IImport
     private CancellationTokenSource? _cancellationToken;
     private Task _runningTask = Task.CompletedTask;
 
-    public void StartAsync(int delayInSeconds)
+    public void Start(int delayInSeconds)
     {
         Guard.Against.Negative(delayInSeconds);
 
