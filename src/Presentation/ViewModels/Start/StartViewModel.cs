@@ -9,7 +9,6 @@ using Windows.Storage.AccessCache;
 
 namespace Rok.ViewModels.Start;
 
-
 public partial class StartViewModel : ObservableObject
 {
     private const int KDisplayIntervalMs = 300;
@@ -52,7 +51,6 @@ public partial class StartViewModel : ObservableObject
     [ObservableProperty]
     public partial string? ErrorBannerMessage { get; set; }
 
-
     public StartViewModel(IAlbumPicture albumPicture, ISettingsFile settingsFile, NavigationService navigationService, IResourceService resourceService, IMediator mediator, IImport importService, IAppOptions appOptions)
     {
         Debug.Assert(
@@ -81,14 +79,12 @@ public partial class StartViewModel : ObservableObject
         Messenger.Subscribe<AlbumImportedMessage>(AlbumImported);
     }
 
-
     private void UnregisterEvents()
     {
         _displayTimer.Stop();
         Messenger.Unsubscribe<LibraryRefreshMessage>(async (message) => await LibraryRefreshChangeAsync(message));
         Messenger.Unsubscribe<AlbumImportedMessage>(AlbumImported);
     }
-
 
     private void OnDisplayTimerTick(DispatcherQueueTimer sender, object args)
     {
@@ -113,7 +109,6 @@ public partial class StartViewModel : ObservableObject
         }
     }
 
-
     private async Task LibraryRefreshChangeAsync(LibraryRefreshMessage message)
     {
         if (message.ProcessState == LibraryRefreshMessage.EState.Running)
@@ -135,7 +130,8 @@ public partial class StartViewModel : ObservableObject
                 if (trackCount == 0)
                 {
                     ErrorOccurred = true;
-                    ErrorBannerMessage = _errorNoAudioFiles;
+                    if (_appOptions.LibraryTokens.Count > 0)
+                        ErrorBannerMessage = _errorNoAudioFiles;
                 }
                 else
                 {
@@ -145,7 +141,6 @@ public partial class StartViewModel : ObservableObject
             });
         }
     }
-
 
     private void AlbumImported(AlbumImportedMessage message)
     {
@@ -172,7 +167,6 @@ public partial class StartViewModel : ObservableObject
             });
         });
     }
-
 
     [RelayCommand]
     private async Task AddLibraryFolderAsync(StorageFolder folder)
@@ -205,6 +199,6 @@ public partial class StartViewModel : ObservableObject
             LibraryRefreshRunning = true;
         });
 
-        _importService.StartAsync(0);
+        _importService.Start(0);
     }
 }
