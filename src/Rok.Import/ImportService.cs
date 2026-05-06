@@ -48,6 +48,7 @@ ILogger<ImportService> logger) : IImport
     private readonly PostImportDominantColorTask _postImportDominantColorTask = Guard.Against.Null(postImportDominantColorTask);
 
     private CancellationTokenSource? _cancellationToken;
+    private Task _runningTask = Task.CompletedTask;
 
     public void StartAsync(int delayInSeconds)
     {
@@ -70,7 +71,28 @@ ILogger<ImportService> logger) : IImport
         _progressService.ReportRunning();
         var stopwatch = Stopwatch.StartNew();
 
-        _ = RunImportAsync(delayInSeconds, stopwatch);
+        _runningTask = RunImportAsync(delayInSeconds, stopwatch);
+    }
+
+    public async Task StopAsync()
+    {
+        if (_cancellationToken is null || !UpdateInProgress)
+            return;
+
+        await _cancellationToken.CancelAsync();
+
+        try
+        {
+            await _runningTask.WaitAsync(TimeSpan.FromSeconds(5));
+        }
+        catch (OperationCanceledException)
+        {
+            // Expected.
+        }
+        catch (TimeoutException)
+        {
+            _logger.LogWarning("Import did not stop within the expected timeout.");
+        }
     }
 
     private async Task RunImportAsync(int delayInSeconds, Stopwatch stopwatch)
@@ -114,8 +136,7 @@ ILogger<ImportService> logger) : IImport
 
         List<string> pathsToImport = await GetLibraryImportPathsAsync(cancellationToken);
 
-        foreach (string path in pathsToImport
-)
+        foreach (string path in pathsToImport)
         {
             if (cancellationToken.IsCancellationRequested)
                 break;
@@ -126,10 +147,19 @@ ILogger<ImportService> logger) : IImport
             }
         }
 
+        if (cancellationToken.IsCancellationRequested)
+            return;
+
         await UpdateStatisticsAsync();
+
+        if (cancellationToken.IsCancellationRequested)
+            return;
 
         if (!errorOccurred)
             await CleanDataAsync(cancellationToken);
+
+        if (cancellationToken.IsCancellationRequested)
+            return;
 
         if (!errorOccurred)
             await _postImportDominantColorTask.RunAsync(cancellationToken);

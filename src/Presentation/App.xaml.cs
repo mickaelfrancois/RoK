@@ -209,6 +209,9 @@ public partial class App : Microsoft.UI.Xaml.Application
         ISettingsFile settingFileService = ServiceProvider.GetRequiredService<ISettingsFile>();
         ITelemetryClient telemetryClient = ServiceProvider.GetRequiredService<ITelemetryClient>();
 
+        IImport importService = ServiceProvider.GetRequiredService<IImport>();
+        await importService.StopAsync();
+
         await telemetryClient.CaptureEventAsync("Event", "Stop");
 
         await settingFileService.SaveAsync(options);
