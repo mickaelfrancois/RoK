@@ -14,7 +14,7 @@ public partial class StartViewModel : ObservableObject
 {
     private const int KDisplayIntervalMs = 300;
 
-    // Must stay <= ImportMessageThrottler.MaxMessagesBeforeThrottle (currently 100).
+    // Must stay <= ImportMessageThrottler.MaxMessagesBeforeThrottle.
     // If unlock > throttle, AlbumImportedMessage stops arriving before the threshold is reached
     // and navigation falls back to the LibraryRefreshMessage Stop handler without notification.
     private const int KMinAlbumsToUnlockApp = 100;
@@ -29,7 +29,7 @@ public partial class StartViewModel : ObservableObject
     private readonly DispatcherQueue _dispatcherQueue = DispatcherQueue.GetForCurrentThread();
     private readonly Queue<AlbumImportedModel> _pendingAlbums = new();
     private readonly DispatcherQueueTimer _displayTimer;
-    private readonly string _albumsImportedMessage = Guid.NewGuid().ToString();
+    private readonly string _albumsImportedMessage;
     private readonly string _importBackgroundTitle;
     private readonly string _importBackgroundMessage;
 
@@ -95,14 +95,14 @@ public partial class StartViewModel : ObservableObject
 
         if (AlbumsImported.Count >= KMinAlbumsToUnlockApp)
         {
-            UnregisterEvents();
-            _navigationService.NavigateToAlbums();
             Messenger.Send(new ShowNotificationMessage
             {
                 Title = _importBackgroundTitle,
                 Message = _importBackgroundMessage,
                 Type = NotificationType.Informational
             });
+            UnregisterEvents();
+            _navigationService.NavigateToAlbums();
         }
     }
 

@@ -134,7 +134,7 @@ ILogger<ImportService> logger) : IImport
         if (!errorOccurred)
             await _postImportDominantColorTask.RunAsync(cancellationToken);
 
-        await SendMetricsAsync().ConfigureAwait(false);
+        _ = SendMetricsAsync();
     }
 
     private void InitializeImport()

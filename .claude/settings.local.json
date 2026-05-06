@@ -78,7 +78,10 @@
       "Bash(/usr/bin/dotnet restore *)",
       "Bash(cmd.exe /c \"dotnet restore D:\\\\Development\\\\MF\\\\Rok\\\\Rok.slnx /p:Platform=x64\")",
       "Bash(cmd.exe /c \"dotnet build D:\\\\Development\\\\MF\\\\Rok\\\\Rok.slnx /p:Platform=x64 --no-restore -v quiet\")",
-      "Bash(cmd.exe /c \"dotnet build D:\\\\Development\\\\MF\\\\Rok\\\\Rok.slnx /p:Platform=x64 --no-restore -v quiet 2>&1\")"
+      "Bash(cmd.exe /c \"dotnet build D:\\\\Development\\\\MF\\\\Rok\\\\Rok.slnx /p:Platform=x64 --no-restore -v quiet 2>&1\")",
+      "WebFetch(domain:rok-telemetry.fpc-france.com)",
+      "Bash(\"/mnt/c/Program Files/dotnet/dotnet.exe\" build /mnt/d/Development/MF/Rok/src/Rok.Import/Rok.Import.csproj /p:Platform=x64 -v quiet)",
+      "Bash(\"/mnt/c/Program Files/dotnet/dotnet.exe\" build \"D:/Development/MF/Rok/src/Rok.Import/Rok.Import.csproj\" /p:Platform=x64 -v quiet)"
     ],
     "deny": [
       "Bash(rm -rf *)",

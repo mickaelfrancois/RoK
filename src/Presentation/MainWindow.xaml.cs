@@ -37,6 +37,8 @@ public sealed partial class MainWindow : Window
 
     private int _tracksListenedCount = 0;
 
+    private bool _isOnboardingActive = false;
+
     private MainViewModel? _viewModel;
     public MainViewModel? ViewModel
     {
@@ -147,6 +149,8 @@ public sealed partial class MainWindow : Window
             PlaylistsSeed playlistsSeed = App.ServiceProvider.GetRequiredService<PlaylistsSeed>();
             playlistsSeed.SeedAsync().GetAwaiter().GetResult();
 
+            _isOnboardingActive = true;
+            navMenu.IsPaneVisible = false;
             ContentFrame.Navigate(typeof(Pages.WelcomePage), null, new EntranceNavigationTransitionInfo());
             return;
         }
@@ -363,6 +367,13 @@ public sealed partial class MainWindow : Window
 
     private void ContentFrame_Navigated(object sender, NavigationEventArgs e)
     {
+        if (_isOnboardingActive && e.Content is not Pages.WelcomePage)
+        {
+            _isOnboardingActive = false;
+            navMenu.IsPaneVisible = true;
+            AttachGlobalShortcuts();
+        }
+
         if (e.Content is Pages.OptionsPage)
         {
             navMenu.SelectedItem = navMenu.SettingsItem;
