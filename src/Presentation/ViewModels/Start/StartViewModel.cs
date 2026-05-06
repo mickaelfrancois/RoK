@@ -24,6 +24,7 @@ public partial class StartViewModel : ObservableObject
     private readonly IImport _importService;
     private readonly IAppOptions _appOptions;
     private readonly ISettingsFile _settingsFile;
+    private readonly ITelemetryClient _telemetryClient;
 
     private readonly DispatcherQueue _dispatcherQueue = DispatcherQueue.GetForCurrentThread();
     private readonly Queue<AlbumImportedModel> _pendingAlbums = new();
@@ -51,7 +52,7 @@ public partial class StartViewModel : ObservableObject
     [ObservableProperty]
     public partial string? ErrorBannerMessage { get; set; }
 
-    public StartViewModel(IAlbumPicture albumPicture, ISettingsFile settingsFile, NavigationService navigationService, IResourceService resourceService, IMediator mediator, IImport importService, IAppOptions appOptions)
+    public StartViewModel(IAlbumPicture albumPicture, ISettingsFile settingsFile, NavigationService navigationService, IResourceService resourceService, IMediator mediator, IImport importService, IAppOptions appOptions, ITelemetryClient telemetryClient)
     {
         Debug.Assert(
             ImportMessageThrottler.MaxMessagesBeforeThrottle >= KMinAlbumsToUnlockApp,
@@ -63,6 +64,7 @@ public partial class StartViewModel : ObservableObject
         _mediator = mediator;
         _importService = importService;
         _appOptions = appOptions;
+        _telemetryClient = telemetryClient;
 
         _albumsImportedMessage = resourceService.GetString("AlbumsImported");
         _importBackgroundTitle = resourceService.GetString("notification_import_background_title");
@@ -131,7 +133,10 @@ public partial class StartViewModel : ObservableObject
                 {
                     ErrorOccurred = true;
                     if (_appOptions.LibraryTokens.Count > 0)
+                    {
                         ErrorBannerMessage = _errorNoAudioFiles;
+                        _ = _telemetryClient.CaptureEventAsync("Onboarding", "NoAudioFiles");
+                    }
                 }
                 else
                 {
@@ -174,6 +179,7 @@ public partial class StartViewModel : ObservableObject
         {
             LibraryRefreshRunning = false;
             ErrorOccurred = true;
+            _ = _telemetryClient.CaptureEventAsync("Onboarding", "NoFolderConfigured");
             return;
         }
 
@@ -188,12 +194,14 @@ public partial class StartViewModel : ObservableObject
         if (validationResult == FolderValidationResult.AccessDenied)
         {
             _dispatcherQueue.TryEnqueue(() => ErrorBannerMessage = _errorAccessDenied);
+            _ = _telemetryClient.CaptureEventAsync("Onboarding", "FolderAccessDenied");
             return;
         }
 
         if (validationResult == FolderValidationResult.NoAudioFiles)
         {
             _dispatcherQueue.TryEnqueue(() => ErrorBannerMessage = _errorNoAudioFiles);
+            _ = _telemetryClient.CaptureEventAsync("Onboarding", "FolderNoAudioFiles");
             return;
         }
 
