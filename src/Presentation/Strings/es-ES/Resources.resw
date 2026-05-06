@@ -1455,6 +1455,12 @@
   <data name="AlbumsImported" xml:space="preserve">
     <value>álbumes descubiertos</value>
   </data>
+  <data name="notification_import_background_title" xml:space="preserve">
+    <value>Importación en curso</value>
+  </data>
+  <data name="notification_import_background_message" xml:space="preserve">
+    <value>Tus primeros álbumes están listos. La importación continúa en segundo plano.</value>
+  </data>
   <data name="reviewSentimentGateTitle" xml:space="preserve">
     <value>¿Te gusta Corea del Sur?</value>
   </data>

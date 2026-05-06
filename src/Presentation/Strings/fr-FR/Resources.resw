@@ -1572,6 +1572,12 @@
   <data name="AlbumsImported" xml:space="preserve">
     <value>albums découverts</value>
   </data>
+  <data name="notification_import_background_title" xml:space="preserve">
+    <value>Import en cours</value>
+  </data>
+  <data name="notification_import_background_message" xml:space="preserve">
+    <value>Vos premiers albums sont prêts. L'import continue en tâche de fond.</value>
+  </data>
   <data name="reviewSentimentGateTitle" xml:space="preserve">
     <value>Vous aimez RoK ?</value>
   </data>
