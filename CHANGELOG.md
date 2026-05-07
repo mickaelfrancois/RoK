@@ -1,5 +1,23 @@
 ﻿# ChangeLog
 
+## [1.11.0] Store – 7 mai 2026
+
+### Ajouté
+
+- Raccourcis clavier dans l'application avec une boîte de dialogue récapitulative accessible depuis les options.
+- Intégration améliorée avec les contrôles média système Windows (SMTC).
+- Paroles synchronisées en couleurs avec refonte de l'affichage en mode plein écran.
+- Navigation automatique vers la bibliothèque après 100 albums importés avec notification d'import en arrière-plan.
+- Validation du dossier musique avant import avec bandeau d'erreur contextuel à l'onboarding.
+
+### Corrigé
+
+- L'import s'arrête proprement à la fermeture de l'application (plus de crash sur les logs).
+- L'état d'erreur à l'onboarding s'affiche correctement quand aucun dossier n'est configuré.
+- Correction de la vérification de la bibliothèque musicale au démarrage.
+
+--
+
 ## [1.10.3] Store – 29 avril 2026
 
 ### Ajouté
