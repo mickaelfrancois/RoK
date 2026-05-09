@@ -10,7 +10,7 @@ namespace Rok.Application.Features.Artists.Services;
 public class ArtistApiService(
     IMediator mediator,
     IMusicDataApiService musicDataApiService,
-    ILogger<ArtistApiService> logger)
+    ILogger<ArtistApiService> logger) : IArtistApiService
 {
     public async Task<ArtistApiUpdateResult> GetAndUpdateArtistDataAsync(ArtistDto artist, IArtistPictureService pictureService, IBackdropPicture backdropPicture)
     {
