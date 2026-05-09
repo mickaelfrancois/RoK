@@ -165,4 +165,65 @@ public class AlbumImportTests
         Assert.Equal(1, import.CreatedCount);
         Assert.Equal(1, import.CountInCache);
     }
+
+    [Fact(DisplayName = "NewlyCreatedIds should be empty on initialization")]
+    public void NewlyCreatedIds_ShouldBeEmpty_OnInitialization()
+    {
+        // Arrange & Act
+        AlbumImport import = new(Mock.Of<IAlbumRepository>());
+
+        // Assert
+        Assert.Empty(import.NewlyCreatedIds);
+    }
+
+    [Fact(DisplayName = "CreateAsync should add the new album id to NewlyCreatedIds")]
+    public async Task CreateAsync_ShouldAddIdToNewlyCreatedIds()
+    {
+        // Arrange
+        Mock<IAlbumRepository> repository = new();
+        repository.Setup(r => r.AddAsync(It.IsAny<AlbumEntity>(), It.IsAny<RepositoryConnectionKind>())).ReturnsAsync(99L);
+        AlbumImport import = new(repository.Object);
+
+        // Act
+        await import.CreateAsync(new TrackFile { Album = "Black", Artist = "AC/DC", FullPath = @"C:\m\t.mp3" }, 1, null);
+
+        // Assert
+        Assert.Single(import.NewlyCreatedIds);
+        Assert.Equal(99L, import.NewlyCreatedIds[0]);
+    }
+
+    [Fact(DisplayName = "CreateAsync should not add more than 100 ids to NewlyCreatedIds")]
+    public async Task CreateAsync_ShouldNotAddMoreThan100Ids_ToNewlyCreatedIds()
+    {
+        // Arrange
+        long id = 1;
+        Mock<IAlbumRepository> repository = new();
+        repository.Setup(r => r.AddAsync(It.IsAny<AlbumEntity>(), It.IsAny<RepositoryConnectionKind>()))
+            .ReturnsAsync(() => id++);
+        AlbumImport import = new(repository.Object);
+
+        // Act
+        for (int i = 0; i < 101; i++)
+            await import.CreateAsync(new TrackFile { Album = $"Album{i}", Artist = "Artist", FullPath = @"C:\m\t.mp3" }, 1, null);
+
+        // Assert
+        Assert.Equal(100, import.NewlyCreatedIds.Count);
+    }
+
+    [Fact(DisplayName = "LoadCacheAsync should clear NewlyCreatedIds")]
+    public async Task LoadCacheAsync_ShouldClearNewlyCreatedIds()
+    {
+        // Arrange
+        Mock<IAlbumRepository> repository = new();
+        repository.Setup(r => r.AddAsync(It.IsAny<AlbumEntity>(), It.IsAny<RepositoryConnectionKind>())).ReturnsAsync(1L);
+        repository.Setup(r => r.GetAllAsync(It.IsAny<RepositoryConnectionKind>())).ReturnsAsync(Array.Empty<AlbumEntity>());
+        AlbumImport import = new(repository.Object);
+        await import.CreateAsync(new TrackFile { Album = "Black", Artist = "AC/DC", FullPath = @"C:\m\t.mp3" }, 1, null);
+
+        // Act
+        await import.LoadCacheAsync();
+
+        // Assert
+        Assert.Empty(import.NewlyCreatedIds);
+    }
 }

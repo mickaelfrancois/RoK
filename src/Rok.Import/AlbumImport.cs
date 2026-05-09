@@ -18,6 +18,12 @@ public class AlbumImport(IAlbumRepository _albumRepository)
 
     private static readonly Regex _liveRegex = new(@"\b(live|concert|performance)\b", RegexOptions.IgnoreCase | RegexOptions.Compiled);
 
+    private const int MaxAlbumsApiEnrichment = 100;
+
+    private readonly List<long> _newlyCreatedIds = new();
+
+    public IReadOnlyList<long> NewlyCreatedIds => _newlyCreatedIds;
+
 
     /// <summary>
     /// Asynchronously loads album data into the cache.
@@ -29,6 +35,7 @@ public class AlbumImport(IAlbumRepository _albumRepository)
     public async Task LoadCacheAsync()
     {
         _cache.Clear();
+        _newlyCreatedIds.Clear();
 
         IEnumerable<AlbumEntity> albums = await _albumRepository.GetAllAsync(RepositoryConnectionKind.Background);
 
@@ -122,6 +129,9 @@ public class AlbumImport(IAlbumRepository _albumRepository)
         };
         _cache.Add(key, cacheItem);
         CreatedCount++;
+
+        if (_newlyCreatedIds.Count < MaxAlbumsApiEnrichment)
+            _newlyCreatedIds.Add(id);
 
         return cacheItem;
     }
