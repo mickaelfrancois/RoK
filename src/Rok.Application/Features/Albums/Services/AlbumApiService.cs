@@ -10,7 +10,7 @@ namespace Rok.Application.Features.Albums.Services;
 public class AlbumApiService(
     IMediator mediator,
     IMusicDataApiService musicDataApiService,
-    ILogger<AlbumApiService> logger)
+    ILogger<AlbumApiService> logger) : IAlbumApiService
 {
     public async Task<AlbumApiUpdateResult> GetAndUpdateAlbumDataAsync(AlbumDto album, IAlbumPictureService pictureService)
     {

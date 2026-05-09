@@ -27,8 +27,8 @@ public static class DependencyInjection
         services.AddSingleton<IPlayerSleepModeService, PlayerSleepModeService>();
 
         services.AddTransient<TrackLyricsService>();
-        services.AddTransient<AlbumApiService>();
-        services.AddTransient<ArtistApiService>();
+        services.AddTransient<IArtistApiService, ArtistApiService>();
+        services.AddTransient<IAlbumApiService, AlbumApiService>();
 
         services.AddSimpleMediator();
 

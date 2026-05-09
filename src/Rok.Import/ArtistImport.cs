@@ -15,6 +15,12 @@ public class ArtistImport(IArtistRepository _artistRepository)
 
     private readonly Dictionary<string, ArtistCacheItem> _cache = new(StringComparer.InvariantCultureIgnoreCase);
 
+    private const int MaxArtistsApiEnrichment = 100;
+
+    private readonly List<long> _newlyCreatedIds = new();
+
+    public IReadOnlyList<long> NewlyCreatedIds => _newlyCreatedIds;
+
 
     /// <summary>
     /// Asynchronously loads artist data into the cache.
@@ -25,6 +31,7 @@ public class ArtistImport(IArtistRepository _artistRepository)
     public async Task LoadCacheAsync()
     {
         _cache.Clear();
+        _newlyCreatedIds.Clear();
 
         IEnumerable<ArtistEntity> artists = await _artistRepository.GetAllAsync(RepositoryConnectionKind.Background);
 
@@ -100,6 +107,9 @@ public class ArtistImport(IArtistRepository _artistRepository)
         };
         _cache.Add(key, cacheItem);
         CreatedCount++;
+
+        if (_newlyCreatedIds.Count < MaxArtistsApiEnrichment)
+            _newlyCreatedIds.Add(id);
 
         return cacheItem;
     }
