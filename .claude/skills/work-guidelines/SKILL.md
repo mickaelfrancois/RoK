@@ -22,7 +22,7 @@ rtk git branch --show-current
 - Si le résultat est **vide** (HEAD détachée) : afficher `⚠ HEAD détachée — impossible de vérifier la branche. Continuer avec précaution.` et poursuivre normalement.
 - Sinon : afficher `Branche \`<nom>\` — règles de travail actives.` et continuer normalement.
 
-Une fois la branche confirmée, ne plus intervenir sur ce sujet sauf si une commande git tente de commiter sur `master`.
+Une fois la branche confirmée, ne plus intervenir sur ce sujet sauf si une commande git tente de commiter sur `master` ou `main`.
 
 ## Phase END — Avant de terminer le travail
 
@@ -32,7 +32,7 @@ Déclencher cette phase quand tu t'apprêtes à invoquer `superpowers:finishing-
 
 Vérifier le nombre de commits sur la branche :
 ```bash
-BASE=$(rtk git rev-parse --verify master 2>/dev/null && echo master || echo main)
+BASE=$(rtk git rev-parse --verify master > /dev/null 2>&1 && echo master || echo main)
 rtk git log $BASE..HEAD --oneline
 ```
 
@@ -51,13 +51,22 @@ Travail terminé. Tu as N commits sur cette branche :
 ```
 
 **Si "Oui" :**
-1. Exécuter :
+1. Déterminer la branche de base :
 ```bash
-BASE=$(rtk git rev-parse --verify master 2>/dev/null && echo master || echo main)
-rtk git reset --soft $(rtk git merge-base HEAD $BASE)
+BASE=$(rtk git rev-parse --verify master > /dev/null 2>&1 && echo master || echo main)
 ```
-Si `git merge-base` échoue (code non-zero), afficher une erreur et ne pas effectuer le squash : `⛔ Impossible de trouver la base commune avec la branche de base. Squash annulé.`
-2. Proposer un message de commit consolidé basé sur les messages existants
-3. Attendre la validation du message par l'utilisateur, puis commiter
+2. Calculer le commit de fusion :
+```bash
+MERGE_BASE=$(rtk git merge-base HEAD $BASE 2>/dev/null) || { echo "⛔ Impossible de trouver la base commune avec la branche de base. Squash annulé."; exit 1; }
+```
+Si cette commande échoue (code non-zero), s'arrêter là et afficher le message d'erreur — ne pas poursuivre le squash.
+
+3. Exécuter le reset :
+```bash
+rtk git reset --soft $MERGE_BASE
+```
+
+4. Proposer un message de commit consolidé basé sur les messages existants
+5. Attendre la validation du message par l'utilisateur, puis commiter
 
 **Si "Non" :** continuer directement vers `superpowers:finishing-a-development-branch`.
