@@ -51,22 +51,19 @@ Travail terminé. Tu as N commits sur cette branche :
 ```
 
 **Si "Oui" :**
-1. Déterminer la branche de base :
+1. Déterminer la branche de base et le commit de fusion :
 ```bash
 BASE=$(rtk git rev-parse --verify master > /dev/null 2>&1 && echo master || echo main)
+MERGE_BASE=$(rtk git merge-base HEAD $BASE) || { echo "⛔ Impossible de trouver la base commune avec la branche de base. Squash annulé."; exit 1; }
 ```
-2. Calculer le commit de fusion :
-```bash
-MERGE_BASE=$(rtk git merge-base HEAD $BASE 2>/dev/null) || { echo "⛔ Impossible de trouver la base commune avec la branche de base. Squash annulé."; exit 1; }
-```
-Si cette commande échoue (code non-zero), s'arrêter là et afficher le message d'erreur — ne pas poursuivre le squash.
+Si `MERGE_BASE` est vide ou que la commande échoue, s'arrêter et afficher le message d'erreur — ne pas poursuivre.
 
-3. Exécuter le reset :
+2. Exécuter le reset :
 ```bash
 rtk git reset --soft $MERGE_BASE
 ```
 
-4. Proposer un message de commit consolidé basé sur les messages existants
-5. Attendre la validation du message par l'utilisateur, puis commiter
+3. Proposer un message de commit consolidé au format Conventional Commits (`type(scope): description`) basé sur les messages existants
+4. Attendre la validation du message par l'utilisateur, puis commiter
 
 **Si "Non" :** continuer directement vers `superpowers:finishing-a-development-branch`.
