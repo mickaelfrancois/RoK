@@ -29,7 +29,7 @@ public class PostImportApiEnrichmentTask(
         await EnrichAlbumsAsync(cancellationToken);
     }
 
-    public async Task EnrichArtistsAsync(CancellationToken cancellationToken)
+    internal async Task EnrichArtistsAsync(CancellationToken cancellationToken)
     {
         int enriched = 0;
 
@@ -60,7 +60,7 @@ public class PostImportApiEnrichmentTask(
         logger.LogInformation("API enrichment: {Count} artists enriched.", enriched);
     }
 
-    public async Task EnrichAlbumsAsync(CancellationToken cancellationToken)
+    internal async Task EnrichAlbumsAsync(CancellationToken cancellationToken)
     {
         int enriched = 0;
 

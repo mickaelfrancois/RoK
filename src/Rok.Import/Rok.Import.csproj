@@ -6,6 +6,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <InternalsVisibleTo Include="Rok.ImportTests" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="MiF.Messenger" Version="1.0.0" />
   </ItemGroup>
 
