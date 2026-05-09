@@ -17,6 +17,7 @@ public static class DependencyInjection
         services.AddSingleton<GenreImport>();
         services.AddSingleton<TrackImport>();
         services.AddSingleton<PostImportDominantColorTask>();
+        services.AddTransient<PostImportApiEnrichmentTask>();
 
         services.AddSingleton<CountryCache>();
         services.AddSingleton<ImportMessageThrottler>();
