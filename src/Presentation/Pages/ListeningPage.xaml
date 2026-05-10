@@ -241,7 +241,8 @@
                                     <TextBlock x:Name="RowIndexText" VerticalAlignment="Center" Visibility="{x:Bind Listening, Mode=OneWay, Converter={StaticResource BoolToInvertVisibilityConverter}}" Style="{StaticResource gridTracksRowIndexText}" />
 
                                     <HyperlinkButton Style="{StaticResource GridTracksTitleHyperlinkButtonStyle}" Command="{x:Bind TrackOpenCommand}" CommandParameter="{x:Bind}" VerticalAlignment="Center" />
-                                    <HyperlinkButton x:Uid="lyricsTag" Visibility="{x:Bind LyricsExists, Converter={StaticResource BoolToVisibilityConverter}}" Style="{StaticResource GridTracksLyricsHyperlinkButtonStyle}" Command="{x:Bind LyricsOpenCommand}" />
+                                    <HyperlinkButton Visibility="{x:Bind LyricsType, Converter={StaticResource LyricsTypeVisibilityConverter}, ConverterParameter=Synchronized, Mode=OneWay}" Style="{StaticResource GridTracksSyncLyricsBadgeStyle}" Command="{x:Bind LyricsOpenCommand}" />
+                                    <HyperlinkButton Visibility="{x:Bind LyricsType, Converter={StaticResource LyricsTypeVisibilityConverter}, ConverterParameter=Plain, Mode=OneWay}" Style="{StaticResource GridTracksPlainLyricsBadgeStyle}" Command="{x:Bind LyricsOpenCommand}" />
                                 </StackPanel>
                             </Grid>
 

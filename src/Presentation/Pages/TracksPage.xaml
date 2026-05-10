@@ -138,7 +138,8 @@
 
                                     <StackPanel Grid.Column="0" Orientation="Horizontal">
                                         <HyperlinkButton Style="{StaticResource GridTracksTitleHyperlinkButtonStyle}" Command="{x:Bind ListenCommand}" CommandParameter="{x:Bind}" />
-                                        <HyperlinkButton x:Uid="lyricsTag" Visibility="{x:Bind LyricsExists, Converter={StaticResource BoolToVisibilityConverter}}" Style="{StaticResource GridTracksLyricsHyperlinkButtonStyle}" Command="{x:Bind LyricsOpenCommand}" />
+                                        <HyperlinkButton Visibility="{x:Bind LyricsType, Converter={StaticResource LyricsTypeVisibilityConverter}, ConverterParameter=Synchronized, Mode=OneWay}" Style="{StaticResource GridTracksSyncLyricsBadgeStyle}" Command="{x:Bind LyricsOpenCommand}" />
+                                        <HyperlinkButton Visibility="{x:Bind LyricsType, Converter={StaticResource LyricsTypeVisibilityConverter}, ConverterParameter=Plain, Mode=OneWay}" Style="{StaticResource GridTracksPlainLyricsBadgeStyle}" Command="{x:Bind LyricsOpenCommand}" />
                                     </StackPanel>
 
                                     <HyperlinkButton Grid.Column="1" Style="{StaticResource GridTracksArtistHyperlinkButtonStyle}" Command="{x:Bind ArtistOpenCommand}" />
