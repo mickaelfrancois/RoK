@@ -256,6 +256,10 @@ public class MusicDataApiService : IMusicDataApiService, IDisposable
         if (!response.IsSuccessStatusCode)
             return;
 
+        string? folder = Path.GetDirectoryName(targetFile);
+        if (!string.IsNullOrEmpty(folder))
+            Directory.CreateDirectory(folder);
+
         using Stream responseStream = await response.Content.ReadAsStreamAsync(cancellationToken);
         using FileStream fileStream = new(targetFile, FileMode.Create, FileAccess.Write, FileShare.None, bufferSize: 81920, useAsync: true);
 
