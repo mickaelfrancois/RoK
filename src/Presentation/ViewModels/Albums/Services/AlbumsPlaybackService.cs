@@ -16,6 +16,12 @@ public class AlbumsPlaybackService(IMediator mediator, IPlayerService playerServ
 
         var tracks = (await mediator.SendMessageAsync(new GetTracksByAlbumListQuery { AlbumsId = albumIds.ToList() })).ToList();
 
+        if (tracks.Count == 0)
+        {
+            logger.LogWarning("No tracks found for the selected albums.");
+            return;
+        }
+
         if (albumIds.Count() > 1)
             TracksRandomizer.ArtistBalancedTrackRandomize(tracks, 0);
 

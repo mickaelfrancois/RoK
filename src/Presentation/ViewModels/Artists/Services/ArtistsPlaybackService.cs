@@ -16,6 +16,12 @@ public class ArtistsPlaybackService(IMediator mediator, IPlayerService playerSer
 
         List<TrackDto> tracks = (await mediator.SendMessageAsync(new GetTracksByArtistListQuery { ArtistIds = artistIds.ToList() })).ToList();
 
+        if (tracks.Count == 0)
+        {
+            logger.LogWarning("No tracks found for the selected artists.");
+            return;
+        }
+
         if (artistIds.Count() == 1)
             TracksRandomizer.Randomize(tracks);
         else

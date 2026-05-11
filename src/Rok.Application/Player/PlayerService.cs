@@ -336,7 +336,7 @@ public class PlayerService : IPlayerService, IDisposable
         else
             _currentIndex = Playlist.FindIndex(c => c.Id == startTrack.Id);
 
-        if (_currentIndex < 0)
+        if (_currentIndex < 0 || _currentIndex >= Playlist.Count)
             return;
 
         LoadFile(Playlist[_currentIndex]);
