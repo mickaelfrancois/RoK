@@ -13,6 +13,11 @@ public class TrackLyricsService(IMediator mediator, ILyricsService lyricsService
         return lyricsService.CheckLyricsFileExists(musicFile) != ELyricsType.None;
     }
 
+    public ELyricsType CheckLyricsType(string musicFile)
+    {
+        return lyricsService.CheckLyricsFileExists(musicFile);
+    }
+
 
     public Task<LyricsModel?> LoadLyricsAsync(string musicFile)
     {

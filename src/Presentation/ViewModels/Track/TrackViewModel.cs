@@ -24,6 +24,7 @@ public partial class TrackViewModel : ObservableObject, IDisposable, IFilterable
     private readonly TrackScoreService _scoreService;
     private readonly TrackNavigationService _navigationService;
     private LyricsModel? _lyrics;
+    private ELyricsType? _lyricsType;
     public IPlaylistMenuService PlaylistMenuService { get; }
     public TrackDto Track { get; private set; } = new();
 
@@ -134,21 +135,26 @@ public partial class TrackViewModel : ObservableObject, IDisposable, IFilterable
 
     public string PlainLyrics => _lyrics?.PlainLyrics ?? string.Empty;
 
-    public bool LyricsExists
+    public ELyricsType LyricsType
     {
         get
         {
-            bool exists = _lyricsService.CheckLyricsExists(Track.MusicFile);
-            if (!exists)
+            if (_lyricsType is null)
             {
+                _lyricsType = _lyricsService.CheckLyricsType(Track.MusicFile);
+                if (_lyricsType == ELyricsType.None)
+                {
 #pragma warning disable 4014
-                _ = GetLyricsFromAPIAsync();
+                    _ = GetLyricsFromAPIAsync();
 #pragma warning restore 4014
+                }
             }
 
-            return exists;
+            return _lyricsType.Value;
         }
     }
+
+    public bool LyricsExists => LyricsType != ELyricsType.None;
 
     public BitmapImage Picture { get; set; } = null!;
 
@@ -261,10 +267,17 @@ public partial class TrackViewModel : ObservableObject, IDisposable, IFilterable
             DispatcherQueue dispatcher = DispatcherQueue.GetForCurrentThread();
             if (dispatcher != null)
             {
-                dispatcher.TryEnqueue(() => OnPropertyChanged(nameof(LyricsExists)));
+                dispatcher.TryEnqueue(() =>
+                {
+                    _lyricsType = null;
+                    OnPropertyChanged(nameof(LyricsType));
+                    OnPropertyChanged(nameof(LyricsExists));
+                });
             }
             else
             {
+                _lyricsType = null;
+                OnPropertyChanged(nameof(LyricsType));
                 OnPropertyChanged(nameof(LyricsExists));
             }
         }

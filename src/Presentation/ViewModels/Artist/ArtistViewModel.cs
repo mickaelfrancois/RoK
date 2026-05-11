@@ -32,7 +32,7 @@ public partial class ArtistViewModel : ObservableObject, IFilterableArtist, IGro
     private readonly ArtistDataLoader _dataLoader;
     private readonly TagsProvider _tagsProvider;
     private readonly ArtistPictureService _pictureService;
-    private readonly ArtistApiService _apiService;
+    private readonly IArtistApiService _apiService;
     private readonly ArtistStatisticsService _statisticsService;
     private readonly ArtistEditService _editService;
     private readonly BackdropPicture _backdropPicture;
@@ -243,7 +243,7 @@ public partial class ArtistViewModel : ObservableObject, IFilterableArtist, IGro
         ArtistDataLoader dataLoader,
         TagsProvider tagsDataLoader,
         ArtistPictureService pictureService,
-        ArtistApiService apiService,
+        IArtistApiService apiService,
         ArtistStatisticsService statisticsService,
         IDominantColorCalculator dominantColorCalculator,
         ArtistEditService editService,

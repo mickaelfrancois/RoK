@@ -374,3 +374,5 @@ appsettings.*.json
 */Properties/PublishProfiles/*
 /Presentation/appsettings.json
 /.claude/settings.local.json
+
+.superpowers/

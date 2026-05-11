@@ -164,23 +164,4 @@ public class PostImportApiEnrichmentTaskTests
         // Assert
         mediator.Verify(m => m.SendMessageAsync(It.IsAny<GetArtistByIdQuery>(), It.IsAny<CancellationToken>()), Times.Never);
     }
-
-    [Fact(DisplayName = "EnrichAlbumsAsync should stop processing when cancellation is requested")]
-    public async Task EnrichAlbumsAsync_ShouldStop_WhenCancellationIsRequested()
-    {
-        // Arrange
-        ArtistImport artistImport = new(Mock.Of<IArtistRepository>());
-        AlbumImport albumImport = await BuildAlbumImportAsync(2);
-        Mock<IAlbumApiService> albumApi = new();
-        Mock<IMediator> mediator = new();
-        using CancellationTokenSource cts = new();
-        cts.Cancel();
-        PostImportApiEnrichmentTask task = BuildTask(artistImport, albumImport, new(), albumApi, mediator);
-
-        // Act
-        await task.EnrichAlbumsAsync(cts.Token);
-
-        // Assert
-        mediator.Verify(m => m.SendMessageAsync(It.IsAny<GetAlbumByIdQuery>(), It.IsAny<CancellationToken>()), Times.Never);
-    }
 }

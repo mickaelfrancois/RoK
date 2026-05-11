@@ -27,7 +27,7 @@ public partial class AlbumViewModel : ObservableObject, IFilterableAlbum, IGroup
     private readonly AlbumDataLoader _dataLoader;
     private readonly TagsProvider _tagsProvider;
     private readonly AlbumPictureService _pictureService;
-    private readonly AlbumApiService _apiService;
+    private readonly IAlbumApiService _apiService;
     private readonly AlbumStatisticsService _statisticsService;
     private readonly AlbumEditService _editService;
     private readonly IDominantColorCalculator _dominantColorCalculator;
@@ -170,7 +170,7 @@ public partial class AlbumViewModel : ObservableObject, IFilterableAlbum, IGroup
         AlbumDataLoader dataLoader,
         TagsProvider tagsDataLoader,
         AlbumPictureService pictureService,
-        AlbumApiService apiService,
+        IAlbumApiService apiService,
         AlbumStatisticsService statisticsService,
         IDominantColorCalculator dominantColorCalculator,
         AlbumEditService editService,
