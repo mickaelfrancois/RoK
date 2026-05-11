@@ -1,5 +1,19 @@
 ﻿# ChangeLog
 
+## [1.11.1] Store – 11 mai 2026
+
+### Ajouté
+
+- Badge de paroles dans l'interface du lecteur.
+- Enrichissement automatique des métadonnées depuis l'API lors de l'import.
+
+### Corrigé
+
+- Correction d'un crash lorsqu'une requête album ou artiste ne retourne aucune piste.
+- Correction du téléchargement des photos d'artiste quand le dossier de destination n'existe pas.
+
+--
+
 ## [1.11.0] Store – 7 mai 2026
 
 ### Ajouté
