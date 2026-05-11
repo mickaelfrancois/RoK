@@ -60,6 +60,7 @@ public class PostImportApiEnrichmentTask(
         logger.LogInformation("API enrichment: {Count} artists enriched.", enriched);
     }
 
+
     public async Task EnrichAlbumsAsync(CancellationToken cancellationToken)
     {
         int enriched = 0;
