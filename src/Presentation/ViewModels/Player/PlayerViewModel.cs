@@ -220,8 +220,6 @@ public partial class PlayerViewModel : ObservableObject, IDisposable
         }
     }
 
-    #region Timer Events
-
     private void OnBackdropTimerTick(object? sender, EventArgs e)
     {
         if (CurrentTrack != null)
@@ -249,10 +247,6 @@ public partial class PlayerViewModel : ObservableObject, IDisposable
             _stateManager.UpdateLyricsTime(ListenDuration);
         }
     }
-
-    #endregion
-
-    #region Message Handlers
 
     private void OnTrackScoreUpdated(TrackScoreUpdateMessage message)
     {
@@ -367,8 +361,6 @@ public partial class PlayerViewModel : ObservableObject, IDisposable
     {
         _listenTracker.ClearCache();
     }
-
-    #endregion
 
     private void LoadBackdrop()
     {

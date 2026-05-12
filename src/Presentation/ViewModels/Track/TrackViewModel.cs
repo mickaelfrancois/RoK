@@ -339,8 +339,6 @@ public partial class TrackViewModel : ObservableObject, IDisposable, IFilterable
     }
 
 
-    #region IDisposable Support
-
     private bool disposedValue = false;
 
     protected virtual void Dispose(bool disposing)
@@ -359,6 +357,4 @@ public partial class TrackViewModel : ObservableObject, IDisposable, IFilterable
         Dispose(true);
         GC.SuppressFinalize(this);
     }
-
-    #endregion
 }

@@ -227,8 +227,6 @@ public partial class TracksViewModel : ObservableObject, IDisposable
         _playbackService.PlayTracks(tracks);
     }
 
-    #region IDisposable Support
-
     private bool disposedValue = false;
 
     protected virtual void Dispose(bool disposing)
@@ -250,6 +248,4 @@ public partial class TracksViewModel : ObservableObject, IDisposable
         Dispose(true);
         GC.SuppressFinalize(this);
     }
-
-    #endregion
 }
