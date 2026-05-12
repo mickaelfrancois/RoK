@@ -353,6 +353,9 @@ public partial class TrackViewModel : ObservableObject, IDisposable, IFilterable
     {
         if (!disposedValue)
         {
+            if (disposing)
+                Messenger.Unsubscribe<TrackScoreUpdateMessage>(TrackScoreUpdateMessageHandle);
+
             disposedValue = true;
         }
     }
