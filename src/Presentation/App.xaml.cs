@@ -286,8 +286,8 @@ public partial class App : Microsoft.UI.Xaml.Application
                 crashStore.IncrementCrashCount();
 
                 ITelemetryClient telemetry = ServiceProvider.GetRequiredService<ITelemetryClient>();
-                telemetry.CaptureExceptionAsync(ex);
-                System.Threading.Thread.Sleep(500); // Give some time to send the telemetry before exiting
+                Task.Run(async () => await telemetry.CaptureExceptionAsync(ex))
+                    .Wait(TimeSpan.FromSeconds(2));
             }
 #endif
         };
