@@ -47,10 +47,16 @@ public sealed partial class ArtistsPage : Page, IDisposable
 
     protected override async void OnNavigatedTo(NavigationEventArgs e)
     {
-        await ViewModel.LoadDataAsync(forceReload: false);
-        UpdateVisualState();
-
-        base.OnNavigatedTo(e);
+        try
+        {
+            await ViewModel.LoadDataAsync(forceReload: false);
+            UpdateVisualState();
+            base.OnNavigatedTo(e);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Navigation to ArtistsPage failed");
+        }
     }
 
 

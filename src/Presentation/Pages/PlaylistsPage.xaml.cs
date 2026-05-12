@@ -9,12 +9,14 @@ namespace Rok.Pages;
 public sealed partial class PlaylistsPage : Page, IDisposable
 {
     public PlaylistsViewModel ViewModel { get; set; }
+    private readonly ILogger<PlaylistsPage> _logger;
 
 
     public PlaylistsPage()
     {
         InitializeComponent();
 
+        _logger = App.ServiceProvider.GetRequiredService<ILogger<PlaylistsPage>>();
         ViewModel = App.ServiceProvider.GetRequiredService<PlaylistsViewModel>();
         ViewModel.PropertyChanged += OnViewModelPropertyChanged;
     }
@@ -22,10 +24,16 @@ public sealed partial class PlaylistsPage : Page, IDisposable
 
     protected override async void OnNavigatedTo(NavigationEventArgs e)
     {
-        await ViewModel.LoadDataAsync(forceReload: false);
-        UpdateVisualState();
-
-        base.OnNavigatedTo(e);
+        try
+        {
+            await ViewModel.LoadDataAsync(forceReload: false);
+            UpdateVisualState();
+            base.OnNavigatedTo(e);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Navigation to PlaylistsPage failed");
+        }
     }
 
     private void OnViewModelPropertyChanged(object? sender, PropertyChangedEventArgs e)

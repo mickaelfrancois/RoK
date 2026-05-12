@@ -8,10 +8,13 @@ namespace Rok.Pages;
 public sealed partial class ArtistPage : Page
 {
     public ArtistViewModel ViewModel { get; set; } = null!;
+    private readonly ILogger<ArtistPage> _logger;
 
     public ArtistPage()
     {
         this.InitializeComponent();
+
+        _logger = App.ServiceProvider.GetRequiredService<ILogger<ArtistPage>>();
     }
 
 
@@ -20,12 +23,18 @@ public sealed partial class ArtistPage : Page
         if (e.Parameter is not ArtistOpenArgs options)
             throw new ArgumentException("Navigation parameters must be type of ArtistOpenArgs", nameof(e));
 
-        ViewModel = App.ServiceProvider.GetRequiredService<ArtistViewModel>();
-        DataContext = ViewModel;
+        try
+        {
+            ViewModel = App.ServiceProvider.GetRequiredService<ArtistViewModel>();
+            DataContext = ViewModel;
 
-        await ViewModel.LoadDataAsync(options.ArtistId);
-
-        base.OnNavigatedTo(e);
+            await ViewModel.LoadDataAsync(options.ArtistId);
+            base.OnNavigatedTo(e);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Navigation to ArtistPage failed");
+        }
     }
 
 

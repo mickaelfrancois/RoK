@@ -9,12 +9,14 @@ public sealed partial class SmartPlaylistPage : Page
 {
     public PlaylistViewModel ViewModel { get; set; }
     private readonly ResourceLoader _resourceLoader;
+    private readonly ILogger<SmartPlaylistPage> _logger;
 
     public SmartPlaylistPage()
     {
         InitializeComponent();
 
         _resourceLoader = App.ServiceProvider.GetRequiredService<ResourceLoader>();
+        _logger = App.ServiceProvider.GetRequiredService<ILogger<SmartPlaylistPage>>();
         ViewModel = App.ServiceProvider.GetRequiredService<PlaylistViewModel>();
         DataContext = ViewModel;
     }
@@ -24,18 +26,25 @@ public sealed partial class SmartPlaylistPage : Page
         if (e.Parameter is not PlaylistOpenArgs options)
             throw new ArgumentNullException(nameof(e), "PlaylistOpenArgs cannot be null");
 
-        if (options.PlaylistId.HasValue)
-            await ViewModel.LoadDataAsync(options.PlaylistId.Value);
+        try
+        {
+            if (options.PlaylistId.HasValue)
+                await ViewModel.LoadDataAsync(options.PlaylistId.Value);
 
-        if (ViewModel.Playlist.Groups.Count > 0)
-            LoadGroups();
-        else
-            GroupNew_Click(this, new RoutedEventArgs());
+            if (ViewModel.Playlist.Groups.Count > 0)
+                LoadGroups();
+            else
+                GroupNew_Click(this, new RoutedEventArgs());
 
-        if (ViewModel.Tracks.Count > 0)
-            playlistPivot.SelectedItem = playlistViewTabTracks;
+            if (ViewModel.Tracks.Count > 0)
+                playlistPivot.SelectedItem = playlistViewTabTracks;
 
-        base.OnNavigatedTo(e);
+            base.OnNavigatedTo(e);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Navigation to SmartPlaylistPage failed");
+        }
     }
 
     private void LoadGroups()
