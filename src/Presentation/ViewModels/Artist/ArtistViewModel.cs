@@ -9,7 +9,7 @@ using Rok.Application.Randomizer;
 using Rok.Application.Services.Filters;
 using Rok.Application.Services.Grouping;
 using Rok.Commons;
-using Rok.Infrastructure.Translate;
+using Rok.Infrastructure.Files;
 using Rok.ViewModels.Album;
 using Rok.ViewModels.Artist.Services;
 using Rok.ViewModels.Track;
@@ -575,7 +575,7 @@ public partial class ArtistViewModel : ObservableObject, IFilterableArtist, IGro
         if (!string.IsNullOrEmpty(Artist.Biography))
         {
             string? rawLanguage = Windows.Globalization.ApplicationLanguages.Languages.FirstOrDefault();
-            string language = TranslateService.NormalizeLanguageForLibreTranslate(rawLanguage, "fr");
+            string language = LanguageHelpers.NormalizeLanguageForLibreTranslate(rawLanguage, "fr");
 
             await _dialogService.ShowTextAsync(Artist.Name, Artist.Biography, showTranslateButton: _appOptions.NovaApiEnabled, language);
         }

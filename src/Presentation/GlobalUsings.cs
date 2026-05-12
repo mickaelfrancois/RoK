@@ -21,7 +21,6 @@ global using Rok.Application.Dto;
 global using Rok.Application.Features.Artists.Query;
 global using Rok.Application.Interfaces;
 global using Rok.Application.Messages;
-global using Rok.Infrastructure.Files;
 global using Rok.Mapping;
 global using Rok.Services;
 global using Rok.Shared;

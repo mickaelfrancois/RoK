@@ -7,7 +7,6 @@ using Rok.Application.Features.Tracks.Services;
 using Rok.Application.Player;
 using Rok.Application.Services.Filters;
 using Rok.Application.Services.Grouping;
-using Rok.Infrastructure.Translate;
 using Rok.ViewModels.Track.Services;
 
 namespace Rok.ViewModels.Track;
@@ -326,7 +325,7 @@ public partial class TrackViewModel : ObservableObject, IDisposable, IFilterable
         if (!string.IsNullOrEmpty(PlainLyrics))
         {
             string? rawLanguage = Windows.Globalization.ApplicationLanguages.Languages.FirstOrDefault();
-            string language = TranslateService.NormalizeLanguageForLibreTranslate(rawLanguage, "fr");
+            string language = LanguageHelpers.NormalizeLanguageForLibreTranslate(rawLanguage, "fr");
 
             await _dialogService.ShowTextAsync($"{ArtistName} - {Title}", PlainLyrics, showTranslateButton: _appOptions.NovaApiEnabled, language);
         }
