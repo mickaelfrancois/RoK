@@ -1,4 +1,5 @@
 ﻿using Microsoft.UI.Dispatching;
+using Rok.Commons.Equalizer;
 using Rok.Application.Features.Playlists.PlaylistMenu;
 using Rok.Application.Interfaces.Pictures;
 using Rok.Application.Services.Filters;
@@ -201,6 +202,7 @@ public static class DependencyInjection
         services.AddTransient<PlaylistExportService>();
 
         // Player ViewModel and services
+        services.AddSingleton<IEqualizerWindowService, EqualizerWindowService>();
         services.AddSingleton<PlayerViewModel>();
         services.AddSingleton<EqualizerViewModel>((sp) =>
         {

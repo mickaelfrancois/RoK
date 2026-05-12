@@ -4,7 +4,7 @@ using CommunityToolkit.Mvvm.Input;
 using Rok.Application.Dto.Lyrics;
 using Rok.Application.Features.Tracks.Command;
 using Rok.Application.Player;
-using Rok.Commons.Equalizer;
+using Rok.Services;
 using Rok.ViewModels.Album;
 using Rok.ViewModels.Artist;
 using Rok.ViewModels.Player.Services;
@@ -30,7 +30,7 @@ public partial class PlayerViewModel : ObservableObject, IDisposable
     private readonly PlayerStateManager _stateManager;
 
     private bool _isFullScreen;
-    private EqualizerWindow? _equalizerWindow;
+    private readonly IEqualizerWindowService _equalizerWindowService;
 
     public TrackViewModel? CurrentTrack => _stateManager.CurrentTrack;
     public ArtistViewModel? CurrentArtist => _stateManager.CurrentArtist;
@@ -151,6 +151,7 @@ public partial class PlayerViewModel : ObservableObject, IDisposable
         PlayerTimerManager timerManager,
         PlayerStateManager stateManager,
         EqualizerViewModel equalizerViewModel,
+        IEqualizerWindowService equalizerWindowService,
         ResourceLoader resourceLoader,
         IPlayerSleepModeService playerSleepModeService,
         ITelemetryClient telemetryClient,
@@ -165,6 +166,7 @@ public partial class PlayerViewModel : ObservableObject, IDisposable
         _timerManager = Guard.Against.Null(timerManager);
         _stateManager = Guard.Against.Null(stateManager);
         EqualizerViewModel = Guard.Against.Null(equalizerViewModel);
+        _equalizerWindowService = Guard.Against.Null(equalizerWindowService);
         _resourceLoader = Guard.Against.Null(resourceLoader);
         _playerSleepModeService = Guard.Against.Null(playerSleepModeService);
         _telemetryClient = Guard.Against.Null(telemetryClient);
@@ -508,18 +510,7 @@ public partial class PlayerViewModel : ObservableObject, IDisposable
     }
 
     [RelayCommand]
-    private void ToggleEqualizer()
-    {
-        if (_equalizerWindow != null)
-        {
-            _equalizerWindow.Activate();
-            return;
-        }
-
-        _equalizerWindow = new EqualizerWindow(EqualizerViewModel, _resourceLoader);
-        _equalizerWindow.Closed += (_, _) => _equalizerWindow = null;
-        _equalizerWindow.Activate();
-    }
+    private void ToggleEqualizer() => _equalizerWindowService.ShowOrActivate();
 
     public void Dispose()
     {
@@ -540,7 +531,7 @@ public partial class PlayerViewModel : ObservableObject, IDisposable
             _playerSleepModeService.SleepTimerStateChanged -= OnSleepTimerStateChanged;
 
             _timerManager?.Dispose();
-            _equalizerWindow?.Close();
+            _equalizerWindowService.Close();
         }
 
         _disposed = true;
