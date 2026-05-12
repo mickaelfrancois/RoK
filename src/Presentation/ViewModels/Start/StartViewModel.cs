@@ -77,14 +77,16 @@ public partial class StartViewModel : ObservableObject
         _displayTimer.Tick += OnDisplayTimerTick;
         _displayTimer.Start();
 
-        Messenger.Subscribe<LibraryRefreshMessage>(async (message) => await LibraryRefreshChangeAsync(message));
+        Messenger.Subscribe<LibraryRefreshMessage>(OnLibraryRefreshMessage);
         Messenger.Subscribe<AlbumImportedMessage>(AlbumImported);
     }
+
+    private void OnLibraryRefreshMessage(LibraryRefreshMessage message) => _ = LibraryRefreshChangeAsync(message);
 
     private void UnregisterEvents()
     {
         _displayTimer.Stop();
-        Messenger.Unsubscribe<LibraryRefreshMessage>(async (message) => await LibraryRefreshChangeAsync(message));
+        Messenger.Unsubscribe<LibraryRefreshMessage>(OnLibraryRefreshMessage);
         Messenger.Unsubscribe<AlbumImportedMessage>(AlbumImported);
     }
 
