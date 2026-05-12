@@ -140,14 +140,14 @@ public sealed partial class MainWindow : Window
     }
 
 
-    private void NavigationView_Loaded(object sender, RoutedEventArgs e)
+    private async void NavigationView_Loaded(object sender, RoutedEventArgs e)
     {
         _navigationService.MainFrame = ContentFrame;
 
         if (_dbContext.IsFirstStart)
         {
             PlaylistsSeed playlistsSeed = App.ServiceProvider.GetRequiredService<PlaylistsSeed>();
-            playlistsSeed.SeedAsync().GetAwaiter().GetResult();
+            await playlistsSeed.SeedAsync();
 
             _isOnboardingActive = true;
             navMenu.IsPaneVisible = false;
