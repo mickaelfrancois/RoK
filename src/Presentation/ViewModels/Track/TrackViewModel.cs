@@ -135,24 +135,7 @@ public partial class TrackViewModel : ObservableObject, IDisposable, IFilterable
 
     public string PlainLyrics => _lyrics?.PlainLyrics ?? string.Empty;
 
-    public ELyricsType LyricsType
-    {
-        get
-        {
-            if (_lyricsType is null)
-            {
-                _lyricsType = _lyricsService.CheckLyricsType(Track.MusicFile);
-                if (_lyricsType == ELyricsType.None)
-                {
-#pragma warning disable 4014
-                    _ = GetLyricsFromAPIAsync();
-#pragma warning restore 4014
-                }
-            }
-
-            return _lyricsType.Value;
-        }
-    }
+    public ELyricsType LyricsType => _lyricsType ?? ELyricsType.None;
 
     public bool LyricsExists => LyricsType != ELyricsType.None;
 
@@ -224,8 +207,20 @@ public partial class TrackViewModel : ObservableObject, IDisposable, IFilterable
 
         Track = track;
         LoadBackdrop();
+        await InitializeLyricsTypeAsync();
 
         OnPropertyChanged(string.Empty);
+    }
+
+    private async Task InitializeLyricsTypeAsync()
+    {
+        _lyricsType = _lyricsService.CheckLyricsType(Track.MusicFile);
+
+        if (_lyricsType == ELyricsType.None)
+            await GetLyricsFromAPIAsync();
+
+        OnPropertyChanged(nameof(LyricsType));
+        OnPropertyChanged(nameof(LyricsExists));
     }
 
     public void SetData(TrackDto track)
