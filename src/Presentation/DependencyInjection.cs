@@ -51,6 +51,7 @@ public static class DependencyInjection
     public static IServiceCollection AddLogic(this IServiceCollection services)
     {
         services.AddSingleton<ResourceLoader>((c) => ResourceLoader.GetForViewIndependentUse());
+        services.AddSingleton<IStringResourceProvider, WindowsStringResourceProvider>();
         services.AddSingleton<NavigationService>();
         services.AddSingleton<PlaylistsSeed>();
         services.AddSingleton<IDialogService, DialogService>();
