@@ -195,7 +195,7 @@ public partial class PlaylistMenuService : IPlaylistMenuService, IDisposable
             long playlistId = playlistResult.Value;
             Messenger.Send(new PlaylistUpdatedMessage(playlistId, ActionType.Add));
 
-            await AddAlbumToPlaylistAsync(playlistId, artistId);
+            await AddArtistToPlaylistAsync(playlistId, artistId);
         }
         catch (Exception ex)
         {
