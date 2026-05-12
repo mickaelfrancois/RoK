@@ -484,24 +484,24 @@ public static class MenuFlyoutExtensions
 
         TextBox textBox = new()
         {
-            PlaceholderText = resourceLoader.GetString("NewPlaylistDialog_TextBox_PlaceholderText") ?? "Nom de la playlist",
+            PlaceholderText = resourceLoader.GetString("NewPlaylistDialog_TextBox_PlaceholderText") ?? "Playlist name",
             Margin = new Thickness(0, 10, 0, 0)
         };
 
         TextBlock descriptionText = new()
         {
-            Text = resourceLoader.GetString("NewPlaylistDialog_Description_Text") ?? "Entrez le nom de votre nouvelle playlist :"
+            Text = resourceLoader.GetString("NewPlaylistDialog_Description_Text") ?? "Enter the name of your new playlist:"
         };
 
         ContentDialog dialog = new()
         {
-            Title = resourceLoader.GetString("NewPlaylistDialog_Title") ?? "Nouvelle playlist",
+            Title = resourceLoader.GetString("NewPlaylistDialog_Title") ?? "New playlist",
             Content = new StackPanel
             {
                 Children = { descriptionText, textBox }
             },
-            PrimaryButtonText = resourceLoader.GetString("NewPlaylistDialog_PrimaryButton") ?? "Cr�er",
-            CloseButtonText = resourceLoader.GetString("NewPlaylistDialog_CloseButton") ?? "Annuler",
+            PrimaryButtonText = resourceLoader.GetString("NewPlaylistDialog_PrimaryButton") ?? "Create",
+            CloseButtonText = resourceLoader.GetString("NewPlaylistDialog_CloseButton") ?? "Cancel",
             DefaultButton = ContentDialogButton.Primary,
             XamlRoot = xamlRoot
         };
