@@ -335,7 +335,7 @@ public class MusicDataApiService : IMusicDataApiService, IDisposable
             }
             catch (OperationCanceledException)
             {
-                // Ignore errors
+                // Cancellation requested by caller — expected, no action needed
             }
             catch (Exception ex)
             {
