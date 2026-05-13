@@ -90,7 +90,7 @@ public class ArtistImport(IArtistRepository _artistRepository)
         {
             Name = track.Artist.Capitalize(),
             GenreId = genreId,
-            MusicBrainzID = track.MusicbrainzAlbumID,
+            MusicBrainzID = track.MusicbrainzArtistID,
             CreatDate = DateTime.Now,
             AlbumCount = track.IsCompilation ? 0 : 1,
             CompilationCount = track.IsCompilation ? 1 : 0,

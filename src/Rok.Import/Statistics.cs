@@ -1,10 +1,11 @@
-﻿using Rok.Application.Interfaces;
+﻿using Microsoft.Extensions.Logging;
+using Rok.Application.Interfaces;
 using Rok.Application.Interfaces.Repositories;
 using Rok.Domain.Entities;
 
 namespace Rok.Import;
 
-public class Statistics(ITrackRepository trackRepository, IAlbumRepository albumRepository, IArtistRepository artistRepository, IGenreRepository genreRepository)
+public class Statistics(ITrackRepository trackRepository, IAlbumRepository albumRepository, IArtistRepository artistRepository, IGenreRepository genreRepository, ILogger<Statistics> logger)
 {
     private IEnumerable<TrackEntity>? _tracks;
     private IEnumerable<AlbumEntity>? _albums;
@@ -125,7 +126,7 @@ public class Statistics(ITrackRepository trackRepository, IAlbumRepository album
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error updating artist {artistId}: {ex.Message}");
+                logger.LogError(ex, "Failed to update statistics for artist {ArtistId}", artistId);
             }
         }
     }
