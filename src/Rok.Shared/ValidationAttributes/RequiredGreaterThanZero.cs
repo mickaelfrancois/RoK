@@ -2,7 +2,6 @@
 
 namespace Rok.Shared.ValidationAttributes;
 
-
 public class RequiredGreaterThanZero : ValidationAttribute
 {
     public RequiredGreaterThanZero()
@@ -12,6 +11,17 @@ public class RequiredGreaterThanZero : ValidationAttribute
 
     public override bool IsValid(object? value)
     {
-        return value is int i && i > 0;
+        if (value is not IConvertible convertible)
+            return false;
+
+        try
+        {
+            long numericValue = convertible.ToInt64(null);
+            return numericValue > 0;
+        }
+        catch (InvalidCastException)
+        {
+            return false;
+        }
     }
 }
