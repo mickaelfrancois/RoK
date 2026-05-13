@@ -17,8 +17,7 @@ public static class LanguageHelpers
         try
         {
             CultureInfo culture = new(languageTag);
-            string two = culture.TwoLetterISOLanguageName?.ToLowerInvariant() ?? defaultLang;
-            return string.IsNullOrWhiteSpace(two) ? defaultLang : two;
+            return culture.TwoLetterISOLanguageName.ToLowerInvariant();
         }
         catch (CultureNotFoundException)
         {
