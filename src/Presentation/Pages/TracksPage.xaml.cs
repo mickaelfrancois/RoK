@@ -45,6 +45,7 @@ public sealed partial class TracksPage : Page, IDisposable
             await ViewModel.LoadDataAsync(forceReload: false);
             base.OnNavigatedTo(e);
         }
+        catch (OperationCanceledException) { }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Navigation to TracksPage failed");

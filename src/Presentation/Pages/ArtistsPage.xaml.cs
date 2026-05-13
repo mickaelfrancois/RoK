@@ -53,6 +53,7 @@ public sealed partial class ArtistsPage : Page, IDisposable
             UpdateVisualState();
             base.OnNavigatedTo(e);
         }
+        catch (OperationCanceledException) { }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Navigation to ArtistsPage failed");

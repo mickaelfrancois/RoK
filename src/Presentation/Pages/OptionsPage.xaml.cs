@@ -74,6 +74,7 @@ public sealed partial class OptionsPage : Page
 
             await StatisticsViewModel.LoadAsync();
         }
+        catch (OperationCanceledException) { }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Navigation to OptionsPage failed");

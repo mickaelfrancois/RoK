@@ -31,6 +31,7 @@ public sealed partial class TrackPage : Page
             await ViewModel.LoadDataAsync(options.TrackId);
             base.OnNavigatedTo(e);
         }
+        catch (OperationCanceledException) { }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Navigation to TrackPage failed");

@@ -29,6 +29,7 @@ public sealed partial class AlbumPage : Page
             await ViewModel.LoadDataAsync(options.AlbumId);
             base.OnNavigatedTo(e);
         }
+        catch (OperationCanceledException) { }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Navigation to AlbumPage failed");

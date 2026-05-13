@@ -32,6 +32,7 @@ public sealed partial class PlaylistPage : Page
 
             base.OnNavigatedTo(e);
         }
+        catch (OperationCanceledException) { }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Navigation to PlaylistPage failed");

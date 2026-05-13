@@ -31,6 +31,7 @@ public sealed partial class ArtistPage : Page
             await ViewModel.LoadDataAsync(options.ArtistId);
             base.OnNavigatedTo(e);
         }
+        catch (OperationCanceledException) { }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Navigation to ArtistPage failed");

@@ -27,6 +27,7 @@ public sealed partial class InsightsPage : Page
             await ViewModel.LoadDataAsync();
             base.OnNavigatedTo(e);
         }
+        catch (OperationCanceledException) { }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Navigation to InsightsPage failed");

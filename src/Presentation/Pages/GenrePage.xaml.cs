@@ -33,6 +33,7 @@ public sealed partial class GenrePage : Page
             await ViewModel.LoadDataAsync(options.GenreId);
             base.OnNavigatedTo(e);
         }
+        catch (OperationCanceledException) { }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Navigation to GenrePage failed");
