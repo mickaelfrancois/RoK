@@ -6,7 +6,7 @@ using Rok.Shared.Extensions;
 
 namespace Rok.Import;
 
-public class GenreImport(IGenreRepository _genreRepository)
+public class GenreImport(IGenreRepository _genreRepository, TimeProvider _timeProvider)
 {
     public int CreatedCount { get; private set; } = 0;
 
@@ -16,7 +16,7 @@ public class GenreImport(IGenreRepository _genreRepository)
     private readonly Dictionary<string, GenreCacheItem> _cache = new(StringComparer.InvariantCultureIgnoreCase);
 
 
-    public async Task LoadCacheAsync()
+    public async Task LoadCacheAsync(CancellationToken cancellationToken = default)
     {
         _cache.Clear();
 
@@ -48,7 +48,7 @@ public class GenreImport(IGenreRepository _genreRepository)
     }
 
 
-    public async Task<GenreCacheItem?> CreateAsync(string genreName)
+    public async Task<GenreCacheItem?> CreateAsync(string genreName, CancellationToken cancellationToken = default)
     {
         if (string.IsNullOrEmpty(genreName))
             return null;
@@ -56,7 +56,7 @@ public class GenreImport(IGenreRepository _genreRepository)
         GenreEntity genre = new()
         {
             Name = genreName.Capitalize(),
-            CreatDate = DateTime.Now,
+            CreatDate = _timeProvider.GetLocalNow().DateTime,
             ArtistCount = 1
         };
 
@@ -75,8 +75,8 @@ public class GenreImport(IGenreRepository _genreRepository)
     }
 
 
-    private static string GetKey(string artistName)
+    private static string GetKey(string genreName)
     {
-        return artistName.ToUpperInvariant();
+        return genreName.ToUpperInvariant();
     }
 }

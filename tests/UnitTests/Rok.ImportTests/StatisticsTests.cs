@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using Rok.Application.Interfaces.Repositories;
 using Rok.Import;
@@ -20,7 +21,7 @@ public class StatisticsTests
         artistRepo.Setup(r => r.GetAllAsync(It.IsAny<RepositoryConnectionKind>())).ReturnsAsync(artists ?? Array.Empty<ArtistEntity>());
         Mock<IGenreRepository> genreRepo = new();
         genreRepo.Setup(r => r.GetAllAsync(It.IsAny<RepositoryConnectionKind>())).ReturnsAsync(genres ?? Array.Empty<GenreEntity>());
-        return (new Statistics(trackRepo.Object, albumRepo.Object, artistRepo.Object, genreRepo.Object), trackRepo, albumRepo, artistRepo, genreRepo);
+        return (new Statistics(trackRepo.Object, albumRepo.Object, artistRepo.Object, genreRepo.Object, NullLogger<Statistics>.Instance), trackRepo, albumRepo, artistRepo, genreRepo);
     }
 
     [Fact(DisplayName = "UpdateAlbumsAsync should do nothing when the id list is empty")]

@@ -12,7 +12,7 @@ public class ArtistApiService(
     IMusicDataApiService musicDataApiService,
     ILogger<ArtistApiService> logger) : IArtistApiService
 {
-    public async Task<ArtistApiUpdateResult> GetAndUpdateArtistDataAsync(ArtistDto artist, IArtistPictureService pictureService, IBackdropPicture backdropPicture)
+    public async Task<ArtistApiUpdateResult> GetAndUpdateArtistDataAsync(ArtistDto artist, IArtistPictureService pictureService, IBackdropPicture backdropPicture, CancellationToken cancellationToken = default)
     {
         if (string.IsNullOrEmpty(artist.Name))
             return ArtistApiUpdateResult.None;

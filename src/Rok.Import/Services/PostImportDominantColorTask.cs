@@ -27,6 +27,8 @@ public class PostImportDominantColorTask(IDominantColorCalculator calculator,
     public async Task ProcessAlbumsAsync(CancellationToken cancellationToken)
     {
         int count = 0;
+        if (cancellationToken.IsCancellationRequested)
+            return;
         IEnumerable<AlbumEntity> albums = await albumRepository.GetAllAsync(RepositoryConnectionKind.Background);
 
         foreach (AlbumEntity album in albums.Where(c => !c.PictureDominantColor.HasValue))
@@ -53,6 +55,8 @@ public class PostImportDominantColorTask(IDominantColorCalculator calculator,
     public async Task ProcessArtistsAsync(CancellationToken cancellationToken)
     {
         int count = 0;
+        if (cancellationToken.IsCancellationRequested)
+            return;
         IEnumerable<ArtistEntity> artists = await artistRepository.GetAllAsync(RepositoryConnectionKind.Background);
 
         foreach (ArtistEntity artist in artists.Where(c => !c.PictureDominantColor.HasValue))

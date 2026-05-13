@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Time.Testing;
 using Moq;
 using Rok.Application.Interfaces.Repositories;
 using Rok.Application.Tag;
@@ -62,7 +63,7 @@ public class TrackMetadataServiceTests
 
     #region AreTrackAndFileEquals
 
-    [Fact]
+    [Fact(DisplayName = "AreTrackAndFileEquals should return true when all fields match")]
     public void AreTrackAndFileEquals_ShouldReturnTrue_WhenAllFieldsMatch()
     {
         TrackEntity track = BuildTrack();
@@ -73,7 +74,7 @@ public class TrackMetadataServiceTests
         Assert.True(result);
     }
 
-    [Fact]
+    [Fact(DisplayName = "AreTrackAndFileEquals should return false when title differs")]
     public void AreTrackAndFileEquals_ShouldReturnFalse_WhenTitleDiffers()
     {
         TrackEntity track = BuildTrack(title: "Old Title");
@@ -84,7 +85,7 @@ public class TrackMetadataServiceTests
         Assert.False(result);
     }
 
-    [Fact]
+    [Fact(DisplayName = "AreTrackAndFileEquals should return false when artist differs")]
     public void AreTrackAndFileEquals_ShouldReturnFalse_WhenArtistDiffers()
     {
         TrackEntity track = BuildTrack(artistName: "Old Artist");
@@ -95,7 +96,7 @@ public class TrackMetadataServiceTests
         Assert.False(result);
     }
 
-    [Fact]
+    [Fact(DisplayName = "AreTrackAndFileEquals should return false when album differs")]
     public void AreTrackAndFileEquals_ShouldReturnFalse_WhenAlbumDiffers()
     {
         TrackEntity track = BuildTrack(albumName: "Old Album");
@@ -106,7 +107,7 @@ public class TrackMetadataServiceTests
         Assert.False(result);
     }
 
-    [Fact]
+    [Fact(DisplayName = "AreTrackAndFileEquals should return false when genre differs")]
     public void AreTrackAndFileEquals_ShouldReturnFalse_WhenGenreDiffers()
     {
         TrackEntity track = BuildTrack(genreName: "Rock");
@@ -117,7 +118,7 @@ public class TrackMetadataServiceTests
         Assert.False(result);
     }
 
-    [Fact]
+    [Fact(DisplayName = "AreTrackAndFileEquals should return false when size differs")]
     public void AreTrackAndFileEquals_ShouldReturnFalse_WhenSizeDiffers()
     {
         TrackEntity track = BuildTrack(size: 1000);
@@ -128,7 +129,7 @@ public class TrackMetadataServiceTests
         Assert.False(result);
     }
 
-    [Fact]
+    [Fact(DisplayName = "AreTrackAndFileEquals should return false when track number differs")]
     public void AreTrackAndFileEquals_ShouldReturnFalse_WhenTrackNumberDiffers()
     {
         TrackEntity track = BuildTrack(trackNumber: 1);
@@ -139,7 +140,7 @@ public class TrackMetadataServiceTests
         Assert.False(result);
     }
 
-    [Fact]
+    [Fact(DisplayName = "AreTrackAndFileEquals should be case insensitive")]
     public void AreTrackAndFileEquals_ShouldBeCaseInsensitive()
     {
         TrackEntity track = BuildTrack(title: "title", artistName: "artist", albumName: "album", genreName: "genre");
@@ -154,49 +155,52 @@ public class TrackMetadataServiceTests
 
     #region EnsureTrackTimestamps
 
-    [Fact]
+    [Fact(DisplayName = "EnsureTrackTimestamps when new track should set MusicFile and CreatDate")]
     public void EnsureTrackTimestamps_WhenNewTrack_ShouldSetMusicFileAndCreatDate()
     {
+        TrackMetadataService service = new(new TrackImport(Mock.Of<ITrackRepository>()), Mock.Of<ILogger<TrackMetadataService>>(), TimeProvider.System);
         TrackEntity track = new() { Id = 0 };
         TrackFile file = BuildFile(fullPath: @"C:\music\song.mp3");
 
-        TrackMetadataService.EnsureTrackTimestamps(track, file);
+        service.EnsureTrackTimestamps(track, file);
 
         Assert.Equal(Path.GetFullPath(@"C:\music\song.mp3"), track.MusicFile);
         Assert.NotEqual(default, track.CreatDate);
         Assert.Null(track.EditDate);
     }
 
-    [Fact]
+    [Fact(DisplayName = "EnsureTrackTimestamps when existing track should set EditDate only")]
     public void EnsureTrackTimestamps_WhenExistingTrack_ShouldSetEditDateOnly()
     {
+        TrackMetadataService service = new(new TrackImport(Mock.Of<ITrackRepository>()), Mock.Of<ILogger<TrackMetadataService>>(), TimeProvider.System);
         TrackEntity track = new() { Id = 42, MusicFile = @"C:\music\song.mp3" };
         TrackFile file = BuildFile(fullPath: @"C:\music\other.mp3");
 
-        TrackMetadataService.EnsureTrackTimestamps(track, file);
+        service.EnsureTrackTimestamps(track, file);
 
         Assert.Equal(@"C:\music\song.mp3", track.MusicFile);
         Assert.NotNull(track.EditDate);
     }
 
-    [Fact]
-    public void EnsureTrackTimestamps_WhenNewTrack_CreatDateShouldBeCloseToNow()
+    [Fact(DisplayName = "EnsureTrackTimestamps when new track CreatDate should match TimeProvider")]
+    public void EnsureTrackTimestamps_WhenNewTrack_CreatDateShouldMatchTimeProvider()
     {
+        FakeTimeProvider fakeTime = new();
+        fakeTime.SetLocalTimeZone(TimeZoneInfo.Local);
+        TrackMetadataService service = new(new TrackImport(Mock.Of<ITrackRepository>()), Mock.Of<ILogger<TrackMetadataService>>(), fakeTime);
         TrackEntity track = new() { Id = 0 };
         TrackFile file = BuildFile();
 
-        DateTime before = DateTime.Now;
-        TrackMetadataService.EnsureTrackTimestamps(track, file);
-        DateTime after = DateTime.Now;
+        service.EnsureTrackTimestamps(track, file);
 
-        Assert.InRange(track.CreatDate, before, after);
+        Assert.Equal(fakeTime.GetLocalNow().DateTime, track.CreatDate);
     }
 
     #endregion
 
     #region FillTrackEntity
 
-    [Fact]
+    [Fact(DisplayName = "FillTrackEntity should fill all fields from the track file")]
     public void FillTrackEntity_ShouldFillAllFields()
     {
         TrackEntity track = new();
@@ -219,7 +223,7 @@ public class TrackMetadataServiceTests
         Assert.Equal(200, track.Duration);
     }
 
-    [Fact]
+    [Fact(DisplayName = "FillTrackEntity should accept null ids")]
     public void FillTrackEntity_ShouldAcceptNullIds()
     {
         TrackEntity track = new();
@@ -232,7 +236,7 @@ public class TrackMetadataServiceTests
         Assert.Null(track.GenreId);
     }
 
-    [Fact]
+    [Fact(DisplayName = "FillTrackEntity should round duration to nearest second")]
     public void FillTrackEntity_ShouldRoundDurationToNearestSecond()
     {
         TrackEntity track = new();
@@ -243,7 +247,7 @@ public class TrackMetadataServiceTests
         Assert.Equal(100, track.Duration);
     }
 
-    [Fact]
+    [Fact(DisplayName = "FillTrackEntity should set FileDate from the track file modified date")]
     public void FillTrackEntity_ShouldSetFileDate()
     {
         TrackEntity track = new();
@@ -265,7 +269,7 @@ public class TrackMetadataServiceTests
         Mock<ITrackRepository> mockRepo = new();
         TrackImport importTrack = new(mockRepo.Object);
         Mock<ILogger<TrackMetadataService>> mockLogger = new();
-        TrackMetadataService service = new(importTrack, mockLogger.Object);
+        TrackMetadataService service = new(importTrack, mockLogger.Object, TimeProvider.System);
 
         TrackFile file = BuildFile();
 
@@ -280,7 +284,7 @@ public class TrackMetadataServiceTests
         Mock<ITrackRepository> mockRepo = new();
         TrackImport importTrack = new(mockRepo.Object);
         Mock<ILogger<TrackMetadataService>> mockLogger = new();
-        TrackMetadataService service = new(importTrack, mockLogger.Object);
+        TrackMetadataService service = new(importTrack, mockLogger.Object, TimeProvider.System);
 
         TrackEntity track = BuildTrack(title: "Old Title");
         TrackFile file = BuildFile(title: "New Title");
@@ -296,7 +300,7 @@ public class TrackMetadataServiceTests
         Mock<ITrackRepository> mockRepo = new();
         TrackImport importTrack = new(mockRepo.Object);
         Mock<ILogger<TrackMetadataService>> mockLogger = new();
-        TrackMetadataService service = new(importTrack, mockLogger.Object);
+        TrackMetadataService service = new(importTrack, mockLogger.Object, TimeProvider.System);
 
         var date = new DateTime(2024, 1, 1, 12, 0, 0, DateTimeKind.Utc);
         TrackEntity track = BuildTrack(fileDate: date);

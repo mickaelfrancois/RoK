@@ -5,9 +5,9 @@ using Rok.Shared.Extensions;
 
 namespace Rok.Import.Services;
 
-public class TrackMetadataService(TrackImport importTrack, ILogger<TrackMetadataService> logger)
+public class TrackMetadataService(TrackImport importTrack, ILogger<TrackMetadataService> logger, TimeProvider timeProvider)
 {
-    public async Task<bool> ShouldUpdateMetadataAsync(TrackFile file, TrackEntity? track)
+    public async Task<bool> ShouldUpdateMetadataAsync(TrackFile file, TrackEntity? track, CancellationToken cancellationToken = default)
     {
         if (track == null)
             return true;
@@ -52,17 +52,17 @@ public class TrackMetadataService(TrackImport importTrack, ILogger<TrackMetadata
         return true;
     }
 
-    public static void EnsureTrackTimestamps(TrackEntity track, TrackFile file)
+    public void EnsureTrackTimestamps(TrackEntity track, TrackFile file)
     {
         if (track.Id == 0)
         {
             track.MusicFile = Path.GetFullPath(file.FullPath);
-            track.CreatDate = DateTime.Now;
+            track.CreatDate = timeProvider.GetLocalNow().DateTime;
             track.EditDate = null;
         }
         else
         {
-            track.EditDate = DateTime.Now;
+            track.EditDate = timeProvider.GetLocalNow().DateTime;
         }
     }
 

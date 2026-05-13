@@ -48,7 +48,7 @@ public class PostImportApiEnrichmentTask(
                     continue;
                 }
 
-                await artistApiService.GetAndUpdateArtistDataAsync(result.Value!, artistPictureService, backdropPicture);
+                await artistApiService.GetAndUpdateArtistDataAsync(result.Value!, artistPictureService, backdropPicture, cancellationToken);
                 enriched++;
             }
             catch (Exception ex)
@@ -80,7 +80,7 @@ public class PostImportApiEnrichmentTask(
                     continue;
                 }
 
-                await albumApiService.GetAndUpdateAlbumDataAsync(result.Value!, albumPictureService);
+                await albumApiService.GetAndUpdateAlbumDataAsync(result.Value!, albumPictureService, cancellationToken);
                 enriched++;
             }
             catch (Exception ex)

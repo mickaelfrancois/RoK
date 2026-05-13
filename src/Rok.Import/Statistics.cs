@@ -1,10 +1,11 @@
-﻿using Rok.Application.Interfaces;
+﻿using Microsoft.Extensions.Logging;
+using Rok.Application.Interfaces;
 using Rok.Application.Interfaces.Repositories;
 using Rok.Domain.Entities;
 
 namespace Rok.Import;
 
-public class Statistics(ITrackRepository trackRepository, IAlbumRepository albumRepository, IArtistRepository artistRepository, IGenreRepository genreRepository)
+public class Statistics(ITrackRepository trackRepository, IAlbumRepository albumRepository, IArtistRepository artistRepository, IGenreRepository genreRepository, ILogger<Statistics> logger)
 {
     private IEnumerable<TrackEntity>? _tracks;
     private IEnumerable<AlbumEntity>? _albums;
@@ -41,7 +42,7 @@ public class Statistics(ITrackRepository trackRepository, IAlbumRepository album
     }
 
 
-    public async Task UpdateAlbumsAsync(IEnumerable<long> albumsId)
+    public async Task UpdateAlbumsAsync(IEnumerable<long> albumsId, CancellationToken cancellationToken = default)
     {
         if (!albumsId.Any())
             return;
@@ -60,11 +61,12 @@ public class Statistics(ITrackRepository trackRepository, IAlbumRepository album
             if (album.TrackCount == albumTracks.Count && album.Duration == albumTracks.Sum(t => t.Duration))
                 continue; // No changes needed
 
+            // TODO: pass cancellationToken when repositories support it
             await albumRepository.UpdateStatisticsAsync(albumId, albumTracks.Count, albumTracks.Sum(t => t.Duration), RepositoryConnectionKind.Background);
         }
     }
 
-    public async Task UpdateArtistsAsync(IEnumerable<long> artistsId)
+    public async Task UpdateArtistsAsync(IEnumerable<long> artistsId, CancellationToken cancellationToken = default)
     {
         if (!artistsId.Any())
             return;
@@ -110,6 +112,7 @@ public class Statistics(ITrackRepository trackRepository, IAlbumRepository album
                    artist.YearMaxi == yearMaxi)
                     continue; // No changes needed
 
+                // TODO: pass cancellationToken when repositories support it
                 await artistRepository.UpdateStatisticsAsync(
                     artistId,
                     trackCount,
@@ -125,12 +128,12 @@ public class Statistics(ITrackRepository trackRepository, IAlbumRepository album
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error updating artist {artistId}: {ex.Message}");
+                logger.LogError(ex, "Failed to update statistics for artist {ArtistId}", artistId);
             }
         }
     }
 
-    public async Task UpdateGenresAsync(IEnumerable<long> genresId)
+    public async Task UpdateGenresAsync(IEnumerable<long> genresId, CancellationToken cancellationToken = default)
     {
         if (!genresId.Any())
             return;
@@ -166,6 +169,7 @@ public class Statistics(ITrackRepository trackRepository, IAlbumRepository album
                genre.CompilationCount == compilationCount)
                 continue; // No changes needed
 
+            // TODO: pass cancellationToken when repositories support it
             await genreRepository.UpdateStatisticsAsync(
                 genreId,
                 trackCount,

@@ -7,7 +7,7 @@ using Rok.Shared.Extensions;
 
 namespace Rok.Import;
 
-public class ArtistImport(IArtistRepository _artistRepository)
+public class ArtistImport(IArtistRepository _artistRepository, TimeProvider _timeProvider)
 {
     public int CreatedCount { get; private set; } = 0;
 
@@ -28,7 +28,7 @@ public class ArtistImport(IArtistRepository _artistRepository)
     /// <remarks>This method retrieves all artist entities from the repository and populates the cache with
     /// them. Each artist is stored in the cache using a key derived from the artist's name.</remarks>
     /// <returns>A task that represents the asynchronous operation.</returns>
-    public async Task LoadCacheAsync()
+    public async Task LoadCacheAsync(CancellationToken cancellationToken = default)
     {
         _cache.Clear();
         _newlyCreatedIds.Clear();
@@ -79,7 +79,7 @@ public class ArtistImport(IArtistRepository _artistRepository)
     /// <param name="genreId">An optional genre identifier to associate with the artist. Can be null if no genre is specified.</param>
     /// <returns>An <see cref="ArtistCacheItem"/> representing the newly created artist entry, or <see langword="null"/> if the
     /// artist information is incomplete.</returns>
-    public async Task<ArtistCacheItem?> CreateAsync(TrackFile track, long? genreId)
+    public async Task<ArtistCacheItem?> CreateAsync(TrackFile track, long? genreId, CancellationToken cancellationToken = default)
     {
         if (string.IsNullOrEmpty(track.Artist))
             return null;
@@ -90,8 +90,8 @@ public class ArtistImport(IArtistRepository _artistRepository)
         {
             Name = track.Artist.Capitalize(),
             GenreId = genreId,
-            MusicBrainzID = track.MusicbrainzAlbumID,
-            CreatDate = DateTime.Now,
+            MusicBrainzID = track.MusicbrainzArtistID,
+            CreatDate = _timeProvider.GetLocalNow().DateTime,
             AlbumCount = track.IsCompilation ? 0 : 1,
             CompilationCount = track.IsCompilation ? 1 : 0,
         };

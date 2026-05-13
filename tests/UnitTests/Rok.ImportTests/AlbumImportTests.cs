@@ -11,7 +11,7 @@ public class AlbumImportTests
     public void GetFromCache_ShouldReturnNull_ForEmptyAlbumName()
     {
         // Arrange
-        AlbumImport import = new(Mock.Of<IAlbumRepository>());
+        AlbumImport import = new(Mock.Of<IAlbumRepository>(), TimeProvider.System);
 
         // Act
         AlbumCacheItem? result = import.GetFromCache("", false, 1);
@@ -31,7 +31,7 @@ public class AlbumImportTests
         };
         Mock<IAlbumRepository> repository = new();
         repository.Setup(r => r.GetAllAsync(It.IsAny<RepositoryConnectionKind>())).ReturnsAsync(albums);
-        AlbumImport import = new(repository.Object);
+        AlbumImport import = new(repository.Object, TimeProvider.System);
 
         // Act
         await import.LoadCacheAsync();
@@ -53,7 +53,7 @@ public class AlbumImportTests
         };
         Mock<IAlbumRepository> repository = new();
         repository.Setup(r => r.GetAllAsync(It.IsAny<RepositoryConnectionKind>())).ReturnsAsync(albums);
-        AlbumImport import = new(repository.Object);
+        AlbumImport import = new(repository.Object, TimeProvider.System);
         await import.LoadCacheAsync();
 
         // Act
@@ -69,7 +69,7 @@ public class AlbumImportTests
     public async Task CreateAsync_ShouldReturnNull_WhenTrackHasNoAlbumName()
     {
         // Arrange
-        AlbumImport import = new(Mock.Of<IAlbumRepository>());
+        AlbumImport import = new(Mock.Of<IAlbumRepository>(), TimeProvider.System);
 
         // Act
         AlbumCacheItem? result = await import.CreateAsync(new TrackFile { Album = "", FullPath = @"C:\music\x.mp3" }, null, null);
@@ -82,7 +82,7 @@ public class AlbumImportTests
     public async Task CreateAsync_ShouldReturnNull_WhenTrackHasNoFilePath()
     {
         // Arrange
-        AlbumImport import = new(Mock.Of<IAlbumRepository>());
+        AlbumImport import = new(Mock.Of<IAlbumRepository>(), TimeProvider.System);
 
         // Act
         AlbumCacheItem? result = await import.CreateAsync(new TrackFile { Album = "A", FullPath = "" }, null, null);
@@ -100,7 +100,7 @@ public class AlbumImportTests
         repository.Setup(r => r.AddAsync(It.IsAny<AlbumEntity>(), It.IsAny<RepositoryConnectionKind>()))
             .Callback<AlbumEntity, RepositoryConnectionKind>((a, _) => captured = a)
             .ReturnsAsync(1);
-        AlbumImport import = new(repository.Object);
+        AlbumImport import = new(repository.Object, TimeProvider.System);
 
         // Act
         await import.CreateAsync(new TrackFile { Album = "Unplugged In New York live", FullPath = @"C:\music\x.mp3" }, 10, null);
@@ -119,7 +119,7 @@ public class AlbumImportTests
         repository.Setup(r => r.AddAsync(It.IsAny<AlbumEntity>(), It.IsAny<RepositoryConnectionKind>()))
             .Callback<AlbumEntity, RepositoryConnectionKind>((a, _) => captured = a)
             .ReturnsAsync(1);
-        AlbumImport import = new(repository.Object);
+        AlbumImport import = new(repository.Object, TimeProvider.System);
 
         // Act
         await import.CreateAsync(new TrackFile { Album = "The Greatest Hits", FullPath = @"C:\music\x.mp3" }, 10, null);
@@ -137,7 +137,7 @@ public class AlbumImportTests
         repository.Setup(r => r.AddAsync(It.IsAny<AlbumEntity>(), It.IsAny<RepositoryConnectionKind>()))
             .Callback<AlbumEntity, RepositoryConnectionKind>((a, _) => captured = a)
             .ReturnsAsync(1);
-        AlbumImport import = new(repository.Object);
+        AlbumImport import = new(repository.Object, TimeProvider.System);
 
         // Act
         await import.CreateAsync(new TrackFile { Album = "My Album", FullPath = @"C:\music\artist\album\track.mp3" }, 7, 3);
@@ -154,7 +154,7 @@ public class AlbumImportTests
         // Arrange
         Mock<IAlbumRepository> repository = new();
         repository.Setup(r => r.AddAsync(It.IsAny<AlbumEntity>(), It.IsAny<RepositoryConnectionKind>())).ReturnsAsync(99);
-        AlbumImport import = new(repository.Object);
+        AlbumImport import = new(repository.Object, TimeProvider.System);
 
         // Act
         AlbumCacheItem? created = await import.CreateAsync(new TrackFile { Album = "ok", FullPath = @"C:\m\t.mp3" }, 1, null);
@@ -170,7 +170,7 @@ public class AlbumImportTests
     public void NewlyCreatedIds_ShouldBeEmpty_OnInitialization()
     {
         // Arrange & Act
-        AlbumImport import = new(Mock.Of<IAlbumRepository>());
+        AlbumImport import = new(Mock.Of<IAlbumRepository>(), TimeProvider.System);
 
         // Assert
         Assert.Empty(import.NewlyCreatedIds);
@@ -182,7 +182,7 @@ public class AlbumImportTests
         // Arrange
         Mock<IAlbumRepository> repository = new();
         repository.Setup(r => r.AddAsync(It.IsAny<AlbumEntity>(), It.IsAny<RepositoryConnectionKind>())).ReturnsAsync(99L);
-        AlbumImport import = new(repository.Object);
+        AlbumImport import = new(repository.Object, TimeProvider.System);
 
         // Act
         await import.CreateAsync(new TrackFile { Album = "Black", Artist = "AC/DC", FullPath = @"C:\m\t.mp3" }, 1, null);
@@ -200,7 +200,7 @@ public class AlbumImportTests
         Mock<IAlbumRepository> repository = new();
         repository.Setup(r => r.AddAsync(It.IsAny<AlbumEntity>(), It.IsAny<RepositoryConnectionKind>()))
             .ReturnsAsync(() => id++);
-        AlbumImport import = new(repository.Object);
+        AlbumImport import = new(repository.Object, TimeProvider.System);
 
         // Act
         for (int i = 0; i < 101; i++)
@@ -217,7 +217,7 @@ public class AlbumImportTests
         Mock<IAlbumRepository> repository = new();
         repository.Setup(r => r.AddAsync(It.IsAny<AlbumEntity>(), It.IsAny<RepositoryConnectionKind>())).ReturnsAsync(1L);
         repository.Setup(r => r.GetAllAsync(It.IsAny<RepositoryConnectionKind>())).ReturnsAsync(Array.Empty<AlbumEntity>());
-        AlbumImport import = new(repository.Object);
+        AlbumImport import = new(repository.Object, TimeProvider.System);
         await import.CreateAsync(new TrackFile { Album = "Black", Artist = "AC/DC", FullPath = @"C:\m\t.mp3" }, 1, null);
 
         // Act

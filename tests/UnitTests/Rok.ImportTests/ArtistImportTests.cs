@@ -11,7 +11,7 @@ public class ArtistImportTests
     public void GetFromCache_ShouldReturnNull_ForEmptyArtistName()
     {
         // Arrange
-        ArtistImport import = new(Mock.Of<IArtistRepository>());
+        ArtistImport import = new(Mock.Of<IArtistRepository>(), TimeProvider.System);
 
         // Act & Assert
         Assert.Null(import.GetFromCache(""));
@@ -27,7 +27,7 @@ public class ArtistImportTests
         };
         Mock<IArtistRepository> repository = new();
         repository.Setup(r => r.GetAllAsync(It.IsAny<RepositoryConnectionKind>())).ReturnsAsync(artists);
-        ArtistImport import = new(repository.Object);
+        ArtistImport import = new(repository.Object, TimeProvider.System);
 
         // Act
         await import.LoadCacheAsync();
@@ -42,7 +42,7 @@ public class ArtistImportTests
     public async Task CreateAsync_ShouldReturnNull_WhenTrackArtistIsEmpty()
     {
         // Arrange
-        ArtistImport import = new(Mock.Of<IArtistRepository>());
+        ArtistImport import = new(Mock.Of<IArtistRepository>(), TimeProvider.System);
 
         // Act
         ArtistCacheItem? result = await import.CreateAsync(new TrackFile { Artist = "", FullPath = @"C:\music\x.mp3" }, null);
@@ -60,7 +60,7 @@ public class ArtistImportTests
         repository.Setup(r => r.AddAsync(It.IsAny<ArtistEntity>(), It.IsAny<RepositoryConnectionKind>()))
             .Callback<ArtistEntity, RepositoryConnectionKind>((a, _) => captured = a)
             .ReturnsAsync(1);
-        ArtistImport import = new(repository.Object);
+        ArtistImport import = new(repository.Object, TimeProvider.System);
 
         // Act
         await import.CreateAsync(new TrackFile { Artist = "queen", FullPath = @"C:\m\t.mp3", IsCompilation = false }, 7);
@@ -81,7 +81,7 @@ public class ArtistImportTests
         repository.Setup(r => r.AddAsync(It.IsAny<ArtistEntity>(), It.IsAny<RepositoryConnectionKind>()))
             .Callback<ArtistEntity, RepositoryConnectionKind>((a, _) => captured = a)
             .ReturnsAsync(1);
-        ArtistImport import = new(repository.Object);
+        ArtistImport import = new(repository.Object, TimeProvider.System);
 
         // Act
         await import.CreateAsync(new TrackFile { Artist = "various", FullPath = @"C:\m\t.mp3", IsCompilation = true }, null);
@@ -97,7 +97,7 @@ public class ArtistImportTests
         // Arrange
         Mock<IArtistRepository> repository = new();
         repository.Setup(r => r.AddAsync(It.IsAny<ArtistEntity>(), It.IsAny<RepositoryConnectionKind>())).ReturnsAsync(50);
-        ArtistImport import = new(repository.Object);
+        ArtistImport import = new(repository.Object, TimeProvider.System);
 
         // Act
         ArtistCacheItem? created = await import.CreateAsync(new TrackFile { Artist = "Metallica", FullPath = @"C:\m\t.mp3" }, 2);
@@ -113,7 +113,7 @@ public class ArtistImportTests
     public void NewlyCreatedIds_ShouldBeEmpty_OnInitialization()
     {
         // Arrange & Act
-        ArtistImport import = new(Mock.Of<IArtistRepository>());
+        ArtistImport import = new(Mock.Of<IArtistRepository>(), TimeProvider.System);
 
         // Assert
         Assert.Empty(import.NewlyCreatedIds);
@@ -125,7 +125,7 @@ public class ArtistImportTests
         // Arrange
         Mock<IArtistRepository> repository = new();
         repository.Setup(r => r.AddAsync(It.IsAny<ArtistEntity>(), It.IsAny<RepositoryConnectionKind>())).ReturnsAsync(42L);
-        ArtistImport import = new(repository.Object);
+        ArtistImport import = new(repository.Object, TimeProvider.System);
 
         // Act
         await import.CreateAsync(new TrackFile { Artist = "Metallica", FullPath = @"C:\m\t.mp3" }, null);
@@ -143,7 +143,7 @@ public class ArtistImportTests
         Mock<IArtistRepository> repository = new();
         repository.Setup(r => r.AddAsync(It.IsAny<ArtistEntity>(), It.IsAny<RepositoryConnectionKind>()))
             .ReturnsAsync(() => id++);
-        ArtistImport import = new(repository.Object);
+        ArtistImport import = new(repository.Object, TimeProvider.System);
 
         // Act
         for (int i = 0; i < 101; i++)
@@ -160,7 +160,7 @@ public class ArtistImportTests
         Mock<IArtistRepository> repository = new();
         repository.Setup(r => r.AddAsync(It.IsAny<ArtistEntity>(), It.IsAny<RepositoryConnectionKind>())).ReturnsAsync(1L);
         repository.Setup(r => r.GetAllAsync(It.IsAny<RepositoryConnectionKind>())).ReturnsAsync(Array.Empty<ArtistEntity>());
-        ArtistImport import = new(repository.Object);
+        ArtistImport import = new(repository.Object, TimeProvider.System);
         await import.CreateAsync(new TrackFile { Artist = "Metallica", FullPath = @"C:\m\t.mp3" }, null);
 
         // Act

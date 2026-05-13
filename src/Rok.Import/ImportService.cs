@@ -10,7 +10,6 @@ namespace Rok.Import;
 
 public class ImportService(
 IFolderResolver folderResolver,
-CountryCache countryCache,
 IAppOptions options,
 Statistics statistics,
 TrackImport importTrack,
@@ -35,7 +34,6 @@ ILogger<ImportService> logger) : IImport
     private readonly ILogger<ImportService> _logger = Guard.Against.Null(logger);
     private readonly IAppOptions _options = Guard.Against.Null(options);
     private readonly ICleanLibrary _cleanLibraryService = Guard.Against.Null(cleanLibraryService);
-    private readonly CountryCache _countryCache = Guard.Against.Null(countryCache);
     private readonly Statistics _statistics = Guard.Against.Null(statistics);
     private readonly TrackImport _importTrack = Guard.Against.Null(importTrack);
     private readonly AlbumImport _importAlbum = Guard.Against.Null(importAlbum);
@@ -49,7 +47,7 @@ ILogger<ImportService> logger) : IImport
     private readonly PostImportDominantColorTask _postImportDominantColorTask = Guard.Against.Null(postImportDominantColorTask);
     private readonly PostImportApiEnrichmentTask _postImportApiEnrichmentTask = Guard.Against.Null(postImportApiEnrichmentTask);
 
-    private CancellationTokenSource? _cancellationToken;
+    private CancellationTokenSource? _cts;
     private Task _runningTask = Task.CompletedTask;
 
     public void Start(int delayInSeconds)
@@ -65,7 +63,7 @@ ILogger<ImportService> logger) : IImport
         if (UpdateInProgress)
             return;
 
-        _cancellationToken = new CancellationTokenSource();
+        _cts = new CancellationTokenSource();
         UpdateInProgress = true;
 
         _messageThrottler.Reset();
@@ -78,10 +76,10 @@ ILogger<ImportService> logger) : IImport
 
     public async Task StopAsync()
     {
-        if (_cancellationToken is null || !UpdateInProgress)
+        if (_cts is null || !UpdateInProgress)
             return;
 
-        await _cancellationToken.CancelAsync();
+        await _cts.CancelAsync();
 
         try
         {
@@ -102,9 +100,9 @@ ILogger<ImportService> logger) : IImport
         try
         {
             if (delayInSeconds > 0)
-                await Task.Delay(delayInSeconds, _cancellationToken!.Token);
+                await Task.Delay(delayInSeconds, _cts!.Token);
 
-            await Task.Run(() => ImportAsync(_cancellationToken!.Token), _cancellationToken!.Token);
+            await Task.Run(() => ImportAsync(_cts!.Token), _cts!.Token);
         }
         catch (OperationCanceledException)
         {
@@ -124,7 +122,7 @@ ILogger<ImportService> logger) : IImport
             UpdateInProgress = false;
             _progressService.ReportStopped(Statistics);
 
-            _cancellationToken?.Dispose();
+            _cts?.Dispose();
         }
     }
 
@@ -152,7 +150,7 @@ ILogger<ImportService> logger) : IImport
         if (cancellationToken.IsCancellationRequested)
             return;
 
-        await UpdateStatisticsAsync();
+        await UpdateStatisticsAsync(cancellationToken);
 
         if (cancellationToken.IsCancellationRequested)
             return;
@@ -244,15 +242,15 @@ ILogger<ImportService> logger) : IImport
         return errorOccurred;
     }
 
-    private async Task UpdateStatisticsAsync()
+    private async Task UpdateStatisticsAsync(CancellationToken cancellationToken)
     {
         _progressService.ReportUpdateData();
 
         using (PerfLogger perfLogger = new PerfLogger(_logger).Parameters("Update statistics"))
         {
-            await _statistics.UpdateArtistsAsync(_trackingService.GetUpdatedArtists());
-            await _statistics.UpdateAlbumsAsync(_trackingService.GetUpdatedAlbums());
-            await _statistics.UpdateGenresAsync(_trackingService.GetUpdatedGenres());
+            await _statistics.UpdateArtistsAsync(_trackingService.GetUpdatedArtists(), cancellationToken);
+            await _statistics.UpdateAlbumsAsync(_trackingService.GetUpdatedAlbums(), cancellationToken);
+            await _statistics.UpdateGenresAsync(_trackingService.GetUpdatedGenres(), cancellationToken);
         }
     }
 
@@ -281,7 +279,6 @@ ILogger<ImportService> logger) : IImport
     {
         using (PerfLogger perfLogger = new PerfLogger(_logger).Parameters("LoadCaches"))
         {
-            await _countryCache.LoadCacheAsync();
             await _importTrack.LoadCacheAsync();
             await _importAlbum.LoadCacheAsync();
             await _importArtist.LoadCacheAsync();

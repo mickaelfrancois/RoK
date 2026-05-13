@@ -8,7 +8,7 @@ using Rok.Shared.Extensions;
 
 namespace Rok.Import;
 
-public class AlbumImport(IAlbumRepository _albumRepository)
+public class AlbumImport(IAlbumRepository _albumRepository, TimeProvider _timeProvider)
 {
     public int CreatedCount { get; private set; } = 0;
 
@@ -32,7 +32,7 @@ public class AlbumImport(IAlbumRepository _albumRepository)
     /// repository. Each album is stored in the cache with a unique key generated from its name, compilation status, and
     /// artist ID.</remarks>
     /// <returns>A task that represents the asynchronous operation.</returns>
-    public async Task LoadCacheAsync()
+    public async Task LoadCacheAsync(CancellationToken cancellationToken = default)
     {
         _cache.Clear();
         _newlyCreatedIds.Clear();
@@ -90,7 +90,7 @@ public class AlbumImport(IAlbumRepository _albumRepository)
     /// applicable.</param>
     /// <returns>A task that represents the asynchronous operation. The task result contains an <see cref="AlbumCacheItem"/>
     /// representing the created album, or <see langword="null"/> if the album name or path is not provided.</returns>
-    public async Task<AlbumCacheItem?> CreateAsync(TrackFile track, long? artistId, long? genreId)
+    public async Task<AlbumCacheItem?> CreateAsync(TrackFile track, long? artistId, long? genreId, CancellationToken cancellationToken = default)
     {
         if (string.IsNullOrEmpty(track.Album))
             return null;
@@ -113,7 +113,7 @@ public class AlbumImport(IAlbumRepository _albumRepository)
             IsLive = isLive,
             AlbumPath = Path.GetDirectoryName(track.FullPath)!,
             MusicBrainzID = track.MusicbrainzAlbumID,
-            CreatDate = DateTime.Now
+            CreatDate = _timeProvider.GetLocalNow().DateTime
         };
 
         long id = await _albumRepository.AddAsync(album, RepositoryConnectionKind.Background);

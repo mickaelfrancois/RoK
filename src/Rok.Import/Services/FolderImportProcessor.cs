@@ -51,7 +51,7 @@ public class FolderImportProcessor(
 
         statistics.FilesRead += files.Count;
 
-        if (!AreFilesNewer(files))
+        if (!RequiresImport(files))
             return;
 
         _trackFileProcessor.ReadMusicProperties(files);
@@ -62,15 +62,15 @@ public class FolderImportProcessor(
             if (cancellationToken.IsCancellationRequested)
                 return;
 
-            await ProcessTrackFileAsync(file, statistics).ConfigureAwait(false);
+            await ProcessTrackFileAsync(file, statistics, cancellationToken).ConfigureAwait(false);
         }
     }
 
-    private async Task ProcessTrackFileAsync(TrackFile file, ImportStatisticsDto statistics)
+    private async Task ProcessTrackFileAsync(TrackFile file, ImportStatisticsDto statistics, CancellationToken cancellationToken)
     {
         TrackEntity? track = GetTrackByFile(file);
 
-        if (!await _metadataService.ShouldUpdateMetadataAsync(file, track).ConfigureAwait(false))
+        if (!await _metadataService.ShouldUpdateMetadataAsync(file, track, cancellationToken).ConfigureAwait(false))
             return;
 
         GenreCacheItem? genre = await GetOrCreateGenreAsync(file.Genre, statistics).ConfigureAwait(false);
@@ -81,7 +81,7 @@ public class FolderImportProcessor(
 
         track ??= new TrackEntity();
 
-        TrackMetadataService.EnsureTrackTimestamps(track, file);
+        _metadataService.EnsureTrackTimestamps(track, file);
         TrackMetadataService.FillTrackEntity(track, file, artist?.Id, album?.Id, genreId);
 
         UpdateStatisticsForTrack(track);
@@ -128,7 +128,7 @@ public class FolderImportProcessor(
         }
     }
 
-    private bool AreFilesNewer(List<TrackFile> files)
+    private bool RequiresImport(List<TrackFile> files)
     {
         foreach (TrackFile file in files)
         {
