@@ -142,7 +142,7 @@ public class AddTrackToPlaylistCommandHandlerTests
         trackLinkRepository.Setup(r => r.GetAsync(1L, 5L, It.IsAny<RepositoryConnectionKind>())).ReturnsAsync(0);
         trackLinkRepository.Setup(r => r.AddAsync(It.IsAny<PlaylistTrackEntity>(), It.IsAny<RepositoryConnectionKind>())).ReturnsAsync(99);
 
-        AddTrackToPlaylistCommandHandler handler = new(trackLinkRepository.Object, headerRepository.Object, trackRepository.Object);
+        AddTrackToPlaylistCommandHandler handler = new(trackLinkRepository.Object, headerRepository.Object, trackRepository.Object, Mock.Of<ILogger<AddTrackToPlaylistCommandHandler>>());
 
         // Act
         Result<long> result = await handler.HandleAsync(new AddTrackToPlaylistCommand { PlaylistId = 1, TrackId = 5 }, CancellationToken.None);
@@ -160,7 +160,7 @@ public class AddTrackToPlaylistCommandHandlerTests
         // Arrange
         Mock<ITrackRepository> trackRepository = new();
         trackRepository.Setup(r => r.GetByIdAsync(It.IsAny<long>(), It.IsAny<RepositoryConnectionKind>())).ReturnsAsync((TrackEntity?)null);
-        AddTrackToPlaylistCommandHandler handler = new(Mock.Of<IPlaylistTrackRepository>(), Mock.Of<IPlaylistHeaderRepository>(), trackRepository.Object);
+        AddTrackToPlaylistCommandHandler handler = new(Mock.Of<IPlaylistTrackRepository>(), Mock.Of<IPlaylistHeaderRepository>(), trackRepository.Object, Mock.Of<ILogger<AddTrackToPlaylistCommandHandler>>());
 
         // Act
         Result<long> result = await handler.HandleAsync(new AddTrackToPlaylistCommand { PlaylistId = 1, TrackId = 5 }, CancellationToken.None);
@@ -178,7 +178,7 @@ public class AddTrackToPlaylistCommandHandlerTests
         Mock<IPlaylistHeaderRepository> headerRepository = new();
         headerRepository.Setup(r => r.GetByIdAsync(It.IsAny<long>(), It.IsAny<RepositoryConnectionKind>())).ReturnsAsync((PlaylistHeaderEntity?)null);
 
-        AddTrackToPlaylistCommandHandler handler = new(Mock.Of<IPlaylistTrackRepository>(), headerRepository.Object, trackRepository.Object);
+        AddTrackToPlaylistCommandHandler handler = new(Mock.Of<IPlaylistTrackRepository>(), headerRepository.Object, trackRepository.Object, Mock.Of<ILogger<AddTrackToPlaylistCommandHandler>>());
 
         // Act
         Result<long> result = await handler.HandleAsync(new AddTrackToPlaylistCommand { PlaylistId = 1, TrackId = 5 }, CancellationToken.None);
@@ -198,7 +198,7 @@ public class AddTrackToPlaylistCommandHandlerTests
         Mock<IPlaylistTrackRepository> trackLinkRepository = new();
         trackLinkRepository.Setup(r => r.GetAsync(1L, 5L, It.IsAny<RepositoryConnectionKind>())).ReturnsAsync(77);
 
-        AddTrackToPlaylistCommandHandler handler = new(trackLinkRepository.Object, headerRepository.Object, trackRepository.Object);
+        AddTrackToPlaylistCommandHandler handler = new(trackLinkRepository.Object, headerRepository.Object, trackRepository.Object, Mock.Of<ILogger<AddTrackToPlaylistCommandHandler>>());
 
         // Act
         Result<long> result = await handler.HandleAsync(new AddTrackToPlaylistCommand { PlaylistId = 1, TrackId = 5 }, CancellationToken.None);
@@ -206,6 +206,27 @@ public class AddTrackToPlaylistCommandHandlerTests
         // Assert
         Assert.False(result.IsSuccess);
         trackLinkRepository.Verify(r => r.AddAsync(It.IsAny<PlaylistTrackEntity>(), It.IsAny<RepositoryConnectionKind>()), Times.Never);
+    }
+
+    [Fact(DisplayName = "Handle should return failure when repository throws inside transaction")]
+    public async Task Handle_ShouldReturnFailure_WhenRepositoryThrowsInsideTransaction()
+    {
+        // Arrange
+        Mock<ITrackRepository> trackRepository = new();
+        trackRepository.Setup(r => r.GetByIdAsync(5, It.IsAny<RepositoryConnectionKind>())).ReturnsAsync(new TrackEntity { Id = 5 });
+        Mock<IPlaylistHeaderRepository> headerRepository = new();
+        headerRepository.Setup(r => r.GetByIdAsync(1, It.IsAny<RepositoryConnectionKind>())).ReturnsAsync(new PlaylistHeaderEntity { Id = 1 });
+        Mock<IPlaylistTrackRepository> trackLinkRepository = new();
+        trackLinkRepository.Setup(r => r.GetAsync(1L, 5L, It.IsAny<RepositoryConnectionKind>())).ReturnsAsync(0);
+        trackLinkRepository.Setup(r => r.AddAsync(It.IsAny<PlaylistTrackEntity>(), It.IsAny<RepositoryConnectionKind>())).ThrowsAsync(new InvalidOperationException("DB error"));
+
+        AddTrackToPlaylistCommandHandler handler = new(trackLinkRepository.Object, headerRepository.Object, trackRepository.Object, Mock.Of<ILogger<AddTrackToPlaylistCommandHandler>>());
+
+        // Act
+        Result<long> result = await handler.HandleAsync(new AddTrackToPlaylistCommand { PlaylistId = 1, TrackId = 5 }, CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsSuccess);
     }
 }
 
@@ -234,7 +255,7 @@ public class AddAlbumToPlaylistCommandHandlerTests
         trackLinkRepository.Setup(r => r.GetAsync(10L, 3L, It.IsAny<RepositoryConnectionKind>())).ReturnsAsync(0);
         trackLinkRepository.Setup(r => r.AddAsync(It.IsAny<PlaylistTrackEntity>(), It.IsAny<RepositoryConnectionKind>())).ReturnsAsync(1);
 
-        AddAlbumToPlaylistCommandHandler handler = new(trackLinkRepository.Object, headerRepository.Object, trackRepository.Object);
+        AddAlbumToPlaylistCommandHandler handler = new(trackLinkRepository.Object, headerRepository.Object, trackRepository.Object, Mock.Of<ILogger<AddAlbumToPlaylistCommandHandler>>());
 
         // Act
         Result<long> result = await handler.HandleAsync(new AddAlbumToPlaylistCommand { PlaylistId = 10, AlbumId = 5 }, CancellationToken.None);
@@ -256,7 +277,7 @@ public class AddAlbumToPlaylistCommandHandlerTests
         Mock<IPlaylistHeaderRepository> headerRepository = new();
         headerRepository.Setup(r => r.GetByIdAsync(It.IsAny<long>(), It.IsAny<RepositoryConnectionKind>())).ReturnsAsync((PlaylistHeaderEntity?)null);
 
-        AddAlbumToPlaylistCommandHandler handler = new(Mock.Of<IPlaylistTrackRepository>(), headerRepository.Object, trackRepository.Object);
+        AddAlbumToPlaylistCommandHandler handler = new(Mock.Of<IPlaylistTrackRepository>(), headerRepository.Object, trackRepository.Object, Mock.Of<ILogger<AddAlbumToPlaylistCommandHandler>>());
 
         // Act
         Result<long> result = await handler.HandleAsync(new AddAlbumToPlaylistCommand { PlaylistId = 99, AlbumId = 5 }, CancellationToken.None);
@@ -277,10 +298,32 @@ public class AddAlbumToPlaylistCommandHandlerTests
         Mock<IPlaylistTrackRepository> trackLinkRepository = new();
         trackLinkRepository.Setup(r => r.GetAsync(It.IsAny<long>(), It.IsAny<long>(), It.IsAny<RepositoryConnectionKind>())).ReturnsAsync(77);
 
-        AddAlbumToPlaylistCommandHandler handler = new(trackLinkRepository.Object, headerRepository.Object, trackRepository.Object);
+        AddAlbumToPlaylistCommandHandler handler = new(trackLinkRepository.Object, headerRepository.Object, trackRepository.Object, Mock.Of<ILogger<AddAlbumToPlaylistCommandHandler>>());
 
         // Act
         Result<long> result = await handler.HandleAsync(new AddAlbumToPlaylistCommand { PlaylistId = 10, AlbumId = 1 }, CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsSuccess);
+    }
+
+    [Fact(DisplayName = "Handle should return failure when repository throws inside transaction")]
+    public async Task Handle_ShouldReturnFailure_WhenRepositoryThrowsInsideTransaction()
+    {
+        // Arrange
+        List<TrackEntity> tracks = new() { new() { Id = 1, Duration = 100 } };
+        Mock<ITrackRepository> trackRepository = new();
+        trackRepository.Setup(r => r.GetByAlbumIdAsync(5L, It.IsAny<RepositoryConnectionKind>())).ReturnsAsync(tracks);
+        Mock<IPlaylistHeaderRepository> headerRepository = new();
+        headerRepository.Setup(r => r.GetByIdAsync(10, It.IsAny<RepositoryConnectionKind>())).ReturnsAsync(new PlaylistHeaderEntity { Id = 10 });
+        Mock<IPlaylistTrackRepository> trackLinkRepository = new();
+        trackLinkRepository.Setup(r => r.GetAsync(10L, 1L, It.IsAny<RepositoryConnectionKind>())).ReturnsAsync(0);
+        trackLinkRepository.Setup(r => r.AddAsync(It.IsAny<PlaylistTrackEntity>(), It.IsAny<RepositoryConnectionKind>())).ThrowsAsync(new InvalidOperationException("DB error"));
+
+        AddAlbumToPlaylistCommandHandler handler = new(trackLinkRepository.Object, headerRepository.Object, trackRepository.Object, Mock.Of<ILogger<AddAlbumToPlaylistCommandHandler>>());
+
+        // Act
+        Result<long> result = await handler.HandleAsync(new AddAlbumToPlaylistCommand { PlaylistId = 10, AlbumId = 5 }, CancellationToken.None);
 
         // Assert
         Assert.False(result.IsSuccess);
@@ -309,7 +352,7 @@ public class AddArtistToPlaylistCommandHandlerTests
         trackLinkRepository.Setup(r => r.GetAsync(It.IsAny<long>(), It.IsAny<long>(), It.IsAny<RepositoryConnectionKind>())).ReturnsAsync(0);
         trackLinkRepository.Setup(r => r.AddAsync(It.IsAny<PlaylistTrackEntity>(), It.IsAny<RepositoryConnectionKind>())).ReturnsAsync(1);
 
-        AddArtistToPlaylistCommandHandler handler = new(trackLinkRepository.Object, headerRepository.Object, trackRepository.Object);
+        AddArtistToPlaylistCommandHandler handler = new(trackLinkRepository.Object, headerRepository.Object, trackRepository.Object, Mock.Of<ILogger<AddArtistToPlaylistCommandHandler>>());
 
         // Act
         Result<long> result = await handler.HandleAsync(new AddArtistToPlaylistCommand { PlaylistId = 10, ArtistId = 7 }, CancellationToken.None);
@@ -319,6 +362,28 @@ public class AddArtistToPlaylistCommandHandlerTests
         Assert.Equal(2, result.Value);
         Assert.Equal(2, header.TrackCount);
         Assert.Equal(300, header.Duration);
+    }
+
+    [Fact(DisplayName = "Handle should return failure when repository throws inside transaction")]
+    public async Task Handle_ShouldReturnFailure_WhenRepositoryThrowsInsideTransaction()
+    {
+        // Arrange
+        List<TrackEntity> tracks = new() { new() { Id = 1, Duration = 100 } };
+        Mock<ITrackRepository> trackRepository = new();
+        trackRepository.Setup(r => r.GetByArtistIdAsync(7L, It.IsAny<RepositoryConnectionKind>())).ReturnsAsync(tracks);
+        Mock<IPlaylistHeaderRepository> headerRepository = new();
+        headerRepository.Setup(r => r.GetByIdAsync(10, It.IsAny<RepositoryConnectionKind>())).ReturnsAsync(new PlaylistHeaderEntity { Id = 10 });
+        Mock<IPlaylistTrackRepository> trackLinkRepository = new();
+        trackLinkRepository.Setup(r => r.GetAsync(10L, 1L, It.IsAny<RepositoryConnectionKind>())).ReturnsAsync(0);
+        trackLinkRepository.Setup(r => r.AddAsync(It.IsAny<PlaylistTrackEntity>(), It.IsAny<RepositoryConnectionKind>())).ThrowsAsync(new InvalidOperationException("DB error"));
+
+        AddArtistToPlaylistCommandHandler handler = new(trackLinkRepository.Object, headerRepository.Object, trackRepository.Object, Mock.Of<ILogger<AddArtistToPlaylistCommandHandler>>());
+
+        // Act
+        Result<long> result = await handler.HandleAsync(new AddArtistToPlaylistCommand { PlaylistId = 10, ArtistId = 7 }, CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsSuccess);
     }
 }
 
@@ -340,7 +405,7 @@ public class RemoveTrackFromPlaylistCommandHandlerTests
         trackLinkRepository.Setup(r => r.GetAsync(10L, 5L, It.IsAny<RepositoryConnectionKind>())).ReturnsAsync(77);
         trackLinkRepository.Setup(r => r.DeleteAsync(10L, 5L, It.IsAny<RepositoryConnectionKind>())).ReturnsAsync(1);
 
-        RemoveTrackFromPlaylistCommandHandler handler = new(trackLinkRepository.Object, headerRepository.Object, trackRepository.Object);
+        RemoveTrackFromPlaylistCommandHandler handler = new(trackLinkRepository.Object, headerRepository.Object, trackRepository.Object, Mock.Of<ILogger<RemoveTrackFromPlaylistCommandHandler>>());
 
         // Act
         Result result = await handler.HandleAsync(new RemoveTrackFromPlaylistCommand { PlaylistId = 10, TrackId = 5 }, CancellationToken.None);
@@ -367,7 +432,7 @@ public class RemoveTrackFromPlaylistCommandHandlerTests
         trackLinkRepository.Setup(r => r.GetAsync(10L, 5L, It.IsAny<RepositoryConnectionKind>())).ReturnsAsync(77);
         trackLinkRepository.Setup(r => r.DeleteAsync(10L, 5L, It.IsAny<RepositoryConnectionKind>())).ReturnsAsync(1);
 
-        RemoveTrackFromPlaylistCommandHandler handler = new(trackLinkRepository.Object, headerRepository.Object, trackRepository.Object);
+        RemoveTrackFromPlaylistCommandHandler handler = new(trackLinkRepository.Object, headerRepository.Object, trackRepository.Object, Mock.Of<ILogger<RemoveTrackFromPlaylistCommandHandler>>());
 
         // Act
         Result result = await handler.HandleAsync(new RemoveTrackFromPlaylistCommand { PlaylistId = 10, TrackId = 5 }, CancellationToken.None);
@@ -389,7 +454,28 @@ public class RemoveTrackFromPlaylistCommandHandlerTests
         Mock<IPlaylistTrackRepository> trackLinkRepository = new();
         trackLinkRepository.Setup(r => r.GetAsync(It.IsAny<long>(), It.IsAny<long>(), It.IsAny<RepositoryConnectionKind>())).ReturnsAsync(0);
 
-        RemoveTrackFromPlaylistCommandHandler handler = new(trackLinkRepository.Object, headerRepository.Object, trackRepository.Object);
+        RemoveTrackFromPlaylistCommandHandler handler = new(trackLinkRepository.Object, headerRepository.Object, trackRepository.Object, Mock.Of<ILogger<RemoveTrackFromPlaylistCommandHandler>>());
+
+        // Act
+        Result result = await handler.HandleAsync(new RemoveTrackFromPlaylistCommand { PlaylistId = 10, TrackId = 5 }, CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsSuccess);
+    }
+
+    [Fact(DisplayName = "Handle should return failure when repository throws inside transaction")]
+    public async Task Handle_ShouldReturnFailure_WhenRepositoryThrowsInsideTransaction()
+    {
+        // Arrange
+        Mock<ITrackRepository> trackRepository = new();
+        trackRepository.Setup(r => r.GetByIdAsync(5, It.IsAny<RepositoryConnectionKind>())).ReturnsAsync(new TrackEntity { Id = 5 });
+        Mock<IPlaylistHeaderRepository> headerRepository = new();
+        headerRepository.Setup(r => r.GetByIdAsync(10, It.IsAny<RepositoryConnectionKind>())).ReturnsAsync(new PlaylistHeaderEntity { Id = 10 });
+        Mock<IPlaylistTrackRepository> trackLinkRepository = new();
+        trackLinkRepository.Setup(r => r.GetAsync(10L, 5L, It.IsAny<RepositoryConnectionKind>())).ReturnsAsync(77);
+        trackLinkRepository.Setup(r => r.DeleteAsync(10L, 5L, It.IsAny<RepositoryConnectionKind>())).ThrowsAsync(new InvalidOperationException("DB error"));
+
+        RemoveTrackFromPlaylistCommandHandler handler = new(trackLinkRepository.Object, headerRepository.Object, trackRepository.Object, Mock.Of<ILogger<RemoveTrackFromPlaylistCommandHandler>>());
 
         // Act
         Result result = await handler.HandleAsync(new RemoveTrackFromPlaylistCommand { PlaylistId = 10, TrackId = 5 }, CancellationToken.None);
@@ -445,7 +531,7 @@ public class MovePlaylistTracksCommandHandlerTests
         Mock<IPlaylistTrackRepository> repository = new();
         repository.Setup(r => r.GetAsync(10L, It.IsAny<RepositoryConnectionKind>())).ReturnsAsync(current);
         repository.Setup(r => r.UpdatePositionAsync(It.IsAny<long>(), It.IsAny<int>(), It.IsAny<RepositoryConnectionKind>())).ReturnsAsync(1);
-        MovePlaylistTracksCommandHandler handler = new(repository.Object);
+        MovePlaylistTracksCommandHandler handler = new(repository.Object, Mock.Of<ILogger<MovePlaylistTracksCommandHandler>>());
 
         MovePlaylistTracksCommand command = new() { PlaylistId = 10, Tracks = new List<long> { 3, 2, 1 } };
 
@@ -471,10 +557,25 @@ public class MovePlaylistTracksCommandHandlerTests
         Mock<IPlaylistTrackRepository> repository = new();
         repository.Setup(r => r.GetAsync(10L, It.IsAny<RepositoryConnectionKind>())).ReturnsAsync(current);
         repository.Setup(r => r.UpdatePositionAsync(It.IsAny<long>(), It.IsAny<int>(), It.IsAny<RepositoryConnectionKind>())).ReturnsAsync(0);
-        MovePlaylistTracksCommandHandler handler = new(repository.Object);
+        MovePlaylistTracksCommandHandler handler = new(repository.Object, Mock.Of<ILogger<MovePlaylistTracksCommandHandler>>());
 
         // Act
         Result<bool> result = await handler.HandleAsync(new MovePlaylistTracksCommand { PlaylistId = 10, Tracks = new List<long> { 2, 1 } }, CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsSuccess);
+    }
+
+    [Fact(DisplayName = "Handle should return failure when repository throws inside transaction")]
+    public async Task Handle_ShouldReturnFailure_WhenRepositoryThrowsInsideTransaction()
+    {
+        // Arrange
+        Mock<IPlaylistTrackRepository> repository = new();
+        repository.Setup(r => r.GetAsync(10L, It.IsAny<RepositoryConnectionKind>())).ThrowsAsync(new InvalidOperationException("DB error"));
+        MovePlaylistTracksCommandHandler handler = new(repository.Object, Mock.Of<ILogger<MovePlaylistTracksCommandHandler>>());
+
+        // Act
+        Result<bool> result = await handler.HandleAsync(new MovePlaylistTracksCommand { PlaylistId = 10, Tracks = new List<long> { 1, 2 } }, CancellationToken.None);
 
         // Assert
         Assert.False(result.IsSuccess);

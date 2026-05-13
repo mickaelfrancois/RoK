@@ -42,7 +42,7 @@ public class RemoveTrackFromPlaylistCommandHandler(IPlaylistTrackRepository _rep
         catch (Exception ex)
         {
             _logger.LogError(ex, "Failed to remove track {TrackId} from playlist {PlaylistId}.", message.TrackId, message.PlaylistId);
-            return Result.Fail("Failed to remove track to playlist due to an error.");
+            return Result.Fail("Failed to remove track from playlist due to an error.");
         }
 
         return Result.Success();
