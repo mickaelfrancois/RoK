@@ -325,7 +325,7 @@ public partial class TrackViewModel : ObservableObject, IDisposable, IFilterable
         if (!string.IsNullOrEmpty(PlainLyrics))
         {
             string? rawLanguage = Windows.Globalization.ApplicationLanguages.Languages.FirstOrDefault();
-            string language = LanguageHelpers.NormalizeLanguageForLibreTranslate(rawLanguage, "fr");
+            string language = LanguageHelpers.NormalizeLanguageCode(rawLanguage, "fr");
 
             await _dialogService.ShowTextAsync($"{ArtistName} - {Title}", PlainLyrics, showTranslateButton: _appOptions.NovaApiEnabled, language);
         }

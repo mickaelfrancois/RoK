@@ -9,7 +9,7 @@ public static class LanguageHelpers
         return CultureInfo.CurrentCulture.TwoLetterISOLanguageName;
     }
 
-    public static string NormalizeLanguageForLibreTranslate(string? languageTag, string defaultLang = "fr")
+    public static string NormalizeLanguageCode(string? languageTag, string defaultLang = "fr")
     {
         if (string.IsNullOrWhiteSpace(languageTag))
             return defaultLang;
@@ -29,7 +29,7 @@ public static class LanguageHelpers
             if (primary.Length == 2)
                 return primary;
 
-            return primary.Length >= 2 ? primary.Substring(0, 2) : defaultLang;
+            return primary.Length >= 2 ? primary[..2] : defaultLang;
         }
     }
 }

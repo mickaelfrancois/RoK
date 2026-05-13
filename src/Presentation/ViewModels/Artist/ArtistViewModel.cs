@@ -575,7 +575,7 @@ public partial class ArtistViewModel : ObservableObject, IFilterableArtist, IGro
         if (!string.IsNullOrEmpty(Artist.Biography))
         {
             string? rawLanguage = Windows.Globalization.ApplicationLanguages.Languages.FirstOrDefault();
-            string language = LanguageHelpers.NormalizeLanguageForLibreTranslate(rawLanguage, "fr");
+            string language = LanguageHelpers.NormalizeLanguageCode(rawLanguage, "fr");
 
             await _dialogService.ShowTextAsync(Artist.Name, Artist.Biography, showTranslateButton: _appOptions.NovaApiEnabled, language);
         }

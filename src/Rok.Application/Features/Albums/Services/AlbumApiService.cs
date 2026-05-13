@@ -104,23 +104,23 @@ public class AlbumApiService(
 
     private static bool CompareAlbumFromApi(AlbumDto album, MusicDataAlbumDto albumApi)
     {
-        if (album.Label.AreDifferents(albumApi.Label)) return true;
-        if (album.Sales.AreDifferents(albumApi.Sales)) return true;
-        if (album.MusicBrainzID.AreDifferents(albumApi.MusicBrainzID)) return true;
+        if (album.Label.AreDifferent(albumApi.Label)) return true;
+        if (album.Sales.AreDifferent(albumApi.Sales)) return true;
+        if (album.MusicBrainzID.AreDifferent(albumApi.MusicBrainzID)) return true;
         if (album.ReleaseDate != albumApi.ReleaseDate) return true;
-        if (album.ReleaseFormat.AreDifferents(albumApi.ReleaseFormat)) return true;
-        if (album.Wikipedia.AreDifferents(albumApi.Wikipedia)) return true;
-        if (album.AllMusicID.AreDifferents(albumApi.AllMusicID)) return true;
-        if (album.AmazonID.AreDifferents(albumApi.AmazonID)) return true;
-        if (album.AudioDbArtistID.AreDifferents(albumApi.AudioDbArtistID)) return true;
-        if (album.AudioDbID.AreDifferents(albumApi.AudioDbID)) return true;
-        if (album.DiscogsID.AreDifferents(albumApi.DiscogsID)) return true;
-        if (album.GeniusID.AreDifferents(albumApi.GeniusID)) return true;
-        if (album.LyricWikiID.AreDifferents(albumApi.LyricWikiID)) return true;
-        if (album.MusicMozID.AreDifferents(albumApi.MusicMozID)) return true;
-        if (album.ReleaseGroupMusicBrainzID.AreDifferents(albumApi.ReleaseGroupMusicBrainzID)) return true;
-        if (album.WikidataID.AreDifferents(albumApi.WikidataID)) return true;
-        if (album.WikipediaID.AreDifferents(albumApi.WikipediaID)) return true;
+        if (album.ReleaseFormat.AreDifferent(albumApi.ReleaseFormat)) return true;
+        if (album.Wikipedia.AreDifferent(albumApi.Wikipedia)) return true;
+        if (album.AllMusicID.AreDifferent(albumApi.AllMusicID)) return true;
+        if (album.AmazonID.AreDifferent(albumApi.AmazonID)) return true;
+        if (album.AudioDbArtistID.AreDifferent(albumApi.AudioDbArtistID)) return true;
+        if (album.AudioDbID.AreDifferent(albumApi.AudioDbID)) return true;
+        if (album.DiscogsID.AreDifferent(albumApi.DiscogsID)) return true;
+        if (album.GeniusID.AreDifferent(albumApi.GeniusID)) return true;
+        if (album.LyricWikiID.AreDifferent(albumApi.LyricWikiID)) return true;
+        if (album.MusicMozID.AreDifferent(albumApi.MusicMozID)) return true;
+        if (album.ReleaseGroupMusicBrainzID.AreDifferent(albumApi.ReleaseGroupMusicBrainzID)) return true;
+        if (album.WikidataID.AreDifferent(albumApi.WikidataID)) return true;
+        if (album.WikipediaID.AreDifferent(albumApi.WikipediaID)) return true;
 
         return string.IsNullOrWhiteSpace(album.Biography) && !string.IsNullOrWhiteSpace(albumApi.Biography);
     }

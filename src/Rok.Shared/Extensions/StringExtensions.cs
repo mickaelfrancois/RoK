@@ -17,13 +17,13 @@ public static class StringExtensions
     {
         if (value.Length > 1)
         {
-            value = value[0].ToString().ToUpper() + value.Substring(1).ToLower();
+            value = value[0].ToString().ToUpper() + value[1..].ToLower();
         }
         return value;
     }
 
 
-    public static string GetNameFirstLetter(string name)
+    public static string GetNameFirstLetter(this string? name)
     {
         string result = "#123";
 
@@ -41,7 +41,7 @@ public static class StringExtensions
 
     public static bool IsDifferent(this string value, string value2)
     {
-        return string.Compare(value, value2, true) != 0;
+        return string.Compare(value, value2, StringComparison.OrdinalIgnoreCase) != 0;
     }
 
 
@@ -60,6 +60,6 @@ public static class StringExtensions
     /// <param name="a">The first string to compare. Can be <see langword="null"/>.</param>
     /// <param name="b">The second string to compare. Can be <see langword="null"/>.</param>
     /// <returns><see langword="true"/> if the strings are different; otherwise, <see langword="false"/>.</returns>
-    public static bool AreDifferents(this string? a, string? b) => (a ?? "") != (b ?? "");
+    public static bool AreDifferent(this string? a, string? b) => (a ?? "") != (b ?? "");
 
 }

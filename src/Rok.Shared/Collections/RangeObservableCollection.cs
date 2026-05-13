@@ -5,12 +5,11 @@ namespace Rok.Shared.Collections;
 
 public class RangeObservableCollection<T> : ObservableCollection<T>
 {
-    private bool _supressEvents = false;
-    private readonly Lock _lock = new();
+    private bool _suppressEvents;
 
     /// <summary>
     /// Clear collection and add a list of items.
-    /// </summary>    
+    /// </summary>
     public virtual void InitWithAddRange(IEnumerable<T> items)
     {
         Clear();
@@ -19,23 +18,20 @@ public class RangeObservableCollection<T> : ObservableCollection<T>
 
     public virtual void AddRange(IEnumerable<T> items)
     {
-        lock (_lock)
-        {
-            _supressEvents = true;
+        _suppressEvents = true;
 
-            foreach (T item in items)
-                Add(item);
+        foreach (T item in items)
+            Add(item);
 
-            _supressEvents = false;
+        _suppressEvents = false;
 
-            OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
-        }
+        OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
     }
 
 
     protected override void OnCollectionChanged(NotifyCollectionChangedEventArgs e)
     {
-        if (!_supressEvents)
+        if (!_suppressEvents)
             base.OnCollectionChanged(e);
     }
 
