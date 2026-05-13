@@ -61,6 +61,7 @@ public class Statistics(ITrackRepository trackRepository, IAlbumRepository album
             if (album.TrackCount == albumTracks.Count && album.Duration == albumTracks.Sum(t => t.Duration))
                 continue; // No changes needed
 
+            // TODO: pass cancellationToken when repositories support it
             await albumRepository.UpdateStatisticsAsync(albumId, albumTracks.Count, albumTracks.Sum(t => t.Duration), RepositoryConnectionKind.Background);
         }
     }
@@ -111,6 +112,7 @@ public class Statistics(ITrackRepository trackRepository, IAlbumRepository album
                    artist.YearMaxi == yearMaxi)
                     continue; // No changes needed
 
+                // TODO: pass cancellationToken when repositories support it
                 await artistRepository.UpdateStatisticsAsync(
                     artistId,
                     trackCount,
@@ -167,6 +169,7 @@ public class Statistics(ITrackRepository trackRepository, IAlbumRepository album
                genre.CompilationCount == compilationCount)
                 continue; // No changes needed
 
+            // TODO: pass cancellationToken when repositories support it
             await genreRepository.UpdateStatisticsAsync(
                 genreId,
                 trackCount,

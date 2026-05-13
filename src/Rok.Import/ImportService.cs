@@ -150,7 +150,7 @@ ILogger<ImportService> logger) : IImport
         if (cancellationToken.IsCancellationRequested)
             return;
 
-        await UpdateStatisticsAsync();
+        await UpdateStatisticsAsync(cancellationToken);
 
         if (cancellationToken.IsCancellationRequested)
             return;
@@ -242,15 +242,15 @@ ILogger<ImportService> logger) : IImport
         return errorOccurred;
     }
 
-    private async Task UpdateStatisticsAsync()
+    private async Task UpdateStatisticsAsync(CancellationToken cancellationToken)
     {
         _progressService.ReportUpdateData();
 
         using (PerfLogger perfLogger = new PerfLogger(_logger).Parameters("Update statistics"))
         {
-            await _statistics.UpdateArtistsAsync(_trackingService.GetUpdatedArtists());
-            await _statistics.UpdateAlbumsAsync(_trackingService.GetUpdatedAlbums());
-            await _statistics.UpdateGenresAsync(_trackingService.GetUpdatedGenres());
+            await _statistics.UpdateArtistsAsync(_trackingService.GetUpdatedArtists(), cancellationToken);
+            await _statistics.UpdateAlbumsAsync(_trackingService.GetUpdatedAlbums(), cancellationToken);
+            await _statistics.UpdateGenresAsync(_trackingService.GetUpdatedGenres(), cancellationToken);
         }
     }
 
