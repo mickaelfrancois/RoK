@@ -115,11 +115,7 @@ public class TelemetryClient : ITelemetryClient
 
         try
         {
-            HttpResponseMessage response = await _httpClient.PostAsJsonAsync("events", eventDto, cts.Token);
-            if (response.IsSuccessStatusCode)
-            {
-                // test
-            }
+            await _httpClient.PostAsJsonAsync("events", eventDto, cts.Token);
         }
         catch
         {
