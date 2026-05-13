@@ -98,7 +98,7 @@ public partial class App : Microsoft.UI.Xaml.Application
                     ITelemetryClient telemetry = ServiceProvider.GetRequiredService<ITelemetryClient>();
                     await telemetry.CaptureExceptionAsync(ex);
                 }
-                catch { }
+                catch { } // telemetry failure is non-fatal here — app is already exiting
             }
 
             Microsoft.UI.Xaml.Application.Current.Exit();
