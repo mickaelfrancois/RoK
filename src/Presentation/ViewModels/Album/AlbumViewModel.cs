@@ -8,7 +8,6 @@ using Rok.Application.Player;
 using Rok.Application.Services.Filters;
 using Rok.Application.Services.Grouping;
 using Rok.Commons;
-using Rok.Infrastructure.Translate;
 using Rok.ViewModels.Album.Services;
 using Rok.ViewModels.Track;
 
@@ -484,7 +483,7 @@ public partial class AlbumViewModel : ObservableObject, IFilterableAlbum, IGroup
             return;
 
         string? rawLanguage = Windows.Globalization.ApplicationLanguages.Languages.FirstOrDefault();
-        string language = TranslateService.NormalizeLanguageForLibreTranslate(rawLanguage, "fr");
+        string language = LanguageHelpers.NormalizeLanguageForLibreTranslate(rawLanguage, "fr");
 
         await _dialogService.ShowTextAsync(Album.Name, Album.Biography, showTranslateButton: _appOptions.NovaApiEnabled, language);
     }

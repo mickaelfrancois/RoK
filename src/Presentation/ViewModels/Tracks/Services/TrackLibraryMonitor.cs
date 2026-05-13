@@ -39,6 +39,9 @@ public partial class TrackLibraryMonitor : ITrackLibraryMonitor
 
         if (disposing)
         {
+            Messenger.Unsubscribe<LibraryRefreshMessage>(_libraryRefreshHandler.Handle);
+            Messenger.Unsubscribe<AlbumImportedMessage>(_trackImportedHandler.Handle);
+
             _libraryRefreshHandler.LibraryChanged -= OnLibraryChanged;
             _trackImportedHandler.TrackImported -= OnLibraryChanged;
         }

@@ -8,8 +8,9 @@ namespace Rok.PresentationTests.ViewModels.Player.Services;
 public class PlayerLyricsServiceTests
 {
     private readonly Mock<ILyricsService> _lyricsService = new();
+    private readonly Mock<ILyricsParser> _lyricsParser = new();
 
-    private PlayerLyricsService BuildService() => new(_lyricsService.Object);
+    private PlayerLyricsService BuildService() => new(_lyricsService.Object, _lyricsParser.Object);
 
     [Fact(DisplayName = "CheckLyricsExists should return true when the lyrics service finds a non-None type")]
     public void CheckLyricsExists_ShouldReturnTrue_WhenLyricsExist()
@@ -54,18 +55,19 @@ public class PlayerLyricsServiceTests
         Assert.Same(expected, result);
     }
 
-    [Fact(DisplayName = "ParseSynchronizedLyrics should parse a synchronized LRC string into timed lines")]
-    public void ParseSynchronizedLyrics_ShouldParseSynchronizedString()
+    [Fact(DisplayName = "ParseSynchronizedLyrics should delegate to the lyrics parser and return its result")]
+    public void ParseSynchronizedLyrics_ShouldDelegateToLyricsParser()
     {
         // Arrange
+        string lrc = "[00:00.00]first line\n[00:05.00]second line";
+        SyncLyricsModel expected = new();
+        _lyricsParser.Setup(p => p.Parse(lrc)).Returns(expected);
         PlayerLyricsService sut = BuildService();
-        string lrc = "[00:00.00]first line\n[00:05.00]second line\n[00:10.00]third line";
 
         // Act
         SyncLyricsModel result = sut.ParseSynchronizedLyrics(lrc);
 
         // Assert
-        Assert.NotEmpty(result.Lyrics);
-        Assert.NotEmpty(result.Time);
+        Assert.Same(expected, result);
     }
 }

@@ -28,8 +28,8 @@ public sealed partial class OptionsPage : Page
     }
 
     private readonly IFolderResolver _folderResolver;
-
     private readonly ResourceLoader _resourceLoader;
+    private readonly ILogger<OptionsPage> _logger;
 
     private StatisticsViewModel StatisticsViewModel { get; }
 
@@ -50,6 +50,7 @@ public sealed partial class OptionsPage : Page
         Options = App.ServiceProvider.GetRequiredService<IAppOptions>();
         _folderResolver = App.ServiceProvider.GetRequiredService<IFolderResolver>();
         _resourceLoader = App.ServiceProvider.GetRequiredService<ResourceLoader>();
+        _logger = App.ServiceProvider.GetRequiredService<ILogger<OptionsPage>>();
 
         StatisticsViewModel = App.ServiceProvider.GetRequiredService<StatisticsViewModel>();
     }
@@ -58,18 +59,26 @@ public sealed partial class OptionsPage : Page
     {
         base.OnNavigatedTo(e);
 
-        _paths.Clear();
-
-        foreach (string token in Options.LibraryTokens ?? Enumerable.Empty<string>())
+        try
         {
-            string? path = await _folderResolver.GetDisplayNameFromTokenAsync(token);
-            if (path is not null)
-            {
-                _paths.Add(new PathItem(token, path));
-            }
-        }
+            _paths.Clear();
 
-        await StatisticsViewModel.LoadAsync();
+            foreach (string token in Options.LibraryTokens ?? Enumerable.Empty<string>())
+            {
+                string? path = await _folderResolver.GetDisplayNameFromTokenAsync(token);
+                if (path is not null)
+                {
+                    _paths.Add(new PathItem(token, path));
+                }
+            }
+
+            await StatisticsViewModel.LoadAsync();
+        }
+        catch (OperationCanceledException) { }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Navigation to OptionsPage failed");
+        }
     }
 
     private void StorePageButton_Click(object sender, RoutedEventArgs e)

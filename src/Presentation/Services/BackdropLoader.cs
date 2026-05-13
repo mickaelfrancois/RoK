@@ -1,4 +1,6 @@
-﻿namespace Rok.Services;
+﻿using Rok.Infrastructure.Files;
+
+namespace Rok.Services;
 
 public class BackdropLoader(BackdropPicture _backdropPicture, ILogger<BackdropLoader> _logger) : IBackdropLoader
 {

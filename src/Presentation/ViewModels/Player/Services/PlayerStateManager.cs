@@ -177,6 +177,14 @@ public partial class PlayerStateManager : ObservableObject
             return;
 
         int previousIndex = _lyricsCurrentIndex;
+
+        bool seekingBackward = _lyricsCurrentIndex >= 0
+            && _lyricsCurrentIndex < SyncLyrics.Time.Count
+            && time < SyncLyrics.Time[_lyricsCurrentIndex];
+
+        if (seekingBackward)
+            _lyricsCurrentIndex = -1;
+
         int start = _lyricsCurrentIndex + 1;
 
         for (int i = start; i < SyncLyrics.Time.Count; i++)
@@ -186,6 +194,9 @@ public partial class PlayerStateManager : ObservableObject
                 _lyricsCurrentIndex = i - 1;
                 break;
             }
+
+            if (i == SyncLyrics.Time.Count - 1)
+                _lyricsCurrentIndex = i;
         }
 
         if (_lyricsCurrentIndex != previousIndex)

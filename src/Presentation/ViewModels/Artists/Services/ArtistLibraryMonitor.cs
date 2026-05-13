@@ -21,7 +21,7 @@ public partial class ArtistLibraryMonitor : IArtistLibraryMonitor
         _artistImportedHandler = albumImportedHandler;
         _tagUpdatedHandler = tagUpdatedMessageHandler;
 
-        Messenger.Subscribe<ArtistUpdateMessage>(async message => await _artistUpdateHandler.HandleAsync(message));
+        Messenger.Subscribe<ArtistUpdateMessage>(OnArtistUpdateMessage);
         Messenger.Subscribe<LibraryRefreshMessage>(_libraryRefreshHandler.Handle);
         Messenger.Subscribe<ArtistImportedMessage>(_artistImportedHandler.Handle);
         Messenger.Subscribe<TagUpdatedMessage>(_tagUpdatedHandler.Handle);
@@ -33,6 +33,8 @@ public partial class ArtistLibraryMonitor : IArtistLibraryMonitor
     }
 
     private void OnLibraryChanged(object? sender, EventArgs e) => LibraryChanged?.Invoke(this, EventArgs.Empty);
+
+    private void OnArtistUpdateMessage(ArtistUpdateMessage message) => _ = _artistUpdateHandler.HandleAsync(message);
 
     public void ResetUpdateFlags()
     {
@@ -48,6 +50,11 @@ public partial class ArtistLibraryMonitor : IArtistLibraryMonitor
 
         if (disposing)
         {
+            Messenger.Unsubscribe<ArtistUpdateMessage>(OnArtistUpdateMessage);
+            Messenger.Unsubscribe<LibraryRefreshMessage>(_libraryRefreshHandler.Handle);
+            Messenger.Unsubscribe<ArtistImportedMessage>(_artistImportedHandler.Handle);
+            Messenger.Unsubscribe<TagUpdatedMessage>(_tagUpdatedHandler.Handle);
+
             _artistUpdateHandler.DataChanged -= OnLibraryChanged;
             _libraryRefreshHandler.LibraryChanged -= OnLibraryChanged;
             _artistImportedHandler.ArtistImported -= OnLibraryChanged;

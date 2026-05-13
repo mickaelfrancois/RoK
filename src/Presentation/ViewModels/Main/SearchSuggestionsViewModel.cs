@@ -5,11 +5,12 @@ using Rok.Application.Services;
 
 namespace Rok.ViewModels.Main;
 
-public partial class SearchSuggestionsViewModel : ObservableObject
+public partial class SearchSuggestionsViewModel : ObservableObject, IDisposable
 {
     private readonly IMediator _mediator;
     private System.Threading.CancellationTokenSource? _debounceCts;
     private bool _isCacheLoaded;
+    private bool _disposed;
 
     public ObservableCollection<AlbumDto> AlbumSuggestions { get; } = new ObservableCollection<AlbumDto>();
     public ObservableCollection<ArtistDto> ArtistSuggestions { get; } = new ObservableCollection<ArtistDto>();
@@ -98,6 +99,17 @@ public partial class SearchSuggestionsViewModel : ObservableObject
         ArtistSuggestions.Clear();
         TrackSuggestions.Clear();
         HasResults = false;
+    }
+
+    public void Dispose()
+    {
+        if (_disposed)
+            return;
+
+        Messenger.Unsubscribe<LibraryRefreshMessage>(OnLibraryRefresh);
+        _debounceCts?.Dispose();
+        _disposed = true;
+        GC.SuppressFinalize(this);
     }
 
 

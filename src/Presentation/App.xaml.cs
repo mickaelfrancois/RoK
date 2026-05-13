@@ -35,55 +35,74 @@ public partial class App : Microsoft.UI.Xaml.Application
     /// <param name="args">Details about the launch request and process.</param>
     protected override async void OnLaunched(Microsoft.UI.Xaml.LaunchActivatedEventArgs args)
     {
-        ServiceProvider = ConfigureServices();
+        try
+        {
+            ServiceProvider = ConfigureServices();
 
-        IAppOptions options = await LoadOptionsAsync();
-        options.SessionsCount++;
+            IAppOptions options = await LoadOptionsAsync();
+            options.SessionsCount++;
 
-        SetLanguage(options);
+            SetLanguage(options);
 
-        IAppDbContext appDbContext = ServiceProvider.GetRequiredService<IAppDbContext>();
-        appDbContext.GetOpenConnection();
-        appDbContext.EnsureCreated();
+            IAppDbContext appDbContext = ServiceProvider.GetRequiredService<IAppDbContext>();
+            appDbContext.GetOpenConnection();
+            appDbContext.EnsureCreated();
 
-        NavigationService navigationService = ServiceProvider.GetRequiredService<NavigationService>();
-        ResourceLoader resourceLoader = ServiceProvider.GetRequiredService<ResourceLoader>();
-        ITelemetryClient telemetryClient = ServiceProvider.GetRequiredService<ITelemetryClient>();
-        IReviewPromptEligibilityService reviewPromptEligibilityService = ServiceProvider.GetRequiredService<IReviewPromptEligibilityService>();
+            NavigationService navigationService = ServiceProvider.GetRequiredService<NavigationService>();
+            ResourceLoader resourceLoader = ServiceProvider.GetRequiredService<ResourceLoader>();
+            ITelemetryClient telemetryClient = ServiceProvider.GetRequiredService<ITelemetryClient>();
+            IReviewPromptEligibilityService reviewPromptEligibilityService = ServiceProvider.GetRequiredService<IReviewPromptEligibilityService>();
 
-        if (options.SessionsCount == 1)
-            _ = telemetryClient.CaptureEventAsync("Event", "FirstStart");
+            if (options.SessionsCount == 1)
+                _ = telemetryClient.CaptureEventAsync("Event", "FirstStart");
 
-        string iconPath = Path.Combine(AppContext.BaseDirectory, "Assets/Square44x44Logo.ico");
+            string iconPath = Path.Combine(AppContext.BaseDirectory, "Assets/Square44x44Logo.ico");
 
-        MainWindow = new MainWindow(navigationService, telemetryClient, resourceLoader, appDbContext, options, reviewPromptEligibilityService);
-        MainWindow.AppWindow.SetIcon(iconPath);
-        MainWindow.Title = "RoK";
+            MainWindow = new MainWindow(navigationService, telemetryClient, resourceLoader, appDbContext, options, reviewPromptEligibilityService);
+            MainWindow.AppWindow.SetIcon(iconPath);
+            MainWindow.Title = "RoK";
 #if DEBUG
-        MainWindow.Title += " [DEBUG]";
+            MainWindow.Title += " [DEBUG]";
 #endif
-        MainWindow.Activate();
-        MainWindow.Closed += MainWindow_Closed;
+            MainWindow.Activate();
+            MainWindow.Closed += MainWindow_Closed;
 
-        MainWindowHandle = WindowNative.GetWindowHandle(MainWindow);
+            MainWindowHandle = WindowNative.GetWindowHandle(MainWindow);
 
 #if DEBUG
-        TryEnableXamlDiagnostics();
+            TryEnableXamlDiagnostics();
 #endif
 
-        ThemeManager.Initialize(options.Theme, MainWindow);
+            ThemeManager.Initialize(options.Theme, MainWindow);
 
-        AppInstance.GetCurrent().Activated += OnInstanceActivated;
+            AppInstance.GetCurrent().Activated += OnInstanceActivated;
 
-        if (!string.IsNullOrWhiteSpace(args.Arguments))
-            HandleCliCommand(args.Arguments);
+            if (!string.IsNullOrWhiteSpace(args.Arguments))
+                HandleCliCommand(args.Arguments);
 
-        if (options.EnableWebApi)
-            ServiceProvider.GetRequiredService<PlayerWebApiService>().Start();
+            if (options.EnableWebApi)
+                ServiceProvider.GetRequiredService<PlayerWebApiService>().Start();
 
-        ISystemMediaTransportControlsService smtc = ServiceProvider.GetRequiredService<ISystemMediaTransportControlsService>();
-        smtc.SetPlayerService(ServiceProvider.GetRequiredService<IPlayerService>());
-        smtc.Initialize();
+            ISystemMediaTransportControlsService smtc = ServiceProvider.GetRequiredService<ISystemMediaTransportControlsService>();
+            smtc.SetPlayerService(ServiceProvider.GetRequiredService<IPlayerService>());
+            smtc.Initialize();
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine("[OnLaunched] Fatal: " + ex);
+
+            if (ServiceProvider != null)
+            {
+                try
+                {
+                    ITelemetryClient telemetry = ServiceProvider.GetRequiredService<ITelemetryClient>();
+                    await telemetry.CaptureExceptionAsync(ex);
+                }
+                catch { } // telemetry failure is non-fatal here — app is already exiting
+            }
+
+            Microsoft.UI.Xaml.Application.Current.Exit();
+        }
     }
 
     private static void SetLanguage(IAppOptions options)
@@ -267,8 +286,8 @@ public partial class App : Microsoft.UI.Xaml.Application
                 crashStore.IncrementCrashCount();
 
                 ITelemetryClient telemetry = ServiceProvider.GetRequiredService<ITelemetryClient>();
-                telemetry.CaptureExceptionAsync(ex);
-                System.Threading.Thread.Sleep(500); // Give some time to send the telemetry before exiting
+                Task.Run(async () => await telemetry.CaptureExceptionAsync(ex))
+                    .Wait(TimeSpan.FromSeconds(2));
             }
 #endif
         };

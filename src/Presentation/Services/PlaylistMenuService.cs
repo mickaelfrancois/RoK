@@ -10,7 +10,7 @@ namespace Rok.Services;
 public partial class PlaylistMenuService : IPlaylistMenuService, IDisposable
 {
     private readonly IMediator _mediator;
-    private readonly ResourceLoader _resourceLoader;
+    private readonly IStringResourceProvider _resourceProvider;
     private readonly ILogger<PlaylistMenuService> _logger;
     private readonly IPlayerService _playerService;
 
@@ -20,11 +20,11 @@ public partial class PlaylistMenuService : IPlaylistMenuService, IDisposable
     private readonly SemaphoreSlim _cacheSemaphore = new(1, 1);
 
 
-    public PlaylistMenuService(IMediator mediator, IPlayerService playerService, ResourceLoader resourceManager, ILogger<PlaylistMenuService> logger)
+    public PlaylistMenuService(IMediator mediator, IPlayerService playerService, IStringResourceProvider resourceProvider, ILogger<PlaylistMenuService> logger)
     {
         _mediator = mediator;
         _playerService = playerService;
-        _resourceLoader = resourceManager;
+        _resourceProvider = resourceProvider;
         _logger = logger;
 
         Messenger.Subscribe<PlaylistUpdatedMessage>(_ => OnPlaylistsChanged());
@@ -65,7 +65,7 @@ public partial class PlaylistMenuService : IPlaylistMenuService, IDisposable
             if (result.IsSuccess)
             {
                 Messenger.Send(new PlaylistUpdatedMessage(playlistId, ActionType.Update));
-                Messenger.Send(new ShowNotificationMessage() { Message = _resourceLoader.GetString("notification_playlist_track_add")!, Type = NotificationType.Success });
+                Messenger.Send(new ShowNotificationMessage() { Message = _resourceProvider.GetString("notification_playlist_track_add"), Type = NotificationType.Success });
 
                 _logger.LogInformation("Track '{TrackId}' add to playlist '{PlaylistId}'", trackId, playlistId);
             }
@@ -73,19 +73,19 @@ public partial class PlaylistMenuService : IPlaylistMenuService, IDisposable
             {
                 if (result.Error!.Code == "DUPLICATE")
                 {
-                    Messenger.Send(new ShowNotificationMessage() { Message = _resourceLoader.GetString("notification_playlist_track_add_duplicate")!, Type = NotificationType.Warning });
+                    Messenger.Send(new ShowNotificationMessage() { Message = _resourceProvider.GetString("notification_playlist_track_add_duplicate"), Type = NotificationType.Warning });
                     _logger.LogWarning("Track '{TrackId}' already exists in playlist '{PlaylistId}'", trackId, playlistId);
                 }
                 else
                 {
-                    Messenger.Send(new ShowNotificationMessage() { Message = _resourceLoader.GetString("notification_playlist_track_add_error")!, Type = NotificationType.Error });
+                    Messenger.Send(new ShowNotificationMessage() { Message = _resourceProvider.GetString("notification_playlist_track_add_error"), Type = NotificationType.Error });
                     _logger.LogError("Failed to add track '{TrackId}' to playlist '{PlaylistId}': {Error}", trackId, playlistId, result.Error);
                 }
             }
         }
         catch (Exception ex)
         {
-            Messenger.Send(new ShowNotificationMessage() { Message = _resourceLoader.GetString("notification_playlist_track_add_error")!, Type = NotificationType.Error });
+            Messenger.Send(new ShowNotificationMessage() { Message = _resourceProvider.GetString("notification_playlist_track_add_error"), Type = NotificationType.Error });
             _logger.LogError(ex, "Error while add track to playlist");
         }
     }
@@ -104,7 +104,7 @@ public partial class PlaylistMenuService : IPlaylistMenuService, IDisposable
             if (result.IsSuccess)
             {
                 Messenger.Send(new PlaylistUpdatedMessage(playlistId, ActionType.Update));
-                Messenger.Send(new ShowNotificationMessage() { Message = _resourceLoader.GetString("notification_playlist_track_add")!, Type = NotificationType.Success });
+                Messenger.Send(new ShowNotificationMessage() { Message = _resourceProvider.GetString("notification_playlist_track_add"), Type = NotificationType.Success });
 
                 _logger.LogInformation("Album '{AlbumId}' add to playlist '{PlaylistId}'", albumId, playlistId);
             }
@@ -115,7 +115,7 @@ public partial class PlaylistMenuService : IPlaylistMenuService, IDisposable
         }
         catch (Exception ex)
         {
-            Messenger.Send(new ShowNotificationMessage() { Message = _resourceLoader.GetString("notification_playlist_track_add_error")!, Type = NotificationType.Error });
+            Messenger.Send(new ShowNotificationMessage() { Message = _resourceProvider.GetString("notification_playlist_track_add_error"), Type = NotificationType.Error });
             _logger.LogError(ex, "Error while add tracks to playlist");
         }
     }
@@ -134,7 +134,7 @@ public partial class PlaylistMenuService : IPlaylistMenuService, IDisposable
             if (result.IsSuccess)
             {
                 Messenger.Send(new PlaylistUpdatedMessage(playlistId, ActionType.Update));
-                Messenger.Send(new ShowNotificationMessage() { Message = _resourceLoader.GetString("notification_playlist_track_add")!, Type = NotificationType.Success });
+                Messenger.Send(new ShowNotificationMessage() { Message = _resourceProvider.GetString("notification_playlist_track_add"), Type = NotificationType.Success });
 
                 _logger.LogInformation("Album '{ArtistId}' add to playlist '{PlaylistId}'", artistId, playlistId);
             }
@@ -145,7 +145,7 @@ public partial class PlaylistMenuService : IPlaylistMenuService, IDisposable
         }
         catch (Exception ex)
         {
-            Messenger.Send(new ShowNotificationMessage() { Message = _resourceLoader.GetString("notification_playlist_track_add_error")!, Type = NotificationType.Error });
+            Messenger.Send(new ShowNotificationMessage() { Message = _resourceProvider.GetString("notification_playlist_track_add_error"), Type = NotificationType.Error });
             _logger.LogError(ex, "Error while add tracks to playlist");
         }
     }
@@ -163,7 +163,7 @@ public partial class PlaylistMenuService : IPlaylistMenuService, IDisposable
         }
         catch (Exception ex)
         {
-            Messenger.Send(new ShowNotificationMessage() { Message = _resourceLoader.GetString("notification_playlist_track_add_error")!, Type = NotificationType.Error });
+            Messenger.Send(new ShowNotificationMessage() { Message = _resourceProvider.GetString("notification_playlist_track_add_error"), Type = NotificationType.Error });
             _logger.LogError(ex, "Error while add track to playlist");
         }
     }
@@ -181,7 +181,7 @@ public partial class PlaylistMenuService : IPlaylistMenuService, IDisposable
         }
         catch (Exception ex)
         {
-            Messenger.Send(new ShowNotificationMessage() { Message = _resourceLoader.GetString("notification_playlist_track_add_error")!, Type = NotificationType.Error });
+            Messenger.Send(new ShowNotificationMessage() { Message = _resourceProvider.GetString("notification_playlist_track_add_error"), Type = NotificationType.Error });
             _logger.LogError(ex, "Error while add tracks to playlist");
         }
     }
@@ -195,11 +195,11 @@ public partial class PlaylistMenuService : IPlaylistMenuService, IDisposable
             long playlistId = playlistResult.Value;
             Messenger.Send(new PlaylistUpdatedMessage(playlistId, ActionType.Add));
 
-            await AddAlbumToPlaylistAsync(playlistId, artistId);
+            await AddArtistToPlaylistAsync(playlistId, artistId);
         }
         catch (Exception ex)
         {
-            Messenger.Send(new ShowNotificationMessage() { Message = _resourceLoader.GetString("notification_playlist_track_add_error")!, Type = NotificationType.Error });
+            Messenger.Send(new ShowNotificationMessage() { Message = _resourceProvider.GetString("notification_playlist_track_add_error"), Type = NotificationType.Error });
             _logger.LogError(ex, "Error while add tracks to playlist");
         }
     }
@@ -212,7 +212,7 @@ public partial class PlaylistMenuService : IPlaylistMenuService, IDisposable
             IEnumerable<TrackDto> tracks = await _mediator.SendMessageAsync(new GetTracksByArtistIdQuery(artistId));
             if (tracks == null || !tracks.Any())
             {
-                Messenger.Send(new ShowNotificationMessage() { Message = _resourceLoader.GetString("notification_playlist_track_add_error")!, Type = NotificationType.Error });
+                Messenger.Send(new ShowNotificationMessage() { Message = _resourceProvider.GetString("notification_playlist_track_add_error"), Type = NotificationType.Error });
                 _logger.LogWarning("No tracks found for artist '{ArtistId}'", artistId);
                 return;
             }
@@ -221,7 +221,7 @@ public partial class PlaylistMenuService : IPlaylistMenuService, IDisposable
         }
         catch (Exception ex)
         {
-            Messenger.Send(new ShowNotificationMessage() { Message = _resourceLoader.GetString("notification_playlist_track_add_error")!, Type = NotificationType.Error });
+            Messenger.Send(new ShowNotificationMessage() { Message = _resourceProvider.GetString("notification_playlist_track_add_error"), Type = NotificationType.Error });
             _logger.LogError(ex, "Error while add tracks to current listening");
         }
     }
@@ -233,7 +233,7 @@ public partial class PlaylistMenuService : IPlaylistMenuService, IDisposable
             IEnumerable<TrackDto> tracks = await _mediator.SendMessageAsync(new GetTracksByAlbumIdQuery(albumId));
             if (tracks == null || !tracks.Any())
             {
-                Messenger.Send(new ShowNotificationMessage() { Message = _resourceLoader.GetString("notification_playlist_track_add_error")!, Type = NotificationType.Error });
+                Messenger.Send(new ShowNotificationMessage() { Message = _resourceProvider.GetString("notification_playlist_track_add_error"), Type = NotificationType.Error });
                 _logger.LogWarning("No tracks found for album '{AlbumId}'", albumId);
                 return;
             }
@@ -242,7 +242,7 @@ public partial class PlaylistMenuService : IPlaylistMenuService, IDisposable
         }
         catch (Exception ex)
         {
-            Messenger.Send(new ShowNotificationMessage() { Message = _resourceLoader.GetString("notification_playlist_track_add_error")!, Type = NotificationType.Error });
+            Messenger.Send(new ShowNotificationMessage() { Message = _resourceProvider.GetString("notification_playlist_track_add_error"), Type = NotificationType.Error });
             _logger.LogError(ex, "Error while add tracks to current listening");
         }
     }
@@ -254,7 +254,7 @@ public partial class PlaylistMenuService : IPlaylistMenuService, IDisposable
             Result<TrackDto> trackResult = await _mediator.SendMessageAsync(new GetTrackByIdQuery(trackId));
             if (!trackResult.IsSuccess || trackResult.Value == null)
             {
-                Messenger.Send(new ShowNotificationMessage() { Message = _resourceLoader.GetString("notification_playlist_track_add_error")!, Type = NotificationType.Error });
+                Messenger.Send(new ShowNotificationMessage() { Message = _resourceProvider.GetString("notification_playlist_track_add_error"), Type = NotificationType.Error });
                 _logger.LogWarning("No track found for id '{TrackId}'", trackId);
                 return;
             }
@@ -263,7 +263,7 @@ public partial class PlaylistMenuService : IPlaylistMenuService, IDisposable
         }
         catch (Exception ex)
         {
-            Messenger.Send(new ShowNotificationMessage() { Message = _resourceLoader.GetString("notification_playlist_track_add_error")!, Type = NotificationType.Error });
+            Messenger.Send(new ShowNotificationMessage() { Message = _resourceProvider.GetString("notification_playlist_track_add_error"), Type = NotificationType.Error });
             _logger.LogError(ex, "Error while add tracks to current listening");
         }
     }

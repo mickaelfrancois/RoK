@@ -1,4 +1,5 @@
 ﻿using Microsoft.UI.Dispatching;
+using Rok.Commons.Equalizer;
 using Rok.Application.Features.Playlists.PlaylistMenu;
 using Rok.Application.Interfaces.Pictures;
 using Rok.Application.Services.Filters;
@@ -50,6 +51,7 @@ public static class DependencyInjection
     public static IServiceCollection AddLogic(this IServiceCollection services)
     {
         services.AddSingleton<ResourceLoader>((c) => ResourceLoader.GetForViewIndependentUse());
+        services.AddSingleton<IStringResourceProvider, WindowsStringResourceProvider>();
         services.AddSingleton<NavigationService>();
         services.AddSingleton<PlaylistsSeed>();
         services.AddSingleton<IDialogService, DialogService>();
@@ -94,8 +96,8 @@ public static class DependencyInjection
         // Album detail services (for AlbumViewModel - single album)
         services.AddTransient<AlbumViewModel>();
         services.AddTransient<AlbumDataLoader>();
-        services.AddTransient<AlbumPictureService>();
         services.AddTransient<IAlbumPictureService, AlbumPictureService>();
+        services.AddTransient<AlbumPictureService>(sp => (AlbumPictureService)sp.GetRequiredService<IAlbumPictureService>());
         services.AddTransient<AlbumStatisticsService>();
         services.AddTransient<AlbumEditService>();
 
@@ -135,8 +137,8 @@ public static class DependencyInjection
         // Artist detail services (for ArtistViewModel - single artist)
         services.AddTransient<ArtistViewModel>();
         services.AddTransient<ArtistDataLoader>();
-        services.AddTransient<ArtistPictureService>();
         services.AddTransient<IArtistPictureService, ArtistPictureService>();
+        services.AddTransient<ArtistPictureService>(sp => (ArtistPictureService)sp.GetRequiredService<IArtistPictureService>());
         services.AddTransient<ArtistStatisticsService>();
         services.AddTransient<ArtistEditService>();
 
@@ -201,6 +203,7 @@ public static class DependencyInjection
         services.AddTransient<PlaylistExportService>();
 
         // Player ViewModel and services
+        services.AddSingleton<IEqualizerWindowService, EqualizerWindowService>();
         services.AddSingleton<PlayerViewModel>();
         services.AddSingleton<EqualizerViewModel>((sp) =>
         {

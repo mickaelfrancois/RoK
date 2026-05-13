@@ -7,11 +7,13 @@ namespace Rok.Pages;
 public sealed partial class AlbumPage : Page
 {
     public AlbumViewModel ViewModel { get; set; }
+    private readonly ILogger<AlbumPage> _logger;
 
     public AlbumPage()
     {
         this.InitializeComponent();
 
+        _logger = App.ServiceProvider.GetRequiredService<ILogger<AlbumPage>>();
         ViewModel = App.ServiceProvider.GetRequiredService<AlbumViewModel>();
         DataContext = ViewModel;
     }
@@ -22,9 +24,16 @@ public sealed partial class AlbumPage : Page
         if (e.Parameter is not AlbumOpenArgs options)
             throw new ArgumentNullException(nameof(options), "AlbumOpenArgs cannot be null");
 
-        await ViewModel.LoadDataAsync(options.AlbumId);
-
-        base.OnNavigatedTo(e);
+        try
+        {
+            await ViewModel.LoadDataAsync(options.AlbumId);
+            base.OnNavigatedTo(e);
+        }
+        catch (OperationCanceledException) { }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Navigation to AlbumPage failed");
+        }
     }
 
     protected override void OnNavigatedFrom(NavigationEventArgs e)

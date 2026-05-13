@@ -8,12 +8,14 @@ public sealed partial class PlaylistPage : Page
 {
     public PlaylistViewModel ViewModel { get; set; }
     private readonly ResourceLoader _resourceLoader;
+    private readonly ILogger<PlaylistPage> _logger;
 
     public PlaylistPage()
     {
         InitializeComponent();
 
         _resourceLoader = App.ServiceProvider.GetRequiredService<ResourceLoader>();
+        _logger = App.ServiceProvider.GetRequiredService<ILogger<PlaylistPage>>();
         ViewModel = App.ServiceProvider.GetRequiredService<PlaylistViewModel>();
         DataContext = ViewModel;
     }
@@ -23,10 +25,18 @@ public sealed partial class PlaylistPage : Page
         if (e.Parameter is not PlaylistOpenArgs options)
             throw new ArgumentNullException(nameof(e), "PlaylistOpenArgs cannot be null");
 
-        if (options.PlaylistId.HasValue)
-            await ViewModel.LoadDataAsync(options.PlaylistId.Value);
+        try
+        {
+            if (options.PlaylistId.HasValue)
+                await ViewModel.LoadDataAsync(options.PlaylistId.Value);
 
-        base.OnNavigatedTo(e);
+            base.OnNavigatedTo(e);
+        }
+        catch (OperationCanceledException) { }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Navigation to PlaylistPage failed");
+        }
     }
 
     private async void DeleteButton_Click(object sender, RoutedEventArgs e)

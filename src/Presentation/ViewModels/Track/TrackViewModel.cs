@@ -7,7 +7,6 @@ using Rok.Application.Features.Tracks.Services;
 using Rok.Application.Player;
 using Rok.Application.Services.Filters;
 using Rok.Application.Services.Grouping;
-using Rok.Infrastructure.Translate;
 using Rok.ViewModels.Track.Services;
 
 namespace Rok.ViewModels.Track;
@@ -135,24 +134,7 @@ public partial class TrackViewModel : ObservableObject, IDisposable, IFilterable
 
     public string PlainLyrics => _lyrics?.PlainLyrics ?? string.Empty;
 
-    public ELyricsType LyricsType
-    {
-        get
-        {
-            if (_lyricsType is null)
-            {
-                _lyricsType = _lyricsService.CheckLyricsType(Track.MusicFile);
-                if (_lyricsType == ELyricsType.None)
-                {
-#pragma warning disable 4014
-                    _ = GetLyricsFromAPIAsync();
-#pragma warning restore 4014
-                }
-            }
-
-            return _lyricsType.Value;
-        }
-    }
+    public ELyricsType LyricsType => _lyricsType ?? ELyricsType.None;
 
     public bool LyricsExists => LyricsType != ELyricsType.None;
 
@@ -224,8 +206,20 @@ public partial class TrackViewModel : ObservableObject, IDisposable, IFilterable
 
         Track = track;
         LoadBackdrop();
+        await InitializeLyricsTypeAsync();
 
         OnPropertyChanged(string.Empty);
+    }
+
+    private async Task InitializeLyricsTypeAsync()
+    {
+        _lyricsType = _lyricsService.CheckLyricsType(Track.MusicFile);
+
+        if (_lyricsType == ELyricsType.None)
+            await GetLyricsFromAPIAsync();
+
+        OnPropertyChanged(nameof(LyricsType));
+        OnPropertyChanged(nameof(LyricsExists));
     }
 
     public void SetData(TrackDto track)
@@ -331,7 +325,7 @@ public partial class TrackViewModel : ObservableObject, IDisposable, IFilterable
         if (!string.IsNullOrEmpty(PlainLyrics))
         {
             string? rawLanguage = Windows.Globalization.ApplicationLanguages.Languages.FirstOrDefault();
-            string language = TranslateService.NormalizeLanguageForLibreTranslate(rawLanguage, "fr");
+            string language = LanguageHelpers.NormalizeLanguageForLibreTranslate(rawLanguage, "fr");
 
             await _dialogService.ShowTextAsync($"{ArtistName} - {Title}", PlainLyrics, showTranslateButton: _appOptions.NovaApiEnabled, language);
         }
@@ -345,14 +339,15 @@ public partial class TrackViewModel : ObservableObject, IDisposable, IFilterable
     }
 
 
-    #region IDisposable Support
-
     private bool disposedValue = false;
 
     protected virtual void Dispose(bool disposing)
     {
         if (!disposedValue)
         {
+            if (disposing)
+                Messenger.Unsubscribe<TrackScoreUpdateMessage>(TrackScoreUpdateMessageHandle);
+
             disposedValue = true;
         }
     }
@@ -362,6 +357,4 @@ public partial class TrackViewModel : ObservableObject, IDisposable, IFilterable
         Dispose(true);
         GC.SuppressFinalize(this);
     }
-
-    #endregion
 }

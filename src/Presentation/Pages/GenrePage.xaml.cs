@@ -11,11 +11,13 @@ namespace Rok.Pages;
 public sealed partial class GenrePage : Page
 {
     public GenreViewModel ViewModel { get; set; }
+    private readonly ILogger<GenrePage> _logger;
 
     public GenrePage()
     {
         this.InitializeComponent();
 
+        _logger = App.ServiceProvider.GetRequiredService<ILogger<GenrePage>>();
         ViewModel = App.ServiceProvider.GetRequiredService<GenreViewModel>();
         DataContext = ViewModel;
     }
@@ -26,9 +28,16 @@ public sealed partial class GenrePage : Page
         if (e.Parameter is not GenreOpenArgs options)
             throw new ArgumentNullException(nameof(options), "GenreOpenArgs cannot be null");
 
-        await ViewModel.LoadDataAsync(options.GenreId);
-
-        base.OnNavigatedTo(e);
+        try
+        {
+            await ViewModel.LoadDataAsync(options.GenreId);
+            base.OnNavigatedTo(e);
+        }
+        catch (OperationCanceledException) { }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Navigation to GenrePage failed");
+        }
     }
 
     private void grid_ContainerContentChanging(ListViewBase sender, ContainerContentChangingEventArgs args)

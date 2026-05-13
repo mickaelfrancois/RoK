@@ -129,8 +129,6 @@ public partial class PlaylistsViewModel : ObservableObject, IDisposable
     }
 
 
-    #region IDisposable Support
-
     private bool disposedValue = false;
 
     protected virtual void Dispose(bool disposing)
@@ -154,6 +152,4 @@ public partial class PlaylistsViewModel : ObservableObject, IDisposable
         Dispose(true);
         GC.SuppressFinalize(this);
     }
-
-    #endregion
 }
