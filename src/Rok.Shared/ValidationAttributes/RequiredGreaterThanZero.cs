@@ -12,6 +12,6 @@ public class RequiredGreaterThanZero : ValidationAttribute
 
     public override bool IsValid(object? value)
     {
-        return value != null && int.TryParse(value.ToString(), out int i) && i > 0;
+        return value is int i && i > 0;
     }
 }

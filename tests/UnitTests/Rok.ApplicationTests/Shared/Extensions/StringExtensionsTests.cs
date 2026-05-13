@@ -83,15 +83,15 @@ public class StringExtensionsTests
         Assert.Equal(expected, result);
     }
 
-    [Theory(DisplayName = "AreDifferents should be the inverse of AreEquals")]
+    [Theory(DisplayName = "AreDifferent should be the inverse of AreEquals")]
     [InlineData(null, null, false)]
     [InlineData("a", null, true)]
     [InlineData("a", "a", false)]
     [InlineData("a", "b", true)]
-    public void AreDifferents_ShouldBeInverseOfAreEquals(string? a, string? b, bool expected)
+    public void AreDifferent_ShouldBeInverseOfAreEquals(string? a, string? b, bool expected)
     {
         // Act
-        bool result = a.AreDifferents(b);
+        bool result = a.AreDifferent(b);
 
         // Assert
         Assert.Equal(expected, result);

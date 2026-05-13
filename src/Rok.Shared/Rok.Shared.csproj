@@ -11,8 +11,5 @@
     <PackageReference Include="MiF.Guard" Version="1.0.0" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Interfaces\" />
-  </ItemGroup>
 
 </Project>

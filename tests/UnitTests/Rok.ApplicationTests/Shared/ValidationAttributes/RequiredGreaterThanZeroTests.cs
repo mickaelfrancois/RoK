@@ -4,15 +4,13 @@ namespace Rok.ApplicationTests.Shared.ValidationAttributes;
 
 public class RequiredGreaterThanZeroTests
 {
-    [Theory(DisplayName = "IsValid should return true only when value parses to a positive integer")]
+    [Theory(DisplayName = "IsValid should return false for non-integer values")]
     [InlineData(null, false)]
     [InlineData("", false)]
-    [InlineData("0", false)]
-    [InlineData("-1", false)]
+    [InlineData("1", false)]
+    [InlineData("42", false)]
     [InlineData("not-a-number", false)]
-    [InlineData("1", true)]
-    [InlineData("42", true)]
-    public void IsValid_StringValues_ShouldReturnExpected(string? value, bool expected)
+    public void IsValid_NonIntegerValues_ShouldReturnFalse(object? value, bool expected)
     {
         // Arrange
         RequiredGreaterThanZero sut = new();

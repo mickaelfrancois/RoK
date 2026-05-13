@@ -106,26 +106,26 @@ public class ArtistApiService(
 
     private static bool CompareArtistFromApi(ArtistDto artist, MusicDataArtistDto artistApi)
     {
-        if (artist.FlickrUrl.AreDifferents(artistApi.Flickr)) return true;
-        if (artist.InstagramUrl.AreDifferents(artistApi.Instagram)) return true;
-        if (artist.TiktokUrl.AreDifferents(artistApi.TikTok)) return true;
-        if (artist.ThreadsUrl.AreDifferents(artistApi.Threads)) return true;
-        if (artist.SongkickUrl.AreDifferents(artistApi.SongKick)) return true;
-        if (artist.SoundcloundUrl.AreDifferents(artistApi.SoundCloud)) return true;
-        if (artist.ImdbUrl.AreDifferents(artistApi.Imdb)) return true;
-        if (artist.LastFmUrl.AreDifferents(artistApi.LastFM)) return true;
-        if (artist.DiscogsUrl.AreDifferents(artistApi.Discogs)) return true;
-        if (artist.BandsintownUrl.AreDifferents(artistApi.Bandsintown)) return true;
-        if (artist.YoutubeUrl.AreDifferents(artistApi.Youtube)) return true;
-        if (artist.AudioDbID.AreDifferents(artistApi.AudioDbID)) return true;
-        if (artist.AllMusicUrl.AreDifferents(artistApi.AllMusic)) return true;
-        if (artist.TwitterUrl.AreDifferents(artistApi.Twitter)) return true;
-        if (artist.OfficialSiteUrl.AreDifferents(artistApi.Website)) return true;
-        if (artist.FacebookUrl.AreDifferents(artistApi.Facebook)) return true;
-        if (artist.WikipediaUrl.AreDifferents(artistApi.Wikipedia)) return true;
-        if (artist.MusicBrainzID.AreDifferents(artistApi.MusicBrainzID)) return true;
-        if (artist.BornYear.AreDifferents(artistApi.BeginYear)) return true;
-        if (artist.DiedYear.AreDifferents(artistApi.EndYear)) return true;
+        if (artist.FlickrUrl.AreDifferent(artistApi.Flickr)) return true;
+        if (artist.InstagramUrl.AreDifferent(artistApi.Instagram)) return true;
+        if (artist.TiktokUrl.AreDifferent(artistApi.TikTok)) return true;
+        if (artist.ThreadsUrl.AreDifferent(artistApi.Threads)) return true;
+        if (artist.SongkickUrl.AreDifferent(artistApi.SongKick)) return true;
+        if (artist.SoundcloundUrl.AreDifferent(artistApi.SoundCloud)) return true;
+        if (artist.ImdbUrl.AreDifferent(artistApi.Imdb)) return true;
+        if (artist.LastFmUrl.AreDifferent(artistApi.LastFM)) return true;
+        if (artist.DiscogsUrl.AreDifferent(artistApi.Discogs)) return true;
+        if (artist.BandsintownUrl.AreDifferent(artistApi.Bandsintown)) return true;
+        if (artist.YoutubeUrl.AreDifferent(artistApi.Youtube)) return true;
+        if (artist.AudioDbID.AreDifferent(artistApi.AudioDbID)) return true;
+        if (artist.AllMusicUrl.AreDifferent(artistApi.AllMusic)) return true;
+        if (artist.TwitterUrl.AreDifferent(artistApi.Twitter)) return true;
+        if (artist.OfficialSiteUrl.AreDifferent(artistApi.Website)) return true;
+        if (artist.FacebookUrl.AreDifferent(artistApi.Facebook)) return true;
+        if (artist.WikipediaUrl.AreDifferent(artistApi.Wikipedia)) return true;
+        if (artist.MusicBrainzID.AreDifferent(artistApi.MusicBrainzID)) return true;
+        if (artist.BornYear.AreDifferent(artistApi.BeginYear)) return true;
+        if (artist.DiedYear.AreDifferent(artistApi.EndYear)) return true;
         if (artist.Disbanded != artistApi.Disbanded) return true;
 
         return string.IsNullOrWhiteSpace(artist.Biography) && !string.IsNullOrWhiteSpace(artistApi.Biography);

@@ -2,7 +2,7 @@
 
 public static class DoubleExtensions
 {
-    private const float Epsilon = 1e-6f;
+    private const double Epsilon = 1e-6;
 
     public static bool EqualsZero(this double value)
     {

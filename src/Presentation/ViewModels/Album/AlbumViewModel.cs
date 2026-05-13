@@ -483,7 +483,7 @@ public partial class AlbumViewModel : ObservableObject, IFilterableAlbum, IGroup
             return;
 
         string? rawLanguage = Windows.Globalization.ApplicationLanguages.Languages.FirstOrDefault();
-        string language = LanguageHelpers.NormalizeLanguageForLibreTranslate(rawLanguage, "fr");
+        string language = LanguageHelpers.NormalizeLanguageCode(rawLanguage, "fr");
 
         await _dialogService.ShowTextAsync(Album.Name, Album.Biography, showTranslateButton: _appOptions.NovaApiEnabled, language);
     }
