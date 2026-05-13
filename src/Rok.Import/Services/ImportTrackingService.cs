@@ -62,10 +62,13 @@ public class ImportTrackingService
 
     private void MarkAsUpdated(EntityType entityType, long entityId)
     {
-        if (!_updatedEntities.ContainsKey(entityType))
-            _updatedEntities[entityType] = [];
+        if (!_updatedEntities.TryGetValue(entityType, out HashSet<long>? ids))
+        {
+            ids = [];
+            _updatedEntities[entityType] = ids;
+        }
 
-        _updatedEntities[entityType].Add(entityId);
+        ids.Add(entityId);
     }
 
     private IEnumerable<long> GetUpdatedEntities(EntityType entityType)
