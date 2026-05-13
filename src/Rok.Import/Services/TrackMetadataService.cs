@@ -7,7 +7,7 @@ namespace Rok.Import.Services;
 
 public class TrackMetadataService(TrackImport importTrack, ILogger<TrackMetadataService> logger, TimeProvider timeProvider)
 {
-    public async Task<bool> ShouldUpdateMetadataAsync(TrackFile file, TrackEntity? track)
+    public async Task<bool> ShouldUpdateMetadataAsync(TrackFile file, TrackEntity? track, CancellationToken cancellationToken = default)
     {
         if (track == null)
             return true;

@@ -62,15 +62,15 @@ public class FolderImportProcessor(
             if (cancellationToken.IsCancellationRequested)
                 return;
 
-            await ProcessTrackFileAsync(file, statistics).ConfigureAwait(false);
+            await ProcessTrackFileAsync(file, statistics, cancellationToken).ConfigureAwait(false);
         }
     }
 
-    private async Task ProcessTrackFileAsync(TrackFile file, ImportStatisticsDto statistics)
+    private async Task ProcessTrackFileAsync(TrackFile file, ImportStatisticsDto statistics, CancellationToken cancellationToken)
     {
         TrackEntity? track = GetTrackByFile(file);
 
-        if (!await _metadataService.ShouldUpdateMetadataAsync(file, track).ConfigureAwait(false))
+        if (!await _metadataService.ShouldUpdateMetadataAsync(file, track, cancellationToken).ConfigureAwait(false))
             return;
 
         GenreCacheItem? genre = await GetOrCreateGenreAsync(file.Genre, statistics).ConfigureAwait(false);
