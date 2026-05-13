@@ -8,7 +8,7 @@ namespace Rok.Infrastructure.UnitTests.Repositories;
 public class PlaylistTrackRepositoryTests
 {
     private static PlaylistTrackRepository CreateRepository(SqliteDatabaseFixture fixture) =>
-        new(fixture.Connection, fixture.Connection, NullLogger<PlaylistTrackRepository>.Instance);
+        new(fixture.Connection, fixture.Connection, NullLogger<PlaylistTrackRepository>.Instance, TimeProvider.System);
 
     private static async Task<long> SeedPlaylistAsync(SqliteDatabaseFixture fixture)
     {

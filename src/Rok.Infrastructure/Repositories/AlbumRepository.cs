@@ -6,7 +6,7 @@ using Rok.Domain.Interfaces.Entities;
 
 namespace Rok.Infrastructure.Repositories;
 
-public class AlbumRepository(IDbConnection connection, [FromKeyedServices("BackgroundConnection")] IDbConnection backgroundConnection, ILogger<AlbumRepository> logger) : GenericRepository<AlbumEntity>(connection, backgroundConnection, null, logger), IAlbumRepository
+public class AlbumRepository(IDbConnection connection, [FromKeyedServices("BackgroundConnection")] IDbConnection backgroundConnection, ILogger<AlbumRepository> logger, TimeProvider timeProvider) : GenericRepository<AlbumEntity>(connection, backgroundConnection, null, logger, timeProvider), IAlbumRepository
 {
     private const string UpdateFavoriteSql = "UPDATE albums SET isFavorite = @isFavorite WHERE Id = @id";
     private const string UpdateLastListenSql = "UPDATE albums SET listenCount = listenCount + 1, lastListen = @lastListen WHERE Id = @id";
@@ -58,7 +58,7 @@ public class AlbumRepository(IDbConnection connection, [FromKeyedServices("Backg
     {
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(id);
 
-        return ExecuteUpdateAsync(UpdateLastListenSql, new { lastListen = DateTime.UtcNow, id }, kind);
+        return ExecuteUpdateAsync(UpdateLastListenSql, new { lastListen = _timeProvider.GetUtcNow().UtcDateTime, id }, kind);
     }
 
     public Task<bool> UpdatePictureDominantColorAsync(long id, long? colorValue, RepositoryConnectionKind kind = RepositoryConnectionKind.Foreground)
@@ -84,7 +84,7 @@ public class AlbumRepository(IDbConnection connection, [FromKeyedServices("Backg
     {
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(id);
 
-        return ExecuteUpdateAsync(UpdateMetadataAttemptSql, new { lastAttemptDate = DateTime.UtcNow, id });
+        return ExecuteUpdateAsync(UpdateMetadataAttemptSql, new { lastAttemptDate = _timeProvider.GetUtcNow().UtcDateTime, id });
     }
 
     public Task<int> DeleteOrphansAsync(RepositoryConnectionKind kind = RepositoryConnectionKind.Foreground)

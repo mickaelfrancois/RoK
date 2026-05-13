@@ -5,7 +5,7 @@ using Rok.Application.Interfaces.Repositories;
 
 namespace Rok.Infrastructure.Repositories;
 
-public class PlaylistTrackRepository(IDbConnection connection, [FromKeyedServices("BackgroundConnection")] IDbConnection backgroundConnection, ILogger<PlaylistTrackRepository> logger) : GenericRepository<PlaylistTrackRepository>(connection, backgroundConnection, null, logger), IPlaylistTrackRepository
+public class PlaylistTrackRepository(IDbConnection connection, [FromKeyedServices("BackgroundConnection")] IDbConnection backgroundConnection, ILogger<PlaylistTrackRepository> logger, TimeProvider timeProvider) : GenericRepository<PlaylistTrackRepository>(connection, backgroundConnection, null, logger, timeProvider), IPlaylistTrackRepository
 {
     private const string AddSql = "INSERT INTO playlisttracks (playlistid, trackid, position, listened, creatdate) VALUES (@playlistId, @trackId, @position, @listened, @creatdate)";
     private const string DeleteSql = "DELETE FROM playlisttracks WHERE playlistid = @playlistId";
@@ -17,7 +17,7 @@ public class PlaylistTrackRepository(IDbConnection connection, [FromKeyedService
     public async Task<long> AddAsync(PlaylistTrackEntity entity, RepositoryConnectionKind kind = RepositoryConnectionKind.Foreground)
     {
         IDbConnection localConnection = ResolveConnection(kind);
-        return await localConnection.ExecuteAsync(AddSql, new { playlistId = entity.PlaylistId, trackId = entity.TrackId, position = entity.Position, listened = entity.Listened, creatdate = DateTime.UtcNow });
+        return await localConnection.ExecuteAsync(AddSql, new { playlistId = entity.PlaylistId, trackId = entity.TrackId, position = entity.Position, listened = entity.Listened, creatdate = _timeProvider.GetUtcNow().UtcDateTime });
     }
 
     public async Task<long> DeleteAsync(long playlistId, RepositoryConnectionKind kind = RepositoryConnectionKind.Foreground)

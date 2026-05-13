@@ -7,7 +7,7 @@ using Rok.Application.Interfaces;
 
 namespace Rok.Infrastructure.Repositories;
 
-public partial class GenericRepository<T>(IDbConnection db, [FromKeyedServices("BackgroundConnection")] IDbConnection backgroundDb, IDbTransaction? transaction, ILogger<GenericRepository<T>> logger)
+public partial class GenericRepository<T>(IDbConnection db, [FromKeyedServices("BackgroundConnection")] IDbConnection backgroundDb, IDbTransaction? transaction, ILogger<GenericRepository<T>> logger, TimeProvider timeProvider)
                                 : IRepository<T> where T : class
 {
     private const int SlowQueryThresholdMilliseconds = 1000;
@@ -16,6 +16,7 @@ public partial class GenericRepository<T>(IDbConnection db, [FromKeyedServices("
     protected readonly IDbConnection _backgroundConnection = backgroundDb ?? throw new ArgumentNullException(nameof(backgroundDb));
     protected readonly IDbTransaction? _transaction = transaction;
     protected readonly ILogger<GenericRepository<T>> _logger = logger;
+    protected readonly TimeProvider _timeProvider = timeProvider;
 
     private static readonly JsonSerializerOptions _jsonOptions = new()
     {

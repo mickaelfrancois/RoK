@@ -6,7 +6,7 @@ using Rok.Application.Randomizer;
 
 namespace Rok.Infrastructure.Repositories;
 
-public class TrackRepository(IDbConnection db, [FromKeyedServices("BackgroundConnection")] IDbConnection backgroundDb, ILogger<TrackRepository> logger) : GenericRepository<TrackEntity>(db, backgroundDb, null, logger), ITrackRepository
+public class TrackRepository(IDbConnection db, [FromKeyedServices("BackgroundConnection")] IDbConnection backgroundDb, ILogger<TrackRepository> logger, TimeProvider timeProvider) : GenericRepository<TrackEntity>(db, backgroundDb, null, logger, timeProvider), ITrackRepository
 {
     private const string UpdateScoreSql = "UPDATE tracks SET score = @score WHERE Id = @id";
     private const string UpdateLastListenSql = "UPDATE tracks SET listenCount = listenCount + 1, lastListen = @lastListen WHERE Id = @id";
@@ -125,7 +125,7 @@ public class TrackRepository(IDbConnection db, [FromKeyedServices("BackgroundCon
     {
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(id);
 
-        return ExecuteUpdateAsync(UpdateLastListenSql, new { lastListen = DateTime.UtcNow, id }, kind);
+        return ExecuteUpdateAsync(UpdateLastListenSql, new { lastListen = _timeProvider.GetUtcNow().UtcDateTime, id }, kind);
     }
 
     public Task<bool> ResetListenCountAsync(RepositoryConnectionKind kind = RepositoryConnectionKind.Foreground)
@@ -137,7 +137,7 @@ public class TrackRepository(IDbConnection db, [FromKeyedServices("BackgroundCon
     {
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(id);
 
-        return ExecuteUpdateAsync(UpdateSkipCountSql, new { lastSkip = DateTime.UtcNow, id }, kind);
+        return ExecuteUpdateAsync(UpdateSkipCountSql, new { lastSkip = _timeProvider.GetUtcNow().UtcDateTime, id }, kind);
     }
 
     public Task<bool> UpdateFileDateAsync(long id, DateTime fileDate, RepositoryConnectionKind kind = RepositoryConnectionKind.Foreground)
@@ -151,7 +151,7 @@ public class TrackRepository(IDbConnection db, [FromKeyedServices("BackgroundCon
     {
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(id);
 
-        return ExecuteUpdateAsync(UpdateGetLyricsLastAttemptSql, new { lastAttemptDate = DateTime.UtcNow, id }, kind);
+        return ExecuteUpdateAsync(UpdateGetLyricsLastAttemptSql, new { lastAttemptDate = _timeProvider.GetUtcNow().UtcDateTime, id }, kind);
     }
 
     public async Task<TrackEntity?> GetByFilePathAsync(string filePath, CancellationToken cancellationToken)

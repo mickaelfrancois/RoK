@@ -11,7 +11,7 @@ namespace Rok.Infrastructure.UnitTests.Repositories;
 public class PlaylistTrackGenerateRepositoryTests
 {
     private static PlaylistTrackGenerateRepository CreateRepository(SqliteDatabaseFixture fixture) =>
-        new(fixture.Connection, fixture.Connection, NullLogger<PlaylistTrackGenerateRepository>.Instance);
+        new(fixture.Connection, fixture.Connection, NullLogger<PlaylistTrackGenerateRepository>.Instance, TimeProvider.System);
 
     private static GeneratePlaylistTracksQuery BuildQuery(int count, SmartPlaylistSelectBy sort = SmartPlaylistSelectBy.Random, params PlaylistFilterDto[] filters) =>
         new()

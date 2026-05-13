@@ -9,7 +9,7 @@ namespace Rok.Infrastructure.UnitTests.Repositories;
 public class GenreRepositoryTests
 {
     private static GenreRepository CreateRepository(SqliteDatabaseFixture fixture) =>
-        new(fixture.Connection, fixture.Connection, NullLogger<GenreRepository>.Instance);
+        new(fixture.Connection, fixture.Connection, NullLogger<GenreRepository>.Instance, TimeProvider.System);
 
     [Fact(DisplayName = "GetAll should return all seeded genres")]
     public async Task GetAll_ShouldReturnAllSeededGenres()

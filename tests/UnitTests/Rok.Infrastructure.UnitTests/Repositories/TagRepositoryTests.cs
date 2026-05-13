@@ -8,7 +8,7 @@ namespace Rok.Infrastructure.UnitTests.Repositories;
 public class TagRepositoryTests
 {
     private static TagRepository CreateRepository(SqliteDatabaseFixture fixture) =>
-        new(fixture.Connection, fixture.Connection, NullLogger<TagRepository>.Instance);
+        new(fixture.Connection, fixture.Connection, NullLogger<TagRepository>.Instance, TimeProvider.System);
 
     [Fact(DisplayName = "UpdateEntityTags should create new tags and link them to the entity")]
     public async Task UpdateEntityTags_ShouldCreateNewTags_AndLinkThemToEntity()

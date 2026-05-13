@@ -5,7 +5,7 @@ using Rok.Application.Interfaces.Repositories;
 
 namespace Rok.Infrastructure.Repositories;
 
-public class ListeningEventRepository(IDbConnection connection, [FromKeyedServices("BackgroundConnection")] IDbConnection backgroundConnection, ILogger<ListeningEventRepository> logger) : GenericRepository<ListeningEventEntity>(connection, backgroundConnection, null, logger), IListeningEventRepository
+public class ListeningEventRepository(IDbConnection connection, [FromKeyedServices("BackgroundConnection")] IDbConnection backgroundConnection, ILogger<ListeningEventRepository> logger, TimeProvider timeProvider) : GenericRepository<ListeningEventEntity>(connection, backgroundConnection, null, logger, timeProvider), IListeningEventRepository
 {
     public override string GetTableName()
     {
