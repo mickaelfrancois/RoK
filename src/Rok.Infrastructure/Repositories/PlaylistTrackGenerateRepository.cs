@@ -244,7 +244,7 @@ public class PlaylistTrackGenerateRepository(IDbConnection db, [FromKeyedService
         foreach (PlaylistFilterDto filter in filters)
         {
             int value = Convert.ToInt32(filter.Value);
-            DateTime refDate = DateTime.Now.AddDays(-value);
+            DateTime refDate = DateTime.UtcNow.AddDays(-value);
             string parameter;
             string op = "";
 
