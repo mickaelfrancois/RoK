@@ -12,7 +12,7 @@ public class AlbumApiService(
     IMusicDataApiService musicDataApiService,
     ILogger<AlbumApiService> logger) : IAlbumApiService
 {
-    public async Task<AlbumApiUpdateResult> GetAndUpdateAlbumDataAsync(AlbumDto album, IAlbumPictureService pictureService)
+    public async Task<AlbumApiUpdateResult> GetAndUpdateAlbumDataAsync(AlbumDto album, IAlbumPictureService pictureService, CancellationToken cancellationToken = default)
     {
         if (string.IsNullOrEmpty(album.Name) || string.IsNullOrEmpty(album.ArtistName))
             return AlbumApiUpdateResult.None;
