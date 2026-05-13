@@ -9,7 +9,7 @@ namespace Rok.Infrastructure.UnitTests.Repositories;
 public class EqualizerPresetRepositoryTests
 {
     private static EqualizerPresetRepository CreateRepository(SqliteDatabaseFixture fixture) =>
-        new(fixture.Connection, fixture.Connection, NullLogger<EqualizerPresetRepository>.Instance);
+        new(fixture.Connection, fixture.Connection, NullLogger<EqualizerPresetRepository>.Instance, TimeProvider.System);
 
     private static float[] BuildBands(float value = 1.5f)
     {

@@ -15,7 +15,7 @@ public class TrackRepositoryTests
 
     private static TrackRepository CreateRepository(SqliteDatabaseFixture fixture)
     {
-        return new TrackRepository(fixture.Connection, fixture.Connection, NullLogger<TrackRepository>.Instance);
+        return new TrackRepository(fixture.Connection, fixture.Connection, NullLogger<TrackRepository>.Instance, TimeProvider.System);
     }
 
     [Fact]

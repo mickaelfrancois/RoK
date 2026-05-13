@@ -12,7 +12,7 @@ public class ListeningEventRepositoryTests
     private static SqliteDatabaseFixture CreateFixture() => new();
 
     private static ListeningEventRepository CreateRepository(SqliteDatabaseFixture fixture)
-        => new(fixture.Connection, fixture.Connection, NullLogger<ListeningEventRepository>.Instance);
+        => new(fixture.Connection, fixture.Connection, NullLogger<ListeningEventRepository>.Instance, TimeProvider.System);
 
     private static Task InsertEventAsync(
         SqliteDatabaseFixture fixture,

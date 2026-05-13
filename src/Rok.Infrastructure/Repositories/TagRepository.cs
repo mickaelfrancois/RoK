@@ -6,7 +6,7 @@ using Rok.Application.Messages;
 
 namespace Rok.Infrastructure.Repositories;
 
-public class TagRepository(IDbConnection connection, [FromKeyedServices("BackgroundConnection")] IDbConnection backgroundConnection, ILogger<TagRepository> logger) : GenericRepository<TagEntity>(connection, backgroundConnection, null, logger), ITagRepository
+public class TagRepository(IDbConnection connection, [FromKeyedServices("BackgroundConnection")] IDbConnection backgroundConnection, ILogger<TagRepository> logger, TimeProvider timeProvider) : GenericRepository<TagEntity>(connection, backgroundConnection, null, logger, timeProvider), ITagRepository
 {
     public override string GetSelectQuery(string? whereParam = null)
     {

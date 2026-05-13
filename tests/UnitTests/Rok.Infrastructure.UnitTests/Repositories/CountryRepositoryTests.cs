@@ -8,7 +8,7 @@ namespace Rok.Infrastructure.UnitTests.Repositories;
 public class CountryRepositoryTests
 {
     private static CountryRepository CreateRepository(SqliteDatabaseFixture fixture) =>
-        new(fixture.Connection, fixture.Connection, NullLogger<CountryRepository>.Instance);
+        new(fixture.Connection, fixture.Connection, NullLogger<CountryRepository>.Instance, TimeProvider.System);
 
     [Fact(DisplayName = "GetById should return seeded country")]
     public async Task GetById_ShouldReturnSeededCountry()

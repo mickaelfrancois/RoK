@@ -16,7 +16,7 @@ public class ArtistRepositoryTests
 
     private static ArtistRepository CreateRepository(SqliteDatabaseFixture fixture)
     {
-        return new ArtistRepository(fixture.Connection, fixture.Connection, NullLogger<ArtistRepository>.Instance);
+        return new ArtistRepository(fixture.Connection, fixture.Connection, NullLogger<ArtistRepository>.Instance, TimeProvider.System);
     }
 
     [Fact]

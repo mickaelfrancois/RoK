@@ -8,5 +8,4 @@ public interface ITagService
 
     void FillMusicProperties(string file, TrackFile track);
 
-    Task<bool> SaveTagAsync(string file, TrackFile track);
 }

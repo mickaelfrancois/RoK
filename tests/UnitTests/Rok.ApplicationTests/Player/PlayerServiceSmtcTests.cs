@@ -49,7 +49,7 @@ public class PlayerServiceSmtcTests
         sut.LoadPlaylist(new List<TrackDto> { track });
 
         // Assert
-        smtc.Verify(s => s.UpdateTrackInfo(track, coverFile), Times.AtLeastOnce);
+        smtc.Verify(s => s.UpdateTrackInfoAsync(track, coverFile), Times.AtLeastOnce);
     }
 
     [Fact(DisplayName = "when_track_changes_and_no_cover_file_smtc_receives_null_cover_path")]
@@ -91,7 +91,7 @@ public class PlayerServiceSmtcTests
         sut.LoadPlaylist(new List<TrackDto> { track });
 
         // Assert
-        smtc.Verify(s => s.UpdateTrackInfo(track, null), Times.AtLeastOnce);
+        smtc.Verify(s => s.UpdateTrackInfoAsync(track, null), Times.AtLeastOnce);
         picture.Verify(p => p.GetPictureFile(It.IsAny<string>()), Times.Never);
     }
 

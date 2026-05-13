@@ -5,8 +5,8 @@ using Rok.Domain.Enums;
 
 namespace Rok.Infrastructure.Repositories;
 
-public class EqualizerPresetRepository(IDbConnection db, [FromKeyedServices("BackgroundConnection")] IDbConnection backgroundDb, ILogger<EqualizerPresetRepository> logger)
-    : GenericRepository<EqualizerPresetEntity>(db, backgroundDb, null, logger), IEqualizerPresetRepository
+public class EqualizerPresetRepository(IDbConnection db, [FromKeyedServices("BackgroundConnection")] IDbConnection backgroundDb, ILogger<EqualizerPresetRepository> logger, TimeProvider timeProvider)
+    : GenericRepository<EqualizerPresetEntity>(db, backgroundDb, null, logger, timeProvider), IEqualizerPresetRepository
 {
     private const string FindSql = """
         SELECT Id, Scope, ScopeId, Band0, Band1, Band2, Band3, Band4, Band5, Band6, Band7, Band8, Band9

@@ -14,7 +14,7 @@ public interface ISystemMediaTransportControlsService : IDisposable
 
     void UpdatePlaybackState(Player.PlaybackStatus status);
 
-    void UpdateTrackInfo(TrackDto track, string? coverPath);
+    Task UpdateTrackInfoAsync(TrackDto track, string? coverPath);
 
     void UpdateTimeline(TimeSpan position, TimeSpan duration);
 }

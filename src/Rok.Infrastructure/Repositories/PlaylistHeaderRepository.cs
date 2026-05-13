@@ -5,7 +5,7 @@ using Rok.Application.Interfaces.Repositories;
 
 namespace Rok.Infrastructure.Repositories;
 
-public class PlaylistHeaderRepository(IDbConnection connection, [FromKeyedServices("BackgroundConnection")] IDbConnection backgroundConnection, ILogger<PlaylistHeaderRepository> logger) : GenericRepository<PlaylistHeaderEntity>(connection, backgroundConnection, null, logger), IPlaylistHeaderRepository
+public class PlaylistHeaderRepository(IDbConnection connection, [FromKeyedServices("BackgroundConnection")] IDbConnection backgroundConnection, ILogger<PlaylistHeaderRepository> logger, TimeProvider timeProvider) : GenericRepository<PlaylistHeaderEntity>(connection, backgroundConnection, null, logger, timeProvider), IPlaylistHeaderRepository
 {
     private const string UpdatePictureSql = "UPDATE playlists SET picture = @picture WHERE Id = @id";
     private const string DeletePlaylistSql = "DELETE FROM playlists WHERE id = @id";

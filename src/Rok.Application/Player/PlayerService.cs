@@ -374,7 +374,7 @@ public class PlayerService : IPlayerService, IDisposable
             if (CurrentTrack != null)
             {
                 UpdateDiscordPresence(CurrentTrack, isPlaying: true);
-                _smtcService?.UpdateTrackInfo(CurrentTrack, ResolveCoverPath(CurrentTrack));
+                _ = _smtcService?.UpdateTrackInfoAsync(CurrentTrack, ResolveCoverPath(CurrentTrack));
                 _smtcService?.UpdatePlaybackState(PlaybackStatus.Playing);
                 StartSmtcTimelineTimer();
             }
@@ -625,7 +625,7 @@ public class PlayerService : IPlayerService, IDisposable
 
         PlaybackState = EPlaybackState.Playing;
         UpdateDiscordPresence(nextTrack, isPlaying: true);
-        _smtcService?.UpdateTrackInfo(nextTrack, ResolveCoverPath(nextTrack));
+        await (_smtcService?.UpdateTrackInfoAsync(nextTrack, ResolveCoverPath(nextTrack)) ?? Task.CompletedTask);
         _smtcService?.UpdatePlaybackState(PlaybackStatus.Playing);
     }
 

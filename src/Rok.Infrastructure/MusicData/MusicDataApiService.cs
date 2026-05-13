@@ -21,7 +21,7 @@ public class MusicDataApiService : IMusicDataApiService, IDisposable
 
     private readonly HttpClient _httpClient;
 
-    private readonly HttpClient _downloadHttpClient;
+    private readonly IHttpClientFactory _httpClientFactory;
 
     private readonly ILogger<MusicDataApiService> _logger;
 
@@ -46,14 +46,13 @@ public class MusicDataApiService : IMusicDataApiService, IDisposable
         PropertyNameCaseInsensitive = true
     };
 
-    public MusicDataApiService(HttpClient httpClient, IAppOptions appOptions, IOptions<MusicDataApiOptions> musicDataApiOptions, ILogger<MusicDataApiService> logger)
+    public MusicDataApiService(HttpClient httpClient, IHttpClientFactory httpClientFactory, IAppOptions appOptions, IOptions<MusicDataApiOptions> musicDataApiOptions, ILogger<MusicDataApiService> logger)
     {
         _httpClient = httpClient;
+        _httpClientFactory = httpClientFactory;
         _appOptions = appOptions;
         _musicDataApiOptions = musicDataApiOptions.Value;
         _logger = logger;
-
-        _downloadHttpClient = new HttpClient();
 
         ConfigureHttpClient();
     }
@@ -251,7 +250,8 @@ public class MusicDataApiService : IMusicDataApiService, IDisposable
 
     private async Task DownloadFileAsync(string url, string targetFile, CancellationToken cancellationToken)
     {
-        using HttpResponseMessage response = await _downloadHttpClient.GetAsync(url, HttpCompletionOption.ResponseHeadersRead, cancellationToken);
+        HttpClient downloadClient = _httpClientFactory.CreateClient("MusicDataDownload");
+        using HttpResponseMessage response = await downloadClient.GetAsync(url, HttpCompletionOption.ResponseHeadersRead, cancellationToken);
 
         if (!response.IsSuccessStatusCode)
             return;
@@ -335,7 +335,7 @@ public class MusicDataApiService : IMusicDataApiService, IDisposable
             }
             catch (OperationCanceledException)
             {
-                // Ignore errors
+                // Cancellation requested by caller — expected, no action needed
             }
             catch (Exception ex)
             {

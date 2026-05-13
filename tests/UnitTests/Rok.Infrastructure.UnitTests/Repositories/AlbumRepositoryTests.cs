@@ -16,7 +16,7 @@ public class AlbumRepositoryTests
 
     private static AlbumRepository CreateRepository(SqliteDatabaseFixture fixture)
     {
-        return new AlbumRepository(fixture.Connection, fixture.Connection, NullLogger<AlbumRepository>.Instance);
+        return new AlbumRepository(fixture.Connection, fixture.Connection, NullLogger<AlbumRepository>.Instance, TimeProvider.System);
     }
 
     [Fact]

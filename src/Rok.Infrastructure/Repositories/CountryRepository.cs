@@ -4,7 +4,7 @@ using Rok.Application.Interfaces.Repositories;
 
 namespace Rok.Infrastructure.Repositories;
 
-public class CountryRepository(IDbConnection db, [FromKeyedServices("BackgroundConnection")] IDbConnection backgroundDb, ILogger<CountryRepository> logger) : GenericRepository<CountryEntity>(db, backgroundDb, null, logger), ICountryRepository
+public class CountryRepository(IDbConnection db, [FromKeyedServices("BackgroundConnection")] IDbConnection backgroundDb, ILogger<CountryRepository> logger, TimeProvider timeProvider) : GenericRepository<CountryEntity>(db, backgroundDb, null, logger, timeProvider), ICountryRepository
 {
     public override string GetSelectQuery(string? whereParam = null)
     {

@@ -87,6 +87,8 @@ public static class DependencyInjection
         services.AddSingleton<IPlaylistFormatWriter, M3u8PlaylistWriter>();
         services.AddSingleton<IPlaylistFormatResolver, PlaylistFormatResolver>();
 
+        services.AddHttpClient("MusicDataDownload");
+
         services.AddSingleton<ITagService, TagService>();
         services.AddSingleton<IMusicDataApiService, MusicDataApiService>();
         services.AddSingleton<ITranslateService, TranslateService>();

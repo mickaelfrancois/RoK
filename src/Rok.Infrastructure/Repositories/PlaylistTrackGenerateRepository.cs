@@ -9,7 +9,7 @@ using Rok.Shared.Enums;
 
 namespace Rok.Infrastructure.Repositories;
 
-public class PlaylistTrackGenerateRepository(IDbConnection db, [FromKeyedServices("BackgroundConnection")] IDbConnection backgroundDb, ILogger<PlaylistTrackGenerateRepository> logger) : GenericRepository<TrackEntity>(db, backgroundDb, null, logger), IPlaylistTrackGenerateRepository
+public class PlaylistTrackGenerateRepository(IDbConnection db, [FromKeyedServices("BackgroundConnection")] IDbConnection backgroundDb, ILogger<PlaylistTrackGenerateRepository> logger, TimeProvider timeProvider) : GenericRepository<TrackEntity>(db, backgroundDb, null, logger, timeProvider), IPlaylistTrackGenerateRepository
 {
     public async Task<List<TrackEntity>> GenerateAsync(GeneratePlaylistTracksQuery request, RepositoryConnectionKind kind = RepositoryConnectionKind.Foreground)
     {
@@ -236,7 +236,7 @@ public class PlaylistTrackGenerateRepository(IDbConnection db, [FromKeyedService
         }
     }
 
-    private static void HandleDayFilter(IEnumerable<PlaylistFilterDto> filters, StringBuilder query, Dictionary<string, object> parameters)
+    private void HandleDayFilter(IEnumerable<PlaylistFilterDto> filters, StringBuilder query, Dictionary<string, object> parameters)
     {
         if (!filters.Any())
             return;
@@ -244,7 +244,7 @@ public class PlaylistTrackGenerateRepository(IDbConnection db, [FromKeyedService
         foreach (PlaylistFilterDto filter in filters)
         {
             int value = Convert.ToInt32(filter.Value);
-            DateTime refDate = DateTime.Now.AddDays(-value);
+            DateTime refDate = _timeProvider.GetUtcNow().UtcDateTime.AddDays(-value);
             string parameter;
             string op = "";
 

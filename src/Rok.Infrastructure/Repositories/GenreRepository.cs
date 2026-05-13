@@ -5,7 +5,7 @@ using Rok.Application.Interfaces.Repositories;
 
 namespace Rok.Infrastructure.Repositories;
 
-public class GenreRepository(IDbConnection connection, [FromKeyedServices("BackgroundConnection")] IDbConnection backgroundConnection, ILogger<GenreRepository> logger) : GenericRepository<GenreEntity>(connection, backgroundConnection, null, logger), IGenreRepository
+public class GenreRepository(IDbConnection connection, [FromKeyedServices("BackgroundConnection")] IDbConnection backgroundConnection, ILogger<GenreRepository> logger, TimeProvider timeProvider) : GenericRepository<GenreEntity>(connection, backgroundConnection, null, logger, timeProvider), IGenreRepository
 {
     private const string UpdateFavoriteSql = "UPDATE genres SET isFavorite = @isFavorite WHERE Id = @id";
     private const string UpdateLastListenSql = "UPDATE genres SET listenCount = listenCount + 1, lastListen = @lastListen WHERE Id = @id";
@@ -25,7 +25,7 @@ public class GenreRepository(IDbConnection connection, [FromKeyedServices("Backg
     {
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(id);
 
-        return ExecuteUpdateAsync(UpdateLastListenSql, new { lastListen = DateTime.UtcNow, id }, kind);
+        return ExecuteUpdateAsync(UpdateLastListenSql, new { lastListen = _timeProvider.GetUtcNow().UtcDateTime, id }, kind);
     }
 
     public Task<bool> ResetListenCountAsync(RepositoryConnectionKind kind = RepositoryConnectionKind.Foreground)

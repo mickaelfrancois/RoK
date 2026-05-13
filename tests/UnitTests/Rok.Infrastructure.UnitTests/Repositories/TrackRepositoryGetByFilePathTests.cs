@@ -21,7 +21,7 @@ public class TrackRepositoryGetByFilePathTests
     }
 
     private static TrackRepository CreateRepository(SqliteDatabaseFixture fixture)
-        => new(fixture.Connection, fixture.Connection, NullLogger<TrackRepository>.Instance);
+        => new(fixture.Connection, fixture.Connection, NullLogger<TrackRepository>.Instance, TimeProvider.System);
 
     [Fact(DisplayName = "returns_track_when_file_path_matches_exactly")]
     public async Task Returns_track_when_file_path_matches_exactly()
