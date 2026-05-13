@@ -31,8 +31,8 @@ public class LanguageHelpersTests
         Assert.Equal("fr", result);
     }
 
-    [Fact(DisplayName = "NormalizeLanguageCode should return default for unknown culture tags")]
-    public void NormalizeLanguageCode_UnknownTag_ShouldReturnDefault()
+    [Fact(DisplayName = "NormalizeLanguageCode should extract first two characters from unknown culture tags")]
+    public void NormalizeLanguageCode_UnknownTag_ShouldExtractFirstTwoChars()
     {
         // Act
         string result = LanguageHelpers.NormalizeLanguageCode("xyz-INVALID-TAG", "en");
