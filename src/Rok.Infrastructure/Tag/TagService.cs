@@ -59,12 +59,6 @@ public class TagService(ILogger<TagService> logger) : ITagService
     }
 
 
-    public Task<bool> SaveTagAsync(string file, TrackFile track)
-    {
-        throw new NotImplementedException();
-    }
-
-
     public static async Task<bool> ExtractPictureToFileAsync(string inputFile, string outputFile)
     {
         using TagLib.File tag = TagLib.File.Create(inputFile);
