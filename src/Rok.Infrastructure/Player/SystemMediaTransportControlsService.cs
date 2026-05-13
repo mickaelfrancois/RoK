@@ -133,7 +133,7 @@ public sealed class SystemMediaTransportControlsService(ILogger<SystemMediaTrans
         }
     }
 
-    public async void UpdateTrackInfo(TrackDto track, string? coverPath)
+    public async Task UpdateTrackInfoAsync(TrackDto track, string? coverPath)
     {
         if (_smtc is null)
             return;
