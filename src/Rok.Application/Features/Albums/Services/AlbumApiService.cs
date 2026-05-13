@@ -30,7 +30,7 @@ public class AlbumApiService(
         if (string.IsNullOrEmpty(albumApi.MusicBrainzID))
             return AlbumApiUpdateResult.None;
 
-        bool pictureDownloaded = await DownloadPictureIfNeededAsync(album, albumApi, pictureService, CancellationToken.None);
+        bool pictureDownloaded = await DownloadPictureIfNeededAsync(album, albumApi, pictureService, cancellationToken);
 
         bool dataUpdated = false;
         if (CompareAlbumFromApi(album, albumApi))
