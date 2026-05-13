@@ -78,8 +78,8 @@ public class PostImportApiEnrichmentTaskTests
         await task.RunAsync(CancellationToken.None);
 
         // Assert
-        artistApi.Verify(s => s.GetAndUpdateArtistDataAsync(It.IsAny<ArtistDto>(), It.IsAny<IArtistPictureService>(), It.IsAny<IBackdropPicture>()), Times.Never);
-        albumApi.Verify(s => s.GetAndUpdateAlbumDataAsync(It.IsAny<AlbumDto>(), It.IsAny<IAlbumPictureService>()), Times.Never);
+        artistApi.Verify(s => s.GetAndUpdateArtistDataAsync(It.IsAny<ArtistDto>(), It.IsAny<IArtistPictureService>(), It.IsAny<IBackdropPicture>(), It.IsAny<CancellationToken>()), Times.Never);
+        albumApi.Verify(s => s.GetAndUpdateAlbumDataAsync(It.IsAny<AlbumDto>(), It.IsAny<IAlbumPictureService>(), It.IsAny<CancellationToken>()), Times.Never);
     }
 
     [Fact(DisplayName = "EnrichArtistsAsync should call the api service for each newly created artist id")]
@@ -89,7 +89,7 @@ public class PostImportApiEnrichmentTaskTests
         ArtistImport artistImport = await BuildArtistImportAsync(2);
         AlbumImport albumImport = new(Mock.Of<IAlbumRepository>(), TimeProvider.System);
         Mock<IArtistApiService> artistApi = new();
-        artistApi.Setup(s => s.GetAndUpdateArtistDataAsync(It.IsAny<ArtistDto>(), It.IsAny<IArtistPictureService>(), It.IsAny<IBackdropPicture>()))
+        artistApi.Setup(s => s.GetAndUpdateArtistDataAsync(It.IsAny<ArtistDto>(), It.IsAny<IArtistPictureService>(), It.IsAny<IBackdropPicture>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(ArtistApiUpdateResult.None);
         Mock<IMediator> mediator = new();
         mediator.Setup(m => m.SendMessageAsync(It.IsAny<GetArtistByIdQuery>(), It.IsAny<CancellationToken>()))
@@ -100,7 +100,7 @@ public class PostImportApiEnrichmentTaskTests
         await task.EnrichArtistsAsync(CancellationToken.None);
 
         // Assert
-        artistApi.Verify(s => s.GetAndUpdateArtistDataAsync(It.IsAny<ArtistDto>(), It.IsAny<IArtistPictureService>(), It.IsAny<IBackdropPicture>()), Times.Exactly(2));
+        artistApi.Verify(s => s.GetAndUpdateArtistDataAsync(It.IsAny<ArtistDto>(), It.IsAny<IArtistPictureService>(), It.IsAny<IBackdropPicture>(), It.IsAny<CancellationToken>()), Times.Exactly(2));
     }
 
     [Fact(DisplayName = "EnrichAlbumsAsync should call the api service for each newly created album id")]
@@ -110,7 +110,7 @@ public class PostImportApiEnrichmentTaskTests
         ArtistImport artistImport = new(Mock.Of<IArtistRepository>(), TimeProvider.System);
         AlbumImport albumImport = await BuildAlbumImportAsync(3);
         Mock<IAlbumApiService> albumApi = new();
-        albumApi.Setup(s => s.GetAndUpdateAlbumDataAsync(It.IsAny<AlbumDto>(), It.IsAny<IAlbumPictureService>()))
+        albumApi.Setup(s => s.GetAndUpdateAlbumDataAsync(It.IsAny<AlbumDto>(), It.IsAny<IAlbumPictureService>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(AlbumApiUpdateResult.None);
         Mock<IMediator> mediator = new();
         mediator.Setup(m => m.SendMessageAsync(It.IsAny<GetAlbumByIdQuery>(), It.IsAny<CancellationToken>()))
@@ -121,7 +121,7 @@ public class PostImportApiEnrichmentTaskTests
         await task.EnrichAlbumsAsync(CancellationToken.None);
 
         // Assert
-        albumApi.Verify(s => s.GetAndUpdateAlbumDataAsync(It.IsAny<AlbumDto>(), It.IsAny<IAlbumPictureService>()), Times.Exactly(3));
+        albumApi.Verify(s => s.GetAndUpdateAlbumDataAsync(It.IsAny<AlbumDto>(), It.IsAny<IAlbumPictureService>(), It.IsAny<CancellationToken>()), Times.Exactly(3));
     }
 
     [Fact(DisplayName = "EnrichArtistsAsync should continue processing remaining artists when one throws")]
@@ -131,7 +131,7 @@ public class PostImportApiEnrichmentTaskTests
         ArtistImport artistImport = await BuildArtistImportAsync(2);
         AlbumImport albumImport = new(Mock.Of<IAlbumRepository>(), TimeProvider.System);
         Mock<IArtistApiService> artistApi = new();
-        artistApi.SetupSequence(s => s.GetAndUpdateArtistDataAsync(It.IsAny<ArtistDto>(), It.IsAny<IArtistPictureService>(), It.IsAny<IBackdropPicture>()))
+        artistApi.SetupSequence(s => s.GetAndUpdateArtistDataAsync(It.IsAny<ArtistDto>(), It.IsAny<IArtistPictureService>(), It.IsAny<IBackdropPicture>(), It.IsAny<CancellationToken>()))
             .Returns(Task.FromException<ArtistApiUpdateResult>(new InvalidOperationException("API failure")))
             .ReturnsAsync(ArtistApiUpdateResult.None);
         Mock<IMediator> mediator = new();
@@ -143,7 +143,7 @@ public class PostImportApiEnrichmentTaskTests
         await task.EnrichArtistsAsync(CancellationToken.None);
 
         // Assert — second artist was still processed
-        artistApi.Verify(s => s.GetAndUpdateArtistDataAsync(It.IsAny<ArtistDto>(), It.IsAny<IArtistPictureService>(), It.IsAny<IBackdropPicture>()), Times.Exactly(2));
+        artistApi.Verify(s => s.GetAndUpdateArtistDataAsync(It.IsAny<ArtistDto>(), It.IsAny<IArtistPictureService>(), It.IsAny<IBackdropPicture>(), It.IsAny<CancellationToken>()), Times.Exactly(2));
     }
 
     [Fact(DisplayName = "EnrichArtistsAsync should stop processing when cancellation is requested")]
