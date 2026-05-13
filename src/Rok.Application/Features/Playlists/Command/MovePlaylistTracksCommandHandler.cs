@@ -1,4 +1,5 @@
 ﻿using System.Transactions;
+using Microsoft.Extensions.Logging;
 using Rok.Application.Interfaces;
 using Rok.Application.Interfaces.Repositories;
 
@@ -12,7 +13,7 @@ public class MovePlaylistTracksCommand : ICommand<Result<bool>>
 }
 
 
-public class MovePlaylistTracksCommandHandler(IPlaylistTrackRepository _repository) : ICommandHandler<MovePlaylistTracksCommand, Result<bool>>
+public class MovePlaylistTracksCommandHandler(IPlaylistTrackRepository _repository, ILogger<MovePlaylistTracksCommandHandler> _logger) : ICommandHandler<MovePlaylistTracksCommand, Result<bool>>
 {
     public async Task<Result<bool>> HandleAsync(MovePlaylistTracksCommand message, CancellationToken cancellationToken)
     {
@@ -42,9 +43,9 @@ public class MovePlaylistTracksCommandHandler(IPlaylistTrackRepository _reposito
 
             scope.Complete();
         }
-        catch (Exception)
+        catch (Exception ex)
         {
-            scope.Dispose();
+            _logger.LogError(ex, "Failed to move tracks in playlist {PlaylistId}.", message.PlaylistId);
             return Result<bool>.Fail("Failed to move tracks in playlist due to an error.");
         }
 

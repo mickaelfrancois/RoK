@@ -1,4 +1,5 @@
 ﻿using System.Transactions;
+using Microsoft.Extensions.Logging;
 using Rok.Application.Interfaces.Repositories;
 
 namespace Rok.Application.Features.Playlists.Command;
@@ -11,7 +12,7 @@ public class RemoveTrackFromPlaylistCommand : ICommand<Result>
 }
 
 
-public class RemoveTrackFromPlaylistCommandHandler(IPlaylistTrackRepository _repository, IPlaylistHeaderRepository _playlistHeaderRepository, ITrackRepository _trackRepository) : ICommandHandler<RemoveTrackFromPlaylistCommand, Result>
+public class RemoveTrackFromPlaylistCommandHandler(IPlaylistTrackRepository _repository, IPlaylistHeaderRepository _playlistHeaderRepository, ITrackRepository _trackRepository, ILogger<RemoveTrackFromPlaylistCommandHandler> _logger) : ICommandHandler<RemoveTrackFromPlaylistCommand, Result>
 {
     public async Task<Result> HandleAsync(RemoveTrackFromPlaylistCommand message, CancellationToken cancellationToken)
     {
@@ -38,9 +39,9 @@ public class RemoveTrackFromPlaylistCommandHandler(IPlaylistTrackRepository _rep
 
             scope.Complete();
         }
-        catch (Exception)
+        catch (Exception ex)
         {
-            scope.Dispose();
+            _logger.LogError(ex, "Failed to remove track {TrackId} from playlist {PlaylistId}.", message.TrackId, message.PlaylistId);
             return Result.Fail("Failed to remove track to playlist due to an error.");
         }
 

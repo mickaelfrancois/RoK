@@ -1,4 +1,5 @@
 ﻿using System.Transactions;
+using Microsoft.Extensions.Logging;
 using Rok.Application.Interfaces.Repositories;
 
 namespace Rok.Application.Features.Playlists.Command;
@@ -11,7 +12,7 @@ public class AddArtistToPlaylistCommand : ICommand<Result<long>>
 }
 
 
-public class AddArtistToPlaylistCommandHandler(IPlaylistTrackRepository _repository, IPlaylistHeaderRepository _playlistHeaderRepository, ITrackRepository _trackRepository) : ICommandHandler<AddArtistToPlaylistCommand, Result<long>>
+public class AddArtistToPlaylistCommandHandler(IPlaylistTrackRepository _repository, IPlaylistHeaderRepository _playlistHeaderRepository, ITrackRepository _trackRepository, ILogger<AddArtistToPlaylistCommandHandler> _logger) : ICommandHandler<AddArtistToPlaylistCommand, Result<long>>
 {
     public async Task<Result<long>> HandleAsync(AddArtistToPlaylistCommand message, CancellationToken cancellationToken)
     {
@@ -43,8 +44,9 @@ public class AddArtistToPlaylistCommandHandler(IPlaylistTrackRepository _reposit
 
             scope.Complete();
         }
-        catch (Exception)
+        catch (Exception ex)
         {
+            _logger.LogError(ex, "Failed to add artist {ArtistId} tracks to playlist {PlaylistId}.", message.ArtistId, message.PlaylistId);
             return Result<long>.Fail("Failed to add track to playlist due to an error.");
         }
 
