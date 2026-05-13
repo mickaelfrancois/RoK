@@ -15,7 +15,7 @@ public class QueryPreProcessor<TMessage, TResponse>(ILogger<TMessage> _logger) :
         catch (Exception ex)
         {
             _logger.LogError(ex, "Processing message error: {Message}", message.GetType().Name);
-            return default!;
+            throw;
         }
     }
 }

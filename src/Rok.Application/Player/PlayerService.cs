@@ -5,7 +5,6 @@ using Rok.Application.Interfaces;
 using Rok.Application.Interfaces.Pictures;
 using Rok.Application.Messages;
 using Rok.Application.Randomizer;
-using Rok.Infrastructure.Social;
 using Rok.Services.Player;
 
 namespace Rok.Application.Player;

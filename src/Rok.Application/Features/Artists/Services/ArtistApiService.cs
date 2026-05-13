@@ -30,8 +30,8 @@ public class ArtistApiService(
         if (string.IsNullOrEmpty(artistApi.MusicBrainzID))
             return ArtistApiUpdateResult.None;
 
-        bool pictureDownloaded = await DownloadPictureIfNeededAsync(artist, artistApi, pictureService, CancellationToken.None);
-        bool backdropsDownloaded = await DownloadBackdropsIfNeededAsync(artist, artistApi, backdropPicture, CancellationToken.None);
+        bool pictureDownloaded = await DownloadPictureIfNeededAsync(artist, artistApi, pictureService, cancellationToken);
+        bool backdropsDownloaded = await DownloadBackdropsIfNeededAsync(artist, artistApi, backdropPicture, cancellationToken);
 
         bool dataUpdated = false;
         if (CompareArtistFromApi(artist, artistApi))

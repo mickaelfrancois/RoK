@@ -1,5 +1,5 @@
 ﻿
-namespace Rok.Infrastructure.Social;
+namespace Rok.Application.Interfaces;
 
 public interface IDiscordRichPresenceService
 {
