@@ -60,7 +60,7 @@ public sealed class CallDetectionService : ICallDetectionService, IAudioSessionE
                     AudioSessionManager sessionManager = device.AudioSessionManager;
                     sessionManager.OnSessionCreated += OnSessionCreated;
 
-                    _trackedManagers.Clear();
+                    _trackedManagers.Add(sessionManager);
 
                     ScanExistingSessions(sessionManager);
                 }
