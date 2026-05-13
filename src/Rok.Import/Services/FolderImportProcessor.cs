@@ -81,7 +81,7 @@ public class FolderImportProcessor(
 
         track ??= new TrackEntity();
 
-        TrackMetadataService.EnsureTrackTimestamps(track, file);
+        _metadataService.EnsureTrackTimestamps(track, file);
         TrackMetadataService.FillTrackEntity(track, file, artist?.Id, album?.Id, genreId);
 
         UpdateStatisticsForTrack(track);

@@ -6,7 +6,7 @@ using Rok.Shared.Extensions;
 
 namespace Rok.Import;
 
-public class GenreImport(IGenreRepository _genreRepository)
+public class GenreImport(IGenreRepository _genreRepository, TimeProvider _timeProvider)
 {
     public int CreatedCount { get; private set; } = 0;
 
@@ -56,7 +56,7 @@ public class GenreImport(IGenreRepository _genreRepository)
         GenreEntity genre = new()
         {
             Name = genreName.Capitalize(),
-            CreatDate = DateTime.Now,
+            CreatDate = _timeProvider.GetLocalNow().DateTime,
             ArtistCount = 1
         };
 

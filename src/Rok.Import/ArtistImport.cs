@@ -7,7 +7,7 @@ using Rok.Shared.Extensions;
 
 namespace Rok.Import;
 
-public class ArtistImport(IArtistRepository _artistRepository)
+public class ArtistImport(IArtistRepository _artistRepository, TimeProvider _timeProvider)
 {
     public int CreatedCount { get; private set; } = 0;
 
@@ -91,7 +91,7 @@ public class ArtistImport(IArtistRepository _artistRepository)
             Name = track.Artist.Capitalize(),
             GenreId = genreId,
             MusicBrainzID = track.MusicbrainzArtistID,
-            CreatDate = DateTime.Now,
+            CreatDate = _timeProvider.GetLocalNow().DateTime,
             AlbumCount = track.IsCompilation ? 0 : 1,
             CompilationCount = track.IsCompilation ? 1 : 0,
         };

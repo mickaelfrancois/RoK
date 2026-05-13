@@ -8,7 +8,7 @@ using Rok.Shared.Extensions;
 
 namespace Rok.Import;
 
-public class AlbumImport(IAlbumRepository _albumRepository)
+public class AlbumImport(IAlbumRepository _albumRepository, TimeProvider _timeProvider)
 {
     public int CreatedCount { get; private set; } = 0;
 
@@ -113,7 +113,7 @@ public class AlbumImport(IAlbumRepository _albumRepository)
             IsLive = isLive,
             AlbumPath = Path.GetDirectoryName(track.FullPath)!,
             MusicBrainzID = track.MusicbrainzAlbumID,
-            CreatDate = DateTime.Now
+            CreatDate = _timeProvider.GetLocalNow().DateTime
         };
 
         long id = await _albumRepository.AddAsync(album, RepositoryConnectionKind.Background);

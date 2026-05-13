@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Time.Testing;
 using Moq;
 using Rok.Application.Interfaces.Repositories;
 using Rok.Application.Tag;
@@ -157,10 +158,11 @@ public class TrackMetadataServiceTests
     [Fact]
     public void EnsureTrackTimestamps_WhenNewTrack_ShouldSetMusicFileAndCreatDate()
     {
+        TrackMetadataService service = new(new TrackImport(Mock.Of<ITrackRepository>()), Mock.Of<ILogger<TrackMetadataService>>(), TimeProvider.System);
         TrackEntity track = new() { Id = 0 };
         TrackFile file = BuildFile(fullPath: @"C:\music\song.mp3");
 
-        TrackMetadataService.EnsureTrackTimestamps(track, file);
+        service.EnsureTrackTimestamps(track, file);
 
         Assert.Equal(Path.GetFullPath(@"C:\music\song.mp3"), track.MusicFile);
         Assert.NotEqual(default, track.CreatDate);
@@ -170,26 +172,28 @@ public class TrackMetadataServiceTests
     [Fact]
     public void EnsureTrackTimestamps_WhenExistingTrack_ShouldSetEditDateOnly()
     {
+        TrackMetadataService service = new(new TrackImport(Mock.Of<ITrackRepository>()), Mock.Of<ILogger<TrackMetadataService>>(), TimeProvider.System);
         TrackEntity track = new() { Id = 42, MusicFile = @"C:\music\song.mp3" };
         TrackFile file = BuildFile(fullPath: @"C:\music\other.mp3");
 
-        TrackMetadataService.EnsureTrackTimestamps(track, file);
+        service.EnsureTrackTimestamps(track, file);
 
         Assert.Equal(@"C:\music\song.mp3", track.MusicFile);
         Assert.NotNull(track.EditDate);
     }
 
     [Fact]
-    public void EnsureTrackTimestamps_WhenNewTrack_CreatDateShouldBeCloseToNow()
+    public void EnsureTrackTimestamps_WhenNewTrack_CreatDateShouldMatchTimeProvider()
     {
+        FakeTimeProvider fakeTime = new();
+        fakeTime.SetLocalTimeZone(TimeZoneInfo.Local);
+        TrackMetadataService service = new(new TrackImport(Mock.Of<ITrackRepository>()), Mock.Of<ILogger<TrackMetadataService>>(), fakeTime);
         TrackEntity track = new() { Id = 0 };
         TrackFile file = BuildFile();
 
-        DateTime before = DateTime.Now;
-        TrackMetadataService.EnsureTrackTimestamps(track, file);
-        DateTime after = DateTime.Now;
+        service.EnsureTrackTimestamps(track, file);
 
-        Assert.InRange(track.CreatDate, before, after);
+        Assert.Equal(fakeTime.GetLocalNow().DateTime, track.CreatDate);
     }
 
     #endregion
@@ -265,7 +269,7 @@ public class TrackMetadataServiceTests
         Mock<ITrackRepository> mockRepo = new();
         TrackImport importTrack = new(mockRepo.Object);
         Mock<ILogger<TrackMetadataService>> mockLogger = new();
-        TrackMetadataService service = new(importTrack, mockLogger.Object);
+        TrackMetadataService service = new(importTrack, mockLogger.Object, TimeProvider.System);
 
         TrackFile file = BuildFile();
 
@@ -280,7 +284,7 @@ public class TrackMetadataServiceTests
         Mock<ITrackRepository> mockRepo = new();
         TrackImport importTrack = new(mockRepo.Object);
         Mock<ILogger<TrackMetadataService>> mockLogger = new();
-        TrackMetadataService service = new(importTrack, mockLogger.Object);
+        TrackMetadataService service = new(importTrack, mockLogger.Object, TimeProvider.System);
 
         TrackEntity track = BuildTrack(title: "Old Title");
         TrackFile file = BuildFile(title: "New Title");
@@ -296,7 +300,7 @@ public class TrackMetadataServiceTests
         Mock<ITrackRepository> mockRepo = new();
         TrackImport importTrack = new(mockRepo.Object);
         Mock<ILogger<TrackMetadataService>> mockLogger = new();
-        TrackMetadataService service = new(importTrack, mockLogger.Object);
+        TrackMetadataService service = new(importTrack, mockLogger.Object, TimeProvider.System);
 
         var date = new DateTime(2024, 1, 1, 12, 0, 0, DateTimeKind.Utc);
         TrackEntity track = BuildTrack(fileDate: date);

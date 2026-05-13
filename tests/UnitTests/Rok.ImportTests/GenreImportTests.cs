@@ -11,7 +11,7 @@ public class GenreImportTests
     public void GetFromCache_ShouldReturnNull_ForEmptyGenreName()
     {
         // Arrange
-        GenreImport import = new(Mock.Of<IGenreRepository>());
+        GenreImport import = new(Mock.Of<IGenreRepository>(), TimeProvider.System);
 
         // Act & Assert
         Assert.Null(import.GetFromCache(""));
@@ -24,7 +24,7 @@ public class GenreImportTests
         List<GenreEntity> genres = new() { new() { Id = 1, Name = "Rock" }, new() { Id = 2, Name = "Jazz" } };
         Mock<IGenreRepository> repository = new();
         repository.Setup(r => r.GetAllAsync(It.IsAny<RepositoryConnectionKind>())).ReturnsAsync(genres);
-        GenreImport import = new(repository.Object);
+        GenreImport import = new(repository.Object, TimeProvider.System);
 
         // Act
         await import.LoadCacheAsync();
@@ -39,7 +39,7 @@ public class GenreImportTests
     public async Task CreateAsync_ShouldReturnNull_ForEmptyGenreName()
     {
         // Arrange
-        GenreImport import = new(Mock.Of<IGenreRepository>());
+        GenreImport import = new(Mock.Of<IGenreRepository>(), TimeProvider.System);
 
         // Act
         GenreCacheItem? result = await import.CreateAsync("");
@@ -57,7 +57,7 @@ public class GenreImportTests
         repository.Setup(r => r.AddAsync(It.IsAny<GenreEntity>(), It.IsAny<RepositoryConnectionKind>()))
             .Callback<GenreEntity, RepositoryConnectionKind>((g, _) => captured = g)
             .ReturnsAsync(7);
-        GenreImport import = new(repository.Object);
+        GenreImport import = new(repository.Object, TimeProvider.System);
 
         // Act
         GenreCacheItem? created = await import.CreateAsync("electro");

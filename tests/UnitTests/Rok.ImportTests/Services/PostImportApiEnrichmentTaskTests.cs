@@ -22,7 +22,7 @@ public class PostImportApiEnrichmentTaskTests
         Mock<IArtistRepository> repo = new();
         repo.Setup(r => r.AddAsync(It.IsAny<ArtistEntity>(), It.IsAny<RepositoryConnectionKind>()))
             .ReturnsAsync(() => id++);
-        ArtistImport artistImport = new(repo.Object);
+        ArtistImport artistImport = new(repo.Object, TimeProvider.System);
 
         for (int i = 0; i < idCount; i++)
             await artistImport.CreateAsync(new TrackFile { Artist = $"Artist{i}", FullPath = @"C:\m\t.mp3" }, null);
@@ -36,7 +36,7 @@ public class PostImportApiEnrichmentTaskTests
         Mock<IAlbumRepository> repo = new();
         repo.Setup(r => r.AddAsync(It.IsAny<AlbumEntity>(), It.IsAny<RepositoryConnectionKind>()))
             .ReturnsAsync(() => id++);
-        AlbumImport albumImport = new(repo.Object);
+        AlbumImport albumImport = new(repo.Object, TimeProvider.System);
 
         for (int i = 0; i < idCount; i++)
             await albumImport.CreateAsync(new TrackFile { Album = $"Album{i}", Artist = "Artist", FullPath = @"C:\m\t.mp3" }, 1, null);
@@ -67,8 +67,8 @@ public class PostImportApiEnrichmentTaskTests
     public async Task RunAsync_ShouldNotCallAnyApiService_WhenNoNewlyCreatedIdsExist()
     {
         // Arrange
-        ArtistImport artistImport = new(Mock.Of<IArtistRepository>());
-        AlbumImport albumImport = new(Mock.Of<IAlbumRepository>());
+        ArtistImport artistImport = new(Mock.Of<IArtistRepository>(), TimeProvider.System);
+        AlbumImport albumImport = new(Mock.Of<IAlbumRepository>(), TimeProvider.System);
         Mock<IArtistApiService> artistApi = new();
         Mock<IAlbumApiService> albumApi = new();
         Mock<IMediator> mediator = new();
@@ -87,7 +87,7 @@ public class PostImportApiEnrichmentTaskTests
     {
         // Arrange
         ArtistImport artistImport = await BuildArtistImportAsync(2);
-        AlbumImport albumImport = new(Mock.Of<IAlbumRepository>());
+        AlbumImport albumImport = new(Mock.Of<IAlbumRepository>(), TimeProvider.System);
         Mock<IArtistApiService> artistApi = new();
         artistApi.Setup(s => s.GetAndUpdateArtistDataAsync(It.IsAny<ArtistDto>(), It.IsAny<IArtistPictureService>(), It.IsAny<IBackdropPicture>()))
             .ReturnsAsync(ArtistApiUpdateResult.None);
@@ -107,7 +107,7 @@ public class PostImportApiEnrichmentTaskTests
     public async Task EnrichAlbumsAsync_ShouldCallApiService_ForEachNewlyCreatedAlbumId()
     {
         // Arrange
-        ArtistImport artistImport = new(Mock.Of<IArtistRepository>());
+        ArtistImport artistImport = new(Mock.Of<IArtistRepository>(), TimeProvider.System);
         AlbumImport albumImport = await BuildAlbumImportAsync(3);
         Mock<IAlbumApiService> albumApi = new();
         albumApi.Setup(s => s.GetAndUpdateAlbumDataAsync(It.IsAny<AlbumDto>(), It.IsAny<IAlbumPictureService>()))
@@ -129,7 +129,7 @@ public class PostImportApiEnrichmentTaskTests
     {
         // Arrange
         ArtistImport artistImport = await BuildArtistImportAsync(2);
-        AlbumImport albumImport = new(Mock.Of<IAlbumRepository>());
+        AlbumImport albumImport = new(Mock.Of<IAlbumRepository>(), TimeProvider.System);
         Mock<IArtistApiService> artistApi = new();
         artistApi.SetupSequence(s => s.GetAndUpdateArtistDataAsync(It.IsAny<ArtistDto>(), It.IsAny<IArtistPictureService>(), It.IsAny<IBackdropPicture>()))
             .Returns(Task.FromException<ArtistApiUpdateResult>(new InvalidOperationException("API failure")))
@@ -151,7 +151,7 @@ public class PostImportApiEnrichmentTaskTests
     {
         // Arrange
         ArtistImport artistImport = await BuildArtistImportAsync(2);
-        AlbumImport albumImport = new(Mock.Of<IAlbumRepository>());
+        AlbumImport albumImport = new(Mock.Of<IAlbumRepository>(), TimeProvider.System);
         Mock<IArtistApiService> artistApi = new();
         Mock<IMediator> mediator = new();
         using CancellationTokenSource cts = new();
