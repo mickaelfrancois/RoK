@@ -16,7 +16,7 @@ public class GenreImport(IGenreRepository _genreRepository, TimeProvider _timePr
     private readonly Dictionary<string, GenreCacheItem> _cache = new(StringComparer.InvariantCultureIgnoreCase);
 
 
-    public async Task LoadCacheAsync()
+    public async Task LoadCacheAsync(CancellationToken cancellationToken = default)
     {
         _cache.Clear();
 
@@ -48,7 +48,7 @@ public class GenreImport(IGenreRepository _genreRepository, TimeProvider _timePr
     }
 
 
-    public async Task<GenreCacheItem?> CreateAsync(string genreName)
+    public async Task<GenreCacheItem?> CreateAsync(string genreName, CancellationToken cancellationToken = default)
     {
         if (string.IsNullOrEmpty(genreName))
             return null;

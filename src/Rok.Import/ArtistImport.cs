@@ -28,7 +28,7 @@ public class ArtistImport(IArtistRepository _artistRepository, TimeProvider _tim
     /// <remarks>This method retrieves all artist entities from the repository and populates the cache with
     /// them. Each artist is stored in the cache using a key derived from the artist's name.</remarks>
     /// <returns>A task that represents the asynchronous operation.</returns>
-    public async Task LoadCacheAsync()
+    public async Task LoadCacheAsync(CancellationToken cancellationToken = default)
     {
         _cache.Clear();
         _newlyCreatedIds.Clear();
@@ -79,7 +79,7 @@ public class ArtistImport(IArtistRepository _artistRepository, TimeProvider _tim
     /// <param name="genreId">An optional genre identifier to associate with the artist. Can be null if no genre is specified.</param>
     /// <returns>An <see cref="ArtistCacheItem"/> representing the newly created artist entry, or <see langword="null"/> if the
     /// artist information is incomplete.</returns>
-    public async Task<ArtistCacheItem?> CreateAsync(TrackFile track, long? genreId)
+    public async Task<ArtistCacheItem?> CreateAsync(TrackFile track, long? genreId, CancellationToken cancellationToken = default)
     {
         if (string.IsNullOrEmpty(track.Artist))
             return null;

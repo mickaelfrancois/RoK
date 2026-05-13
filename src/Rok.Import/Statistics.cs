@@ -42,7 +42,7 @@ public class Statistics(ITrackRepository trackRepository, IAlbumRepository album
     }
 
 
-    public async Task UpdateAlbumsAsync(IEnumerable<long> albumsId)
+    public async Task UpdateAlbumsAsync(IEnumerable<long> albumsId, CancellationToken cancellationToken = default)
     {
         if (!albumsId.Any())
             return;
@@ -65,7 +65,7 @@ public class Statistics(ITrackRepository trackRepository, IAlbumRepository album
         }
     }
 
-    public async Task UpdateArtistsAsync(IEnumerable<long> artistsId)
+    public async Task UpdateArtistsAsync(IEnumerable<long> artistsId, CancellationToken cancellationToken = default)
     {
         if (!artistsId.Any())
             return;
@@ -131,7 +131,7 @@ public class Statistics(ITrackRepository trackRepository, IAlbumRepository album
         }
     }
 
-    public async Task UpdateGenresAsync(IEnumerable<long> genresId)
+    public async Task UpdateGenresAsync(IEnumerable<long> genresId, CancellationToken cancellationToken = default)
     {
         if (!genresId.Any())
             return;

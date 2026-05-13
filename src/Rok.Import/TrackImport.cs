@@ -14,7 +14,7 @@ public class TrackImport(ITrackRepository _trackRepository)
     private readonly Dictionary<string, TrackEntity> _cache = new(StringComparer.InvariantCultureIgnoreCase);
 
 
-    public async Task LoadCacheAsync()
+    public async Task LoadCacheAsync(CancellationToken cancellationToken = default)
     {
         _cache.Clear();
 
@@ -42,7 +42,7 @@ public class TrackImport(ITrackRepository _trackRepository)
     }
 
 
-    public async Task<TrackEntity?> CreateAsync(TrackEntity track)
+    public async Task<TrackEntity?> CreateAsync(TrackEntity track, CancellationToken cancellationToken = default)
     {
         await _trackRepository.AddAsync(track, RepositoryConnectionKind.Background);
 

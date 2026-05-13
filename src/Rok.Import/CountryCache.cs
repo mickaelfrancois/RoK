@@ -22,7 +22,7 @@ public class CountryCache(ICountryRepository _countryRepository)
     /// <remarks>This method clears the existing cache and repopulates it with the latest country data
     /// retrieved from the repository. The cache is keyed by the lowercase country code.</remarks>
     /// <returns>A task that represents the asynchronous load operation.</returns>
-    public async Task LoadCacheAsync()
+    public async Task LoadCacheAsync(CancellationToken cancellationToken = default)
     {
         _countriesCache.Clear();
 
