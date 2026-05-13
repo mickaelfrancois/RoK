@@ -51,7 +51,7 @@ public class FolderImportProcessor(
 
         statistics.FilesRead += files.Count;
 
-        if (!AreFilesNewer(files))
+        if (!RequiresImport(files))
             return;
 
         _trackFileProcessor.ReadMusicProperties(files);
@@ -128,7 +128,7 @@ public class FolderImportProcessor(
         }
     }
 
-    private bool AreFilesNewer(List<TrackFile> files)
+    private bool RequiresImport(List<TrackFile> files)
     {
         foreach (TrackFile file in files)
         {

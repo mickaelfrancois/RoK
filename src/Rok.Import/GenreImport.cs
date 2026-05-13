@@ -75,8 +75,8 @@ public class GenreImport(IGenreRepository _genreRepository)
     }
 
 
-    private static string GetKey(string artistName)
+    private static string GetKey(string genreName)
     {
-        return artistName.ToUpperInvariant();
+        return genreName.ToUpperInvariant();
     }
 }
