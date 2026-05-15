@@ -1,5 +1,27 @@
 ﻿# ChangeLog
 
+## [1.11.2] Store – 15 mai 2026
+
+### Modifié
+
+- Passe de revue qualité sur les couches Application, Infrastructure, Présentation et Shared (propagation de CancellationToken, injection de TimeProvider, désabonnements propres).
+- Gestion de la fenêtre d'égaliseur extraite dans un service dédié.
+
+### Corrigé
+
+- Synchronisation des paroles : la dernière ligne s'affiche désormais et le retour en arrière fonctionne à nouveau.
+- L'ajout d'un artiste à une playlist ajoutait par erreur l'album correspondant.
+- Le filtre par date des playlists intelligentes utilise désormais l'heure UTC.
+- Stabilité au démarrage et à la fermeture : flush de la télémétrie non bloquant, gestion des exceptions fatales au lancement, attente correcte du seeding initial.
+- Annulations correctement filtrées dans les handlers de navigation pour éviter des crashs lors de changements de page rapides.
+- Désabonnement systématique des messages au dispose (score de piste, messages transitoires, sessions de lecture).
+- Correction de la source MusicBrainzID utilisée pour les artistes lors de l'import.
+- Validateur « supérieur à zéro » corrigé.
+- Chaînes de secours des menus contextuels converties en anglais.
+- Initialisation du type de paroles déplacée hors du getter pour éviter des effets de bord.
+
+--
+
 ## [1.11.1] Store – 11 mai 2026
 
 ### Ajouté
