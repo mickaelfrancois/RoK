@@ -1,8 +1,8 @@
 using CleanArch.DevKit.Mediator.Results;
-using Rok.Application.Errors;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using Rok.Application.Dto;
+using Rok.Application.Errors;
 using Rok.Application.Features.Playlists.Requests;
 using Rok.ViewModels.Playlist;
 using Rok.ViewModels.Playlists.Interfaces;

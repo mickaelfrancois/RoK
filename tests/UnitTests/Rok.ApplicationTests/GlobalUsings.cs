@@ -1,3 +1,5 @@
+global using System.Threading;
+global using System.Threading.Tasks;
 global using CleanArch.DevKit.Mediator;
 global using CleanArch.DevKit.Mediator.Results;
 global using CleanArch.DevKit.Mediator.Results.Testing;
@@ -8,5 +10,3 @@ global using Rok.Application.Dto;
 global using Rok.Application.Errors;
 global using Rok.Application.Interfaces;
 global using Rok.Domain.Entities;
-global using System.Threading;
-global using System.Threading.Tasks;

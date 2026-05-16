@@ -12,8 +12,8 @@ public partial class LyricsTypeVisibilityConverter : IValueConverter
         return target switch
         {
             "Synchronized" => lyricsType == ELyricsType.Synchronized ? Visibility.Visible : Visibility.Collapsed,
-            "Plain"        => lyricsType == ELyricsType.Plain        ? Visibility.Visible : Visibility.Collapsed,
-            _              => Visibility.Collapsed
+            "Plain" => lyricsType == ELyricsType.Plain ? Visibility.Visible : Visibility.Collapsed,
+            _ => Visibility.Collapsed
         };
     }
 

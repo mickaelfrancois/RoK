@@ -1,8 +1,8 @@
 global using CleanArch.DevKit.Mediator;
 global using CleanArch.DevKit.Mediator.Behaviors;
 global using CleanArch.DevKit.Mediator.Results;
-global using CleanArch.DevKit.Messaging;
 global using CleanArch.DevKit.Mediator.Validation;
+global using CleanArch.DevKit.Messaging;
 global using Rok.Application.Dto;
 global using Rok.Application.Errors;
 global using Rok.Application.Mapping;

@@ -1,7 +1,7 @@
 using CleanArch.DevKit.Mediator.Results;
-using Rok.Application.Errors;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
+using Rok.Application.Errors;
 using Rok.Application.Features.Playlists;
 using Rok.Application.Features.Playlists.Requests;
 using Rok.Application.Messages;

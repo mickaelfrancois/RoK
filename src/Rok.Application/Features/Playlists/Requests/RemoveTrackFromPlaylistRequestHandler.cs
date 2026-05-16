@@ -67,4 +67,3 @@ public class RemoveTrackFromPlaylistRequestHandler(IPlaylistTrackRepository _rep
         return _playlistHeaderRepository.UpdateAsync(playlistHeader);
     }
 }
-
