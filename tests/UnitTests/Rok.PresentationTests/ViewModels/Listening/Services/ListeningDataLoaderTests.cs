@@ -10,19 +10,18 @@ namespace Rok.PresentationTests.ViewModels.Listening.Services;
 
 public class ListeningDataLoaderTests
 {
-    private readonly Mock<IMediator> _mediator = new();
+    private readonly FakeMediator _mediator = new();
     private readonly Mock<IArtistViewModelFactory> _artistFactory = new();
     private readonly Mock<ITrackViewModelFactory> _trackFactory = new();
 
     private ListeningDataLoader BuildService() =>
-        new(_mediator.Object, _artistFactory.Object, _trackFactory.Object, NullLogger<ListeningDataLoader>.Instance);
+        new(_mediator, _artistFactory.Object, _trackFactory.Object, NullLogger<ListeningDataLoader>.Instance);
 
     [Fact(DisplayName = "GetTracksByArtistAsync should return an empty list when the artist has no tracks")]
     public async Task GetTracksByArtistAsync_ShouldReturnEmpty_WhenNoTracks()
     {
         // Arrange
-        _mediator.Setup(m => m.Send(It.IsAny<GetTracksByArtistIdRequest>(), It.IsAny<CancellationToken>()))
-                 .ReturnsAsync(new List<TrackDto>());
+        _mediator.Setup<GetTracksByArtistIdRequest, IEnumerable<TrackDto>>().Returns(new List<TrackDto>());
         ListeningDataLoader sut = BuildService();
 
         // Act
@@ -37,8 +36,7 @@ public class ListeningDataLoaderTests
     {
         // Arrange
         List<TrackDto> tracks = Enumerable.Range(1, 5).Select(i => new TrackDto { Id = i }).ToList();
-        _mediator.Setup(m => m.Send(It.IsAny<GetTracksByArtistIdRequest>(), It.IsAny<CancellationToken>()))
-                 .ReturnsAsync(tracks);
+        _mediator.Setup<GetTracksByArtistIdRequest, IEnumerable<TrackDto>>().Returns(tracks);
         ListeningDataLoader sut = BuildService();
 
         // Act
@@ -54,8 +52,7 @@ public class ListeningDataLoaderTests
     {
         // Arrange
         List<TrackDto> tracks = Enumerable.Range(1, 10).Select(i => new TrackDto { Id = i }).ToList();
-        _mediator.Setup(m => m.Send(It.IsAny<GetTracksByArtistIdRequest>(), It.IsAny<CancellationToken>()))
-                 .ReturnsAsync(tracks);
+        _mediator.Setup<GetTracksByArtistIdRequest, IEnumerable<TrackDto>>().Returns(tracks);
         ListeningDataLoader sut = BuildService();
 
         // Act

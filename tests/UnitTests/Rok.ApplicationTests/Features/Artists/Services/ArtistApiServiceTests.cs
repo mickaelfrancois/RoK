@@ -10,12 +10,12 @@ namespace Rok.ApplicationTests.Features.Artists.Services;
 
 public class ArtistApiServiceTests
 {
-    private readonly Mock<IMediator> _mediator = new();
+    private readonly FakeMediator _mediator = new();
     private readonly Mock<IMusicDataApiService> _musicData = new();
     private readonly Mock<IArtistPictureService> _pictureService = new();
     private readonly Mock<IBackdropPicture> _backdropPicture = new();
 
-    private ArtistApiService BuildService() => new(_mediator.Object, _musicData.Object, NullLogger<ArtistApiService>.Instance);
+    private ArtistApiService BuildService() => new(_mediator, _musicData.Object, NullLogger<ArtistApiService>.Instance);
 
     [Fact(DisplayName = "GetAndUpdateArtistDataAsync should return None when artist name is empty")]
     public async Task GetAndUpdateArtistDataAsync_ShouldReturnNone_WhenNameMissing()
@@ -61,7 +61,8 @@ public class ArtistApiServiceTests
         await sut.GetAndUpdateArtistDataAsync(artist, _pictureService.Object, _backdropPicture.Object);
 
         // Assert
-        _mediator.Verify(m => m.Send(It.Is<UpdateArtistGetMetaDataLastAttemptRequest>(c => c.ArtistId == 1), It.IsAny<CancellationToken>()), Times.Once);
+        UpdateArtistGetMetaDataLastAttemptRequest sent = Assert.Single(_mediator.Sent<UpdateArtistGetMetaDataLastAttemptRequest>());
+        Assert.Equal(1, sent.ArtistId);
         Assert.NotNull(artist.GetMetaDataLastAttempt);
     }
 
@@ -220,6 +221,6 @@ public class ArtistApiServiceTests
         // Assert
         Assert.True(result.PictureDownloaded);
         Assert.False(result.DataUpdated);
-        _mediator.Verify(m => m.Send(It.IsAny<UpdateArtistRequest>(), It.IsAny<CancellationToken>()), Times.Never);
+        Assert.Empty(_mediator.Sent<UpdateArtistRequest>());
     }
 }

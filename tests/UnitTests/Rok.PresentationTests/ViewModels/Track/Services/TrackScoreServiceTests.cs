@@ -1,4 +1,3 @@
-using Moq;
 using Rok.Application.Features.Tracks.Requests;
 using Rok.ViewModels.Track.Services;
 
@@ -6,9 +5,9 @@ namespace Rok.PresentationTests.ViewModels.Track.Services;
 
 public class TrackScoreServiceTests
 {
-    private readonly Mock<IMediator> _mediator = new();
+    private readonly FakeMediator _mediator = new();
 
-    private TrackScoreService BuildService() => new(_mediator.Object, new Messenger());
+    private TrackScoreService BuildService() => new(_mediator, new Messenger());
 
     [Fact(DisplayName = "UpdateScoreAsync should send an UpdateScoreRequest with the provided values")]
     public async Task UpdateScoreAsync_ShouldSendUpdateScoreRequest()
@@ -20,8 +19,8 @@ public class TrackScoreServiceTests
         await sut.UpdateScoreAsync(trackId: 42, score: 5);
 
         // Assert
-        _mediator.Verify(m => m.Send(
-            It.Is<UpdateScoreRequest>(c => c.TrackId == 42 && c.Score == 5),
-            It.IsAny<CancellationToken>()), Times.Once);
+        UpdateScoreRequest sent = Assert.Single(_mediator.Sent<UpdateScoreRequest>());
+        Assert.Equal(42, sent.TrackId);
+        Assert.Equal(5, sent.Score);
     }
 }

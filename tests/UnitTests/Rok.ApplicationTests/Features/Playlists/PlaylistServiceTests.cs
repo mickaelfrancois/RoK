@@ -13,16 +13,19 @@ public class PlaylistServiceTests
 
     private static List<TrackDto> BuildTracks(params long[] ids) => ids.Select(id => new TrackDto { Id = id, Title = $"t{id}" }).ToList();
 
-    private static Mock<IMediator> BuildMediator(Dictionary<PlaylistGroupDto, List<TrackDto>> groupTracks)
+    private static FakeMediator BuildMediator(Dictionary<PlaylistGroupDto, List<TrackDto>> groupTracks)
     {
-        Mock<IMediator> mediator = new();
-        foreach (KeyValuePair<PlaylistGroupDto, List<TrackDto>> entry in groupTracks)
-        {
-            PlaylistGroupDto capturedGroup = entry.Key;
-            List<TrackDto> capturedTracks = entry.Value;
-            mediator.Setup(m => m.Send(It.Is<GeneratePlaylistTracksRequest>(q => q.Group == capturedGroup), It.IsAny<CancellationToken>()))
-                    .ReturnsAsync(capturedTracks);
-        }
+        FakeMediator mediator = new();
+        mediator.Setup<GeneratePlaylistTracksRequest, IEnumerable<TrackDto>>()
+                .Returns(request =>
+                {
+                    foreach (KeyValuePair<PlaylistGroupDto, List<TrackDto>> entry in groupTracks)
+                    {
+                        if (ReferenceEquals(request.Group, entry.Key))
+                            return entry.Value;
+                    }
+                    return new List<TrackDto>();
+                });
         return mediator;
     }
 
@@ -57,8 +60,8 @@ public class PlaylistServiceTests
         PlaylistGroupDto group = BuildGroup("g1", trackCount: 2);
         PlaylistHeaderDto playlist = BuildPlaylist(trackMaximum: 10, group);
         Dictionary<PlaylistGroupDto, List<TrackDto>> groupTracks = new() { { group, BuildTracks(1, 2, 3, 4, 5) } };
-        Mock<IMediator> mediator = BuildMediator(groupTracks);
-        PlaylistService sut = new(mediator.Object);
+        FakeMediator mediator = BuildMediator(groupTracks);
+        PlaylistService sut = new(mediator);
 
         // Act
         PlaylistTracksDto result = await sut.GenerateAsync(playlist);
@@ -73,8 +76,8 @@ public class PlaylistServiceTests
         // Arrange
         PlaylistGroupDto group = BuildGroup("g1", trackCount: 10);
         PlaylistHeaderDto playlist = BuildPlaylist(trackMaximum: 3, group);
-        Mock<IMediator> mediator = BuildMediator(new() { { group, BuildTracks(1, 2, 3, 4, 5) } });
-        PlaylistService sut = new(mediator.Object);
+        FakeMediator mediator = BuildMediator(new() { { group, BuildTracks(1, 2, 3, 4, 5) } });
+        PlaylistService sut = new(mediator);
 
         // Act
         PlaylistTracksDto result = await sut.GenerateAsync(playlist);
@@ -90,12 +93,12 @@ public class PlaylistServiceTests
         PlaylistGroupDto g1 = BuildGroup("g1", trackCount: 1);
         PlaylistGroupDto g2 = BuildGroup("g2", trackCount: 1);
         PlaylistHeaderDto playlist = BuildPlaylist(trackMaximum: 4, g1, g2);
-        Mock<IMediator> mediator = BuildMediator(new()
+        FakeMediator mediator = BuildMediator(new()
         {
             { g1, BuildTracks(1, 2) },
             { g2, BuildTracks(10, 20) }
         });
-        PlaylistService sut = new(mediator.Object);
+        PlaylistService sut = new(mediator);
 
         // Act
         PlaylistTracksDto result = await sut.GenerateAsync(playlist);
@@ -111,12 +114,12 @@ public class PlaylistServiceTests
         PlaylistGroupDto g1 = BuildGroup("g1", trackCount: 2);
         PlaylistGroupDto g2 = BuildGroup("g2", trackCount: 2);
         PlaylistHeaderDto playlist = BuildPlaylist(trackMaximum: 10, g1, g2);
-        Mock<IMediator> mediator = BuildMediator(new()
+        FakeMediator mediator = BuildMediator(new()
         {
             { g1, BuildTracks(1, 2) },
             { g2, BuildTracks(2, 3) }
         });
-        PlaylistService sut = new(mediator.Object);
+        PlaylistService sut = new(mediator);
 
         // Act
         PlaylistTracksDto result = await sut.GenerateAsync(playlist);
@@ -131,8 +134,8 @@ public class PlaylistServiceTests
         // Arrange
         PlaylistGroupDto g1 = BuildGroup("g1", trackCount: 5);
         PlaylistHeaderDto playlist = BuildPlaylist(trackMaximum: 100, g1);
-        Mock<IMediator> mediator = BuildMediator(new() { { g1, BuildTracks(1, 2) } });
-        PlaylistService sut = new(mediator.Object);
+        FakeMediator mediator = BuildMediator(new() { { g1, BuildTracks(1, 2) } });
+        PlaylistService sut = new(mediator);
 
         // Act
         PlaylistTracksDto result = await sut.GenerateAsync(playlist);
@@ -147,8 +150,8 @@ public class PlaylistServiceTests
         // Arrange
         PlaylistGroupDto group = BuildGroup("g1", trackCount: 3);
         PlaylistHeaderDto playlist = BuildPlaylist(trackMaximum: 5, group);
-        Mock<IMediator> mediator = BuildMediator(new() { { group, BuildTracks(7, 8, 9) } });
-        PlaylistService sut = new(mediator.Object);
+        FakeMediator mediator = BuildMediator(new() { { group, BuildTracks(7, 8, 9) } });
+        PlaylistService sut = new(mediator);
 
         // Act
         PlaylistTracksDto result = await sut.GenerateAsync(playlist);

@@ -9,10 +9,10 @@ namespace Rok.PresentationTests.ViewModels.Artists.Services;
 
 public class ArtistsPlaybackServiceTests
 {
-    private readonly Mock<IMediator> _mediator = new();
+    private readonly FakeMediator _mediator = new();
     private readonly Mock<IPlayerService> _player = new();
 
-    private ArtistsPlaybackService BuildService() => new(_mediator.Object, _player.Object, NullLogger<ArtistsPlaybackService>.Instance);
+    private ArtistsPlaybackService BuildService() => new(_mediator, _player.Object, NullLogger<ArtistsPlaybackService>.Instance);
 
     [Fact(DisplayName = "PlayArtistsAsync should skip work when no artist ids are provided")]
     public async Task PlayArtistsAsync_ShouldSkip_WhenEmpty()
@@ -24,7 +24,7 @@ public class ArtistsPlaybackServiceTests
         await sut.PlayArtistsAsync(Array.Empty<long>());
 
         // Assert
-        _mediator.Verify(m => m.Send(It.IsAny<GetTracksByArtistListRequest>(), It.IsAny<CancellationToken>()), Times.Never);
+        Assert.Empty(_mediator.Sent<GetTracksByArtistListRequest>());
         _player.Verify(p => p.LoadPlaylist(It.IsAny<List<TrackDto>>(), It.IsAny<TrackDto>()), Times.Never);
     }
 
@@ -33,14 +33,16 @@ public class ArtistsPlaybackServiceTests
     {
         // Arrange
         List<TrackDto> tracks = new() { new TrackDto { Id = 10 }, new TrackDto { Id = 11 } };
-        _mediator.Setup(m => m.Send(It.Is<GetTracksByArtistListRequest>(q => q.ArtistIds.SequenceEqual(new long[] { 1, 2 })), It.IsAny<CancellationToken>()))
-                 .ReturnsAsync(tracks);
+        _mediator.Setup<GetTracksByArtistListRequest, IEnumerable<TrackDto>>()
+                 .Returns(tracks);
         ArtistsPlaybackService sut = BuildService();
 
         // Act
         await sut.PlayArtistsAsync(new long[] { 1, 2 });
 
         // Assert
+        GetTracksByArtistListRequest sent = Assert.Single(_mediator.Sent<GetTracksByArtistListRequest>());
+        Assert.True(sent.ArtistIds.SequenceEqual(new long[] { 1, 2 }));
         _player.Verify(p => p.LoadPlaylist(It.Is<List<TrackDto>>(l => l.Count == 2), It.IsAny<TrackDto>()), Times.Once);
     }
 }

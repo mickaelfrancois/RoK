@@ -12,12 +12,12 @@ namespace Rok.PresentationTests.ViewModels.Playlists.Services;
 
 public class PlaylistImportServiceTests
 {
-    private readonly Mock<IMediator> _mediator = new();
+    private readonly FakeMediator _mediator = new();
     private readonly Mock<IPlaylistFilePickerService> _picker = new();
     private readonly IMessenger _messenger = new Messenger();
 
     private PlaylistImportService BuildService()
-        => new(_mediator.Object, _picker.Object, _messenger, NullLogger<PlaylistImportService>.Instance);
+        => new(_mediator, _picker.Object, _messenger, NullLogger<PlaylistImportService>.Instance);
 
     private static Result<PlaylistImportResult> Imported(int matched, int ignored)
         => Result<PlaylistImportResult>.Ok(new PlaylistImportResult(PlaylistImportStatus.Imported, 1, "Mix", matched, ignored));
@@ -46,7 +46,7 @@ public class PlaylistImportServiceTests
 
             // Assert
             Assert.Null(captured);
-            _mediator.Verify(m => m.Send(It.IsAny<ImportPlaylistRequest>(), It.IsAny<CancellationToken>()), Times.Never);
+            Assert.Empty(_mediator.Sent<ImportPlaylistRequest>());
         }
         finally
         {
@@ -64,9 +64,12 @@ public class PlaylistImportServiceTests
         try
         {
             _picker.Setup(p => p.PickPlaylistFilesAsync()).ReturnsAsync(new[] { "a.m3u8", "b.m3u8" });
-            _mediator.SetupSequence(m => m.Send(It.IsAny<ImportPlaylistRequest>(), It.IsAny<CancellationToken>()))
-                     .ReturnsAsync(Imported(matched: 5, ignored: 1))
-                     .ReturnsAsync(Imported(matched: 3, ignored: 2));
+            Queue<Result<PlaylistImportResult>> responses = new(new[]
+            {
+                Imported(matched: 5, ignored: 1),
+                Imported(matched: 3, ignored: 2)
+            });
+            _mediator.Setup<ImportPlaylistRequest, Result<PlaylistImportResult>>().Returns(_ => responses.Dequeue());
 
             PlaylistImportService sut = BuildService();
 
@@ -96,9 +99,12 @@ public class PlaylistImportServiceTests
         try
         {
             _picker.Setup(p => p.PickPlaylistFilesAsync()).ReturnsAsync(new[] { "a.m3u8", "b.m3u8" });
-            _mediator.SetupSequence(m => m.Send(It.IsAny<ImportPlaylistRequest>(), It.IsAny<CancellationToken>()))
-                     .ReturnsAsync(Imported(matched: 2, ignored: 0))
-                     .ReturnsAsync(Skipped(ignored: 4));
+            Queue<Result<PlaylistImportResult>> responses = new(new[]
+            {
+                Imported(matched: 2, ignored: 0),
+                Skipped(ignored: 4)
+            });
+            _mediator.Setup<ImportPlaylistRequest, Result<PlaylistImportResult>>().Returns(_ => responses.Dequeue());
 
             PlaylistImportService sut = BuildService();
 
@@ -126,9 +132,12 @@ public class PlaylistImportServiceTests
         try
         {
             _picker.Setup(p => p.PickPlaylistFilesAsync()).ReturnsAsync(new[] { "a.m3u8", "b.m3u8" });
-            _mediator.SetupSequence(m => m.Send(It.IsAny<ImportPlaylistRequest>(), It.IsAny<CancellationToken>()))
-                     .ReturnsAsync(Imported(matched: 1, ignored: 0))
-                     .ReturnsAsync(Failed());
+            Queue<Result<PlaylistImportResult>> responses = new(new[]
+            {
+                Imported(matched: 1, ignored: 0),
+                Failed()
+            });
+            _mediator.Setup<ImportPlaylistRequest, Result<PlaylistImportResult>>().Returns(_ => responses.Dequeue());
 
             PlaylistImportService sut = BuildService();
 
@@ -155,8 +164,7 @@ public class PlaylistImportServiceTests
         try
         {
             _picker.Setup(p => p.PickPlaylistFilesAsync()).ReturnsAsync(new[] { "a.m3u8" });
-            _mediator.Setup(m => m.Send(It.IsAny<ImportPlaylistRequest>(), It.IsAny<CancellationToken>()))
-                     .ReturnsAsync(Failed());
+            _mediator.Setup<ImportPlaylistRequest, Result<PlaylistImportResult>>().Returns(Failed());
 
             PlaylistImportService sut = BuildService();
 

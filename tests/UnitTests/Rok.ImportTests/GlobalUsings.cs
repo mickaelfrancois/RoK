@@ -1,4 +1,5 @@
 global using CleanArch.DevKit.Mediator;
+global using CleanArch.DevKit.Mediator.Testing;
 global using CleanArch.DevKit.Messaging;
 global using Rok.Application.Dto;
 global using Rok.Application.Interfaces;

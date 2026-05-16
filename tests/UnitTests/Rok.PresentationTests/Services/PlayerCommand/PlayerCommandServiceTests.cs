@@ -13,9 +13,9 @@ namespace Rok.PresentationTests.Services.PlayerCommand;
 public class PlayerCommandServiceTests
 {
     private readonly Mock<IPlayerService> _player = new();
-    private readonly Mock<IMediator> _mediator = new();
+    private readonly FakeMediator _mediator = new();
 
-    private PlayerCommandService BuildService() => new(_player.Object, _mediator.Object);
+    private PlayerCommandService BuildService() => new(_player.Object, _mediator);
 
     [Fact(DisplayName = "Play should delegate to the player service")]
     public void Play_ShouldDelegateToPlayer()
@@ -122,8 +122,8 @@ public class PlayerCommandServiceTests
     public async Task ListenPlaylistAsync_ShouldReturnFalse_WhenNoMatch()
     {
         // Arrange
-        _mediator.Setup(m => m.Send(It.IsAny<GetAllPlaylistsRequest>(), It.IsAny<CancellationToken>()))
-                 .ReturnsAsync(new List<PlaylistHeaderDto>());
+        _mediator.Setup<GetAllPlaylistsRequest, IEnumerable<PlaylistHeaderDto>>()
+                 .Returns(new List<PlaylistHeaderDto>());
         PlayerCommandService sut = BuildService();
 
         // Act
@@ -139,10 +139,10 @@ public class PlayerCommandServiceTests
     {
         // Arrange
         PlaylistHeaderDto playlist = new() { Id = 1, Name = "MyMix" };
-        _mediator.Setup(m => m.Send(It.IsAny<GetAllPlaylistsRequest>(), It.IsAny<CancellationToken>()))
-                 .ReturnsAsync(new List<PlaylistHeaderDto> { playlist });
-        _mediator.Setup(m => m.Send(It.IsAny<GetTracksByPlaylistIdRequest>(), It.IsAny<CancellationToken>()))
-                 .ReturnsAsync(new List<TrackDto>());
+        _mediator.Setup<GetAllPlaylistsRequest, IEnumerable<PlaylistHeaderDto>>()
+                 .Returns(new List<PlaylistHeaderDto> { playlist });
+        _mediator.Setup<GetTracksByPlaylistIdRequest, IEnumerable<TrackDto>>()
+                 .Returns(new List<TrackDto>());
         PlayerCommandService sut = BuildService();
 
         // Act
@@ -159,10 +159,10 @@ public class PlayerCommandServiceTests
         // Arrange
         PlaylistHeaderDto playlist = new() { Id = 1, Name = "MyMix" };
         List<TrackDto> tracks = new() { new TrackDto { Id = 10 } };
-        _mediator.Setup(m => m.Send(It.IsAny<GetAllPlaylistsRequest>(), It.IsAny<CancellationToken>()))
-                 .ReturnsAsync(new List<PlaylistHeaderDto> { playlist });
-        _mediator.Setup(m => m.Send(It.IsAny<GetTracksByPlaylistIdRequest>(), It.IsAny<CancellationToken>()))
-                 .ReturnsAsync(tracks);
+        _mediator.Setup<GetAllPlaylistsRequest, IEnumerable<PlaylistHeaderDto>>()
+                 .Returns(new List<PlaylistHeaderDto> { playlist });
+        _mediator.Setup<GetTracksByPlaylistIdRequest, IEnumerable<TrackDto>>()
+                 .Returns(tracks);
         PlayerCommandService sut = BuildService();
 
         // Act
@@ -178,8 +178,8 @@ public class PlayerCommandServiceTests
     public async Task ListenAlbumAsync_ShouldReturnFalse_WhenAlbumMissing()
     {
         // Arrange
-        _mediator.Setup(m => m.Send(It.IsAny<GetAllAlbumsRequest>(), It.IsAny<CancellationToken>()))
-                 .ReturnsAsync(new List<AlbumDto>());
+        _mediator.Setup<GetAllAlbumsRequest, IEnumerable<AlbumDto>>()
+                 .Returns(new List<AlbumDto>());
         PlayerCommandService sut = BuildService();
 
         // Act
@@ -195,10 +195,10 @@ public class PlayerCommandServiceTests
         // Arrange
         AlbumDto album = new() { Id = 1, Name = "Best Of" };
         List<TrackDto> tracks = new() { new TrackDto { Id = 10 } };
-        _mediator.Setup(m => m.Send(It.IsAny<GetAllAlbumsRequest>(), It.IsAny<CancellationToken>()))
-                 .ReturnsAsync(new List<AlbumDto> { album });
-        _mediator.Setup(m => m.Send(It.IsAny<GetTracksByAlbumIdRequest>(), It.IsAny<CancellationToken>()))
-                 .ReturnsAsync(tracks);
+        _mediator.Setup<GetAllAlbumsRequest, IEnumerable<AlbumDto>>()
+                 .Returns(new List<AlbumDto> { album });
+        _mediator.Setup<GetTracksByAlbumIdRequest, IEnumerable<TrackDto>>()
+                 .Returns(tracks);
         PlayerCommandService sut = BuildService();
 
         // Act
@@ -214,8 +214,8 @@ public class PlayerCommandServiceTests
     public async Task ListenArtistAsync_ShouldReturnFalse_WhenArtistMissing()
     {
         // Arrange
-        _mediator.Setup(m => m.Send(It.IsAny<GetAllArtistsRequest>(), It.IsAny<CancellationToken>()))
-                 .ReturnsAsync(new List<ArtistDto>());
+        _mediator.Setup<GetAllArtistsRequest, IEnumerable<ArtistDto>>()
+                 .Returns(new List<ArtistDto>());
         PlayerCommandService sut = BuildService();
 
         // Act
@@ -231,10 +231,10 @@ public class PlayerCommandServiceTests
         // Arrange
         ArtistDto artist = new() { Id = 7, Name = "Artist X" };
         List<TrackDto> tracks = new() { new TrackDto { Id = 10 } };
-        _mediator.Setup(m => m.Send(It.IsAny<GetAllArtistsRequest>(), It.IsAny<CancellationToken>()))
-                 .ReturnsAsync(new List<ArtistDto> { artist });
-        _mediator.Setup(m => m.Send(It.Is<GetTracksByArtistIdRequest>(q => q.ArtistId == 7), It.IsAny<CancellationToken>()))
-                 .ReturnsAsync(tracks);
+        _mediator.Setup<GetAllArtistsRequest, IEnumerable<ArtistDto>>()
+                 .Returns(new List<ArtistDto> { artist });
+        _mediator.Setup<GetTracksByArtistIdRequest, IEnumerable<TrackDto>>()
+                 .Returns(tracks);
         PlayerCommandService sut = BuildService();
 
         // Act
@@ -242,15 +242,16 @@ public class PlayerCommandServiceTests
 
         // Assert
         Assert.True(result);
-        _mediator.Verify(m => m.Send(It.Is<GetTracksByArtistIdRequest>(q => q.ArtistId == 7), It.IsAny<CancellationToken>()), Times.Once);
+        GetTracksByArtistIdRequest sent = Assert.Single(_mediator.Sent<GetTracksByArtistIdRequest>());
+        Assert.Equal(7, sent.ArtistId);
     }
 
     [Fact(DisplayName = "ListenGenreAsync should return false when genre does not exist")]
     public async Task ListenGenreAsync_ShouldReturnFalse_WhenGenreMissing()
     {
         // Arrange
-        _mediator.Setup(m => m.Send(It.IsAny<GetAllGenresRequest>(), It.IsAny<CancellationToken>()))
-                 .ReturnsAsync(new List<GenreDto>());
+        _mediator.Setup<GetAllGenresRequest, IEnumerable<GenreDto>>()
+                 .Returns(new List<GenreDto>());
         PlayerCommandService sut = BuildService();
 
         // Act
@@ -266,10 +267,10 @@ public class PlayerCommandServiceTests
         // Arrange
         GenreDto genre = new() { Id = 3, Name = "Rock" };
         List<TrackDto> tracks = new() { new TrackDto { Id = 10 } };
-        _mediator.Setup(m => m.Send(It.IsAny<GetAllGenresRequest>(), It.IsAny<CancellationToken>()))
-                 .ReturnsAsync(new List<GenreDto> { genre });
-        _mediator.Setup(m => m.Send(It.Is<GetTracksByGenreIdRequest>(q => q.GenreId == 3), It.IsAny<CancellationToken>()))
-                 .ReturnsAsync(tracks);
+        _mediator.Setup<GetAllGenresRequest, IEnumerable<GenreDto>>()
+                 .Returns(new List<GenreDto> { genre });
+        _mediator.Setup<GetTracksByGenreIdRequest, IEnumerable<TrackDto>>()
+                 .Returns(tracks);
         PlayerCommandService sut = BuildService();
 
         // Act
@@ -277,6 +278,7 @@ public class PlayerCommandServiceTests
 
         // Assert
         Assert.True(result);
-        _mediator.Verify(m => m.Send(It.Is<GetTracksByGenreIdRequest>(q => q.GenreId == 3), It.IsAny<CancellationToken>()), Times.Once);
+        GetTracksByGenreIdRequest sent = Assert.Single(_mediator.Sent<GetTracksByGenreIdRequest>());
+        Assert.Equal(3, sent.GenreId);
     }
 }

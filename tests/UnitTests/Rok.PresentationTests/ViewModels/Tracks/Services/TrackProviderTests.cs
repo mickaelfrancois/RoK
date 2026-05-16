@@ -13,13 +13,13 @@ namespace Rok.PresentationTests.ViewModels.Tracks.Services;
 
 public class TrackProviderTests
 {
-    private readonly Mock<IMediator> _mediator = new();
+    private readonly FakeMediator _mediator = new();
     private readonly Mock<ITrackViewModelFactory> _vmFactory = new();
     private readonly Mock<IResourceService> _resource = new();
 
     private TrackProvider BuildService()
     {
-        TracksDataLoader loader = new(_mediator.Object, _vmFactory.Object, NullLogger<TracksDataLoader>.Instance);
+        TracksDataLoader loader = new(_mediator, _vmFactory.Object, NullLogger<TracksDataLoader>.Instance);
         TracksFilter filter = new(_resource.Object);
         TracksGroupCategory grouper = new(_resource.Object);
         return new TrackProvider(loader, filter, grouper);
@@ -29,18 +29,16 @@ public class TrackProviderTests
     public async Task LoadAsync_ShouldCallMediatorForGenresAndTracks()
     {
         // Arrange
-        _mediator.Setup(m => m.Send(It.IsAny<GetAllGenresRequest>(), It.IsAny<CancellationToken>()))
-                 .ReturnsAsync(new List<GenreDto>());
-        _mediator.Setup(m => m.Send(It.IsAny<GetAllTracksRequest>(), It.IsAny<CancellationToken>()))
-                 .ReturnsAsync(new List<TrackDto>());
+        _mediator.Setup<GetAllGenresRequest, IEnumerable<GenreDto>>().Returns(new List<GenreDto>());
+        _mediator.Setup<GetAllTracksRequest, IEnumerable<TrackDto>>().Returns(new List<TrackDto>());
         TrackProvider sut = BuildService();
 
         // Act
         await sut.LoadAsync();
 
         // Assert
-        _mediator.Verify(m => m.Send(It.IsAny<GetAllGenresRequest>(), It.IsAny<CancellationToken>()), Times.Once);
-        _mediator.Verify(m => m.Send(It.IsAny<GetAllTracksRequest>(), It.IsAny<CancellationToken>()), Times.Once);
+        Assert.Single(_mediator.Sent<GetAllGenresRequest>());
+        Assert.Single(_mediator.Sent<GetAllTracksRequest>());
     }
 
     [Fact(DisplayName = "GetProcessedData should return empty result when no tracks are loaded")]
