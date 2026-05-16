@@ -1,4 +1,4 @@
-﻿using Rok.Application.Features.Tracks.Query;
+﻿using Rok.Application.Features.Tracks.Requests;
 
 namespace Rok.ViewModels.Track.Services;
 
@@ -6,14 +6,14 @@ public class TrackDetailDataLoader(IMediator mediator, ILogger<TrackDetailDataLo
 {
     public async Task<TrackDto?> LoadTrackAsync(long trackId)
     {
-        Result<TrackDto> trackResult = await mediator.SendMessageAsync(new GetTrackByIdQuery(trackId));
+        Result<TrackDto> trackResult = await mediator.Send(new GetTrackByIdRequest(trackId));
 
-        if (trackResult.IsError)
+        if (trackResult.IsFailure)
         {
             logger.LogError("Failed to load track {TrackId}", trackId);
             return null;
         }
 
-        return trackResult.Value!;
+        return trackResult.Value;
     }
 }

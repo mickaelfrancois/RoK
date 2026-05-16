@@ -1,30 +1,31 @@
-﻿using Rok.Application.Features.Playlists.Command;
+﻿using Rok.Application.Features.Playlists.Requests;
 
 namespace Rok.ViewModels.Playlists.Services;
 
 public class PlaylistCreationService(
     IMediator mediator,
+    IMessenger messenger,
     NavigationService navigationService,
     ResourceLoader resourceLoader,
     ILogger<PlaylistCreationService> logger)
 {
     public async Task<long?> CreateSmartPlaylistAsync()
     {
-        CreatePlaylistCommand command = new()
+        CreatePlaylistRequest command = new()
         {
             Type = (int)PlaylistType.Smart,
             Name = resourceLoader.GetString("newPlaylist")
         };
 
-        Result<long> result = await mediator.SendMessageAsync(command);
-        if (result.IsError)
+        Result<long> result = await mediator.Send(command);
+        if (result.IsFailure)
         {
-            logger.LogError("Failed to create new smart playlist: {ErrorMessage}", result.Error);
+            logger.LogError("Failed to create new smart playlist: {ErrorMessage}", result.Errors[0]);
             return null;
         }
 
         long playlistId = result.Value;
-        Messenger.Send(new PlaylistUpdatedMessage(playlistId, ActionType.Add));
+        messenger.Send(new PlaylistUpdatedMessage(playlistId, ActionType.Add));
         navigationService.NavigateToSmartPlaylist(playlistId);
 
         return playlistId;
@@ -32,21 +33,21 @@ public class PlaylistCreationService(
 
     public async Task<long?> CreateClassicPlaylistAsync()
     {
-        CreatePlaylistCommand command = new()
+        CreatePlaylistRequest command = new()
         {
             Type = (int)PlaylistType.Classic,
             Name = resourceLoader.GetString("newPlaylist")
         };
 
-        Result<long> result = await mediator.SendMessageAsync(command);
-        if (result.IsError)
+        Result<long> result = await mediator.Send(command);
+        if (result.IsFailure)
         {
-            logger.LogError("Failed to create new classic playlist: {ErrorMessage}", result.Error);
+            logger.LogError("Failed to create new classic playlist: {ErrorMessage}", result.Errors[0]);
             return null;
         }
 
         long playlistId = result.Value;
-        Messenger.Send(new PlaylistUpdatedMessage(playlistId, ActionType.Add));
+        messenger.Send(new PlaylistUpdatedMessage(playlistId, ActionType.Add));
         navigationService.NavigateToPlaylist(playlistId);
 
         return playlistId;

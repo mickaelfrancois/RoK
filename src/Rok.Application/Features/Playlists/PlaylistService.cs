@@ -1,5 +1,5 @@
 ﻿using MiF.Guard;
-using Rok.Application.Features.Playlists.Query;
+using Rok.Application.Features.Playlists.Requests;
 
 namespace Rok.Application.Features.Playlists;
 
@@ -39,7 +39,7 @@ public class PlaylistService(IMediator _mediator) : IPlaylistService
 
         foreach (PlaylistGroupDto group in playlist.Groups)
         {
-            IEnumerable<TrackDto> tracksGroup = await _mediator.SendMessageAsync(new GeneratePlaylistTracksQuery() { PlaylistTrackCount = playlist.TrackMaximum, Group = group });
+            IEnumerable<TrackDto> tracksGroup = await _mediator.Send(new GeneratePlaylistTracksRequest() { PlaylistTrackCount = playlist.TrackMaximum, Group = group });
             groupTracks.Add(group, tracksGroup.ToList());
         }
 

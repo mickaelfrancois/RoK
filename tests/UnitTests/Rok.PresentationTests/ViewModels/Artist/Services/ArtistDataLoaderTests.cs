@@ -1,11 +1,11 @@
-using MiF.Mediator.Interfaces;
-using MiF.Result;
+using CleanArch.DevKit.Mediator.Results;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using Rok.Application.Dto;
-using Rok.Application.Features.Albums.Query;
-using Rok.Application.Features.Artists.Query;
-using Rok.Application.Features.Tracks.Query;
+using Rok.Application.Errors;
+using Rok.Application.Features.Albums.Requests;
+using Rok.Application.Features.Artists.Requests;
+using Rok.Application.Features.Tracks.Requests;
 using Rok.ViewModels.Album;
 using Rok.ViewModels.Albums.Interfaces;
 using Rok.ViewModels.Artist.Services;
@@ -16,20 +16,19 @@ namespace Rok.PresentationTests.ViewModels.Artist.Services;
 
 public class ArtistDataLoaderTests
 {
-    private readonly Mock<IMediator> _mediator = new();
+    private readonly FakeMediator _mediator = new();
     private readonly Mock<IAlbumViewModelFactory> _albumFactory = new();
     private readonly Mock<ITrackViewModelFactory> _trackFactory = new();
 
     private ArtistDataLoader BuildService() =>
-        new(_mediator.Object, _albumFactory.Object, _trackFactory.Object, NullLogger<ArtistDataLoader>.Instance);
+        new(_mediator, _albumFactory.Object, _trackFactory.Object, NullLogger<ArtistDataLoader>.Instance);
 
     [Fact(DisplayName = "LoadArtistAsync should return the artist when the mediator succeeds")]
     public async Task LoadArtistAsync_ShouldReturnArtist_WhenSuccess()
     {
         // Arrange
         ArtistDto artist = new() { Id = 7, Name = "Beatles" };
-        _mediator.Setup(m => m.SendMessageAsync(It.IsAny<GetArtistByIdQuery>(), It.IsAny<CancellationToken>()))
-                 .ReturnsAsync(Result<ArtistDto>.Success(artist));
+        _mediator.Setup<GetArtistByIdRequest, Result<ArtistDto>>().Returns(Result<ArtistDto>.Ok(artist));
         ArtistDataLoader sut = BuildService();
 
         // Act
@@ -44,8 +43,7 @@ public class ArtistDataLoaderTests
     public async Task LoadArtistAsync_ShouldReturnNull_WhenError()
     {
         // Arrange
-        _mediator.Setup(m => m.SendMessageAsync(It.IsAny<GetArtistByIdQuery>(), It.IsAny<CancellationToken>()))
-                 .ReturnsAsync(Result<ArtistDto>.Fail("not found"));
+        _mediator.Setup<GetArtistByIdRequest, Result<ArtistDto>>().Returns(Result<ArtistDto>.Fail(new OperationError("artist.not_found", "not found")));
         ArtistDataLoader sut = BuildService();
 
         // Act
@@ -59,8 +57,7 @@ public class ArtistDataLoaderTests
     public async Task LoadAlbumsAsync_ShouldReturnEmpty_WhenNoAlbums()
     {
         // Arrange
-        _mediator.Setup(m => m.SendMessageAsync(It.IsAny<GetAlbumsByArtistIdQuery>(), It.IsAny<CancellationToken>()))
-                 .ReturnsAsync(new List<AlbumDto>());
+        _mediator.Setup<GetAlbumsByArtistIdRequest, IEnumerable<AlbumDto>>().Returns(new List<AlbumDto>());
         ArtistDataLoader sut = BuildService();
 
         // Act
@@ -75,8 +72,7 @@ public class ArtistDataLoaderTests
     public async Task LoadTracksAsync_ShouldReturnEmpty_WhenNoTracks()
     {
         // Arrange
-        _mediator.Setup(m => m.SendMessageAsync(It.IsAny<GetTracksByArtistIdQuery>(), It.IsAny<CancellationToken>()))
-                 .ReturnsAsync(new List<TrackDto>());
+        _mediator.Setup<GetTracksByArtistIdRequest, IEnumerable<TrackDto>>().Returns(new List<TrackDto>());
         ArtistDataLoader sut = BuildService();
 
         // Act
@@ -92,8 +88,7 @@ public class ArtistDataLoaderTests
     {
         // Arrange
         ArtistDto artist = new() { Id = 7 };
-        _mediator.Setup(m => m.SendMessageAsync(It.IsAny<GetArtistByIdQuery>(), It.IsAny<CancellationToken>()))
-                 .ReturnsAsync(Result<ArtistDto>.Success(artist));
+        _mediator.Setup<GetArtistByIdRequest, Result<ArtistDto>>().Returns(Result<ArtistDto>.Ok(artist));
         ArtistDataLoader sut = BuildService();
 
         // Act
@@ -107,8 +102,7 @@ public class ArtistDataLoaderTests
     public async Task ReloadArtistAsync_ShouldReturnNull_WhenError()
     {
         // Arrange
-        _mediator.Setup(m => m.SendMessageAsync(It.IsAny<GetArtistByIdQuery>(), It.IsAny<CancellationToken>()))
-                 .ReturnsAsync(Result<ArtistDto>.Fail("not found"));
+        _mediator.Setup<GetArtistByIdRequest, Result<ArtistDto>>().Returns(Result<ArtistDto>.Fail(new OperationError("artist.not_found", "not found")));
         ArtistDataLoader sut = BuildService();
 
         // Act

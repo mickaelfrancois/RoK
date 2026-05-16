@@ -1,5 +1,5 @@
 ﻿using Microsoft.UI.Xaml.Controls;
-using Rok.Application.Features.Albums.Command;
+using Rok.Application.Features.Albums.Requests;
 using Rok.Dialogs;
 
 namespace Rok.ViewModels.Album.Services;
@@ -27,7 +27,7 @@ public class AlbumEditService(IMediator mediator)
         if (result != ContentDialogResult.Primary)
             return false;
 
-        UpdateAlbumCommand command = new()
+        UpdateAlbumRequest command = new()
         {
             Id = album.Id,
         };
@@ -41,7 +41,7 @@ public class AlbumEditService(IMediator mediator)
         command.IsLock.Set(dialog.IsLock);
         command.LastFmUrl.Set(dialog.LastFmUrl);
 
-        await mediator.SendMessageAsync(command);
+        await mediator.Send(command);
 
         album.IsBestOf = dialog.IsBestOf;
         album.IsLive = dialog.IsLive;
@@ -57,17 +57,17 @@ public class AlbumEditService(IMediator mediator)
 
     public async Task UpdateFavoriteAsync(AlbumDto album, bool isFavorite)
     {
-        await mediator.SendMessageAsync(new UpdateAlbumFavoriteCommand(album.Id, isFavorite));
+        await mediator.Send(new UpdateAlbumFavoriteRequest(album.Id, isFavorite));
         album.IsFavorite = isFavorite;
     }
 
     public Task UpdateTagsAsync(long id, IEnumerable<string> tags)
     {
-        return mediator.SendMessageAsync(new UpdateAlbumTagsCommand(id, tags));
+        return mediator.Send(new UpdateAlbumTagsRequest(id, tags));
     }
 
     public Task UpdatePictureDominantColorAsync(long id, long? colorValue)
     {
-        return mediator.SendMessageAsync(new UpdateAlbumPictureDominantColorCommand(id, colorValue));
+        return mediator.Send(new UpdateAlbumPictureDominantColorRequest(id, colorValue));
     }
 }

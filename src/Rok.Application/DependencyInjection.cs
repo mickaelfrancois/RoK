@@ -1,6 +1,9 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using MiF.Mediator;
-using MiF.Mediator.DependencyInjection;
+using CleanArch.DevKit.Mediator;
+using CleanArch.DevKit.Mediator.Behaviors;
+using CleanArch.DevKit.Mediator.Results;
+using CleanArch.DevKit.Mediator.Validation;
+using CleanArch.DevKit.Messaging;
+using Microsoft.Extensions.DependencyInjection;
 using Rok.Application.Features.Albums.Services;
 using Rok.Application.Features.Artists.Services;
 using Rok.Application.Features.EqualizerPresets;
@@ -18,7 +21,6 @@ public static class DependencyInjection
     public static IServiceCollection AddApplication(this IServiceCollection services)
     {
         services.AddSingleton<IAppOptions, AppOptions>();
-        services.AddScoped<IValidationService, ValidationService>();
         services.AddSingleton<IPlaylistService, PlaylistService>();
         services.AddSingleton<IPlayerService, PlayerService>();
         services.AddSingleton<IReviewPromptEligibilityService, ReviewPromptEligibilityService>();
@@ -30,7 +32,12 @@ public static class DependencyInjection
         services.AddTransient<IArtistApiService, ArtistApiService>();
         services.AddTransient<IAlbumApiService, AlbumApiService>();
 
-        services.AddSimpleMediator();
+        services.AddMediator();
+        services.AddValidators();
+        services.AddValidationBehavior();
+        services.AddResultBehavior();
+        services.AddMessenger();
+        services.AddCommonBehaviors();
 
         return services;
     }

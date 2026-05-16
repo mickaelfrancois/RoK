@@ -1,12 +1,12 @@
 ﻿using System.Globalization;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using Rok.Application.Features.Albums.Command;
-using Rok.Application.Features.Artists.Command;
-using Rok.Application.Features.Genres.Command;
+using Rok.Application.Features.Albums.Requests;
+using Rok.Application.Features.Artists.Requests;
+using Rok.Application.Features.Genres.Requests;
 using Rok.Application.Features.Statistics;
-using Rok.Application.Features.Statistics.Query;
-using Rok.Application.Features.Tracks.Command;
+using Rok.Application.Features.Statistics.Requests;
+using Rok.Application.Features.Tracks.Requests;
 
 namespace Rok.ViewModels.Statistics;
 
@@ -71,7 +71,7 @@ public partial class StatisticsViewModel(IMediator mediator) : ObservableObject
 
     public async Task LoadAsync()
     {
-        Current = await mediator.SendMessageAsync(new GetStatisticsQuery());
+        Current = await mediator.Send(new GetStatisticsRequest());
 
         TopTracks = (Current.TopTracks ?? new List<TopItem>())
            .Select((t, i) => new RankedTopItem { Rank = i + 1, Id = t.Id, Name = t.Name, ListenCount = t.ListenCount })
@@ -89,7 +89,7 @@ public partial class StatisticsViewModel(IMediator mediator) : ObservableObject
           .Select((t, i) => new RankedTopItem { Rank = i + 1, Id = t.Id, Name = t.Name, ListenCount = t.ListenCount })
           .ToList();
 
-        LyricsStatisticsDto lyrics = await mediator.SendMessageAsync(new GetLyricsStatisticsQuery());
+        LyricsStatisticsDto lyrics = await mediator.Send(new GetLyricsStatisticsRequest());
         TotalRawLyrics = lyrics.TotalRawLyrics;
         TotalSyncLyrics = lyrics.TotalSyncLyrics;
 
@@ -108,10 +108,10 @@ public partial class StatisticsViewModel(IMediator mediator) : ObservableObject
     [RelayCommand]
     private async Task ResetListenCountAsync()
     {
-        await mediator.SendMessageAsync(new ResetGenreListenCountCommand());
-        await mediator.SendMessageAsync(new ResetArtistListenCountCommand());
-        await mediator.SendMessageAsync(new ResetAlbumListenCountCommand());
-        await mediator.SendMessageAsync(new ResetTrackListenCountCommand());
+        await mediator.Send(new ResetGenreListenCountRequest());
+        await mediator.Send(new ResetArtistListenCountRequest());
+        await mediator.Send(new ResetAlbumListenCountRequest());
+        await mediator.Send(new ResetTrackListenCountRequest());
 
         await LoadAsync();
     }

@@ -10,21 +10,22 @@ public partial class ArtistLibraryMonitor : IArtistLibraryMonitor
     private readonly LibraryRefreshMessageHandler _libraryRefreshHandler;
     private readonly ArtistImportedMessageHandler _artistImportedHandler;
     private readonly TagUpdatedMessageHandler _tagUpdatedHandler;
+    private readonly List<IDisposable> _subscriptions = new();
     private bool _disposed;
 
     public event EventHandler? LibraryChanged;
 
-    public ArtistLibraryMonitor(ArtistUpdateMessageHandler albumUpdateHandler, LibraryRefreshMessageHandler libraryRefreshHandler, ArtistImportedMessageHandler albumImportedHandler, TagUpdatedMessageHandler tagUpdatedMessageHandler)
+    public ArtistLibraryMonitor(IMessenger messenger, ArtistUpdateMessageHandler albumUpdateHandler, LibraryRefreshMessageHandler libraryRefreshHandler, ArtistImportedMessageHandler albumImportedHandler, TagUpdatedMessageHandler tagUpdatedMessageHandler)
     {
         _artistUpdateHandler = albumUpdateHandler;
         _libraryRefreshHandler = libraryRefreshHandler;
         _artistImportedHandler = albumImportedHandler;
         _tagUpdatedHandler = tagUpdatedMessageHandler;
 
-        Messenger.Subscribe<ArtistUpdateMessage>(OnArtistUpdateMessage);
-        Messenger.Subscribe<LibraryRefreshMessage>(_libraryRefreshHandler.Handle);
-        Messenger.Subscribe<ArtistImportedMessage>(_artistImportedHandler.Handle);
-        Messenger.Subscribe<TagUpdatedMessage>(_tagUpdatedHandler.Handle);
+        _subscriptions.Add(messenger.Subscribe<ArtistUpdateMessage>(OnArtistUpdateMessage));
+        _subscriptions.Add(messenger.Subscribe<LibraryRefreshMessage>(_libraryRefreshHandler.Handle));
+        _subscriptions.Add(messenger.Subscribe<ArtistImportedMessage>(_artistImportedHandler.Handle));
+        _subscriptions.Add(messenger.Subscribe<TagUpdatedMessage>(_tagUpdatedHandler.Handle));
 
         _artistUpdateHandler.DataChanged += OnLibraryChanged;
         _libraryRefreshHandler.LibraryChanged += OnLibraryChanged;
@@ -50,10 +51,9 @@ public partial class ArtistLibraryMonitor : IArtistLibraryMonitor
 
         if (disposing)
         {
-            Messenger.Unsubscribe<ArtistUpdateMessage>(OnArtistUpdateMessage);
-            Messenger.Unsubscribe<LibraryRefreshMessage>(_libraryRefreshHandler.Handle);
-            Messenger.Unsubscribe<ArtistImportedMessage>(_artistImportedHandler.Handle);
-            Messenger.Unsubscribe<TagUpdatedMessage>(_tagUpdatedHandler.Handle);
+            foreach (IDisposable subscription in _subscriptions)
+                subscription.Dispose();
+            _subscriptions.Clear();
 
             _artistUpdateHandler.DataChanged -= OnLibraryChanged;
             _libraryRefreshHandler.LibraryChanged -= OnLibraryChanged;

@@ -1,7 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.UI.Dispatching;
-using Rok.Application.Features.Tracks.Query;
+using Rok.Application.Features.Tracks.Requests;
 using Rok.Application.Interfaces.Pictures;
 using Rok.Import.Services;
 using Windows.Storage;
@@ -9,7 +9,7 @@ using Windows.Storage.AccessCache;
 
 namespace Rok.ViewModels.Start;
 
-public partial class StartViewModel : ObservableObject
+public partial class StartViewModel : ObservableObject, IDisposable
 {
     private const int KDisplayIntervalMs = 300;
 
@@ -21,10 +21,13 @@ public partial class StartViewModel : ObservableObject
     private readonly IAlbumPicture _albumPicture;
     private readonly NavigationService _navigationService;
     private readonly IMediator _mediator;
+    private readonly IMessenger _messenger;
     private readonly IImport _importService;
     private readonly IAppOptions _appOptions;
     private readonly ISettingsFile _settingsFile;
     private readonly ITelemetryClient _telemetryClient;
+    private readonly List<IDisposable> _subscriptions = new();
+    private bool _disposed;
 
     private readonly DispatcherQueue _dispatcherQueue = DispatcherQueue.GetForCurrentThread();
     private readonly Queue<AlbumImportedModel> _pendingAlbums = new();
@@ -52,7 +55,7 @@ public partial class StartViewModel : ObservableObject
     [ObservableProperty]
     public partial string? ErrorBannerMessage { get; set; }
 
-    public StartViewModel(IAlbumPicture albumPicture, ISettingsFile settingsFile, NavigationService navigationService, IResourceService resourceService, IMediator mediator, IImport importService, IAppOptions appOptions, ITelemetryClient telemetryClient)
+    public StartViewModel(IAlbumPicture albumPicture, ISettingsFile settingsFile, NavigationService navigationService, IResourceService resourceService, IMediator mediator, IMessenger messenger, IImport importService, IAppOptions appOptions, ITelemetryClient telemetryClient)
     {
         Debug.Assert(
             ImportMessageThrottler.MaxMessagesBeforeThrottle >= KMinAlbumsToUnlockApp,
@@ -62,6 +65,7 @@ public partial class StartViewModel : ObservableObject
         _settingsFile = settingsFile;
         _navigationService = navigationService;
         _mediator = mediator;
+        _messenger = messenger;
         _importService = importService;
         _appOptions = appOptions;
         _telemetryClient = telemetryClient;
@@ -77,8 +81,8 @@ public partial class StartViewModel : ObservableObject
         _displayTimer.Tick += OnDisplayTimerTick;
         _displayTimer.Start();
 
-        Messenger.Subscribe<LibraryRefreshMessage>(OnLibraryRefreshMessage);
-        Messenger.Subscribe<AlbumImportedMessage>(AlbumImported);
+        _subscriptions.Add(_messenger.Subscribe<LibraryRefreshMessage>(OnLibraryRefreshMessage));
+        _subscriptions.Add(_messenger.Subscribe<AlbumImportedMessage>(AlbumImported));
     }
 
     private void OnLibraryRefreshMessage(LibraryRefreshMessage message) => _ = LibraryRefreshChangeAsync(message);
@@ -86,8 +90,9 @@ public partial class StartViewModel : ObservableObject
     private void UnregisterEvents()
     {
         _displayTimer.Stop();
-        Messenger.Unsubscribe<LibraryRefreshMessage>(OnLibraryRefreshMessage);
-        Messenger.Unsubscribe<AlbumImportedMessage>(AlbumImported);
+        foreach (IDisposable subscription in _subscriptions)
+            subscription.Dispose();
+        _subscriptions.Clear();
     }
 
     private void OnDisplayTimerTick(DispatcherQueueTimer sender, object args)
@@ -102,7 +107,7 @@ public partial class StartViewModel : ObservableObject
 
         if (AlbumsImported.Count >= KMinAlbumsToUnlockApp)
         {
-            Messenger.Send(new ShowNotificationMessage
+            _messenger.Send(new ShowNotificationMessage
             {
                 Title = _importBackgroundTitle,
                 Message = _importBackgroundMessage,
@@ -111,6 +116,16 @@ public partial class StartViewModel : ObservableObject
             UnregisterEvents();
             _navigationService.NavigateToAlbums();
         }
+    }
+
+    public void Dispose()
+    {
+        if (_disposed)
+            return;
+
+        UnregisterEvents();
+        _disposed = true;
+        GC.SuppressFinalize(this);
     }
 
     private async Task LibraryRefreshChangeAsync(LibraryRefreshMessage message)
@@ -125,7 +140,7 @@ public partial class StartViewModel : ObservableObject
 
         if (message.ProcessState == LibraryRefreshMessage.EState.Stop)
         {
-            int trackCount = await _mediator.SendMessageAsync(new GetTracksCountQuery());
+            int trackCount = await _mediator.Send(new GetTracksCountRequest());
 
             _dispatcherQueue.TryEnqueue(() =>
             {

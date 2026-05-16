@@ -1,4 +1,4 @@
-﻿using Rok.Application.Features.Tracks.Query;
+﻿using Rok.Application.Features.Tracks.Requests;
 using Rok.ViewModels.Artist;
 using Rok.ViewModels.Artists.Interfaces;
 using Rok.ViewModels.Track;
@@ -39,7 +39,7 @@ public class ListeningDataLoader(IMediator mediator, IArtistViewModelFactory art
 
     public async Task<List<TrackDto>> GetTracksByArtistAsync(long artistId, int maxTracks, IEnumerable<long> excludeTrackIds)
     {
-        IEnumerable<TrackDto> tracks = await mediator.SendMessageAsync(new GetTracksByArtistIdQuery(artistId));
+        IEnumerable<TrackDto> tracks = await mediator.Send(new GetTracksByArtistIdRequest(artistId));
 
         List<TrackDto> shuffledTracks = tracks.ToList();
         if (shuffledTracks.Count == 0)

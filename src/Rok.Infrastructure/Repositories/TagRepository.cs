@@ -1,12 +1,12 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using CleanArch.DevKit.Messaging;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using MiF.SimpleMessenger;
 using Rok.Application.Interfaces;
 using Rok.Application.Messages;
 
 namespace Rok.Infrastructure.Repositories;
 
-public class TagRepository(IDbConnection connection, [FromKeyedServices("BackgroundConnection")] IDbConnection backgroundConnection, ILogger<TagRepository> logger, TimeProvider timeProvider) : GenericRepository<TagEntity>(connection, backgroundConnection, null, logger, timeProvider), ITagRepository
+public class TagRepository(IDbConnection connection, [FromKeyedServices("BackgroundConnection")] IDbConnection backgroundConnection, IMessenger messenger, ILogger<TagRepository> logger, TimeProvider timeProvider) : GenericRepository<TagEntity>(connection, backgroundConnection, null, logger, timeProvider), ITagRepository
 {
     public override string GetSelectQuery(string? whereParam = null)
     {
@@ -47,7 +47,7 @@ public class TagRepository(IDbConnection connection, [FromKeyedServices("Backgro
 
             transaction.Commit();
 
-            Messenger.Send(new TagUpdatedMessage());
+            messenger.Send(new TagUpdatedMessage());
 
             return true;
         }

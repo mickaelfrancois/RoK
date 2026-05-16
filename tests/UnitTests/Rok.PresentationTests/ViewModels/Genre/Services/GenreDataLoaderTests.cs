@@ -1,11 +1,11 @@
-using MiF.Mediator.Interfaces;
-using MiF.Result;
+using CleanArch.DevKit.Mediator.Results;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using Rok.Application.Dto;
-using Rok.Application.Features.Albums.Query;
-using Rok.Application.Features.Genres.Query;
-using Rok.Application.Features.Tracks.Query;
+using Rok.Application.Errors;
+using Rok.Application.Features.Albums.Requests;
+using Rok.Application.Features.Genres.Requests;
+using Rok.Application.Features.Tracks.Requests;
 using Rok.ViewModels.Album;
 using Rok.ViewModels.Albums.Interfaces;
 using Rok.ViewModels.Genre.Services;
@@ -14,18 +14,17 @@ namespace Rok.PresentationTests.ViewModels.Genre.Services;
 
 public class GenreDataLoaderTests
 {
-    private readonly Mock<IMediator> _mediator = new();
+    private readonly FakeMediator _mediator = new();
     private readonly Mock<IAlbumViewModelFactory> _vmFactory = new();
 
-    private GenreDataLoader BuildService() => new(_mediator.Object, _vmFactory.Object, NullLogger<GenreDataLoader>.Instance);
+    private GenreDataLoader BuildService() => new(_mediator, _vmFactory.Object, NullLogger<GenreDataLoader>.Instance);
 
     [Fact(DisplayName = "LoadGenreAsync should return the genre when the mediator succeeds")]
     public async Task LoadGenreAsync_ShouldReturnGenre_WhenSuccess()
     {
         // Arrange
         GenreDto genre = new() { Id = 7, Name = "Jazz" };
-        _mediator.Setup(m => m.SendMessageAsync(It.IsAny<GetGenreByIdQuery>(), It.IsAny<CancellationToken>()))
-                 .ReturnsAsync(Result<GenreDto>.Success(genre));
+        _mediator.Setup<GetGenreByIdRequest, Result<GenreDto>>().Returns(Result<GenreDto>.Ok(genre));
         GenreDataLoader sut = BuildService();
 
         // Act
@@ -40,8 +39,7 @@ public class GenreDataLoaderTests
     public async Task LoadGenreAsync_ShouldReturnNull_WhenError()
     {
         // Arrange
-        _mediator.Setup(m => m.SendMessageAsync(It.IsAny<GetGenreByIdQuery>(), It.IsAny<CancellationToken>()))
-                 .ReturnsAsync(Result<GenreDto>.Fail("not found"));
+        _mediator.Setup<GetGenreByIdRequest, Result<GenreDto>>().Returns(Result<GenreDto>.Fail(new OperationError("genre.not_found", "not found")));
         GenreDataLoader sut = BuildService();
 
         // Act
@@ -55,8 +53,7 @@ public class GenreDataLoaderTests
     public async Task LoadAlbumsAsync_ShouldReturnEmpty_WhenNoAlbums()
     {
         // Arrange
-        _mediator.Setup(m => m.SendMessageAsync(It.IsAny<GetAlbumsByGenreIdQuery>(), It.IsAny<CancellationToken>()))
-                 .ReturnsAsync(new List<AlbumDto>());
+        _mediator.Setup<GetAlbumsByGenreIdRequest, IEnumerable<AlbumDto>>().Returns(new List<AlbumDto>());
         GenreDataLoader sut = BuildService();
 
         // Act
@@ -72,8 +69,7 @@ public class GenreDataLoaderTests
     {
         // Arrange
         List<TrackDto> tracks = new() { new TrackDto { Id = 1 }, new TrackDto { Id = 2 } };
-        _mediator.Setup(m => m.SendMessageAsync(It.Is<GetTracksByGenreIdQuery>(q => q.GenreId == 7), It.IsAny<CancellationToken>()))
-                 .ReturnsAsync(tracks);
+        _mediator.Setup<GetTracksByGenreIdRequest, IEnumerable<TrackDto>>().Returns(tracks);
         GenreDataLoader sut = BuildService();
 
         // Act
@@ -81,5 +77,7 @@ public class GenreDataLoaderTests
 
         // Assert
         Assert.Equal(2, result.Count);
+        GetTracksByGenreIdRequest sent = Assert.Single(_mediator.Sent<GetTracksByGenreIdRequest>());
+        Assert.Equal(7, sent.GenreId);
     }
 }

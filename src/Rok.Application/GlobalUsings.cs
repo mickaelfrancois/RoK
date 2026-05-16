@@ -1,7 +1,9 @@
-﻿global using System.ComponentModel.DataAnnotations;
-global using MiF.Mediator.Interfaces;
-global using MiF.Result;
+global using CleanArch.DevKit.Mediator;
+global using CleanArch.DevKit.Mediator.Behaviors;
+global using CleanArch.DevKit.Mediator.Results;
+global using CleanArch.DevKit.Mediator.Validation;
+global using CleanArch.DevKit.Messaging;
 global using Rok.Application.Dto;
+global using Rok.Application.Errors;
 global using Rok.Application.Mapping;
 global using Rok.Domain.Entities;
-global using Rok.Shared.ValidationAttributes;

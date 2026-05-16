@@ -1,7 +1,7 @@
 using Dapper;
 using Microsoft.Extensions.Logging.Abstractions;
 using Rok.Application.Dto;
-using Rok.Application.Features.Playlists.Query;
+using Rok.Application.Features.Playlists.Requests;
 using Rok.Domain.Entities;
 using Rok.Infrastructure.Repositories;
 using Rok.Shared.Enums;
@@ -13,7 +13,7 @@ public class PlaylistTrackGenerateRepositoryTests
     private static PlaylistTrackGenerateRepository CreateRepository(SqliteDatabaseFixture fixture) =>
         new(fixture.Connection, fixture.Connection, NullLogger<PlaylistTrackGenerateRepository>.Instance, TimeProvider.System);
 
-    private static GeneratePlaylistTracksQuery BuildQuery(int count, SmartPlaylistSelectBy sort = SmartPlaylistSelectBy.Random, params PlaylistFilterDto[] filters) =>
+    private static GeneratePlaylistTracksRequest BuildQuery(int count, SmartPlaylistSelectBy sort = SmartPlaylistSelectBy.Random, params PlaylistFilterDto[] filters) =>
         new()
         {
             PlaylistTrackCount = count,

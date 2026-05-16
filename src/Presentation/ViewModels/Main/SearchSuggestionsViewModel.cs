@@ -1,6 +1,6 @@
 using CommunityToolkit.Mvvm.ComponentModel;
-using Rok.Application.Features.Albums.Query;
-using Rok.Application.Features.Tracks.Query;
+using Rok.Application.Features.Albums.Requests;
+using Rok.Application.Features.Tracks.Requests;
 using Rok.Application.Services;
 
 namespace Rok.ViewModels.Main;
@@ -8,6 +8,7 @@ namespace Rok.ViewModels.Main;
 public partial class SearchSuggestionsViewModel : ObservableObject, IDisposable
 {
     private readonly IMediator _mediator;
+    private readonly IDisposable _libraryRefreshSubscription;
     private System.Threading.CancellationTokenSource? _debounceCts;
     private bool _isCacheLoaded;
     private bool _disposed;
@@ -27,10 +28,10 @@ public partial class SearchSuggestionsViewModel : ObservableObject, IDisposable
         set => SetProperty(ref _hasResults, value);
     }
 
-    public SearchSuggestionsViewModel(IMediator mediator)
+    public SearchSuggestionsViewModel(IMediator mediator, IMessenger messenger)
     {
         _mediator = mediator;
-        Messenger.Subscribe<LibraryRefreshMessage>(OnLibraryRefresh);
+        _libraryRefreshSubscription = messenger.Subscribe<LibraryRefreshMessage>(OnLibraryRefresh);
     }
 
     private void OnLibraryRefresh(LibraryRefreshMessage message)
@@ -106,7 +107,7 @@ public partial class SearchSuggestionsViewModel : ObservableObject, IDisposable
         if (_disposed)
             return;
 
-        Messenger.Unsubscribe<LibraryRefreshMessage>(OnLibraryRefresh);
+        _libraryRefreshSubscription.Dispose();
         _debounceCts?.Dispose();
         _disposed = true;
         GC.SuppressFinalize(this);
@@ -115,9 +116,9 @@ public partial class SearchSuggestionsViewModel : ObservableObject, IDisposable
 
     private async Task LoadCacheAsync()
     {
-        _artistsCache = await _mediator.SendMessageAsync(new GetAllArtistsQuery());
-        _albumsCache = await _mediator.SendMessageAsync(new GetAllAlbumsQuery());
-        _tracksCache = await _mediator.SendMessageAsync(new GetAllTracksQuery());
+        _artistsCache = await _mediator.Send(new GetAllArtistsRequest());
+        _albumsCache = await _mediator.Send(new GetAllAlbumsRequest());
+        _tracksCache = await _mediator.Send(new GetAllTracksRequest());
         _isCacheLoaded = true;
     }
 }

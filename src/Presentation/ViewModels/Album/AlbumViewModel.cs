@@ -30,6 +30,7 @@ public partial class AlbumViewModel : ObservableObject, IFilterableAlbum, IGroup
     private readonly AlbumStatisticsService _statisticsService;
     private readonly AlbumEditService _editService;
     private readonly IDominantColorCalculator _dominantColorCalculator;
+    private readonly IMessenger _messenger;
 
     private CancellationTokenSource _navigationCts = new();
 
@@ -176,6 +177,7 @@ public partial class AlbumViewModel : ObservableObject, IFilterableAlbum, IGroup
         IAppOptions appOptions,
         IDialogService dialogService,
         IPlaylistMenuService playlistMenuService,
+        IMessenger messenger,
         ILogger<AlbumViewModel> logger)
     {
         _backdropLoader = Guard.Against.Null(backdropLoader);
@@ -186,6 +188,7 @@ public partial class AlbumViewModel : ObservableObject, IFilterableAlbum, IGroup
         _tagsProvider = Guard.Against.Null(tagsDataLoader);
         _pictureService = Guard.Against.Null(pictureService);
         _apiService = Guard.Against.Null(apiService);
+        _messenger = Guard.Against.Null(messenger);
         _statisticsService = Guard.Against.Null(statisticsService);
         _dominantColorCalculator = Guard.Against.Null(dominantColorCalculator);
         _editService = Guard.Against.Null(editService);
@@ -362,7 +365,7 @@ public partial class AlbumViewModel : ObservableObject, IFilterableAlbum, IGroup
         bool updated = await _statisticsService.UpdateIfNeededAsync(Album, Tracks);
 
         if (updated)
-            Messenger.Send(new AlbumUpdateMessage(Album.Id, ActionType.Update));
+            _messenger.Send(new AlbumUpdateMessage(Album.Id, ActionType.Update));
     }
 
     [RelayCommand]
@@ -402,7 +405,7 @@ public partial class AlbumViewModel : ObservableObject, IFilterableAlbum, IGroup
         await _editService.UpdateFavoriteAsync(Album, newFavoriteState);
 
         OnPropertyChanged(nameof(IsFavorite));
-        Messenger.Send(new AlbumUpdateMessage(Album.Id, ActionType.Update));
+        _messenger.Send(new AlbumUpdateMessage(Album.Id, ActionType.Update));
     }
 
     [RelayCommand]
@@ -418,7 +421,7 @@ public partial class AlbumViewModel : ObservableObject, IFilterableAlbum, IGroup
         if (result.PictureDownloaded)
         {
             LoadPicture();
-            Messenger.Send(new AlbumUpdateMessage(Album.Id, ActionType.Picture));
+            _messenger.Send(new AlbumUpdateMessage(Album.Id, ActionType.Picture));
         }
 
         if (result.DataUpdated)
@@ -427,7 +430,7 @@ public partial class AlbumViewModel : ObservableObject, IFilterableAlbum, IGroup
             if (refreshedAlbum != null)
                 Album = refreshedAlbum;
 
-            Messenger.Send(new AlbumUpdateMessage(Album.Id, ActionType.Update));
+            _messenger.Send(new AlbumUpdateMessage(Album.Id, ActionType.Update));
         }
     }
 
@@ -439,7 +442,7 @@ public partial class AlbumViewModel : ObservableObject, IFilterableAlbum, IGroup
         if (!updated)
             return;
 
-        Messenger.Send(new AlbumUpdateMessage(Album.Id, ActionType.Update));
+        _messenger.Send(new AlbumUpdateMessage(Album.Id, ActionType.Update));
         OnPropertyChanged(nameof(Album));
     }
 
@@ -458,7 +461,7 @@ public partial class AlbumViewModel : ObservableObject, IFilterableAlbum, IGroup
 
         Picture = newPicture;
 
-        Messenger.Send(new AlbumUpdateMessage(Album.Id, ActionType.Picture));
+        _messenger.Send(new AlbumUpdateMessage(Album.Id, ActionType.Picture));
     }
 
     [RelayCommand]

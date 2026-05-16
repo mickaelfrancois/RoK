@@ -48,9 +48,9 @@ Clean / layered architecture with a strict dependency direction `Presentation �
 src/
   Rok.Domain/           Entities, enums, repository interfaces. Zero deps.
   Rok.Shared/           Cross-cutting helpers (collections, extensions, validation). Zero domain deps.
-  Rok.Application/      Use cases (Features/<Area>/Command|Query), CQRS handlers via MiF.Mediator,
+  Rok.Application/      Use cases (Features/<Area>/Requests/), CQRS handlers via CleanArch.DevKit.Mediator,
                         application services (PlayerService, PlaylistService, ReviewPromptEligibilityService),
-                        DTOs, options, decoupled messages (MiF.Messenger). Tests have InternalsVisibleTo.
+                        DTOs, options, decoupled messages (CleanArch.DevKit.Messaging). Tests have InternalsVisibleTo.
   Rok.Infrastructure/   Dapper + SQLite repositories, AppDbContext, schema Migrations (Migration2..N +
                         MigrationService), TagLibSharp tag IO, NAudio playback engine
                         (Player/NAudioMediaPlayer + MediaPlayerEngine), LastFm/MusicData/Translate HTTP
@@ -70,12 +70,20 @@ Application features follow the same shape:
 
 ```
 Rok.Application/Features/<Area>/
-  Command/    *CommandHandler.cs         (mutations)
-  Query/      *QueryHandler.cs           (reads)
+  Requests/   *Request.cs + *RequestHandler.cs + *RequestValidator.cs
+              (mutations and reads colocated; handlers implement IRequestHandler<TReq, TResp>)
   Services/   feature-scoped helpers
 ```
 
-Handlers are dispatched through **MiF.Mediator** (`AddSimpleMediator()` in `Rok.Application/DependencyInjection.cs`). Cross-cutting domain events flow through **MiF.Messenger** (e.g. `AlbumImportedMessageHandler`, `TrackImportedMessageHandler` in Presentation listen to messages emitted by Application/Import).
+Handlers are dispatched through **CleanArch.DevKit.Mediator** (`AddMediator()` in `Rok.Application/DependencyInjection.cs`). The mediator is source-generated (Roslyn) for zero-reflection dispatch — `public partial class Mediator { }` must exist in any project that registers handlers (already in `Rok.Application/Mediator.cs` and `tests/.../Rok.ApplicationTests/Mediator.cs`).
+
+Request validation uses **CleanArch.DevKit.Mediator.Validation** (FluentValidation-style rule builders, `Validator<TRequest>` colocated next to each `Request`). The validation pipeline behavior throws `ValidationException`, automatically converted to `Result.Fail(ValidationError)` by `ResultBehavior` for Result-returning handlers.
+
+Result/error pattern uses **CleanArch.DevKit.Mediator.Results** (`Result` / `Result<T>` structs + `Error` records: `NotFoundError`, `ConflictError`, `ValidationError`, `OperationError` from `Rok.Application.Errors`).
+
+Cross-cutting runtime events flow through **CleanArch.DevKit.Messaging** (`IMessenger`, instance-based, injected via DI). Subscribers receive an `IDisposable` token that **must** be disposed (typically via a `List<IDisposable> _subscriptions` field + dispose loop in `Dispose()`). Examples: `AlbumImportedMessageHandler`, `TrackImportedMessageHandler` in Presentation listen to messages emitted by Application/Import.
+
+Pipeline behaviors registered (in execution order, outermost → innermost): `ValidationBehavior` → `ResultBehavior` → `UnhandledExceptionBehavior` → `LoggingBehavior` → `PerformanceBehavior` (from `CleanArch.DevKit.Mediator.Behaviors`, wired via `AddCommonBehaviors()`).
 
 ### Presentation composition
 
@@ -95,7 +103,7 @@ ViewModels use `CommunityToolkit.Mvvm` (`ObservableObject`, source-gen commands)
 
 ## Testing
 
-xUnit + Moq + coverlet, with `Microsoft.Extensions.TimeProvider.Testing` for deterministic time. Test projects mirror the source layout:
+xUnit + Moq + coverlet, with `Microsoft.Extensions.TimeProvider.Testing` for deterministic time. `IMediator` is stubbed in tests via `FakeMediator` from `CleanArch.DevKit.Mediator.Testing` (instead of `Mock<IMediator>`): `_mediator.Setup<TRequest, TResponse>().Returns(value)` + `Assert.Single(_mediator.Sent<TRequest>())`. Result assertions use the fluent `.Should()` API from `CleanArch.DevKit.Mediator.Results.Testing` (e.g., `result.Should().BeFailure().And.HaveError<NotFoundError>().And.HaveErrorWithCode("track.not_found")`). Test projects mirror the source layout:
 
 ```
 tests/UnitTests/
@@ -117,7 +125,6 @@ Conventions enforced in the codebase:
 From `.github/copilot-instructions.md` and `.editorconfig`:
 
 - **All code and identifiers in English.** Comments only when strictly necessary; prefer self-documenting code. No regions.
-- **Never use collection expressions** (`dotnet_style_prefer_collection_expression = never`) — use explicit `new List<T>()` / `new[] { … }`.
 - Braces on their own line; blank lines around conditions, loops, logical blocks; prefer early return.
 - `var` only when the type is obvious from the RHS (`new`, casts, literals).
 - `async`/`await` everywhere — no synchronous I/O, no static service locators.

@@ -1,8 +1,7 @@
-using MiF.Mediator.Interfaces;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using Rok.Application.Dto.MusicDataApi;
-using Rok.Application.Features.Albums.Command;
+using Rok.Application.Features.Albums.Requests;
 using Rok.Application.Features.Albums.Services;
 using Rok.Application.Interfaces;
 using Rok.Application.Interfaces.Pictures;
@@ -11,11 +10,11 @@ namespace Rok.ApplicationTests.Features.Albums.Services;
 
 public class AlbumApiServiceTests
 {
-    private readonly Mock<IMediator> _mediator = new();
+    private readonly FakeMediator _mediator = new();
     private readonly Mock<IMusicDataApiService> _musicData = new();
     private readonly Mock<IAlbumPictureService> _pictureService = new();
 
-    private AlbumApiService BuildService() => new(_mediator.Object, _musicData.Object, NullLogger<AlbumApiService>.Instance);
+    private AlbumApiService BuildService() => new(_mediator, _musicData.Object, NullLogger<AlbumApiService>.Instance);
 
     [Theory(DisplayName = "GetAndUpdateAlbumDataAsync should return None when album name or artist name is empty")]
     [InlineData("", "Beatles")]
@@ -49,7 +48,7 @@ public class AlbumApiServiceTests
         // Assert
         Assert.Equal(AlbumApiUpdateResult.None, result);
         _musicData.Verify(m => m.GetAlbumAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string?>(), It.IsAny<string?>()), Times.Never);
-        _mediator.Verify(m => m.SendMessageAsync(It.IsAny<UpdateAlbumGetMetaDataLastAttemptCommand>(), It.IsAny<CancellationToken>()), Times.Never);
+        Assert.Empty(_mediator.Sent<UpdateAlbumGetMetaDataLastAttemptRequest>());
     }
 
     [Fact(DisplayName = "GetAndUpdateAlbumDataAsync should update last-attempt timestamp before calling the API")]
@@ -65,7 +64,8 @@ public class AlbumApiServiceTests
         await sut.GetAndUpdateAlbumDataAsync(album, _pictureService.Object);
 
         // Assert
-        _mediator.Verify(m => m.SendMessageAsync(It.Is<UpdateAlbumGetMetaDataLastAttemptCommand>(c => c.AlbumId == 1), It.IsAny<CancellationToken>()), Times.Once);
+        UpdateAlbumGetMetaDataLastAttemptRequest sent = Assert.Single(_mediator.Sent<UpdateAlbumGetMetaDataLastAttemptRequest>());
+        Assert.Equal(1, sent.AlbumId);
         Assert.NotNull(album.GetMetaDataLastAttempt);
     }
 
@@ -159,6 +159,6 @@ public class AlbumApiServiceTests
         // Assert
         Assert.True(result.PictureDownloaded);
         Assert.False(result.DataUpdated);
-        _mediator.Verify(m => m.SendMessageAsync(It.IsAny<UpdateAlbumCommand>(), It.IsAny<CancellationToken>()), Times.Never);
+        Assert.Empty(_mediator.Sent<UpdateAlbumRequest>());
     }
 }

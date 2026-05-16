@@ -1,6 +1,6 @@
-﻿using Rok.Application.Features.Albums.Query;
-using Rok.Application.Features.Genres.Query;
-using Rok.Application.Features.Tags.Query;
+﻿using Rok.Application.Features.Albums.Requests;
+using Rok.Application.Features.Genres.Requests;
+using Rok.Application.Features.Tags.Requests;
 using Rok.ViewModels.Album;
 using Rok.ViewModels.Albums.Interfaces;
 
@@ -19,20 +19,20 @@ public class AlbumsDataLoader(IMediator mediator, IAlbumViewModelFactory albumVi
     {
         using (PerfLogger perfLogger = new PerfLogger(logger).Parameters("Albums loaded"))
         {
-            IEnumerable<AlbumDto> albums = await mediator.SendMessageAsync(new GetAllAlbumsQuery());
+            IEnumerable<AlbumDto> albums = await mediator.Send(new GetAllAlbumsRequest());
             ViewModels = CreateAlbumsViewModels(albums);
         }
     }
 
     public async Task LoadGenresAsync()
     {
-        IEnumerable<GenreDto> genres = await mediator.SendMessageAsync(new GetAllGenresQuery());
+        IEnumerable<GenreDto> genres = await mediator.Send(new GetAllGenresRequest());
         Genres = genres.OrderBy(c => c.Name).ToList();
     }
 
     public async Task LoadTagsAsync()
     {
-        IEnumerable<TagDto> tags = await mediator.SendMessageAsync(new GetAllTagsQuery());
+        IEnumerable<TagDto> tags = await mediator.Send(new GetAllTagsRequest());
         Tags = tags.Select(v => v.Name)
                    .Distinct()
                    .OrderBy(t => t)
@@ -49,11 +49,11 @@ public class AlbumsDataLoader(IMediator mediator, IAlbumViewModelFactory albumVi
 
     public async Task<AlbumDto?> GetAlbumByIdAsync(long id)
     {
-        Result<AlbumDto> result = await mediator.SendMessageAsync(new GetAlbumByIdQuery(id));
+        Result<AlbumDto> result = await mediator.Send(new GetAlbumByIdRequest(id));
 
-        if (result.IsError)
+        if (result.IsFailure)
         {
-            logger.LogError("Failed to retrieve album {Id}: {ErrorMessage}", id, result.Error);
+            logger.LogError("Failed to retrieve album {Id}: {ErrorMessage}", id, result.Errors[0]);
             return null;
         }
 

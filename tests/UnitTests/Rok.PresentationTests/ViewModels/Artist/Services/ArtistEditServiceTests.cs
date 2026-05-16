@@ -1,17 +1,15 @@
-using MiF.Mediator.Interfaces;
 using Microsoft.Extensions.Logging.Abstractions;
-using Moq;
 using Rok.Application.Dto;
-using Rok.Application.Features.Artists.Command;
+using Rok.Application.Features.Artists.Requests;
 using Rok.ViewModels.Artist.Services;
 
 namespace Rok.PresentationTests.ViewModels.Artist.Services;
 
 public class ArtistEditServiceTests
 {
-    private readonly Mock<IMediator> _mediator = new();
+    private readonly FakeMediator _mediator = new();
 
-    private ArtistEditService BuildService() => new(_mediator.Object, NullLogger<ArtistEditService>.Instance);
+    private ArtistEditService BuildService() => new(_mediator, NullLogger<ArtistEditService>.Instance);
 
     [Fact(DisplayName = "UpdateFavoriteAsync should send the favorite command and update the artist state")]
     public async Task UpdateFavoriteAsync_ShouldSendCommandAndUpdateState()
@@ -25,9 +23,9 @@ public class ArtistEditServiceTests
 
         // Assert
         Assert.True(artist.IsFavorite);
-        _mediator.Verify(m => m.SendMessageAsync(
-            It.Is<UpdateArtistFavoriteCommand>(c => c.Id == 5 && c.IsFavorite == true),
-            It.IsAny<CancellationToken>()), Times.Once);
+        UpdateArtistFavoriteRequest sent = Assert.Single(_mediator.Sent<UpdateArtistFavoriteRequest>());
+        Assert.Equal(5, sent.Id);
+        Assert.True(sent.IsFavorite);
     }
 
     [Fact(DisplayName = "UpdateTagsAsync should send the tags command for the given artist")]
@@ -41,9 +39,9 @@ public class ArtistEditServiceTests
         await sut.UpdateTagsAsync(id: 5, tags);
 
         // Assert
-        _mediator.Verify(m => m.SendMessageAsync(
-            It.Is<UpdateArtistTagsCommand>(c => c.Id == 5 && c.Tags.SequenceEqual(tags)),
-            It.IsAny<CancellationToken>()), Times.Once);
+        UpdateArtistTagsRequest sent = Assert.Single(_mediator.Sent<UpdateArtistTagsRequest>());
+        Assert.Equal(5, sent.Id);
+        Assert.True(sent.Tags.SequenceEqual(tags));
     }
 
     [Fact(DisplayName = "UpdatePictureDominantColorAsync should send the color command")]
@@ -56,9 +54,9 @@ public class ArtistEditServiceTests
         await sut.UpdatePictureDominantColorAsync(id: 5, colorValue: 0xFF112233);
 
         // Assert
-        _mediator.Verify(m => m.SendMessageAsync(
-            It.Is<UpdateArtistPictureDominantColorCommand>(c => c.Id == 5 && c.ColorValue == 0xFF112233),
-            It.IsAny<CancellationToken>()), Times.Once);
+        UpdateArtistPictureDominantColorRequest sent = Assert.Single(_mediator.Sent<UpdateArtistPictureDominantColorRequest>());
+        Assert.Equal(5, sent.Id);
+        Assert.Equal(0xFF112233, sent.ColorValue);
     }
 
     [Theory(DisplayName = "OpenOfficialSiteAsync should return false when no URL is available on the artist")]

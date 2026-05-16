@@ -1,4 +1,4 @@
-﻿using Rok.Application.Features.Playlists.Query;
+﻿using Rok.Application.Features.Playlists.Requests;
 using Rok.ViewModels.Playlist;
 using Rok.ViewModels.Playlists.Interfaces;
 
@@ -12,18 +12,18 @@ public class PlaylistsDataLoader(IMediator mediator, IPlaylistViewModelFactory p
     {
         using (PerfLogger perfLogger = new PerfLogger(logger).Parameters("Playlists loaded"))
         {
-            IEnumerable<PlaylistHeaderDto> playlists = await mediator.SendMessageAsync(new GetAllPlaylistsQuery());
+            IEnumerable<PlaylistHeaderDto> playlists = await mediator.Send(new GetAllPlaylistsRequest());
             ViewModels = CreatePlaylistsViewModels(playlists.OrderBy(c => c.Name));
         }
     }
 
     public async Task<PlaylistHeaderDto?> GetPlaylistByIdAsync(long id)
     {
-        Result<PlaylistHeaderDto> result = await mediator.SendMessageAsync(new GetPlaylistByIdQuery(id));
+        Result<PlaylistHeaderDto> result = await mediator.Send(new GetPlaylistByIdRequest(id));
 
-        if (result.IsError)
+        if (result.IsFailure)
         {
-            logger.LogError("Failed to retrieve playlist {Id}: {ErrorMessage}", id, result.Error);
+            logger.LogError("Failed to retrieve playlist {Id}: {ErrorMessage}", id, result.Errors[0]);
             return null;
         }
 

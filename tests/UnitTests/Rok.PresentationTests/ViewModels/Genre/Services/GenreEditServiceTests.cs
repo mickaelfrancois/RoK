@@ -1,7 +1,5 @@
-using MiF.Mediator.Interfaces;
-using Moq;
 using Rok.Application.Dto;
-using Rok.Application.Features.Genres.Command;
+using Rok.Application.Features.Genres.Requests;
 using Rok.ViewModels.Genre.Services;
 
 namespace Rok.PresentationTests.ViewModels.Genre.Services;
@@ -12,17 +10,17 @@ public class GenreEditServiceTests
     public async Task UpdateFavoriteAsync_ShouldSendCommandAndUpdateState()
     {
         // Arrange
-        Mock<IMediator> mediator = new();
+        FakeMediator mediator = new();
         GenreDto genre = new() { Id = 5, IsFavorite = false };
-        GenreEditService sut = new(mediator.Object);
+        GenreEditService sut = new(mediator);
 
         // Act
         await sut.UpdateFavoriteAsync(genre, isFavorite: true);
 
         // Assert
         Assert.True(genre.IsFavorite);
-        mediator.Verify(m => m.SendMessageAsync(
-            It.Is<UpdateGenreFavoriteCommand>(c => c.Id == 5 && c.IsFavorite == true),
-            It.IsAny<CancellationToken>()), Times.Once);
+        UpdateGenreFavoriteRequest sent = Assert.Single(mediator.Sent<UpdateGenreFavoriteRequest>());
+        Assert.Equal(5, sent.Id);
+        Assert.True(sent.IsFavorite);
     }
 }

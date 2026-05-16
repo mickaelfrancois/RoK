@@ -1,26 +1,24 @@
-using MiF.Mediator.Interfaces;
-using MiF.Result;
+using CleanArch.DevKit.Mediator.Results;
 using Microsoft.Extensions.Logging.Abstractions;
-using Moq;
 using Rok.Application.Dto;
-using Rok.Application.Features.Tracks.Query;
+using Rok.Application.Errors;
+using Rok.Application.Features.Tracks.Requests;
 using Rok.ViewModels.Track.Services;
 
 namespace Rok.PresentationTests.ViewModels.Track.Services;
 
 public class TrackDetailDataLoaderTests
 {
-    private readonly Mock<IMediator> _mediator = new();
+    private readonly FakeMediator _mediator = new();
 
-    private TrackDetailDataLoader BuildService() => new(_mediator.Object, NullLogger<TrackDetailDataLoader>.Instance);
+    private TrackDetailDataLoader BuildService() => new(_mediator, NullLogger<TrackDetailDataLoader>.Instance);
 
     [Fact(DisplayName = "LoadTrackAsync should return the track when the mediator succeeds")]
     public async Task LoadTrackAsync_ShouldReturnTrack_WhenSuccess()
     {
         // Arrange
         TrackDto track = new() { Id = 42, Title = "Song" };
-        _mediator.Setup(m => m.SendMessageAsync(It.IsAny<GetTrackByIdQuery>(), It.IsAny<CancellationToken>()))
-                 .ReturnsAsync(Result<TrackDto>.Success(track));
+        _mediator.Setup<GetTrackByIdRequest, Result<TrackDto>>().Returns(Result<TrackDto>.Ok(track));
         TrackDetailDataLoader sut = BuildService();
 
         // Act
@@ -35,8 +33,7 @@ public class TrackDetailDataLoaderTests
     public async Task LoadTrackAsync_ShouldReturnNull_WhenError()
     {
         // Arrange
-        _mediator.Setup(m => m.SendMessageAsync(It.IsAny<GetTrackByIdQuery>(), It.IsAny<CancellationToken>()))
-                 .ReturnsAsync(Result<TrackDto>.Fail("not found"));
+        _mediator.Setup<GetTrackByIdRequest, Result<TrackDto>>().Returns(Result<TrackDto>.Fail(new OperationError("track.not_found", "not found")));
         TrackDetailDataLoader sut = BuildService();
 
         // Act

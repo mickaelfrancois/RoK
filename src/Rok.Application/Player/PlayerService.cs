@@ -1,6 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
 using MiF.Guard;
-using MiF.SimpleMessenger;
 using Rok.Application.Interfaces;
 using Rok.Application.Interfaces.Pictures;
 using Rok.Application.Messages;
@@ -44,7 +43,7 @@ public class PlayerService : IPlayerService, IDisposable
         {
             _playerState = value;
 
-            Messenger.Send(new MediaStateChanged(_playerState));
+            _messenger.Send(new MediaStateChanged(_playerState));
         }
     }
 
@@ -145,7 +144,9 @@ public class PlayerService : IPlayerService, IDisposable
 
     private readonly ILogger<PlayerService> _logger;
 
-    public PlayerService(ICallDetectionService callDetectionService, IPlayerEngine player, IAppOptions appOptions, IDiscordRichPresenceService? discordService, ISystemMediaTransportControlsService? smtcService, IAlbumPicture albumPicture, TimeProvider timeProvider, ILogger<PlayerService> logger)
+    private readonly IMessenger _messenger;
+
+    public PlayerService(ICallDetectionService callDetectionService, IPlayerEngine player, IAppOptions appOptions, IDiscordRichPresenceService? discordService, ISystemMediaTransportControlsService? smtcService, IAlbumPicture albumPicture, TimeProvider timeProvider, IMessenger messenger, ILogger<PlayerService> logger)
     {
         _callDetectionService = Guard.Against.Null(callDetectionService, nameof(callDetectionService));
         _player = Guard.Against.Null(player, nameof(player));
@@ -154,6 +155,7 @@ public class PlayerService : IPlayerService, IDisposable
         _smtcService = smtcService;
         _albumPicture = Guard.Against.Null(albumPicture, nameof(albumPicture));
         _timeProvider = Guard.Against.Null(timeProvider, nameof(timeProvider));
+        _messenger = Guard.Against.Null(messenger, nameof(messenger));
         _logger = Guard.Against.Null(logger, nameof(logger));
 
         _isCrossfadeEnabled = appOptions.CrossFade;
@@ -247,7 +249,7 @@ public class PlayerService : IPlayerService, IDisposable
             return;
 
         if (CurrentTrack != null)
-            Messenger.Send(new MediaEvent(EPlaybackState.Stopped, CurrentTrack));
+            _messenger.Send(new MediaEvent(EPlaybackState.Stopped, CurrentTrack));
 
         Next();
     }
@@ -262,7 +264,7 @@ public class PlayerService : IPlayerService, IDisposable
         _logger.LogDebug("Event Media about to end fired.");
 
         if (CurrentTrack != null)
-            Messenger.Send(new MediaAboutToEndEvent(CurrentTrack));
+            _messenger.Send(new MediaAboutToEndEvent(CurrentTrack));
 
         if (_isCrossfadeEnabled)
         {
@@ -278,7 +280,7 @@ public class PlayerService : IPlayerService, IDisposable
         Guard.Against.Null(tracks);
 
         if (CurrentTrack != null)
-            Messenger.Send(new MediaEvent(EPlaybackState.Ended, CurrentTrack));
+            _messenger.Send(new MediaEvent(EPlaybackState.Ended, CurrentTrack));
 
         Stop(false);
 
@@ -288,7 +290,7 @@ public class PlayerService : IPlayerService, IDisposable
 
         Start(startTrack);
 
-        Messenger.Send(new PlaylistChanged(Playlist));
+        _messenger.Send(new PlaylistChanged(Playlist));
     }
 
     public List<TrackDto> GetQueue()
@@ -307,7 +309,7 @@ public class PlayerService : IPlayerService, IDisposable
         if (!hasTracks)
             Start();
 
-        Messenger.Send(new PlaylistChanged(Playlist));
+        _messenger.Send(new PlaylistChanged(Playlist));
     }
 
     public void InsertTracksToPlaylist(List<TrackDto> tracks, int? index = null)
@@ -325,7 +327,7 @@ public class PlayerService : IPlayerService, IDisposable
 
         Playlist.InsertRange(index.Value, itemsToInsert);
 
-        Messenger.Send(new PlaylistChanged(Playlist));
+        _messenger.Send(new PlaylistChanged(Playlist));
     }
 
     public void Start(TrackDto? startTrack = null)
@@ -457,7 +459,7 @@ public class PlayerService : IPlayerService, IDisposable
     {
         TracksRandomizer.ArtistBalancedTrackRandomize(Playlist, _currentIndex);
 
-        Messenger.Send(new PlaylistChanged(Playlist));
+        _messenger.Send(new PlaylistChanged(Playlist));
     }
 
     #region Engine
@@ -475,7 +477,7 @@ public class PlayerService : IPlayerService, IDisposable
             CurrentTrack = track;
 
             if ((previousTrack == null || previousTrack.Id != _currentTrack?.Id) && _currentTrack != null)
-                Messenger.Send(new MediaChangedMessage(_currentTrack, previousTrack, durationPlayed));
+                _messenger.Send(new MediaChangedMessage(_currentTrack, previousTrack, durationPlayed));
 
             UpdateDiscordPresence(track, isPlaying: false);
         }
@@ -620,7 +622,7 @@ public class PlayerService : IPlayerService, IDisposable
         CurrentTrack = nextTrack;
 
         if (previousTrack == null || previousTrack.Id != nextTrack.Id)
-            Messenger.Send(new MediaChangedMessage(nextTrack, previousTrack, durationPlayed));
+            _messenger.Send(new MediaChangedMessage(nextTrack, previousTrack, durationPlayed));
 
         PlaybackState = EPlaybackState.Playing;
         UpdateDiscordPresence(nextTrack, isPlaying: true);

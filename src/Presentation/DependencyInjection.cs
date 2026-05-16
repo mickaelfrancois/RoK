@@ -1,9 +1,9 @@
 ﻿using Microsoft.UI.Dispatching;
-using Rok.Commons.Equalizer;
 using Rok.Application.Features.Playlists.PlaylistMenu;
 using Rok.Application.Interfaces.Pictures;
 using Rok.Application.Services.Filters;
 using Rok.Application.Services.Grouping;
+using Rok.Commons.Equalizer;
 using Rok.Services;
 using Rok.Services.PlayerCommand;
 using Rok.Services.PlayerCommand.Api;

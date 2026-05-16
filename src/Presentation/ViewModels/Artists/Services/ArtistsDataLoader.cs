@@ -1,4 +1,4 @@
-﻿using Rok.Application.Features.Genres.Query;
+﻿using Rok.Application.Features.Genres.Requests;
 using Rok.ViewModels.Artist;
 using Rok.ViewModels.Artists.Interfaces;
 
@@ -15,14 +15,14 @@ public class ArtistsDataLoader(IMediator mediator, IArtistViewModelFactory artis
     {
         using (PerfLogger perfLogger = new PerfLogger(logger).Parameters("Artists loaded"))
         {
-            IEnumerable<ArtistDto> artists = await mediator.SendMessageAsync(new GetAllArtistsQuery { ExcludeArtistsWithoutAlbum = excludeArtistsWithoutAlbum });
+            IEnumerable<ArtistDto> artists = await mediator.Send(new GetAllArtistsRequest { ExcludeArtistsWithoutAlbum = excludeArtistsWithoutAlbum });
             ViewModels = CreateArtistsViewModels(artists);
         }
     }
 
     public async Task LoadGenresAsync()
     {
-        IEnumerable<GenreDto> genres = await mediator.SendMessageAsync(new GetAllGenresQuery());
+        IEnumerable<GenreDto> genres = await mediator.Send(new GetAllGenresRequest());
         Genres = genres.OrderBy(c => c.Name).ToList();
     }
 
@@ -36,11 +36,11 @@ public class ArtistsDataLoader(IMediator mediator, IArtistViewModelFactory artis
 
     public async Task<ArtistDto?> GetArtistByIdAsync(long id)
     {
-        Result<ArtistDto> result = await mediator.SendMessageAsync(new GetArtistByIdQuery(id));
+        Result<ArtistDto> result = await mediator.Send(new GetArtistByIdRequest(id));
 
-        if (result.IsError)
+        if (result.IsFailure)
         {
-            logger.LogError("Failed to retrieve artist {Id}: {ErrorMessage}", id, result.Error);
+            logger.LogError("Failed to retrieve artist {Id}: {ErrorMessage}", id, result.Errors[0]);
             return null;
         }
 

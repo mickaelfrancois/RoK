@@ -2,7 +2,7 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Rok.Application.Dto.Lyrics;
-using Rok.Application.Features.Tracks.Command;
+using Rok.Application.Features.Tracks.Requests;
 using Rok.Application.Player;
 using Rok.Services;
 using Rok.ViewModels.Album;
@@ -28,6 +28,8 @@ public partial class PlayerViewModel : ObservableObject, IDisposable
     private readonly PlayerListenTracker _listenTracker;
     private readonly PlayerTimerManager _timerManager;
     private readonly PlayerStateManager _stateManager;
+    private readonly IMessenger _messenger;
+    private readonly List<IDisposable> _subscriptions = new();
 
     private bool _isFullScreen;
     private readonly IEqualizerWindowService _equalizerWindowService;
@@ -145,6 +147,7 @@ public partial class PlayerViewModel : ObservableObject, IDisposable
         IPlayerService player,
         NavigationService navigationService,
         IMediator mediator,
+        IMessenger messenger,
         PlayerDataLoader dataLoader,
         PlayerLyricsService lyricsService,
         PlayerListenTracker listenTracker,
@@ -160,6 +163,7 @@ public partial class PlayerViewModel : ObservableObject, IDisposable
         _player = Guard.Against.Null(player);
         _navigationService = Guard.Against.Null(navigationService);
         _mediator = Guard.Against.Null(mediator);
+        _messenger = Guard.Against.Null(messenger);
         _dataLoader = Guard.Against.Null(dataLoader);
         _lyricsService = Guard.Against.Null(lyricsService);
         _listenTracker = Guard.Against.Null(listenTracker);
@@ -196,12 +200,12 @@ public partial class PlayerViewModel : ObservableObject, IDisposable
 
     private void SubscribeToMessages()
     {
-        Messenger.Subscribe<MediaChangedMessage>(async (message) => await OnMediaChangedAsync(message));
-        Messenger.Subscribe<MediaStateChanged>(OnMediaStateChanged);
-        Messenger.Subscribe<MediaEndedEvent>(OnMediaEnded);
-        Messenger.Subscribe<MediaAboutToEndEvent>(OnMediaAboutToEnd);
-        Messenger.Subscribe<TrackScoreUpdateMessage>(OnTrackScoreUpdated);
-        Messenger.Subscribe<PlaylistChanged>(OnPlaylistChanged);
+        _subscriptions.Add(_messenger.Subscribe<MediaChangedMessage>(async (message) => await OnMediaChangedAsync(message)));
+        _subscriptions.Add(_messenger.Subscribe<MediaStateChanged>(OnMediaStateChanged));
+        _subscriptions.Add(_messenger.Subscribe<MediaEndedEvent>(OnMediaEnded));
+        _subscriptions.Add(_messenger.Subscribe<MediaAboutToEndEvent>(OnMediaAboutToEnd));
+        _subscriptions.Add(_messenger.Subscribe<TrackScoreUpdateMessage>(OnTrackScoreUpdated));
+        _subscriptions.Add(_messenger.Subscribe<PlaylistChanged>(OnPlaylistChanged));
     }
 
     private void SubscribeToTimers()
@@ -415,7 +419,7 @@ public partial class PlayerViewModel : ObservableObject, IDisposable
     public void SetSleepTimer(int minutes)
     {
         _playerSleepModeService.StartSleepTimer(minutes);
-        Messenger.Send(new ShowNotificationMessage() { Message = _resourceLoader.GetString("notification_sleepTimer_Start")!, Type = NotificationType.Informational });
+        _messenger.Send(new ShowNotificationMessage() { Message = _resourceLoader.GetString("notification_sleepTimer_Start")!, Type = NotificationType.Informational });
     }
 
     [RelayCommand]
@@ -423,7 +427,7 @@ public partial class PlayerViewModel : ObservableObject, IDisposable
     {
         _playerSleepModeService.StopSleepTimer();
 
-        Messenger.Send(new ShowNotificationMessage() { Message = _resourceLoader.GetString("notification_sleepTimer_Stop")!, Type = NotificationType.Informational });
+        _messenger.Send(new ShowNotificationMessage() { Message = _resourceLoader.GetString("notification_sleepTimer_Stop")!, Type = NotificationType.Informational });
     }
 
     [RelayCommand]
@@ -443,7 +447,7 @@ public partial class PlayerViewModel : ObservableObject, IDisposable
 
         CanSkipNext = false;
 
-        await _mediator.SendMessageAsync(new UpdateSkipCountCommand { TrackId = CurrentTrack.Track.Id });
+        await _mediator.Send(new UpdateSkipCountRequest { TrackId = CurrentTrack.Track.Id });
         _player.Skip();
     }
 
@@ -479,20 +483,20 @@ public partial class PlayerViewModel : ObservableObject, IDisposable
     private void EnableFullScreen()
     {
         _isFullScreen = true;
-        Messenger.Send(new FullScreenMessage(_isFullScreen));
+        _messenger.Send(new FullScreenMessage(_isFullScreen));
     }
 
     [RelayCommand]
     private void DisableFullScreen()
     {
         _isFullScreen = false;
-        Messenger.Send(new FullScreenMessage(_isFullScreen));
+        _messenger.Send(new FullScreenMessage(_isFullScreen));
     }
 
     [RelayCommand]
-    private static void CompactMode()
+    private void CompactMode()
     {
-        Messenger.Send(new CompactModeMessage());
+        _messenger.Send(new CompactModeMessage());
     }
 
     [RelayCommand]
@@ -517,6 +521,10 @@ public partial class PlayerViewModel : ObservableObject, IDisposable
 
         if (disposing)
         {
+            foreach (IDisposable subscription in _subscriptions)
+                subscription.Dispose();
+            _subscriptions.Clear();
+
             if (_stateManager != null)
                 _stateManager.PropertyChanged -= OnStateManagerPropertyChanged;
 

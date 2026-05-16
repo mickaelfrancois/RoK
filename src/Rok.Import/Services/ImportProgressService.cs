@@ -1,14 +1,14 @@
-using MiF.SimpleMessenger;
+using CleanArch.DevKit.Messaging;
 using Rok.Application.Dto;
 using Rok.Application.Messages;
 
 namespace Rok.Import.Services;
 
-public class ImportProgressService
+public class ImportProgressService(IMessenger messenger)
 {
     public void ReportRunning()
     {
-        Messenger.Send(new LibraryRefreshMessage
+        messenger.Send(new LibraryRefreshMessage
         {
             ProcessState = LibraryRefreshMessage.EState.Running
         });
@@ -16,7 +16,7 @@ public class ImportProgressService
 
     public void ReportProgress(int percentage)
     {
-        Messenger.Send(new LibraryRefreshMessage
+        messenger.Send(new LibraryRefreshMessage
         {
             ProcessState = LibraryRefreshMessage.EState.Unchanged,
             ProcessMessage = $"{percentage}%"
@@ -25,7 +25,7 @@ public class ImportProgressService
 
     public void ReportUpdateData()
     {
-        Messenger.Send(new LibraryRefreshMessage
+        messenger.Send(new LibraryRefreshMessage
         {
             ProcessState = LibraryRefreshMessage.EState.UpdateData
         });
@@ -33,7 +33,7 @@ public class ImportProgressService
 
     public void ReportCleanData()
     {
-        Messenger.Send(new LibraryRefreshMessage
+        messenger.Send(new LibraryRefreshMessage
         {
             ProcessState = LibraryRefreshMessage.EState.CleanData
         });
@@ -41,7 +41,7 @@ public class ImportProgressService
 
     public void ReportStopped(ImportStatisticsDto statistics)
     {
-        Messenger.Send(new LibraryRefreshMessage
+        messenger.Send(new LibraryRefreshMessage
         {
             ProcessState = LibraryRefreshMessage.EState.Stop,
             Statistics = statistics

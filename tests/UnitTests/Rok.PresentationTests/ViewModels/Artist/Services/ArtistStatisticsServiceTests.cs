@@ -1,7 +1,5 @@
-using MiF.Mediator.Interfaces;
-using Moq;
 using Rok.Application.Dto;
-using Rok.Application.Features.Artists.Command;
+using Rok.Application.Features.Artists.Requests;
 using Rok.ViewModels.Album;
 using Rok.ViewModels.Artist.Services;
 using Rok.ViewModels.Track;
@@ -10,9 +8,9 @@ namespace Rok.PresentationTests.ViewModels.Artist.Services;
 
 public class ArtistStatisticsServiceTests
 {
-    private readonly Mock<IMediator> _mediator = new();
+    private readonly FakeMediator _mediator = new();
 
-    private ArtistStatisticsService BuildService() => new(_mediator.Object);
+    private ArtistStatisticsService BuildService() => new(_mediator);
 
     [Fact(DisplayName = "NeedUpdate should return false when all counts already match")]
     public void NeedUpdate_ShouldReturnFalse_WhenAllCountsMatch()
@@ -54,7 +52,7 @@ public class ArtistStatisticsServiceTests
 
         // Assert
         Assert.False(result);
-        _mediator.Verify(m => m.SendMessageAsync(It.IsAny<UpdateArtistStatisticsCommand>(), It.IsAny<CancellationToken>()), Times.Never);
+        Assert.Empty(_mediator.Sent<UpdateArtistStatisticsRequest>());
     }
 
     [Fact(DisplayName = "UpdateIfNeededAsync should send a command and reset counts when stats differ from empty inputs")]
@@ -71,8 +69,9 @@ public class ArtistStatisticsServiceTests
         Assert.True(result);
         Assert.Equal(0, artist.TrackCount);
         Assert.Equal(0, artist.AlbumCount);
-        _mediator.Verify(m => m.SendMessageAsync(
-            It.Is<UpdateArtistStatisticsCommand>(c => c.Id == 1 && c.TrackCount == 0 && c.AlbumCount == 0),
-            It.IsAny<CancellationToken>()), Times.Once);
+        UpdateArtistStatisticsRequest sent = Assert.Single(_mediator.Sent<UpdateArtistStatisticsRequest>());
+        Assert.Equal(1, sent.Id);
+        Assert.Equal(0, sent.TrackCount);
+        Assert.Equal(0, sent.AlbumCount);
     }
 }

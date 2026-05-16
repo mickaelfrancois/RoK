@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
 using Rok.Application.Dto.Lyrics;
 using Rok.Application.Dto.MusicDataApi;
-using Rok.Application.Features.Tracks.Command;
+using Rok.Application.Features.Tracks.Requests;
 using Rok.Application.Interfaces;
 
 namespace Rok.Application.Features.Tracks.Services;
@@ -36,7 +36,7 @@ public class TrackLyricsService(IMediator mediator, ILyricsService lyricsService
         logger.LogTrace("Fetching lyrics for {Artist} - {Title} from API", track.ArtistName, track.Title);
 
         track.GetLyricsLastAttempt = DateTime.UtcNow;
-        await mediator.SendMessageAsync(new UpdateTrackGetLyricsLastAttemptCommand(track.Id));
+        await mediator.Send(new UpdateTrackGetLyricsLastAttemptRequest(track.Id));
 
 
         try

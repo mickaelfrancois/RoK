@@ -1,21 +1,19 @@
-using MiF.Mediator.Interfaces;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using Rok.Application.Dto;
 using Rok.Application.Features.Playlists;
-using Rok.Application.Features.Playlists.Command;
-using Rok.Application.Features.Playlists.Query;
+using Rok.Application.Features.Playlists.Requests;
 using Rok.ViewModels.Playlist.Services;
 
 namespace Rok.PresentationTests.ViewModels.Playlist.Services;
 
 public class PlaylistGenerationServiceTests
 {
-    private readonly Mock<IMediator> _mediator = new();
+    private readonly FakeMediator _mediator = new();
     private readonly Mock<IPlaylistService> _playlistService = new();
 
     private PlaylistGenerationService BuildService() =>
-        new(_mediator.Object, _playlistService.Object, NullLogger<PlaylistGenerationService>.Instance);
+        new(_mediator, _playlistService.Object, NullLogger<PlaylistGenerationService>.Instance);
 
     [Fact(DisplayName = "GenerateTracksAsync should delegate generation to IPlaylistService and return its tracks")]
     public async Task GenerateTracksAsync_ShouldReturnGeneratedTracks()
@@ -47,17 +45,18 @@ public class PlaylistGenerationServiceTests
         await sut.GenerateTracksAsync(playlist);
 
         // Assert
-        _mediator.Verify(m => m.SendMessageAsync(
-            It.Is<CreatePlaylistTracksCommand>(c =>
-                c.PlaylistId == 7 &&
-                c.Tracks.Count == 3 &&
-                c.Tracks[0].TrackId == 10 && c.Tracks[0].Position == 1 &&
-                c.Tracks[1].TrackId == 20 && c.Tracks[1].Position == 2 &&
-                c.Tracks[2].TrackId == 30 && c.Tracks[2].Position == 3),
-            It.IsAny<CancellationToken>()), Times.Once);
+        CreatePlaylistTracksRequest sent = Assert.Single(_mediator.Sent<CreatePlaylistTracksRequest>());
+        Assert.Equal(7, sent.PlaylistId);
+        Assert.Equal(3, sent.Tracks.Count);
+        Assert.Equal(10, sent.Tracks[0].TrackId);
+        Assert.Equal(1, sent.Tracks[0].Position);
+        Assert.Equal(20, sent.Tracks[1].TrackId);
+        Assert.Equal(2, sent.Tracks[1].Position);
+        Assert.Equal(30, sent.Tracks[2].TrackId);
+        Assert.Equal(3, sent.Tracks[2].Position);
     }
 
-    [Fact(DisplayName = "GenerateTracksAsync should send an empty CreatePlaylistTracksCommand when no tracks were generated")]
+    [Fact(DisplayName = "GenerateTracksAsync should send an empty CreatePlaylistTracksRequest when no tracks were generated")]
     public async Task GenerateTracksAsync_ShouldSendEmptyCommand_WhenNoTracksGenerated()
     {
         // Arrange
@@ -70,8 +69,8 @@ public class PlaylistGenerationServiceTests
 
         // Assert
         Assert.Empty(result);
-        _mediator.Verify(m => m.SendMessageAsync(
-            It.Is<CreatePlaylistTracksCommand>(c => c.PlaylistId == 7 && c.Tracks.Count == 0),
-            It.IsAny<CancellationToken>()), Times.Once);
+        CreatePlaylistTracksRequest sent = Assert.Single(_mediator.Sent<CreatePlaylistTracksRequest>());
+        Assert.Equal(7, sent.PlaylistId);
+        Assert.Empty(sent.Tracks);
     }
 }

@@ -58,7 +58,8 @@ public partial class App : Microsoft.UI.Xaml.Application
 
             string iconPath = Path.Combine(AppContext.BaseDirectory, "Assets/Square44x44Logo.ico");
 
-            MainWindow = new MainWindow(navigationService, telemetryClient, resourceLoader, appDbContext, options, reviewPromptEligibilityService);
+            IMessenger messenger = ServiceProvider.GetRequiredService<IMessenger>();
+            MainWindow = new MainWindow(navigationService, telemetryClient, resourceLoader, appDbContext, options, reviewPromptEligibilityService, messenger);
             MainWindow.AppWindow.SetIcon(iconPath);
             MainWindow.Title = "RoK";
 #if DEBUG

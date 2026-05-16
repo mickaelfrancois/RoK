@@ -1,18 +1,16 @@
-using MiF.Mediator.Interfaces;
-using Moq;
-using Rok.Application.Features.Tracks.Command;
+using Rok.Application.Features.Tracks.Requests;
 using Rok.ViewModels.Track.Services;
 
 namespace Rok.PresentationTests.ViewModels.Track.Services;
 
 public class TrackScoreServiceTests
 {
-    private readonly Mock<IMediator> _mediator = new();
+    private readonly FakeMediator _mediator = new();
 
-    private TrackScoreService BuildService() => new(_mediator.Object);
+    private TrackScoreService BuildService() => new(_mediator, new Messenger());
 
-    [Fact(DisplayName = "UpdateScoreAsync should send an UpdateScoreCommand with the provided values")]
-    public async Task UpdateScoreAsync_ShouldSendUpdateScoreCommand()
+    [Fact(DisplayName = "UpdateScoreAsync should send an UpdateScoreRequest with the provided values")]
+    public async Task UpdateScoreAsync_ShouldSendUpdateScoreRequest()
     {
         // Arrange
         TrackScoreService sut = BuildService();
@@ -21,8 +19,8 @@ public class TrackScoreServiceTests
         await sut.UpdateScoreAsync(trackId: 42, score: 5);
 
         // Assert
-        _mediator.Verify(m => m.SendMessageAsync(
-            It.Is<UpdateScoreCommand>(c => c.TrackId == 42 && c.Score == 5),
-            It.IsAny<CancellationToken>()), Times.Once);
+        UpdateScoreRequest sent = Assert.Single(_mediator.Sent<UpdateScoreRequest>());
+        Assert.Equal(42, sent.TrackId);
+        Assert.Equal(5, sent.Score);
     }
 }

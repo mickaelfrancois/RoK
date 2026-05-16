@@ -1,5 +1,5 @@
-﻿using Rok.Application.Features.Genres.Query;
-using Rok.Application.Features.Tracks.Query;
+﻿using Rok.Application.Features.Genres.Requests;
+using Rok.Application.Features.Tracks.Requests;
 using Rok.ViewModels.Track;
 using Rok.ViewModels.Tracks.Interfaces;
 
@@ -15,14 +15,14 @@ public class TracksDataLoader(IMediator mediator, ITrackViewModelFactory trackVi
     {
         using (PerfLogger perfLogger = new PerfLogger(logger).Parameters("Tracks loaded"))
         {
-            IEnumerable<TrackDto> tracks = await mediator.SendMessageAsync(new GetAllTracksQuery());
+            IEnumerable<TrackDto> tracks = await mediator.Send(new GetAllTracksRequest());
             ViewModels = TrackViewModelMap.CreateViewModels(tracks, trackViewModelFactory);
         }
     }
 
     public async Task LoadGenresAsync()
     {
-        IEnumerable<GenreDto> genres = await mediator.SendMessageAsync(new GetAllGenresQuery());
+        IEnumerable<GenreDto> genres = await mediator.Send(new GetAllGenresRequest());
         Genres = genres.OrderBy(c => c.Name).ToList();
     }
 

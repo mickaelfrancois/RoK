@@ -1,10 +1,8 @@
-using MiF.Mediator;
-using MiF.Mediator.Interfaces;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using Rok.Application.Dto.Lyrics;
 using Rok.Application.Dto.MusicDataApi;
-using Rok.Application.Features.Tracks.Command;
+using Rok.Application.Features.Tracks.Requests;
 using Rok.Application.Features.Tracks.Services;
 using Rok.Application.Interfaces;
 
@@ -12,12 +10,12 @@ namespace Rok.ApplicationTests.Features.Tracks.Services;
 
 public class TrackLyricsServiceTests
 {
-    private readonly Mock<IMediator> _mediator = new();
+    private readonly FakeMediator _mediator = new();
     private readonly Mock<ILyricsService> _lyricsService = new();
     private readonly Mock<IMusicDataApiService> _musicData = new();
 
     private TrackLyricsService BuildService() =>
-        new(_mediator.Object, _lyricsService.Object, _musicData.Object, NullLogger<TrackLyricsService>.Instance);
+        new(_mediator, _lyricsService.Object, _musicData.Object, NullLogger<TrackLyricsService>.Instance);
 
     [Fact(DisplayName = "CheckLyricsExists should return true when the lyrics service finds a non-None type")]
     public void CheckLyricsExists_ShouldReturnTrue_WhenLyricsExist()
@@ -112,7 +110,8 @@ public class TrackLyricsServiceTests
         await sut.GetAndSaveLyricsFromApiAsync(track);
 
         // Assert
-        _mediator.Verify(m => m.SendMessageAsync(It.Is<UpdateTrackGetLyricsLastAttemptCommand>(c => c.TrackId == 1), It.IsAny<CancellationToken>()), Times.Once);
+        UpdateTrackGetLyricsLastAttemptRequest sent = Assert.Single(_mediator.Sent<UpdateTrackGetLyricsLastAttemptRequest>());
+        Assert.Equal(1, sent.TrackId);
         Assert.NotNull(track.GetLyricsLastAttempt);
     }
 

@@ -1,5 +1,5 @@
 using System.Text.Json;
-using Rok.Application.Features.Playlists.Command;
+using Rok.Application.Features.Playlists.Requests;
 using Rok.Application.Mapping;
 using Rok.Domain.Entities;
 using Rok.Shared.Enums;
@@ -71,7 +71,7 @@ public class PlaylistHeaderDtoMappingTests
     public void MapCreateCommandToEntity_ShouldSerializeGroupsToJson()
     {
         // Arrange
-        CreatePlaylistCommand command = new()
+        CreatePlaylistRequest command = new()
         {
             Name = "MySmart",
             Type = (int)PlaylistType.Smart,
@@ -94,7 +94,7 @@ public class PlaylistHeaderDtoMappingTests
     public void MapCreateCommandToEntity_ShouldLeaveGroupsJsonEmpty_WhenNoGroups()
     {
         // Arrange
-        CreatePlaylistCommand command = new()
+        CreatePlaylistRequest command = new()
         {
             Name = "Plain",
             Type = (int)PlaylistType.Classic,
@@ -108,8 +108,8 @@ public class PlaylistHeaderDtoMappingTests
         Assert.Equal(string.Empty, entity.GroupsJson);
     }
 
-    [Fact(DisplayName = "MapToUpdatePlaylistCommand should preserve dto fields including the Groups collection")]
-    public void MapToUpdatePlaylistCommand_ShouldPreserveFields()
+    [Fact(DisplayName = "MapToUpdatePlaylistRequest should preserve dto fields including the Groups collection")]
+    public void MapToUpdatePlaylistRequest_ShouldPreserveFields()
     {
         // Arrange
         List<PlaylistGroupDto> groups = new() { new() { Name = "g1" } };
@@ -124,7 +124,7 @@ public class PlaylistHeaderDtoMappingTests
         };
 
         // Act
-        UpdatePlaylistCommand command = PlaylistHeadeDtoMapping.MapToUpdatePlaylistCommand(dto);
+        UpdatePlaylistRequest command = PlaylistHeadeDtoMapping.MapToUpdatePlaylistRequest(dto);
 
         // Assert
         Assert.Equal(1, command.Id);

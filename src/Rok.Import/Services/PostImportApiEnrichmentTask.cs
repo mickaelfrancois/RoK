@@ -1,10 +1,10 @@
+using CleanArch.DevKit.Mediator;
+using CleanArch.DevKit.Mediator.Results;
 using Microsoft.Extensions.Logging;
-using MiF.Mediator.Interfaces;
-using MiF.Result;
 using Rok.Application.Dto;
-using Rok.Application.Features.Albums.Query;
+using Rok.Application.Features.Albums.Requests;
 using Rok.Application.Features.Albums.Services;
-using Rok.Application.Features.Artists.Query;
+using Rok.Application.Features.Artists.Requests;
 using Rok.Application.Features.Artists.Services;
 using Rok.Application.Interfaces.Pictures;
 using Rok.Shared;
@@ -40,7 +40,7 @@ public class PostImportApiEnrichmentTask(
 
             try
             {
-                Result<ArtistDto> result = await mediator.SendMessageAsync(new GetArtistByIdQuery(artistId), cancellationToken);
+                Result<ArtistDto> result = await mediator.Send(new GetArtistByIdRequest(artistId), cancellationToken);
 
                 if (!result.IsSuccess)
                 {
@@ -48,7 +48,7 @@ public class PostImportApiEnrichmentTask(
                     continue;
                 }
 
-                await artistApiService.GetAndUpdateArtistDataAsync(result.Value!, artistPictureService, backdropPicture, cancellationToken);
+                await artistApiService.GetAndUpdateArtistDataAsync(result.Value, artistPictureService, backdropPicture, cancellationToken);
                 enriched++;
             }
             catch (Exception ex)
@@ -72,7 +72,7 @@ public class PostImportApiEnrichmentTask(
 
             try
             {
-                Result<AlbumDto> result = await mediator.SendMessageAsync(new GetAlbumByIdQuery(albumId), cancellationToken);
+                Result<AlbumDto> result = await mediator.Send(new GetAlbumByIdRequest(albumId), cancellationToken);
 
                 if (!result.IsSuccess)
                 {
@@ -80,7 +80,7 @@ public class PostImportApiEnrichmentTask(
                     continue;
                 }
 
-                await albumApiService.GetAndUpdateAlbumDataAsync(result.Value!, albumPictureService, cancellationToken);
+                await albumApiService.GetAndUpdateAlbumDataAsync(result.Value, albumPictureService, cancellationToken);
                 enriched++;
             }
             catch (Exception ex)

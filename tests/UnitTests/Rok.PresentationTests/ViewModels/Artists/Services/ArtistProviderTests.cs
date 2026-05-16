@@ -1,9 +1,8 @@
-using MiF.Mediator.Interfaces;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using Rok.Application.Dto;
-using Rok.Application.Features.Artists.Query;
-using Rok.Application.Features.Genres.Query;
+using Rok.Application.Features.Artists.Requests;
+using Rok.Application.Features.Genres.Requests;
 using Rok.Application.Interfaces;
 using Rok.Application.Services.Filters;
 using Rok.Application.Services.Grouping;
@@ -14,13 +13,13 @@ namespace Rok.PresentationTests.ViewModels.Artists.Services;
 
 public class ArtistProviderTests
 {
-    private readonly Mock<IMediator> _mediator = new();
+    private readonly FakeMediator _mediator = new();
     private readonly Mock<IArtistViewModelFactory> _vmFactory = new();
     private readonly Mock<IResourceService> _resource = new();
 
     private ArtistProvider BuildService()
     {
-        ArtistsDataLoader loader = new(_mediator.Object, _vmFactory.Object, NullLogger<ArtistsDataLoader>.Instance);
+        ArtistsDataLoader loader = new(_mediator, _vmFactory.Object, NullLogger<ArtistsDataLoader>.Instance);
         ArtistsFilter filter = new(_resource.Object);
         ArtistsGroupCategory grouper = new(_resource.Object);
         return new ArtistProvider(loader, filter, grouper);
@@ -30,18 +29,18 @@ public class ArtistProviderTests
     public async Task LoadAsync_ShouldCallMediatorForGenresAndArtists()
     {
         // Arrange
-        _mediator.Setup(m => m.SendMessageAsync(It.IsAny<GetAllGenresQuery>(), It.IsAny<CancellationToken>()))
-                 .ReturnsAsync(new List<GenreDto>());
-        _mediator.Setup(m => m.SendMessageAsync(It.IsAny<GetAllArtistsQuery>(), It.IsAny<CancellationToken>()))
-                 .ReturnsAsync(new List<ArtistDto>());
+        _mediator.Setup<GetAllGenresRequest, IEnumerable<GenreDto>>()
+                 .Returns(new List<GenreDto>());
+        _mediator.Setup<GetAllArtistsRequest, IEnumerable<ArtistDto>>()
+                 .Returns(new List<ArtistDto>());
         ArtistProvider sut = BuildService();
 
         // Act
         await sut.LoadAsync(excludeArtistsWithoutAlbum: false);
 
         // Assert
-        _mediator.Verify(m => m.SendMessageAsync(It.IsAny<GetAllGenresQuery>(), It.IsAny<CancellationToken>()), Times.Once);
-        _mediator.Verify(m => m.SendMessageAsync(It.IsAny<GetAllArtistsQuery>(), It.IsAny<CancellationToken>()), Times.Once);
+        Assert.Single(_mediator.Sent<GetAllGenresRequest>());
+        Assert.Single(_mediator.Sent<GetAllArtistsRequest>());
     }
 
     [Fact(DisplayName = "GetProcessedData should return empty result when no artists are loaded")]

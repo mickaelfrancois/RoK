@@ -8,17 +8,18 @@ public partial class TrackLibraryMonitor : ITrackLibraryMonitor
 {
     private readonly LibraryRefreshMessageHandler _libraryRefreshHandler;
     private readonly TrackImportedMessageHandler _trackImportedHandler;
+    private readonly List<IDisposable> _subscriptions = new();
     private bool _disposed;
 
     public event EventHandler? LibraryChanged;
 
-    public TrackLibraryMonitor(LibraryRefreshMessageHandler libraryRefreshHandler, TrackImportedMessageHandler trackImportedHandler)
+    public TrackLibraryMonitor(IMessenger messenger, LibraryRefreshMessageHandler libraryRefreshHandler, TrackImportedMessageHandler trackImportedHandler)
     {
         _libraryRefreshHandler = libraryRefreshHandler;
         _trackImportedHandler = trackImportedHandler;
 
-        Messenger.Subscribe<LibraryRefreshMessage>(_libraryRefreshHandler.Handle);
-        Messenger.Subscribe<AlbumImportedMessage>(_trackImportedHandler.Handle);
+        _subscriptions.Add(messenger.Subscribe<LibraryRefreshMessage>(_libraryRefreshHandler.Handle));
+        _subscriptions.Add(messenger.Subscribe<AlbumImportedMessage>(_trackImportedHandler.Handle));
 
         _libraryRefreshHandler.LibraryChanged += OnLibraryChanged;
         _trackImportedHandler.TrackImported += OnLibraryChanged;
@@ -39,8 +40,9 @@ public partial class TrackLibraryMonitor : ITrackLibraryMonitor
 
         if (disposing)
         {
-            Messenger.Unsubscribe<LibraryRefreshMessage>(_libraryRefreshHandler.Handle);
-            Messenger.Unsubscribe<AlbumImportedMessage>(_trackImportedHandler.Handle);
+            foreach (IDisposable subscription in _subscriptions)
+                subscription.Dispose();
+            _subscriptions.Clear();
 
             _libraryRefreshHandler.LibraryChanged -= OnLibraryChanged;
             _trackImportedHandler.TrackImported -= OnLibraryChanged;

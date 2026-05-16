@@ -1,9 +1,8 @@
-using MiF.Mediator.Interfaces;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using Rok.Application.Dto;
-using Rok.Application.Features.Genres.Query;
-using Rok.Application.Features.Tracks.Query;
+using Rok.Application.Features.Genres.Requests;
+using Rok.Application.Features.Tracks.Requests;
 using Rok.Application.Interfaces;
 using Rok.Application.Services.Filters;
 using Rok.Application.Services.Grouping;
@@ -14,13 +13,13 @@ namespace Rok.PresentationTests.ViewModels.Tracks.Services;
 
 public class TrackProviderTests
 {
-    private readonly Mock<IMediator> _mediator = new();
+    private readonly FakeMediator _mediator = new();
     private readonly Mock<ITrackViewModelFactory> _vmFactory = new();
     private readonly Mock<IResourceService> _resource = new();
 
     private TrackProvider BuildService()
     {
-        TracksDataLoader loader = new(_mediator.Object, _vmFactory.Object, NullLogger<TracksDataLoader>.Instance);
+        TracksDataLoader loader = new(_mediator, _vmFactory.Object, NullLogger<TracksDataLoader>.Instance);
         TracksFilter filter = new(_resource.Object);
         TracksGroupCategory grouper = new(_resource.Object);
         return new TrackProvider(loader, filter, grouper);
@@ -30,18 +29,16 @@ public class TrackProviderTests
     public async Task LoadAsync_ShouldCallMediatorForGenresAndTracks()
     {
         // Arrange
-        _mediator.Setup(m => m.SendMessageAsync(It.IsAny<GetAllGenresQuery>(), It.IsAny<CancellationToken>()))
-                 .ReturnsAsync(new List<GenreDto>());
-        _mediator.Setup(m => m.SendMessageAsync(It.IsAny<GetAllTracksQuery>(), It.IsAny<CancellationToken>()))
-                 .ReturnsAsync(new List<TrackDto>());
+        _mediator.Setup<GetAllGenresRequest, IEnumerable<GenreDto>>().Returns(new List<GenreDto>());
+        _mediator.Setup<GetAllTracksRequest, IEnumerable<TrackDto>>().Returns(new List<TrackDto>());
         TrackProvider sut = BuildService();
 
         // Act
         await sut.LoadAsync();
 
         // Assert
-        _mediator.Verify(m => m.SendMessageAsync(It.IsAny<GetAllGenresQuery>(), It.IsAny<CancellationToken>()), Times.Once);
-        _mediator.Verify(m => m.SendMessageAsync(It.IsAny<GetAllTracksQuery>(), It.IsAny<CancellationToken>()), Times.Once);
+        Assert.Single(_mediator.Sent<GetAllGenresRequest>());
+        Assert.Single(_mediator.Sent<GetAllTracksRequest>());
     }
 
     [Fact(DisplayName = "GetProcessedData should return empty result when no tracks are loaded")]

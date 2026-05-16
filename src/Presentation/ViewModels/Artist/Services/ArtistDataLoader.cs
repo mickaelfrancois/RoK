@@ -1,5 +1,5 @@
-﻿using Rok.Application.Features.Albums.Query;
-using Rok.Application.Features.Tracks.Query;
+﻿using Rok.Application.Features.Albums.Requests;
+using Rok.Application.Features.Tracks.Requests;
 using Rok.ViewModels.Album;
 using Rok.ViewModels.Albums.Interfaces;
 using Rok.ViewModels.Track;
@@ -11,10 +11,10 @@ public class ArtistDataLoader(IMediator mediator, IAlbumViewModelFactory albumVi
 {
     public async Task<ArtistDto?> LoadArtistAsync(long artistId)
     {
-        Result<ArtistDto> resultArtist = await mediator.SendMessageAsync(new GetArtistByIdQuery(artistId));
+        Result<ArtistDto> resultArtist = await mediator.Send(new GetArtistByIdRequest(artistId));
 
         if (resultArtist.IsSuccess)
-            return resultArtist.Value!;
+            return resultArtist.Value;
 
         logger.LogError("Failed to load artist {ArtistId}", artistId);
         return null;
@@ -22,19 +22,19 @@ public class ArtistDataLoader(IMediator mediator, IAlbumViewModelFactory albumVi
 
     public async Task<List<AlbumViewModel>> LoadAlbumsAsync(long artistId)
     {
-        IEnumerable<AlbumDto> albums = await mediator.SendMessageAsync(new GetAlbumsByArtistIdQuery(artistId));
+        IEnumerable<AlbumDto> albums = await mediator.Send(new GetAlbumsByArtistIdRequest(artistId));
         return AlbumViewModelMap.CreateViewModels(albums.ToList(), albumViewModelFactory);
     }
 
     public async Task<List<TrackViewModel>> LoadTracksAsync(long artistId)
     {
-        IEnumerable<TrackDto> tracks = await mediator.SendMessageAsync(new GetTracksByArtistIdQuery(artistId));
+        IEnumerable<TrackDto> tracks = await mediator.Send(new GetTracksByArtistIdRequest(artistId));
         return TrackViewModelMap.CreateViewModels(tracks.ToList(), trackViewModelFactory);
     }
 
     public async Task<ArtistDto?> ReloadArtistAsync(long artistId)
     {
-        Result<ArtistDto> artistResult = await mediator.SendMessageAsync(new GetArtistByIdQuery(artistId));
+        Result<ArtistDto> artistResult = await mediator.Send(new GetArtistByIdRequest(artistId));
         return artistResult.IsSuccess ? artistResult.Value : null;
     }
 }

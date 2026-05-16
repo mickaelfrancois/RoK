@@ -1,6 +1,6 @@
 using Microsoft.Extensions.Logging;
 using Rok.Application.Dto.MusicDataApi;
-using Rok.Application.Features.Artists.Command;
+using Rok.Application.Features.Artists.Requests;
 using Rok.Application.Interfaces;
 using Rok.Application.Interfaces.Pictures;
 using Rok.Shared.Extensions;
@@ -20,7 +20,7 @@ public class ArtistApiService(
         if (!musicDataApiService.IsApiRetryAllowed(artist.GetMetaDataLastAttempt))
             return ArtistApiUpdateResult.None;
 
-        await mediator.SendMessageAsync(new UpdateArtistGetMetaDataLastAttemptCommand(artist.Id));
+        await mediator.Send(new UpdateArtistGetMetaDataLastAttemptRequest(artist.Id));
         artist.GetMetaDataLastAttempt = DateTime.UtcNow;
 
         MusicDataArtistDto? artistApi = await musicDataApiService.GetArtistAsync(artist.Name, artist.MusicBrainzID);
@@ -71,7 +71,7 @@ public class ArtistApiService(
     {
         logger.LogTrace("Patch artist '{Name}' with API data.", artist.Name);
 
-        UpdateArtistCommand command = new()
+        UpdateArtistRequest command = new()
         {
             Id = artist.Id,
             MusicBrainzID = artistApi.MusicBrainzID ?? artist.MusicBrainzID,
@@ -99,7 +99,7 @@ public class ArtistApiService(
         if (string.IsNullOrEmpty(artist.Biography))
             command.Biography = artistApi.Biography;
 
-        await mediator.SendMessageAsync(command);
+        await mediator.Send(command);
 
         return true;
     }

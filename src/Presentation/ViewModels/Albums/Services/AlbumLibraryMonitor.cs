@@ -9,21 +9,22 @@ public partial class AlbumLibraryMonitor : IAlbumLibraryMonitor
     private readonly LibraryRefreshMessageHandler _libraryRefreshHandler;
     private readonly AlbumImportedMessageHandler _albumImportedHandler;
     private readonly TagUpdatedMessageHandler _tagUpdatedHandler;
+    private readonly List<IDisposable> _subscriptions = new();
     private bool _disposed;
 
     public event EventHandler? LibraryChanged;
 
-    public AlbumLibraryMonitor(AlbumUpdateMessageHandler albumUpdateHandler, LibraryRefreshMessageHandler libraryRefreshHandler, AlbumImportedMessageHandler albumImportedHandler, TagUpdatedMessageHandler tagUpdatedMessageHandler)
+    public AlbumLibraryMonitor(IMessenger messenger, AlbumUpdateMessageHandler albumUpdateHandler, LibraryRefreshMessageHandler libraryRefreshHandler, AlbumImportedMessageHandler albumImportedHandler, TagUpdatedMessageHandler tagUpdatedMessageHandler)
     {
         _albumUpdateHandler = albumUpdateHandler;
         _libraryRefreshHandler = libraryRefreshHandler;
         _albumImportedHandler = albumImportedHandler;
         _tagUpdatedHandler = tagUpdatedMessageHandler;
 
-        Messenger.Subscribe<AlbumUpdateMessage>(OnAlbumUpdateMessage);
-        Messenger.Subscribe<LibraryRefreshMessage>(_libraryRefreshHandler.Handle);
-        Messenger.Subscribe<AlbumImportedMessage>(_albumImportedHandler.Handle);
-        Messenger.Subscribe<TagUpdatedMessage>(_tagUpdatedHandler.Handle);
+        _subscriptions.Add(messenger.Subscribe<AlbumUpdateMessage>(OnAlbumUpdateMessage));
+        _subscriptions.Add(messenger.Subscribe<LibraryRefreshMessage>(_libraryRefreshHandler.Handle));
+        _subscriptions.Add(messenger.Subscribe<AlbumImportedMessage>(_albumImportedHandler.Handle));
+        _subscriptions.Add(messenger.Subscribe<TagUpdatedMessage>(_tagUpdatedHandler.Handle));
 
         _albumUpdateHandler.DataChanged += OnLibraryChanged;
         _libraryRefreshHandler.LibraryChanged += OnLibraryChanged;
@@ -49,10 +50,9 @@ public partial class AlbumLibraryMonitor : IAlbumLibraryMonitor
 
         if (disposing)
         {
-            Messenger.Unsubscribe<AlbumUpdateMessage>(OnAlbumUpdateMessage);
-            Messenger.Unsubscribe<LibraryRefreshMessage>(_libraryRefreshHandler.Handle);
-            Messenger.Unsubscribe<AlbumImportedMessage>(_albumImportedHandler.Handle);
-            Messenger.Unsubscribe<TagUpdatedMessage>(_tagUpdatedHandler.Handle);
+            foreach (IDisposable subscription in _subscriptions)
+                subscription.Dispose();
+            _subscriptions.Clear();
 
             _albumUpdateHandler.DataChanged -= OnLibraryChanged;
             _libraryRefreshHandler.LibraryChanged -= OnLibraryChanged;

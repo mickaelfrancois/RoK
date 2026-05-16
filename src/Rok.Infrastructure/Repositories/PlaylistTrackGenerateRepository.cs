@@ -2,7 +2,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Rok.Application.Dto;
-using Rok.Application.Features.Playlists.Query;
+using Rok.Application.Features.Playlists.Requests;
 using Rok.Application.Interfaces;
 using Rok.Application.Interfaces.Repositories;
 using Rok.Shared.Enums;
@@ -11,7 +11,7 @@ namespace Rok.Infrastructure.Repositories;
 
 public class PlaylistTrackGenerateRepository(IDbConnection db, [FromKeyedServices("BackgroundConnection")] IDbConnection backgroundDb, ILogger<PlaylistTrackGenerateRepository> logger, TimeProvider timeProvider) : GenericRepository<TrackEntity>(db, backgroundDb, null, logger, timeProvider), IPlaylistTrackGenerateRepository
 {
-    public async Task<List<TrackEntity>> GenerateAsync(GeneratePlaylistTracksQuery request, RepositoryConnectionKind kind = RepositoryConnectionKind.Foreground)
+    public async Task<List<TrackEntity>> GenerateAsync(GeneratePlaylistTracksRequest request, RepositoryConnectionKind kind = RepositoryConnectionKind.Foreground)
     {
         StringBuilder query = new();
         Dictionary<string, object> parameters = [];

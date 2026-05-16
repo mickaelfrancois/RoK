@@ -1,10 +1,9 @@
-using MiF.Mediator.Interfaces;
-using MiF.Result;
-using MiF.SimpleMessenger;
+using CleanArch.DevKit.Mediator.Results;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
+using Rok.Application.Errors;
 using Rok.Application.Features.Playlists;
-using Rok.Application.Features.Playlists.Command;
+using Rok.Application.Features.Playlists.Requests;
 using Rok.Application.Messages;
 using Rok.Shared.Enums;
 using Rok.ViewModels.Playlists.Services;
@@ -13,20 +12,21 @@ namespace Rok.PresentationTests.ViewModels.Playlists.Services;
 
 public class PlaylistImportServiceTests
 {
-    private readonly Mock<IMediator> _mediator = new();
+    private readonly FakeMediator _mediator = new();
     private readonly Mock<IPlaylistFilePickerService> _picker = new();
+    private readonly IMessenger _messenger = new Messenger();
 
     private PlaylistImportService BuildService()
-        => new(_mediator.Object, _picker.Object, NullLogger<PlaylistImportService>.Instance);
+        => new(_mediator, _picker.Object, _messenger, NullLogger<PlaylistImportService>.Instance);
 
     private static Result<PlaylistImportResult> Imported(int matched, int ignored)
-        => Result<PlaylistImportResult>.Success(new PlaylistImportResult(PlaylistImportStatus.Imported, 1, "Mix", matched, ignored));
+        => Result<PlaylistImportResult>.Ok(new PlaylistImportResult(PlaylistImportStatus.Imported, 1, "Mix", matched, ignored));
 
     private static Result<PlaylistImportResult> Skipped(int ignored)
-        => Result<PlaylistImportResult>.Success(new PlaylistImportResult(PlaylistImportStatus.Skipped, null, null, 0, ignored));
+        => Result<PlaylistImportResult>.Ok(new PlaylistImportResult(PlaylistImportStatus.Skipped, null, null, 0, ignored));
 
     private static Result<PlaylistImportResult> Failed()
-        => Result<PlaylistImportResult>.Fail("ParseError");
+        => Result<PlaylistImportResult>.Fail(new OperationError("playlist.parse_error", "Failed to parse playlist file."));
 
     [Fact(DisplayName = "does_not_show_toast_when_user_cancels_picker")]
     public async Task Does_not_show_toast_when_user_cancels_picker()
@@ -34,7 +34,7 @@ public class PlaylistImportServiceTests
         // Arrange
         ShowNotificationMessage? captured = null;
         void Listen(ShowNotificationMessage m) => captured = m;
-        Messenger.Subscribe<ShowNotificationMessage>(Listen);
+        _messenger.Subscribe<ShowNotificationMessage>(Listen);
         try
         {
             _picker.Setup(p => p.PickPlaylistFilesAsync()).ReturnsAsync(Array.Empty<string>());
@@ -46,11 +46,11 @@ public class PlaylistImportServiceTests
 
             // Assert
             Assert.Null(captured);
-            _mediator.Verify(m => m.SendMessageAsync(It.IsAny<ImportPlaylistCommand>(), It.IsAny<CancellationToken>()), Times.Never);
+            Assert.Empty(_mediator.Sent<ImportPlaylistRequest>());
         }
         finally
         {
-            try { Messenger.Unsubscribe<ShowNotificationMessage>(Listen); } catch { }
+            // _messenger is instance-scoped to this test, no manual unsubscribe needed
         }
     }
 
@@ -60,13 +60,16 @@ public class PlaylistImportServiceTests
         // Arrange
         ShowNotificationMessage? captured = null;
         void Listen(ShowNotificationMessage m) => captured = m;
-        Messenger.Subscribe<ShowNotificationMessage>(Listen);
+        _messenger.Subscribe<ShowNotificationMessage>(Listen);
         try
         {
             _picker.Setup(p => p.PickPlaylistFilesAsync()).ReturnsAsync(new[] { "a.m3u8", "b.m3u8" });
-            _mediator.SetupSequence(m => m.SendMessageAsync(It.IsAny<ImportPlaylistCommand>(), It.IsAny<CancellationToken>()))
-                     .ReturnsAsync(Imported(matched: 5, ignored: 1))
-                     .ReturnsAsync(Imported(matched: 3, ignored: 2));
+            Queue<Result<PlaylistImportResult>> responses = new(new[]
+            {
+                Imported(matched: 5, ignored: 1),
+                Imported(matched: 3, ignored: 2)
+            });
+            _mediator.Setup<ImportPlaylistRequest, Result<PlaylistImportResult>>().Returns(_ => responses.Dequeue());
 
             PlaylistImportService sut = BuildService();
 
@@ -82,7 +85,7 @@ public class PlaylistImportServiceTests
         }
         finally
         {
-            try { Messenger.Unsubscribe<ShowNotificationMessage>(Listen); } catch { }
+            // _messenger is instance-scoped to this test, no manual unsubscribe needed
         }
     }
 
@@ -92,13 +95,16 @@ public class PlaylistImportServiceTests
         // Arrange
         ShowNotificationMessage? captured = null;
         void Listen(ShowNotificationMessage m) => captured = m;
-        Messenger.Subscribe<ShowNotificationMessage>(Listen);
+        _messenger.Subscribe<ShowNotificationMessage>(Listen);
         try
         {
             _picker.Setup(p => p.PickPlaylistFilesAsync()).ReturnsAsync(new[] { "a.m3u8", "b.m3u8" });
-            _mediator.SetupSequence(m => m.SendMessageAsync(It.IsAny<ImportPlaylistCommand>(), It.IsAny<CancellationToken>()))
-                     .ReturnsAsync(Imported(matched: 2, ignored: 0))
-                     .ReturnsAsync(Skipped(ignored: 4));
+            Queue<Result<PlaylistImportResult>> responses = new(new[]
+            {
+                Imported(matched: 2, ignored: 0),
+                Skipped(ignored: 4)
+            });
+            _mediator.Setup<ImportPlaylistRequest, Result<PlaylistImportResult>>().Returns(_ => responses.Dequeue());
 
             PlaylistImportService sut = BuildService();
 
@@ -112,7 +118,7 @@ public class PlaylistImportServiceTests
         }
         finally
         {
-            try { Messenger.Unsubscribe<ShowNotificationMessage>(Listen); } catch { }
+            // _messenger is instance-scoped to this test, no manual unsubscribe needed
         }
     }
 
@@ -122,13 +128,16 @@ public class PlaylistImportServiceTests
         // Arrange
         ShowNotificationMessage? captured = null;
         void Listen(ShowNotificationMessage m) => captured = m;
-        Messenger.Subscribe<ShowNotificationMessage>(Listen);
+        _messenger.Subscribe<ShowNotificationMessage>(Listen);
         try
         {
             _picker.Setup(p => p.PickPlaylistFilesAsync()).ReturnsAsync(new[] { "a.m3u8", "b.m3u8" });
-            _mediator.SetupSequence(m => m.SendMessageAsync(It.IsAny<ImportPlaylistCommand>(), It.IsAny<CancellationToken>()))
-                     .ReturnsAsync(Imported(matched: 1, ignored: 0))
-                     .ReturnsAsync(Failed());
+            Queue<Result<PlaylistImportResult>> responses = new(new[]
+            {
+                Imported(matched: 1, ignored: 0),
+                Failed()
+            });
+            _mediator.Setup<ImportPlaylistRequest, Result<PlaylistImportResult>>().Returns(_ => responses.Dequeue());
 
             PlaylistImportService sut = BuildService();
 
@@ -141,7 +150,7 @@ public class PlaylistImportServiceTests
         }
         finally
         {
-            try { Messenger.Unsubscribe<ShowNotificationMessage>(Listen); } catch { }
+            // _messenger is instance-scoped to this test, no manual unsubscribe needed
         }
     }
 
@@ -151,12 +160,11 @@ public class PlaylistImportServiceTests
         // Arrange
         ShowNotificationMessage? captured = null;
         void Listen(ShowNotificationMessage m) => captured = m;
-        Messenger.Subscribe<ShowNotificationMessage>(Listen);
+        _messenger.Subscribe<ShowNotificationMessage>(Listen);
         try
         {
             _picker.Setup(p => p.PickPlaylistFilesAsync()).ReturnsAsync(new[] { "a.m3u8" });
-            _mediator.Setup(m => m.SendMessageAsync(It.IsAny<ImportPlaylistCommand>(), It.IsAny<CancellationToken>()))
-                     .ReturnsAsync(Failed());
+            _mediator.Setup<ImportPlaylistRequest, Result<PlaylistImportResult>>().Returns(Failed());
 
             PlaylistImportService sut = BuildService();
 
@@ -169,7 +177,7 @@ public class PlaylistImportServiceTests
         }
         finally
         {
-            try { Messenger.Unsubscribe<ShowNotificationMessage>(Listen); } catch { }
+            // _messenger is instance-scoped to this test, no manual unsubscribe needed
         }
     }
 }

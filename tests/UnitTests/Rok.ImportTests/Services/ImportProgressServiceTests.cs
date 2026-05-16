@@ -1,4 +1,3 @@
-using MiF.SimpleMessenger;
 using Rok.Application.Messages;
 using Rok.Import.Services;
 
@@ -8,9 +7,10 @@ public class ImportProgressServiceTests
 {
     private static (ImportProgressService service, List<LibraryRefreshMessage> received) CreateServiceAndCollector()
     {
-        ImportProgressService service = new();
+        IMessenger messenger = new Messenger();
+        ImportProgressService service = new(messenger);
         List<LibraryRefreshMessage> received = new();
-        Messenger.Subscribe<LibraryRefreshMessage>(received.Add);
+        messenger.Subscribe<LibraryRefreshMessage>(received.Add);
         return (service, received);
     }
 

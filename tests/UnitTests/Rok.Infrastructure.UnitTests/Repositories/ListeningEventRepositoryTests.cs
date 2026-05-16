@@ -1,6 +1,6 @@
 using Dapper;
 using Microsoft.Extensions.Logging.Abstractions;
-using Rok.Application.Features.Insights.Query;
+using Rok.Application.Features.Insights;
 using Rok.Infrastructure.Repositories;
 
 namespace Rok.Infrastructure.UnitTests.Repositories;

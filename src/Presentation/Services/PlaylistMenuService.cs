@@ -1,8 +1,7 @@
 using System.Threading;
-using Rok.Application.Features.Playlists.Command;
 using Rok.Application.Features.Playlists.PlaylistMenu;
-using Rok.Application.Features.Playlists.Query;
-using Rok.Application.Features.Tracks.Query;
+using Rok.Application.Features.Playlists.Requests;
+using Rok.Application.Features.Tracks.Requests;
 using Rok.Application.Player;
 
 namespace Rok.Services;
@@ -10,9 +9,11 @@ namespace Rok.Services;
 public partial class PlaylistMenuService : IPlaylistMenuService, IDisposable
 {
     private readonly IMediator _mediator;
+    private readonly IMessenger _messenger;
     private readonly IStringResourceProvider _resourceProvider;
     private readonly ILogger<PlaylistMenuService> _logger;
     private readonly IPlayerService _playerService;
+    private readonly List<IDisposable> _subscriptions = new();
 
     public event EventHandler? PlaylistsChanged;
 
@@ -20,17 +21,18 @@ public partial class PlaylistMenuService : IPlaylistMenuService, IDisposable
     private readonly SemaphoreSlim _cacheSemaphore = new(1, 1);
 
 
-    public PlaylistMenuService(IMediator mediator, IPlayerService playerService, IStringResourceProvider resourceProvider, ILogger<PlaylistMenuService> logger)
+    public PlaylistMenuService(IMediator mediator, IMessenger messenger, IPlayerService playerService, IStringResourceProvider resourceProvider, ILogger<PlaylistMenuService> logger)
     {
         _mediator = mediator;
+        _messenger = messenger;
         _playerService = playerService;
         _resourceProvider = resourceProvider;
         _logger = logger;
 
-        Messenger.Subscribe<PlaylistUpdatedMessage>(_ => OnPlaylistsChanged());
-        Messenger.Subscribe<PlaylistCreatedMessage>(_ => OnPlaylistsChanged());
-        Messenger.Subscribe<PlaylistNameUpdatedMessage>(_ => OnPlaylistsChanged());
-        Messenger.Subscribe<PlaylistDeletedMessage>(_ => OnPlaylistsChanged());
+        _subscriptions.Add(_messenger.Subscribe<PlaylistUpdatedMessage>(_ => OnPlaylistsChanged()));
+        _subscriptions.Add(_messenger.Subscribe<PlaylistCreatedMessage>(_ => OnPlaylistsChanged()));
+        _subscriptions.Add(_messenger.Subscribe<PlaylistNameUpdatedMessage>(_ => OnPlaylistsChanged()));
+        _subscriptions.Add(_messenger.Subscribe<PlaylistDeletedMessage>(_ => OnPlaylistsChanged()));
     }
 
 
@@ -56,7 +58,7 @@ public partial class PlaylistMenuService : IPlaylistMenuService, IDisposable
     {
         try
         {
-            Result<long> result = await _mediator.SendMessageAsync(new AddTrackToPlaylistCommand
+            Result<long> result = await _mediator.Send(new AddTrackToPlaylistRequest
             {
                 PlaylistId = playlistId,
                 TrackId = trackId
@@ -64,28 +66,28 @@ public partial class PlaylistMenuService : IPlaylistMenuService, IDisposable
 
             if (result.IsSuccess)
             {
-                Messenger.Send(new PlaylistUpdatedMessage(playlistId, ActionType.Update));
-                Messenger.Send(new ShowNotificationMessage() { Message = _resourceProvider.GetString("notification_playlist_track_add"), Type = NotificationType.Success });
+                _messenger.Send(new PlaylistUpdatedMessage(playlistId, ActionType.Update));
+                _messenger.Send(new ShowNotificationMessage() { Message = _resourceProvider.GetString("notification_playlist_track_add"), Type = NotificationType.Success });
 
                 _logger.LogInformation("Track '{TrackId}' add to playlist '{PlaylistId}'", trackId, playlistId);
             }
             else
             {
-                if (result.Error!.Code == "DUPLICATE")
+                if (result.Errors[0] is ConflictError)
                 {
-                    Messenger.Send(new ShowNotificationMessage() { Message = _resourceProvider.GetString("notification_playlist_track_add_duplicate"), Type = NotificationType.Warning });
+                    _messenger.Send(new ShowNotificationMessage() { Message = _resourceProvider.GetString("notification_playlist_track_add_duplicate"), Type = NotificationType.Warning });
                     _logger.LogWarning("Track '{TrackId}' already exists in playlist '{PlaylistId}'", trackId, playlistId);
                 }
                 else
                 {
-                    Messenger.Send(new ShowNotificationMessage() { Message = _resourceProvider.GetString("notification_playlist_track_add_error"), Type = NotificationType.Error });
-                    _logger.LogError("Failed to add track '{TrackId}' to playlist '{PlaylistId}': {Error}", trackId, playlistId, result.Error);
+                    _messenger.Send(new ShowNotificationMessage() { Message = _resourceProvider.GetString("notification_playlist_track_add_error"), Type = NotificationType.Error });
+                    _logger.LogError("Failed to add track '{TrackId}' to playlist '{PlaylistId}': {Error}", trackId, playlistId, result.Errors[0]);
                 }
             }
         }
         catch (Exception ex)
         {
-            Messenger.Send(new ShowNotificationMessage() { Message = _resourceProvider.GetString("notification_playlist_track_add_error"), Type = NotificationType.Error });
+            _messenger.Send(new ShowNotificationMessage() { Message = _resourceProvider.GetString("notification_playlist_track_add_error"), Type = NotificationType.Error });
             _logger.LogError(ex, "Error while add track to playlist");
         }
     }
@@ -95,7 +97,7 @@ public partial class PlaylistMenuService : IPlaylistMenuService, IDisposable
     {
         try
         {
-            Result<long> result = await _mediator.SendMessageAsync(new AddAlbumToPlaylistCommand
+            Result<long> result = await _mediator.Send(new AddAlbumToPlaylistRequest
             {
                 PlaylistId = playlistId,
                 AlbumId = albumId
@@ -103,19 +105,19 @@ public partial class PlaylistMenuService : IPlaylistMenuService, IDisposable
 
             if (result.IsSuccess)
             {
-                Messenger.Send(new PlaylistUpdatedMessage(playlistId, ActionType.Update));
-                Messenger.Send(new ShowNotificationMessage() { Message = _resourceProvider.GetString("notification_playlist_track_add"), Type = NotificationType.Success });
+                _messenger.Send(new PlaylistUpdatedMessage(playlistId, ActionType.Update));
+                _messenger.Send(new ShowNotificationMessage() { Message = _resourceProvider.GetString("notification_playlist_track_add"), Type = NotificationType.Success });
 
                 _logger.LogInformation("Album '{AlbumId}' add to playlist '{PlaylistId}'", albumId, playlistId);
             }
             else
             {
-                _logger.LogError("Failed to add track '{AlbumId}' to playlist '{PlaylistId}': {Error}", albumId, playlistId, result.Error);
+                _logger.LogError("Failed to add track '{AlbumId}' to playlist '{PlaylistId}': {Error}", albumId, playlistId, result.Errors[0]);
             }
         }
         catch (Exception ex)
         {
-            Messenger.Send(new ShowNotificationMessage() { Message = _resourceProvider.GetString("notification_playlist_track_add_error"), Type = NotificationType.Error });
+            _messenger.Send(new ShowNotificationMessage() { Message = _resourceProvider.GetString("notification_playlist_track_add_error"), Type = NotificationType.Error });
             _logger.LogError(ex, "Error while add tracks to playlist");
         }
     }
@@ -125,7 +127,7 @@ public partial class PlaylistMenuService : IPlaylistMenuService, IDisposable
     {
         try
         {
-            Result<long> result = await _mediator.SendMessageAsync(new AddArtistToPlaylistCommand
+            Result<long> result = await _mediator.Send(new AddArtistToPlaylistRequest
             {
                 PlaylistId = playlistId,
                 ArtistId = artistId
@@ -133,19 +135,19 @@ public partial class PlaylistMenuService : IPlaylistMenuService, IDisposable
 
             if (result.IsSuccess)
             {
-                Messenger.Send(new PlaylistUpdatedMessage(playlistId, ActionType.Update));
-                Messenger.Send(new ShowNotificationMessage() { Message = _resourceProvider.GetString("notification_playlist_track_add"), Type = NotificationType.Success });
+                _messenger.Send(new PlaylistUpdatedMessage(playlistId, ActionType.Update));
+                _messenger.Send(new ShowNotificationMessage() { Message = _resourceProvider.GetString("notification_playlist_track_add"), Type = NotificationType.Success });
 
                 _logger.LogInformation("Album '{ArtistId}' add to playlist '{PlaylistId}'", artistId, playlistId);
             }
             else
             {
-                _logger.LogError("Failed to add track '{ArtistId}' to playlist '{PlaylistId}': {Error}", artistId, playlistId, result.Error);
+                _logger.LogError("Failed to add track '{ArtistId}' to playlist '{PlaylistId}': {Error}", artistId, playlistId, result.Errors[0]);
             }
         }
         catch (Exception ex)
         {
-            Messenger.Send(new ShowNotificationMessage() { Message = _resourceProvider.GetString("notification_playlist_track_add_error"), Type = NotificationType.Error });
+            _messenger.Send(new ShowNotificationMessage() { Message = _resourceProvider.GetString("notification_playlist_track_add_error"), Type = NotificationType.Error });
             _logger.LogError(ex, "Error while add tracks to playlist");
         }
     }
@@ -155,15 +157,15 @@ public partial class PlaylistMenuService : IPlaylistMenuService, IDisposable
     {
         try
         {
-            Result<long> playlistResult = await _mediator.SendMessageAsync(new CreatePlaylistCommand() { Name = playlistName, Type = (int)PlaylistType.Classic });
+            Result<long> playlistResult = await _mediator.Send(new CreatePlaylistRequest() { Name = playlistName, Type = (int)PlaylistType.Classic });
             long playlistId = playlistResult.Value;
-            Messenger.Send(new PlaylistUpdatedMessage(playlistId, ActionType.Add));
+            _messenger.Send(new PlaylistUpdatedMessage(playlistId, ActionType.Add));
 
             await AddTrackToPlaylistAsync(playlistId, trackId);
         }
         catch (Exception ex)
         {
-            Messenger.Send(new ShowNotificationMessage() { Message = _resourceProvider.GetString("notification_playlist_track_add_error"), Type = NotificationType.Error });
+            _messenger.Send(new ShowNotificationMessage() { Message = _resourceProvider.GetString("notification_playlist_track_add_error"), Type = NotificationType.Error });
             _logger.LogError(ex, "Error while add track to playlist");
         }
     }
@@ -173,15 +175,15 @@ public partial class PlaylistMenuService : IPlaylistMenuService, IDisposable
     {
         try
         {
-            Result<long> playlistResult = await _mediator.SendMessageAsync(new CreatePlaylistCommand() { Name = playlistName, Type = (int)PlaylistType.Classic });
+            Result<long> playlistResult = await _mediator.Send(new CreatePlaylistRequest() { Name = playlistName, Type = (int)PlaylistType.Classic });
             long playlistId = playlistResult.Value;
-            Messenger.Send(new PlaylistUpdatedMessage(playlistId, ActionType.Add));
+            _messenger.Send(new PlaylistUpdatedMessage(playlistId, ActionType.Add));
 
             await AddAlbumToPlaylistAsync(playlistId, albumId);
         }
         catch (Exception ex)
         {
-            Messenger.Send(new ShowNotificationMessage() { Message = _resourceProvider.GetString("notification_playlist_track_add_error"), Type = NotificationType.Error });
+            _messenger.Send(new ShowNotificationMessage() { Message = _resourceProvider.GetString("notification_playlist_track_add_error"), Type = NotificationType.Error });
             _logger.LogError(ex, "Error while add tracks to playlist");
         }
     }
@@ -191,15 +193,15 @@ public partial class PlaylistMenuService : IPlaylistMenuService, IDisposable
     {
         try
         {
-            Result<long> playlistResult = await _mediator.SendMessageAsync(new CreatePlaylistCommand() { Name = playlistName, Type = (int)PlaylistType.Classic });
+            Result<long> playlistResult = await _mediator.Send(new CreatePlaylistRequest() { Name = playlistName, Type = (int)PlaylistType.Classic });
             long playlistId = playlistResult.Value;
-            Messenger.Send(new PlaylistUpdatedMessage(playlistId, ActionType.Add));
+            _messenger.Send(new PlaylistUpdatedMessage(playlistId, ActionType.Add));
 
             await AddArtistToPlaylistAsync(playlistId, artistId);
         }
         catch (Exception ex)
         {
-            Messenger.Send(new ShowNotificationMessage() { Message = _resourceProvider.GetString("notification_playlist_track_add_error"), Type = NotificationType.Error });
+            _messenger.Send(new ShowNotificationMessage() { Message = _resourceProvider.GetString("notification_playlist_track_add_error"), Type = NotificationType.Error });
             _logger.LogError(ex, "Error while add tracks to playlist");
         }
     }
@@ -209,10 +211,10 @@ public partial class PlaylistMenuService : IPlaylistMenuService, IDisposable
     {
         try
         {
-            IEnumerable<TrackDto> tracks = await _mediator.SendMessageAsync(new GetTracksByArtistIdQuery(artistId));
+            IEnumerable<TrackDto> tracks = await _mediator.Send(new GetTracksByArtistIdRequest(artistId));
             if (tracks == null || !tracks.Any())
             {
-                Messenger.Send(new ShowNotificationMessage() { Message = _resourceProvider.GetString("notification_playlist_track_add_error"), Type = NotificationType.Error });
+                _messenger.Send(new ShowNotificationMessage() { Message = _resourceProvider.GetString("notification_playlist_track_add_error"), Type = NotificationType.Error });
                 _logger.LogWarning("No tracks found for artist '{ArtistId}'", artistId);
                 return;
             }
@@ -221,7 +223,7 @@ public partial class PlaylistMenuService : IPlaylistMenuService, IDisposable
         }
         catch (Exception ex)
         {
-            Messenger.Send(new ShowNotificationMessage() { Message = _resourceProvider.GetString("notification_playlist_track_add_error"), Type = NotificationType.Error });
+            _messenger.Send(new ShowNotificationMessage() { Message = _resourceProvider.GetString("notification_playlist_track_add_error"), Type = NotificationType.Error });
             _logger.LogError(ex, "Error while add tracks to current listening");
         }
     }
@@ -230,10 +232,10 @@ public partial class PlaylistMenuService : IPlaylistMenuService, IDisposable
     {
         try
         {
-            IEnumerable<TrackDto> tracks = await _mediator.SendMessageAsync(new GetTracksByAlbumIdQuery(albumId));
+            IEnumerable<TrackDto> tracks = await _mediator.Send(new GetTracksByAlbumIdRequest(albumId));
             if (tracks == null || !tracks.Any())
             {
-                Messenger.Send(new ShowNotificationMessage() { Message = _resourceProvider.GetString("notification_playlist_track_add_error"), Type = NotificationType.Error });
+                _messenger.Send(new ShowNotificationMessage() { Message = _resourceProvider.GetString("notification_playlist_track_add_error"), Type = NotificationType.Error });
                 _logger.LogWarning("No tracks found for album '{AlbumId}'", albumId);
                 return;
             }
@@ -242,7 +244,7 @@ public partial class PlaylistMenuService : IPlaylistMenuService, IDisposable
         }
         catch (Exception ex)
         {
-            Messenger.Send(new ShowNotificationMessage() { Message = _resourceProvider.GetString("notification_playlist_track_add_error"), Type = NotificationType.Error });
+            _messenger.Send(new ShowNotificationMessage() { Message = _resourceProvider.GetString("notification_playlist_track_add_error"), Type = NotificationType.Error });
             _logger.LogError(ex, "Error while add tracks to current listening");
         }
     }
@@ -251,10 +253,10 @@ public partial class PlaylistMenuService : IPlaylistMenuService, IDisposable
     {
         try
         {
-            Result<TrackDto> trackResult = await _mediator.SendMessageAsync(new GetTrackByIdQuery(trackId));
+            Result<TrackDto> trackResult = await _mediator.Send(new GetTrackByIdRequest(trackId));
             if (!trackResult.IsSuccess || trackResult.Value == null)
             {
-                Messenger.Send(new ShowNotificationMessage() { Message = _resourceProvider.GetString("notification_playlist_track_add_error"), Type = NotificationType.Error });
+                _messenger.Send(new ShowNotificationMessage() { Message = _resourceProvider.GetString("notification_playlist_track_add_error"), Type = NotificationType.Error });
                 _logger.LogWarning("No track found for id '{TrackId}'", trackId);
                 return;
             }
@@ -263,7 +265,7 @@ public partial class PlaylistMenuService : IPlaylistMenuService, IDisposable
         }
         catch (Exception ex)
         {
-            Messenger.Send(new ShowNotificationMessage() { Message = _resourceProvider.GetString("notification_playlist_track_add_error"), Type = NotificationType.Error });
+            _messenger.Send(new ShowNotificationMessage() { Message = _resourceProvider.GetString("notification_playlist_track_add_error"), Type = NotificationType.Error });
             _logger.LogError(ex, "Error while add tracks to current listening");
         }
     }
@@ -273,7 +275,7 @@ public partial class PlaylistMenuService : IPlaylistMenuService, IDisposable
     {
         try
         {
-            IEnumerable<PlaylistHeaderDto> playlists = await _mediator.SendMessageAsync(new GetAllPlaylistsQuery() { FilterType = PlaylistType.Classic });
+            IEnumerable<PlaylistHeaderDto> playlists = await _mediator.Send(new GetAllPlaylistsRequest() { FilterType = PlaylistType.Classic });
 
             _cachedPlaylistItems = playlists.Select(p => new PlaylistMenuItem
             {
@@ -307,6 +309,10 @@ public partial class PlaylistMenuService : IPlaylistMenuService, IDisposable
 
     public void Dispose()
     {
+        foreach (IDisposable subscription in _subscriptions)
+            subscription.Dispose();
+        _subscriptions.Clear();
+
         _cacheSemaphore?.Dispose();
         GC.SuppressFinalize(this);
     }

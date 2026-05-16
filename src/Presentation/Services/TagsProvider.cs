@@ -1,5 +1,5 @@
 ﻿using System.Threading;
-using Rok.Application.Features.Tags.Query;
+using Rok.Application.Features.Tags.Requests;
 
 namespace Rok.Services;
 
@@ -8,15 +8,16 @@ public partial class TagsProvider : IDisposable
 {
     private readonly SemaphoreSlim _semaphore = new(1, 1);
     private readonly IMediator _mediator;
+    private readonly IDisposable _tagUpdatedSubscription;
     private List<string> _tags = new();
     private bool _isLoaded;
     private bool _disposed;
 
-    public TagsProvider(IMediator mediator)
+    public TagsProvider(IMediator mediator, IMessenger messenger)
     {
         _mediator = mediator;
 
-        Messenger.Subscribe<TagUpdatedMessage>(async _ => await LoadTagsAsync());
+        _tagUpdatedSubscription = messenger.Subscribe<TagUpdatedMessage>(async _ => await LoadTagsAsync());
     }
 
 
@@ -35,7 +36,7 @@ public partial class TagsProvider : IDisposable
 
         try
         {
-            IEnumerable<TagDto> tags = await _mediator.SendMessageAsync(new GetAllTagsQuery());
+            IEnumerable<TagDto> tags = await _mediator.Send(new GetAllTagsRequest());
 
             _tags = tags.Select(v => v.Name)
                        .Distinct()
@@ -61,6 +62,7 @@ public partial class TagsProvider : IDisposable
         {
             if (disposing)
             {
+                _tagUpdatedSubscription.Dispose();
                 _semaphore.Dispose();
             }
             _disposed = true;

@@ -1,4 +1,4 @@
-﻿using Rok.Application.Features.Albums.Command;
+﻿using Rok.Application.Features.Albums.Requests;
 using Rok.ViewModels.Track;
 
 namespace Rok.ViewModels.Album.Services;
@@ -21,13 +21,13 @@ public class AlbumStatisticsService(IMediator mediator)
         int trackCount = tracks.Count();
         long duration = tracks.Sum(c => c.Track.Duration);
 
-        UpdateAlbumStatisticsCommand command = new(album.Id)
+        UpdateAlbumStatisticsRequest command = new(album.Id)
         {
             TrackCount = trackCount,
             Duration = duration,
         };
 
-        await mediator.SendMessageAsync(command);
+        await mediator.Send(command);
 
         album.TrackCount = trackCount;
         album.Duration = duration;

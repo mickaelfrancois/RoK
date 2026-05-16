@@ -22,6 +22,8 @@ public partial class TrackViewModel : ObservableObject, IDisposable, IFilterable
     private readonly TrackLyricsService _lyricsService;
     private readonly TrackScoreService _scoreService;
     private readonly TrackNavigationService _navigationService;
+    private readonly IMessenger _messenger;
+    private readonly IDisposable _trackScoreUpdateSubscription;
     private LyricsModel? _lyrics;
     private ELyricsType? _lyricsType;
     public IPlaylistMenuService PlaylistMenuService { get; }
@@ -177,6 +179,7 @@ public partial class TrackViewModel : ObservableObject, IDisposable, IFilterable
         TrackScoreService scoreService,
         TrackNavigationService navigationService,
         IAppOptions appOptions,
+        IMessenger messenger,
         ILogger<TrackViewModel> logger)
     {
         _backdropLoader = Guard.Against.Null(backdropLoader);
@@ -189,13 +192,9 @@ public partial class TrackViewModel : ObservableObject, IDisposable, IFilterable
         _scoreService = Guard.Against.Null(scoreService);
         _navigationService = Guard.Against.Null(navigationService);
         _appOptions = Guard.Against.Null(appOptions);
+        _messenger = Guard.Against.Null(messenger);
 
-        SubscribeToMessages();
-    }
-
-    private void SubscribeToMessages()
-    {
-        Messenger.Subscribe<TrackScoreUpdateMessage>(TrackScoreUpdateMessageHandle);
+        _trackScoreUpdateSubscription = _messenger.Subscribe<TrackScoreUpdateMessage>(TrackScoreUpdateMessageHandle);
     }
 
     public async Task LoadDataAsync(long trackId)
@@ -346,7 +345,7 @@ public partial class TrackViewModel : ObservableObject, IDisposable, IFilterable
         if (!disposedValue)
         {
             if (disposing)
-                Messenger.Unsubscribe<TrackScoreUpdateMessage>(TrackScoreUpdateMessageHandle);
+                _trackScoreUpdateSubscription.Dispose();
 
             disposedValue = true;
         }

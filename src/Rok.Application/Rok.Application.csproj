@@ -6,13 +6,15 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="CleanArch.DevKit.Mediator" Version="1.0.0" />
+    <PackageReference Include="CleanArch.DevKit.Mediator.Behaviors" Version="1.0.0" />
+    <PackageReference Include="CleanArch.DevKit.Mediator.Results" Version="1.0.0" />
+    <PackageReference Include="CleanArch.DevKit.Mediator.Validation" Version="1.0.0" />
     <PackageReference Include="Dapper" Version="2.1.72" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.5" />
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="10.0.5" />
+    <PackageReference Include="CleanArch.DevKit.Messaging" Version="1.0.0" />
     <PackageReference Include="MiF.Guard" Version="1.0.0" />
-    <PackageReference Include="MiF.Mediator" Version="1.2.0" />
-    <PackageReference Include="MiF.Messenger" Version="1.0.0" />
-    <PackageReference Include="MiF.Result" Version="1.1.0" />
   </ItemGroup>
 
   <ItemGroup>

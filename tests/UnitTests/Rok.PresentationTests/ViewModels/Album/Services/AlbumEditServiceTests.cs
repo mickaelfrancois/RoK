@@ -1,16 +1,14 @@
-using MiF.Mediator.Interfaces;
-using Moq;
 using Rok.Application.Dto;
-using Rok.Application.Features.Albums.Command;
+using Rok.Application.Features.Albums.Requests;
 using Rok.ViewModels.Album.Services;
 
 namespace Rok.PresentationTests.ViewModels.Album.Services;
 
 public class AlbumEditServiceTests
 {
-    private readonly Mock<IMediator> _mediator = new();
+    private readonly FakeMediator _mediator = new();
 
-    private AlbumEditService BuildService() => new(_mediator.Object);
+    private AlbumEditService BuildService() => new(_mediator);
 
     [Fact(DisplayName = "UpdateFavoriteAsync should send the favorite command and update the album state")]
     public async Task UpdateFavoriteAsync_ShouldSendCommandAndUpdateState()
@@ -24,9 +22,9 @@ public class AlbumEditServiceTests
 
         // Assert
         Assert.True(album.IsFavorite);
-        _mediator.Verify(m => m.SendMessageAsync(
-            It.Is<UpdateAlbumFavoriteCommand>(c => c.Id == 5 && c.IsFavorite == true),
-            It.IsAny<CancellationToken>()), Times.Once);
+        UpdateAlbumFavoriteRequest sent = Assert.Single(_mediator.Sent<UpdateAlbumFavoriteRequest>());
+        Assert.Equal(5, sent.Id);
+        Assert.True(sent.IsFavorite);
     }
 
     [Fact(DisplayName = "UpdateTagsAsync should send the tags command for the given album")]
@@ -40,9 +38,9 @@ public class AlbumEditServiceTests
         await sut.UpdateTagsAsync(id: 5, tags);
 
         // Assert
-        _mediator.Verify(m => m.SendMessageAsync(
-            It.Is<UpdateAlbumTagsCommand>(c => c.Id == 5 && c.Tags.SequenceEqual(tags)),
-            It.IsAny<CancellationToken>()), Times.Once);
+        UpdateAlbumTagsRequest sent = Assert.Single(_mediator.Sent<UpdateAlbumTagsRequest>());
+        Assert.Equal(5, sent.Id);
+        Assert.True(sent.Tags.SequenceEqual(tags));
     }
 
     [Theory(DisplayName = "UpdatePictureDominantColorAsync should send the color command including null values")]
@@ -57,8 +55,8 @@ public class AlbumEditServiceTests
         await sut.UpdatePictureDominantColorAsync(id: 5, colorValue);
 
         // Assert
-        _mediator.Verify(m => m.SendMessageAsync(
-            It.Is<UpdateAlbumPictureDominantColorCommand>(c => c.Id == 5 && c.ColorValue == colorValue),
-            It.IsAny<CancellationToken>()), Times.Once);
+        UpdateAlbumPictureDominantColorRequest sent = Assert.Single(_mediator.Sent<UpdateAlbumPictureDominantColorRequest>());
+        Assert.Equal(5, sent.Id);
+        Assert.Equal(colorValue, sent.ColorValue);
     }
 }

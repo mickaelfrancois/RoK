@@ -1,10 +1,10 @@
-using MiF.Mediator.Interfaces;
-using MiF.Result;
+using CleanArch.DevKit.Mediator.Results;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using Rok.Application.Dto;
-using Rok.Application.Features.Playlists.Query;
-using Rok.Application.Features.Tracks.Query;
+using Rok.Application.Errors;
+using Rok.Application.Features.Playlists.Requests;
+using Rok.Application.Features.Tracks.Requests;
 using Rok.ViewModels.Playlist.Services;
 using Rok.ViewModels.Track;
 using Rok.ViewModels.Tracks.Interfaces;
@@ -13,18 +13,17 @@ namespace Rok.PresentationTests.ViewModels.Playlist.Services;
 
 public class PlaylistDataLoaderTests
 {
-    private readonly Mock<IMediator> _mediator = new();
+    private readonly FakeMediator _mediator = new();
     private readonly Mock<ITrackViewModelFactory> _vmFactory = new();
 
-    private PlaylistDataLoader BuildService() => new(_mediator.Object, _vmFactory.Object, NullLogger<PlaylistDataLoader>.Instance);
+    private PlaylistDataLoader BuildService() => new(_mediator, _vmFactory.Object, NullLogger<PlaylistDataLoader>.Instance);
 
     [Fact(DisplayName = "LoadPlaylistAsync should return the playlist when the mediator succeeds")]
     public async Task LoadPlaylistAsync_ShouldReturnPlaylist_WhenSuccess()
     {
         // Arrange
         PlaylistHeaderDto playlist = new() { Id = 7, Name = "Mix" };
-        _mediator.Setup(m => m.SendMessageAsync(It.IsAny<GetPlaylistByIdQuery>(), It.IsAny<CancellationToken>()))
-                 .ReturnsAsync(Result<PlaylistHeaderDto>.Success(playlist));
+        _mediator.Setup<GetPlaylistByIdRequest, Result<PlaylistHeaderDto>>().Returns(Result<PlaylistHeaderDto>.Ok(playlist));
         PlaylistDataLoader sut = BuildService();
 
         // Act
@@ -39,8 +38,7 @@ public class PlaylistDataLoaderTests
     public async Task LoadPlaylistAsync_ShouldReturnNull_WhenError()
     {
         // Arrange
-        _mediator.Setup(m => m.SendMessageAsync(It.IsAny<GetPlaylistByIdQuery>(), It.IsAny<CancellationToken>()))
-                 .ReturnsAsync(Result<PlaylistHeaderDto>.Fail("not found"));
+        _mediator.Setup<GetPlaylistByIdRequest, Result<PlaylistHeaderDto>>().Returns(Result<PlaylistHeaderDto>.Fail(new OperationError("playlist.not_found", "not found")));
         PlaylistDataLoader sut = BuildService();
 
         // Act
@@ -54,8 +52,7 @@ public class PlaylistDataLoaderTests
     public async Task LoadTracksAsync_ShouldReturnEmpty_WhenNoTracks()
     {
         // Arrange
-        _mediator.Setup(m => m.SendMessageAsync(It.IsAny<GetTracksByPlaylistIdQuery>(), It.IsAny<CancellationToken>()))
-                 .ReturnsAsync(new List<TrackDto>());
+        _mediator.Setup<GetTracksByPlaylistIdRequest, IEnumerable<TrackDto>>().Returns(new List<TrackDto>());
         PlaylistDataLoader sut = BuildService();
 
         // Act

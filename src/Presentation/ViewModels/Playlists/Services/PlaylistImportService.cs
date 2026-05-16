@@ -1,12 +1,13 @@
 using System.Threading;
 using Rok.Application.Features.Playlists;
-using Rok.Application.Features.Playlists.Command;
+using Rok.Application.Features.Playlists.Requests;
 
 namespace Rok.ViewModels.Playlists.Services;
 
 public sealed class PlaylistImportService(
     IMediator _mediator,
     IPlaylistFilePickerService _picker,
+    IMessenger _messenger,
     ILogger<PlaylistImportService> _logger)
 {
     public async Task RunAsync(CancellationToken cancellationToken)
@@ -25,16 +26,16 @@ public sealed class PlaylistImportService(
         {
             cancellationToken.ThrowIfCancellationRequested();
 
-            Result<PlaylistImportResult> result = await _mediator.SendMessageAsync(new ImportPlaylistCommand(file), cancellationToken);
+            Result<PlaylistImportResult> result = await _mediator.Send(new ImportPlaylistRequest(file), cancellationToken);
 
             if (!result.IsSuccess)
             {
                 failed++;
-                _logger.LogError("Import failed for {File}: {Error}", file, result.Error);
+                _logger.LogError("Import failed for {File}: {Error}", file, result.Errors[0]);
                 continue;
             }
 
-            switch (result.Value!.Status)
+            switch (result.Value.Status)
             {
                 case PlaylistImportStatus.Imported:
                     imported++;
@@ -48,7 +49,7 @@ public sealed class PlaylistImportService(
             }
         }
 
-        Messenger.Send(BuildToast(imported, tracksTotal, ignoredTotal, skipped, failed));
+        _messenger.Send(BuildToast(imported, tracksTotal, ignoredTotal, skipped, failed));
     }
 
     private static ShowNotificationMessage BuildToast(int imported, int tracks, int ignored, int skipped, int failed)
