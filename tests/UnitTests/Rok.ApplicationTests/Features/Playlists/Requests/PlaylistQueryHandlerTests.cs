@@ -20,7 +20,7 @@ public class GetPlaylistByIdRequestHandlerTests
         Result<PlaylistHeaderDto> result = await handler.Handle(new GetPlaylistByIdRequest(3), CancellationToken.None);
 
         // Assert
-        Assert.True(result.IsSuccess);
+        result.Should().BeSuccess();
         Assert.Equal("Favs", result.Value.Name);
     }
 
@@ -36,9 +36,7 @@ public class GetPlaylistByIdRequestHandlerTests
         Result<PlaylistHeaderDto> result = await handler.Handle(new GetPlaylistByIdRequest(99), CancellationToken.None);
 
         // Assert
-        Assert.True(result.IsFailure);
-        Assert.IsType<NotFoundError>(result.Errors[0]);
-        Assert.Equal("playlist.not_found", result.Errors[0].Code);
+        result.Should().BeFailure().And.HaveError<NotFoundError>().And.HaveErrorWithCode("playlist.not_found");
     }
 }
 

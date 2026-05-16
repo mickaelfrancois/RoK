@@ -18,7 +18,7 @@ public class UpdateScoreCommandHandlerTests
         Result<bool> result = await handler.Handle(new UpdateScoreRequest(1, 5), CancellationToken.None);
 
         // Assert
-        Assert.True(result.IsSuccess);
+        result.Should().BeSuccess();
         repository.Verify(r => r.UpdateScoreAsync(1, 5, It.IsAny<RepositoryConnectionKind>()), Times.Once);
     }
 
@@ -34,7 +34,7 @@ public class UpdateScoreCommandHandlerTests
         Result<bool> result = await handler.Handle(new UpdateScoreRequest(1, 5), CancellationToken.None);
 
         // Assert
-        Assert.False(result.IsSuccess);
+        result.Should().BeFailure();
     }
 }
 
@@ -52,7 +52,7 @@ public class UpdateSkipCountCommandHandlerTests
         Result<bool> result = await handler.Handle(new UpdateSkipCountRequest { TrackId = 1 }, CancellationToken.None);
 
         // Assert
-        Assert.True(result.IsSuccess);
+        result.Should().BeSuccess();
     }
 
     [Fact(DisplayName = "Handle should return failure when repository fails to update skip count")]
@@ -67,7 +67,7 @@ public class UpdateSkipCountCommandHandlerTests
         Result<bool> result = await handler.Handle(new UpdateSkipCountRequest { TrackId = 1 }, CancellationToken.None);
 
         // Assert
-        Assert.False(result.IsSuccess);
+        result.Should().BeFailure();
     }
 }
 
@@ -85,7 +85,7 @@ public class UpdateTrackLastListenCommandHandlerTests
         Result<bool> result = await handler.Handle(new UpdateTrackLastListenRequest(1), CancellationToken.None);
 
         // Assert
-        Assert.True(result.IsSuccess);
+        result.Should().BeSuccess();
     }
 
     [Fact(DisplayName = "Handle should return failure when repository fails to update last listen")]
@@ -100,7 +100,7 @@ public class UpdateTrackLastListenCommandHandlerTests
         Result<bool> result = await handler.Handle(new UpdateTrackLastListenRequest(1), CancellationToken.None);
 
         // Assert
-        Assert.False(result.IsSuccess);
+        result.Should().BeFailure();
     }
 }
 
@@ -118,7 +118,7 @@ public class ResetTrackListenCountCommandHandlerTests
         Result<bool> result = await handler.Handle(new ResetTrackListenCountRequest(), CancellationToken.None);
 
         // Assert
-        Assert.True(result.IsSuccess);
+        result.Should().BeSuccess();
     }
 
     [Fact(DisplayName = "Handle should return failure when repository fails to reset listen count")]
@@ -133,7 +133,7 @@ public class ResetTrackListenCountCommandHandlerTests
         Result<bool> result = await handler.Handle(new ResetTrackListenCountRequest(), CancellationToken.None);
 
         // Assert
-        Assert.False(result.IsSuccess);
+        result.Should().BeFailure();
     }
 }
 
@@ -151,7 +151,7 @@ public class UpdateTrackGetLyricsLastAttemptCommandHandlerTests
         Result<bool> result = await handler.Handle(new UpdateTrackGetLyricsLastAttemptRequest(1), CancellationToken.None);
 
         // Assert
-        Assert.True(result.IsSuccess);
+        result.Should().BeSuccess();
     }
 
     [Fact(DisplayName = "Handle should return failure when repository fails to update lyrics timestamp")]
@@ -166,6 +166,6 @@ public class UpdateTrackGetLyricsLastAttemptCommandHandlerTests
         Result<bool> result = await handler.Handle(new UpdateTrackGetLyricsLastAttemptRequest(1), CancellationToken.None);
 
         // Assert
-        Assert.False(result.IsSuccess);
+        result.Should().BeFailure();
     }
 }

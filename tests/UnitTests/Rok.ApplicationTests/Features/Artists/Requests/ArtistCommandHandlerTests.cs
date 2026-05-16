@@ -19,7 +19,7 @@ public class CreateArtistRequestHandlerTests
         Result<long> result = await handler.Handle(new CreateArtistRequest { Name = "Queen" }, CancellationToken.None);
 
         // Assert
-        Assert.True(result.IsSuccess);
+        result.Should().BeSuccess();
         Assert.Equal(42, result.Value);
     }
 
@@ -35,7 +35,7 @@ public class CreateArtistRequestHandlerTests
         Result<long> result = await handler.Handle(new CreateArtistRequest { Name = "Unknown" }, CancellationToken.None);
 
         // Assert
-        Assert.False(result.IsSuccess);
+        result.Should().BeFailure();
     }
 }
 
@@ -57,7 +57,7 @@ public class UpdateArtistRequestHandlerTests
         Result<bool> result = await handler.Handle(command, CancellationToken.None);
 
         // Assert
-        Assert.True(result.IsSuccess);
+        result.Should().BeSuccess();
         Assert.Equal("wiki", entity.WikipediaUrl);
         Assert.Equal("new bio", entity.Biography);
         Assert.True(entity.Disbanded);
@@ -77,7 +77,7 @@ public class UpdateArtistRequestHandlerTests
         Result<bool> result = await handler.Handle(new UpdateArtistRequest { Id = 1, Biography = "  " }, CancellationToken.None);
 
         // Assert
-        Assert.True(result.IsSuccess);
+        result.Should().BeSuccess();
         Assert.Equal("original bio", entity.Biography);
     }
 
@@ -93,7 +93,7 @@ public class UpdateArtistRequestHandlerTests
         Result<bool> result = await handler.Handle(new UpdateArtistRequest { Id = 99 }, CancellationToken.None);
 
         // Assert
-        Assert.False(result.IsSuccess);
+        result.Should().BeFailure();
     }
 }
 
@@ -111,7 +111,7 @@ public class DeleteArtistRequestHandlerTests
         Result<bool> result = await handler.Handle(new DeleteArtistRequest { Id = 5 }, CancellationToken.None);
 
         // Assert
-        Assert.True(result.IsSuccess);
+        result.Should().BeSuccess();
     }
 
     [Fact(DisplayName = "Handle should return failure when repository fails to delete artist")]
@@ -126,7 +126,7 @@ public class DeleteArtistRequestHandlerTests
         Result<bool> result = await handler.Handle(new DeleteArtistRequest { Id = 5 }, CancellationToken.None);
 
         // Assert
-        Assert.False(result.IsSuccess);
+        result.Should().BeFailure();
     }
 }
 
@@ -144,7 +144,7 @@ public class UpdateArtistFavoriteRequestHandlerTests
         Result<bool> result = await handler.Handle(new UpdateArtistFavoriteRequest(1, false), CancellationToken.None);
 
         // Assert
-        Assert.True(result.IsSuccess);
+        result.Should().BeSuccess();
     }
 
     [Fact(DisplayName = "Handle should return failure when repository fails to update favorite")]
@@ -159,7 +159,7 @@ public class UpdateArtistFavoriteRequestHandlerTests
         Result<bool> result = await handler.Handle(new UpdateArtistFavoriteRequest(1, true), CancellationToken.None);
 
         // Assert
-        Assert.False(result.IsSuccess);
+        result.Should().BeFailure();
     }
 }
 
@@ -177,7 +177,7 @@ public class ResetArtistListenCountRequestHandlerTests
         Result<bool> result = await handler.Handle(new ResetArtistListenCountRequest(), CancellationToken.None);
 
         // Assert
-        Assert.True(result.IsSuccess);
+        result.Should().BeSuccess();
     }
 
     [Fact(DisplayName = "Handle should return failure when repository fails to reset listen count")]
@@ -192,7 +192,7 @@ public class ResetArtistListenCountRequestHandlerTests
         Result<bool> result = await handler.Handle(new ResetArtistListenCountRequest(), CancellationToken.None);
 
         // Assert
-        Assert.False(result.IsSuccess);
+        result.Should().BeFailure();
     }
 }
 
@@ -210,7 +210,7 @@ public class UpdateArtistLastListenRequestHandlerTests
         Result<bool> result = await handler.Handle(new UpdateArtistLastListenRequest(1), CancellationToken.None);
 
         // Assert
-        Assert.True(result.IsSuccess);
+        result.Should().BeSuccess();
     }
 
     [Fact(DisplayName = "Handle should return failure when repository fails to update last listen")]
@@ -225,7 +225,7 @@ public class UpdateArtistLastListenRequestHandlerTests
         Result<bool> result = await handler.Handle(new UpdateArtistLastListenRequest(1), CancellationToken.None);
 
         // Assert
-        Assert.False(result.IsSuccess);
+        result.Should().BeFailure();
     }
 }
 
@@ -243,7 +243,7 @@ public class UpdateArtistPictureDominantColorRequestHandlerTests
         Result<bool> result = await handler.Handle(new UpdateArtistPictureDominantColorRequest(1, 123L), CancellationToken.None);
 
         // Assert
-        Assert.True(result.IsSuccess);
+        result.Should().BeSuccess();
     }
 
     [Fact(DisplayName = "Handle should return failure when repository fails to update dominant color")]
@@ -258,7 +258,7 @@ public class UpdateArtistPictureDominantColorRequestHandlerTests
         Result<bool> result = await handler.Handle(new UpdateArtistPictureDominantColorRequest(1, null), CancellationToken.None);
 
         // Assert
-        Assert.False(result.IsSuccess);
+        result.Should().BeFailure();
     }
 }
 
@@ -285,7 +285,7 @@ public class UpdateArtistStatisticsRequestHandlerTests
         Result<bool> result = await handler.Handle(command, CancellationToken.None);
 
         // Assert
-        Assert.True(result.IsSuccess);
+        result.Should().BeSuccess();
     }
 
     [Fact(DisplayName = "Handle should normalize zero year bounds to null before saving")]
@@ -301,7 +301,7 @@ public class UpdateArtistStatisticsRequestHandlerTests
         Result<bool> result = await handler.Handle(command, CancellationToken.None);
 
         // Assert
-        Assert.True(result.IsSuccess);
+        result.Should().BeSuccess();
         Assert.Null(command.YearMini);
         Assert.Null(command.YearMaxi);
     }
@@ -318,7 +318,7 @@ public class UpdateArtistStatisticsRequestHandlerTests
         Result<bool> result = await handler.Handle(new UpdateArtistStatisticsRequest(1), CancellationToken.None);
 
         // Assert
-        Assert.False(result.IsSuccess);
+        result.Should().BeFailure();
     }
 }
 
@@ -336,7 +336,7 @@ public class UpdateArtistGetMetaDataLastAttemptRequestHandlerTests
         Result<bool> result = await handler.Handle(new UpdateArtistGetMetaDataLastAttemptRequest(1), CancellationToken.None);
 
         // Assert
-        Assert.True(result.IsSuccess);
+        result.Should().BeSuccess();
     }
 
     [Fact(DisplayName = "Handle should return failure when repository fails to update metadata timestamp")]
@@ -351,7 +351,7 @@ public class UpdateArtistGetMetaDataLastAttemptRequestHandlerTests
         Result<bool> result = await handler.Handle(new UpdateArtistGetMetaDataLastAttemptRequest(1), CancellationToken.None);
 
         // Assert
-        Assert.False(result.IsSuccess);
+        result.Should().BeFailure();
     }
 }
 
@@ -370,7 +370,7 @@ public class UpdateArtistTagsRequestHandlerTests
         Result<bool> result = await handler.Handle(new UpdateArtistTagsRequest(1, tags), CancellationToken.None);
 
         // Assert
-        Assert.True(result.IsSuccess);
+        result.Should().BeSuccess();
         repository.Verify(r => r.UpdateEntityTagsAsync(1, tags, "artisttags", "artistid"), Times.Once);
     }
 
@@ -386,6 +386,6 @@ public class UpdateArtistTagsRequestHandlerTests
         Result<bool> result = await handler.Handle(new UpdateArtistTagsRequest(1, Array.Empty<string>()), CancellationToken.None);
 
         // Assert
-        Assert.False(result.IsSuccess);
+        result.Should().BeFailure();
     }
 }

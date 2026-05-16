@@ -18,7 +18,7 @@ public class UpdateGenreFavoriteRequestHandlerTests
         Result<bool> result = await handler.Handle(new UpdateGenreFavoriteRequest(1, true), CancellationToken.None);
 
         // Assert
-        Assert.True(result.IsSuccess);
+        result.Should().BeSuccess();
     }
 
     [Fact(DisplayName = "Handle should return failure when repository fails to update favorite")]
@@ -33,7 +33,7 @@ public class UpdateGenreFavoriteRequestHandlerTests
         Result<bool> result = await handler.Handle(new UpdateGenreFavoriteRequest(1, false), CancellationToken.None);
 
         // Assert
-        Assert.False(result.IsSuccess);
+        result.Should().BeFailure();
     }
 }
 
@@ -51,7 +51,7 @@ public class UpdateGenretLastListenRequestHandlerTests
         Result<bool> result = await handler.Handle(new UpdateGenretLastListenRequest(1), CancellationToken.None);
 
         // Assert
-        Assert.True(result.IsSuccess);
+        result.Should().BeSuccess();
     }
 
     [Fact(DisplayName = "Handle should return failure when repository fails to update last listen")]
@@ -66,7 +66,7 @@ public class UpdateGenretLastListenRequestHandlerTests
         Result<bool> result = await handler.Handle(new UpdateGenretLastListenRequest(1), CancellationToken.None);
 
         // Assert
-        Assert.False(result.IsSuccess);
+        result.Should().BeFailure();
     }
 }
 
@@ -84,7 +84,7 @@ public class ResetGenreListenCountRequestHandlerTests
         Result<bool> result = await handler.Handle(new ResetGenreListenCountRequest(), CancellationToken.None);
 
         // Assert
-        Assert.True(result.IsSuccess);
+        result.Should().BeSuccess();
     }
 
     [Fact(DisplayName = "Handle should return failure when repository fails to reset listen count")]
@@ -99,7 +99,7 @@ public class ResetGenreListenCountRequestHandlerTests
         Result<bool> result = await handler.Handle(new ResetGenreListenCountRequest(), CancellationToken.None);
 
         // Assert
-        Assert.False(result.IsSuccess);
+        result.Should().BeFailure();
     }
 }
 
@@ -118,7 +118,7 @@ public class GetGenreByIdRequestHandlerTests
         Result<GenreDto> result = await handler.Handle(new GetGenreByIdRequest(2), CancellationToken.None);
 
         // Assert
-        Assert.True(result.IsSuccess);
+        result.Should().BeSuccess();
         Assert.Equal("Rock", result.Value.Name);
     }
 
@@ -134,9 +134,7 @@ public class GetGenreByIdRequestHandlerTests
         Result<GenreDto> result = await handler.Handle(new GetGenreByIdRequest(999), CancellationToken.None);
 
         // Assert
-        Assert.True(result.IsFailure);
-        Assert.IsType<NotFoundError>(result.Errors[0]);
-        Assert.Equal("genre.not_found", result.Errors[0].Code);
+        result.Should().BeFailure().And.HaveError<NotFoundError>().And.HaveErrorWithCode("genre.not_found");
     }
 }
 

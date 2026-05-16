@@ -19,7 +19,7 @@ public class UpdateAlbumFavoriteRequestHandlerTests
         Result<bool> result = await handler.Handle(new UpdateAlbumFavoriteRequest(1, true), CancellationToken.None);
 
         // Assert
-        Assert.True(result.IsSuccess);
+        result.Should().BeSuccess();
     }
 
     [Fact(DisplayName = "Handle should return failure when repository fails to update favorite")]
@@ -34,7 +34,7 @@ public class UpdateAlbumFavoriteRequestHandlerTests
         Result<bool> result = await handler.Handle(new UpdateAlbumFavoriteRequest(1, true), CancellationToken.None);
 
         // Assert
-        Assert.False(result.IsSuccess);
+        result.Should().BeFailure();
     }
 }
 
@@ -52,7 +52,7 @@ public class UpdateAlbumLastListenRequestHandlerTests
         Result<bool> result = await handler.Handle(new UpdateAlbumLastListenRequest(1), CancellationToken.None);
 
         // Assert
-        Assert.True(result.IsSuccess);
+        result.Should().BeSuccess();
     }
 
     [Fact(DisplayName = "Handle should return failure when repository fails to update last listen")]
@@ -67,7 +67,7 @@ public class UpdateAlbumLastListenRequestHandlerTests
         Result<bool> result = await handler.Handle(new UpdateAlbumLastListenRequest(1), CancellationToken.None);
 
         // Assert
-        Assert.False(result.IsSuccess);
+        result.Should().BeFailure();
     }
 }
 
@@ -85,7 +85,7 @@ public class ResetAlbumListenCountRequestHandlerTests
         Result<bool> result = await handler.Handle(new ResetAlbumListenCountRequest(), CancellationToken.None);
 
         // Assert
-        Assert.True(result.IsSuccess);
+        result.Should().BeSuccess();
     }
 
     [Fact(DisplayName = "Handle should return failure when repository fails to reset listen count")]
@@ -100,7 +100,7 @@ public class ResetAlbumListenCountRequestHandlerTests
         Result<bool> result = await handler.Handle(new ResetAlbumListenCountRequest(), CancellationToken.None);
 
         // Assert
-        Assert.False(result.IsSuccess);
+        result.Should().BeFailure();
     }
 }
 
@@ -119,7 +119,7 @@ public class UpdateAlbumStatisticsRequestHandlerTests
         Result<bool> result = await handler.Handle(command, CancellationToken.None);
 
         // Assert
-        Assert.True(result.IsSuccess);
+        result.Should().BeSuccess();
         repository.Verify(r => r.UpdateStatisticsAsync(5, 12, 3600, It.IsAny<RepositoryConnectionKind>()), Times.Once);
     }
 
@@ -135,7 +135,7 @@ public class UpdateAlbumStatisticsRequestHandlerTests
         Result<bool> result = await handler.Handle(new UpdateAlbumStatisticsRequest(1), CancellationToken.None);
 
         // Assert
-        Assert.False(result.IsSuccess);
+        result.Should().BeFailure();
     }
 }
 
@@ -153,7 +153,7 @@ public class UpdateAlbumPictureDominantColorRequestHandlerTests
         Result<bool> result = await handler.Handle(new UpdateAlbumPictureDominantColorRequest(1, 255L), CancellationToken.None);
 
         // Assert
-        Assert.True(result.IsSuccess);
+        result.Should().BeSuccess();
     }
 
     [Fact(DisplayName = "Handle should return failure when repository fails to update dominant color")]
@@ -168,7 +168,7 @@ public class UpdateAlbumPictureDominantColorRequestHandlerTests
         Result<bool> result = await handler.Handle(new UpdateAlbumPictureDominantColorRequest(1, null), CancellationToken.None);
 
         // Assert
-        Assert.False(result.IsSuccess);
+        result.Should().BeFailure();
     }
 }
 
@@ -186,7 +186,7 @@ public class UpdateAlbumGetMetaDataLastAttemptRequestHandlerTests
         Result<bool> result = await handler.Handle(new UpdateAlbumGetMetaDataLastAttemptRequest(1), CancellationToken.None);
 
         // Assert
-        Assert.True(result.IsSuccess);
+        result.Should().BeSuccess();
     }
 
     [Fact(DisplayName = "Handle should return failure when repository fails to update metadata timestamp")]
@@ -201,7 +201,7 @@ public class UpdateAlbumGetMetaDataLastAttemptRequestHandlerTests
         Result<bool> result = await handler.Handle(new UpdateAlbumGetMetaDataLastAttemptRequest(1), CancellationToken.None);
 
         // Assert
-        Assert.False(result.IsSuccess);
+        result.Should().BeFailure();
     }
 }
 
@@ -220,7 +220,7 @@ public class UpdateAlbumTagsRequestHandlerTests
         Result<bool> result = await handler.Handle(new UpdateAlbumTagsRequest(1, tags), CancellationToken.None);
 
         // Assert
-        Assert.True(result.IsSuccess);
+        result.Should().BeSuccess();
         repository.Verify(r => r.UpdateEntityTagsAsync(1, tags, "albumtags", "albumid"), Times.Once);
     }
 
@@ -236,7 +236,7 @@ public class UpdateAlbumTagsRequestHandlerTests
         Result<bool> result = await handler.Handle(new UpdateAlbumTagsRequest(1, Array.Empty<string>()), CancellationToken.None);
 
         // Assert
-        Assert.False(result.IsSuccess);
+        result.Should().BeFailure();
     }
 }
 
@@ -260,7 +260,7 @@ public class UpdateAlbumRequestHandlerTests
         Result<bool> result = await handler.Handle(command, CancellationToken.None);
 
         // Assert
-        Assert.True(result.IsSuccess);
+        result.Should().BeSuccess();
         Assert.Equal("New label", entity.Label);
         Assert.True(entity.IsLive);
     }
@@ -282,7 +282,7 @@ public class UpdateAlbumRequestHandlerTests
         Result<bool> result = await handler.Handle(command, CancellationToken.None);
 
         // Assert
-        Assert.True(result.IsSuccess);
+        result.Should().BeSuccess();
         Assert.Equal("mbid-123", entity.MusicBrainzID);
         Assert.Null(entity.GetMetaDataLastAttempt);
     }
@@ -299,7 +299,7 @@ public class UpdateAlbumRequestHandlerTests
         Result<bool> result = await handler.Handle(new UpdateAlbumRequest { Id = 99 }, CancellationToken.None);
 
         // Assert
-        Assert.False(result.IsSuccess);
+        result.Should().BeFailure();
     }
 
     [Fact(DisplayName = "Handle should return failure when repository fails to update album")]
@@ -316,6 +316,6 @@ public class UpdateAlbumRequestHandlerTests
         Result<bool> result = await handler.Handle(new UpdateAlbumRequest { Id = 1 }, CancellationToken.None);
 
         // Assert
-        Assert.False(result.IsSuccess);
+        result.Should().BeFailure();
     }
 }

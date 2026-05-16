@@ -21,7 +21,7 @@ public class SaveEqualizerPresetRequestHandlerTests
         Result<bool> result = await handler.Handle(request, CancellationToken.None);
 
         // Assert
-        Assert.True(result.IsSuccess);
+        result.Should().BeSuccess();
         repository.Verify(r => r.SaveAsync(It.Is<EqualizerPresetEntity>(e => e.Scope == EqualizerScope.Track && e.ScopeId == 42 && e.Bands == bands)), Times.Once);
     }
 }
@@ -39,7 +39,7 @@ public class DeleteEqualizerPresetRequestHandlerTests
         Result<bool> result = await handler.Handle(new DeleteEqualizerPresetRequest { Scope = EqualizerScope.Album, ScopeId = 5 }, CancellationToken.None);
 
         // Assert
-        Assert.True(result.IsSuccess);
+        result.Should().BeSuccess();
         repository.Verify(r => r.DeleteAsync(EqualizerScope.Album, 5L), Times.Once);
     }
 }
@@ -59,7 +59,7 @@ public class GetEqualizerPresetRequestHandlerTests
         Result<EqualizerPresetDto> result = await handler.Handle(new GetEqualizerPresetRequest(EqualizerScope.Artist, 3), CancellationToken.None);
 
         // Assert
-        Assert.True(result.IsSuccess);
+        result.Should().BeSuccess();
         Assert.Equal(EqualizerScope.Artist, result.Value.Scope);
     }
 
@@ -75,9 +75,7 @@ public class GetEqualizerPresetRequestHandlerTests
         Result<EqualizerPresetDto> result = await handler.Handle(new GetEqualizerPresetRequest(EqualizerScope.Default, null), CancellationToken.None);
 
         // Assert
-        Assert.True(result.IsFailure);
-        Assert.IsType<NotFoundError>(result.Errors[0]);
-        Assert.Equal("equalizerpreset.not_found", result.Errors[0].Code);
+        result.Should().BeFailure().And.HaveError<NotFoundError>().And.HaveErrorWithCode("equalizerpreset.not_found");
     }
 }
 

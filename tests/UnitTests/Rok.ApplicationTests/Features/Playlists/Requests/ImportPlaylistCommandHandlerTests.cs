@@ -68,7 +68,7 @@ public class ImportPlaylistRequestHandlerTests : IDisposable
             Result<PlaylistImportResult> result = await sut.Handle(new ImportPlaylistRequest(path), CancellationToken.None);
 
             // Assert
-            Assert.True(result.IsSuccess);
+            result.Should().BeSuccess();
             Assert.Equal(PlaylistImportStatus.Imported, result.Value.Status);
             Assert.Equal(2, result.Value.MatchedCount);
             Assert.Equal(1, result.Value.IgnoredCount);
@@ -99,7 +99,7 @@ public class ImportPlaylistRequestHandlerTests : IDisposable
             Result<PlaylistImportResult> result = await sut.Handle(new ImportPlaylistRequest(path), CancellationToken.None);
 
             // Assert
-            Assert.True(result.IsSuccess);
+            result.Should().BeSuccess();
             Assert.Equal(PlaylistImportStatus.Skipped, result.Value.Status);
             Assert.Equal(0, _connection.ExecuteScalar<int>("SELECT COUNT(*) FROM playlists"));
         }
@@ -127,7 +127,7 @@ public class ImportPlaylistRequestHandlerTests : IDisposable
             Result<PlaylistImportResult> result = await sut.Handle(new ImportPlaylistRequest(path), CancellationToken.None);
 
             // Assert
-            Assert.True(result.IsSuccess);
+            result.Should().BeSuccess();
             Assert.Equal("Mix (2)", result.Value.FinalName);
         }
         finally
@@ -158,7 +158,7 @@ public class ImportPlaylistRequestHandlerTests : IDisposable
             Result<PlaylistImportResult> result = await sut.Handle(new ImportPlaylistRequest(path), CancellationToken.None);
 
             // Assert
-            Assert.True(result.IsSuccess);
+            result.Should().BeSuccess();
             List<int> positions = _connection.Query<int>("SELECT position FROM playlisttracks WHERE playlistId = @id ORDER BY position", new { id = result.Value.PlaylistId }).ToList();
             Assert.Equal(new[] { 0, 1, 2 }, positions);
         }
@@ -183,7 +183,7 @@ public class ImportPlaylistRequestHandlerTests : IDisposable
             Result<PlaylistImportResult> result = await sut.Handle(new ImportPlaylistRequest(path), CancellationToken.None);
 
             // Assert
-            Assert.False(result.IsSuccess);
+            result.Should().BeFailure();
         }
         finally
         {
@@ -207,7 +207,7 @@ public class ImportPlaylistRequestHandlerTests : IDisposable
             Result<PlaylistImportResult> result = await sut.Handle(new ImportPlaylistRequest(path), CancellationToken.None);
 
             // Assert
-            Assert.False(result.IsSuccess);
+            result.Should().BeFailure();
             Assert.Equal(0, _connection.ExecuteScalar<int>("SELECT COUNT(*) FROM playlists"));
         }
         finally
@@ -264,7 +264,7 @@ public class ImportPlaylistRequestHandlerTests : IDisposable
             Result<PlaylistImportResult> result = await sut.Handle(new ImportPlaylistRequest(path), CancellationToken.None);
 
             // Assert
-            Assert.True(result.IsSuccess);
+            result.Should().BeSuccess();
             Assert.Equal("Mix (4)", result.Value.FinalName);
         }
         finally
@@ -295,7 +295,7 @@ public class ImportPlaylistRequestHandlerTests : IDisposable
             Result<PlaylistImportResult> result = await sut.Handle(new ImportPlaylistRequest(path), CancellationToken.None);
 
             // Assert
-            Assert.True(result.IsSuccess);
+            result.Should().BeSuccess();
             Assert.Equal(1, result.Value.MatchedCount);
             Assert.Equal(2, result.Value.IgnoredCount);
         }
@@ -347,7 +347,7 @@ public class ImportPlaylistRequestHandlerTests : IDisposable
             Result<PlaylistImportResult> result = await sut.Handle(new ImportPlaylistRequest(path), CancellationToken.None);
 
             // Assert
-            Assert.False(result.IsSuccess);
+            result.Should().BeFailure();
             Assert.Equal(0, _connection.ExecuteScalar<int>("SELECT COUNT(*) FROM playlists"));
         }
         finally
@@ -377,7 +377,7 @@ public class ImportPlaylistRequestHandlerTests : IDisposable
             Result<PlaylistImportResult> result = await sut.Handle(new ImportPlaylistRequest(path), CancellationToken.None);
 
             // Assert
-            Assert.True(result.IsSuccess);
+            result.Should().BeSuccess();
             Assert.Equal(result.Value.PlaylistId, receivedId);
         }
         finally

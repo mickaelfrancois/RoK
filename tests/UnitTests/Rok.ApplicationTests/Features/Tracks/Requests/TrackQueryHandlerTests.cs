@@ -19,7 +19,7 @@ public class GetTrackByIdQueryHandlerTests
         Result<TrackDto> result = await handler.Handle(new GetTrackByIdRequest(3), CancellationToken.None);
 
         // Assert
-        Assert.True(result.IsSuccess);
+        result.Should().BeSuccess();
         Assert.Equal(3, result.Value.Id);
         Assert.Equal("Bohemian Rhapsody", result.Value.Title);
     }
@@ -36,9 +36,7 @@ public class GetTrackByIdQueryHandlerTests
         Result<TrackDto> result = await handler.Handle(new GetTrackByIdRequest(999), CancellationToken.None);
 
         // Assert
-        Assert.True(result.IsFailure);
-        Assert.IsType<NotFoundError>(result.Errors[0]);
-        Assert.Equal("track.not_found", result.Errors[0].Code);
+        result.Should().BeFailure().And.HaveError<NotFoundError>().And.HaveErrorWithCode("track.not_found");
     }
 }
 

@@ -18,7 +18,7 @@ public class CreateListeningEventCommandHandlerTests
         Result<long> result = await handler.Handle(command, CancellationToken.None);
 
         // Assert
-        Assert.True(result.IsSuccess);
+        result.Should().BeSuccess();
         Assert.Equal(0, result.Value);
         repository.Verify(r => r.AddAsync(It.IsAny<ListeningEventEntity>(), It.IsAny<RepositoryConnectionKind>()), Times.Never);
     }
@@ -39,7 +39,7 @@ public class CreateListeningEventCommandHandlerTests
         Result<long> result = await handler.Handle(command, CancellationToken.None);
 
         // Assert
-        Assert.True(result.IsSuccess);
+        result.Should().BeSuccess();
         Assert.Equal(88, result.Value);
         Assert.NotNull(capturedEntity);
         Assert.True(capturedEntity!.WasSkipped);
@@ -63,7 +63,7 @@ public class CreateListeningEventCommandHandlerTests
         Result<long> result = await handler.Handle(command, CancellationToken.None);
 
         // Assert
-        Assert.True(result.IsSuccess);
+        result.Should().BeSuccess();
         Assert.Equal(7, result.Value);
         Assert.NotNull(capturedEntity);
         Assert.False(capturedEntity!.WasSkipped);
@@ -82,6 +82,6 @@ public class CreateListeningEventCommandHandlerTests
         Result<long> result = await handler.Handle(command, CancellationToken.None);
 
         // Assert
-        Assert.False(result.IsSuccess);
+        result.Should().BeFailure();
     }
 }

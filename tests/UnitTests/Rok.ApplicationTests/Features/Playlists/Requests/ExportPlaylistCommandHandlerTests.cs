@@ -54,7 +54,7 @@ public class ExportPlaylistRequestHandlerTests
             Result result = await sut.Handle(new ExportPlaylistRequest(1, final), CancellationToken.None);
 
             // Assert
-            Assert.True(result.IsSuccess);
+            result.Should().BeSuccess();
             Assert.NotNull(captured);
             Assert.Equal("Mix", captured!.Name);
             Assert.Equal(2, captured.Entries.Count);
@@ -86,7 +86,7 @@ public class ExportPlaylistRequestHandlerTests
             Result result = await sut.Handle(new ExportPlaylistRequest(1, final), CancellationToken.None);
 
             // Assert
-            Assert.True(result.IsSuccess);
+            result.Should().BeSuccess();
             Assert.Empty(_mediator.Sent<GeneratePlaylistTracksRequest>());
         }
         finally
@@ -118,7 +118,7 @@ public class ExportPlaylistRequestHandlerTests
             Result result = await sut.Handle(new ExportPlaylistRequest(1, final), CancellationToken.None);
 
             // Assert
-            Assert.True(result.IsSuccess);
+            result.Should().BeSuccess();
             Assert.NotNull(captured);
             Assert.Empty(captured!.Entries);
         }
@@ -144,7 +144,7 @@ public class ExportPlaylistRequestHandlerTests
             Result result = await sut.Handle(new ExportPlaylistRequest(1, final), CancellationToken.None);
 
             // Assert
-            Assert.False(result.IsSuccess);
+            result.Should().BeFailure();
             _writer.Verify(w => w.WriteAsync(It.IsAny<Stream>(), It.IsAny<PlaylistFileModel>(), It.IsAny<CancellationToken>()), Times.Never);
         }
         finally
@@ -174,7 +174,7 @@ public class ExportPlaylistRequestHandlerTests
             Result result = await sut.Handle(new ExportPlaylistRequest(1, weirdPath), CancellationToken.None);
 
             // Assert
-            Assert.False(result.IsSuccess);
+            result.Should().BeFailure();
         }
         finally
         {

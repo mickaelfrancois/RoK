@@ -19,7 +19,7 @@ public class CreatePlaylistRequestHandlerTests
         Result<long> result = await handler.Handle(new CreatePlaylistRequest { Name = "My mix" }, CancellationToken.None);
 
         // Assert
-        Assert.True(result.IsSuccess);
+        result.Should().BeSuccess();
         Assert.Equal(42, result.Value);
     }
 
@@ -35,7 +35,7 @@ public class CreatePlaylistRequestHandlerTests
         Result<long> result = await handler.Handle(new CreatePlaylistRequest { Name = "X" }, CancellationToken.None);
 
         // Assert
-        Assert.False(result.IsSuccess);
+        result.Should().BeFailure();
     }
 }
 
@@ -53,7 +53,7 @@ public class UpdatePlaylistRequestHandlerTests
         Result result = await handler.Handle(new UpdatePlaylistRequest { Id = 1, Name = "N" }, CancellationToken.None);
 
         // Assert
-        Assert.True(result.IsSuccess);
+        result.Should().BeSuccess();
     }
 
     [Fact(DisplayName = "Handle should return failure when repository fails to update playlist")]
@@ -68,7 +68,7 @@ public class UpdatePlaylistRequestHandlerTests
         Result result = await handler.Handle(new UpdatePlaylistRequest { Id = 1 }, CancellationToken.None);
 
         // Assert
-        Assert.False(result.IsSuccess);
+        result.Should().BeFailure();
     }
 }
 
@@ -86,7 +86,7 @@ public class DeletePlaylistRequestHandlerTests
         Result<bool> result = await handler.Handle(new DeletePlaylistRequest { Id = 7 }, CancellationToken.None);
 
         // Assert
-        Assert.True(result.IsSuccess);
+        result.Should().BeSuccess();
     }
 
     [Fact(DisplayName = "Handle should return failure when no row is deleted")]
@@ -101,7 +101,7 @@ public class DeletePlaylistRequestHandlerTests
         Result<bool> result = await handler.Handle(new DeletePlaylistRequest { Id = 7 }, CancellationToken.None);
 
         // Assert
-        Assert.False(result.IsSuccess);
+        result.Should().BeFailure();
     }
 }
 
@@ -147,7 +147,7 @@ public class AddTrackToPlaylistRequestHandlerTests
         Result<long> result = await handler.Handle(new AddTrackToPlaylistRequest { PlaylistId = 1, TrackId = 5 }, CancellationToken.None);
 
         // Assert
-        Assert.True(result.IsSuccess);
+        result.Should().BeSuccess();
         Assert.Equal(99, result.Value);
         Assert.Equal(3, header.TrackCount);
         Assert.Equal(600, header.Duration);
@@ -165,7 +165,7 @@ public class AddTrackToPlaylistRequestHandlerTests
         Result<long> result = await handler.Handle(new AddTrackToPlaylistRequest { PlaylistId = 1, TrackId = 5 }, CancellationToken.None);
 
         // Assert
-        Assert.False(result.IsSuccess);
+        result.Should().BeFailure();
     }
 
     [Fact(DisplayName = "Handle should return failure when playlist does not exist")]
@@ -183,7 +183,7 @@ public class AddTrackToPlaylistRequestHandlerTests
         Result<long> result = await handler.Handle(new AddTrackToPlaylistRequest { PlaylistId = 1, TrackId = 5 }, CancellationToken.None);
 
         // Assert
-        Assert.False(result.IsSuccess);
+        result.Should().BeFailure();
     }
 
     [Fact(DisplayName = "Handle should return DUPLICATE failure when track already exists in playlist")]
@@ -203,7 +203,7 @@ public class AddTrackToPlaylistRequestHandlerTests
         Result<long> result = await handler.Handle(new AddTrackToPlaylistRequest { PlaylistId = 1, TrackId = 5 }, CancellationToken.None);
 
         // Assert
-        Assert.False(result.IsSuccess);
+        result.Should().BeFailure();
         trackLinkRepository.Verify(r => r.AddAsync(It.IsAny<PlaylistTrackEntity>(), It.IsAny<RepositoryConnectionKind>()), Times.Never);
     }
 
@@ -225,7 +225,7 @@ public class AddTrackToPlaylistRequestHandlerTests
         Result<long> result = await handler.Handle(new AddTrackToPlaylistRequest { PlaylistId = 1, TrackId = 5 }, CancellationToken.None);
 
         // Assert
-        Assert.False(result.IsSuccess);
+        result.Should().BeFailure();
     }
 }
 
@@ -260,7 +260,7 @@ public class AddAlbumToPlaylistRequestHandlerTests
         Result<long> result = await handler.Handle(new AddAlbumToPlaylistRequest { PlaylistId = 10, AlbumId = 5 }, CancellationToken.None);
 
         // Assert
-        Assert.True(result.IsSuccess);
+        result.Should().BeSuccess();
         Assert.Equal(2, result.Value);
         trackLinkRepository.Verify(r => r.AddAsync(It.IsAny<PlaylistTrackEntity>(), It.IsAny<RepositoryConnectionKind>()), Times.Exactly(2));
         Assert.Equal(2, header.TrackCount);
@@ -282,7 +282,7 @@ public class AddAlbumToPlaylistRequestHandlerTests
         Result<long> result = await handler.Handle(new AddAlbumToPlaylistRequest { PlaylistId = 99, AlbumId = 5 }, CancellationToken.None);
 
         // Assert
-        Assert.False(result.IsSuccess);
+        result.Should().BeFailure();
     }
 
     [Fact(DisplayName = "Handle should return failure when no new track was added")]
@@ -303,7 +303,7 @@ public class AddAlbumToPlaylistRequestHandlerTests
         Result<long> result = await handler.Handle(new AddAlbumToPlaylistRequest { PlaylistId = 10, AlbumId = 1 }, CancellationToken.None);
 
         // Assert
-        Assert.False(result.IsSuccess);
+        result.Should().BeFailure();
     }
 
     [Fact(DisplayName = "Handle should return failure when repository throws inside transaction")]
@@ -325,7 +325,7 @@ public class AddAlbumToPlaylistRequestHandlerTests
         Result<long> result = await handler.Handle(new AddAlbumToPlaylistRequest { PlaylistId = 10, AlbumId = 5 }, CancellationToken.None);
 
         // Assert
-        Assert.False(result.IsSuccess);
+        result.Should().BeFailure();
     }
 }
 
@@ -357,7 +357,7 @@ public class AddArtistToPlaylistRequestHandlerTests
         Result<long> result = await handler.Handle(new AddArtistToPlaylistRequest { PlaylistId = 10, ArtistId = 7 }, CancellationToken.None);
 
         // Assert
-        Assert.True(result.IsSuccess);
+        result.Should().BeSuccess();
         Assert.Equal(2, result.Value);
         Assert.Equal(2, header.TrackCount);
         Assert.Equal(300, header.Duration);
@@ -382,7 +382,7 @@ public class AddArtistToPlaylistRequestHandlerTests
         Result<long> result = await handler.Handle(new AddArtistToPlaylistRequest { PlaylistId = 10, ArtistId = 7 }, CancellationToken.None);
 
         // Assert
-        Assert.False(result.IsSuccess);
+        result.Should().BeFailure();
     }
 }
 
@@ -410,7 +410,7 @@ public class RemoveTrackFromPlaylistRequestHandlerTests
         Result result = await handler.Handle(new RemoveTrackFromPlaylistRequest { PlaylistId = 10, TrackId = 5 }, CancellationToken.None);
 
         // Assert
-        Assert.True(result.IsSuccess);
+        result.Should().BeSuccess();
         Assert.Equal(1, header.TrackCount);
         Assert.Equal(280, header.Duration);
     }
@@ -437,7 +437,7 @@ public class RemoveTrackFromPlaylistRequestHandlerTests
         Result result = await handler.Handle(new RemoveTrackFromPlaylistRequest { PlaylistId = 10, TrackId = 5 }, CancellationToken.None);
 
         // Assert
-        Assert.True(result.IsSuccess);
+        result.Should().BeSuccess();
         Assert.Equal(0, header.TrackCount);
         Assert.Equal(0, header.Duration);
     }
@@ -459,7 +459,7 @@ public class RemoveTrackFromPlaylistRequestHandlerTests
         Result result = await handler.Handle(new RemoveTrackFromPlaylistRequest { PlaylistId = 10, TrackId = 5 }, CancellationToken.None);
 
         // Assert
-        Assert.False(result.IsSuccess);
+        result.Should().BeFailure();
     }
 
     [Fact(DisplayName = "Handle should return failure when repository throws inside transaction")]
@@ -480,7 +480,7 @@ public class RemoveTrackFromPlaylistRequestHandlerTests
         Result result = await handler.Handle(new RemoveTrackFromPlaylistRequest { PlaylistId = 10, TrackId = 5 }, CancellationToken.None);
 
         // Assert
-        Assert.False(result.IsSuccess);
+        result.Should().BeFailure();
     }
 }
 
@@ -538,7 +538,7 @@ public class MovePlaylistTracksRequestHandlerTests
         Result<bool> result = await handler.Handle(command, CancellationToken.None);
 
         // Assert
-        Assert.True(result.IsSuccess);
+        result.Should().BeSuccess();
         repository.Verify(r => r.UpdatePositionAsync(102, 0, It.IsAny<RepositoryConnectionKind>()), Times.Once);
         repository.Verify(r => r.UpdatePositionAsync(100, 2, It.IsAny<RepositoryConnectionKind>()), Times.Once);
         repository.Verify(r => r.UpdatePositionAsync(101, It.IsAny<int>(), It.IsAny<RepositoryConnectionKind>()), Times.Never);
@@ -562,7 +562,7 @@ public class MovePlaylistTracksRequestHandlerTests
         Result<bool> result = await handler.Handle(new MovePlaylistTracksRequest { PlaylistId = 10, Tracks = new List<long> { 2, 1 } }, CancellationToken.None);
 
         // Assert
-        Assert.False(result.IsSuccess);
+        result.Should().BeFailure();
     }
 
     [Fact(DisplayName = "Handle should return failure when repository throws inside transaction")]
@@ -577,6 +577,6 @@ public class MovePlaylistTracksRequestHandlerTests
         Result<bool> result = await handler.Handle(new MovePlaylistTracksRequest { PlaylistId = 10, Tracks = new List<long> { 1, 2 } }, CancellationToken.None);
 
         // Assert
-        Assert.False(result.IsSuccess);
+        result.Should().BeFailure();
     }
 }
