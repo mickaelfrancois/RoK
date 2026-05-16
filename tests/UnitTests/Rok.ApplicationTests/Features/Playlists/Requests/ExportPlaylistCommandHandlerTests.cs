@@ -144,7 +144,7 @@ public class ExportPlaylistRequestHandlerTests
             Result result = await sut.Handle(new ExportPlaylistRequest(1, final), CancellationToken.None);
 
             // Assert
-            result.Should().BeFailure();
+            result.Should().BeFailure().And.HaveError<NotFoundError>().And.HaveErrorWithCode("playlist.not_found");
             _writer.Verify(w => w.WriteAsync(It.IsAny<Stream>(), It.IsAny<PlaylistFileModel>(), It.IsAny<CancellationToken>()), Times.Never);
         }
         finally
@@ -174,7 +174,7 @@ public class ExportPlaylistRequestHandlerTests
             Result result = await sut.Handle(new ExportPlaylistRequest(1, weirdPath), CancellationToken.None);
 
             // Assert
-            result.Should().BeFailure();
+            result.Should().BeFailure().And.HaveError<OperationError>().And.HaveErrorWithCode("playlist.unsupported_format");
         }
         finally
         {

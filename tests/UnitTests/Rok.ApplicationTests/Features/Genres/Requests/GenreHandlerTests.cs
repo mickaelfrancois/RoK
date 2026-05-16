@@ -33,7 +33,7 @@ public class UpdateGenreFavoriteRequestHandlerTests
         Result<bool> result = await handler.Handle(new UpdateGenreFavoriteRequest(1, false), CancellationToken.None);
 
         // Assert
-        result.Should().BeFailure();
+        result.Should().BeFailure().And.HaveError<OperationError>().And.HaveErrorWithCode("genre.favorite_update_failed");
     }
 }
 
@@ -66,7 +66,7 @@ public class UpdateGenretLastListenRequestHandlerTests
         Result<bool> result = await handler.Handle(new UpdateGenretLastListenRequest(1), CancellationToken.None);
 
         // Assert
-        result.Should().BeFailure();
+        result.Should().BeFailure().And.HaveError<OperationError>().And.HaveErrorWithCode("genre.last_listen_update_failed");
     }
 }
 
@@ -99,7 +99,7 @@ public class ResetGenreListenCountRequestHandlerTests
         Result<bool> result = await handler.Handle(new ResetGenreListenCountRequest(), CancellationToken.None);
 
         // Assert
-        result.Should().BeFailure();
+        result.Should().BeFailure().And.HaveError<OperationError>().And.HaveErrorWithCode("genre.listen_count_reset_failed");
     }
 }
 

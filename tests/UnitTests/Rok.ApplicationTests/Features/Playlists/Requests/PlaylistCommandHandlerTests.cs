@@ -35,7 +35,7 @@ public class CreatePlaylistRequestHandlerTests
         Result<long> result = await handler.Handle(new CreatePlaylistRequest { Name = "X" }, CancellationToken.None);
 
         // Assert
-        result.Should().BeFailure();
+        result.Should().BeFailure().And.HaveError<OperationError>().And.HaveErrorWithCode("playlist.create_failed");
     }
 }
 
@@ -68,7 +68,7 @@ public class UpdatePlaylistRequestHandlerTests
         Result result = await handler.Handle(new UpdatePlaylistRequest { Id = 1 }, CancellationToken.None);
 
         // Assert
-        result.Should().BeFailure();
+        result.Should().BeFailure().And.HaveError<OperationError>().And.HaveErrorWithCode("playlist.update_failed");
     }
 }
 
@@ -101,7 +101,7 @@ public class DeletePlaylistRequestHandlerTests
         Result<bool> result = await handler.Handle(new DeletePlaylistRequest { Id = 7 }, CancellationToken.None);
 
         // Assert
-        result.Should().BeFailure();
+        result.Should().BeFailure().And.HaveError<OperationError>().And.HaveErrorWithCode("playlist.delete_failed");
     }
 }
 
@@ -165,7 +165,7 @@ public class AddTrackToPlaylistRequestHandlerTests
         Result<long> result = await handler.Handle(new AddTrackToPlaylistRequest { PlaylistId = 1, TrackId = 5 }, CancellationToken.None);
 
         // Assert
-        result.Should().BeFailure();
+        result.Should().BeFailure().And.HaveError<NotFoundError>().And.HaveErrorWithCode("track.not_found");
     }
 
     [Fact(DisplayName = "Handle should return failure when playlist does not exist")]
@@ -183,7 +183,7 @@ public class AddTrackToPlaylistRequestHandlerTests
         Result<long> result = await handler.Handle(new AddTrackToPlaylistRequest { PlaylistId = 1, TrackId = 5 }, CancellationToken.None);
 
         // Assert
-        result.Should().BeFailure();
+        result.Should().BeFailure().And.HaveError<NotFoundError>().And.HaveErrorWithCode("playlist.not_found");
     }
 
     [Fact(DisplayName = "Handle should return DUPLICATE failure when track already exists in playlist")]
@@ -203,7 +203,7 @@ public class AddTrackToPlaylistRequestHandlerTests
         Result<long> result = await handler.Handle(new AddTrackToPlaylistRequest { PlaylistId = 1, TrackId = 5 }, CancellationToken.None);
 
         // Assert
-        result.Should().BeFailure();
+        result.Should().BeFailure().And.HaveError<ConflictError>().And.HaveErrorWithCode("playlist.duplicate_track");
         trackLinkRepository.Verify(r => r.AddAsync(It.IsAny<PlaylistTrackEntity>(), It.IsAny<RepositoryConnectionKind>()), Times.Never);
     }
 
@@ -225,7 +225,7 @@ public class AddTrackToPlaylistRequestHandlerTests
         Result<long> result = await handler.Handle(new AddTrackToPlaylistRequest { PlaylistId = 1, TrackId = 5 }, CancellationToken.None);
 
         // Assert
-        result.Should().BeFailure();
+        result.Should().BeFailure().And.HaveError<OperationError>().And.HaveErrorWithCode("playlist.add_track_transaction_failed");
     }
 }
 
@@ -282,7 +282,7 @@ public class AddAlbumToPlaylistRequestHandlerTests
         Result<long> result = await handler.Handle(new AddAlbumToPlaylistRequest { PlaylistId = 99, AlbumId = 5 }, CancellationToken.None);
 
         // Assert
-        result.Should().BeFailure();
+        result.Should().BeFailure().And.HaveError<NotFoundError>().And.HaveErrorWithCode("playlist.not_found");
     }
 
     [Fact(DisplayName = "Handle should return failure when no new track was added")]
@@ -303,7 +303,7 @@ public class AddAlbumToPlaylistRequestHandlerTests
         Result<long> result = await handler.Handle(new AddAlbumToPlaylistRequest { PlaylistId = 10, AlbumId = 1 }, CancellationToken.None);
 
         // Assert
-        result.Should().BeFailure();
+        result.Should().BeFailure().And.HaveError<OperationError>().And.HaveErrorWithCode("playlist.add_album_no_tracks");
     }
 
     [Fact(DisplayName = "Handle should return failure when repository throws inside transaction")]
@@ -325,7 +325,7 @@ public class AddAlbumToPlaylistRequestHandlerTests
         Result<long> result = await handler.Handle(new AddAlbumToPlaylistRequest { PlaylistId = 10, AlbumId = 5 }, CancellationToken.None);
 
         // Assert
-        result.Should().BeFailure();
+        result.Should().BeFailure().And.HaveError<OperationError>().And.HaveErrorWithCode("playlist.add_album_transaction_failed");
     }
 }
 
@@ -382,7 +382,7 @@ public class AddArtistToPlaylistRequestHandlerTests
         Result<long> result = await handler.Handle(new AddArtistToPlaylistRequest { PlaylistId = 10, ArtistId = 7 }, CancellationToken.None);
 
         // Assert
-        result.Should().BeFailure();
+        result.Should().BeFailure().And.HaveError<OperationError>().And.HaveErrorWithCode("playlist.add_artist_transaction_failed");
     }
 }
 
@@ -459,7 +459,7 @@ public class RemoveTrackFromPlaylistRequestHandlerTests
         Result result = await handler.Handle(new RemoveTrackFromPlaylistRequest { PlaylistId = 10, TrackId = 5 }, CancellationToken.None);
 
         // Assert
-        result.Should().BeFailure();
+        result.Should().BeFailure().And.HaveError<OperationError>().And.HaveErrorWithCode("playlist.track_not_in_playlist");
     }
 
     [Fact(DisplayName = "Handle should return failure when repository throws inside transaction")]
@@ -480,7 +480,7 @@ public class RemoveTrackFromPlaylistRequestHandlerTests
         Result result = await handler.Handle(new RemoveTrackFromPlaylistRequest { PlaylistId = 10, TrackId = 5 }, CancellationToken.None);
 
         // Assert
-        result.Should().BeFailure();
+        result.Should().BeFailure().And.HaveError<OperationError>().And.HaveErrorWithCode("playlist.remove_track_failed");
     }
 }
 
@@ -562,7 +562,7 @@ public class MovePlaylistTracksRequestHandlerTests
         Result<bool> result = await handler.Handle(new MovePlaylistTracksRequest { PlaylistId = 10, Tracks = new List<long> { 2, 1 } }, CancellationToken.None);
 
         // Assert
-        result.Should().BeFailure();
+        result.Should().BeFailure().And.HaveError<OperationError>().And.HaveErrorWithCode("playlist.move_tracks_failed");
     }
 
     [Fact(DisplayName = "Handle should return failure when repository throws inside transaction")]
@@ -577,6 +577,6 @@ public class MovePlaylistTracksRequestHandlerTests
         Result<bool> result = await handler.Handle(new MovePlaylistTracksRequest { PlaylistId = 10, Tracks = new List<long> { 1, 2 } }, CancellationToken.None);
 
         // Assert
-        result.Should().BeFailure();
+        result.Should().BeFailure().And.HaveError<OperationError>().And.HaveErrorWithCode("playlist.move_tracks_failed");
     }
 }

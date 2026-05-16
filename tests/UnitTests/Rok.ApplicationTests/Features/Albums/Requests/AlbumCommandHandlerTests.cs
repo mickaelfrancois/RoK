@@ -34,7 +34,7 @@ public class UpdateAlbumFavoriteRequestHandlerTests
         Result<bool> result = await handler.Handle(new UpdateAlbumFavoriteRequest(1, true), CancellationToken.None);
 
         // Assert
-        result.Should().BeFailure();
+        result.Should().BeFailure().And.HaveError<OperationError>().And.HaveErrorWithCode("album.favorite_update_failed");
     }
 }
 
@@ -67,7 +67,7 @@ public class UpdateAlbumLastListenRequestHandlerTests
         Result<bool> result = await handler.Handle(new UpdateAlbumLastListenRequest(1), CancellationToken.None);
 
         // Assert
-        result.Should().BeFailure();
+        result.Should().BeFailure().And.HaveError<OperationError>().And.HaveErrorWithCode("album.last_listen_update_failed");
     }
 }
 
@@ -100,7 +100,7 @@ public class ResetAlbumListenCountRequestHandlerTests
         Result<bool> result = await handler.Handle(new ResetAlbumListenCountRequest(), CancellationToken.None);
 
         // Assert
-        result.Should().BeFailure();
+        result.Should().BeFailure().And.HaveError<OperationError>().And.HaveErrorWithCode("album.listen_count_reset_failed");
     }
 }
 
@@ -135,7 +135,7 @@ public class UpdateAlbumStatisticsRequestHandlerTests
         Result<bool> result = await handler.Handle(new UpdateAlbumStatisticsRequest(1), CancellationToken.None);
 
         // Assert
-        result.Should().BeFailure();
+        result.Should().BeFailure().And.HaveError<OperationError>().And.HaveErrorWithCode("album.statistics_update_failed");
     }
 }
 
@@ -168,7 +168,7 @@ public class UpdateAlbumPictureDominantColorRequestHandlerTests
         Result<bool> result = await handler.Handle(new UpdateAlbumPictureDominantColorRequest(1, null), CancellationToken.None);
 
         // Assert
-        result.Should().BeFailure();
+        result.Should().BeFailure().And.HaveError<OperationError>().And.HaveErrorWithCode("album.picture_dominant_color_update_failed");
     }
 }
 
@@ -201,7 +201,7 @@ public class UpdateAlbumGetMetaDataLastAttemptRequestHandlerTests
         Result<bool> result = await handler.Handle(new UpdateAlbumGetMetaDataLastAttemptRequest(1), CancellationToken.None);
 
         // Assert
-        result.Should().BeFailure();
+        result.Should().BeFailure().And.HaveError<OperationError>().And.HaveErrorWithCode("album.meta_attempt_update_failed");
     }
 }
 
@@ -236,7 +236,7 @@ public class UpdateAlbumTagsRequestHandlerTests
         Result<bool> result = await handler.Handle(new UpdateAlbumTagsRequest(1, Array.Empty<string>()), CancellationToken.None);
 
         // Assert
-        result.Should().BeFailure();
+        result.Should().BeFailure().And.HaveError<OperationError>().And.HaveErrorWithCode("album.tags_update_failed");
     }
 }
 
@@ -299,7 +299,7 @@ public class UpdateAlbumRequestHandlerTests
         Result<bool> result = await handler.Handle(new UpdateAlbumRequest { Id = 99 }, CancellationToken.None);
 
         // Assert
-        result.Should().BeFailure();
+        result.Should().BeFailure().And.HaveError<NotFoundError>().And.HaveErrorWithCode("album.not_found");
     }
 
     [Fact(DisplayName = "Handle should return failure when repository fails to update album")]
@@ -316,6 +316,6 @@ public class UpdateAlbumRequestHandlerTests
         Result<bool> result = await handler.Handle(new UpdateAlbumRequest { Id = 1 }, CancellationToken.None);
 
         // Assert
-        result.Should().BeFailure();
+        result.Should().BeFailure().And.HaveError<OperationError>().And.HaveErrorWithCode("album.update_failed");
     }
 }

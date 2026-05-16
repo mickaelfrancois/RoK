@@ -34,7 +34,7 @@ public class UpdateScoreCommandHandlerTests
         Result<bool> result = await handler.Handle(new UpdateScoreRequest(1, 5), CancellationToken.None);
 
         // Assert
-        result.Should().BeFailure();
+        result.Should().BeFailure().And.HaveError<OperationError>().And.HaveErrorWithCode("track.score_update_failed");
     }
 }
 
@@ -67,7 +67,7 @@ public class UpdateSkipCountCommandHandlerTests
         Result<bool> result = await handler.Handle(new UpdateSkipCountRequest { TrackId = 1 }, CancellationToken.None);
 
         // Assert
-        result.Should().BeFailure();
+        result.Should().BeFailure().And.HaveError<OperationError>().And.HaveErrorWithCode("track.skip_count_update_failed");
     }
 }
 
@@ -100,7 +100,7 @@ public class UpdateTrackLastListenCommandHandlerTests
         Result<bool> result = await handler.Handle(new UpdateTrackLastListenRequest(1), CancellationToken.None);
 
         // Assert
-        result.Should().BeFailure();
+        result.Should().BeFailure().And.HaveError<OperationError>().And.HaveErrorWithCode("track.last_listen_update_failed");
     }
 }
 
@@ -133,7 +133,7 @@ public class ResetTrackListenCountCommandHandlerTests
         Result<bool> result = await handler.Handle(new ResetTrackListenCountRequest(), CancellationToken.None);
 
         // Assert
-        result.Should().BeFailure();
+        result.Should().BeFailure().And.HaveError<OperationError>().And.HaveErrorWithCode("track.listen_count_reset_failed");
     }
 }
 
@@ -166,6 +166,6 @@ public class UpdateTrackGetLyricsLastAttemptCommandHandlerTests
         Result<bool> result = await handler.Handle(new UpdateTrackGetLyricsLastAttemptRequest(1), CancellationToken.None);
 
         // Assert
-        result.Should().BeFailure();
+        result.Should().BeFailure().And.HaveError<OperationError>().And.HaveErrorWithCode("track.lyrics_attempt_update_failed");
     }
 }

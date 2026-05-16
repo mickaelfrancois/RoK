@@ -82,6 +82,6 @@ public class CreateListeningEventCommandHandlerTests
         Result<long> result = await handler.Handle(command, CancellationToken.None);
 
         // Assert
-        result.Should().BeFailure();
+        result.Should().BeFailure().And.HaveError<OperationError>().And.HaveErrorWithCode("listening_event.create_failed");
     }
 }

@@ -183,7 +183,7 @@ public class ImportPlaylistRequestHandlerTests : IDisposable
             Result<PlaylistImportResult> result = await sut.Handle(new ImportPlaylistRequest(path), CancellationToken.None);
 
             // Assert
-            result.Should().BeFailure();
+            result.Should().BeFailure().And.HaveError<OperationError>().And.HaveErrorWithCode("playlist.unsupported_format");
         }
         finally
         {
@@ -207,7 +207,7 @@ public class ImportPlaylistRequestHandlerTests : IDisposable
             Result<PlaylistImportResult> result = await sut.Handle(new ImportPlaylistRequest(path), CancellationToken.None);
 
             // Assert
-            result.Should().BeFailure();
+            result.Should().BeFailure().And.HaveError<OperationError>().And.HaveErrorWithCode("playlist.parse_error");
             Assert.Equal(0, _connection.ExecuteScalar<int>("SELECT COUNT(*) FROM playlists"));
         }
         finally
@@ -347,7 +347,7 @@ public class ImportPlaylistRequestHandlerTests : IDisposable
             Result<PlaylistImportResult> result = await sut.Handle(new ImportPlaylistRequest(path), CancellationToken.None);
 
             // Assert
-            result.Should().BeFailure();
+            result.Should().BeFailure().And.HaveError<OperationError>().And.HaveErrorWithCode("playlist.database_error");
             Assert.Equal(0, _connection.ExecuteScalar<int>("SELECT COUNT(*) FROM playlists"));
         }
         finally

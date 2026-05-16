@@ -35,7 +35,7 @@ public class CreateArtistRequestHandlerTests
         Result<long> result = await handler.Handle(new CreateArtistRequest { Name = "Unknown" }, CancellationToken.None);
 
         // Assert
-        result.Should().BeFailure();
+        result.Should().BeFailure().And.HaveError<OperationError>().And.HaveErrorWithCode("artist.create_failed");
     }
 }
 
@@ -93,7 +93,7 @@ public class UpdateArtistRequestHandlerTests
         Result<bool> result = await handler.Handle(new UpdateArtistRequest { Id = 99 }, CancellationToken.None);
 
         // Assert
-        result.Should().BeFailure();
+        result.Should().BeFailure().And.HaveError<NotFoundError>().And.HaveErrorWithCode("artist.not_found");
     }
 }
 
@@ -126,7 +126,7 @@ public class DeleteArtistRequestHandlerTests
         Result<bool> result = await handler.Handle(new DeleteArtistRequest { Id = 5 }, CancellationToken.None);
 
         // Assert
-        result.Should().BeFailure();
+        result.Should().BeFailure().And.HaveError<OperationError>().And.HaveErrorWithCode("artist.delete_failed");
     }
 }
 
@@ -159,7 +159,7 @@ public class UpdateArtistFavoriteRequestHandlerTests
         Result<bool> result = await handler.Handle(new UpdateArtistFavoriteRequest(1, true), CancellationToken.None);
 
         // Assert
-        result.Should().BeFailure();
+        result.Should().BeFailure().And.HaveError<OperationError>().And.HaveErrorWithCode("artist.favorite_update_failed");
     }
 }
 
@@ -192,7 +192,7 @@ public class ResetArtistListenCountRequestHandlerTests
         Result<bool> result = await handler.Handle(new ResetArtistListenCountRequest(), CancellationToken.None);
 
         // Assert
-        result.Should().BeFailure();
+        result.Should().BeFailure().And.HaveError<OperationError>().And.HaveErrorWithCode("artist.listen_count_reset_failed");
     }
 }
 
@@ -225,7 +225,7 @@ public class UpdateArtistLastListenRequestHandlerTests
         Result<bool> result = await handler.Handle(new UpdateArtistLastListenRequest(1), CancellationToken.None);
 
         // Assert
-        result.Should().BeFailure();
+        result.Should().BeFailure().And.HaveError<OperationError>().And.HaveErrorWithCode("artist.last_listen_update_failed");
     }
 }
 
@@ -258,7 +258,7 @@ public class UpdateArtistPictureDominantColorRequestHandlerTests
         Result<bool> result = await handler.Handle(new UpdateArtistPictureDominantColorRequest(1, null), CancellationToken.None);
 
         // Assert
-        result.Should().BeFailure();
+        result.Should().BeFailure().And.HaveError<OperationError>().And.HaveErrorWithCode("artist.picture_dominant_color_update_failed");
     }
 }
 
@@ -318,7 +318,7 @@ public class UpdateArtistStatisticsRequestHandlerTests
         Result<bool> result = await handler.Handle(new UpdateArtistStatisticsRequest(1), CancellationToken.None);
 
         // Assert
-        result.Should().BeFailure();
+        result.Should().BeFailure().And.HaveError<OperationError>().And.HaveErrorWithCode("artist.statistics_update_failed");
     }
 }
 
@@ -351,7 +351,7 @@ public class UpdateArtistGetMetaDataLastAttemptRequestHandlerTests
         Result<bool> result = await handler.Handle(new UpdateArtistGetMetaDataLastAttemptRequest(1), CancellationToken.None);
 
         // Assert
-        result.Should().BeFailure();
+        result.Should().BeFailure().And.HaveError<OperationError>().And.HaveErrorWithCode("artist.meta_attempt_update_failed");
     }
 }
 
@@ -386,6 +386,6 @@ public class UpdateArtistTagsRequestHandlerTests
         Result<bool> result = await handler.Handle(new UpdateArtistTagsRequest(1, Array.Empty<string>()), CancellationToken.None);
 
         // Assert
-        result.Should().BeFailure();
+        result.Should().BeFailure().And.HaveError<OperationError>().And.HaveErrorWithCode("artist.tags_update_failed");
     }
 }
