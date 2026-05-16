@@ -1,7 +1,6 @@
 using System.Data;
 using Dapper;
 using Microsoft.Extensions.Logging;
-using MiF.SimpleMessenger;
 using Rok.Application.Features.Playlists.IO;
 using Rok.Application.Features.Playlists.Messages;
 using Rok.Application.Interfaces.Repositories;
@@ -15,6 +14,7 @@ public sealed class ImportPlaylistRequestHandler(
     IPlaylistFormatResolver _resolver,
     ITrackRepository _trackRepository,
     IDbConnection _connection,
+    IMessenger _messenger,
     ILogger<ImportPlaylistRequestHandler> _logger)
     : IRequestHandler<ImportPlaylistRequest, Result<PlaylistImportResult>>
 {
@@ -139,7 +139,7 @@ public sealed class ImportPlaylistRequestHandler(
             }
         }
 
-        Messenger.Send(new PlaylistImportedMessage(playlistId));
+        _messenger.Send(new PlaylistImportedMessage(playlistId));
 
         _logger.LogInformation("Imported playlist {Name} (Id={Id}): {Matched} tracks, {Ignored} ignored", finalName, playlistId, matched.Count, ignored);
 

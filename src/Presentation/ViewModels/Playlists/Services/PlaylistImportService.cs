@@ -7,6 +7,7 @@ namespace Rok.ViewModels.Playlists.Services;
 public sealed class PlaylistImportService(
     IMediator _mediator,
     IPlaylistFilePickerService _picker,
+    IMessenger _messenger,
     ILogger<PlaylistImportService> _logger)
 {
     public async Task RunAsync(CancellationToken cancellationToken)
@@ -48,7 +49,7 @@ public sealed class PlaylistImportService(
             }
         }
 
-        Messenger.Send(BuildToast(imported, tracksTotal, ignoredTotal, skipped, failed));
+        _messenger.Send(BuildToast(imported, tracksTotal, ignoredTotal, skipped, failed));
     }
 
     private static ShowNotificationMessage BuildToast(int imported, int tracks, int ignored, int skipped, int failed)

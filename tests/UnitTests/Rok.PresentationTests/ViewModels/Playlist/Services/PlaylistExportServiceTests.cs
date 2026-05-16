@@ -11,9 +11,10 @@ public class PlaylistExportServiceTests
 {
     private readonly Mock<IMediator> _mediator = new();
     private readonly Mock<IPlaylistExportPrompts> _prompts = new();
+    private readonly IMessenger _messenger = new Messenger();
 
     private PlaylistExportService BuildService()
-        => new(_mediator.Object, _prompts.Object, NullLogger<PlaylistExportService>.Instance);
+        => new(_mediator.Object, _prompts.Object, _messenger, NullLogger<PlaylistExportService>.Instance);
 
     [Fact(DisplayName = "shows_warning_dialog_for_smart_playlist_before_picker")]
     public async Task Shows_warning_dialog_for_smart_playlist_before_picker()

@@ -1,6 +1,5 @@
 using CleanArch.DevKit.Mediator.Results;
 using Rok.Application.Errors;
-using MiF.SimpleMessenger;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using Rok.Application.Features.Playlists;
@@ -15,9 +14,10 @@ public class PlaylistImportServiceTests
 {
     private readonly Mock<IMediator> _mediator = new();
     private readonly Mock<IPlaylistFilePickerService> _picker = new();
+    private readonly IMessenger _messenger = new Messenger();
 
     private PlaylistImportService BuildService()
-        => new(_mediator.Object, _picker.Object, NullLogger<PlaylistImportService>.Instance);
+        => new(_mediator.Object, _picker.Object, _messenger, NullLogger<PlaylistImportService>.Instance);
 
     private static Result<PlaylistImportResult> Imported(int matched, int ignored)
         => Result<PlaylistImportResult>.Ok(new PlaylistImportResult(PlaylistImportStatus.Imported, 1, "Mix", matched, ignored));
@@ -34,7 +34,7 @@ public class PlaylistImportServiceTests
         // Arrange
         ShowNotificationMessage? captured = null;
         void Listen(ShowNotificationMessage m) => captured = m;
-        Messenger.Subscribe<ShowNotificationMessage>(Listen);
+        _messenger.Subscribe<ShowNotificationMessage>(Listen);
         try
         {
             _picker.Setup(p => p.PickPlaylistFilesAsync()).ReturnsAsync(Array.Empty<string>());
@@ -50,7 +50,7 @@ public class PlaylistImportServiceTests
         }
         finally
         {
-            try { Messenger.Unsubscribe<ShowNotificationMessage>(Listen); } catch { }
+            // _messenger is instance-scoped to this test, no manual unsubscribe needed
         }
     }
 
@@ -60,7 +60,7 @@ public class PlaylistImportServiceTests
         // Arrange
         ShowNotificationMessage? captured = null;
         void Listen(ShowNotificationMessage m) => captured = m;
-        Messenger.Subscribe<ShowNotificationMessage>(Listen);
+        _messenger.Subscribe<ShowNotificationMessage>(Listen);
         try
         {
             _picker.Setup(p => p.PickPlaylistFilesAsync()).ReturnsAsync(new[] { "a.m3u8", "b.m3u8" });
@@ -82,7 +82,7 @@ public class PlaylistImportServiceTests
         }
         finally
         {
-            try { Messenger.Unsubscribe<ShowNotificationMessage>(Listen); } catch { }
+            // _messenger is instance-scoped to this test, no manual unsubscribe needed
         }
     }
 
@@ -92,7 +92,7 @@ public class PlaylistImportServiceTests
         // Arrange
         ShowNotificationMessage? captured = null;
         void Listen(ShowNotificationMessage m) => captured = m;
-        Messenger.Subscribe<ShowNotificationMessage>(Listen);
+        _messenger.Subscribe<ShowNotificationMessage>(Listen);
         try
         {
             _picker.Setup(p => p.PickPlaylistFilesAsync()).ReturnsAsync(new[] { "a.m3u8", "b.m3u8" });
@@ -112,7 +112,7 @@ public class PlaylistImportServiceTests
         }
         finally
         {
-            try { Messenger.Unsubscribe<ShowNotificationMessage>(Listen); } catch { }
+            // _messenger is instance-scoped to this test, no manual unsubscribe needed
         }
     }
 
@@ -122,7 +122,7 @@ public class PlaylistImportServiceTests
         // Arrange
         ShowNotificationMessage? captured = null;
         void Listen(ShowNotificationMessage m) => captured = m;
-        Messenger.Subscribe<ShowNotificationMessage>(Listen);
+        _messenger.Subscribe<ShowNotificationMessage>(Listen);
         try
         {
             _picker.Setup(p => p.PickPlaylistFilesAsync()).ReturnsAsync(new[] { "a.m3u8", "b.m3u8" });
@@ -141,7 +141,7 @@ public class PlaylistImportServiceTests
         }
         finally
         {
-            try { Messenger.Unsubscribe<ShowNotificationMessage>(Listen); } catch { }
+            // _messenger is instance-scoped to this test, no manual unsubscribe needed
         }
     }
 
@@ -151,7 +151,7 @@ public class PlaylistImportServiceTests
         // Arrange
         ShowNotificationMessage? captured = null;
         void Listen(ShowNotificationMessage m) => captured = m;
-        Messenger.Subscribe<ShowNotificationMessage>(Listen);
+        _messenger.Subscribe<ShowNotificationMessage>(Listen);
         try
         {
             _picker.Setup(p => p.PickPlaylistFilesAsync()).ReturnsAsync(new[] { "a.m3u8" });
@@ -169,7 +169,7 @@ public class PlaylistImportServiceTests
         }
         finally
         {
-            try { Messenger.Unsubscribe<ShowNotificationMessage>(Listen); } catch { }
+            // _messenger is instance-scoped to this test, no manual unsubscribe needed
         }
     }
 }

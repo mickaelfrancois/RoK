@@ -18,6 +18,8 @@ public partial class PlaylistsViewModel : ObservableObject, IDisposable
     private readonly PlaylistUpdateMessageHandler _updateHandler;
     private readonly PlaylistImportedMessageHandler _importedHandler;
     private readonly IAppOptions _appOptions;
+    private readonly IMessenger _messenger;
+    private readonly List<IDisposable> _subscriptions = new();
 
     public RangeObservableCollection<PlaylistViewModel> Playlists { get; private set; } = [];
 
@@ -38,6 +40,7 @@ public partial class PlaylistsViewModel : ObservableObject, IDisposable
         PlaylistUpdateMessageHandler updateHandler,
         PlaylistImportedMessageHandler importedHandler,
         IAppOptions appOptions,
+        IMessenger messenger,
         ILogger<PlaylistsViewModel> logger)
     {
         _dataLoader = Guard.Against.Null(dataLoader);
@@ -46,6 +49,7 @@ public partial class PlaylistsViewModel : ObservableObject, IDisposable
         _updateHandler = Guard.Against.Null(updateHandler);
         _importedHandler = Guard.Against.Null(importedHandler);
         _appOptions = Guard.Against.Null(appOptions);
+        _messenger = Guard.Against.Null(messenger);
         _logger = Guard.Against.Null(logger);
 
         SubscribeToMessages();
@@ -55,8 +59,8 @@ public partial class PlaylistsViewModel : ObservableObject, IDisposable
 
     private void SubscribeToMessages()
     {
-        Messenger.Subscribe<PlaylistUpdatedMessage>(async (message) => await _updateHandler.HandleAsync(message));
-        Messenger.Subscribe<PlaylistImportedMessage>(async (message) => await _importedHandler.HandleAsync(message));
+        _subscriptions.Add(_messenger.Subscribe<PlaylistUpdatedMessage>(async (message) => await _updateHandler.HandleAsync(message)));
+        _subscriptions.Add(_messenger.Subscribe<PlaylistImportedMessage>(async (message) => await _importedHandler.HandleAsync(message)));
     }
 
     private void SubscribeToEvents()
@@ -137,6 +141,10 @@ public partial class PlaylistsViewModel : ObservableObject, IDisposable
         {
             if (disposing)
             {
+                foreach (IDisposable subscription in _subscriptions)
+                    subscription.Dispose();
+                _subscriptions.Clear();
+
                 _updateHandler.DataChanged -= OnDataChanged;
                 _importedHandler.DataChanged -= OnDataChanged;
                 _dataLoader.Clear();

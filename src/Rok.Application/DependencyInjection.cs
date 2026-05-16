@@ -1,6 +1,7 @@
 using CleanArch.DevKit.Mediator;
 using CleanArch.DevKit.Mediator.Results;
 using CleanArch.DevKit.Mediator.Validation;
+using CleanArch.DevKit.Messaging;
 using Microsoft.Extensions.DependencyInjection;
 using Rok.Application.Features.Albums.Services;
 using Rok.Application.Features.Artists.Services;
@@ -35,6 +36,7 @@ public static class DependencyInjection
         services.AddValidators();
         services.AddValidationBehavior();
         services.AddResultBehavior();
+        services.AddMessenger();
 
         services.AddTransient(typeof(IPipelineBehavior<,>), typeof(LoggingPipelineBehavior<,>));
 

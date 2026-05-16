@@ -43,6 +43,7 @@ public class PlayerServiceSmtcTests
             smtcService: smtc.Object,
             albumPicture: picture.Object,
             timeProvider: time,
+            messenger: new Messenger(),
             logger: NullLogger<PlayerService>.Instance);
 
         // Act
@@ -85,6 +86,7 @@ public class PlayerServiceSmtcTests
             smtcService: smtc.Object,
             albumPicture: picture.Object,
             timeProvider: time,
+            messenger: new Messenger(),
             logger: NullLogger<PlayerService>.Instance);
 
         // Act
@@ -118,7 +120,7 @@ public class PlayerServiceSmtcTests
         PlayerService sut = new(
             callMock.Object, engine.Object, optionsMock.Object,
             discordService: null, smtcService: smtc.Object, albumPicture: picture.Object,
-            timeProvider: time, logger: NullLogger<PlayerService>.Instance);
+            timeProvider: time, messenger: new Messenger(), logger: NullLogger<PlayerService>.Instance);
 
         sut.LoadPlaylist(new List<TrackDto> { onlyTrack });
         sut.IsLoopingEnabled = false;
@@ -159,7 +161,7 @@ public class PlayerServiceSmtcTests
         PlayerService sut = new(
             callMock.Object, engine.Object, optionsMock.Object,
             discordService: null, smtcService: smtc.Object, albumPicture: picture.Object,
-            timeProvider: time, logger: NullLogger<PlayerService>.Instance);
+            timeProvider: time, messenger: new Messenger(), logger: NullLogger<PlayerService>.Instance);
 
         sut.LoadPlaylist(new List<TrackDto> { track });
         smtc.Invocations.Clear();

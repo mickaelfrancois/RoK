@@ -19,6 +19,8 @@ public sealed partial class PlayerView : UserControl
     private readonly DispatcherTimer _progressionTimer;
     private Storyboard? _sleepModeStoryboard;
 
+    private readonly IDisposable _mediaChangedSubscription;
+
     public PlayerView()
     {
         this.InitializeComponent();
@@ -34,7 +36,8 @@ public sealed partial class PlayerView : UserControl
 
         InitProgressionTimer();
 
-        Messenger.Subscribe<MediaChangedMessage>((message) => MediaChanged(message));
+        IMessenger messenger = App.ServiceProvider.GetRequiredService<IMessenger>();
+        _mediaChangedSubscription = messenger.Subscribe<MediaChangedMessage>((message) => MediaChanged(message));
 
         Loaded += OnLoaded;
         Unloaded += OnUnloaded;
@@ -183,6 +186,7 @@ public sealed partial class PlayerView : UserControl
     {
         ViewModel.PropertyChanged -= OnViewModelPropertyChanged;
         _sleepModeStoryboard?.Stop();
+        _mediaChangedSubscription.Dispose();
     }
 
     private void SetupSleepModeAnimation()

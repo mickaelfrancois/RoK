@@ -10,6 +10,7 @@ namespace Rok.ViewModels.Playlist.Services;
 public sealed class PlaylistExportService(
     IMediator _mediator,
     IPlaylistExportPrompts _prompts,
+    IMessenger _messenger,
     ILogger<PlaylistExportService> _logger)
 {
     public async Task RunAsync(PlaylistHeaderDto playlist, CancellationToken cancellationToken)
@@ -29,12 +30,12 @@ public sealed class PlaylistExportService(
 
         if (result.IsSuccess)
         {
-            Messenger.Send(new ShowNotificationMessage { Message = "Playlist exportée", Type = NotificationType.Success });
+            _messenger.Send(new ShowNotificationMessage { Message = "Playlist exportée", Type = NotificationType.Success });
         }
         else
         {
             _logger.LogError("Export failed for playlist {Id}: {Error}", playlist.Id, result.Errors[0]);
-            Messenger.Send(new ShowNotificationMessage { Message = "Échec de l'export", Type = NotificationType.Error });
+            _messenger.Send(new ShowNotificationMessage { Message = "Échec de l'export", Type = NotificationType.Error });
         }
     }
 }

@@ -18,7 +18,7 @@ public class PlaylistUpdateServiceTests
     private PlaylistUpdateService BuildService()
     {
         PlaylistPictureService pictureService = new(_artistPicture.Object, NullLogger<PlaylistPictureService>.Instance);
-        return new PlaylistUpdateService(_mediator.Object, pictureService, NullLogger<PlaylistUpdateService>.Instance);
+        return new PlaylistUpdateService(_mediator.Object, new Messenger(), pictureService, NullLogger<PlaylistUpdateService>.Instance);
     }
 
     [Fact(DisplayName = "SavePlaylistAsync should not call mediator when nothing has changed and forceUpdate is false")]

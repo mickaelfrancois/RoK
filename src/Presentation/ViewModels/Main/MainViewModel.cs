@@ -6,17 +6,20 @@ using Rok.ViewModels.Search;
 
 namespace Rok.ViewModels.Main;
 
-public partial class MainViewModel : ObservableObject
+public partial class MainViewModel : ObservableObject, IDisposable
 {
     private DispatcherQueue? _dispatcherQueue;
     private DispatcherQueue DispatcherQueue => _dispatcherQueue ??= DispatcherQueue.GetForCurrentThread();
 
     private readonly IImport _importService;
     private readonly IMediator _mediator;
+    private readonly IMessenger _messenger;
     private readonly NavigationService _navigationService;
     private readonly IAppOptions _appOptions;
     private readonly IDialogService _dialogService;
     private readonly ResourceLoader _resourceLoader;
+    private readonly IDisposable _mediaChangedSubscription;
+    private bool _disposed;
 
     [ObservableProperty]
     public partial bool PlayerVisible { get; set; }
@@ -25,17 +28,18 @@ public partial class MainViewModel : ObservableObject
 
     public SearchSuggestionsViewModel SearchSuggestions { get; }
 
-    public MainViewModel(IImport importService, IMediator mediator, NavigationService navigationService, IAppOptions appOptions, IDialogService dialogService, ResourceLoader resourceLoader, SearchSuggestionsViewModel searchSuggestions)
+    public MainViewModel(IImport importService, IMediator mediator, IMessenger messenger, NavigationService navigationService, IAppOptions appOptions, IDialogService dialogService, ResourceLoader resourceLoader, SearchSuggestionsViewModel searchSuggestions)
     {
         _importService = importService;
         _mediator = mediator;
+        _messenger = messenger;
         _navigationService = navigationService;
         _appOptions = appOptions;
         _dialogService = dialogService;
         _resourceLoader = resourceLoader;
         SearchSuggestions = searchSuggestions;
 
-        Messenger.Subscribe<MediaChangedMessage>(OnMediaChanged);
+        _mediaChangedSubscription = _messenger.Subscribe<MediaChangedMessage>(OnMediaChanged);
     }
 
 
@@ -92,7 +96,7 @@ public partial class MainViewModel : ObservableObject
             else if (result.ResultCount > 0)
                 _navigationService.NavigateToSearch(new SearchOpenArgs { SearchResult = result });
             else
-                Messenger.Send(new SearchNoResultMessage());
+                _messenger.Send(new SearchNoResultMessage());
         }
     }
 
@@ -113,5 +117,15 @@ public partial class MainViewModel : ObservableObject
                 _navigationService.NavigateToTrack(track.Id);
                 break;
         }
+    }
+
+    public void Dispose()
+    {
+        if (_disposed)
+            return;
+
+        _mediaChangedSubscription.Dispose();
+        _disposed = true;
+        GC.SuppressFinalize(this);
     }
 }

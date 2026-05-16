@@ -29,7 +29,7 @@ public class PlayerServiceTests
         mockPlayerEngine.Setup(o => o.SetTrack(It.IsAny<TrackDto>())).Returns(true);
         mockAppOptions.SetupGet(o => o.CrossFade).Returns(false);
 
-        playerService = new PlayerService(mockCallDetectionService.Object, mockPlayerEngine.Object, mockAppOptions.Object, null, null, mockAlbumPicture.Object, fakeTimeProvider, mockLogger.Object);
+        playerService = new PlayerService(mockCallDetectionService.Object, mockPlayerEngine.Object, mockAppOptions.Object, null, null, mockAlbumPicture.Object, fakeTimeProvider, new Messenger(), mockLogger.Object);
     }
 
     [Fact]

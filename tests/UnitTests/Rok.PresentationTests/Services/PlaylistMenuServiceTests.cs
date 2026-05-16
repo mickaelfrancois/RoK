@@ -1,6 +1,5 @@
 using CleanArch.DevKit.Mediator.Results;
 using Rok.Application.Errors;
-using MiF.SimpleMessenger;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using Rok.Application.Dto;
@@ -19,9 +18,10 @@ public class PlaylistMenuServiceTests
     private readonly Mock<IMediator> _mediator = new();
     private readonly Mock<IPlayerService> _playerService = new();
     private readonly Mock<IStringResourceProvider> _resources = new();
+    private readonly IMessenger _messenger = new Messenger();
 
     private PlaylistMenuService BuildService()
-        => new(_mediator.Object, _playerService.Object, _resources.Object, NullLogger<PlaylistMenuService>.Instance);
+        => new(_mediator.Object, _messenger, _playerService.Object, _resources.Object, NullLogger<PlaylistMenuService>.Instance);
 
     // --- GetPlaylistMenuItemsAsync ---
 
@@ -69,7 +69,7 @@ public class PlaylistMenuServiceTests
 
         // Act
         await sut.GetPlaylistMenuItemsAsync();
-        Messenger.Send(new PlaylistUpdatedMessage(1, ActionType.Update));
+        _messenger.Send(new PlaylistUpdatedMessage(1, ActionType.Update));
         await sut.GetPlaylistMenuItemsAsync();
 
         // Assert
@@ -88,8 +88,8 @@ public class PlaylistMenuServiceTests
         ShowNotificationMessage? notification = null;
         void ListenUpdate(PlaylistUpdatedMessage m) => update = m;
         void ListenNotify(ShowNotificationMessage m) => notification = m;
-        Messenger.Subscribe<PlaylistUpdatedMessage>(ListenUpdate);
-        Messenger.Subscribe<ShowNotificationMessage>(ListenNotify);
+        _messenger.Subscribe<PlaylistUpdatedMessage>(ListenUpdate);
+        _messenger.Subscribe<ShowNotificationMessage>(ListenNotify);
         try
         {
             PlaylistMenuService sut = BuildService();
@@ -107,8 +107,7 @@ public class PlaylistMenuServiceTests
         }
         finally
         {
-            try { Messenger.Unsubscribe<PlaylistUpdatedMessage>(ListenUpdate); } catch { }
-            try { Messenger.Unsubscribe<ShowNotificationMessage>(ListenNotify); } catch { }
+            // _messenger is instance-scoped to this test, no manual unsubscribe needed
         }
     }
 
@@ -120,7 +119,7 @@ public class PlaylistMenuServiceTests
                  .ReturnsAsync(Result<long>.Fail(new ConflictError("playlist.duplicate_track", "Already in playlist")));
         ShowNotificationMessage? notification = null;
         void Listen(ShowNotificationMessage m) => notification = m;
-        Messenger.Subscribe<ShowNotificationMessage>(Listen);
+        _messenger.Subscribe<ShowNotificationMessage>(Listen);
         try
         {
             PlaylistMenuService sut = BuildService();
@@ -134,7 +133,7 @@ public class PlaylistMenuServiceTests
         }
         finally
         {
-            try { Messenger.Unsubscribe<ShowNotificationMessage>(Listen); } catch { }
+            // _messenger is instance-scoped to this test, no manual unsubscribe needed
         }
     }
 
@@ -146,7 +145,7 @@ public class PlaylistMenuServiceTests
                  .ReturnsAsync(Result<long>.Fail(new OperationError("test.db_error", "Database error")));
         ShowNotificationMessage? notification = null;
         void Listen(ShowNotificationMessage m) => notification = m;
-        Messenger.Subscribe<ShowNotificationMessage>(Listen);
+        _messenger.Subscribe<ShowNotificationMessage>(Listen);
         try
         {
             PlaylistMenuService sut = BuildService();
@@ -160,7 +159,7 @@ public class PlaylistMenuServiceTests
         }
         finally
         {
-            try { Messenger.Unsubscribe<ShowNotificationMessage>(Listen); } catch { }
+            // _messenger is instance-scoped to this test, no manual unsubscribe needed
         }
     }
 
@@ -214,7 +213,7 @@ public class PlaylistMenuServiceTests
                  .ReturnsAsync(Enumerable.Empty<TrackDto>());
         ShowNotificationMessage? notification = null;
         void Listen(ShowNotificationMessage m) => notification = m;
-        Messenger.Subscribe<ShowNotificationMessage>(Listen);
+        _messenger.Subscribe<ShowNotificationMessage>(Listen);
         try
         {
             PlaylistMenuService sut = BuildService();
@@ -229,7 +228,7 @@ public class PlaylistMenuServiceTests
         }
         finally
         {
-            try { Messenger.Unsubscribe<ShowNotificationMessage>(Listen); } catch { }
+            // _messenger is instance-scoped to this test, no manual unsubscribe needed
         }
     }
 
@@ -259,7 +258,7 @@ public class PlaylistMenuServiceTests
                  .ReturnsAsync(Enumerable.Empty<TrackDto>());
         ShowNotificationMessage? notification = null;
         void Listen(ShowNotificationMessage m) => notification = m;
-        Messenger.Subscribe<ShowNotificationMessage>(Listen);
+        _messenger.Subscribe<ShowNotificationMessage>(Listen);
         try
         {
             PlaylistMenuService sut = BuildService();
@@ -274,7 +273,7 @@ public class PlaylistMenuServiceTests
         }
         finally
         {
-            try { Messenger.Unsubscribe<ShowNotificationMessage>(Listen); } catch { }
+            // _messenger is instance-scoped to this test, no manual unsubscribe needed
         }
     }
 
@@ -305,7 +304,7 @@ public class PlaylistMenuServiceTests
                  .ReturnsAsync(Result<TrackDto>.Fail(NotFoundError.ForEntity("Track", 1L)));
         ShowNotificationMessage? notification = null;
         void Listen(ShowNotificationMessage m) => notification = m;
-        Messenger.Subscribe<ShowNotificationMessage>(Listen);
+        _messenger.Subscribe<ShowNotificationMessage>(Listen);
         try
         {
             PlaylistMenuService sut = BuildService();
@@ -320,7 +319,7 @@ public class PlaylistMenuServiceTests
         }
         finally
         {
-            try { Messenger.Unsubscribe<ShowNotificationMessage>(Listen); } catch { }
+            // _messenger is instance-scoped to this test, no manual unsubscribe needed
         }
     }
 }

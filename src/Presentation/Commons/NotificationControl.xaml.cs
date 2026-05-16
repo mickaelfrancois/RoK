@@ -6,13 +6,16 @@ public sealed partial class NotificationControl : UserControl
 {
     private const int MaxNotifications = 5;
     private readonly List<NotificationItemControl> _notifications = new();
+    private readonly IDisposable _notificationSubscription;
 
     public NotificationControl()
     {
         this.InitializeComponent();
 
         this.Visibility = Visibility.Collapsed;
-        Messenger.Subscribe<ShowNotificationMessage>(ShowNotification);
+        IMessenger messenger = App.ServiceProvider.GetRequiredService<IMessenger>();
+        _notificationSubscription = messenger.Subscribe<ShowNotificationMessage>(ShowNotification);
+        this.Unloaded += (_, _) => _notificationSubscription.Dispose();
     }
 
 

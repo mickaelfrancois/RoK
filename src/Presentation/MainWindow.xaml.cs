@@ -22,6 +22,8 @@ public sealed partial class MainWindow : Window
     private readonly NavigationService _navigationService;
     private readonly ITelemetryClient _telemetryClient;
     private readonly ResourceLoader _resourceLoader;
+    private readonly IMessenger _messenger;
+    private readonly List<IDisposable> _subscriptions = new();
 
     private PointInt32? _compactModeAppPosition;
     private PointInt32? _normalModeAppPosition;
@@ -65,7 +67,7 @@ public sealed partial class MainWindow : Window
 
 
 
-    public MainWindow(NavigationService navigationService, ITelemetryClient telemetryClient, ResourceLoader resourceLoader, IAppDbContext dbContext, IAppOptions appOptions, IReviewPromptEligibilityService reviewPromptEligibilityService)
+    public MainWindow(NavigationService navigationService, ITelemetryClient telemetryClient, ResourceLoader resourceLoader, IAppDbContext dbContext, IAppOptions appOptions, IReviewPromptEligibilityService reviewPromptEligibilityService, IMessenger messenger)
     {
         _navigationService = Guard.Against.Null(navigationService);
         _telemetryClient = Guard.Against.Null(telemetryClient);
@@ -73,6 +75,7 @@ public sealed partial class MainWindow : Window
         _dbContext = Guard.Against.Null(dbContext);
         _appOptions = Guard.Against.Null(appOptions);
         _reviewPromptEligibilityService = Guard.Against.Null(reviewPromptEligibilityService);
+        _messenger = Guard.Against.Null(messenger);
 
         this.InitializeComponent();
 
@@ -86,11 +89,11 @@ public sealed partial class MainWindow : Window
         SplashScreen.Start();
         _ = SendMetricsAsync();
 
-        Messenger.Subscribe<FullScreenMessage>((message) => FullScreenHandle(message));
-        Messenger.Subscribe<MediaChangedMessage>((message) => MediaChanged(message));
-        Messenger.Subscribe<LibraryRefreshMessage>((message) => LibraryRefreshHandle(message));
-        Messenger.Subscribe<SearchNoResultMessage>(async (message) => await SearchNoResultHandleAsync());
-        Messenger.Subscribe<CompactModeMessage>((message) => ToggleCompactMode());
+        _subscriptions.Add(_messenger.Subscribe<FullScreenMessage>((message) => FullScreenHandle(message)));
+        _subscriptions.Add(_messenger.Subscribe<MediaChangedMessage>((message) => MediaChanged(message)));
+        _subscriptions.Add(_messenger.Subscribe<LibraryRefreshMessage>((message) => LibraryRefreshHandle(message)));
+        _subscriptions.Add(_messenger.Subscribe<SearchNoResultMessage>(async (message) => await SearchNoResultHandleAsync()));
+        _subscriptions.Add(_messenger.Subscribe<CompactModeMessage>((message) => ToggleCompactMode()));
 
         ContentFrame.Navigated += ContentFrame_Navigated;
 
@@ -504,10 +507,10 @@ public sealed partial class MainWindow : Window
     private void EnsureNormalMode()
     {
         if (IsInFullScreenMode())
-            Messenger.Send(new FullScreenMessage(false));
+            _messenger.Send(new FullScreenMessage(false));
 
         if (IsInCompactMode())
-            Messenger.Send(new CompactModeMessage());
+            _messenger.Send(new CompactModeMessage());
     }
 
 
@@ -593,14 +596,14 @@ public sealed partial class MainWindow : Window
     private void OnToggleFullScreenAccelerator(KeyboardAccelerator sender, KeyboardAcceleratorInvokedEventArgs args)
     {
         args.Handled = true;
-        Messenger.Send(new FullScreenMessage(!IsInFullScreenMode()));
+        _messenger.Send(new FullScreenMessage(!IsInFullScreenMode()));
     }
 
 
     private void OnToggleCompactAccelerator(KeyboardAccelerator sender, KeyboardAcceleratorInvokedEventArgs args)
     {
         args.Handled = true;
-        Messenger.Send(new CompactModeMessage());
+        _messenger.Send(new CompactModeMessage());
     }
 
 
@@ -608,14 +611,14 @@ public sealed partial class MainWindow : Window
     {
         if (IsInFullScreenMode())
         {
-            Messenger.Send(new FullScreenMessage(false));
+            _messenger.Send(new FullScreenMessage(false));
             args.Handled = true;
             return;
         }
 
         if (IsInCompactMode())
         {
-            Messenger.Send(new CompactModeMessage());
+            _messenger.Send(new CompactModeMessage());
             args.Handled = true;
             return;
         }

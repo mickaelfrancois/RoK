@@ -8,15 +8,16 @@ public partial class TagsProvider : IDisposable
 {
     private readonly SemaphoreSlim _semaphore = new(1, 1);
     private readonly IMediator _mediator;
+    private readonly IDisposable _tagUpdatedSubscription;
     private List<string> _tags = new();
     private bool _isLoaded;
     private bool _disposed;
 
-    public TagsProvider(IMediator mediator)
+    public TagsProvider(IMediator mediator, IMessenger messenger)
     {
         _mediator = mediator;
 
-        Messenger.Subscribe<TagUpdatedMessage>(async _ => await LoadTagsAsync());
+        _tagUpdatedSubscription = messenger.Subscribe<TagUpdatedMessage>(async _ => await LoadTagsAsync());
     }
 
 
@@ -61,6 +62,7 @@ public partial class TagsProvider : IDisposable
         {
             if (disposing)
             {
+                _tagUpdatedSubscription.Dispose();
                 _semaphore.Dispose();
             }
             _disposed = true;

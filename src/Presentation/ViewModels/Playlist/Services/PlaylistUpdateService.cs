@@ -5,6 +5,7 @@ namespace Rok.ViewModels.Playlist.Services;
 
 public class PlaylistUpdateService(
     IMediator mediator,
+    IMessenger messenger,
     PlaylistPictureService pictureService,
     ILogger<PlaylistUpdateService> logger)
 {
@@ -61,7 +62,7 @@ public class PlaylistUpdateService(
         playlist.DurationMaximum = command.DurationMaximum;
         playlist.Groups = command.Groups;
 
-        Messenger.Send(new PlaylistUpdatedMessage(playlist.Id, ActionType.Update));
+        messenger.Send(new PlaylistUpdatedMessage(playlist.Id, ActionType.Update));
 
         return true;
     }
@@ -73,11 +74,11 @@ public class PlaylistUpdateService(
 
         if (result.IsSuccess)
         {
-            Messenger.Send(new PlaylistUpdatedMessage(playlistId, ActionType.Update));
+            messenger.Send(new PlaylistUpdatedMessage(playlistId, ActionType.Update));
             return true;
         }
 
-        Messenger.Send(new ShowNotificationMessage
+        messenger.Send(new ShowNotificationMessage
         {
             Message = "Failed to remove track from playlist",
             Type = NotificationType.Error
@@ -91,7 +92,7 @@ public class PlaylistUpdateService(
 
         if (result.IsSuccess)
         {
-            Messenger.Send(new PlaylistUpdatedMessage(playlistId, ActionType.Delete));
+            messenger.Send(new PlaylistUpdatedMessage(playlistId, ActionType.Delete));
             return true;
         }
 
@@ -104,7 +105,7 @@ public class PlaylistUpdateService(
         Result<bool> result = await mediator.Send(new MovePlaylistTracksRequest { PlaylistId = playlistId, Tracks = tracks });
         if (result.IsSuccess)
         {
-            Messenger.Send(new PlaylistUpdatedMessage(playlistId, ActionType.Delete));
+            messenger.Send(new PlaylistUpdatedMessage(playlistId, ActionType.Delete));
             return true;
         }
 

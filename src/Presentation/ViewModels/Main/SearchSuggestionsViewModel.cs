@@ -8,6 +8,7 @@ namespace Rok.ViewModels.Main;
 public partial class SearchSuggestionsViewModel : ObservableObject, IDisposable
 {
     private readonly IMediator _mediator;
+    private readonly IDisposable _libraryRefreshSubscription;
     private System.Threading.CancellationTokenSource? _debounceCts;
     private bool _isCacheLoaded;
     private bool _disposed;
@@ -27,10 +28,10 @@ public partial class SearchSuggestionsViewModel : ObservableObject, IDisposable
         set => SetProperty(ref _hasResults, value);
     }
 
-    public SearchSuggestionsViewModel(IMediator mediator)
+    public SearchSuggestionsViewModel(IMediator mediator, IMessenger messenger)
     {
         _mediator = mediator;
-        Messenger.Subscribe<LibraryRefreshMessage>(OnLibraryRefresh);
+        _libraryRefreshSubscription = messenger.Subscribe<LibraryRefreshMessage>(OnLibraryRefresh);
     }
 
     private void OnLibraryRefresh(LibraryRefreshMessage message)
@@ -106,7 +107,7 @@ public partial class SearchSuggestionsViewModel : ObservableObject, IDisposable
         if (_disposed)
             return;
 
-        Messenger.Unsubscribe<LibraryRefreshMessage>(OnLibraryRefresh);
+        _libraryRefreshSubscription.Dispose();
         _debounceCts?.Dispose();
         _disposed = true;
         GC.SuppressFinalize(this);

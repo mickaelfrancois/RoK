@@ -37,6 +37,7 @@ public partial class ArtistViewModel : ObservableObject, IFilterableArtist, IGro
     private readonly ArtistEditService _editService;
     private readonly BackdropPicture _backdropPicture;
     private readonly IDominantColorCalculator _dominantColorCalculator;
+    private readonly IMessenger _messenger;
 
     private IEnumerable<TrackDto>? _tracks = null;
     private CancellationTokenSource _navigationCts = new();
@@ -250,6 +251,7 @@ public partial class ArtistViewModel : ObservableObject, IFilterableArtist, IGro
         BackdropPicture backdropPicture,
         IAppOptions appOptions,
         IPlaylistMenuService playlistMenuService,
+        IMessenger messenger,
         ILogger<ArtistViewModel> logger)
     {
         _backdropLoader = Guard.Against.Null(backdropLoader);
@@ -260,6 +262,7 @@ public partial class ArtistViewModel : ObservableObject, IFilterableArtist, IGro
         _dataLoader = Guard.Against.Null(dataLoader);
         _tagsProvider = Guard.Against.Null(tagsDataLoader);
         _pictureService = Guard.Against.Null(pictureService);
+        _messenger = Guard.Against.Null(messenger);
         _apiService = Guard.Against.Null(apiService);
         _statisticsService = Guard.Against.Null(statisticsService);
         _dominantColorCalculator = Guard.Against.Null(dominantColorCalculator);
@@ -459,7 +462,7 @@ public partial class ArtistViewModel : ObservableObject, IFilterableArtist, IGro
         bool updated = await _statisticsService.UpdateIfNeededAsync(Artist, Albums, Tracks);
         if (updated)
         {
-            Messenger.Send(new ArtistUpdateMessage(Artist.Id, ActionType.Update));
+            _messenger.Send(new ArtistUpdateMessage(Artist.Id, ActionType.Update));
         }
     }
 
@@ -475,7 +478,7 @@ public partial class ArtistViewModel : ObservableObject, IFilterableArtist, IGro
         if (result.PictureDownloaded)
         {
             LoadPicture();
-            Messenger.Send(new ArtistUpdateMessage(Artist.Id, ActionType.Picture));
+            _messenger.Send(new ArtistUpdateMessage(Artist.Id, ActionType.Picture));
         }
 
         if (result.BackdropsDownloaded)
@@ -487,7 +490,7 @@ public partial class ArtistViewModel : ObservableObject, IFilterableArtist, IGro
             if (refreshedArtist != null)
                 Artist = refreshedArtist;
 
-            Messenger.Send(new ArtistUpdateMessage(Artist.Id, ActionType.Update));
+            _messenger.Send(new ArtistUpdateMessage(Artist.Id, ActionType.Update));
         }
     }
 
@@ -527,7 +530,7 @@ public partial class ArtistViewModel : ObservableObject, IFilterableArtist, IGro
         await _editService.UpdateFavoriteAsync(Artist, newFavoriteState);
 
         OnPropertyChanged(nameof(IsFavorite));
-        Messenger.Send(new ArtistUpdateMessage(Artist.Id, ActionType.Update));
+        _messenger.Send(new ArtistUpdateMessage(Artist.Id, ActionType.Update));
     }
 
     [RelayCommand]
@@ -551,7 +554,7 @@ public partial class ArtistViewModel : ObservableObject, IFilterableArtist, IGro
 
         Picture = newPicture;
 
-        Messenger.Send(new ArtistUpdateMessage(Artist.Id, ActionType.Picture));
+        _messenger.Send(new ArtistUpdateMessage(Artist.Id, ActionType.Picture));
     }
 
     [RelayCommand]

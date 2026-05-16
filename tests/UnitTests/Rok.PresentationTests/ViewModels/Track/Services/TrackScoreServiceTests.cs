@@ -8,7 +8,7 @@ public class TrackScoreServiceTests
 {
     private readonly Mock<IMediator> _mediator = new();
 
-    private TrackScoreService BuildService() => new(_mediator.Object);
+    private TrackScoreService BuildService() => new(_mediator.Object, new Messenger());
 
     [Fact(DisplayName = "UpdateScoreAsync should send an UpdateScoreRequest with the provided values")]
     public async Task UpdateScoreAsync_ShouldSendUpdateScoreRequest()

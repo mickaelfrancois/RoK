@@ -2,7 +2,6 @@ using System.Data;
 using Dapper;
 using Microsoft.Data.Sqlite;
 using Microsoft.Extensions.Logging.Abstractions;
-using MiF.SimpleMessenger;
 using Moq;
 using Rok.Application.Features.Playlists;
 using Rok.Application.Features.Playlists.IO;
@@ -18,6 +17,7 @@ public class ImportPlaylistRequestHandlerTests : IDisposable
     private readonly Mock<IPlaylistFormatResolver> _resolver = new();
     private readonly Mock<IPlaylistFormatReader> _reader = new();
     private readonly Mock<ITrackRepository> _trackRepository = new();
+    private readonly IMessenger _messenger = new Messenger();
 
     public ImportPlaylistRequestHandlerTests()
     {
@@ -33,7 +33,7 @@ public class ImportPlaylistRequestHandlerTests : IDisposable
     {
         IPlaylistFormatReader? reader = _reader.Object;
         _resolver.Setup(r => r.TryGetReader(It.IsAny<string>(), out reader)).Returns(true);
-        return new ImportPlaylistRequestHandler(_resolver.Object, _trackRepository.Object, _connection, NullLogger<ImportPlaylistRequestHandler>.Instance);
+        return new ImportPlaylistRequestHandler(_resolver.Object, _trackRepository.Object, _connection, _messenger, NullLogger<ImportPlaylistRequestHandler>.Instance);
     }
 
     private static PlaylistFileModel Model(string name, params (string Path, string? Title, string? Artist, TimeSpan? Duration)[] entries)
@@ -177,7 +177,7 @@ public class ImportPlaylistRequestHandlerTests : IDisposable
         string path = WritePlaylistFile("ignored", "weird.foo");
         try
         {
-            ImportPlaylistRequestHandler sut = new(_resolver.Object, _trackRepository.Object, _connection, NullLogger<ImportPlaylistRequestHandler>.Instance);
+            ImportPlaylistRequestHandler sut = new(_resolver.Object, _trackRepository.Object, _connection, _messenger, NullLogger<ImportPlaylistRequestHandler>.Instance);
 
             // Act
             Result<PlaylistImportResult> result = await sut.Handle(new ImportPlaylistRequest(path), CancellationToken.None);
@@ -362,33 +362,27 @@ public class ImportPlaylistRequestHandlerTests : IDisposable
         // Arrange
         long? receivedId = null;
         void Listener(PlaylistImportedMessage m) => receivedId = m.PlaylistId;
-        Messenger.Subscribe<PlaylistImportedMessage>(Listener);
+        using IDisposable subscription = _messenger.Subscribe<PlaylistImportedMessage>(Listener);
+
+        string path = WritePlaylistFile("dummy");
         try
         {
-            string path = WritePlaylistFile("dummy");
-            try
-            {
-                _reader.Setup(r => r.ReadAsync(It.IsAny<Stream>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
-                       .ReturnsAsync(Model("Mix", ("D:\\a.mp3", null, null, null)));
-                _trackRepository.Setup(r => r.GetByFilePathAsync("D:\\a.mp3", It.IsAny<CancellationToken>())).ReturnsAsync(new TrackEntity { Id = 1 });
+            _reader.Setup(r => r.ReadAsync(It.IsAny<Stream>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
+                   .ReturnsAsync(Model("Mix", ("D:\\a.mp3", null, null, null)));
+            _trackRepository.Setup(r => r.GetByFilePathAsync("D:\\a.mp3", It.IsAny<CancellationToken>())).ReturnsAsync(new TrackEntity { Id = 1 });
 
-                ImportPlaylistRequestHandler sut = BuildHandler();
+            ImportPlaylistRequestHandler sut = BuildHandler();
 
-                // Act
-                Result<PlaylistImportResult> result = await sut.Handle(new ImportPlaylistRequest(path), CancellationToken.None);
+            // Act
+            Result<PlaylistImportResult> result = await sut.Handle(new ImportPlaylistRequest(path), CancellationToken.None);
 
-                // Assert
-                Assert.True(result.IsSuccess);
-                Assert.Equal(result.Value.PlaylistId, receivedId);
-            }
-            finally
-            {
-                File.Delete(path);
-            }
+            // Assert
+            Assert.True(result.IsSuccess);
+            Assert.Equal(result.Value.PlaylistId, receivedId);
         }
         finally
         {
-            try { Messenger.Unsubscribe<PlaylistImportedMessage>(Listener); } catch { }
+            File.Delete(path);
         }
     }
 }

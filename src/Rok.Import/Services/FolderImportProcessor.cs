@@ -1,6 +1,6 @@
+using CleanArch.DevKit.Messaging;
 using Microsoft.Extensions.Logging;
 using MiF.Guard;
-using MiF.SimpleMessenger;
 using Rok.Application.Dto;
 using Rok.Application.Interfaces;
 using Rok.Application.Messages;
@@ -22,6 +22,7 @@ public class FolderImportProcessor(
     ImportTrackingService trackingService,
     ITagService tagService,
     ImportMessageThrottler messageThrottler,
+    IMessenger messenger,
     ILogger<FolderImportProcessor> logger)
 {
     private readonly IAppOptions _options = Guard.Against.Null(options);
@@ -199,7 +200,7 @@ public class FolderImportProcessor(
                 if (_messageThrottler.ShouldSendArtistMessage())
                 {
                     string artistName = file.Artist ?? string.Empty;
-                    Messenger.Send(new ArtistImportedMessage(artistName));
+                    messenger.Send(new ArtistImportedMessage(artistName));
                 }
             }
         }
@@ -240,7 +241,7 @@ public class FolderImportProcessor(
                     string artistName = file.Artist ?? string.Empty;
                     string albumPath = album.AlbumPath ?? string.Empty;
 
-                    Messenger.Send(new AlbumImportedMessage(albumName, artistName, albumPath));
+                    messenger.Send(new AlbumImportedMessage(albumName, artistName, albumPath));
                 }
             }
         }

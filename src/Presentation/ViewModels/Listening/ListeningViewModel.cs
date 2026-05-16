@@ -9,7 +9,7 @@ using ResourceLoader = Windows.ApplicationModel.Resources.ResourceLoader;
 
 namespace Rok.ViewModels.Listening;
 
-public partial class ListeningViewModel : ObservableObject
+public partial class ListeningViewModel : ObservableObject, IDisposable
 {
     private readonly ILogger<ListeningViewModel> _logger;
     private readonly IPlayerService _playerService;
@@ -19,6 +19,9 @@ public partial class ListeningViewModel : ObservableObject
     private readonly NavigationService _navigationService;
     private readonly IPlayerSleepModeService _playerSleepModeService;
     private readonly PlayerStateManager _stateManager;
+    private readonly IMessenger _messenger;
+    private readonly List<IDisposable> _subscriptions = new();
+    private bool _disposed;
 
     public int TrackCount => _playlistManager.TrackCount;
     public long Duration => _playlistManager.Duration;
@@ -35,7 +38,8 @@ public partial class ListeningViewModel : ObservableObject
         NavigationService navigationService,
         PlayerStateManager stateManager,
         IPlayerSleepModeService playerSleepModeService,
-         ResourceLoader resourceLoader,
+        IMessenger messenger,
+        ResourceLoader resourceLoader,
         ILogger<ListeningViewModel> logger)
     {
         _playerService = Guard.Against.Null(playerService);
@@ -44,6 +48,7 @@ public partial class ListeningViewModel : ObservableObject
         _playerSleepModeService = Guard.Against.Null(playerSleepModeService);
         _stateManager = Guard.Against.Null(stateManager);
         _navigationService = Guard.Against.Null(navigationService);
+        _messenger = Guard.Against.Null(messenger);
         _resourceLoader = Guard.Against.Null(resourceLoader);
         _logger = Guard.Against.Null(logger);
 
@@ -56,8 +61,8 @@ public partial class ListeningViewModel : ObservableObject
 
     private void SubscribeToMessages()
     {
-        Messenger.Subscribe<MediaChangedMessage>(async (message) => await MediaChangedAsync(message));
-        Messenger.Subscribe<PlaylistChanged>(async (message) => await PlaylistChangedAsync(message));
+        _subscriptions.Add(_messenger.Subscribe<MediaChangedMessage>(async (message) => await MediaChangedAsync(message)));
+        _subscriptions.Add(_messenger.Subscribe<PlaylistChanged>(async (message) => await PlaylistChangedAsync(message)));
     }
 
     private void SubscribeToEvents()
@@ -121,7 +126,7 @@ public partial class ListeningViewModel : ObservableObject
     public void SetSleepTimer(int minutes)
     {
         _playerSleepModeService.StartSleepTimer(minutes);
-        Messenger.Send(new ShowNotificationMessage() { Message = _resourceLoader.GetString("notification_sleepTimer_Start")!, Type = NotificationType.Informational });
+        _messenger.Send(new ShowNotificationMessage() { Message = _resourceLoader.GetString("notification_sleepTimer_Start")!, Type = NotificationType.Informational });
     }
 
     [RelayCommand]
@@ -129,7 +134,7 @@ public partial class ListeningViewModel : ObservableObject
     {
         _playerSleepModeService.StopSleepTimer();
 
-        Messenger.Send(new ShowNotificationMessage() { Message = _resourceLoader.GetString("notification_sleepTimer_Stop")!, Type = NotificationType.Informational });
+        _messenger.Send(new ShowNotificationMessage() { Message = _resourceLoader.GetString("notification_sleepTimer_Stop")!, Type = NotificationType.Informational });
     }
 
     [RelayCommand]
@@ -166,5 +171,17 @@ public partial class ListeningViewModel : ObservableObject
             return;
 
         _navigationService.NavigateToTrack(trackId.Value);
+    }
+
+    public void Dispose()
+    {
+        if (_disposed)
+            return;
+
+        foreach (IDisposable subscription in _subscriptions)
+            subscription.Dispose();
+        _subscriptions.Clear();
+        _disposed = true;
+        GC.SuppressFinalize(this);
     }
 }

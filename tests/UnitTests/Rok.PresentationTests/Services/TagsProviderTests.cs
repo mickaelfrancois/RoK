@@ -15,7 +15,7 @@ public class TagsProviderTests
         // Arrange
         _mediator.Setup(m => m.Send(It.IsAny<GetAllTagsRequest>(), It.IsAny<CancellationToken>()))
                  .ReturnsAsync(new List<TagDto> { new() { Name = "rock" }, new() { Name = "jazz" } });
-        using TagsProvider sut = new(_mediator.Object);
+        using TagsProvider sut = new(_mediator.Object, new Messenger());
 
         // Act
         List<string> result = await sut.GetTagsAsync();
@@ -30,7 +30,7 @@ public class TagsProviderTests
         // Arrange
         _mediator.Setup(m => m.Send(It.IsAny<GetAllTagsRequest>(), It.IsAny<CancellationToken>()))
                  .ReturnsAsync(new List<TagDto> { new() { Name = "rock" } });
-        using TagsProvider sut = new(_mediator.Object);
+        using TagsProvider sut = new(_mediator.Object, new Messenger());
 
         // Act
         await sut.GetTagsAsync();
@@ -52,7 +52,7 @@ public class TagsProviderTests
                      new() { Name = "rock" },
                      new() { Name = "ambient" }
                  });
-        using TagsProvider sut = new(_mediator.Object);
+        using TagsProvider sut = new(_mediator.Object, new Messenger());
 
         // Act
         List<string> result = await sut.GetTagsAsync();
@@ -65,7 +65,7 @@ public class TagsProviderTests
     public void Dispose_ShouldBeIdempotent()
     {
         // Arrange
-        TagsProvider sut = new(_mediator.Object);
+        TagsProvider sut = new(_mediator.Object, new Messenger());
 
         // Act
         sut.Dispose();

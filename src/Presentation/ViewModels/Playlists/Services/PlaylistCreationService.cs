@@ -4,6 +4,7 @@ namespace Rok.ViewModels.Playlists.Services;
 
 public class PlaylistCreationService(
     IMediator mediator,
+    IMessenger messenger,
     NavigationService navigationService,
     ResourceLoader resourceLoader,
     ILogger<PlaylistCreationService> logger)
@@ -24,7 +25,7 @@ public class PlaylistCreationService(
         }
 
         long playlistId = result.Value;
-        Messenger.Send(new PlaylistUpdatedMessage(playlistId, ActionType.Add));
+        messenger.Send(new PlaylistUpdatedMessage(playlistId, ActionType.Add));
         navigationService.NavigateToSmartPlaylist(playlistId);
 
         return playlistId;
@@ -46,7 +47,7 @@ public class PlaylistCreationService(
         }
 
         long playlistId = result.Value;
-        Messenger.Send(new PlaylistUpdatedMessage(playlistId, ActionType.Add));
+        messenger.Send(new PlaylistUpdatedMessage(playlistId, ActionType.Add));
         navigationService.NavigateToPlaylist(playlistId);
 
         return playlistId;
