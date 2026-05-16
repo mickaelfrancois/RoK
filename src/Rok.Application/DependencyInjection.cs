@@ -1,4 +1,5 @@
 using CleanArch.DevKit.Mediator;
+using CleanArch.DevKit.Mediator.Behaviors;
 using CleanArch.DevKit.Mediator.Results;
 using CleanArch.DevKit.Mediator.Validation;
 using CleanArch.DevKit.Messaging;
@@ -10,7 +11,6 @@ using Rok.Application.Features.Playlists;
 using Rok.Application.Features.Tracks.Services;
 using Rok.Application.Interfaces;
 using Rok.Application.Options;
-using Rok.Application.Pipeline;
 using Rok.Application.Player;
 using Rok.Application.Services;
 
@@ -37,8 +37,7 @@ public static class DependencyInjection
         services.AddValidationBehavior();
         services.AddResultBehavior();
         services.AddMessenger();
-
-        services.AddTransient(typeof(IPipelineBehavior<,>), typeof(LoggingPipelineBehavior<,>));
+        services.AddCommonBehaviors();
 
         return services;
     }

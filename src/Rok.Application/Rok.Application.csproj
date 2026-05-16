@@ -7,6 +7,7 @@
 
   <ItemGroup>
     <PackageReference Include="CleanArch.DevKit.Mediator" Version="1.0.0" />
+    <PackageReference Include="CleanArch.DevKit.Mediator.Behaviors" Version="1.0.0" />
     <PackageReference Include="CleanArch.DevKit.Mediator.Results" Version="1.0.0" />
     <PackageReference Include="CleanArch.DevKit.Mediator.Validation" Version="1.0.0" />
     <PackageReference Include="Dapper" Version="2.1.72" />
