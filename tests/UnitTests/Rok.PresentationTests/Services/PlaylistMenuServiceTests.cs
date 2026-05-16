@@ -1,4 +1,5 @@
-using MiF.Result;
+using CleanArch.DevKit.Mediator.Results;
+using Rok.Application.Errors;
 using MiF.SimpleMessenger;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
@@ -82,7 +83,7 @@ public class PlaylistMenuServiceTests
     {
         // Arrange
         _mediator.Setup(m => m.Send(It.IsAny<AddTrackToPlaylistRequest>(), It.IsAny<CancellationToken>()))
-                 .ReturnsAsync(Result<long>.Success(1));
+                 .ReturnsAsync(Result<long>.Ok(1));
         PlaylistUpdatedMessage? update = null;
         ShowNotificationMessage? notification = null;
         void ListenUpdate(PlaylistUpdatedMessage m) => update = m;
@@ -116,7 +117,7 @@ public class PlaylistMenuServiceTests
     {
         // Arrange
         _mediator.Setup(m => m.Send(It.IsAny<AddTrackToPlaylistRequest>(), It.IsAny<CancellationToken>()))
-                 .ReturnsAsync(Result<long>.Fail("DUPLICATE", "Already in playlist"));
+                 .ReturnsAsync(Result<long>.Fail(new ConflictError("playlist.duplicate_track", "Already in playlist")));
         ShowNotificationMessage? notification = null;
         void Listen(ShowNotificationMessage m) => notification = m;
         Messenger.Subscribe<ShowNotificationMessage>(Listen);
@@ -142,7 +143,7 @@ public class PlaylistMenuServiceTests
     {
         // Arrange
         _mediator.Setup(m => m.Send(It.IsAny<AddTrackToPlaylistRequest>(), It.IsAny<CancellationToken>()))
-                 .ReturnsAsync(Result<long>.Fail("DB_ERROR", "Database error"));
+                 .ReturnsAsync(Result<long>.Fail(new OperationError("test.db_error", "Database error")));
         ShowNotificationMessage? notification = null;
         void Listen(ShowNotificationMessage m) => notification = m;
         Messenger.Subscribe<ShowNotificationMessage>(Listen);
@@ -170,9 +171,9 @@ public class PlaylistMenuServiceTests
     {
         // Arrange
         _mediator.Setup(m => m.Send(It.IsAny<CreatePlaylistRequest>(), It.IsAny<CancellationToken>()))
-                 .ReturnsAsync(Result<long>.Success(42));
+                 .ReturnsAsync(Result<long>.Ok(42));
         _mediator.Setup(m => m.Send(It.IsAny<AddArtistToPlaylistRequest>(), It.IsAny<CancellationToken>()))
-                 .ReturnsAsync(Result<long>.Success(1));
+                 .ReturnsAsync(Result<long>.Ok(1));
         PlaylistMenuService sut = BuildService();
 
         // Act
@@ -285,7 +286,7 @@ public class PlaylistMenuServiceTests
         // Arrange
         TrackDto track = new() { Id = 99 };
         _mediator.Setup(m => m.Send(It.IsAny<GetTrackByIdRequest>(), It.IsAny<CancellationToken>()))
-                 .ReturnsAsync(Result<TrackDto>.Success(track));
+                 .ReturnsAsync(Result<TrackDto>.Ok(track));
         PlaylistMenuService sut = BuildService();
 
         // Act
@@ -301,7 +302,7 @@ public class PlaylistMenuServiceTests
     {
         // Arrange
         _mediator.Setup(m => m.Send(It.IsAny<GetTrackByIdRequest>(), It.IsAny<CancellationToken>()))
-                 .ReturnsAsync(Result<TrackDto>.Fail("NOT_FOUND", "Track not found"));
+                 .ReturnsAsync(Result<TrackDto>.Fail(NotFoundError.ForEntity("Track", 1L)));
         ShowNotificationMessage? notification = null;
         void Listen(ShowNotificationMessage m) => notification = m;
         Messenger.Subscribe<ShowNotificationMessage>(Listen);

@@ -19,8 +19,8 @@ public class DeleteArtistRequestHandler(IArtistRepository _artistRepository) : I
         bool result = await _artistRepository.DeleteAsync(new ArtistEntity { Id = message.Id });
 
         if (result)
-            return Result<bool>.Success(true);
+            return Result<bool>.Ok(true);
         else
-            return Result<bool>.Fail("Failed to delete artist.");
+            return Result<bool>.Fail(new OperationError("artist.delete_failed", "Failed to delete artist."));
     }
 }

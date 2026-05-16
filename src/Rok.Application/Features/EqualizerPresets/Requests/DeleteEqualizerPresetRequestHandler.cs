@@ -16,6 +16,6 @@ public class DeleteEqualizerPresetRequestHandler(IEqualizerPresetRepository repo
     {
         await repository.DeleteAsync(message.Scope, message.ScopeId);
 
-        return Result<bool>.Success(true);
+        return Result<bool>.Ok(true);
     }
 }

@@ -1,4 +1,5 @@
-using MiF.Result;
+using CleanArch.DevKit.Mediator.Results;
+using Rok.Application.Errors;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using Rok.Application.Dto;
@@ -23,7 +24,7 @@ public class AlbumDataLoaderTests
         // Arrange
         AlbumDto album = new() { Id = 7, Name = "Greatest Hits" };
         _mediator.Setup(m => m.Send(It.IsAny<GetAlbumByIdRequest>(), It.IsAny<CancellationToken>()))
-                 .ReturnsAsync(Result<AlbumDto>.Success(album));
+                 .ReturnsAsync(Result<AlbumDto>.Ok(album));
         AlbumDataLoader sut = BuildService();
 
         // Act
@@ -39,7 +40,7 @@ public class AlbumDataLoaderTests
     {
         // Arrange
         _mediator.Setup(m => m.Send(It.IsAny<GetAlbumByIdRequest>(), It.IsAny<CancellationToken>()))
-                 .ReturnsAsync(Result<AlbumDto>.Fail("not found"));
+                 .ReturnsAsync(Result<AlbumDto>.Fail(new OperationError("album.not_found", "not found")));
         AlbumDataLoader sut = BuildService();
 
         // Act
@@ -71,7 +72,7 @@ public class AlbumDataLoaderTests
         // Arrange
         AlbumDto album = new() { Id = 7 };
         _mediator.Setup(m => m.Send(It.IsAny<GetAlbumByIdRequest>(), It.IsAny<CancellationToken>()))
-                 .ReturnsAsync(Result<AlbumDto>.Success(album));
+                 .ReturnsAsync(Result<AlbumDto>.Ok(album));
         AlbumDataLoader sut = BuildService();
 
         // Act
@@ -86,7 +87,7 @@ public class AlbumDataLoaderTests
     {
         // Arrange
         _mediator.Setup(m => m.Send(It.IsAny<GetAlbumByIdRequest>(), It.IsAny<CancellationToken>()))
-                 .ReturnsAsync(Result<AlbumDto>.Fail("not found"));
+                 .ReturnsAsync(Result<AlbumDto>.Fail(new OperationError("album.not_found", "not found")));
         AlbumDataLoader sut = BuildService();
 
         // Act

@@ -13,8 +13,8 @@ public class ResetArtistListenCountRequestHandler(IArtistRepository _artistRepos
         bool result = await _artistRepository.ResetListenCountAsync();
 
         if (result)
-            return Result<bool>.Success(result);
+            return Result<bool>.Ok(result);
         else
-            return Result<bool>.Fail("Failed to reset artist listen count.");
+            return Result<bool>.Fail(new OperationError("artist.listen_count_reset_failed", "Failed to reset artist listen count."));
     }
 }

@@ -1,4 +1,5 @@
-using MiF.Result;
+using CleanArch.DevKit.Mediator.Results;
+using Rok.Application.Errors;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using Rok.Application.Dto;
@@ -28,7 +29,7 @@ public class ArtistDataLoaderTests
         // Arrange
         ArtistDto artist = new() { Id = 7, Name = "Beatles" };
         _mediator.Setup(m => m.Send(It.IsAny<GetArtistByIdRequest>(), It.IsAny<CancellationToken>()))
-                 .ReturnsAsync(Result<ArtistDto>.Success(artist));
+                 .ReturnsAsync(Result<ArtistDto>.Ok(artist));
         ArtistDataLoader sut = BuildService();
 
         // Act
@@ -44,7 +45,7 @@ public class ArtistDataLoaderTests
     {
         // Arrange
         _mediator.Setup(m => m.Send(It.IsAny<GetArtistByIdRequest>(), It.IsAny<CancellationToken>()))
-                 .ReturnsAsync(Result<ArtistDto>.Fail("not found"));
+                 .ReturnsAsync(Result<ArtistDto>.Fail(new OperationError("artist.not_found", "not found")));
         ArtistDataLoader sut = BuildService();
 
         // Act
@@ -92,7 +93,7 @@ public class ArtistDataLoaderTests
         // Arrange
         ArtistDto artist = new() { Id = 7 };
         _mediator.Setup(m => m.Send(It.IsAny<GetArtistByIdRequest>(), It.IsAny<CancellationToken>()))
-                 .ReturnsAsync(Result<ArtistDto>.Success(artist));
+                 .ReturnsAsync(Result<ArtistDto>.Ok(artist));
         ArtistDataLoader sut = BuildService();
 
         // Act
@@ -107,7 +108,7 @@ public class ArtistDataLoaderTests
     {
         // Arrange
         _mediator.Setup(m => m.Send(It.IsAny<GetArtistByIdRequest>(), It.IsAny<CancellationToken>()))
-                 .ReturnsAsync(Result<ArtistDto>.Fail("not found"));
+                 .ReturnsAsync(Result<ArtistDto>.Fail(new OperationError("artist.not_found", "not found")));
         ArtistDataLoader sut = BuildService();
 
         // Act

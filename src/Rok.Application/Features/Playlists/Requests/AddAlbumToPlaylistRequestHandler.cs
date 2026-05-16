@@ -18,11 +18,11 @@ public class AddAlbumToPlaylistRequestHandler(IPlaylistTrackRepository _reposito
     {
         IEnumerable<TrackEntity> tracks = await _trackRepository.GetByAlbumIdAsync(message.AlbumId);
         if (tracks == null)
-            return Result<long>.Fail("Track not found.");
+            return Result<long>.Fail(NotFoundError.ForEntity("Track", message.AlbumId));
 
         PlaylistHeaderEntity? playlistHeader = await _playlistHeaderRepository.GetByIdAsync(message.PlaylistId);
         if (playlistHeader == null)
-            return Result<long>.Fail("Playlist not found.");
+            return Result<long>.Fail(NotFoundError.ForEntity("Playlist", message.PlaylistId));
 
         int addCount = 0;
 
@@ -47,13 +47,13 @@ public class AddAlbumToPlaylistRequestHandler(IPlaylistTrackRepository _reposito
         catch (Exception ex)
         {
             _logger.LogError(ex, "Failed to add album {AlbumId} tracks to playlist {PlaylistId}.", message.AlbumId, message.PlaylistId);
-            return Result<long>.Fail("Failed to add track to playlist due to an error.");
+            return Result<long>.Fail(new OperationError("playlist.add_album_transaction_failed", "Failed to add track to playlist due to an error."));
         }
 
         if (addCount > 0)
-            return Result<long>.Success(addCount);
+            return Result<long>.Ok(addCount);
         else
-            return Result<long>.Fail("Failed to add tracks to playlist.");
+            return Result<long>.Fail(new OperationError("playlist.add_album_no_tracks", "Failed to add tracks to playlist."));
     }
 
 

@@ -24,8 +24,8 @@ public class UpdateAlbumPictureDominantColorRequestHandler(IAlbumRepository _alb
         bool result = await _albumRepository.UpdatePictureDominantColorAsync(message.Id, message.ColorValue);
 
         if (result)
-            return Result<bool>.Success(result);
+            return Result<bool>.Ok(result);
         else
-            return Result<bool>.Fail("Failed to update album picture dominant color.");
+            return Result<bool>.Fail(new OperationError("album.picture_dominant_color_update_failed", "Failed to update album picture dominant color."));
     }
 }

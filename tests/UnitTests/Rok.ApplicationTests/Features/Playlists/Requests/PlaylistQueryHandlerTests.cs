@@ -21,7 +21,7 @@ public class GetPlaylistByIdRequestHandlerTests
 
         // Assert
         Assert.True(result.IsSuccess);
-        Assert.Equal("Favs", result.Value!.Name);
+        Assert.Equal("Favs", result.Value.Name);
     }
 
     [Fact(DisplayName = "Handle should return NotFound failure when playlist does not exist")]
@@ -36,7 +36,9 @@ public class GetPlaylistByIdRequestHandlerTests
         Result<PlaylistHeaderDto> result = await handler.Handle(new GetPlaylistByIdRequest(99), CancellationToken.None);
 
         // Assert
-        Assert.False(result.IsSuccess);
+        Assert.True(result.IsFailure);
+        Assert.IsType<NotFoundError>(result.Errors[0]);
+        Assert.Equal("playlist.not_found", result.Errors[0].Code);
     }
 }
 

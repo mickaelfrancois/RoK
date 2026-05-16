@@ -15,8 +15,8 @@ internal class UpdateTrackGetLyricsLastAttemptRequestHandler(ITrackRepository _t
         bool result = await _trackRepository.UpdateGetLyricsLastAttemptAsync(request.TrackId);
 
         if (result)
-            return Result<bool>.Success(result);
+            return Result<bool>.Ok(result);
         else
-            return Result<bool>.Fail("Failed to update lyrics last attempt.");
+            return Result<bool>.Fail(new OperationError("track.lyrics_attempt_update_failed", "Failed to update lyrics last attempt."));
     }
 }

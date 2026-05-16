@@ -22,8 +22,8 @@ public class UpdateAlbumLastListenRequestHandler(IAlbumRepository _albumReposito
         bool result = await _albumRepository.UpdateLastListenAsync(message.Id);
 
         if (result)
-            return Result<bool>.Success(result);
+            return Result<bool>.Ok(result);
         else
-            return Result<bool>.Fail("Failed to update album last listen status.");
+            return Result<bool>.Fail(new OperationError("album.last_listen_update_failed", "Failed to update album last listen status."));
     }
 }

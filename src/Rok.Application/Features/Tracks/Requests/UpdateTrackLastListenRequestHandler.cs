@@ -15,8 +15,8 @@ internal class UpdateTrackLastListenRequestHandler(ITrackRepository _trackReposi
         bool result = await _trackRepository.UpdateLastListenAsync(request.TrackId);
 
         if (result)
-            return Result<bool>.Success(result);
+            return Result<bool>.Ok(result);
         else
-            return Result<bool>.Fail("Failed to update last listen.");
+            return Result<bool>.Fail(new OperationError("track.last_listen_update_failed", "Failed to update last listen."));
     }
 }

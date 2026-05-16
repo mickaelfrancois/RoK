@@ -67,7 +67,7 @@ public class UpdateAlbumRequestHandler(IAlbumRepository _albumRepository) : IReq
     {
         AlbumEntity? entity = await _albumRepository.GetByIdAsync(command.Id);
         if (entity is null)
-            return Result<bool>.Fail("Album not found.");
+            return Result<bool>.Fail(NotFoundError.ForEntity("Album", command.Id));
 
         if (command.MusicBrainzID.TryGetValue(out string? musicBrainzID))
             entity.MusicBrainzID = musicBrainzID;
@@ -141,8 +141,8 @@ public class UpdateAlbumRequestHandler(IAlbumRepository _albumRepository) : IReq
         bool result = await _albumRepository.UpdateAsync(entity);
 
         if (result)
-            return Result<bool>.Success(true);
+            return Result<bool>.Ok(true);
         else
-            return Result<bool>.Fail("Failed to update album.");
+            return Result<bool>.Fail(new OperationError("album.update_failed", "Failed to update album."));
     }
 }

@@ -1,4 +1,5 @@
-using MiF.Result;
+using CleanArch.DevKit.Mediator.Results;
+using Rok.Application.Errors;
 using MiF.SimpleMessenger;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
@@ -19,13 +20,13 @@ public class PlaylistImportServiceTests
         => new(_mediator.Object, _picker.Object, NullLogger<PlaylistImportService>.Instance);
 
     private static Result<PlaylistImportResult> Imported(int matched, int ignored)
-        => Result<PlaylistImportResult>.Success(new PlaylistImportResult(PlaylistImportStatus.Imported, 1, "Mix", matched, ignored));
+        => Result<PlaylistImportResult>.Ok(new PlaylistImportResult(PlaylistImportStatus.Imported, 1, "Mix", matched, ignored));
 
     private static Result<PlaylistImportResult> Skipped(int ignored)
-        => Result<PlaylistImportResult>.Success(new PlaylistImportResult(PlaylistImportStatus.Skipped, null, null, 0, ignored));
+        => Result<PlaylistImportResult>.Ok(new PlaylistImportResult(PlaylistImportStatus.Skipped, null, null, 0, ignored));
 
     private static Result<PlaylistImportResult> Failed()
-        => Result<PlaylistImportResult>.Fail("ParseError");
+        => Result<PlaylistImportResult>.Fail(new OperationError("playlist.parse_error", "Failed to parse playlist file."));
 
     [Fact(DisplayName = "does_not_show_toast_when_user_cancels_picker")]
     public async Task Does_not_show_toast_when_user_cancels_picker()

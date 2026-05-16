@@ -19,8 +19,8 @@ public class DeletePlaylistRequestHandler(IPlaylistHeaderRepository _repository)
         int deleteRows = await _repository.DeleteAsync(message.Id);
 
         if (deleteRows == 1)
-            return Result<bool>.Success(true);
+            return Result<bool>.Ok(true);
         else
-            return Result<bool>.Fail("Failed to delete playlist.");
+            return Result<bool>.Fail(new OperationError("playlist.delete_failed", "Failed to delete playlist."));
     }
 }

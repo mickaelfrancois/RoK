@@ -17,8 +17,8 @@ internal class UpdateScoreRequestHandler(ITrackRepository _trackRepository) : IR
         bool result = await _trackRepository.UpdateScoreAsync(request.TrackId, request.Score);
 
         if (result)
-            return Result<bool>.Success(result);
+            return Result<bool>.Ok(result);
         else
-            return Result<bool>.Fail("Failed to update track score.");
+            return Result<bool>.Fail(new OperationError("track.score_update_failed", "Failed to update track score."));
     }
 }

@@ -30,11 +30,11 @@ public sealed class PlaylistImportService(
             if (!result.IsSuccess)
             {
                 failed++;
-                _logger.LogError("Import failed for {File}: {Error}", file, result.Error);
+                _logger.LogError("Import failed for {File}: {Error}", file, result.Errors[0]);
                 continue;
             }
 
-            switch (result.Value!.Status)
+            switch (result.Value.Status)
             {
                 case PlaylistImportStatus.Imported:
                     imported++;

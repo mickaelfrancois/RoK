@@ -1,4 +1,5 @@
-using MiF.Result;
+using CleanArch.DevKit.Mediator.Results;
+using Rok.Application.Errors;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using Rok.Application.Dto;
@@ -19,7 +20,7 @@ public class TrackDetailDataLoaderTests
         // Arrange
         TrackDto track = new() { Id = 42, Title = "Song" };
         _mediator.Setup(m => m.Send(It.IsAny<GetTrackByIdRequest>(), It.IsAny<CancellationToken>()))
-                 .ReturnsAsync(Result<TrackDto>.Success(track));
+                 .ReturnsAsync(Result<TrackDto>.Ok(track));
         TrackDetailDataLoader sut = BuildService();
 
         // Act
@@ -35,7 +36,7 @@ public class TrackDetailDataLoaderTests
     {
         // Arrange
         _mediator.Setup(m => m.Send(It.IsAny<GetTrackByIdRequest>(), It.IsAny<CancellationToken>()))
-                 .ReturnsAsync(Result<TrackDto>.Fail("not found"));
+                 .ReturnsAsync(Result<TrackDto>.Fail(new OperationError("track.not_found", "not found")));
         TrackDetailDataLoader sut = BuildService();
 
         // Act

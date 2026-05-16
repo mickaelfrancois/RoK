@@ -20,7 +20,7 @@ public class GetArtistByIdRequestHandlerTests
 
         // Assert
         Assert.True(result.IsSuccess);
-        Assert.Equal("Daft Punk", result.Value!.Name);
+        Assert.Equal("Daft Punk", result.Value.Name);
     }
 
     [Fact(DisplayName = "Handle should return NotFound failure when artist does not exist")]
@@ -35,7 +35,9 @@ public class GetArtistByIdRequestHandlerTests
         Result<ArtistDto> result = await handler.Handle(new GetArtistByIdRequest(999), CancellationToken.None);
 
         // Assert
-        Assert.False(result.IsSuccess);
+        Assert.True(result.IsFailure);
+        Assert.IsType<NotFoundError>(result.Errors[0]);
+        Assert.Equal("artist.not_found", result.Errors[0].Code);
     }
 }
 
@@ -55,7 +57,7 @@ public class GetArtistByNameRequestHandlerTests
 
         // Assert
         Assert.True(result.IsSuccess);
-        Assert.Equal("Radiohead", result.Value!.Name);
+        Assert.Equal("Radiohead", result.Value.Name);
     }
 
     [Fact(DisplayName = "Handle should return NotFound failure when artist name is unknown")]
@@ -70,7 +72,9 @@ public class GetArtistByNameRequestHandlerTests
         Result<ArtistDto> result = await handler.Handle(new GetArtistByNameRequest("Unknown"), CancellationToken.None);
 
         // Assert
-        Assert.False(result.IsSuccess);
+        Assert.True(result.IsFailure);
+        Assert.IsType<NotFoundError>(result.Errors[0]);
+        Assert.Equal("artist.not_found", result.Errors[0].Code);
     }
 }
 

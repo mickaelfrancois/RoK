@@ -29,8 +29,8 @@ public class CreatePlaylistRequestHandler(IPlaylistHeaderRepository _repository)
         long id = await _repository.AddAsync(playlistEntity);
 
         if (id > 0)
-            return Result<long>.Success(id);
+            return Result<long>.Ok(id);
         else
-            return Result<long>.Fail("Failed to create playlist.");
+            return Result<long>.Fail(new OperationError("playlist.create_failed", "Failed to create playlist."));
     }
 }

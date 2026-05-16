@@ -18,17 +18,17 @@ public class RemoveTrackFromPlaylistRequestHandler(IPlaylistTrackRepository _rep
     {
         TrackEntity? track = await _trackRepository.GetByIdAsync(message.TrackId);
         if (track == null)
-            return Result.Fail("Track not found.");
+            return Result.Fail(NotFoundError.ForEntity("Track", message.TrackId));
 
         PlaylistHeaderEntity? playlistHeader = await _playlistHeaderRepository.GetByIdAsync(message.PlaylistId);
         if (playlistHeader == null)
-            return Result.Fail("Playlist not found.");
+            return Result.Fail(NotFoundError.ForEntity("Playlist", message.PlaylistId));
 
 
         long id = await _repository.GetAsync(message.PlaylistId, message.TrackId);
 
         if (id <= 0)
-            return Result.Fail("Track not exists in the playlist.");
+            return Result.Fail(new OperationError("playlist.track_not_in_playlist", "Track not in the playlist."));
 
         using TransactionScope scope = new(TransactionScopeAsyncFlowOption.Enabled);
 
@@ -42,10 +42,10 @@ public class RemoveTrackFromPlaylistRequestHandler(IPlaylistTrackRepository _rep
         catch (Exception ex)
         {
             _logger.LogError(ex, "Failed to remove track {TrackId} from playlist {PlaylistId}.", message.TrackId, message.PlaylistId);
-            return Result.Fail("Failed to remove track from playlist due to an error.");
+            return Result.Fail(new OperationError("playlist.remove_track_failed", "Failed to remove track from playlist due to an error."));
         }
 
-        return Result.Success();
+        return Result.Ok();
     }
 
 

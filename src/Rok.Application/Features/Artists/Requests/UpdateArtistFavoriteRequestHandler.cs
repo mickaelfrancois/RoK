@@ -21,8 +21,8 @@ public class UpdateArtistFavoriteRequestHandler(IArtistRepository _artistReposit
         bool result = await _artistRepository.UpdateFavoriteAsync(message.Id, message.IsFavorite);
 
         if (result)
-            return Result<bool>.Success(result);
+            return Result<bool>.Ok(result);
         else
-            return Result<bool>.Fail("Failed to update artist favorite status.");
+            return Result<bool>.Fail(new OperationError("artist.favorite_update_failed", "Failed to update artist favorite status."));
     }
 }

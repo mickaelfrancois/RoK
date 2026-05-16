@@ -1,4 +1,5 @@
 using CleanArch.DevKit.Mediator;
+using CleanArch.DevKit.Mediator.Results;
 using CleanArch.DevKit.Mediator.Validation;
 using Microsoft.Extensions.DependencyInjection;
 using Rok.Application.Features.Albums.Services;
@@ -33,6 +34,7 @@ public static class DependencyInjection
         services.AddMediator();
         services.AddValidators();
         services.AddValidationBehavior();
+        services.AddResultBehavior();
 
         services.AddTransient(typeof(IPipelineBehavior<,>), typeof(LoggingPipelineBehavior<,>));
 

@@ -27,8 +27,8 @@ public class UpdateAlbumStatisticsRequestHandler(IAlbumRepository _albumReposito
         bool result = await _albumRepository.UpdateStatisticsAsync(message.Id, message.TrackCount, message.Duration);
 
         if (result)
-            return Result<bool>.Success(result);
+            return Result<bool>.Ok(result);
         else
-            return Result<bool>.Fail("Failed to update album statistics.");
+            return Result<bool>.Fail(new OperationError("album.statistics_update_failed", "Failed to update album statistics."));
     }
 }

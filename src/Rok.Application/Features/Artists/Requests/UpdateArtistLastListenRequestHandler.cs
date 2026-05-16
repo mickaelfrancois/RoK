@@ -19,8 +19,8 @@ public class UpdateArtistLastListenRequestHandler(IArtistRepository _artistRepos
         bool result = await _artistRepository.UpdateLastListenAsync(message.Id);
 
         if (result)
-            return Result<bool>.Success(result);
+            return Result<bool>.Ok(result);
         else
-            return Result<bool>.Fail("Failed to update artist last listen status.");
+            return Result<bool>.Fail(new OperationError("artist.last_listen_update_failed", "Failed to update artist last listen status."));
     }
 }

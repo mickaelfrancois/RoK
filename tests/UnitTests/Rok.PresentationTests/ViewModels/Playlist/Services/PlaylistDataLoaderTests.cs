@@ -1,4 +1,5 @@
-using MiF.Result;
+using CleanArch.DevKit.Mediator.Results;
+using Rok.Application.Errors;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using Rok.Application.Dto;
@@ -23,7 +24,7 @@ public class PlaylistDataLoaderTests
         // Arrange
         PlaylistHeaderDto playlist = new() { Id = 7, Name = "Mix" };
         _mediator.Setup(m => m.Send(It.IsAny<GetPlaylistByIdRequest>(), It.IsAny<CancellationToken>()))
-                 .ReturnsAsync(Result<PlaylistHeaderDto>.Success(playlist));
+                 .ReturnsAsync(Result<PlaylistHeaderDto>.Ok(playlist));
         PlaylistDataLoader sut = BuildService();
 
         // Act
@@ -39,7 +40,7 @@ public class PlaylistDataLoaderTests
     {
         // Arrange
         _mediator.Setup(m => m.Send(It.IsAny<GetPlaylistByIdRequest>(), It.IsAny<CancellationToken>()))
-                 .ReturnsAsync(Result<PlaylistHeaderDto>.Fail("not found"));
+                 .ReturnsAsync(Result<PlaylistHeaderDto>.Fail(new OperationError("playlist.not_found", "not found")));
         PlaylistDataLoader sut = BuildService();
 
         // Act

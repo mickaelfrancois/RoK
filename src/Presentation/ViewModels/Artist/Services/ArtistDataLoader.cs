@@ -14,7 +14,7 @@ public class ArtistDataLoader(IMediator mediator, IAlbumViewModelFactory albumVi
         Result<ArtistDto> resultArtist = await mediator.Send(new GetArtistByIdRequest(artistId));
 
         if (resultArtist.IsSuccess)
-            return resultArtist.Value!;
+            return resultArtist.Value;
 
         logger.LogError("Failed to load artist {ArtistId}", artistId);
         return null;

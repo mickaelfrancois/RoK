@@ -18,17 +18,17 @@ public class AddTrackToPlaylistRequestHandler(IPlaylistTrackRepository _reposito
     {
         TrackEntity? track = await _trackRepository.GetByIdAsync(message.TrackId);
         if (track == null)
-            return Result<long>.Fail("Track not found.");
+            return Result<long>.Fail(NotFoundError.ForEntity("Track", message.TrackId));
 
         PlaylistHeaderEntity? playlistHeader = await _playlistHeaderRepository.GetByIdAsync(message.PlaylistId);
         if (playlistHeader == null)
-            return Result<long>.Fail("Playlist not found.");
+            return Result<long>.Fail(NotFoundError.ForEntity("Playlist", message.PlaylistId));
 
 
         long id = await _repository.GetAsync(message.PlaylistId, message.TrackId);
 
         if (id > 0)
-            return Result<long>.Fail("Track already exists in the playlist.", "DUPLICATE");
+            return Result<long>.Fail(new ConflictError("playlist.duplicate_track", "Track already exists in the playlist."));
 
         using TransactionScope scope = new(TransactionScopeAsyncFlowOption.Enabled);
 
@@ -42,14 +42,14 @@ public class AddTrackToPlaylistRequestHandler(IPlaylistTrackRepository _reposito
         catch (Exception ex)
         {
             _logger.LogError(ex, "Failed to add track {TrackId} to playlist {PlaylistId}.", message.TrackId, message.PlaylistId);
-            return Result<long>.Fail("Failed to add track to playlist due to an error.");
+            return Result<long>.Fail(new OperationError("playlist.add_track_transaction_failed", "Failed to add track to playlist due to an error."));
         }
 
 
         if (id > 0)
-            return Result<long>.Success(id);
+            return Result<long>.Ok(id);
         else
-            return Result<long>.Fail("Failed to add track to playlist.");
+            return Result<long>.Fail(new OperationError("playlist.add_track_persistence_failed", "Failed to add track to playlist."));
     }
 
 

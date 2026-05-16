@@ -12,7 +12,7 @@ public class PlaylistDataLoader(IMediator mediator, ITrackViewModelFactory track
         Result<PlaylistHeaderDto> result = await mediator.Send(new GetPlaylistByIdRequest(playlistId));
 
         if (result.IsSuccess)
-            return result.Value!;
+            return result.Value;
 
         logger.LogError("Playlist {PlaylistId} not found", playlistId);
         return null;

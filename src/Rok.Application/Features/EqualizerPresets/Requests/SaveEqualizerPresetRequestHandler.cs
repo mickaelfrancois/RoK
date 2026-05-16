@@ -28,6 +28,6 @@ public class SaveEqualizerPresetRequestHandler(IEqualizerPresetRepository reposi
     {
         await repository.SaveAsync(message.ToEntity());
 
-        return Result<bool>.Success(true);
+        return Result<bool>.Ok(true);
     }
 }

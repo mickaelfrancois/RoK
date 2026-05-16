@@ -51,9 +51,9 @@ public class AlbumsDataLoader(IMediator mediator, IAlbumViewModelFactory albumVi
     {
         Result<AlbumDto> result = await mediator.Send(new GetAlbumByIdRequest(id));
 
-        if (result.IsError)
+        if (result.IsFailure)
         {
-            logger.LogError("Failed to retrieve album {Id}: {ErrorMessage}", id, result.Error);
+            logger.LogError("Failed to retrieve album {Id}: {ErrorMessage}", id, result.Errors[0]);
             return null;
         }
 

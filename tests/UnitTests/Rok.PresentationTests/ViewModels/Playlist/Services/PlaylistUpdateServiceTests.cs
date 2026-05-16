@@ -1,4 +1,5 @@
-using MiF.Result;
+using CleanArch.DevKit.Mediator.Results;
+using Rok.Application.Errors;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using Rok.Application.Dto;
@@ -41,7 +42,7 @@ public class PlaylistUpdateServiceTests
         // Arrange
         PlaylistHeaderDto playlist = new() { Id = 1, Name = "Mix" };
         _mediator.Setup(m => m.Send(It.IsAny<UpdatePlaylistRequest>(), It.IsAny<CancellationToken>()))
-                 .ReturnsAsync(Result.Success());
+                 .ReturnsAsync(Result.Ok());
         PlaylistUpdateService sut = BuildService();
 
         // Act
@@ -58,7 +59,7 @@ public class PlaylistUpdateServiceTests
         // Arrange
         PlaylistHeaderDto playlist = new() { Id = 1, Name = "Mix" };
         _mediator.Setup(m => m.Send(It.IsAny<UpdatePlaylistRequest>(), It.IsAny<CancellationToken>()))
-                 .ReturnsAsync(Result.Fail("boom"));
+                 .ReturnsAsync(Result.Fail(new OperationError("test.boom", "boom")));
         PlaylistUpdateService sut = BuildService();
 
         // Act
@@ -73,7 +74,7 @@ public class PlaylistUpdateServiceTests
     {
         // Arrange
         _mediator.Setup(m => m.Send(It.IsAny<RemoveTrackFromPlaylistRequest>(), It.IsAny<CancellationToken>()))
-                 .ReturnsAsync(Result.Success());
+                 .ReturnsAsync(Result.Ok());
         PlaylistUpdateService sut = BuildService();
 
         // Act
@@ -91,7 +92,7 @@ public class PlaylistUpdateServiceTests
     {
         // Arrange
         _mediator.Setup(m => m.Send(It.IsAny<RemoveTrackFromPlaylistRequest>(), It.IsAny<CancellationToken>()))
-                 .ReturnsAsync(Result.Fail("boom"));
+                 .ReturnsAsync(Result.Fail(new OperationError("test.boom", "boom")));
         PlaylistUpdateService sut = BuildService();
 
         // Act
@@ -106,7 +107,7 @@ public class PlaylistUpdateServiceTests
     {
         // Arrange
         _mediator.Setup(m => m.Send(It.IsAny<DeletePlaylistRequest>(), It.IsAny<CancellationToken>()))
-                 .ReturnsAsync(Result<bool>.Success(true));
+                 .ReturnsAsync(Result<bool>.Ok(true));
         PlaylistUpdateService sut = BuildService();
 
         // Act
@@ -122,7 +123,7 @@ public class PlaylistUpdateServiceTests
     {
         // Arrange
         _mediator.Setup(m => m.Send(It.IsAny<DeletePlaylistRequest>(), It.IsAny<CancellationToken>()))
-                 .ReturnsAsync(Result<bool>.Fail("boom"));
+                 .ReturnsAsync(Result<bool>.Fail(new OperationError("test.boom", "boom")));
         PlaylistUpdateService sut = BuildService();
 
         // Act
@@ -137,7 +138,7 @@ public class PlaylistUpdateServiceTests
     {
         // Arrange
         _mediator.Setup(m => m.Send(It.IsAny<MovePlaylistTracksRequest>(), It.IsAny<CancellationToken>()))
-                 .ReturnsAsync(Result<bool>.Success(true));
+                 .ReturnsAsync(Result<bool>.Ok(true));
         PlaylistUpdateService sut = BuildService();
 
         // Act
@@ -155,7 +156,7 @@ public class PlaylistUpdateServiceTests
     {
         // Arrange
         _mediator.Setup(m => m.Send(It.IsAny<MovePlaylistTracksRequest>(), It.IsAny<CancellationToken>()))
-                 .ReturnsAsync(Result<bool>.Fail("boom"));
+                 .ReturnsAsync(Result<bool>.Fail(new OperationError("test.boom", "boom")));
         PlaylistUpdateService sut = BuildService();
 
         // Act

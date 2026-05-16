@@ -19,8 +19,8 @@ public class GetArtistByNameRequestHandler(IArtistRepository artistRepository) :
     {
         ArtistEntity? artist = await artistRepository.GetByNameAsync(query.Name);
         if (artist == null)
-            return Result<ArtistDto>.Fail("NotFound", "Artist not found");
+            return Result<ArtistDto>.Fail(NotFoundError.ForEntity("Artist", query.Name));
         else
-            return Result<ArtistDto>.Success(ArtistMapping.ToDto(artist));
+            return Result<ArtistDto>.Ok(ArtistMapping.ToDto(artist));
     }
 }

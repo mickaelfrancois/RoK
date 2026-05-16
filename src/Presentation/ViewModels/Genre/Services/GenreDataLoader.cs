@@ -13,7 +13,7 @@ public class GenreDataLoader(IMediator mediator, IAlbumViewModelFactory albumVie
         Result<GenreDto> result = await mediator.Send(new GetGenreByIdRequest(genreId));
 
         if (result.IsSuccess)
-            return result.Value!;
+            return result.Value;
 
         logger.LogError("Failed to load genre {GenreId}", genreId);
         return null;

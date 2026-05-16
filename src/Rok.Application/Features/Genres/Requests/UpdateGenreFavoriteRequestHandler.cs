@@ -21,8 +21,8 @@ public class UpdateGenreFavoriteRequestHandler(IGenreRepository _genreRepository
         bool result = await _genreRepository.UpdateFavoriteAsync(message.Id, message.IsFavorite);
 
         if (result)
-            return Result<bool>.Success(result);
+            return Result<bool>.Ok(result);
         else
-            return Result<bool>.Fail("Failed to update genre favorite status.");
+            return Result<bool>.Fail(new OperationError("genre.favorite_update_failed", "Failed to update genre favorite status."));
     }
 }

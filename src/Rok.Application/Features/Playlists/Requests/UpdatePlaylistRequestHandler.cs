@@ -43,8 +43,8 @@ public class UpdatePlaylistRequestHandler(IPlaylistHeaderRepository _repository,
         bool isSuccess = await _repository.UpdateAsync(playlistEntity);
 
         if (isSuccess)
-            return Result.Success();
+            return Result.Ok();
         else
-            return Result.Fail("Failed to update playlist.");
+            return Result.Fail(new OperationError("playlist.update_failed", "Failed to update playlist."));
     }
 }

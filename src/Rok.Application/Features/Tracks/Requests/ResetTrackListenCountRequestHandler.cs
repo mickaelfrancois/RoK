@@ -13,8 +13,8 @@ public class ResetTrackListenCountRequestHandler(ITrackRepository _trackReposito
         bool result = await _trackRepository.ResetListenCountAsync();
 
         if (result)
-            return Result<bool>.Success(result);
+            return Result<bool>.Ok(result);
         else
-            return Result<bool>.Fail("Failed to reset track listen count.");
+            return Result<bool>.Fail(new OperationError("track.listen_count_reset_failed", "Failed to reset track listen count."));
     }
 }

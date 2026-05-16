@@ -46,9 +46,9 @@ public class MovePlaylistTracksRequestHandler(IPlaylistTrackRepository _reposito
         catch (Exception ex)
         {
             _logger.LogError(ex, "Failed to move tracks in playlist {PlaylistId}.", message.PlaylistId);
-            return Result<bool>.Fail("Failed to move tracks in playlist due to an error.");
+            return Result<bool>.Fail(new OperationError("playlist.move_tracks_failed", "Failed to move tracks in playlist due to an error."));
         }
 
-        return Result<bool>.Success(true);
+        return Result<bool>.Ok(true);
     }
 }

@@ -35,7 +35,7 @@ public class ExportPlaylistRequestHandlerTests
         try
         {
             _mediator.Setup(m => m.Send(It.IsAny<GetPlaylistByIdRequest>(), It.IsAny<CancellationToken>()))
-                     .ReturnsAsync(Result<PlaylistHeaderDto>.Success(new PlaylistHeaderDto { Id = 1, Name = "Mix", Type = 1 }));
+                     .ReturnsAsync(Result<PlaylistHeaderDto>.Ok(new PlaylistHeaderDto { Id = 1, Name = "Mix", Type = 1 }));
             _mediator.Setup(m => m.Send(It.IsAny<GetTracksByPlaylistIdRequest>(), It.IsAny<CancellationToken>()))
                      .ReturnsAsync(new[]
                      {
@@ -75,7 +75,7 @@ public class ExportPlaylistRequestHandlerTests
         try
         {
             _mediator.Setup(m => m.Send(It.IsAny<GetPlaylistByIdRequest>(), It.IsAny<CancellationToken>()))
-                     .ReturnsAsync(Result<PlaylistHeaderDto>.Success(new PlaylistHeaderDto { Id = 1, Name = "Smart", Type = 0 }));
+                     .ReturnsAsync(Result<PlaylistHeaderDto>.Ok(new PlaylistHeaderDto { Id = 1, Name = "Smart", Type = 0 }));
             _mediator.Setup(m => m.Send(It.IsAny<GetTracksByPlaylistIdRequest>(), It.IsAny<CancellationToken>()))
                      .ReturnsAsync(new[] { new TrackDto { Title = "T", ArtistName = "A", MusicFile = "D:\\s.mp3", Duration = 10 } });
             _writer.Setup(w => w.WriteAsync(It.IsAny<Stream>(), It.IsAny<PlaylistFileModel>(), It.IsAny<CancellationToken>())).Returns(Task.CompletedTask);
@@ -103,7 +103,7 @@ public class ExportPlaylistRequestHandlerTests
         try
         {
             _mediator.Setup(m => m.Send(It.IsAny<GetPlaylistByIdRequest>(), It.IsAny<CancellationToken>()))
-                     .ReturnsAsync(Result<PlaylistHeaderDto>.Success(new PlaylistHeaderDto { Id = 1, Name = "Empty", Type = 1 }));
+                     .ReturnsAsync(Result<PlaylistHeaderDto>.Ok(new PlaylistHeaderDto { Id = 1, Name = "Empty", Type = 1 }));
             _mediator.Setup(m => m.Send(It.IsAny<GetTracksByPlaylistIdRequest>(), It.IsAny<CancellationToken>()))
                      .ReturnsAsync(Array.Empty<TrackDto>());
 
@@ -136,7 +136,7 @@ public class ExportPlaylistRequestHandlerTests
         try
         {
             _mediator.Setup(m => m.Send(It.IsAny<GetPlaylistByIdRequest>(), It.IsAny<CancellationToken>()))
-                     .ReturnsAsync(Result<PlaylistHeaderDto>.Fail("NotFound"));
+                     .ReturnsAsync(Result<PlaylistHeaderDto>.Fail(NotFoundError.ForEntity("Playlist", 1L)));
 
             ExportPlaylistRequestHandler sut = BuildHandler();
 
@@ -162,7 +162,7 @@ public class ExportPlaylistRequestHandlerTests
         try
         {
             _mediator.Setup(m => m.Send(It.IsAny<GetPlaylistByIdRequest>(), It.IsAny<CancellationToken>()))
-                     .ReturnsAsync(Result<PlaylistHeaderDto>.Success(new PlaylistHeaderDto { Id = 1, Name = "X", Type = 1 }));
+                     .ReturnsAsync(Result<PlaylistHeaderDto>.Ok(new PlaylistHeaderDto { Id = 1, Name = "X", Type = 1 }));
             _mediator.Setup(m => m.Send(It.IsAny<GetTracksByPlaylistIdRequest>(), It.IsAny<CancellationToken>()))
                      .ReturnsAsync(Array.Empty<TrackDto>());
             IPlaylistFormatWriter? noWriter = null;
@@ -190,7 +190,7 @@ public class ExportPlaylistRequestHandlerTests
         try
         {
             _mediator.Setup(m => m.Send(It.IsAny<GetPlaylistByIdRequest>(), It.IsAny<CancellationToken>()))
-                     .ReturnsAsync(Result<PlaylistHeaderDto>.Success(new PlaylistHeaderDto { Id = 1, Name = "X", Type = 1 }));
+                     .ReturnsAsync(Result<PlaylistHeaderDto>.Ok(new PlaylistHeaderDto { Id = 1, Name = "X", Type = 1 }));
             _mediator.Setup(m => m.Send(It.IsAny<GetTracksByPlaylistIdRequest>(), It.IsAny<CancellationToken>()))
                      .ReturnsAsync(Array.Empty<TrackDto>());
 

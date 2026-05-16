@@ -1,4 +1,5 @@
-using MiF.Result;
+using CleanArch.DevKit.Mediator.Results;
+using Rok.Application.Errors;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using Rok.Application.Dto;
@@ -24,7 +25,7 @@ public class GenreDataLoaderTests
         // Arrange
         GenreDto genre = new() { Id = 7, Name = "Jazz" };
         _mediator.Setup(m => m.Send(It.IsAny<GetGenreByIdRequest>(), It.IsAny<CancellationToken>()))
-                 .ReturnsAsync(Result<GenreDto>.Success(genre));
+                 .ReturnsAsync(Result<GenreDto>.Ok(genre));
         GenreDataLoader sut = BuildService();
 
         // Act
@@ -40,7 +41,7 @@ public class GenreDataLoaderTests
     {
         // Arrange
         _mediator.Setup(m => m.Send(It.IsAny<GetGenreByIdRequest>(), It.IsAny<CancellationToken>()))
-                 .ReturnsAsync(Result<GenreDto>.Fail("not found"));
+                 .ReturnsAsync(Result<GenreDto>.Fail(new OperationError("genre.not_found", "not found")));
         GenreDataLoader sut = BuildService();
 
         // Act

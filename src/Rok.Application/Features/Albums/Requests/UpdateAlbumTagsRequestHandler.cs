@@ -25,8 +25,8 @@ public class UpdateAlbumTagsRequestHandler(ITagRepository repository) : IRequest
         bool result = await repository.UpdateEntityTagsAsync(message.Id, message.Tags, "albumtags", "albumid");
 
         if (result)
-            return Result<bool>.Success(result);
+            return Result<bool>.Ok(result);
         else
-            return Result<bool>.Fail("Failed to update album tags.");
+            return Result<bool>.Fail(new OperationError("album.tags_update_failed", "Failed to update album tags."));
     }
 }

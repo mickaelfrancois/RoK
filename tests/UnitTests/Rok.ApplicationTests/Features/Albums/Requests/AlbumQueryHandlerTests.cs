@@ -22,7 +22,7 @@ public class GetAlbumByIdRequestHandlerTests
 
         // Assert
         Assert.True(result.IsSuccess);
-        Assert.Equal(7, result.Value!.Id);
+        Assert.Equal(7, result.Value.Id);
         Assert.Equal("Thriller", result.Value.Name);
     }
 
@@ -38,7 +38,9 @@ public class GetAlbumByIdRequestHandlerTests
         Result<AlbumDto> result = await handler.Handle(new GetAlbumByIdRequest(99), CancellationToken.None);
 
         // Assert
-        Assert.False(result.IsSuccess);
+        Assert.True(result.IsFailure);
+        Assert.IsType<NotFoundError>(result.Errors[0]);
+        Assert.Equal("album.not_found", result.Errors[0].Code);
     }
 }
 

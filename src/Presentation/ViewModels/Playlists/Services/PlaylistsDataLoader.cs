@@ -21,9 +21,9 @@ public class PlaylistsDataLoader(IMediator mediator, IPlaylistViewModelFactory p
     {
         Result<PlaylistHeaderDto> result = await mediator.Send(new GetPlaylistByIdRequest(id));
 
-        if (result.IsError)
+        if (result.IsFailure)
         {
-            logger.LogError("Failed to retrieve playlist {Id}: {ErrorMessage}", id, result.Error);
+            logger.LogError("Failed to retrieve playlist {Id}: {ErrorMessage}", id, result.Errors[0]);
             return null;
         }
 

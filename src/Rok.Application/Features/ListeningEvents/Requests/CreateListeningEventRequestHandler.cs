@@ -30,7 +30,7 @@ public class CreateListeningEventRequestHandler(IListeningEventRepository _liste
         double completionRate = (double)message.DurationPlayed / message.DurationTotal;
         bool fastChange = message.DurationPlayed < 30 && completionRate < 0.2;
         if (fastChange)
-            return Result<long>.Success(0);
+            return Result<long>.Ok(0);
 
         bool wasSkipped = message.DurationPlayed >= 30 && completionRate < 0.2;
 
@@ -49,8 +49,8 @@ public class CreateListeningEventRequestHandler(IListeningEventRepository _liste
         long id = await _listeningEventRepository.AddAsync(entity);
 
         if (id > 0)
-            return Result<long>.Success(id);
+            return Result<long>.Ok(id);
         else
-            return Result<long>.Fail("Failed to create listening event.");
+            return Result<long>.Fail(new OperationError("listening_event.create_failed", "Failed to create listening event."));
     }
 }

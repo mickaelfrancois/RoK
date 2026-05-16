@@ -41,8 +41,8 @@ public class UpdateArtistStatisticsRequestHandler(IArtistRepository _artistRepos
         bool result = await _artistRepository.UpdateStatisticsAsync(message.Id, message.TrackCount, message.TotalDurationSeconds, message.AlbumCount, message.BestOfCount, message.LiveCount, message.CompilationCount, message.YearMini, message.YearMaxi);
 
         if (result)
-            return Result<bool>.Success(result);
+            return Result<bool>.Ok(result);
         else
-            return Result<bool>.Fail("Failed to update artist statistics.");
+            return Result<bool>.Fail(new OperationError("artist.statistics_update_failed", "Failed to update artist statistics."));
     }
 }

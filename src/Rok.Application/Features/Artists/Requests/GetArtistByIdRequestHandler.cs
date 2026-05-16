@@ -19,8 +19,8 @@ public class GetArtistByIdRequestHandler(IArtistRepository artistRepository) : I
     {
         ArtistEntity? artist = await artistRepository.GetByIdAsync(query.Id);
         if (artist == null)
-            return Result<ArtistDto>.Fail("NotFound", "Artist not found");
+            return Result<ArtistDto>.Fail(NotFoundError.ForEntity("Artist", query.Id));
         else
-            return Result<ArtistDto>.Success(ArtistMapping.ToDto(artist));
+            return Result<ArtistDto>.Ok(ArtistMapping.ToDto(artist));
     }
 }

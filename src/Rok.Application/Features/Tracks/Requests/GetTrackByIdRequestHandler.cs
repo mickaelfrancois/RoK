@@ -23,8 +23,8 @@ public class GetTrackByIdRequestHandler(ITrackRepository trackRepository) : IReq
     {
         TrackEntity? track = await trackRepository.GetByIdAsync(query.Id);
         if (track == null)
-            return Result<TrackDto>.Fail("NotFound", "Track not found");
+            return Result<TrackDto>.Fail(NotFoundError.ForEntity("Track", query.Id));
         else
-            return Result<TrackDto>.Success(TrackDtoMapping.Map(track));
+            return Result<TrackDto>.Ok(TrackDtoMapping.Map(track));
     }
 }

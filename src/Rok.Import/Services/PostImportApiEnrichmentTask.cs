@@ -1,6 +1,6 @@
 using CleanArch.DevKit.Mediator;
+using CleanArch.DevKit.Mediator.Results;
 using Microsoft.Extensions.Logging;
-using MiF.Result;
 using Rok.Application.Dto;
 using Rok.Application.Features.Albums.Requests;
 using Rok.Application.Features.Albums.Services;
@@ -48,7 +48,7 @@ public class PostImportApiEnrichmentTask(
                     continue;
                 }
 
-                await artistApiService.GetAndUpdateArtistDataAsync(result.Value!, artistPictureService, backdropPicture, cancellationToken);
+                await artistApiService.GetAndUpdateArtistDataAsync(result.Value, artistPictureService, backdropPicture, cancellationToken);
                 enriched++;
             }
             catch (Exception ex)
@@ -80,7 +80,7 @@ public class PostImportApiEnrichmentTask(
                     continue;
                 }
 
-                await albumApiService.GetAndUpdateAlbumDataAsync(result.Value!, albumPictureService, cancellationToken);
+                await albumApiService.GetAndUpdateAlbumDataAsync(result.Value, albumPictureService, cancellationToken);
                 enriched++;
             }
             catch (Exception ex)

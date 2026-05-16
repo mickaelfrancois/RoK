@@ -102,8 +102,8 @@ public class CreateArtistRequestHandler(IArtistRepository _artistRepository) : I
         long id = await _artistRepository.AddAsync(artistEntity);
 
         if (id > 0)
-            return Result<long>.Success(id);
+            return Result<long>.Ok(id);
         else
-            return Result<long>.Fail("Failed to create artist.");
+            return Result<long>.Fail(new OperationError("artist.create_failed", "Failed to create artist."));
     }
 }

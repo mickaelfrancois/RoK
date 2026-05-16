@@ -19,8 +19,8 @@ public class GetGenreByIdRequestHandler(IGenreRepository genreRepository) : IReq
     {
         GenreEntity? genre = await genreRepository.GetByIdAsync(query.Id);
         if (genre == null)
-            return Result<GenreDto>.Fail("NotFound", "Genre not found");
+            return Result<GenreDto>.Fail(NotFoundError.ForEntity("Genre", query.Id));
         else
-            return Result<GenreDto>.Success(GenreDtoMapping.Map(genre));
+            return Result<GenreDto>.Ok(GenreDtoMapping.Map(genre));
     }
 }

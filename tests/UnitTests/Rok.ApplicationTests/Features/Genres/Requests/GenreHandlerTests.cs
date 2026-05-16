@@ -119,7 +119,7 @@ public class GetGenreByIdRequestHandlerTests
 
         // Assert
         Assert.True(result.IsSuccess);
-        Assert.Equal("Rock", result.Value!.Name);
+        Assert.Equal("Rock", result.Value.Name);
     }
 
     [Fact(DisplayName = "Handle should return NotFound failure when genre does not exist")]
@@ -134,7 +134,9 @@ public class GetGenreByIdRequestHandlerTests
         Result<GenreDto> result = await handler.Handle(new GetGenreByIdRequest(999), CancellationToken.None);
 
         // Assert
-        Assert.False(result.IsSuccess);
+        Assert.True(result.IsFailure);
+        Assert.IsType<NotFoundError>(result.Errors[0]);
+        Assert.Equal("genre.not_found", result.Errors[0].Code);
     }
 }
 

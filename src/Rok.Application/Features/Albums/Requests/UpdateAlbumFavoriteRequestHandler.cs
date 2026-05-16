@@ -24,8 +24,8 @@ public class UpdateAlbumFavoriteRequestHandler(IAlbumRepository _albumRepository
         bool result = await _albumRepository.UpdateFavoriteAsync(message.Id, message.IsFavorite);
 
         if (result)
-            return Result<bool>.Success(result);
+            return Result<bool>.Ok(result);
         else
-            return Result<bool>.Fail("Failed to update album favorite status.");
+            return Result<bool>.Fail(new OperationError("album.favorite_update_failed", "Failed to update album favorite status."));
     }
 }

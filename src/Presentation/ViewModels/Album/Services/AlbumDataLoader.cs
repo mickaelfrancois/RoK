@@ -12,7 +12,7 @@ public class AlbumDataLoader(IMediator mediator, ITrackViewModelFactory trackVie
         Result<AlbumDto> resultAlbum = await mediator.Send(new GetAlbumByIdRequest(albumId));
 
         if (resultAlbum.IsSuccess)
-            return resultAlbum.Value!;
+            return resultAlbum.Value;
 
         logger.LogError("Failed to load album {AlbumId}", albumId);
         return null;

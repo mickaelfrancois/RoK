@@ -69,11 +69,11 @@ public class ImportPlaylistRequestHandlerTests : IDisposable
 
             // Assert
             Assert.True(result.IsSuccess);
-            Assert.Equal(PlaylistImportStatus.Imported, result.Value!.Status);
-            Assert.Equal(2, result.Value!.MatchedCount);
-            Assert.Equal(1, result.Value!.IgnoredCount);
+            Assert.Equal(PlaylistImportStatus.Imported, result.Value.Status);
+            Assert.Equal(2, result.Value.MatchedCount);
+            Assert.Equal(1, result.Value.IgnoredCount);
 
-            int trackRows = _connection.ExecuteScalar<int>("SELECT COUNT(*) FROM playlisttracks WHERE playlistId = @id", new { id = result.Value!.PlaylistId });
+            int trackRows = _connection.ExecuteScalar<int>("SELECT COUNT(*) FROM playlisttracks WHERE playlistId = @id", new { id = result.Value.PlaylistId });
             Assert.Equal(2, trackRows);
         }
         finally
@@ -100,7 +100,7 @@ public class ImportPlaylistRequestHandlerTests : IDisposable
 
             // Assert
             Assert.True(result.IsSuccess);
-            Assert.Equal(PlaylistImportStatus.Skipped, result.Value!.Status);
+            Assert.Equal(PlaylistImportStatus.Skipped, result.Value.Status);
             Assert.Equal(0, _connection.ExecuteScalar<int>("SELECT COUNT(*) FROM playlists"));
         }
         finally
@@ -128,7 +128,7 @@ public class ImportPlaylistRequestHandlerTests : IDisposable
 
             // Assert
             Assert.True(result.IsSuccess);
-            Assert.Equal("Mix (2)", result.Value!.FinalName);
+            Assert.Equal("Mix (2)", result.Value.FinalName);
         }
         finally
         {
@@ -159,7 +159,7 @@ public class ImportPlaylistRequestHandlerTests : IDisposable
 
             // Assert
             Assert.True(result.IsSuccess);
-            List<int> positions = _connection.Query<int>("SELECT position FROM playlisttracks WHERE playlistId = @id ORDER BY position", new { id = result.Value!.PlaylistId }).ToList();
+            List<int> positions = _connection.Query<int>("SELECT position FROM playlisttracks WHERE playlistId = @id ORDER BY position", new { id = result.Value.PlaylistId }).ToList();
             Assert.Equal(new[] { 0, 1, 2 }, positions);
         }
         finally
@@ -265,7 +265,7 @@ public class ImportPlaylistRequestHandlerTests : IDisposable
 
             // Assert
             Assert.True(result.IsSuccess);
-            Assert.Equal("Mix (4)", result.Value!.FinalName);
+            Assert.Equal("Mix (4)", result.Value.FinalName);
         }
         finally
         {
@@ -296,8 +296,8 @@ public class ImportPlaylistRequestHandlerTests : IDisposable
 
             // Assert
             Assert.True(result.IsSuccess);
-            Assert.Equal(1, result.Value!.MatchedCount);
-            Assert.Equal(2, result.Value!.IgnoredCount);
+            Assert.Equal(1, result.Value.MatchedCount);
+            Assert.Equal(2, result.Value.IgnoredCount);
         }
         finally
         {
@@ -379,7 +379,7 @@ public class ImportPlaylistRequestHandlerTests : IDisposable
 
                 // Assert
                 Assert.True(result.IsSuccess);
-                Assert.Equal(result.Value!.PlaylistId, receivedId);
+                Assert.Equal(result.Value.PlaylistId, receivedId);
             }
             finally
             {

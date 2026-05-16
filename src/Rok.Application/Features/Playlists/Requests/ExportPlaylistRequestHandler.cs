@@ -20,7 +20,7 @@ public sealed class ExportPlaylistRequestHandler(
         if (!headerResult.IsSuccess)
         {
             _logger.LogWarning("Export aborted: playlist {Id} not found", command.PlaylistId);
-            return Result.Fail("PlaylistNotFound");
+            return Result.Fail(NotFoundError.ForEntity("Playlist", command.PlaylistId));
         }
 
         IEnumerable<TrackDto> tracks = await _mediator.Send(new GetTracksByPlaylistIdRequest(command.PlaylistId), cancellationToken);
@@ -33,14 +33,14 @@ public sealed class ExportPlaylistRequestHandler(
                 t.Duration > 0 ? TimeSpan.FromSeconds(t.Duration) : null))
             .ToList();
 
-        PlaylistFileModel model = new(headerResult.Value!.Name, entries);
+        PlaylistFileModel model = new(headerResult.Value.Name, entries);
 
         string extension = Path.GetExtension(command.FilePath);
 
         if (!_resolver.TryGetWriter(extension, out IPlaylistFormatWriter? writer) || writer == null)
         {
             _logger.LogWarning("Export aborted: unsupported format {Extension}", extension);
-            return Result.Fail("UnsupportedFormat");
+            return Result.Fail(new OperationError("playlist.unsupported_format", "Unsupported playlist format."));
         }
 
         string tempPath = command.FilePath + ".tmp";
@@ -54,7 +54,7 @@ public sealed class ExportPlaylistRequestHandler(
 
             File.Move(tempPath, command.FilePath, overwrite: true);
             _logger.LogInformation("Exported playlist {Id} to {Path}", command.PlaylistId, command.FilePath);
-            return Result.Success();
+            return Result.Ok();
         }
         catch (OperationCanceledException)
         {
@@ -65,7 +65,7 @@ public sealed class ExportPlaylistRequestHandler(
         {
             TryDelete(tempPath);
             _logger.LogError(ex, "Failed to export playlist {Id} to {Path}", command.PlaylistId, command.FilePath);
-            return Result.Fail("WriteError");
+            return Result.Fail(new OperationError("playlist.write_error", "Failed to write playlist file."));
         }
     }
 

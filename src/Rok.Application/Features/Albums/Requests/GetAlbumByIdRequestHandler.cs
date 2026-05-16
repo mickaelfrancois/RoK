@@ -22,8 +22,8 @@ public class GetAlbumByIdRequestHandler(IAlbumRepository albumRepository) : IReq
     {
         AlbumEntity? album = await albumRepository.GetByIdAsync(query.Id);
         if (album == null)
-            return Result<AlbumDto>.Fail("NotFound", "Album not found");
+            return Result<AlbumDto>.Fail(NotFoundError.ForEntity("Album", query.Id));
         else
-            return Result<AlbumDto>.Success(AlbumMapping.ToDto(album));
+            return Result<AlbumDto>.Ok(AlbumMapping.ToDto(album));
     }
 }

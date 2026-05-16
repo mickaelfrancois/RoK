@@ -34,7 +34,7 @@ public sealed class ImportPlaylistRequestHandler(
         if (!_resolver.TryGetReader(extension, out IPlaylistFormatReader? reader) || reader == null)
         {
             _logger.LogWarning("Unsupported playlist format: {Extension}", extension);
-            return Result<PlaylistImportResult>.Fail("UnsupportedFormat");
+            return Result<PlaylistImportResult>.Fail(new OperationError("playlist.unsupported_format", "Unsupported playlist format."));
         }
 
         PlaylistFileModel model;
@@ -50,7 +50,7 @@ public sealed class ImportPlaylistRequestHandler(
         catch (Exception ex)
         {
             _logger.LogError(ex, "Failed to parse playlist {Path}", command.FilePath);
-            return Result<PlaylistImportResult>.Fail("ParseError");
+            return Result<PlaylistImportResult>.Fail(new OperationError("playlist.parse_error", "Failed to parse playlist file."));
         }
 
         List<(TrackEntity Track, PlaylistFileEntry Entry)> matched = new List<(TrackEntity, PlaylistFileEntry)>();
@@ -74,7 +74,7 @@ public sealed class ImportPlaylistRequestHandler(
         if (matched.Count == 0)
         {
             _logger.LogInformation("Playlist {Name} skipped: 0 tracks matched, {Ignored} ignored", model.Name, ignored);
-            return Result<PlaylistImportResult>.Success(new PlaylistImportResult(PlaylistImportStatus.Skipped, null, null, 0, ignored));
+            return Result<PlaylistImportResult>.Ok(new PlaylistImportResult(PlaylistImportStatus.Skipped, null, null, 0, ignored));
         }
 
         string? finalName = await ResolveFinalNameAsync(model.Name, cancellationToken);
@@ -82,7 +82,7 @@ public sealed class ImportPlaylistRequestHandler(
         if (finalName == null)
         {
             _logger.LogError("Name collision exhausted for {Name}", model.Name);
-            return Result<PlaylistImportResult>.Fail("NameCollisionExhausted");
+            return Result<PlaylistImportResult>.Fail(new OperationError("playlist.name_collision_exhausted", "Could not resolve unique playlist name."));
         }
 
         if (_connection.State != ConnectionState.Open)
@@ -135,7 +135,7 @@ public sealed class ImportPlaylistRequestHandler(
             {
                 transaction.Rollback();
                 _logger.LogError(ex, "Failed to insert playlist {Name}", finalName);
-                return Result<PlaylistImportResult>.Fail("DatabaseError");
+                return Result<PlaylistImportResult>.Fail(new OperationError("playlist.database_error", "Failed to insert playlist."));
             }
         }
 
@@ -143,7 +143,7 @@ public sealed class ImportPlaylistRequestHandler(
 
         _logger.LogInformation("Imported playlist {Name} (Id={Id}): {Matched} tracks, {Ignored} ignored", finalName, playlistId, matched.Count, ignored);
 
-        return Result<PlaylistImportResult>.Success(new PlaylistImportResult(PlaylistImportStatus.Imported, playlistId, finalName, matched.Count, ignored));
+        return Result<PlaylistImportResult>.Ok(new PlaylistImportResult(PlaylistImportStatus.Imported, playlistId, finalName, matched.Count, ignored));
     }
 
     private async Task<string?> ResolveFinalNameAsync(string baseName, CancellationToken cancellationToken)

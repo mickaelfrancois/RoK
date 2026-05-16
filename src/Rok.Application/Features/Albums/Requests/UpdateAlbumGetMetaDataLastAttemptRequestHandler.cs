@@ -15,8 +15,8 @@ internal class UpdateAlbumGetMetaDataLastAttemptRequestHandler(IAlbumRepository 
         bool result = await _repository.UpdateGetMetaDataLastAttemptAsync(request.AlbumId);
 
         if (result)
-            return Result<bool>.Success(result);
+            return Result<bool>.Ok(result);
         else
-            return Result<bool>.Fail("Failed to update meta last attempt.");
+            return Result<bool>.Fail(new OperationError("album.meta_attempt_update_failed", "Failed to update meta last attempt."));
     }
 }

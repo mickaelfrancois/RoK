@@ -46,10 +46,10 @@ public class PlaylistUpdateService(
 
         Result result = await mediator.Send(command);
 
-        if (result.IsError)
+        if (result.IsFailure)
         {
             logger.LogError("Failed to update playlist statistics for {Name} (Id: {Id}). Error: {Error}",
-                playlist.Name, playlist.Id, result.Error);
+                playlist.Name, playlist.Id, result.Errors[0]);
             return false;
         }
 
@@ -95,7 +95,7 @@ public class PlaylistUpdateService(
             return true;
         }
 
-        logger.LogError("Failed to delete playlist: {Name}. Error: {Error}", playlistName, result.Error);
+        logger.LogError("Failed to delete playlist: {Name}. Error: {Error}", playlistName, result.Errors[0]);
         return false;
     }
 
@@ -108,7 +108,7 @@ public class PlaylistUpdateService(
             return true;
         }
 
-        logger.LogError("Failed to update playlist: {PlaylistId}. Error: {Error}", playlistId, result.Error);
+        logger.LogError("Failed to update playlist: {PlaylistId}. Error: {Error}", playlistId, result.Errors[0]);
         return false;
     }
 }

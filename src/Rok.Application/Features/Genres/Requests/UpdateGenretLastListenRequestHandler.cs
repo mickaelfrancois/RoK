@@ -19,8 +19,8 @@ public class UpdateGenretLastListenRequestHandler(IGenreRepository _genreReposit
         bool result = await _genreRepository.UpdateLastListenAsync(message.Id);
 
         if (result)
-            return Result<bool>.Success(result);
+            return Result<bool>.Ok(result);
         else
-            return Result<bool>.Fail("Failed to update genre last listen status.");
+            return Result<bool>.Fail(new OperationError("genre.last_listen_update_failed", "Failed to update genre last listen status."));
     }
 }

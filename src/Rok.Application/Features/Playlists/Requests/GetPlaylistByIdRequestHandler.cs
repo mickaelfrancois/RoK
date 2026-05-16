@@ -19,8 +19,8 @@ public class GetPlaylistByIdRequestHandler(IPlaylistHeaderRepository _playlistHe
         PlaylistHeaderEntity? playlist = await _playlistHeaderRepository.GetByIdAsync(query.Id);
 
         if (playlist == null)
-            return Result<PlaylistHeaderDto>.Fail("NotFound", "Playlist not found");
+            return Result<PlaylistHeaderDto>.Fail(NotFoundError.ForEntity("Playlist", query.Id));
         else
-            return Result<PlaylistHeaderDto>.Success(PlaylistHeadeDtoMapping.Map(playlist));
+            return Result<PlaylistHeaderDto>.Ok(PlaylistHeadeDtoMapping.Map(playlist));
     }
 }

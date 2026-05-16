@@ -13,8 +13,8 @@ public class ResetGenreListenCountRequestHandler(IGenreRepository _genreReposito
         bool result = await _genreRepository.ResetListenCountAsync();
 
         if (result)
-            return Result<bool>.Success(result);
+            return Result<bool>.Ok(result);
         else
-            return Result<bool>.Fail("Failed to reset genre listen count.");
+            return Result<bool>.Fail(new OperationError("genre.listen_count_reset_failed", "Failed to reset genre listen count."));
     }
 }

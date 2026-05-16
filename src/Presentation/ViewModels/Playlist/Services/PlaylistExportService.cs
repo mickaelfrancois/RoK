@@ -33,7 +33,7 @@ public sealed class PlaylistExportService(
         }
         else
         {
-            _logger.LogError("Export failed for playlist {Id}: {Error}", playlist.Id, result.Error);
+            _logger.LogError("Export failed for playlist {Id}: {Error}", playlist.Id, result.Errors[0]);
             Messenger.Send(new ShowNotificationMessage { Message = "Échec de l'export", Type = NotificationType.Error });
         }
     }

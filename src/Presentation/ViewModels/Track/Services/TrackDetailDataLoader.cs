@@ -8,12 +8,12 @@ public class TrackDetailDataLoader(IMediator mediator, ILogger<TrackDetailDataLo
     {
         Result<TrackDto> trackResult = await mediator.Send(new GetTrackByIdRequest(trackId));
 
-        if (trackResult.IsError)
+        if (trackResult.IsFailure)
         {
             logger.LogError("Failed to load track {TrackId}", trackId);
             return null;
         }
 
-        return trackResult.Value!;
+        return trackResult.Value;
     }
 }

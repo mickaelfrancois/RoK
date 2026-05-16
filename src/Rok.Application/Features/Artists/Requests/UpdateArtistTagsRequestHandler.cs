@@ -24,8 +24,8 @@ public class UpdateArtistTagsRequestHandler(ITagRepository repository) : IReques
         bool result = await repository.UpdateEntityTagsAsync(message.Id, message.Tags, "artisttags", "artistid");
 
         if (result)
-            return Result<bool>.Success(result);
+            return Result<bool>.Ok(result);
         else
-            return Result<bool>.Fail("Failed to update artist tags.");
+            return Result<bool>.Fail(new OperationError("artist.tags_update_failed", "Failed to update artist tags."));
     }
 }

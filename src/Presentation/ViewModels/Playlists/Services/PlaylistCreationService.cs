@@ -17,9 +17,9 @@ public class PlaylistCreationService(
         };
 
         Result<long> result = await mediator.Send(command);
-        if (result.IsError)
+        if (result.IsFailure)
         {
-            logger.LogError("Failed to create new smart playlist: {ErrorMessage}", result.Error);
+            logger.LogError("Failed to create new smart playlist: {ErrorMessage}", result.Errors[0]);
             return null;
         }
 
@@ -39,9 +39,9 @@ public class PlaylistCreationService(
         };
 
         Result<long> result = await mediator.Send(command);
-        if (result.IsError)
+        if (result.IsFailure)
         {
-            logger.LogError("Failed to create new classic playlist: {ErrorMessage}", result.Error);
+            logger.LogError("Failed to create new classic playlist: {ErrorMessage}", result.Errors[0]);
             return null;
         }
 

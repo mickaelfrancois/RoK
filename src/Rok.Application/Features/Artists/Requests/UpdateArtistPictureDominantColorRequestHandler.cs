@@ -22,8 +22,8 @@ public class UpdateArtistPictureDominantColorRequestHandler(IArtistRepository _a
         bool result = await _artistRepository.UpdatePictureDominantColorAsync(message.Id, message.ColorValue);
 
         if (result)
-            return Result<bool>.Success(result);
+            return Result<bool>.Ok(result);
         else
-            return Result<bool>.Fail("Failed to update artist picture dominant color.");
+            return Result<bool>.Fail(new OperationError("artist.picture_dominant_color_update_failed", "Failed to update artist picture dominant color."));
     }
 }

@@ -71,7 +71,7 @@ public class UpdateArtistRequestHandler(IArtistRepository _artistRepository) : I
     {
         ArtistEntity? entity = await _artistRepository.GetByIdAsync(command.Id);
         if (entity is null)
-            return Result<bool>.Fail("Artist not found.");
+            return Result<bool>.Fail(NotFoundError.ForEntity("Artist", command.Id));
 
         entity.YoutubeUrl = command.YoutubeUrl;
         entity.MusicBrainzID = command.MusicBrainzID;
@@ -104,8 +104,8 @@ public class UpdateArtistRequestHandler(IArtistRepository _artistRepository) : I
         bool result = await _artistRepository.UpdateAsync(entity);
 
         if (result)
-            return Result<bool>.Success(true);
+            return Result<bool>.Ok(true);
         else
-            return Result<bool>.Fail("Failed to update artist.");
+            return Result<bool>.Fail(new OperationError("artist.update_failed", "Failed to update artist."));
     }
 }

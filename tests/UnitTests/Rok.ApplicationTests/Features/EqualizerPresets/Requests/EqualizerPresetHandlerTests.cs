@@ -60,8 +60,7 @@ public class GetEqualizerPresetRequestHandlerTests
 
         // Assert
         Assert.True(result.IsSuccess);
-        Assert.NotNull(result.Value);
-        Assert.Equal(EqualizerScope.Artist, result.Value!.Scope);
+        Assert.Equal(EqualizerScope.Artist, result.Value.Scope);
     }
 
     [Fact(DisplayName = "Handle should return failure when no preset is found")]
@@ -76,7 +75,9 @@ public class GetEqualizerPresetRequestHandlerTests
         Result<EqualizerPresetDto> result = await handler.Handle(new GetEqualizerPresetRequest(EqualizerScope.Default, null), CancellationToken.None);
 
         // Assert
-        Assert.False(result.IsSuccess);
+        Assert.True(result.IsFailure);
+        Assert.IsType<NotFoundError>(result.Errors[0]);
+        Assert.Equal("equalizerpreset.not_found", result.Errors[0].Code);
     }
 }
 

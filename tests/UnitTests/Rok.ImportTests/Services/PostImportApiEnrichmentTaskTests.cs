@@ -1,4 +1,4 @@
-using MiF.Result;
+using CleanArch.DevKit.Mediator.Results;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using Rok.Application.Features.Albums.Requests;
@@ -92,7 +92,7 @@ public class PostImportApiEnrichmentTaskTests
             .ReturnsAsync(ArtistApiUpdateResult.None);
         Mock<IMediator> mediator = new();
         mediator.Setup(m => m.Send(It.IsAny<GetArtistByIdRequest>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync(Result<ArtistDto>.Success(new ArtistDto { Id = 1, Name = "Artist" }));
+            .ReturnsAsync(Result<ArtistDto>.Ok(new ArtistDto { Id = 1, Name = "Artist" }));
         PostImportApiEnrichmentTask task = BuildTask(artistImport, albumImport, artistApi, new(), mediator);
 
         // Act
@@ -113,7 +113,7 @@ public class PostImportApiEnrichmentTaskTests
             .ReturnsAsync(AlbumApiUpdateResult.None);
         Mock<IMediator> mediator = new();
         mediator.Setup(m => m.Send(It.IsAny<GetAlbumByIdRequest>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync(Result<AlbumDto>.Success(new AlbumDto { Id = 1, Name = "Album" }));
+            .ReturnsAsync(Result<AlbumDto>.Ok(new AlbumDto { Id = 1, Name = "Album" }));
         PostImportApiEnrichmentTask task = BuildTask(artistImport, albumImport, new(), albumApi, mediator);
 
         // Act
@@ -135,7 +135,7 @@ public class PostImportApiEnrichmentTaskTests
             .ReturnsAsync(ArtistApiUpdateResult.None);
         Mock<IMediator> mediator = new();
         mediator.Setup(m => m.Send(It.IsAny<GetArtistByIdRequest>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync(Result<ArtistDto>.Success(new ArtistDto { Id = 1, Name = "Artist" }));
+            .ReturnsAsync(Result<ArtistDto>.Ok(new ArtistDto { Id = 1, Name = "Artist" }));
         PostImportApiEnrichmentTask task = BuildTask(artistImport, albumImport, artistApi, new(), mediator);
 
         // Act — must not throw

@@ -13,14 +13,14 @@ public class PlayerDataLoader(IMediator mediator, IArtistViewModelFactory artist
     public async Task<AlbumViewModel?> GetAlbumByIdAsync(long albumId)
     {
         Result<AlbumDto> albumResult = await mediator.Send(new GetAlbumByIdRequest(albumId));
-        if (albumResult.IsError)
+        if (albumResult.IsFailure)
         {
-            logger.LogError("Failed to get album by ID {AlbumId}: {ErrorMessage}", albumId, albumResult.Error);
+            logger.LogError("Failed to get album by ID {AlbumId}: {ErrorMessage}", albumId, albumResult.Errors[0]);
             return null;
         }
 
         AlbumViewModel albumViewModel = albumViewModelFactory.Create();
-        albumViewModel.SetData(albumResult.Value!);
+        albumViewModel.SetData(albumResult.Value);
 
         return albumViewModel;
     }
@@ -28,14 +28,14 @@ public class PlayerDataLoader(IMediator mediator, IArtistViewModelFactory artist
     public async Task<ArtistViewModel?> GetArtistByIdAsync(long artistId)
     {
         Result<ArtistDto> artistResult = await mediator.Send(new GetArtistByIdRequest(artistId));
-        if (artistResult.IsError)
+        if (artistResult.IsFailure)
         {
-            logger.LogError("Failed to get artist by ID {ArtistId}: {ErrorMessage}", artistId, artistResult.Error);
+            logger.LogError("Failed to get artist by ID {ArtistId}: {ErrorMessage}", artistId, artistResult.Errors[0]);
             return null;
         }
 
         ArtistViewModel artistViewModel = artistViewModelFactory.Create();
-        artistViewModel.SetData(artistResult.Value!);
+        artistViewModel.SetData(artistResult.Value);
 
         return artistViewModel;
     }

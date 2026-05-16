@@ -38,9 +38,9 @@ public class ArtistsDataLoader(IMediator mediator, IArtistViewModelFactory artis
     {
         Result<ArtistDto> result = await mediator.Send(new GetArtistByIdRequest(id));
 
-        if (result.IsError)
+        if (result.IsFailure)
         {
-            logger.LogError("Failed to retrieve artist {Id}: {ErrorMessage}", id, result.Error);
+            logger.LogError("Failed to retrieve artist {Id}: {ErrorMessage}", id, result.Errors[0]);
             return null;
         }
 

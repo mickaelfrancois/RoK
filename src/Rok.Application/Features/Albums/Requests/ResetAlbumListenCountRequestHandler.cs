@@ -13,8 +13,8 @@ public class ResetAlbumListenCountRequestHandler(IAlbumRepository _albumReposito
         bool result = await _albumRepository.ResetListenCountAsync();
 
         if (result)
-            return Result<bool>.Success(result);
+            return Result<bool>.Ok(result);
         else
-            return Result<bool>.Fail("Failed to reset album listen count.");
+            return Result<bool>.Fail(new OperationError("album.listen_count_reset_failed", "Failed to reset album listen count."));
     }
 }

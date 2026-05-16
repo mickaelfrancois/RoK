@@ -15,8 +15,8 @@ internal class UpdateSkipCountRequestHandler(ITrackRepository _trackRepository) 
         bool result = await _trackRepository.UpdateSkipCountAsync(request.TrackId);
 
         if (result)
-            return Result<bool>.Success(result);
+            return Result<bool>.Ok(result);
         else
-            return Result<bool>.Fail("Failed to update skip count.");
+            return Result<bool>.Fail(new OperationError("track.skip_count_update_failed", "Failed to update skip count."));
     }
 }

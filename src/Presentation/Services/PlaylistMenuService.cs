@@ -70,7 +70,7 @@ public partial class PlaylistMenuService : IPlaylistMenuService, IDisposable
             }
             else
             {
-                if (result.Error!.Code == "DUPLICATE")
+                if (result.Errors[0] is ConflictError)
                 {
                     Messenger.Send(new ShowNotificationMessage() { Message = _resourceProvider.GetString("notification_playlist_track_add_duplicate"), Type = NotificationType.Warning });
                     _logger.LogWarning("Track '{TrackId}' already exists in playlist '{PlaylistId}'", trackId, playlistId);
@@ -78,7 +78,7 @@ public partial class PlaylistMenuService : IPlaylistMenuService, IDisposable
                 else
                 {
                     Messenger.Send(new ShowNotificationMessage() { Message = _resourceProvider.GetString("notification_playlist_track_add_error"), Type = NotificationType.Error });
-                    _logger.LogError("Failed to add track '{TrackId}' to playlist '{PlaylistId}': {Error}", trackId, playlistId, result.Error);
+                    _logger.LogError("Failed to add track '{TrackId}' to playlist '{PlaylistId}': {Error}", trackId, playlistId, result.Errors[0]);
                 }
             }
         }
@@ -109,7 +109,7 @@ public partial class PlaylistMenuService : IPlaylistMenuService, IDisposable
             }
             else
             {
-                _logger.LogError("Failed to add track '{AlbumId}' to playlist '{PlaylistId}': {Error}", albumId, playlistId, result.Error);
+                _logger.LogError("Failed to add track '{AlbumId}' to playlist '{PlaylistId}': {Error}", albumId, playlistId, result.Errors[0]);
             }
         }
         catch (Exception ex)
@@ -139,7 +139,7 @@ public partial class PlaylistMenuService : IPlaylistMenuService, IDisposable
             }
             else
             {
-                _logger.LogError("Failed to add track '{ArtistId}' to playlist '{PlaylistId}': {Error}", artistId, playlistId, result.Error);
+                _logger.LogError("Failed to add track '{ArtistId}' to playlist '{PlaylistId}': {Error}", artistId, playlistId, result.Errors[0]);
             }
         }
         catch (Exception ex)

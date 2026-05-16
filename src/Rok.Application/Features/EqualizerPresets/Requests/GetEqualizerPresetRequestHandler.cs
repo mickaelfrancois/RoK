@@ -17,8 +17,8 @@ public class GetEqualizerPresetRequestHandler(IEqualizerPresetRepository reposit
         EqualizerPresetEntity? entity = await repository.FindAsync(message.Scope, message.ScopeId);
 
         if (entity == null)
-            return Result<EqualizerPresetDto>.Fail("NotFound", "Equalizer preset not found");
+            return Result<EqualizerPresetDto>.Fail(NotFoundError.ForEntity("EqualizerPreset", message.Scope));
 
-        return Result<EqualizerPresetDto>.Success(entity.ToDto());
+        return Result<EqualizerPresetDto>.Ok(entity.ToDto());
     }
 }
