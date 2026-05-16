@@ -125,7 +125,6 @@ Conventions enforced in the codebase:
 From `.github/copilot-instructions.md` and `.editorconfig`:
 
 - **All code and identifiers in English.** Comments only when strictly necessary; prefer self-documenting code. No regions.
-- **Never use collection expressions** (`dotnet_style_prefer_collection_expression = never`) — use explicit `new List<T>()` / `new[] { … }`.
 - Braces on their own line; blank lines around conditions, loops, logical blocks; prefer early return.
 - `var` only when the type is obvious from the RHS (`new`, casts, literals).
 - `async`/`await` everywhere — no synchronous I/O, no static service locators.
