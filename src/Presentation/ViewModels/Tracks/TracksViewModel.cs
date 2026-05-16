@@ -236,6 +236,7 @@ public partial class TracksViewModel : ObservableObject, IDisposable
             if (disposing)
             {
                 _libraryMonitor.LibraryChanged -= OnLibraryChanged;
+                _libraryMonitor.Dispose();
                 _trackProvider.Clear();
             }
 

@@ -296,6 +296,7 @@ public partial class AlbumsViewModel : ObservableObject, IDisposable
             if (disposing)
             {
                 _libraryMonitor.LibraryChanged -= OnLibraryChanged;
+                _libraryMonitor.Dispose();
                 _albumProvider.Clear();
             }
 

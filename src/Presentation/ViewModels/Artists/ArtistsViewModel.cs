@@ -301,6 +301,7 @@ public partial class ArtistsViewModel : ObservableObject, IDisposable
             if (disposing)
             {
                 _libraryMonitor.LibraryChanged -= OnLibraryChanged;
+                _libraryMonitor.Dispose();
                 _artistProvider.Clear();
             }
 
