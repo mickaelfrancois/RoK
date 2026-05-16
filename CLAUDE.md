@@ -83,7 +83,7 @@ Result/error pattern uses **CleanArch.DevKit.Mediator.Results** (`Result` / `Res
 
 Cross-cutting runtime events flow through **CleanArch.DevKit.Messaging** (`IMessenger`, instance-based, injected via DI). Subscribers receive an `IDisposable` token that **must** be disposed (typically via a `List<IDisposable> _subscriptions` field + dispose loop in `Dispose()`). Examples: `AlbumImportedMessageHandler`, `TrackImportedMessageHandler` in Presentation listen to messages emitted by Application/Import.
 
-Pipeline behaviors registered (in execution order, outermost → innermost): `ResultBehavior` → `ValidationBehavior` → `UnhandledExceptionBehavior` → `LoggingBehavior` → `PerformanceBehavior` (from `CleanArch.DevKit.Mediator.Behaviors`, wired via `AddCommonBehaviors()`).
+Pipeline behaviors registered (in execution order, outermost → innermost): `ValidationBehavior` → `ResultBehavior` → `UnhandledExceptionBehavior` → `LoggingBehavior` → `PerformanceBehavior` (from `CleanArch.DevKit.Mediator.Behaviors`, wired via `AddCommonBehaviors()`).
 
 ### Presentation composition
 
