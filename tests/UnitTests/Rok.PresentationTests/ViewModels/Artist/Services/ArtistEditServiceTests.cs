@@ -1,8 +1,7 @@
-using MiF.Mediator.Interfaces;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using Rok.Application.Dto;
-using Rok.Application.Features.Artists.Command;
+using Rok.Application.Features.Artists.Requests;
 using Rok.ViewModels.Artist.Services;
 
 namespace Rok.PresentationTests.ViewModels.Artist.Services;
@@ -25,8 +24,8 @@ public class ArtistEditServiceTests
 
         // Assert
         Assert.True(artist.IsFavorite);
-        _mediator.Verify(m => m.SendMessageAsync(
-            It.Is<UpdateArtistFavoriteCommand>(c => c.Id == 5 && c.IsFavorite == true),
+        _mediator.Verify(m => m.Send(
+            It.Is<UpdateArtistFavoriteRequest>(c => c.Id == 5 && c.IsFavorite == true),
             It.IsAny<CancellationToken>()), Times.Once);
     }
 
@@ -41,8 +40,8 @@ public class ArtistEditServiceTests
         await sut.UpdateTagsAsync(id: 5, tags);
 
         // Assert
-        _mediator.Verify(m => m.SendMessageAsync(
-            It.Is<UpdateArtistTagsCommand>(c => c.Id == 5 && c.Tags.SequenceEqual(tags)),
+        _mediator.Verify(m => m.Send(
+            It.Is<UpdateArtistTagsRequest>(c => c.Id == 5 && c.Tags.SequenceEqual(tags)),
             It.IsAny<CancellationToken>()), Times.Once);
     }
 
@@ -56,8 +55,8 @@ public class ArtistEditServiceTests
         await sut.UpdatePictureDominantColorAsync(id: 5, colorValue: 0xFF112233);
 
         // Assert
-        _mediator.Verify(m => m.SendMessageAsync(
-            It.Is<UpdateArtistPictureDominantColorCommand>(c => c.Id == 5 && c.ColorValue == 0xFF112233),
+        _mediator.Verify(m => m.Send(
+            It.Is<UpdateArtistPictureDominantColorRequest>(c => c.Id == 5 && c.ColorValue == 0xFF112233),
             It.IsAny<CancellationToken>()), Times.Once);
     }
 

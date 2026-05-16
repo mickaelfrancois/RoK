@@ -1,7 +1,6 @@
-using MiF.Mediator.Interfaces;
 using Moq;
 using Rok.Application.Dto;
-using Rok.Application.Features.Tags.Query;
+using Rok.Application.Features.Tags.Requests;
 using Rok.Services;
 
 namespace Rok.PresentationTests.Services;
@@ -14,7 +13,7 @@ public class TagsProviderTests
     public async Task GetTagsAsync_ShouldLoadTagsOnFirstCall()
     {
         // Arrange
-        _mediator.Setup(m => m.SendMessageAsync(It.IsAny<GetAllTagsQuery>(), It.IsAny<CancellationToken>()))
+        _mediator.Setup(m => m.Send(It.IsAny<GetAllTagsRequest>(), It.IsAny<CancellationToken>()))
                  .ReturnsAsync(new List<TagDto> { new() { Name = "rock" }, new() { Name = "jazz" } });
         using TagsProvider sut = new(_mediator.Object);
 
@@ -29,7 +28,7 @@ public class TagsProviderTests
     public async Task GetTagsAsync_ShouldNotReloadTags_AfterFirstCall()
     {
         // Arrange
-        _mediator.Setup(m => m.SendMessageAsync(It.IsAny<GetAllTagsQuery>(), It.IsAny<CancellationToken>()))
+        _mediator.Setup(m => m.Send(It.IsAny<GetAllTagsRequest>(), It.IsAny<CancellationToken>()))
                  .ReturnsAsync(new List<TagDto> { new() { Name = "rock" } });
         using TagsProvider sut = new(_mediator.Object);
 
@@ -38,14 +37,14 @@ public class TagsProviderTests
         await sut.GetTagsAsync();
 
         // Assert
-        _mediator.Verify(m => m.SendMessageAsync(It.IsAny<GetAllTagsQuery>(), It.IsAny<CancellationToken>()), Times.Once);
+        _mediator.Verify(m => m.Send(It.IsAny<GetAllTagsRequest>(), It.IsAny<CancellationToken>()), Times.Once);
     }
 
     [Fact(DisplayName = "GetTagsAsync should remove duplicates and order tags alphabetically")]
     public async Task GetTagsAsync_ShouldDeduplicateAndOrder()
     {
         // Arrange
-        _mediator.Setup(m => m.SendMessageAsync(It.IsAny<GetAllTagsQuery>(), It.IsAny<CancellationToken>()))
+        _mediator.Setup(m => m.Send(It.IsAny<GetAllTagsRequest>(), It.IsAny<CancellationToken>()))
                  .ReturnsAsync(new List<TagDto>
                  {
                      new() { Name = "rock" },

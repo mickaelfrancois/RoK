@@ -1,10 +1,9 @@
-using MiF.Mediator.Interfaces;
 using MiF.Result;
 using MiF.SimpleMessenger;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using Rok.Application.Features.Playlists;
-using Rok.Application.Features.Playlists.Command;
+using Rok.Application.Features.Playlists.Requests;
 using Rok.Application.Messages;
 using Rok.Shared.Enums;
 using Rok.ViewModels.Playlists.Services;
@@ -46,7 +45,7 @@ public class PlaylistImportServiceTests
 
             // Assert
             Assert.Null(captured);
-            _mediator.Verify(m => m.SendMessageAsync(It.IsAny<ImportPlaylistCommand>(), It.IsAny<CancellationToken>()), Times.Never);
+            _mediator.Verify(m => m.Send(It.IsAny<ImportPlaylistRequest>(), It.IsAny<CancellationToken>()), Times.Never);
         }
         finally
         {
@@ -64,7 +63,7 @@ public class PlaylistImportServiceTests
         try
         {
             _picker.Setup(p => p.PickPlaylistFilesAsync()).ReturnsAsync(new[] { "a.m3u8", "b.m3u8" });
-            _mediator.SetupSequence(m => m.SendMessageAsync(It.IsAny<ImportPlaylistCommand>(), It.IsAny<CancellationToken>()))
+            _mediator.SetupSequence(m => m.Send(It.IsAny<ImportPlaylistRequest>(), It.IsAny<CancellationToken>()))
                      .ReturnsAsync(Imported(matched: 5, ignored: 1))
                      .ReturnsAsync(Imported(matched: 3, ignored: 2));
 
@@ -96,7 +95,7 @@ public class PlaylistImportServiceTests
         try
         {
             _picker.Setup(p => p.PickPlaylistFilesAsync()).ReturnsAsync(new[] { "a.m3u8", "b.m3u8" });
-            _mediator.SetupSequence(m => m.SendMessageAsync(It.IsAny<ImportPlaylistCommand>(), It.IsAny<CancellationToken>()))
+            _mediator.SetupSequence(m => m.Send(It.IsAny<ImportPlaylistRequest>(), It.IsAny<CancellationToken>()))
                      .ReturnsAsync(Imported(matched: 2, ignored: 0))
                      .ReturnsAsync(Skipped(ignored: 4));
 
@@ -126,7 +125,7 @@ public class PlaylistImportServiceTests
         try
         {
             _picker.Setup(p => p.PickPlaylistFilesAsync()).ReturnsAsync(new[] { "a.m3u8", "b.m3u8" });
-            _mediator.SetupSequence(m => m.SendMessageAsync(It.IsAny<ImportPlaylistCommand>(), It.IsAny<CancellationToken>()))
+            _mediator.SetupSequence(m => m.Send(It.IsAny<ImportPlaylistRequest>(), It.IsAny<CancellationToken>()))
                      .ReturnsAsync(Imported(matched: 1, ignored: 0))
                      .ReturnsAsync(Failed());
 
@@ -155,7 +154,7 @@ public class PlaylistImportServiceTests
         try
         {
             _picker.Setup(p => p.PickPlaylistFilesAsync()).ReturnsAsync(new[] { "a.m3u8" });
-            _mediator.Setup(m => m.SendMessageAsync(It.IsAny<ImportPlaylistCommand>(), It.IsAny<CancellationToken>()))
+            _mediator.Setup(m => m.Send(It.IsAny<ImportPlaylistRequest>(), It.IsAny<CancellationToken>()))
                      .ReturnsAsync(Failed());
 
             PlaylistImportService sut = BuildService();

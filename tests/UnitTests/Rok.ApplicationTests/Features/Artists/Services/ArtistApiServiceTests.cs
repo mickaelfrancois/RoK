@@ -1,8 +1,7 @@
-using MiF.Mediator.Interfaces;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using Rok.Application.Dto.MusicDataApi;
-using Rok.Application.Features.Artists.Command;
+using Rok.Application.Features.Artists.Requests;
 using Rok.Application.Features.Artists.Services;
 using Rok.Application.Interfaces;
 using Rok.Application.Interfaces.Pictures;
@@ -62,7 +61,7 @@ public class ArtistApiServiceTests
         await sut.GetAndUpdateArtistDataAsync(artist, _pictureService.Object, _backdropPicture.Object);
 
         // Assert
-        _mediator.Verify(m => m.SendMessageAsync(It.Is<UpdateArtistGetMetaDataLastAttemptCommand>(c => c.ArtistId == 1), It.IsAny<CancellationToken>()), Times.Once);
+        _mediator.Verify(m => m.Send(It.Is<UpdateArtistGetMetaDataLastAttemptRequest>(c => c.ArtistId == 1), It.IsAny<CancellationToken>()), Times.Once);
         Assert.NotNull(artist.GetMetaDataLastAttempt);
     }
 
@@ -221,6 +220,6 @@ public class ArtistApiServiceTests
         // Assert
         Assert.True(result.PictureDownloaded);
         Assert.False(result.DataUpdated);
-        _mediator.Verify(m => m.SendMessageAsync(It.IsAny<UpdateArtistCommand>(), It.IsAny<CancellationToken>()), Times.Never);
+        _mediator.Verify(m => m.Send(It.IsAny<UpdateArtistRequest>(), It.IsAny<CancellationToken>()), Times.Never);
     }
 }

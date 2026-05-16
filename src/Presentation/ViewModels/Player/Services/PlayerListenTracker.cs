@@ -1,8 +1,8 @@
-using Rok.Application.Features.Albums.Command;
-using Rok.Application.Features.Artists.Command;
-using Rok.Application.Features.Genres.Command;
-using Rok.Application.Features.ListeningEvents.Command;
-using Rok.Application.Features.Tracks.Command;
+using Rok.Application.Features.Albums.Requests;
+using Rok.Application.Features.Artists.Requests;
+using Rok.Application.Features.Genres.Requests;
+using Rok.Application.Features.ListeningEvents.Requests;
+using Rok.Application.Features.Tracks.Requests;
 
 namespace Rok.ViewModels.Player.Services;
 
@@ -26,7 +26,7 @@ public class PlayerListenTracker(IMediator mediator)
         if (_trackUpdatedCache.Contains(trackId))
             return;
 
-        await mediator.SendMessageAsync(new UpdateTrackLastListenCommand(trackId));
+        await mediator.Send(new UpdateTrackLastListenRequest(trackId));
         _trackUpdatedCache.Add(trackId);
     }
 
@@ -35,7 +35,7 @@ public class PlayerListenTracker(IMediator mediator)
         if (_artistUpdatedCache.Contains(artistId))
             return;
 
-        await mediator.SendMessageAsync(new UpdateArtistLastListenCommand(artistId));
+        await mediator.Send(new UpdateArtistLastListenRequest(artistId));
         _artistUpdatedCache.Add(artistId);
     }
 
@@ -44,7 +44,7 @@ public class PlayerListenTracker(IMediator mediator)
         if (_albumUpdatedCache.Contains(albumId))
             return;
 
-        await mediator.SendMessageAsync(new UpdateAlbumLastListenCommand(albumId));
+        await mediator.Send(new UpdateAlbumLastListenRequest(albumId));
         _albumUpdatedCache.Add(albumId);
     }
 
@@ -53,14 +53,14 @@ public class PlayerListenTracker(IMediator mediator)
         if (_genreUpdatedCache.Contains(genreId))
             return;
 
-        await mediator.SendMessageAsync(new UpdateGenretLastListenCommand(genreId));
+        await mediator.Send(new UpdateGenretLastListenRequest(genreId));
         _genreUpdatedCache.Add(genreId);
     }
 
 
     public Task UpdateListeningEventsAsync(long trackId, long? artistId, long? albumId, long? genreId, long durationPlayed, long durationTotal)
     {
-        return mediator.SendMessageAsync(new CreateListeningEventCommand
+        return mediator.Send(new CreateListeningEventRequest
         {
             TrackId = trackId,
             ArtistId = artistId,

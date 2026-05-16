@@ -1,7 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.UI.Dispatching;
-using Rok.Application.Features.Tracks.Query;
+using Rok.Application.Features.Tracks.Requests;
 using Rok.Application.Interfaces.Pictures;
 using Rok.Import.Services;
 using Windows.Storage;
@@ -125,7 +125,7 @@ public partial class StartViewModel : ObservableObject
 
         if (message.ProcessState == LibraryRefreshMessage.EState.Stop)
         {
-            int trackCount = await _mediator.SendMessageAsync(new GetTracksCountQuery());
+            int trackCount = await _mediator.Send(new GetTracksCountRequest());
 
             _dispatcherQueue.TryEnqueue(() =>
             {

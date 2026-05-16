@@ -2,7 +2,7 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Rok.Application.Dto.Lyrics;
-using Rok.Application.Features.Tracks.Command;
+using Rok.Application.Features.Tracks.Requests;
 using Rok.Application.Player;
 using Rok.Services;
 using Rok.ViewModels.Album;
@@ -443,7 +443,7 @@ public partial class PlayerViewModel : ObservableObject, IDisposable
 
         CanSkipNext = false;
 
-        await _mediator.SendMessageAsync(new UpdateSkipCountCommand { TrackId = CurrentTrack.Track.Id });
+        await _mediator.Send(new UpdateSkipCountRequest { TrackId = CurrentTrack.Track.Id });
         _player.Skip();
     }
 

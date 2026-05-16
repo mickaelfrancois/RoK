@@ -1,4 +1,4 @@
-﻿using Rok.Application.Features.Playlists.Command;
+﻿using Rok.Application.Features.Playlists.Requests;
 
 namespace Rok.ViewModels.Playlists.Services;
 
@@ -10,13 +10,13 @@ public class PlaylistCreationService(
 {
     public async Task<long?> CreateSmartPlaylistAsync()
     {
-        CreatePlaylistCommand command = new()
+        CreatePlaylistRequest command = new()
         {
             Type = (int)PlaylistType.Smart,
             Name = resourceLoader.GetString("newPlaylist")
         };
 
-        Result<long> result = await mediator.SendMessageAsync(command);
+        Result<long> result = await mediator.Send(command);
         if (result.IsError)
         {
             logger.LogError("Failed to create new smart playlist: {ErrorMessage}", result.Error);
@@ -32,13 +32,13 @@ public class PlaylistCreationService(
 
     public async Task<long?> CreateClassicPlaylistAsync()
     {
-        CreatePlaylistCommand command = new()
+        CreatePlaylistRequest command = new()
         {
             Type = (int)PlaylistType.Classic,
             Name = resourceLoader.GetString("newPlaylist")
         };
 
-        Result<long> result = await mediator.SendMessageAsync(command);
+        Result<long> result = await mediator.Send(command);
         if (result.IsError)
         {
             logger.LogError("Failed to create new classic playlist: {ErrorMessage}", result.Error);

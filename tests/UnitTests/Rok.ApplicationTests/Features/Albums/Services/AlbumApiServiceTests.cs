@@ -1,8 +1,7 @@
-using MiF.Mediator.Interfaces;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using Rok.Application.Dto.MusicDataApi;
-using Rok.Application.Features.Albums.Command;
+using Rok.Application.Features.Albums.Requests;
 using Rok.Application.Features.Albums.Services;
 using Rok.Application.Interfaces;
 using Rok.Application.Interfaces.Pictures;
@@ -49,7 +48,7 @@ public class AlbumApiServiceTests
         // Assert
         Assert.Equal(AlbumApiUpdateResult.None, result);
         _musicData.Verify(m => m.GetAlbumAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string?>(), It.IsAny<string?>()), Times.Never);
-        _mediator.Verify(m => m.SendMessageAsync(It.IsAny<UpdateAlbumGetMetaDataLastAttemptCommand>(), It.IsAny<CancellationToken>()), Times.Never);
+        _mediator.Verify(m => m.Send(It.IsAny<UpdateAlbumGetMetaDataLastAttemptRequest>(), It.IsAny<CancellationToken>()), Times.Never);
     }
 
     [Fact(DisplayName = "GetAndUpdateAlbumDataAsync should update last-attempt timestamp before calling the API")]
@@ -65,7 +64,7 @@ public class AlbumApiServiceTests
         await sut.GetAndUpdateAlbumDataAsync(album, _pictureService.Object);
 
         // Assert
-        _mediator.Verify(m => m.SendMessageAsync(It.Is<UpdateAlbumGetMetaDataLastAttemptCommand>(c => c.AlbumId == 1), It.IsAny<CancellationToken>()), Times.Once);
+        _mediator.Verify(m => m.Send(It.Is<UpdateAlbumGetMetaDataLastAttemptRequest>(c => c.AlbumId == 1), It.IsAny<CancellationToken>()), Times.Once);
         Assert.NotNull(album.GetMetaDataLastAttempt);
     }
 
@@ -159,6 +158,6 @@ public class AlbumApiServiceTests
         // Assert
         Assert.True(result.PictureDownloaded);
         Assert.False(result.DataUpdated);
-        _mediator.Verify(m => m.SendMessageAsync(It.IsAny<UpdateAlbumCommand>(), It.IsAny<CancellationToken>()), Times.Never);
+        _mediator.Verify(m => m.Send(It.IsAny<UpdateAlbumRequest>(), It.IsAny<CancellationToken>()), Times.Never);
     }
 }

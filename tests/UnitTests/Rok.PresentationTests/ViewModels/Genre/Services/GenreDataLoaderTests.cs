@@ -1,11 +1,10 @@
-using MiF.Mediator.Interfaces;
 using MiF.Result;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using Rok.Application.Dto;
-using Rok.Application.Features.Albums.Query;
-using Rok.Application.Features.Genres.Query;
-using Rok.Application.Features.Tracks.Query;
+using Rok.Application.Features.Albums.Requests;
+using Rok.Application.Features.Genres.Requests;
+using Rok.Application.Features.Tracks.Requests;
 using Rok.ViewModels.Album;
 using Rok.ViewModels.Albums.Interfaces;
 using Rok.ViewModels.Genre.Services;
@@ -24,7 +23,7 @@ public class GenreDataLoaderTests
     {
         // Arrange
         GenreDto genre = new() { Id = 7, Name = "Jazz" };
-        _mediator.Setup(m => m.SendMessageAsync(It.IsAny<GetGenreByIdQuery>(), It.IsAny<CancellationToken>()))
+        _mediator.Setup(m => m.Send(It.IsAny<GetGenreByIdRequest>(), It.IsAny<CancellationToken>()))
                  .ReturnsAsync(Result<GenreDto>.Success(genre));
         GenreDataLoader sut = BuildService();
 
@@ -40,7 +39,7 @@ public class GenreDataLoaderTests
     public async Task LoadGenreAsync_ShouldReturnNull_WhenError()
     {
         // Arrange
-        _mediator.Setup(m => m.SendMessageAsync(It.IsAny<GetGenreByIdQuery>(), It.IsAny<CancellationToken>()))
+        _mediator.Setup(m => m.Send(It.IsAny<GetGenreByIdRequest>(), It.IsAny<CancellationToken>()))
                  .ReturnsAsync(Result<GenreDto>.Fail("not found"));
         GenreDataLoader sut = BuildService();
 
@@ -55,7 +54,7 @@ public class GenreDataLoaderTests
     public async Task LoadAlbumsAsync_ShouldReturnEmpty_WhenNoAlbums()
     {
         // Arrange
-        _mediator.Setup(m => m.SendMessageAsync(It.IsAny<GetAlbumsByGenreIdQuery>(), It.IsAny<CancellationToken>()))
+        _mediator.Setup(m => m.Send(It.IsAny<GetAlbumsByGenreIdRequest>(), It.IsAny<CancellationToken>()))
                  .ReturnsAsync(new List<AlbumDto>());
         GenreDataLoader sut = BuildService();
 
@@ -72,7 +71,7 @@ public class GenreDataLoaderTests
     {
         // Arrange
         List<TrackDto> tracks = new() { new TrackDto { Id = 1 }, new TrackDto { Id = 2 } };
-        _mediator.Setup(m => m.SendMessageAsync(It.Is<GetTracksByGenreIdQuery>(q => q.GenreId == 7), It.IsAny<CancellationToken>()))
+        _mediator.Setup(m => m.Send(It.Is<GetTracksByGenreIdRequest>(q => q.GenreId == 7), It.IsAny<CancellationToken>()))
                  .ReturnsAsync(tracks);
         GenreDataLoader sut = BuildService();
 

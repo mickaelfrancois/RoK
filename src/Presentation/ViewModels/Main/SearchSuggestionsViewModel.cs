@@ -1,6 +1,6 @@
 using CommunityToolkit.Mvvm.ComponentModel;
-using Rok.Application.Features.Albums.Query;
-using Rok.Application.Features.Tracks.Query;
+using Rok.Application.Features.Albums.Requests;
+using Rok.Application.Features.Tracks.Requests;
 using Rok.Application.Services;
 
 namespace Rok.ViewModels.Main;
@@ -115,9 +115,9 @@ public partial class SearchSuggestionsViewModel : ObservableObject, IDisposable
 
     private async Task LoadCacheAsync()
     {
-        _artistsCache = await _mediator.SendMessageAsync(new GetAllArtistsQuery());
-        _albumsCache = await _mediator.SendMessageAsync(new GetAllAlbumsQuery());
-        _tracksCache = await _mediator.SendMessageAsync(new GetAllTracksQuery());
+        _artistsCache = await _mediator.Send(new GetAllArtistsRequest());
+        _albumsCache = await _mediator.Send(new GetAllAlbumsRequest());
+        _tracksCache = await _mediator.Send(new GetAllTracksRequest());
         _isCacheLoaded = true;
     }
 }

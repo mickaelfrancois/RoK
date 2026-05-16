@@ -1,7 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.UI.Dispatching;
-using Rok.Application.Features.Search.Query;
+using Rok.Application.Features.Search.Requests;
 using Rok.ViewModels.Search;
 
 namespace Rok.ViewModels.Main;
@@ -80,7 +80,7 @@ public partial class MainViewModel : ObservableObject
 
         if (Keyword.Length > 2)
         {
-            SearchDto result = await _mediator.SendMessageAsync(new SearchQuery() { Name = keyword });
+            SearchDto result = await _mediator.Send(new SearchRequest() { Name = keyword });
 
             bool onlyOneArtist = result.Albums.Count == 0 && result.Artists.Count == 1 && result.Tracks.Count == 0;
             bool onlyOneAlbum = result.Albums.Count > 0 && result.Artists.Count == 0 && result.Tracks.Count == 0;

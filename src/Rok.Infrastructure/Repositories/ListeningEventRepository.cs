@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Rok.Application.Features.Insights.Query;
+using Rok.Application.Features.Insights;
 using Rok.Application.Interfaces.Repositories;
 
 namespace Rok.Infrastructure.Repositories;

@@ -1,9 +1,8 @@
-using MiF.Mediator.Interfaces;
 using MiF.Result;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using Rok.Application.Dto;
-using Rok.Application.Features.Playlists.Command;
+using Rok.Application.Features.Playlists.Requests;
 using Rok.ViewModels.Playlist.Services;
 
 namespace Rok.PresentationTests.ViewModels.Playlist.Services;
@@ -22,7 +21,7 @@ public class PlaylistExportServiceTests
         // Arrange
         _prompts.Setup(p => p.ConfirmSmartPlaylistExportAsync()).ReturnsAsync(true);
         _prompts.Setup(p => p.PickSavePathAsync(It.IsAny<string>())).ReturnsAsync("X:\\out.m3u8");
-        _mediator.Setup(m => m.SendMessageAsync(It.IsAny<ExportPlaylistCommand>(), It.IsAny<CancellationToken>())).ReturnsAsync(Result.Success());
+        _mediator.Setup(m => m.Send(It.IsAny<ExportPlaylistRequest>(), It.IsAny<CancellationToken>())).ReturnsAsync(Result.Success());
 
         PlaylistHeaderDto playlist = new() { Id = 1, Name = "Smart", Type = 0 };
         PlaylistExportService sut = BuildService();
@@ -40,7 +39,7 @@ public class PlaylistExportServiceTests
     {
         // Arrange
         _prompts.Setup(p => p.PickSavePathAsync(It.IsAny<string>())).ReturnsAsync("X:\\out.m3u8");
-        _mediator.Setup(m => m.SendMessageAsync(It.IsAny<ExportPlaylistCommand>(), It.IsAny<CancellationToken>())).ReturnsAsync(Result.Success());
+        _mediator.Setup(m => m.Send(It.IsAny<ExportPlaylistRequest>(), It.IsAny<CancellationToken>())).ReturnsAsync(Result.Success());
 
         PlaylistHeaderDto playlist = new() { Id = 1, Name = "Classic", Type = 1 };
         PlaylistExportService sut = BuildService();
@@ -66,7 +65,7 @@ public class PlaylistExportServiceTests
 
         // Assert
         _prompts.Verify(p => p.PickSavePathAsync(It.IsAny<string>()), Times.Never);
-        _mediator.Verify(m => m.SendMessageAsync(It.IsAny<ExportPlaylistCommand>(), It.IsAny<CancellationToken>()), Times.Never);
+        _mediator.Verify(m => m.Send(It.IsAny<ExportPlaylistRequest>(), It.IsAny<CancellationToken>()), Times.Never);
     }
 
     [Fact(DisplayName = "does_not_call_handler_when_picker_cancelled")]
@@ -82,7 +81,7 @@ public class PlaylistExportServiceTests
         await sut.RunAsync(playlist, CancellationToken.None);
 
         // Assert
-        _mediator.Verify(m => m.SendMessageAsync(It.IsAny<ExportPlaylistCommand>(), It.IsAny<CancellationToken>()), Times.Never);
+        _mediator.Verify(m => m.Send(It.IsAny<ExportPlaylistRequest>(), It.IsAny<CancellationToken>()), Times.Never);
     }
 
     [Fact(DisplayName = "passes_chosen_path_to_export_command")]
@@ -90,7 +89,7 @@ public class PlaylistExportServiceTests
     {
         // Arrange
         _prompts.Setup(p => p.PickSavePathAsync(It.IsAny<string>())).ReturnsAsync("X:\\final.m3u8");
-        _mediator.Setup(m => m.SendMessageAsync(It.IsAny<ExportPlaylistCommand>(), It.IsAny<CancellationToken>())).ReturnsAsync(Result.Success());
+        _mediator.Setup(m => m.Send(It.IsAny<ExportPlaylistRequest>(), It.IsAny<CancellationToken>())).ReturnsAsync(Result.Success());
 
         PlaylistHeaderDto playlist = new() { Id = 42, Name = "Mix", Type = 1 };
         PlaylistExportService sut = BuildService();
@@ -99,8 +98,8 @@ public class PlaylistExportServiceTests
         await sut.RunAsync(playlist, CancellationToken.None);
 
         // Assert
-        _mediator.Verify(m => m.SendMessageAsync(
-            It.Is<ExportPlaylistCommand>(c => c.PlaylistId == 42 && c.FilePath == "X:\\final.m3u8"),
+        _mediator.Verify(m => m.Send(
+            It.Is<ExportPlaylistRequest>(c => c.PlaylistId == 42 && c.FilePath == "X:\\final.m3u8"),
             It.IsAny<CancellationToken>()),
             Times.Once);
     }

@@ -1,10 +1,9 @@
-using MiF.Mediator.Interfaces;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using Rok.Application.Dto;
-using Rok.Application.Features.Albums.Query;
-using Rok.Application.Features.Genres.Query;
-using Rok.Application.Features.Tags.Query;
+using Rok.Application.Features.Albums.Requests;
+using Rok.Application.Features.Genres.Requests;
+using Rok.Application.Features.Tags.Requests;
 using Rok.Application.Interfaces;
 using Rok.Application.Services.Filters;
 using Rok.Application.Services.Grouping;
@@ -31,9 +30,9 @@ public class AlbumProviderTests
     public async Task LoadAsync_ShouldCallMediatorForGenresAndAlbums()
     {
         // Arrange
-        _mediator.Setup(m => m.SendMessageAsync(It.IsAny<GetAllGenresQuery>(), It.IsAny<CancellationToken>()))
+        _mediator.Setup(m => m.Send(It.IsAny<GetAllGenresRequest>(), It.IsAny<CancellationToken>()))
                  .ReturnsAsync(new List<GenreDto>());
-        _mediator.Setup(m => m.SendMessageAsync(It.IsAny<GetAllAlbumsQuery>(), It.IsAny<CancellationToken>()))
+        _mediator.Setup(m => m.Send(It.IsAny<GetAllAlbumsRequest>(), It.IsAny<CancellationToken>()))
                  .ReturnsAsync(new List<AlbumDto>());
         AlbumProvider sut = BuildService();
 
@@ -41,8 +40,8 @@ public class AlbumProviderTests
         await sut.LoadAsync();
 
         // Assert
-        _mediator.Verify(m => m.SendMessageAsync(It.IsAny<GetAllGenresQuery>(), It.IsAny<CancellationToken>()), Times.Once);
-        _mediator.Verify(m => m.SendMessageAsync(It.IsAny<GetAllAlbumsQuery>(), It.IsAny<CancellationToken>()), Times.Once);
+        _mediator.Verify(m => m.Send(It.IsAny<GetAllGenresRequest>(), It.IsAny<CancellationToken>()), Times.Once);
+        _mediator.Verify(m => m.Send(It.IsAny<GetAllAlbumsRequest>(), It.IsAny<CancellationToken>()), Times.Once);
     }
 
     [Fact(DisplayName = "GetProcessedData should return empty result when no albums are loaded")]

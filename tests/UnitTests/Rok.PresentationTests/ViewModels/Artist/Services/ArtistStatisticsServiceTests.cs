@@ -1,7 +1,6 @@
-using MiF.Mediator.Interfaces;
 using Moq;
 using Rok.Application.Dto;
-using Rok.Application.Features.Artists.Command;
+using Rok.Application.Features.Artists.Requests;
 using Rok.ViewModels.Album;
 using Rok.ViewModels.Artist.Services;
 using Rok.ViewModels.Track;
@@ -54,7 +53,7 @@ public class ArtistStatisticsServiceTests
 
         // Assert
         Assert.False(result);
-        _mediator.Verify(m => m.SendMessageAsync(It.IsAny<UpdateArtistStatisticsCommand>(), It.IsAny<CancellationToken>()), Times.Never);
+        _mediator.Verify(m => m.Send(It.IsAny<UpdateArtistStatisticsRequest>(), It.IsAny<CancellationToken>()), Times.Never);
     }
 
     [Fact(DisplayName = "UpdateIfNeededAsync should send a command and reset counts when stats differ from empty inputs")]
@@ -71,8 +70,8 @@ public class ArtistStatisticsServiceTests
         Assert.True(result);
         Assert.Equal(0, artist.TrackCount);
         Assert.Equal(0, artist.AlbumCount);
-        _mediator.Verify(m => m.SendMessageAsync(
-            It.Is<UpdateArtistStatisticsCommand>(c => c.Id == 1 && c.TrackCount == 0 && c.AlbumCount == 0),
+        _mediator.Verify(m => m.Send(
+            It.Is<UpdateArtistStatisticsRequest>(c => c.Id == 1 && c.TrackCount == 0 && c.AlbumCount == 0),
             It.IsAny<CancellationToken>()), Times.Once);
     }
 }

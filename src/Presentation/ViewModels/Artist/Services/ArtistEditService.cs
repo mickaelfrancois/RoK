@@ -1,4 +1,4 @@
-﻿using Rok.Application.Features.Artists.Command;
+﻿using Rok.Application.Features.Artists.Requests;
 
 namespace Rok.ViewModels.Artist.Services;
 
@@ -6,7 +6,7 @@ public class ArtistEditService(IMediator mediator, ILogger<ArtistEditService> lo
 {
     public async Task UpdateFavoriteAsync(ArtistDto artist, bool isFavorite)
     {
-        await mediator.SendMessageAsync(new UpdateArtistFavoriteCommand(artist.Id, isFavorite));
+        await mediator.Send(new UpdateArtistFavoriteRequest(artist.Id, isFavorite));
         artist.IsFavorite = isFavorite;
     }
 
@@ -50,11 +50,11 @@ public class ArtistEditService(IMediator mediator, ILogger<ArtistEditService> lo
 
     public Task UpdateTagsAsync(long id, IEnumerable<string> tags)
     {
-        return mediator.SendMessageAsync(new UpdateArtistTagsCommand(id, tags));
+        return mediator.Send(new UpdateArtistTagsRequest(id, tags));
     }
 
     public Task UpdatePictureDominantColorAsync(long id, long? colorValue)
     {
-        return mediator.SendMessageAsync(new UpdateArtistPictureDominantColorCommand(id, colorValue));
+        return mediator.Send(new UpdateArtistPictureDominantColorRequest(id, colorValue));
     }
 }

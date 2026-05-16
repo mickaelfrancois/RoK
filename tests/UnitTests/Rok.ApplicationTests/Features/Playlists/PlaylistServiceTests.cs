@@ -1,8 +1,6 @@
-using MiF.Mediator;
-using MiF.Mediator.Interfaces;
 using Moq;
 using Rok.Application.Features.Playlists;
-using Rok.Application.Features.Playlists.Query;
+using Rok.Application.Features.Playlists.Requests;
 
 namespace Rok.ApplicationTests.Features.Playlists;
 
@@ -22,7 +20,7 @@ public class PlaylistServiceTests
         {
             PlaylistGroupDto capturedGroup = entry.Key;
             List<TrackDto> capturedTracks = entry.Value;
-            mediator.Setup(m => m.SendMessageAsync(It.Is<GeneratePlaylistTracksQuery>(q => q.Group == capturedGroup), It.IsAny<CancellationToken>()))
+            mediator.Setup(m => m.Send(It.Is<GeneratePlaylistTracksRequest>(q => q.Group == capturedGroup), It.IsAny<CancellationToken>()))
                     .ReturnsAsync(capturedTracks);
         }
         return mediator;

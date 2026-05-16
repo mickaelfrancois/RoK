@@ -1,4 +1,4 @@
-﻿using Rok.Application.Features.Artists.Command;
+﻿using Rok.Application.Features.Artists.Requests;
 using Rok.ViewModels.Album;
 using Rok.ViewModels.Track;
 
@@ -41,7 +41,7 @@ public class ArtistStatisticsService(IMediator mediator)
             .DefaultIfEmpty(0)
             .Max();
 
-        UpdateArtistStatisticsCommand command = new(artist.Id)
+        UpdateArtistStatisticsRequest command = new(artist.Id)
         {
             TrackCount = trackCount,
             AlbumCount = albumCount,
@@ -53,7 +53,7 @@ public class ArtistStatisticsService(IMediator mediator)
             YearMaxi = yearMaxi == 0 ? null : yearMaxi
         };
 
-        await mediator.SendMessageAsync(command);
+        await mediator.Send(command);
 
         artist.TrackCount = trackCount;
         artist.AlbumCount = albumCount;

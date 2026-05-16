@@ -1,9 +1,7 @@
 using System.Threading;
-using MiF.Mediator.Interfaces;
-using MiF.SimpleMessenger;
 using Microsoft.Extensions.Logging;
 using Rok.Application.Dto;
-using Rok.Application.Features.Playlists.Command;
+using Rok.Application.Features.Playlists.Requests;
 using Rok.Application.Messages;
 using Rok.Shared.Enums;
 
@@ -27,7 +25,7 @@ public sealed class PlaylistExportService(
         if (string.IsNullOrEmpty(path))
             return;
 
-        Result result = await _mediator.SendMessageAsync(new ExportPlaylistCommand(playlist.Id, path), cancellationToken);
+        Result result = await _mediator.Send(new ExportPlaylistRequest(playlist.Id, path), cancellationToken);
 
         if (result.IsSuccess)
         {

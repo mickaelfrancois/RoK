@@ -1,9 +1,8 @@
-using MiF.Mediator.Interfaces;
 using MiF.Result;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using Rok.Application.Dto;
-using Rok.Application.Features.Tracks.Query;
+using Rok.Application.Features.Tracks.Requests;
 using Rok.ViewModels.Track.Services;
 
 namespace Rok.PresentationTests.ViewModels.Track.Services;
@@ -19,7 +18,7 @@ public class TrackDetailDataLoaderTests
     {
         // Arrange
         TrackDto track = new() { Id = 42, Title = "Song" };
-        _mediator.Setup(m => m.SendMessageAsync(It.IsAny<GetTrackByIdQuery>(), It.IsAny<CancellationToken>()))
+        _mediator.Setup(m => m.Send(It.IsAny<GetTrackByIdRequest>(), It.IsAny<CancellationToken>()))
                  .ReturnsAsync(Result<TrackDto>.Success(track));
         TrackDetailDataLoader sut = BuildService();
 
@@ -35,7 +34,7 @@ public class TrackDetailDataLoaderTests
     public async Task LoadTrackAsync_ShouldReturnNull_WhenError()
     {
         // Arrange
-        _mediator.Setup(m => m.SendMessageAsync(It.IsAny<GetTrackByIdQuery>(), It.IsAny<CancellationToken>()))
+        _mediator.Setup(m => m.Send(It.IsAny<GetTrackByIdRequest>(), It.IsAny<CancellationToken>()))
                  .ReturnsAsync(Result<TrackDto>.Fail("not found"));
         TrackDetailDataLoader sut = BuildService();
 

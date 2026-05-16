@@ -1,10 +1,9 @@
-using MiF.Mediator.Interfaces;
 using MiF.Result;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
-using Rok.Application.Features.Albums.Query;
+using Rok.Application.Features.Albums.Requests;
 using Rok.Application.Features.Albums.Services;
-using Rok.Application.Features.Artists.Query;
+using Rok.Application.Features.Artists.Requests;
 using Rok.Application.Features.Artists.Services;
 using Rok.Application.Interfaces.Pictures;
 using Rok.Application.Interfaces.Repositories;
@@ -92,7 +91,7 @@ public class PostImportApiEnrichmentTaskTests
         artistApi.Setup(s => s.GetAndUpdateArtistDataAsync(It.IsAny<ArtistDto>(), It.IsAny<IArtistPictureService>(), It.IsAny<IBackdropPicture>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(ArtistApiUpdateResult.None);
         Mock<IMediator> mediator = new();
-        mediator.Setup(m => m.SendMessageAsync(It.IsAny<GetArtistByIdQuery>(), It.IsAny<CancellationToken>()))
+        mediator.Setup(m => m.Send(It.IsAny<GetArtistByIdRequest>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(Result<ArtistDto>.Success(new ArtistDto { Id = 1, Name = "Artist" }));
         PostImportApiEnrichmentTask task = BuildTask(artistImport, albumImport, artistApi, new(), mediator);
 
@@ -113,7 +112,7 @@ public class PostImportApiEnrichmentTaskTests
         albumApi.Setup(s => s.GetAndUpdateAlbumDataAsync(It.IsAny<AlbumDto>(), It.IsAny<IAlbumPictureService>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(AlbumApiUpdateResult.None);
         Mock<IMediator> mediator = new();
-        mediator.Setup(m => m.SendMessageAsync(It.IsAny<GetAlbumByIdQuery>(), It.IsAny<CancellationToken>()))
+        mediator.Setup(m => m.Send(It.IsAny<GetAlbumByIdRequest>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(Result<AlbumDto>.Success(new AlbumDto { Id = 1, Name = "Album" }));
         PostImportApiEnrichmentTask task = BuildTask(artistImport, albumImport, new(), albumApi, mediator);
 
@@ -135,7 +134,7 @@ public class PostImportApiEnrichmentTaskTests
             .Returns(Task.FromException<ArtistApiUpdateResult>(new InvalidOperationException("API failure")))
             .ReturnsAsync(ArtistApiUpdateResult.None);
         Mock<IMediator> mediator = new();
-        mediator.Setup(m => m.SendMessageAsync(It.IsAny<GetArtistByIdQuery>(), It.IsAny<CancellationToken>()))
+        mediator.Setup(m => m.Send(It.IsAny<GetArtistByIdRequest>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(Result<ArtistDto>.Success(new ArtistDto { Id = 1, Name = "Artist" }));
         PostImportApiEnrichmentTask task = BuildTask(artistImport, albumImport, artistApi, new(), mediator);
 
@@ -162,6 +161,6 @@ public class PostImportApiEnrichmentTaskTests
         await task.EnrichArtistsAsync(cts.Token);
 
         // Assert
-        mediator.Verify(m => m.SendMessageAsync(It.IsAny<GetArtistByIdQuery>(), It.IsAny<CancellationToken>()), Times.Never);
+        mediator.Verify(m => m.Send(It.IsAny<GetArtistByIdRequest>(), It.IsAny<CancellationToken>()), Times.Never);
     }
 }

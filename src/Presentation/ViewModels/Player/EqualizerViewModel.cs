@@ -1,6 +1,6 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using Rok.Application.Features.EqualizerPresets.Command;
+using Rok.Application.Features.EqualizerPresets.Requests;
 using Rok.Domain.Enums;
 
 namespace Rok.ViewModels.Player;
@@ -132,7 +132,7 @@ public sealed partial class EqualizerViewModel : ObservableObject
             _ => null
         };
 
-        await _mediator.SendMessageAsync(new SaveEqualizerPresetCommand
+        await _mediator.Send(new SaveEqualizerPresetRequest
         {
             Scope = scope,
             ScopeId = scopeId,
@@ -157,7 +157,7 @@ public sealed partial class EqualizerViewModel : ObservableObject
             _ => null
         };
 
-        await _mediator.SendMessageAsync(new DeleteEqualizerPresetCommand
+        await _mediator.Send(new DeleteEqualizerPresetRequest
         {
             Scope = _activePresetScope,
             ScopeId = scopeId
@@ -175,7 +175,7 @@ public sealed partial class EqualizerViewModel : ObservableObject
         ActiveBuiltinPreset = preset;
 
         if (_activePresetScope == EqualizerScope.Default)
-            await _mediator.SendMessageAsync(new SaveEqualizerPresetCommand
+            await _mediator.Send(new SaveEqualizerPresetRequest
             {
                 Scope = EqualizerScope.Default,
                 ScopeId = null,

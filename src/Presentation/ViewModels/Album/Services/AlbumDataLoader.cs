@@ -1,5 +1,5 @@
-﻿using Rok.Application.Features.Albums.Query;
-using Rok.Application.Features.Tracks.Query;
+﻿using Rok.Application.Features.Albums.Requests;
+using Rok.Application.Features.Tracks.Requests;
 using Rok.ViewModels.Track;
 using Rok.ViewModels.Tracks.Interfaces;
 
@@ -9,7 +9,7 @@ public class AlbumDataLoader(IMediator mediator, ITrackViewModelFactory trackVie
 {
     public async Task<AlbumDto?> LoadAlbumAsync(long albumId)
     {
-        Result<AlbumDto> resultAlbum = await mediator.SendMessageAsync(new GetAlbumByIdQuery(albumId));
+        Result<AlbumDto> resultAlbum = await mediator.Send(new GetAlbumByIdRequest(albumId));
 
         if (resultAlbum.IsSuccess)
             return resultAlbum.Value!;
@@ -20,13 +20,13 @@ public class AlbumDataLoader(IMediator mediator, ITrackViewModelFactory trackVie
 
     public async Task<List<TrackViewModel>> LoadTracksAsync(long albumId)
     {
-        IEnumerable<TrackDto> tracks = await mediator.SendMessageAsync(new GetTracksByAlbumIdQuery(albumId));
+        IEnumerable<TrackDto> tracks = await mediator.Send(new GetTracksByAlbumIdRequest(albumId));
         return TrackViewModelMap.CreateViewModels(tracks.ToList(), trackViewModelFactory);
     }
 
     public async Task<AlbumDto?> ReloadAlbumAsync(long albumId)
     {
-        Result<AlbumDto> albumResult = await mediator.SendMessageAsync(new GetAlbumByIdQuery(albumId));
+        Result<AlbumDto> albumResult = await mediator.Send(new GetAlbumByIdRequest(albumId));
         return albumResult.IsSuccess ? albumResult.Value : null;
     }
 }

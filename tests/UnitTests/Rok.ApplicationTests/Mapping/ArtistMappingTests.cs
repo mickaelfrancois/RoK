@@ -1,4 +1,4 @@
-using Rok.Application.Features.Artists.Command;
+using Rok.Application.Features.Artists.Requests;
 using Rok.Application.Mapping;
 using Rok.Domain.Entities;
 
@@ -42,11 +42,11 @@ public class ArtistMappingTests
         Assert.Equal("british;legendary", dto.TagsAsString);
     }
 
-    [Fact(DisplayName = "ToEntity should map a CreateArtistCommand to an ArtistEntity")]
+    [Fact(DisplayName = "ToEntity should map a CreateArtistRequest to an ArtistEntity")]
     public void ToEntity_ShouldMapCreateCommand()
     {
         // Arrange
-        CreateArtistCommand command = new()
+        CreateArtistRequest command = new()
         {
             Name = "Beatles",
             MusicBrainzID = "mbid",
@@ -78,7 +78,7 @@ public class ArtistMappingTests
         Assert.Equal(10, entity.AlbumCount);
     }
 
-    [Fact(DisplayName = "ToCommand should map an ArtistDto to an UpdateArtistCommand")]
+    [Fact(DisplayName = "ToCommand should map an ArtistDto to an UpdateArtistRequest")]
     public void ToCommand_ShouldMapDtoToUpdateCommand()
     {
         // Arrange
@@ -95,7 +95,7 @@ public class ArtistMappingTests
         };
 
         // Act
-        UpdateArtistCommand command = dto.ToCommand();
+        UpdateArtistRequest command = dto.ToCommand();
 
         // Assert
         Assert.Equal(11, command.Id);

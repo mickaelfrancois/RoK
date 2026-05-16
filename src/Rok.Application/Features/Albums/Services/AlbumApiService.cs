@@ -1,6 +1,6 @@
 using Microsoft.Extensions.Logging;
 using Rok.Application.Dto.MusicDataApi;
-using Rok.Application.Features.Albums.Command;
+using Rok.Application.Features.Albums.Requests;
 using Rok.Application.Interfaces;
 using Rok.Application.Interfaces.Pictures;
 using Rok.Shared.Extensions;
@@ -20,7 +20,7 @@ public class AlbumApiService(
         if (!musicDataApiService.IsApiRetryAllowed(album.GetMetaDataLastAttempt))
             return AlbumApiUpdateResult.None;
 
-        await mediator.SendMessageAsync(new UpdateAlbumGetMetaDataLastAttemptCommand(album.Id));
+        await mediator.Send(new UpdateAlbumGetMetaDataLastAttemptRequest(album.Id));
         album.GetMetaDataLastAttempt = DateTime.UtcNow;
 
         MusicDataAlbumDto? albumApi = await musicDataApiService.GetAlbumAsync(album.Name, album.ArtistName, album.MusicBrainzID, album.ArtistMusicBrainzID);
@@ -57,7 +57,7 @@ public class AlbumApiService(
     {
         logger.LogTrace("Patch album '{Name}' from API response.", album.Name);
 
-        UpdateAlbumCommand command = new()
+        UpdateAlbumRequest command = new()
         {
             Id = album.Id
         };
@@ -97,7 +97,7 @@ public class AlbumApiService(
         if (string.IsNullOrWhiteSpace(album.Biography) && !string.IsNullOrWhiteSpace(albumApi.Biography))
             command.Biography.Set(albumApi.Biography);
 
-        await mediator.SendMessageAsync(command);
+        await mediator.Send(command);
 
         return true;
     }

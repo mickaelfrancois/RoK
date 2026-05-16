@@ -1,4 +1,4 @@
-using Rok.Application.Features.Playlists.Command;
+using Rok.Application.Features.Playlists.Requests;
 using Rok.ViewModels.Track;
 
 namespace Rok.ViewModels.Playlist.Services;
@@ -17,7 +17,7 @@ public class PlaylistUpdateService(
         TrackViewModel? track = tracks.FirstOrDefault(c =>
             !string.IsNullOrEmpty(c.ArtistName) && pictureService.PictureExists(c.ArtistName));
 
-        UpdatePlaylistCommand command = new()
+        UpdatePlaylistRequest command = new()
         {
             Id = playlist.Id,
             Name = playlist.Name,
@@ -44,7 +44,7 @@ public class PlaylistUpdateService(
 
         logger.LogInformation("Updating playlist statistics for {Name} (Id: {Id})", playlist.Name, playlist.Id);
 
-        Result result = await mediator.SendMessageAsync(command);
+        Result result = await mediator.Send(command);
 
         if (result.IsError)
         {
@@ -68,8 +68,8 @@ public class PlaylistUpdateService(
 
     public async Task<bool> RemoveTrackAsync(long playlistId, long trackId)
     {
-        Result result = await mediator.SendMessageAsync(
-            new RemoveTrackFromPlaylistCommand { PlaylistId = playlistId, TrackId = trackId });
+        Result result = await mediator.Send(
+            new RemoveTrackFromPlaylistRequest { PlaylistId = playlistId, TrackId = trackId });
 
         if (result.IsSuccess)
         {
@@ -87,7 +87,7 @@ public class PlaylistUpdateService(
 
     public async Task<bool> DeletePlaylistAsync(long playlistId, string playlistName)
     {
-        Result<bool> result = await mediator.SendMessageAsync(new DeletePlaylistCommand { Id = playlistId });
+        Result<bool> result = await mediator.Send(new DeletePlaylistRequest { Id = playlistId });
 
         if (result.IsSuccess)
         {
@@ -101,7 +101,7 @@ public class PlaylistUpdateService(
 
     public async Task<bool> SaveTracksPositionAsync(long playlistId, List<long> tracks)
     {
-        Result<bool> result = await mediator.SendMessageAsync(new MovePlaylistTracksCommand { PlaylistId = playlistId, Tracks = tracks });
+        Result<bool> result = await mediator.Send(new MovePlaylistTracksRequest { PlaylistId = playlistId, Tracks = tracks });
         if (result.IsSuccess)
         {
             Messenger.Send(new PlaylistUpdatedMessage(playlistId, ActionType.Delete));

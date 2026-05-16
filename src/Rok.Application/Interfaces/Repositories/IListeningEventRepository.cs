@@ -1,4 +1,4 @@
-﻿using Rok.Application.Features.Insights.Query;
+﻿using Rok.Application.Features.Insights;
 
 namespace Rok.Application.Interfaces.Repositories;
 

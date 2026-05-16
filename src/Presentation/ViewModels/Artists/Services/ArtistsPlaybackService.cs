@@ -1,4 +1,4 @@
-﻿using Rok.Application.Features.Tracks.Query;
+﻿using Rok.Application.Features.Tracks.Requests;
 using Rok.Application.Player;
 using Rok.Application.Randomizer;
 
@@ -14,7 +14,7 @@ public class ArtistsPlaybackService(IMediator mediator, IPlayerService playerSer
             return;
         }
 
-        List<TrackDto> tracks = (await mediator.SendMessageAsync(new GetTracksByArtistListQuery { ArtistIds = artistIds.ToList() })).ToList();
+        List<TrackDto> tracks = (await mediator.Send(new GetTracksByArtistListRequest { ArtistIds = artistIds.ToList() })).ToList();
 
         if (tracks.Count == 0)
         {

@@ -1,11 +1,10 @@
-using MiF.Mediator.Interfaces;
 using MiF.Result;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using Rok.Application.Dto;
-using Rok.Application.Features.Albums.Query;
-using Rok.Application.Features.Artists.Query;
-using Rok.Application.Features.Tracks.Query;
+using Rok.Application.Features.Albums.Requests;
+using Rok.Application.Features.Artists.Requests;
+using Rok.Application.Features.Tracks.Requests;
 using Rok.ViewModels.Album;
 using Rok.ViewModels.Albums.Interfaces;
 using Rok.ViewModels.Artist.Services;
@@ -28,7 +27,7 @@ public class ArtistDataLoaderTests
     {
         // Arrange
         ArtistDto artist = new() { Id = 7, Name = "Beatles" };
-        _mediator.Setup(m => m.SendMessageAsync(It.IsAny<GetArtistByIdQuery>(), It.IsAny<CancellationToken>()))
+        _mediator.Setup(m => m.Send(It.IsAny<GetArtistByIdRequest>(), It.IsAny<CancellationToken>()))
                  .ReturnsAsync(Result<ArtistDto>.Success(artist));
         ArtistDataLoader sut = BuildService();
 
@@ -44,7 +43,7 @@ public class ArtistDataLoaderTests
     public async Task LoadArtistAsync_ShouldReturnNull_WhenError()
     {
         // Arrange
-        _mediator.Setup(m => m.SendMessageAsync(It.IsAny<GetArtistByIdQuery>(), It.IsAny<CancellationToken>()))
+        _mediator.Setup(m => m.Send(It.IsAny<GetArtistByIdRequest>(), It.IsAny<CancellationToken>()))
                  .ReturnsAsync(Result<ArtistDto>.Fail("not found"));
         ArtistDataLoader sut = BuildService();
 
@@ -59,7 +58,7 @@ public class ArtistDataLoaderTests
     public async Task LoadAlbumsAsync_ShouldReturnEmpty_WhenNoAlbums()
     {
         // Arrange
-        _mediator.Setup(m => m.SendMessageAsync(It.IsAny<GetAlbumsByArtistIdQuery>(), It.IsAny<CancellationToken>()))
+        _mediator.Setup(m => m.Send(It.IsAny<GetAlbumsByArtistIdRequest>(), It.IsAny<CancellationToken>()))
                  .ReturnsAsync(new List<AlbumDto>());
         ArtistDataLoader sut = BuildService();
 
@@ -75,7 +74,7 @@ public class ArtistDataLoaderTests
     public async Task LoadTracksAsync_ShouldReturnEmpty_WhenNoTracks()
     {
         // Arrange
-        _mediator.Setup(m => m.SendMessageAsync(It.IsAny<GetTracksByArtistIdQuery>(), It.IsAny<CancellationToken>()))
+        _mediator.Setup(m => m.Send(It.IsAny<GetTracksByArtistIdRequest>(), It.IsAny<CancellationToken>()))
                  .ReturnsAsync(new List<TrackDto>());
         ArtistDataLoader sut = BuildService();
 
@@ -92,7 +91,7 @@ public class ArtistDataLoaderTests
     {
         // Arrange
         ArtistDto artist = new() { Id = 7 };
-        _mediator.Setup(m => m.SendMessageAsync(It.IsAny<GetArtistByIdQuery>(), It.IsAny<CancellationToken>()))
+        _mediator.Setup(m => m.Send(It.IsAny<GetArtistByIdRequest>(), It.IsAny<CancellationToken>()))
                  .ReturnsAsync(Result<ArtistDto>.Success(artist));
         ArtistDataLoader sut = BuildService();
 
@@ -107,7 +106,7 @@ public class ArtistDataLoaderTests
     public async Task ReloadArtistAsync_ShouldReturnNull_WhenError()
     {
         // Arrange
-        _mediator.Setup(m => m.SendMessageAsync(It.IsAny<GetArtistByIdQuery>(), It.IsAny<CancellationToken>()))
+        _mediator.Setup(m => m.Send(It.IsAny<GetArtistByIdRequest>(), It.IsAny<CancellationToken>()))
                  .ReturnsAsync(Result<ArtistDto>.Fail("not found"));
         ArtistDataLoader sut = BuildService();
 

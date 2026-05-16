@@ -1,10 +1,9 @@
-using MiF.Mediator.Interfaces;
 using Moq;
-using Rok.Application.Features.Albums.Command;
-using Rok.Application.Features.Artists.Command;
-using Rok.Application.Features.Genres.Command;
-using Rok.Application.Features.ListeningEvents.Command;
-using Rok.Application.Features.Tracks.Command;
+using Rok.Application.Features.Albums.Requests;
+using Rok.Application.Features.Artists.Requests;
+using Rok.Application.Features.Genres.Requests;
+using Rok.Application.Features.ListeningEvents.Requests;
+using Rok.Application.Features.Tracks.Requests;
 using Rok.ViewModels.Player.Services;
 
 namespace Rok.PresentationTests.ViewModels.Player.Services;
@@ -25,7 +24,7 @@ public class PlayerListenTrackerTests
         await sut.UpdateTrackListenAsync(42);
 
         // Assert
-        _mediator.Verify(m => m.SendMessageAsync(It.Is<UpdateTrackLastListenCommand>(c => c.TrackId == 42), It.IsAny<CancellationToken>()), Times.Once);
+        _mediator.Verify(m => m.Send(It.Is<UpdateTrackLastListenRequest>(c => c.TrackId == 42), It.IsAny<CancellationToken>()), Times.Once);
     }
 
     [Fact(DisplayName = "UpdateTrackListenAsync should skip the command on a subsequent call for the same track")]
@@ -39,7 +38,7 @@ public class PlayerListenTrackerTests
         await sut.UpdateTrackListenAsync(42);
 
         // Assert
-        _mediator.Verify(m => m.SendMessageAsync(It.IsAny<UpdateTrackLastListenCommand>(), It.IsAny<CancellationToken>()), Times.Once);
+        _mediator.Verify(m => m.Send(It.IsAny<UpdateTrackLastListenRequest>(), It.IsAny<CancellationToken>()), Times.Once);
     }
 
     [Fact(DisplayName = "UpdateArtistListenAsync should send the command on first call for an artist")]
@@ -53,7 +52,7 @@ public class PlayerListenTrackerTests
         await sut.UpdateArtistListenAsync(7);
 
         // Assert
-        _mediator.Verify(m => m.SendMessageAsync(It.Is<UpdateArtistLastListenCommand>(c => c.Id == 7), It.IsAny<CancellationToken>()), Times.Once);
+        _mediator.Verify(m => m.Send(It.Is<UpdateArtistLastListenRequest>(c => c.Id == 7), It.IsAny<CancellationToken>()), Times.Once);
     }
 
     [Fact(DisplayName = "UpdateAlbumListenAsync should send the command on first call for an album")]
@@ -67,7 +66,7 @@ public class PlayerListenTrackerTests
         await sut.UpdateAlbumListenAsync(11);
 
         // Assert
-        _mediator.Verify(m => m.SendMessageAsync(It.Is<UpdateAlbumLastListenCommand>(c => c.Id == 11), It.IsAny<CancellationToken>()), Times.Once);
+        _mediator.Verify(m => m.Send(It.Is<UpdateAlbumLastListenRequest>(c => c.Id == 11), It.IsAny<CancellationToken>()), Times.Once);
     }
 
     [Fact(DisplayName = "UpdateGenreListenAsync should send the command on first call for a genre")]
@@ -81,7 +80,7 @@ public class PlayerListenTrackerTests
         await sut.UpdateGenreListenAsync(3);
 
         // Assert
-        _mediator.Verify(m => m.SendMessageAsync(It.Is<UpdateGenretLastListenCommand>(c => c.Id == 3), It.IsAny<CancellationToken>()), Times.Once);
+        _mediator.Verify(m => m.Send(It.Is<UpdateGenretLastListenRequest>(c => c.Id == 3), It.IsAny<CancellationToken>()), Times.Once);
     }
 
     [Fact(DisplayName = "ClearCache should reset all caches and allow re-sending commands")]
@@ -102,10 +101,10 @@ public class PlayerListenTrackerTests
         await sut.UpdateGenreListenAsync(3);
 
         // Assert — each command sent twice (before and after clear)
-        _mediator.Verify(m => m.SendMessageAsync(It.IsAny<UpdateTrackLastListenCommand>(), It.IsAny<CancellationToken>()), Times.Exactly(2));
-        _mediator.Verify(m => m.SendMessageAsync(It.IsAny<UpdateAlbumLastListenCommand>(), It.IsAny<CancellationToken>()), Times.Exactly(2));
-        _mediator.Verify(m => m.SendMessageAsync(It.IsAny<UpdateArtistLastListenCommand>(), It.IsAny<CancellationToken>()), Times.Exactly(2));
-        _mediator.Verify(m => m.SendMessageAsync(It.IsAny<UpdateGenretLastListenCommand>(), It.IsAny<CancellationToken>()), Times.Exactly(2));
+        _mediator.Verify(m => m.Send(It.IsAny<UpdateTrackLastListenRequest>(), It.IsAny<CancellationToken>()), Times.Exactly(2));
+        _mediator.Verify(m => m.Send(It.IsAny<UpdateAlbumLastListenRequest>(), It.IsAny<CancellationToken>()), Times.Exactly(2));
+        _mediator.Verify(m => m.Send(It.IsAny<UpdateArtistLastListenRequest>(), It.IsAny<CancellationToken>()), Times.Exactly(2));
+        _mediator.Verify(m => m.Send(It.IsAny<UpdateGenretLastListenRequest>(), It.IsAny<CancellationToken>()), Times.Exactly(2));
     }
 
     [Fact(DisplayName = "UpdateListeningEventsAsync should always send the command with the supplied fields")]
@@ -118,8 +117,8 @@ public class PlayerListenTrackerTests
         await sut.UpdateListeningEventsAsync(trackId: 1, artistId: 2, albumId: 3, genreId: 4, durationPlayed: 100, durationTotal: 200);
 
         // Assert
-        _mediator.Verify(m => m.SendMessageAsync(
-            It.Is<CreateListeningEventCommand>(c =>
+        _mediator.Verify(m => m.Send(
+            It.Is<CreateListeningEventRequest>(c =>
                 c.TrackId == 1 && c.ArtistId == 2 && c.AlbumId == 3 && c.GenreId == 4 &&
                 c.DurationPlayed == 100 && c.DurationTotal == 200),
             It.IsAny<CancellationToken>()), Times.Once);
@@ -136,6 +135,6 @@ public class PlayerListenTrackerTests
         await sut.UpdateListeningEventsAsync(1, null, null, null, 50, 100);
 
         // Assert
-        _mediator.Verify(m => m.SendMessageAsync(It.IsAny<CreateListeningEventCommand>(), It.IsAny<CancellationToken>()), Times.Exactly(2));
+        _mediator.Verify(m => m.Send(It.IsAny<CreateListeningEventRequest>(), It.IsAny<CancellationToken>()), Times.Exactly(2));
     }
 }

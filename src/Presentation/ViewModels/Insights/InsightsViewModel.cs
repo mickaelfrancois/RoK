@@ -1,6 +1,7 @@
 ﻿using System.Globalization;
 using CommunityToolkit.Mvvm.ComponentModel;
-using Rok.Application.Features.Insights.Query;
+using Rok.Application.Features.Insights;
+using Rok.Application.Features.Insights.Requests;
 
 namespace Rok.ViewModels.Insights;
 
@@ -73,7 +74,7 @@ public partial class InsightsViewModel(IMediator mediator, IResourceService reso
         OnPropertyChanged(nameof(IsLoading));
         OnPropertyChanged(nameof(IsEmpty));
 
-        Insights = await mediator.SendMessageAsync(new GetInsightsQuery() { Month = DateTime.UtcNow });
+        Insights = await mediator.Send(new GetInsightsRequest() { Month = DateTime.UtcNow });
         HeatmapRows = BuildHeatmapRows(Insights.HeatmapCells);
         ListeningProfileCard = BuildProfileCard(Insights, resourceLoader);
         Badges = BuildBadgeViewModels(Insights.Badges);

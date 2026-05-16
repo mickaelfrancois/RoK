@@ -1,8 +1,7 @@
-using MiF.Mediator.Interfaces;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using Rok.Application.Dto;
-using Rok.Application.Features.Tracks.Query;
+using Rok.Application.Features.Tracks.Requests;
 using Rok.Application.Player;
 using Rok.ViewModels.Albums.Services;
 
@@ -25,7 +24,7 @@ public class AlbumsPlaybackServiceTests
         await sut.PlayAlbumsAsync(Array.Empty<long>());
 
         // Assert
-        _mediator.Verify(m => m.SendMessageAsync(It.IsAny<GetTracksByAlbumListQuery>(), It.IsAny<CancellationToken>()), Times.Never);
+        _mediator.Verify(m => m.Send(It.IsAny<GetTracksByAlbumListRequest>(), It.IsAny<CancellationToken>()), Times.Never);
         _player.Verify(p => p.LoadPlaylist(It.IsAny<List<TrackDto>>(), It.IsAny<TrackDto>()), Times.Never);
     }
 
@@ -34,7 +33,7 @@ public class AlbumsPlaybackServiceTests
     {
         // Arrange
         List<TrackDto> tracks = new() { new TrackDto { Id = 10 }, new TrackDto { Id = 11 } };
-        _mediator.Setup(m => m.SendMessageAsync(It.Is<GetTracksByAlbumListQuery>(q => q.AlbumsId.SequenceEqual(new long[] { 1, 2 })), It.IsAny<CancellationToken>()))
+        _mediator.Setup(m => m.Send(It.Is<GetTracksByAlbumListRequest>(q => q.AlbumsId.SequenceEqual(new long[] { 1, 2 })), It.IsAny<CancellationToken>()))
                  .ReturnsAsync(tracks);
         AlbumsPlaybackService sut = BuildService();
 

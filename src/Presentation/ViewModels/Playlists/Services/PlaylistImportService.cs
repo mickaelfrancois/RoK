@@ -1,6 +1,6 @@
 using System.Threading;
 using Rok.Application.Features.Playlists;
-using Rok.Application.Features.Playlists.Command;
+using Rok.Application.Features.Playlists.Requests;
 
 namespace Rok.ViewModels.Playlists.Services;
 
@@ -25,7 +25,7 @@ public sealed class PlaylistImportService(
         {
             cancellationToken.ThrowIfCancellationRequested();
 
-            Result<PlaylistImportResult> result = await _mediator.SendMessageAsync(new ImportPlaylistCommand(file), cancellationToken);
+            Result<PlaylistImportResult> result = await _mediator.Send(new ImportPlaylistRequest(file), cancellationToken);
 
             if (!result.IsSuccess)
             {

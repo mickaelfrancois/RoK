@@ -1,4 +1,4 @@
-﻿using Rok.Application.Features.Artists.Command;
+﻿using Rok.Application.Features.Artists.Requests;
 using Rok.Domain.Interfaces.Entities;
 
 namespace Rok.Application.Mapping;
@@ -63,7 +63,7 @@ public static class ArtistMapping
         };
     }
 
-    public static ArtistEntity ToEntity(this CreateArtistCommand command)
+    public static ArtistEntity ToEntity(this CreateArtistRequest command)
     {
         return new ArtistEntity
         {
@@ -103,9 +103,9 @@ public static class ArtistMapping
         };
     }
 
-    public static UpdateArtistCommand ToCommand(this ArtistDto dto)
+    public static UpdateArtistRequest ToCommand(this ArtistDto dto)
     {
-        return new UpdateArtistCommand
+        return new UpdateArtistRequest
         {
             Id = dto.Id,
             MusicBrainzID = dto.MusicBrainzID,

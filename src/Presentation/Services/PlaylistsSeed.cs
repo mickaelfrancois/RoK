@@ -1,4 +1,4 @@
-﻿using Rok.Application.Features.Playlists.Command;
+﻿using Rok.Application.Features.Playlists.Requests;
 
 namespace Rok.Services;
 
@@ -13,7 +13,7 @@ public class PlaylistsSeed(IMediator _mediator, ResourceLoader _resourceLoader)
 
     private Task InitRadioPlaylistsAsync()
     {
-        CreatePlaylistCommand playlist = new()
+        CreatePlaylistRequest playlist = new()
         {
             Name = _resourceLoader.GetString("defaultRadioPlaylistName"),
             Type = (int)PlaylistType.Smart,
@@ -58,12 +58,12 @@ public class PlaylistsSeed(IMediator _mediator, ResourceLoader _resourceLoader)
 
         playlist.Groups.AddRange(group1, group2);
 
-        return _mediator.SendMessageAsync(playlist);
+        return _mediator.Send(playlist);
     }
 
     private Task InitBestofPlaylistsAsync()
     {
-        CreatePlaylistCommand playlist = new()
+        CreatePlaylistRequest playlist = new()
         {
             Name = _resourceLoader.GetString("defaultBestofPlaylistName"),
             Type = (int)PlaylistType.Smart,
@@ -108,12 +108,12 @@ public class PlaylistsSeed(IMediator _mediator, ResourceLoader _resourceLoader)
 
         playlist.Groups.AddRange(group1, group2);
 
-        return _mediator.SendMessageAsync(playlist);
+        return _mediator.Send(playlist);
     }
 
     private Task InitAlbumsOfTheYearPlaylistsAsync()
     {
-        CreatePlaylistCommand playlist = new()
+        CreatePlaylistRequest playlist = new()
         {
             Name = _resourceLoader.GetString("defaultAlbumOfTheYearfPlaylistName"),
             Type = (int)PlaylistType.Smart,
@@ -140,6 +140,6 @@ public class PlaylistsSeed(IMediator _mediator, ResourceLoader _resourceLoader)
 
         playlist.Groups.Add(group1);
 
-        return _mediator.SendMessageAsync(playlist);
+        return _mediator.Send(playlist);
     }
 }

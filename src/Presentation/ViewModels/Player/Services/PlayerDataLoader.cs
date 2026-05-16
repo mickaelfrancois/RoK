@@ -1,4 +1,4 @@
-using Rok.Application.Features.Albums.Query;
+using Rok.Application.Features.Albums.Requests;
 using Rok.ViewModels.Album;
 using Rok.ViewModels.Albums.Interfaces;
 using Rok.ViewModels.Artist;
@@ -12,7 +12,7 @@ public class PlayerDataLoader(IMediator mediator, IArtistViewModelFactory artist
 {
     public async Task<AlbumViewModel?> GetAlbumByIdAsync(long albumId)
     {
-        Result<AlbumDto> albumResult = await mediator.SendMessageAsync(new GetAlbumByIdQuery(albumId));
+        Result<AlbumDto> albumResult = await mediator.Send(new GetAlbumByIdRequest(albumId));
         if (albumResult.IsError)
         {
             logger.LogError("Failed to get album by ID {AlbumId}: {ErrorMessage}", albumId, albumResult.Error);
@@ -27,7 +27,7 @@ public class PlayerDataLoader(IMediator mediator, IArtistViewModelFactory artist
 
     public async Task<ArtistViewModel?> GetArtistByIdAsync(long artistId)
     {
-        Result<ArtistDto> artistResult = await mediator.SendMessageAsync(new GetArtistByIdQuery(artistId));
+        Result<ArtistDto> artistResult = await mediator.Send(new GetArtistByIdRequest(artistId));
         if (artistResult.IsError)
         {
             logger.LogError("Failed to get artist by ID {ArtistId}: {ErrorMessage}", artistId, artistResult.Error);

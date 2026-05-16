@@ -1,5 +1,5 @@
 ﻿using System.Threading;
-using Rok.Application.Features.Tags.Query;
+using Rok.Application.Features.Tags.Requests;
 
 namespace Rok.Services;
 
@@ -35,7 +35,7 @@ public partial class TagsProvider : IDisposable
 
         try
         {
-            IEnumerable<TagDto> tags = await _mediator.SendMessageAsync(new GetAllTagsQuery());
+            IEnumerable<TagDto> tags = await _mediator.Send(new GetAllTagsRequest());
 
             _tags = tags.Select(v => v.Name)
                        .Distinct()

@@ -1,7 +1,6 @@
-using MiF.Mediator.Interfaces;
 using Moq;
 using Rok.Application.Dto;
-using Rok.Application.Features.Albums.Command;
+using Rok.Application.Features.Albums.Requests;
 using Rok.ViewModels.Album.Services;
 using Rok.ViewModels.Track;
 
@@ -25,7 +24,7 @@ public class AlbumStatisticsServiceTests
 
         // Assert
         Assert.False(result);
-        _mediator.Verify(m => m.SendMessageAsync(It.IsAny<UpdateAlbumStatisticsCommand>(), It.IsAny<CancellationToken>()), Times.Never);
+        _mediator.Verify(m => m.Send(It.IsAny<UpdateAlbumStatisticsRequest>(), It.IsAny<CancellationToken>()), Times.Never);
     }
 
     [Fact(DisplayName = "UpdateIfNeededAsync should send a command and update the album when stats differ")]
@@ -42,8 +41,8 @@ public class AlbumStatisticsServiceTests
         Assert.True(result);
         Assert.Equal(0, album.TrackCount);
         Assert.Equal(0, album.Duration);
-        _mediator.Verify(m => m.SendMessageAsync(
-            It.Is<UpdateAlbumStatisticsCommand>(c => c.Id == 1 && c.TrackCount == 0 && c.Duration == 0),
+        _mediator.Verify(m => m.Send(
+            It.Is<UpdateAlbumStatisticsRequest>(c => c.Id == 1 && c.TrackCount == 0 && c.Duration == 0),
             It.IsAny<CancellationToken>()), Times.Once);
     }
 }

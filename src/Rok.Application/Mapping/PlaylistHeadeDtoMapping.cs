@@ -1,5 +1,5 @@
 ﻿using System.Text.Json;
-using Rok.Application.Features.Playlists.Command;
+using Rok.Application.Features.Playlists.Requests;
 
 namespace Rok.Application.Mapping;
 
@@ -28,7 +28,7 @@ public static class PlaylistHeadeDtoMapping
         };
     }
 
-    public static PlaylistHeaderEntity Map(CreatePlaylistCommand command)
+    public static PlaylistHeaderEntity Map(CreatePlaylistRequest command)
     {
         return new PlaylistHeaderEntity
         {
@@ -41,7 +41,7 @@ public static class PlaylistHeadeDtoMapping
         };
     }
 
-    public static PlaylistHeaderEntity Map(UpdatePlaylistCommand command)
+    public static PlaylistHeaderEntity Map(UpdatePlaylistRequest command)
     {
         return new PlaylistHeaderEntity
         {
@@ -57,9 +57,9 @@ public static class PlaylistHeadeDtoMapping
         };
     }
 
-    public static CreatePlaylistCommand Map(PlaylistHeaderDto dto)
+    public static CreatePlaylistRequest Map(PlaylistHeaderDto dto)
     {
-        return new CreatePlaylistCommand
+        return new CreatePlaylistRequest
         {
             Name = dto.Name,
             Picture = dto.Picture,
@@ -70,9 +70,9 @@ public static class PlaylistHeadeDtoMapping
         };
     }
 
-    public static UpdatePlaylistCommand MapToUpdatePlaylistCommand(PlaylistHeaderDto dto)
+    public static UpdatePlaylistRequest MapToUpdatePlaylistRequest(PlaylistHeaderDto dto)
     {
-        return new UpdatePlaylistCommand
+        return new UpdatePlaylistRequest
         {
             Id = dto.Id,
             Name = dto.Name,

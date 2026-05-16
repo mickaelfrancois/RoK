@@ -1,8 +1,7 @@
 using System.Threading;
-using Rok.Application.Features.Playlists.Command;
 using Rok.Application.Features.Playlists.PlaylistMenu;
-using Rok.Application.Features.Playlists.Query;
-using Rok.Application.Features.Tracks.Query;
+using Rok.Application.Features.Playlists.Requests;
+using Rok.Application.Features.Tracks.Requests;
 using Rok.Application.Player;
 
 namespace Rok.Services;
@@ -56,7 +55,7 @@ public partial class PlaylistMenuService : IPlaylistMenuService, IDisposable
     {
         try
         {
-            Result<long> result = await _mediator.SendMessageAsync(new AddTrackToPlaylistCommand
+            Result<long> result = await _mediator.Send(new AddTrackToPlaylistRequest
             {
                 PlaylistId = playlistId,
                 TrackId = trackId
@@ -95,7 +94,7 @@ public partial class PlaylistMenuService : IPlaylistMenuService, IDisposable
     {
         try
         {
-            Result<long> result = await _mediator.SendMessageAsync(new AddAlbumToPlaylistCommand
+            Result<long> result = await _mediator.Send(new AddAlbumToPlaylistRequest
             {
                 PlaylistId = playlistId,
                 AlbumId = albumId
@@ -125,7 +124,7 @@ public partial class PlaylistMenuService : IPlaylistMenuService, IDisposable
     {
         try
         {
-            Result<long> result = await _mediator.SendMessageAsync(new AddArtistToPlaylistCommand
+            Result<long> result = await _mediator.Send(new AddArtistToPlaylistRequest
             {
                 PlaylistId = playlistId,
                 ArtistId = artistId
@@ -155,7 +154,7 @@ public partial class PlaylistMenuService : IPlaylistMenuService, IDisposable
     {
         try
         {
-            Result<long> playlistResult = await _mediator.SendMessageAsync(new CreatePlaylistCommand() { Name = playlistName, Type = (int)PlaylistType.Classic });
+            Result<long> playlistResult = await _mediator.Send(new CreatePlaylistRequest() { Name = playlistName, Type = (int)PlaylistType.Classic });
             long playlistId = playlistResult.Value;
             Messenger.Send(new PlaylistUpdatedMessage(playlistId, ActionType.Add));
 
@@ -173,7 +172,7 @@ public partial class PlaylistMenuService : IPlaylistMenuService, IDisposable
     {
         try
         {
-            Result<long> playlistResult = await _mediator.SendMessageAsync(new CreatePlaylistCommand() { Name = playlistName, Type = (int)PlaylistType.Classic });
+            Result<long> playlistResult = await _mediator.Send(new CreatePlaylistRequest() { Name = playlistName, Type = (int)PlaylistType.Classic });
             long playlistId = playlistResult.Value;
             Messenger.Send(new PlaylistUpdatedMessage(playlistId, ActionType.Add));
 
@@ -191,7 +190,7 @@ public partial class PlaylistMenuService : IPlaylistMenuService, IDisposable
     {
         try
         {
-            Result<long> playlistResult = await _mediator.SendMessageAsync(new CreatePlaylistCommand() { Name = playlistName, Type = (int)PlaylistType.Classic });
+            Result<long> playlistResult = await _mediator.Send(new CreatePlaylistRequest() { Name = playlistName, Type = (int)PlaylistType.Classic });
             long playlistId = playlistResult.Value;
             Messenger.Send(new PlaylistUpdatedMessage(playlistId, ActionType.Add));
 
@@ -209,7 +208,7 @@ public partial class PlaylistMenuService : IPlaylistMenuService, IDisposable
     {
         try
         {
-            IEnumerable<TrackDto> tracks = await _mediator.SendMessageAsync(new GetTracksByArtistIdQuery(artistId));
+            IEnumerable<TrackDto> tracks = await _mediator.Send(new GetTracksByArtistIdRequest(artistId));
             if (tracks == null || !tracks.Any())
             {
                 Messenger.Send(new ShowNotificationMessage() { Message = _resourceProvider.GetString("notification_playlist_track_add_error"), Type = NotificationType.Error });
@@ -230,7 +229,7 @@ public partial class PlaylistMenuService : IPlaylistMenuService, IDisposable
     {
         try
         {
-            IEnumerable<TrackDto> tracks = await _mediator.SendMessageAsync(new GetTracksByAlbumIdQuery(albumId));
+            IEnumerable<TrackDto> tracks = await _mediator.Send(new GetTracksByAlbumIdRequest(albumId));
             if (tracks == null || !tracks.Any())
             {
                 Messenger.Send(new ShowNotificationMessage() { Message = _resourceProvider.GetString("notification_playlist_track_add_error"), Type = NotificationType.Error });
@@ -251,7 +250,7 @@ public partial class PlaylistMenuService : IPlaylistMenuService, IDisposable
     {
         try
         {
-            Result<TrackDto> trackResult = await _mediator.SendMessageAsync(new GetTrackByIdQuery(trackId));
+            Result<TrackDto> trackResult = await _mediator.Send(new GetTrackByIdRequest(trackId));
             if (!trackResult.IsSuccess || trackResult.Value == null)
             {
                 Messenger.Send(new ShowNotificationMessage() { Message = _resourceProvider.GetString("notification_playlist_track_add_error"), Type = NotificationType.Error });
@@ -273,7 +272,7 @@ public partial class PlaylistMenuService : IPlaylistMenuService, IDisposable
     {
         try
         {
-            IEnumerable<PlaylistHeaderDto> playlists = await _mediator.SendMessageAsync(new GetAllPlaylistsQuery() { FilterType = PlaylistType.Classic });
+            IEnumerable<PlaylistHeaderDto> playlists = await _mediator.Send(new GetAllPlaylistsRequest() { FilterType = PlaylistType.Classic });
 
             _cachedPlaylistItems = playlists.Select(p => new PlaylistMenuItem
             {

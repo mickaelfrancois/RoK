@@ -1,10 +1,9 @@
-using MiF.Mediator.Interfaces;
 using MiF.Result;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using Rok.Application.Dto;
-using Rok.Application.Features.Albums.Query;
-using Rok.Application.Features.Tracks.Query;
+using Rok.Application.Features.Albums.Requests;
+using Rok.Application.Features.Tracks.Requests;
 using Rok.ViewModels.Album.Services;
 using Rok.ViewModels.Track;
 using Rok.ViewModels.Tracks.Interfaces;
@@ -23,7 +22,7 @@ public class AlbumDataLoaderTests
     {
         // Arrange
         AlbumDto album = new() { Id = 7, Name = "Greatest Hits" };
-        _mediator.Setup(m => m.SendMessageAsync(It.IsAny<GetAlbumByIdQuery>(), It.IsAny<CancellationToken>()))
+        _mediator.Setup(m => m.Send(It.IsAny<GetAlbumByIdRequest>(), It.IsAny<CancellationToken>()))
                  .ReturnsAsync(Result<AlbumDto>.Success(album));
         AlbumDataLoader sut = BuildService();
 
@@ -39,7 +38,7 @@ public class AlbumDataLoaderTests
     public async Task LoadAlbumAsync_ShouldReturnNull_WhenError()
     {
         // Arrange
-        _mediator.Setup(m => m.SendMessageAsync(It.IsAny<GetAlbumByIdQuery>(), It.IsAny<CancellationToken>()))
+        _mediator.Setup(m => m.Send(It.IsAny<GetAlbumByIdRequest>(), It.IsAny<CancellationToken>()))
                  .ReturnsAsync(Result<AlbumDto>.Fail("not found"));
         AlbumDataLoader sut = BuildService();
 
@@ -54,7 +53,7 @@ public class AlbumDataLoaderTests
     public async Task LoadTracksAsync_ShouldReturnEmpty_WhenNoTracks()
     {
         // Arrange
-        _mediator.Setup(m => m.SendMessageAsync(It.IsAny<GetTracksByAlbumIdQuery>(), It.IsAny<CancellationToken>()))
+        _mediator.Setup(m => m.Send(It.IsAny<GetTracksByAlbumIdRequest>(), It.IsAny<CancellationToken>()))
                  .ReturnsAsync(new List<TrackDto>());
         AlbumDataLoader sut = BuildService();
 
@@ -71,7 +70,7 @@ public class AlbumDataLoaderTests
     {
         // Arrange
         AlbumDto album = new() { Id = 7 };
-        _mediator.Setup(m => m.SendMessageAsync(It.IsAny<GetAlbumByIdQuery>(), It.IsAny<CancellationToken>()))
+        _mediator.Setup(m => m.Send(It.IsAny<GetAlbumByIdRequest>(), It.IsAny<CancellationToken>()))
                  .ReturnsAsync(Result<AlbumDto>.Success(album));
         AlbumDataLoader sut = BuildService();
 
@@ -86,7 +85,7 @@ public class AlbumDataLoaderTests
     public async Task ReloadAlbumAsync_ShouldReturnNull_WhenError()
     {
         // Arrange
-        _mediator.Setup(m => m.SendMessageAsync(It.IsAny<GetAlbumByIdQuery>(), It.IsAny<CancellationToken>()))
+        _mediator.Setup(m => m.Send(It.IsAny<GetAlbumByIdRequest>(), It.IsAny<CancellationToken>()))
                  .ReturnsAsync(Result<AlbumDto>.Fail("not found"));
         AlbumDataLoader sut = BuildService();
 

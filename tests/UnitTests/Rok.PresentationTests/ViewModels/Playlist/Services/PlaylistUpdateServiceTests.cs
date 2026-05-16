@@ -1,9 +1,8 @@
-using MiF.Mediator.Interfaces;
 using MiF.Result;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using Rok.Application.Dto;
-using Rok.Application.Features.Playlists.Command;
+using Rok.Application.Features.Playlists.Requests;
 using Rok.Application.Interfaces.Pictures;
 using Rok.ViewModels.Playlist.Services;
 using Rok.ViewModels.Track;
@@ -33,7 +32,7 @@ public class PlaylistUpdateServiceTests
 
         // Assert
         Assert.False(result);
-        _mediator.Verify(m => m.SendMessageAsync(It.IsAny<UpdatePlaylistCommand>(), It.IsAny<CancellationToken>()), Times.Never);
+        _mediator.Verify(m => m.Send(It.IsAny<UpdatePlaylistRequest>(), It.IsAny<CancellationToken>()), Times.Never);
     }
 
     [Fact(DisplayName = "SavePlaylistAsync should call mediator when forceUpdate is true even without changes")]
@@ -41,7 +40,7 @@ public class PlaylistUpdateServiceTests
     {
         // Arrange
         PlaylistHeaderDto playlist = new() { Id = 1, Name = "Mix" };
-        _mediator.Setup(m => m.SendMessageAsync(It.IsAny<UpdatePlaylistCommand>(), It.IsAny<CancellationToken>()))
+        _mediator.Setup(m => m.Send(It.IsAny<UpdatePlaylistRequest>(), It.IsAny<CancellationToken>()))
                  .ReturnsAsync(Result.Success());
         PlaylistUpdateService sut = BuildService();
 
@@ -50,7 +49,7 @@ public class PlaylistUpdateServiceTests
 
         // Assert
         Assert.True(result);
-        _mediator.Verify(m => m.SendMessageAsync(It.Is<UpdatePlaylistCommand>(c => c.Id == 1), It.IsAny<CancellationToken>()), Times.Once);
+        _mediator.Verify(m => m.Send(It.Is<UpdatePlaylistRequest>(c => c.Id == 1), It.IsAny<CancellationToken>()), Times.Once);
     }
 
     [Fact(DisplayName = "SavePlaylistAsync should return false when the mediator returns an error")]
@@ -58,7 +57,7 @@ public class PlaylistUpdateServiceTests
     {
         // Arrange
         PlaylistHeaderDto playlist = new() { Id = 1, Name = "Mix" };
-        _mediator.Setup(m => m.SendMessageAsync(It.IsAny<UpdatePlaylistCommand>(), It.IsAny<CancellationToken>()))
+        _mediator.Setup(m => m.Send(It.IsAny<UpdatePlaylistRequest>(), It.IsAny<CancellationToken>()))
                  .ReturnsAsync(Result.Fail("boom"));
         PlaylistUpdateService sut = BuildService();
 
@@ -73,7 +72,7 @@ public class PlaylistUpdateServiceTests
     public async Task RemoveTrackAsync_ShouldReturnTrue_WhenSuccess()
     {
         // Arrange
-        _mediator.Setup(m => m.SendMessageAsync(It.IsAny<RemoveTrackFromPlaylistCommand>(), It.IsAny<CancellationToken>()))
+        _mediator.Setup(m => m.Send(It.IsAny<RemoveTrackFromPlaylistRequest>(), It.IsAny<CancellationToken>()))
                  .ReturnsAsync(Result.Success());
         PlaylistUpdateService sut = BuildService();
 
@@ -82,8 +81,8 @@ public class PlaylistUpdateServiceTests
 
         // Assert
         Assert.True(result);
-        _mediator.Verify(m => m.SendMessageAsync(
-            It.Is<RemoveTrackFromPlaylistCommand>(c => c.PlaylistId == 1 && c.TrackId == 10),
+        _mediator.Verify(m => m.Send(
+            It.Is<RemoveTrackFromPlaylistRequest>(c => c.PlaylistId == 1 && c.TrackId == 10),
             It.IsAny<CancellationToken>()), Times.Once);
     }
 
@@ -91,7 +90,7 @@ public class PlaylistUpdateServiceTests
     public async Task RemoveTrackAsync_ShouldReturnFalse_WhenFailure()
     {
         // Arrange
-        _mediator.Setup(m => m.SendMessageAsync(It.IsAny<RemoveTrackFromPlaylistCommand>(), It.IsAny<CancellationToken>()))
+        _mediator.Setup(m => m.Send(It.IsAny<RemoveTrackFromPlaylistRequest>(), It.IsAny<CancellationToken>()))
                  .ReturnsAsync(Result.Fail("boom"));
         PlaylistUpdateService sut = BuildService();
 
@@ -106,7 +105,7 @@ public class PlaylistUpdateServiceTests
     public async Task DeletePlaylistAsync_ShouldReturnTrue_WhenSuccess()
     {
         // Arrange
-        _mediator.Setup(m => m.SendMessageAsync(It.IsAny<DeletePlaylistCommand>(), It.IsAny<CancellationToken>()))
+        _mediator.Setup(m => m.Send(It.IsAny<DeletePlaylistRequest>(), It.IsAny<CancellationToken>()))
                  .ReturnsAsync(Result<bool>.Success(true));
         PlaylistUpdateService sut = BuildService();
 
@@ -115,14 +114,14 @@ public class PlaylistUpdateServiceTests
 
         // Assert
         Assert.True(result);
-        _mediator.Verify(m => m.SendMessageAsync(It.Is<DeletePlaylistCommand>(c => c.Id == 1), It.IsAny<CancellationToken>()), Times.Once);
+        _mediator.Verify(m => m.Send(It.Is<DeletePlaylistRequest>(c => c.Id == 1), It.IsAny<CancellationToken>()), Times.Once);
     }
 
     [Fact(DisplayName = "DeletePlaylistAsync should return false when the mediator fails")]
     public async Task DeletePlaylistAsync_ShouldReturnFalse_WhenFailure()
     {
         // Arrange
-        _mediator.Setup(m => m.SendMessageAsync(It.IsAny<DeletePlaylistCommand>(), It.IsAny<CancellationToken>()))
+        _mediator.Setup(m => m.Send(It.IsAny<DeletePlaylistRequest>(), It.IsAny<CancellationToken>()))
                  .ReturnsAsync(Result<bool>.Fail("boom"));
         PlaylistUpdateService sut = BuildService();
 
@@ -137,7 +136,7 @@ public class PlaylistUpdateServiceTests
     public async Task SaveTracksPositionAsync_ShouldReturnTrue_WhenSuccess()
     {
         // Arrange
-        _mediator.Setup(m => m.SendMessageAsync(It.IsAny<MovePlaylistTracksCommand>(), It.IsAny<CancellationToken>()))
+        _mediator.Setup(m => m.Send(It.IsAny<MovePlaylistTracksRequest>(), It.IsAny<CancellationToken>()))
                  .ReturnsAsync(Result<bool>.Success(true));
         PlaylistUpdateService sut = BuildService();
 
@@ -146,8 +145,8 @@ public class PlaylistUpdateServiceTests
 
         // Assert
         Assert.True(result);
-        _mediator.Verify(m => m.SendMessageAsync(
-            It.Is<MovePlaylistTracksCommand>(c => c.PlaylistId == 1 && c.Tracks.SequenceEqual(new long[] { 10, 20 })),
+        _mediator.Verify(m => m.Send(
+            It.Is<MovePlaylistTracksRequest>(c => c.PlaylistId == 1 && c.Tracks.SequenceEqual(new long[] { 10, 20 })),
             It.IsAny<CancellationToken>()), Times.Once);
     }
 
@@ -155,7 +154,7 @@ public class PlaylistUpdateServiceTests
     public async Task SaveTracksPositionAsync_ShouldReturnFalse_WhenFailure()
     {
         // Arrange
-        _mediator.Setup(m => m.SendMessageAsync(It.IsAny<MovePlaylistTracksCommand>(), It.IsAny<CancellationToken>()))
+        _mediator.Setup(m => m.Send(It.IsAny<MovePlaylistTracksRequest>(), It.IsAny<CancellationToken>()))
                  .ReturnsAsync(Result<bool>.Fail("boom"));
         PlaylistUpdateService sut = BuildService();
 

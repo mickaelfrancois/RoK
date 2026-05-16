@@ -1,8 +1,7 @@
-using MiF.Mediator.Interfaces;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using Rok.Application.Dto;
-using Rok.Application.Features.Tracks.Query;
+using Rok.Application.Features.Tracks.Requests;
 using Rok.ViewModels.Artists.Interfaces;
 using Rok.ViewModels.Listening.Services;
 using Rok.ViewModels.Tracks.Interfaces;
@@ -22,7 +21,7 @@ public class ListeningDataLoaderTests
     public async Task GetTracksByArtistAsync_ShouldReturnEmpty_WhenNoTracks()
     {
         // Arrange
-        _mediator.Setup(m => m.SendMessageAsync(It.IsAny<GetTracksByArtistIdQuery>(), It.IsAny<CancellationToken>()))
+        _mediator.Setup(m => m.Send(It.IsAny<GetTracksByArtistIdRequest>(), It.IsAny<CancellationToken>()))
                  .ReturnsAsync(new List<TrackDto>());
         ListeningDataLoader sut = BuildService();
 
@@ -38,7 +37,7 @@ public class ListeningDataLoaderTests
     {
         // Arrange
         List<TrackDto> tracks = Enumerable.Range(1, 5).Select(i => new TrackDto { Id = i }).ToList();
-        _mediator.Setup(m => m.SendMessageAsync(It.IsAny<GetTracksByArtistIdQuery>(), It.IsAny<CancellationToken>()))
+        _mediator.Setup(m => m.Send(It.IsAny<GetTracksByArtistIdRequest>(), It.IsAny<CancellationToken>()))
                  .ReturnsAsync(tracks);
         ListeningDataLoader sut = BuildService();
 
@@ -55,7 +54,7 @@ public class ListeningDataLoaderTests
     {
         // Arrange
         List<TrackDto> tracks = Enumerable.Range(1, 10).Select(i => new TrackDto { Id = i }).ToList();
-        _mediator.Setup(m => m.SendMessageAsync(It.IsAny<GetTracksByArtistIdQuery>(), It.IsAny<CancellationToken>()))
+        _mediator.Setup(m => m.Send(It.IsAny<GetTracksByArtistIdRequest>(), It.IsAny<CancellationToken>()))
                  .ReturnsAsync(tracks);
         ListeningDataLoader sut = BuildService();
 

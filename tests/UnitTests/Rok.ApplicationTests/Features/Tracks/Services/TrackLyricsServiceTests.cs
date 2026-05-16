@@ -1,10 +1,8 @@
-using MiF.Mediator;
-using MiF.Mediator.Interfaces;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using Rok.Application.Dto.Lyrics;
 using Rok.Application.Dto.MusicDataApi;
-using Rok.Application.Features.Tracks.Command;
+using Rok.Application.Features.Tracks.Requests;
 using Rok.Application.Features.Tracks.Services;
 using Rok.Application.Interfaces;
 
@@ -112,7 +110,7 @@ public class TrackLyricsServiceTests
         await sut.GetAndSaveLyricsFromApiAsync(track);
 
         // Assert
-        _mediator.Verify(m => m.SendMessageAsync(It.Is<UpdateTrackGetLyricsLastAttemptCommand>(c => c.TrackId == 1), It.IsAny<CancellationToken>()), Times.Once);
+        _mediator.Verify(m => m.Send(It.Is<UpdateTrackGetLyricsLastAttemptRequest>(c => c.TrackId == 1), It.IsAny<CancellationToken>()), Times.Once);
         Assert.NotNull(track.GetLyricsLastAttempt);
     }
 

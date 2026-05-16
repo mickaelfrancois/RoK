@@ -1,4 +1,4 @@
-using Rok.Application.Features.EqualizerPresets.Command;
+using Rok.Application.Features.EqualizerPresets.Requests;
 
 namespace Rok.Application.Mapping;
 
@@ -13,7 +13,7 @@ public static class EqualizerPresetMapping
         Bands = entity.Bands
     };
 
-    public static EqualizerPresetEntity ToEntity(this SaveEqualizerPresetCommand command) => new()
+    public static EqualizerPresetEntity ToEntity(this SaveEqualizerPresetRequest command) => new()
     {
         Scope = command.Scope,
         BuiltinPresetKey = command.BuiltinPresetKey,
