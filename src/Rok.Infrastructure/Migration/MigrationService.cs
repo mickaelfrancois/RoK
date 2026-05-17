@@ -8,7 +8,7 @@ public class MigrationService(IDbConnection database, IEnumerable<IMigration>? m
     private readonly List<IMigration> _migrations = (migrations ?? Enumerable.Empty<IMigration>())
                                                     .OrderBy(m => m.TargetVersion).ToList();
 
-    private readonly IDbConnection _database = Guard.Against.Null(database);
+    private readonly IDbConnection _database = Guard.NotNull(database);
 
     public void Initial()
     {

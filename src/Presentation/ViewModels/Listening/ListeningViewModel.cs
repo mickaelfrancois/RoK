@@ -42,15 +42,15 @@ public partial class ListeningViewModel : ObservableObject, IDisposable
         ResourceLoader resourceLoader,
         ILogger<ListeningViewModel> logger)
     {
-        _playerService = Guard.Against.Null(playerService);
-        _playlistManager = Guard.Against.Null(playlistManager);
-        _playbackService = Guard.Against.Null(playbackService);
-        _playerSleepModeService = Guard.Against.Null(playerSleepModeService);
-        _stateManager = Guard.Against.Null(stateManager);
-        _navigationService = Guard.Against.Null(navigationService);
-        _messenger = Guard.Against.Null(messenger);
-        _resourceLoader = Guard.Against.Null(resourceLoader);
-        _logger = Guard.Against.Null(logger);
+        _playerService = Guard.NotNull(playerService);
+        _playlistManager = Guard.NotNull(playlistManager);
+        _playbackService = Guard.NotNull(playbackService);
+        _playerSleepModeService = Guard.NotNull(playerSleepModeService);
+        _stateManager = Guard.NotNull(stateManager);
+        _navigationService = Guard.NotNull(navigationService);
+        _messenger = Guard.NotNull(messenger);
+        _resourceLoader = Guard.NotNull(resourceLoader);
+        _logger = Guard.NotNull(logger);
 
         SubscribeToMessages();
         SubscribeToEvents();

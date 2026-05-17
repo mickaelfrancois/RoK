@@ -4,11 +4,11 @@ namespace Rok.Infrastructure;
 
 public class AppDbContext(IDbConnection connection, [FromKeyedServices("BackgroundConnection")] IDbConnection backgroundDb, IMigrationService migrationService) : IAppDbContext, IDisposable
 {
-    public IDbConnection Connection { get; init; } = Guard.Against.Null(connection);
+    public IDbConnection Connection { get; init; } = Guard.NotNull(connection);
 
-    public IDbConnection BackgroundConnection { get; init; } = Guard.Against.Null(backgroundDb);
+    public IDbConnection BackgroundConnection { get; init; } = Guard.NotNull(backgroundDb);
 
-    private readonly IMigrationService _migrationService = Guard.Against.Null(migrationService);
+    private readonly IMigrationService _migrationService = Guard.NotNull(migrationService);
     private bool disposedValue;
 
     public bool IsFirstStart { get; private set; }

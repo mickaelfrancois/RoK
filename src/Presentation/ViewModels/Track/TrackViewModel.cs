@@ -182,17 +182,17 @@ public partial class TrackViewModel : ObservableObject, IDisposable, IFilterable
         IMessenger messenger,
         ILogger<TrackViewModel> logger)
     {
-        _backdropLoader = Guard.Against.Null(backdropLoader);
-        PlaylistMenuService = Guard.Against.Null(playlistMenuService);
-        _resourceLoader = Guard.Against.Null(resourceLoader);
-        _dialogService = Guard.Against.Null(dialogService);
-        _playerService = Guard.Against.Null(playerService);
-        _dataLoader = Guard.Against.Null(dataLoader);
-        _lyricsService = Guard.Against.Null(lyricsService);
-        _scoreService = Guard.Against.Null(scoreService);
-        _navigationService = Guard.Against.Null(navigationService);
-        _appOptions = Guard.Against.Null(appOptions);
-        _messenger = Guard.Against.Null(messenger);
+        _backdropLoader = Guard.NotNull(backdropLoader);
+        PlaylistMenuService = Guard.NotNull(playlistMenuService);
+        _resourceLoader = Guard.NotNull(resourceLoader);
+        _dialogService = Guard.NotNull(dialogService);
+        _playerService = Guard.NotNull(playerService);
+        _dataLoader = Guard.NotNull(dataLoader);
+        _lyricsService = Guard.NotNull(lyricsService);
+        _scoreService = Guard.NotNull(scoreService);
+        _navigationService = Guard.NotNull(navigationService);
+        _appOptions = Guard.NotNull(appOptions);
+        _messenger = Guard.NotNull(messenger);
 
         _trackScoreUpdateSubscription = _messenger.Subscribe<TrackScoreUpdateMessage>(TrackScoreUpdateMessageHandle);
     }

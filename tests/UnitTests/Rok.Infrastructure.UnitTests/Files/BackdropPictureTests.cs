@@ -57,7 +57,7 @@ public class BackdropPictureTests
 
         // Act & Assert
         Assert.Throws<ArgumentException>(() => sut.SetRepositoryArtistPath(""));
-        Assert.Throws<ArgumentNullException>(() => sut.SetRepositoryArtistPath(null!));
+        Assert.Throws<ArgumentException>(() => sut.SetRepositoryArtistPath(null!));
     }
 
     [Fact]
@@ -98,7 +98,7 @@ public class BackdropPictureTests
 
         // Act & Assert
         Assert.Throws<ArgumentException>(() => sut.GetArtistPictureFolder(""));
-        Assert.Throws<ArgumentNullException>(() => sut.GetArtistPictureFolder(null!));
+        Assert.Throws<ArgumentException>(() => sut.GetArtistPictureFolder(null!));
     }
 
     [Fact]
@@ -123,7 +123,7 @@ public class BackdropPictureTests
 
         // Act & Assert
         Assert.Throws<ArgumentException>(() => sut.GetBackdrops(""));
-        Assert.Throws<ArgumentNullException>(() => sut.GetBackdrops(null!));
+        Assert.Throws<ArgumentException>(() => sut.GetBackdrops(null!));
     }
 
     [Fact]
@@ -148,7 +148,7 @@ public class BackdropPictureTests
 
         // Act & Assert
         Assert.Throws<ArgumentException>(() => sut.HasBackdrops(""));
-        Assert.Throws<ArgumentNullException>(() => sut.HasBackdrops(null!));
+        Assert.Throws<ArgumentException>(() => sut.HasBackdrops(null!));
     }
 
     [Fact]

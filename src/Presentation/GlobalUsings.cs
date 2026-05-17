@@ -14,7 +14,7 @@ global using Microsoft.UI.Xaml;
 global using Microsoft.UI.Xaml.Data;
 global using Microsoft.UI.Xaml.Media;
 global using Microsoft.UI.Xaml.Media.Imaging;
-global using MiF.Guard;
+global using CleanArch.DevKit.Guards;
 global using MiF.RelayCommand;
 global using Rok.Application;
 global using Rok.Application.Dto;

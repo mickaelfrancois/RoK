@@ -1,4 +1,4 @@
-﻿using MiF.Guard;
+﻿using CleanArch.DevKit.Guards;
 using Rok.Application.Interfaces;
 using Rok.Application.Interfaces.Repositories;
 using Rok.Domain.Entities;
@@ -63,7 +63,7 @@ public class TrackImport(ITrackRepository _trackRepository)
 
     public Task UpdateTrackFileDateAsync(long trackId, DateTime fileDate)
     {
-        Guard.Against.NegativeOrZero(trackId);
+        Guard.NotNegativeOrZero(trackId);
 
         return _trackRepository.UpdateFileDateAsync(trackId, fileDate, RepositoryConnectionKind.Background);
     }

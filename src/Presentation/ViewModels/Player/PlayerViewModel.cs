@@ -160,21 +160,21 @@ public partial class PlayerViewModel : ObservableObject, IDisposable
         ITelemetryClient telemetryClient,
         ILogger<PlayerViewModel> logger)
     {
-        _player = Guard.Against.Null(player);
-        _navigationService = Guard.Against.Null(navigationService);
-        _mediator = Guard.Against.Null(mediator);
-        _messenger = Guard.Against.Null(messenger);
-        _dataLoader = Guard.Against.Null(dataLoader);
-        _lyricsService = Guard.Against.Null(lyricsService);
-        _listenTracker = Guard.Against.Null(listenTracker);
-        _timerManager = Guard.Against.Null(timerManager);
-        _stateManager = Guard.Against.Null(stateManager);
-        EqualizerViewModel = Guard.Against.Null(equalizerViewModel);
-        _equalizerWindowService = Guard.Against.Null(equalizerWindowService);
-        _resourceLoader = Guard.Against.Null(resourceLoader);
-        _playerSleepModeService = Guard.Against.Null(playerSleepModeService);
-        _telemetryClient = Guard.Against.Null(telemetryClient);
-        _logger = Guard.Against.Null(logger);
+        _player = Guard.NotNull(player);
+        _navigationService = Guard.NotNull(navigationService);
+        _mediator = Guard.NotNull(mediator);
+        _messenger = Guard.NotNull(messenger);
+        _dataLoader = Guard.NotNull(dataLoader);
+        _lyricsService = Guard.NotNull(lyricsService);
+        _listenTracker = Guard.NotNull(listenTracker);
+        _timerManager = Guard.NotNull(timerManager);
+        _stateManager = Guard.NotNull(stateManager);
+        EqualizerViewModel = Guard.NotNull(equalizerViewModel);
+        _equalizerWindowService = Guard.NotNull(equalizerWindowService);
+        _resourceLoader = Guard.NotNull(resourceLoader);
+        _playerSleepModeService = Guard.NotNull(playerSleepModeService);
+        _telemetryClient = Guard.NotNull(telemetryClient);
+        _logger = Guard.NotNull(logger);
 
         _stateManager.PropertyChanged += OnStateManagerPropertyChanged;
         _playerSleepModeService.SleepTimerStateChanged += OnSleepTimerStateChanged;

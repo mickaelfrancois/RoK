@@ -69,13 +69,13 @@ public sealed partial class MainWindow : Window
 
     public MainWindow(NavigationService navigationService, ITelemetryClient telemetryClient, ResourceLoader resourceLoader, IAppDbContext dbContext, IAppOptions appOptions, IReviewPromptEligibilityService reviewPromptEligibilityService, IMessenger messenger)
     {
-        _navigationService = Guard.Against.Null(navigationService);
-        _telemetryClient = Guard.Against.Null(telemetryClient);
-        _resourceLoader = Guard.Against.Null(resourceLoader);
-        _dbContext = Guard.Against.Null(dbContext);
-        _appOptions = Guard.Against.Null(appOptions);
-        _reviewPromptEligibilityService = Guard.Against.Null(reviewPromptEligibilityService);
-        _messenger = Guard.Against.Null(messenger);
+        _navigationService = Guard.NotNull(navigationService);
+        _telemetryClient = Guard.NotNull(telemetryClient);
+        _resourceLoader = Guard.NotNull(resourceLoader);
+        _dbContext = Guard.NotNull(dbContext);
+        _appOptions = Guard.NotNull(appOptions);
+        _reviewPromptEligibilityService = Guard.NotNull(reviewPromptEligibilityService);
+        _messenger = Guard.NotNull(messenger);
 
         this.InitializeComponent();
 

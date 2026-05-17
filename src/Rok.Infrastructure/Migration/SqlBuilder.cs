@@ -19,7 +19,7 @@ public class SqlBuilder
 
     public SqlBuilder CreateTable(string tableName)
     {
-        Guard.Against.NullOrEmpty(tableName);
+        Guard.NotNullOrEmpty(tableName);
 
         _currentTableName = tableName;
         _currentColumnName = "";
@@ -35,7 +35,7 @@ public class SqlBuilder
 
     public SqlBuilder WithIdColumn(string columnName)
     {
-        Guard.Against.NullOrEmpty(columnName);
+        Guard.NotNullOrEmpty(columnName);
 
         _sql.Append($"{columnName} INTEGER NOT NULL CONSTRAINT PK_{_currentTableName} PRIMARY KEY AUTOINCREMENT ");
 
@@ -47,7 +47,7 @@ public class SqlBuilder
 
     public SqlBuilder WithColumn(string columnName)
     {
-        Guard.Against.NullOrEmpty(columnName);
+        Guard.NotNullOrEmpty(columnName);
 
         _sql.Append($", {columnName} ");
 

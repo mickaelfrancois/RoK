@@ -1,15 +1,15 @@
-﻿using MiF.Guard;
+﻿using CleanArch.DevKit.Guards;
 using Rok.Application.Features.Playlists.Requests;
 
 namespace Rok.Application.Features.Playlists;
 
 public class PlaylistService(IMediator _mediator) : IPlaylistService
 {
-    private readonly IMediator _mediator = Guard.Against.Null(_mediator);
+    private readonly IMediator _mediator = Guard.NotNull(_mediator);
 
     public async Task<PlaylistTracksDto> GenerateAsync(PlaylistHeaderDto playlist)
     {
-        Guard.Against.Null(playlist);
+        Guard.NotNull(playlist);
 
         List<PlaylistGroupDto> emptyGroups = [];
         PlaylistTracksDto result = new PlaylistTracksDto();

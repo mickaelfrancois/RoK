@@ -68,7 +68,7 @@ public class ArtistPictureTests
 
         // Act & Assert
         Assert.Throws<ArgumentException>(() => sut.SetRepositoryArtistPath(""));
-        Assert.Throws<ArgumentNullException>(() => sut.SetRepositoryArtistPath(null!));
+        Assert.Throws<ArgumentException>(() => sut.SetRepositoryArtistPath(null!));
     }
 
     [Fact]
@@ -115,7 +115,7 @@ public class ArtistPictureTests
 
         // Act & Assert
         Assert.Throws<ArgumentException>(() => sut.GetArtistFolder(""));
-        Assert.Throws<ArgumentNullException>(() => sut.GetArtistFolder(null!));
+        Assert.Throws<ArgumentException>(() => sut.GetArtistFolder(null!));
     }
 
     [Fact]
@@ -144,7 +144,7 @@ public class ArtistPictureTests
 
         // Act & Assert
         Assert.Throws<ArgumentException>(() => sut.GetPictureFile(""));
-        Assert.Throws<ArgumentNullException>(() => sut.GetPictureFile(null!));
+        Assert.Throws<ArgumentException>(() => sut.GetPictureFile(null!));
     }
 
     [Fact]
@@ -191,7 +191,7 @@ public class ArtistPictureTests
 
         // Act & Assert
         Assert.Throws<ArgumentException>(() => sut.PictureFileExists(""));
-        Assert.Throws<ArgumentNullException>(() => sut.PictureFileExists(null!));
+        Assert.Throws<ArgumentException>(() => sut.PictureFileExists(null!));
     }
 
     [Fact]

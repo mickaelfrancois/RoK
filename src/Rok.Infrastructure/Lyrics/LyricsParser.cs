@@ -15,7 +15,7 @@ public partial class LyricsParser : ILyricsParser
 
     public SyncLyricsModel Parse(string lyrics)
     {
-        Guard.Against.NullOrEmpty(lyrics);
+        Guard.NotNullOrEmpty(lyrics);
 
         SyncLyricsModel result = new();
         SortedDictionary<TimeSpan, string> sortedLyrics = new();

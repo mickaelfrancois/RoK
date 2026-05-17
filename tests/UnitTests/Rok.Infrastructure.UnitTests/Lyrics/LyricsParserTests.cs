@@ -13,7 +13,7 @@ public class LyricsParserTests
 
         // Act & Assert
         Assert.Throws<ArgumentException>(() => sut.Parse(""));
-        Assert.Throws<ArgumentNullException>(() => sut.Parse(null!));
+        Assert.Throws<ArgumentException>(() => sut.Parse(null!));
     }
 
     [Fact]

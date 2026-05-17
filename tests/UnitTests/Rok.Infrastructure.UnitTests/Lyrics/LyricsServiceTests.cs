@@ -43,7 +43,7 @@ public class LyricsServiceTests
 
         // Act & Assert
         Assert.Throws<ArgumentException>(() => sut.GetSynchronizedLyricsFileName(""));
-        Assert.Throws<ArgumentNullException>(() => sut.GetSynchronizedLyricsFileName(null!));
+        Assert.Throws<ArgumentException>(() => sut.GetSynchronizedLyricsFileName(null!));
     }
 
     [Fact]
@@ -87,7 +87,7 @@ public class LyricsServiceTests
 
         // Act & Assert
         Assert.Throws<ArgumentException>(() => sut.GetPlainLyricsFileName(""));
-        Assert.Throws<ArgumentNullException>(() => sut.GetPlainLyricsFileName(null!));
+        Assert.Throws<ArgumentException>(() => sut.GetPlainLyricsFileName(null!));
     }
 
     [Fact]
@@ -185,7 +185,7 @@ public class LyricsServiceTests
 
         // Act & Assert
         Assert.Throws<ArgumentException>(() => sut.CheckLyricsFileExists(""));
-        Assert.Throws<ArgumentNullException>(() => sut.CheckLyricsFileExists(null!));
+        Assert.Throws<ArgumentException>(() => sut.CheckLyricsFileExists(null!));
     }
 
     [Fact]
@@ -277,7 +277,7 @@ public class LyricsServiceTests
 
         // Act & Assert
         await Assert.ThrowsAsync<ArgumentException>(() => sut.LoadLyricsAsync(""));
-        await Assert.ThrowsAsync<ArgumentNullException>(() => sut.LoadLyricsAsync(null!));
+        await Assert.ThrowsAsync<ArgumentException>(() => sut.LoadLyricsAsync(null!));
     }
 
     [Fact]

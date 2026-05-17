@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using Microsoft.Extensions.Logging;
-using MiF.Guard;
+using CleanArch.DevKit.Guards;
 
 namespace Rok.Shared;
 
@@ -15,7 +15,7 @@ public class PerfLogger : IDisposable
 
     public PerfLogger(ILogger logger, [CallerMemberName] string caller = "")
     {
-        _logger = Guard.Against.Null(logger);
+        _logger = Guard.NotNull(logger);
         _caller = caller;
         _timer.Start();
     }

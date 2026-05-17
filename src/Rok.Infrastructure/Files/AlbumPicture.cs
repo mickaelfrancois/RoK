@@ -11,14 +11,14 @@ public class AlbumPicture(IFileSystem _fileSystem) : IAlbumPicture
 
     public bool PictureFileExists(string albumPath)
     {
-        Guard.Against.NullOrEmpty(albumPath);
+        Guard.NotNullOrEmpty(albumPath);
 
         return _fileSystem.FileExists(GetPictureFile(albumPath));
     }
 
     public string GetPictureFile(string albumPath)
     {
-        Guard.Against.NullOrEmpty(albumPath);
+        Guard.NotNullOrEmpty(albumPath);
 
         for (int i = 0; i < _files.Length; i++)
         {
