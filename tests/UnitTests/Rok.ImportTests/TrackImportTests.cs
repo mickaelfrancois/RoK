@@ -91,6 +91,6 @@ public class TrackImportTests
         TrackImport import = new(Mock.Of<ITrackRepository>());
 
         // Act & Assert
-        return Assert.ThrowsAsync<ArgumentException>(() => import.UpdateTrackFileDateAsync(0, DateTime.UtcNow));
+        return Assert.ThrowsAsync<ArgumentOutOfRangeException>(() => import.UpdateTrackFileDateAsync(0, DateTime.UtcNow));
     }
 }

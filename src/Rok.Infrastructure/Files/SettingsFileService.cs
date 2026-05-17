@@ -38,7 +38,7 @@ public class SettingsFileService(string applicationPath, IFolderResolver folderR
 
     public Task SaveAsync(IAppOptions options)
     {
-        Guard.Against.Null(options, nameof(options));
+        Guard.NotNull(options, nameof(options));
 
         string jsonString = JsonSerializer.Serialize(options, _jsonOptions);
 
@@ -47,7 +47,7 @@ public class SettingsFileService(string applicationPath, IFolderResolver folderR
 
     public async Task RemoveInvalidLibraryTokensAsync(IAppOptions options)
     {
-        Guard.Against.Null(options, nameof(options));
+        Guard.NotNull(options, nameof(options));
 
         if (options.LibraryTokens is null || options.LibraryTokens.Count == 0)
             return;

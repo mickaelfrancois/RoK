@@ -43,14 +43,14 @@ public partial class PlaylistsViewModel : ObservableObject, IDisposable
         IMessenger messenger,
         ILogger<PlaylistsViewModel> logger)
     {
-        _dataLoader = Guard.Against.Null(dataLoader);
-        _creationService = Guard.Against.Null(creationService);
-        _importService = Guard.Against.Null(importService);
-        _updateHandler = Guard.Against.Null(updateHandler);
-        _importedHandler = Guard.Against.Null(importedHandler);
-        _appOptions = Guard.Against.Null(appOptions);
-        _messenger = Guard.Against.Null(messenger);
-        _logger = Guard.Against.Null(logger);
+        _dataLoader = Guard.NotNull(dataLoader);
+        _creationService = Guard.NotNull(creationService);
+        _importService = Guard.NotNull(importService);
+        _updateHandler = Guard.NotNull(updateHandler);
+        _importedHandler = Guard.NotNull(importedHandler);
+        _appOptions = Guard.NotNull(appOptions);
+        _messenger = Guard.NotNull(messenger);
+        _logger = Guard.NotNull(logger);
 
         SubscribeToMessages();
         SubscribeToEvents();

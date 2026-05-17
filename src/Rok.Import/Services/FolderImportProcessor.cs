@@ -1,6 +1,6 @@
 using CleanArch.DevKit.Messaging;
 using Microsoft.Extensions.Logging;
-using MiF.Guard;
+using CleanArch.DevKit.Guards;
 using Rok.Application.Dto;
 using Rok.Application.Interfaces;
 using Rok.Application.Messages;
@@ -25,18 +25,18 @@ public class FolderImportProcessor(
     IMessenger messenger,
     ILogger<FolderImportProcessor> logger)
 {
-    private readonly IAppOptions _options = Guard.Against.Null(options);
-    private readonly TrackImport _importTrack = Guard.Against.Null(importTrack);
-    private readonly ArtistImport _importArtist = Guard.Against.Null(importArtist);
-    private readonly AlbumImport _importAlbum = Guard.Against.Null(importAlbum);
-    private readonly GenreImport _importGenre = Guard.Against.Null(importGenre);
-    private readonly FileSystemService _fileSystemService = Guard.Against.Null(fileSystemService);
-    private readonly TrackFileProcessor _trackFileProcessor = Guard.Against.Null(trackFileProcessor);
-    private readonly TrackMetadataService _metadataService = Guard.Against.Null(metadataService);
-    private readonly ImportTrackingService _trackingService = Guard.Against.Null(trackingService);
-    private readonly ITagService _tagService = Guard.Against.Null(tagService);
-    private readonly ImportMessageThrottler _messageThrottler = Guard.Against.Null(messageThrottler);
-    private readonly ILogger<FolderImportProcessor> _logger = Guard.Against.Null(logger);
+    private readonly IAppOptions _options = Guard.NotNull(options);
+    private readonly TrackImport _importTrack = Guard.NotNull(importTrack);
+    private readonly ArtistImport _importArtist = Guard.NotNull(importArtist);
+    private readonly AlbumImport _importAlbum = Guard.NotNull(importAlbum);
+    private readonly GenreImport _importGenre = Guard.NotNull(importGenre);
+    private readonly FileSystemService _fileSystemService = Guard.NotNull(fileSystemService);
+    private readonly TrackFileProcessor _trackFileProcessor = Guard.NotNull(trackFileProcessor);
+    private readonly TrackMetadataService _metadataService = Guard.NotNull(metadataService);
+    private readonly ImportTrackingService _trackingService = Guard.NotNull(trackingService);
+    private readonly ITagService _tagService = Guard.NotNull(tagService);
+    private readonly ImportMessageThrottler _messageThrottler = Guard.NotNull(messageThrottler);
+    private readonly ILogger<FolderImportProcessor> _logger = Guard.NotNull(logger);
 
     public async Task ImportFolderAsync(
         string musicFolder,

@@ -254,29 +254,29 @@ public partial class ArtistViewModel : ObservableObject, IFilterableArtist, IGro
         IMessenger messenger,
         ILogger<ArtistViewModel> logger)
     {
-        _backdropLoader = Guard.Against.Null(backdropLoader);
-        _navigationService = Guard.Against.Null(navigationService);
-        _playerService = Guard.Against.Null(playerService);
-        _dialogService = Guard.Against.Null(dialogService);
-        _resourceLoader = Guard.Against.Null(resourceLoader);
-        _dataLoader = Guard.Against.Null(dataLoader);
-        _tagsProvider = Guard.Against.Null(tagsDataLoader);
-        _pictureService = Guard.Against.Null(pictureService);
-        _messenger = Guard.Against.Null(messenger);
-        _apiService = Guard.Against.Null(apiService);
-        _statisticsService = Guard.Against.Null(statisticsService);
-        _dominantColorCalculator = Guard.Against.Null(dominantColorCalculator);
-        _editService = Guard.Against.Null(editService);
-        _backdropPicture = Guard.Against.Null(backdropPicture);
-        _appOptions = Guard.Against.Null(appOptions);
-        PlaylistMenuService = Guard.Against.Null(playlistMenuService);
-        _logger = Guard.Against.Null(logger);
+        _backdropLoader = Guard.NotNull(backdropLoader);
+        _navigationService = Guard.NotNull(navigationService);
+        _playerService = Guard.NotNull(playerService);
+        _dialogService = Guard.NotNull(dialogService);
+        _resourceLoader = Guard.NotNull(resourceLoader);
+        _dataLoader = Guard.NotNull(dataLoader);
+        _tagsProvider = Guard.NotNull(tagsDataLoader);
+        _pictureService = Guard.NotNull(pictureService);
+        _messenger = Guard.NotNull(messenger);
+        _apiService = Guard.NotNull(apiService);
+        _statisticsService = Guard.NotNull(statisticsService);
+        _dominantColorCalculator = Guard.NotNull(dominantColorCalculator);
+        _editService = Guard.NotNull(editService);
+        _backdropPicture = Guard.NotNull(backdropPicture);
+        _appOptions = Guard.NotNull(appOptions);
+        PlaylistMenuService = Guard.NotNull(playlistMenuService);
+        _logger = Guard.NotNull(logger);
     }
 
 
     public void SetData(ArtistDto artist)
     {
-        Artist = Guard.Against.Null(artist);
+        Artist = Guard.NotNull(artist);
         IsNew = Artist.CreatDate > DateTime.UtcNow.AddDays(-_appOptions.ArtistRecentThresholdDays);
 
         if (Artist.PictureDominantColor.HasValue)

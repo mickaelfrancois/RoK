@@ -136,7 +136,7 @@
 		</PackageReference>
 		<PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.28000.1721" />
 		<PackageReference Include="Microsoft.WindowsAppSDK" Version="1.8.260317003" />
-		<PackageReference Include="MiF.Guard" Version="1.0.0" />
+		<PackageReference Include="CleanArch.DevKit.Guards" Version="1.1.1" />
 		<PackageReference Include="MiF.RelayCommand" Version="1.0.0" />
 	</ItemGroup>
 	<ItemGroup>

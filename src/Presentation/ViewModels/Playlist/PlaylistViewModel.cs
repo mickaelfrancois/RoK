@@ -110,23 +110,23 @@ public partial class PlaylistViewModel : ObservableObject
         PlaylistExportService exportService,
         ILogger<PlaylistViewModel> logger)
     {
-        _backdropLoader = Guard.Against.Null(backdropLoader);
-        _navigationService = Guard.Against.Null(navigationService);
-        _playerService = Guard.Against.Null(playerService);
-        _resourceLoader = Guard.Against.Null(resourceLoader);
-        _dataLoader = Guard.Against.Null(dataLoader);
-        _pictureService = Guard.Against.Null(pictureService);
-        _updateService = Guard.Against.Null(updateService);
-        _generationService = Guard.Against.Null(generationService);
-        _exportService = Guard.Against.Null(exportService);
-        _logger = Guard.Against.Null(logger);
+        _backdropLoader = Guard.NotNull(backdropLoader);
+        _navigationService = Guard.NotNull(navigationService);
+        _playerService = Guard.NotNull(playerService);
+        _resourceLoader = Guard.NotNull(resourceLoader);
+        _dataLoader = Guard.NotNull(dataLoader);
+        _pictureService = Guard.NotNull(pictureService);
+        _updateService = Guard.NotNull(updateService);
+        _generationService = Guard.NotNull(generationService);
+        _exportService = Guard.NotNull(exportService);
+        _logger = Guard.NotNull(logger);
         Tracks.CollectionChanged += (_, _) => OnPropertyChanged(nameof(IsTracksEmpty));
     }
 
     public void SetData(PlaylistHeaderDto playlist)
     {
         string oldPicture = Playlist.Picture;
-        Playlist = Guard.Against.Null(playlist);
+        Playlist = Guard.NotNull(playlist);
 
         if (oldPicture != Playlist.Picture)
         {

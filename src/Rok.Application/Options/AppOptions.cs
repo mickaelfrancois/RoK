@@ -1,4 +1,4 @@
-﻿using MiF.Guard;
+﻿using CleanArch.DevKit.Guards;
 using Rok.Application.Interfaces;
 using Rok.Shared.Enums;
 
@@ -91,7 +91,7 @@ public class AppOptions : IAppOptions
 
     public void SetCachePath(string path)
     {
-        Guard.Against.NullOrEmpty(path);
+        Guard.NotNullOrEmpty(path);
 
         CachePath = path;
     }

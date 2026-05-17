@@ -7,8 +7,8 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="CleanArch.DevKit.Mediator.Results.Testing" Version="1.0.0" />
-		<PackageReference Include="CleanArch.DevKit.Mediator.Testing" Version="1.0.0" />
+		<PackageReference Include="CleanArch.DevKit.Mediator.Results.Testing" Version="1.1.1" />
+		<PackageReference Include="CleanArch.DevKit.Mediator.Testing" Version="1.1.1" />
 		<PackageReference Include="coverlet.collector" Version="10.0.0">
 		  <PrivateAssets>all</PrivateAssets>
 		  <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>

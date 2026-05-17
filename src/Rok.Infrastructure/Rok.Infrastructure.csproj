@@ -13,7 +13,7 @@
 		<PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.5" />
 		<PackageReference Include="Microsoft.Extensions.Http" Version="10.0.5" />
 		<PackageReference Include="Microsoft.Extensions.Logging" Version="10.0.5" />
-		<PackageReference Include="MiF.Guard" Version="1.0.0" />
+		<PackageReference Include="CleanArch.DevKit.Guards" Version="1.1.1" />
 		<PackageReference Include="NAudio" Version="2.3.0" />
 		<PackageReference Include="Serilog.Extensions.Logging" Version="10.0.0" />
 		<PackageReference Include="Serilog.Settings.Configuration" Version="10.0.0" />

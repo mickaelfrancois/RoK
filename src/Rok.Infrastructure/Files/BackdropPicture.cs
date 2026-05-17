@@ -21,7 +21,7 @@ public class BackdropPicture : IBackdropPicture
 
     public void SetRepositoryArtistPath(string path)
     {
-        Guard.Against.NullOrEmpty(path);
+        Guard.NotNullOrEmpty(path);
 
         RepositoryArtistPath = Path.Combine(path, KArtistFolderName);
 
@@ -30,7 +30,7 @@ public class BackdropPicture : IBackdropPicture
 
     public string GetArtistPictureFolder(string artistName)
     {
-        Guard.Against.NullOrEmpty(artistName);
+        Guard.NotNullOrEmpty(artistName);
 
         return Path.Combine(RepositoryArtistPath, artistName.ToFileName());
     }
@@ -38,7 +38,7 @@ public class BackdropPicture : IBackdropPicture
 
     public List<string> GetBackdrops(string artistName)
     {
-        Guard.Against.NullOrEmpty(artistName);
+        Guard.NotNullOrEmpty(artistName);
 
         string picturePath = GetArtistPictureFolder(artistName);
 
@@ -75,7 +75,7 @@ public class BackdropPicture : IBackdropPicture
 
     public bool HasBackdrops(string artistName)
     {
-        Guard.Against.NullOrEmpty(artistName, nameof(artistName));
+        Guard.NotNullOrEmpty(artistName, nameof(artistName));
 
         string picturePath = GetArtistPictureFolder(artistName);
 

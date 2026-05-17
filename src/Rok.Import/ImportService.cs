@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics;
 using Microsoft.Extensions.Logging;
-using MiF.Guard;
+using CleanArch.DevKit.Guards;
 using Rok.Application.Dto;
 using Rok.Application.Interfaces;
 using Rok.Import.Services;
@@ -30,29 +30,29 @@ ILogger<ImportService> logger) : IImport
     public bool UpdateInProgress { get; private set; }
     public ImportStatisticsDto Statistics { get; private set; } = new();
 
-    private readonly IFolderResolver _folderResolver = Guard.Against.Null(folderResolver);
-    private readonly ILogger<ImportService> _logger = Guard.Against.Null(logger);
-    private readonly IAppOptions _options = Guard.Against.Null(options);
-    private readonly ICleanLibrary _cleanLibraryService = Guard.Against.Null(cleanLibraryService);
-    private readonly Statistics _statistics = Guard.Against.Null(statistics);
-    private readonly TrackImport _importTrack = Guard.Against.Null(importTrack);
-    private readonly AlbumImport _importAlbum = Guard.Against.Null(importAlbum);
-    private readonly ArtistImport _importArtist = Guard.Against.Null(importArtist);
-    private readonly GenreImport _importGenre = Guard.Against.Null(importGenre);
-    private readonly ImportProgressService _progressService = Guard.Against.Null(progressService);
-    private readonly ImportTrackingService _trackingService = Guard.Against.Null(trackingService);
-    private readonly FileSystemService _fileSystemService = Guard.Against.Null(fileSystemService);
-    private readonly FolderImportProcessor _folderProcessor = Guard.Against.Null(folderProcessor);
-    private readonly ImportMessageThrottler _messageThrottler = Guard.Against.Null(messageThrottler);
-    private readonly PostImportDominantColorTask _postImportDominantColorTask = Guard.Against.Null(postImportDominantColorTask);
-    private readonly PostImportApiEnrichmentTask _postImportApiEnrichmentTask = Guard.Against.Null(postImportApiEnrichmentTask);
+    private readonly IFolderResolver _folderResolver = Guard.NotNull(folderResolver);
+    private readonly ILogger<ImportService> _logger = Guard.NotNull(logger);
+    private readonly IAppOptions _options = Guard.NotNull(options);
+    private readonly ICleanLibrary _cleanLibraryService = Guard.NotNull(cleanLibraryService);
+    private readonly Statistics _statistics = Guard.NotNull(statistics);
+    private readonly TrackImport _importTrack = Guard.NotNull(importTrack);
+    private readonly AlbumImport _importAlbum = Guard.NotNull(importAlbum);
+    private readonly ArtistImport _importArtist = Guard.NotNull(importArtist);
+    private readonly GenreImport _importGenre = Guard.NotNull(importGenre);
+    private readonly ImportProgressService _progressService = Guard.NotNull(progressService);
+    private readonly ImportTrackingService _trackingService = Guard.NotNull(trackingService);
+    private readonly FileSystemService _fileSystemService = Guard.NotNull(fileSystemService);
+    private readonly FolderImportProcessor _folderProcessor = Guard.NotNull(folderProcessor);
+    private readonly ImportMessageThrottler _messageThrottler = Guard.NotNull(messageThrottler);
+    private readonly PostImportDominantColorTask _postImportDominantColorTask = Guard.NotNull(postImportDominantColorTask);
+    private readonly PostImportApiEnrichmentTask _postImportApiEnrichmentTask = Guard.NotNull(postImportApiEnrichmentTask);
 
     private CancellationTokenSource? _cts;
     private Task _runningTask = Task.CompletedTask;
 
     public void Start(int delayInSeconds)
     {
-        Guard.Against.Negative(delayInSeconds);
+        Guard.NotNegative(delayInSeconds);
 
         if (_options.LibraryTokens is null)
         {

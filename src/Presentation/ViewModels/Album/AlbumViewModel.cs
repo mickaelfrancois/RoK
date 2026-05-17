@@ -180,27 +180,27 @@ public partial class AlbumViewModel : ObservableObject, IFilterableAlbum, IGroup
         IMessenger messenger,
         ILogger<AlbumViewModel> logger)
     {
-        _backdropLoader = Guard.Against.Null(backdropLoader);
-        _navigationService = Guard.Against.Null(navigationService);
-        _playerService = Guard.Against.Null(playerService);
-        _resourceLoader = Guard.Against.Null(resourceLoader);
-        _dataLoader = Guard.Against.Null(dataLoader);
-        _tagsProvider = Guard.Against.Null(tagsDataLoader);
-        _pictureService = Guard.Against.Null(pictureService);
-        _apiService = Guard.Against.Null(apiService);
-        _messenger = Guard.Against.Null(messenger);
-        _statisticsService = Guard.Against.Null(statisticsService);
-        _dominantColorCalculator = Guard.Against.Null(dominantColorCalculator);
-        _editService = Guard.Against.Null(editService);
-        _appOptions = Guard.Against.Null(appOptions);
-        _dialogService = Guard.Against.Null(dialogService);
-        PlaylistMenuService = Guard.Against.Null(playlistMenuService);
-        _logger = Guard.Against.Null(logger);
+        _backdropLoader = Guard.NotNull(backdropLoader);
+        _navigationService = Guard.NotNull(navigationService);
+        _playerService = Guard.NotNull(playerService);
+        _resourceLoader = Guard.NotNull(resourceLoader);
+        _dataLoader = Guard.NotNull(dataLoader);
+        _tagsProvider = Guard.NotNull(tagsDataLoader);
+        _pictureService = Guard.NotNull(pictureService);
+        _apiService = Guard.NotNull(apiService);
+        _messenger = Guard.NotNull(messenger);
+        _statisticsService = Guard.NotNull(statisticsService);
+        _dominantColorCalculator = Guard.NotNull(dominantColorCalculator);
+        _editService = Guard.NotNull(editService);
+        _appOptions = Guard.NotNull(appOptions);
+        _dialogService = Guard.NotNull(dialogService);
+        PlaylistMenuService = Guard.NotNull(playlistMenuService);
+        _logger = Guard.NotNull(logger);
     }
 
     public void SetData(AlbumDto album)
     {
-        Album = Guard.Against.Null(album);
+        Album = Guard.NotNull(album);
 
         IsNew = Album.CreatDate > DateTime.UtcNow.AddDays(-_appOptions.AlbumRecentThresholdDays);
 

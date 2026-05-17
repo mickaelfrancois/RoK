@@ -1,5 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
-using MiF.Guard;
+using CleanArch.DevKit.Guards;
 using Rok.Application.Interfaces;
 using Rok.Application.Interfaces.Pictures;
 using Rok.Application.Messages;
@@ -148,15 +148,15 @@ public class PlayerService : IPlayerService, IDisposable
 
     public PlayerService(ICallDetectionService callDetectionService, IPlayerEngine player, IAppOptions appOptions, IDiscordRichPresenceService? discordService, ISystemMediaTransportControlsService? smtcService, IAlbumPicture albumPicture, TimeProvider timeProvider, IMessenger messenger, ILogger<PlayerService> logger)
     {
-        _callDetectionService = Guard.Against.Null(callDetectionService, nameof(callDetectionService));
-        _player = Guard.Against.Null(player, nameof(player));
-        _appOptions = Guard.Against.Null(appOptions, nameof(appOptions));
+        _callDetectionService = Guard.NotNull(callDetectionService, nameof(callDetectionService));
+        _player = Guard.NotNull(player, nameof(player));
+        _appOptions = Guard.NotNull(appOptions, nameof(appOptions));
         _discordService = discordService;
         _smtcService = smtcService;
-        _albumPicture = Guard.Against.Null(albumPicture, nameof(albumPicture));
-        _timeProvider = Guard.Against.Null(timeProvider, nameof(timeProvider));
-        _messenger = Guard.Against.Null(messenger, nameof(messenger));
-        _logger = Guard.Against.Null(logger, nameof(logger));
+        _albumPicture = Guard.NotNull(albumPicture, nameof(albumPicture));
+        _timeProvider = Guard.NotNull(timeProvider, nameof(timeProvider));
+        _messenger = Guard.NotNull(messenger, nameof(messenger));
+        _logger = Guard.NotNull(logger, nameof(logger));
 
         _isCrossfadeEnabled = appOptions.CrossFade;
 
@@ -277,7 +277,7 @@ public class PlayerService : IPlayerService, IDisposable
 
     public void LoadPlaylist(List<TrackDto> tracks, TrackDto? startTrack = null)
     {
-        Guard.Against.Null(tracks);
+        Guard.NotNull(tracks);
 
         if (CurrentTrack != null)
             _messenger.Send(new MediaEvent(EPlaybackState.Ended, CurrentTrack));
@@ -300,7 +300,7 @@ public class PlayerService : IPlayerService, IDisposable
 
     public void AddTracksToPlaylist(List<TrackDto> tracks)
     {
-        Guard.Against.Null(tracks);
+        Guard.NotNull(tracks);
 
         bool hasTracks = Playlist.Count > 0;
 
@@ -314,7 +314,7 @@ public class PlayerService : IPlayerService, IDisposable
 
     public void InsertTracksToPlaylist(List<TrackDto> tracks, int? index = null)
     {
-        Guard.Against.Null(tracks);
+        Guard.NotNull(tracks);
 
         if (tracks.Count == 0)
             return;

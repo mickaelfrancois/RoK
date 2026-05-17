@@ -26,7 +26,7 @@ public class NavigationService(ITelemetryClient telemetryClient)
 
     public void NavigateToArtist(long artistId)
     {
-        Guard.Against.NegativeOrZero(artistId);
+        Guard.NotNegativeOrZero(artistId);
         _ = telemetryClient.CaptureScreenAsync("ArtistPage");
         MainFrame.Navigate(typeof(ArtistPage), new ArtistOpenArgs(artistId));
     }
@@ -39,21 +39,21 @@ public class NavigationService(ITelemetryClient telemetryClient)
 
     public void NavigateToAlbum(long albumId)
     {
-        Guard.Against.NegativeOrZero(albumId);
+        Guard.NotNegativeOrZero(albumId);
         _ = telemetryClient.CaptureScreenAsync("AlbumPage");
         MainFrame.Navigate(typeof(AlbumPage), new AlbumOpenArgs(albumId));
     }
 
     public void NavigateToGenre(long genreId)
     {
-        Guard.Against.NegativeOrZero(genreId);
+        Guard.NotNegativeOrZero(genreId);
         _ = telemetryClient.CaptureScreenAsync("GenrePage");
         MainFrame.Navigate(typeof(GenrePage), new GenreOpenArgs(genreId));
     }
 
     public void NavigateToTrack(long trackId)
     {
-        Guard.Against.NegativeOrZero(trackId);
+        Guard.NotNegativeOrZero(trackId);
         _ = telemetryClient.CaptureScreenAsync("TrackPage");
         MainFrame.Navigate(typeof(TrackPage), new TrackOpenArgs(trackId));
     }
@@ -84,7 +84,7 @@ public class NavigationService(ITelemetryClient telemetryClient)
 
     public void NavigateToSearch(SearchOpenArgs args)
     {
-        Guard.Against.Null(args);
+        Guard.NotNull(args);
         _ = telemetryClient.CaptureScreenAsync("SearchPage");
         MainFrame.Navigate(typeof(SearchPage), args);
     }

@@ -23,7 +23,7 @@ public class ArtistPicture : IArtistPicture
 
     public void SetRepositoryArtistPath(string path)
     {
-        Guard.Against.NullOrEmpty(path);
+        Guard.NotNullOrEmpty(path);
 
         RepositoryArtistPath = Path.Combine(path, KArtistFolderName);
 
@@ -33,7 +33,7 @@ public class ArtistPicture : IArtistPicture
 
     public string GetArtistFolder(string artistName)
     {
-        Guard.Against.NullOrEmpty(artistName);
+        Guard.NotNullOrEmpty(artistName);
 
         return Path.Combine(RepositoryArtistPath, artistName.ToFileName());
     }
@@ -41,7 +41,7 @@ public class ArtistPicture : IArtistPicture
 
     public string GetPictureFile(string artistName)
     {
-        Guard.Against.NullOrEmpty(artistName);
+        Guard.NotNullOrEmpty(artistName);
 
         return Path.Combine(RepositoryArtistPath, artistName.ToFileName(), KArtistFileName);
     }
@@ -49,7 +49,7 @@ public class ArtistPicture : IArtistPicture
 
     public bool PictureFileExists(string artistName)
     {
-        Guard.Against.NullOrEmpty(artistName);
+        Guard.NotNullOrEmpty(artistName);
 
         return _fileSystem.FileExists(GetPictureFile(artistName));
     }

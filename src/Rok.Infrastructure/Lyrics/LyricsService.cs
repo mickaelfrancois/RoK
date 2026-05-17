@@ -13,7 +13,7 @@ public partial class LyricsService(IFileSystem fileSystem) : ILyricsService
 
     public string GetSynchronizedLyricsFileName(string musicFile)
     {
-        Guard.Against.NullOrEmpty(musicFile);
+        Guard.NotNullOrEmpty(musicFile);
 
         string? folder = fileSystem.GetDirectoryName(musicFile);
         string fileNameWithoutExtension = fileSystem.GetFileNameWithoutExtension(musicFile);
@@ -23,7 +23,7 @@ public partial class LyricsService(IFileSystem fileSystem) : ILyricsService
 
     public string GetPlainLyricsFileName(string musicFile)
     {
-        Guard.Against.NullOrEmpty(musicFile);
+        Guard.NotNullOrEmpty(musicFile);
 
         string? folder = fileSystem.GetDirectoryName(musicFile);
         string fileNameWithoutExtension = fileSystem.GetFileNameWithoutExtension(musicFile);
@@ -33,7 +33,7 @@ public partial class LyricsService(IFileSystem fileSystem) : ILyricsService
 
     public ELyricsType CheckLyricsFileExists(string musicFile)
     {
-        Guard.Against.NullOrEmpty(musicFile);
+        Guard.NotNullOrEmpty(musicFile);
 
         string? folder = fileSystem.GetDirectoryName(musicFile);
         string fileNameWithoutExtension = fileSystem.GetFileNameWithoutExtension(musicFile);
@@ -51,7 +51,7 @@ public partial class LyricsService(IFileSystem fileSystem) : ILyricsService
 
     public async Task<LyricsModel?> LoadLyricsAsync(string musicFile)
     {
-        Guard.Against.NullOrEmpty(musicFile);
+        Guard.NotNullOrEmpty(musicFile);
 
         string? folder = fileSystem.GetDirectoryName(musicFile);
 
@@ -90,7 +90,7 @@ public partial class LyricsService(IFileSystem fileSystem) : ILyricsService
 
     public Task SaveLyricsAsync(LyricsModel lyrics)
     {
-        Guard.Against.Null(lyrics);
+        Guard.NotNull(lyrics);
 
         return fileSystem.WriteAllTextAsync(lyrics.File, lyrics.PlainLyrics);
     }
