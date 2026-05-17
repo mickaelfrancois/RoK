@@ -1,4 +1,7 @@
-﻿namespace Rok.Shared.Extensions;
+﻿using System.Globalization;
+using System.Text;
+
+namespace Rok.Shared.Extensions;
 
 public static class StringExtensions
 {
@@ -62,4 +65,39 @@ public static class StringExtensions
     /// <returns><see langword="true"/> if the strings are different; otherwise, <see langword="false"/>.</returns>
     public static bool AreDifferent(this string? a, string? b) => (a ?? "") != (b ?? "");
 
+    /// <summary>
+    /// Normalizes a name used as a case-insensitive index or lookup key.
+    /// Trims surrounding whitespace, applies Unicode NFC composition, folds the
+    /// common dash and hyphen variants (U+2010 to U+2015, U+2212, U+FE58, U+FE63, U+FF0D)
+    /// to ASCII '-' (U+002D), and folds non-breaking and zero-width spaces
+    /// (U+00A0, U+202F, U+2007, U+200B) to a regular space.
+    /// Returns the input unchanged if null or empty.
+    /// </summary>
+    public static string NormalizeIndexedName(this string value)
+    {
+        if (string.IsNullOrEmpty(value))
+            return value;
+
+        string trimmed = value.Trim();
+
+        if (trimmed.Length == 0)
+            return trimmed;
+
+        string normalized = trimmed.Normalize(NormalizationForm.FormC);
+
+        StringBuilder sb = new(normalized.Length);
+
+        foreach (char c in normalized)
+        {
+            char folded = c switch
+            {
+                '‐' or '‑' or '‒' or '–' or '—' or '―' or '−' or '﹘' or '﹣' or '－' => '-',
+                ' ' or ' ' or ' ' or '​' => ' ',
+                _ => c
+            };
+            sb.Append(folded);
+        }
+
+        return sb.ToString();
+    }
 }

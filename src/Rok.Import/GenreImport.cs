@@ -77,6 +77,6 @@ public class GenreImport(IGenreRepository _genreRepository, TimeProvider _timePr
 
     private static string GetKey(string genreName)
     {
-        return genreName.ToUpperInvariant();
+        return genreName.NormalizeIndexedName().ToUpperInvariant();
     }
 }

@@ -117,6 +117,6 @@ public class ArtistImport(IArtistRepository _artistRepository, TimeProvider _tim
 
     private static string GetKey(string artistName)
     {
-        return artistName.ToUpperInvariant();
+        return artistName.NormalizeIndexedName().ToUpperInvariant();
     }
 }

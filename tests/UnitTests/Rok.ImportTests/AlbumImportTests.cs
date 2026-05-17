@@ -42,6 +42,27 @@ public class AlbumImportTests
         Assert.NotNull(import.GetFromCache("Now That's What I Call Music", true, null));
     }
 
+    [Fact(DisplayName = "GetFromCache should find existing album when stored name uses unicode hyphen and lookup uses ascii hyphen")]
+    public async Task GetFromCache_ShouldFindExistingAlbum_WhenStoredNameUsesUnicodeHyphen_AndLookupUsesAsciiHyphen()
+    {
+        // Arrange — non compilation, scoped by artistId
+        List<AlbumEntity> albums = new()
+        {
+            new() { Id = 77, Name = "Foul Taste of Freedom – the album", ArtistId = 42, IsCompilation = false }
+        };
+        Mock<IAlbumRepository> repository = new();
+        repository.Setup(r => r.GetAllAsync(It.IsAny<RepositoryConnectionKind>())).ReturnsAsync(albums);
+        AlbumImport import = new(repository.Object, TimeProvider.System);
+        await import.LoadCacheAsync();
+
+        // Act — same album name but lookup uses ASCII hyphen
+        AlbumCacheItem? hit = import.GetFromCache("Foul Taste of Freedom - the album", false, 42);
+
+        // Assert
+        Assert.NotNull(hit);
+        Assert.Equal(77, hit!.Id);
+    }
+
     [Fact(DisplayName = "GetFromCache should differentiate same album name by artist when not a compilation")]
     public async Task GetFromCache_ShouldDifferentiateSameAlbumName_ByArtist_WhenNotCompilation()
     {
