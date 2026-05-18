@@ -153,6 +153,27 @@ public class ArtistImportTests
         Assert.Equal(100, import.NewlyCreatedIds.Count);
     }
 
+    [Fact(DisplayName = "GetFromCache should find existing artist when stored name uses unicode hyphen and lookup uses ascii hyphen")]
+    public async Task GetFromCache_ShouldFindExistingArtist_WhenStoredNameUsesUnicodeHyphen_AndLookupUsesAsciiHyphen()
+    {
+        // Arrange — stored "Pro<U+2010>pain", lookup with ascii hyphen
+        List<ArtistEntity> artists = new()
+        {
+            new() { Id = 42, Name = "Pro‐pain" }
+        };
+        Mock<IArtistRepository> repository = new();
+        repository.Setup(r => r.GetAllAsync(It.IsAny<RepositoryConnectionKind>())).ReturnsAsync(artists);
+        ArtistImport import = new(repository.Object, TimeProvider.System);
+        await import.LoadCacheAsync();
+
+        // Act
+        ArtistCacheItem? hit = import.GetFromCache("Pro-pain");
+
+        // Assert
+        Assert.NotNull(hit);
+        Assert.Equal(42, hit!.Id);
+    }
+
     [Fact(DisplayName = "LoadCacheAsync should clear NewlyCreatedIds")]
     public async Task LoadCacheAsync_ShouldClearNewlyCreatedIds()
     {

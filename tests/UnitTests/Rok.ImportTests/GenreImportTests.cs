@@ -48,6 +48,24 @@ public class GenreImportTests
         Assert.Null(result);
     }
 
+    [Fact(DisplayName = "GetFromCache should find existing genre when stored name uses unicode hyphen and lookup uses ascii hyphen")]
+    public async Task GetFromCache_ShouldFindExistingGenre_WhenStoredNameUsesUnicodeHyphen_AndLookupUsesAsciiHyphen()
+    {
+        // Arrange
+        List<GenreEntity> genres = new() { new() { Id = 9, Name = "Hip‐hop" } };
+        Mock<IGenreRepository> repository = new();
+        repository.Setup(r => r.GetAllAsync(It.IsAny<RepositoryConnectionKind>())).ReturnsAsync(genres);
+        GenreImport import = new(repository.Object, TimeProvider.System);
+        await import.LoadCacheAsync();
+
+        // Act
+        GenreCacheItem? hit = import.GetFromCache("Hip-hop");
+
+        // Assert
+        Assert.NotNull(hit);
+        Assert.Equal(9, hit!.Id);
+    }
+
     [Fact(DisplayName = "CreateAsync should persist capitalized genre name with artist count seeded at one")]
     public async Task CreateAsync_ShouldPersistCapitalizedGenreName_WithArtistCountSeededAtOne()
     {

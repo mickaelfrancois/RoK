@@ -96,4 +96,72 @@ public class StringExtensionsTests
         // Assert
         Assert.Equal(expected, result);
     }
+
+    [Theory(DisplayName = "NormalizeIndexedName should fold unicode dash variants to ascii hyphen")]
+    [InlineData("Pro-pain", "Pro-pain")]
+    [InlineData("Pro‐pain", "Pro-pain")]
+    [InlineData("Pro‑pain", "Pro-pain")]
+    [InlineData("Pro‒pain", "Pro-pain")]
+    [InlineData("Pro–pain", "Pro-pain")]
+    [InlineData("Pro—pain", "Pro-pain")]
+    [InlineData("Pro―pain", "Pro-pain")]
+    [InlineData("Pro−pain", "Pro-pain")]
+    [InlineData("Pro﹘pain", "Pro-pain")]
+    [InlineData("Pro﹣pain", "Pro-pain")]
+    [InlineData("Pro－pain", "Pro-pain")]
+    public void NormalizeIndexedName_ShouldFoldUnicodeDashes_ToAsciiHyphen(string input, string expected)
+    {
+        // Act
+        string result = input.NormalizeIndexedName();
+
+        // Assert
+        Assert.Equal(expected, result);
+    }
+
+    [Theory(DisplayName = "NormalizeIndexedName should fold non-breaking and zero-width spaces to a regular space")]
+    [InlineData("Daft Punk", "Daft Punk")]
+    [InlineData("Daft Punk", "Daft Punk")]
+    [InlineData("Daft Punk", "Daft Punk")]
+    [InlineData("Daft​Punk", "Daft Punk")]
+    public void NormalizeIndexedName_ShouldFoldNonBreakingAndZeroWidthSpaces(string input, string expected)
+    {
+        // Act
+        string result = input.NormalizeIndexedName();
+
+        // Assert
+        Assert.Equal(expected, result);
+    }
+
+    [Fact(DisplayName = "NormalizeIndexedName should trim surrounding whitespace")]
+    public void NormalizeIndexedName_ShouldTrimSurroundingWhitespace()
+    {
+        // Act
+        string result = "  Pro-pain  ".NormalizeIndexedName();
+
+        // Assert
+        Assert.Equal("Pro-pain", result);
+    }
+
+    [Fact(DisplayName = "NormalizeIndexedName should compose decomposed unicode to NFC")]
+    public void NormalizeIndexedName_ShouldComposeDecomposedUnicode_ToNfc()
+    {
+        // Built from char escapes so the source-file encoding cannot pre-normalize the input.
+        string decomposed = "Béatrice";
+        string composed = "Béatrice";
+
+        Assert.NotEqual(composed, decomposed);
+        Assert.Equal(composed, decomposed.NormalizeIndexedName());
+    }
+
+    [Theory(DisplayName = "NormalizeIndexedName should return input unchanged when null or empty")]
+    [InlineData("", "")]
+    [InlineData("   ", "")]
+    public void NormalizeIndexedName_ShouldReturnInputUnchanged_WhenNullOrEmpty(string input, string expected)
+    {
+        // Act
+        string result = input.NormalizeIndexedName();
+
+        // Assert
+        Assert.Equal(expected, result);
+    }
 }

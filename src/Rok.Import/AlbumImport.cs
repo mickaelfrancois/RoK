@@ -138,9 +138,11 @@ public class AlbumImport(IAlbumRepository _albumRepository, TimeProvider _timePr
 
     private static string GetKey(string albumName, bool isCompilation, long? artistId)
     {
+        string normalized = albumName.NormalizeIndexedName();
+
         if (isCompilation || !artistId.HasValue)
-            return albumName;
+            return normalized;
         else
-            return $"{artistId}___{albumName}";
+            return $"{artistId}___{normalized}";
     }
 }
