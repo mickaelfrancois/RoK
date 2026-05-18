@@ -588,9 +588,9 @@ public class PlayerService : IPlayerService, IDisposable
         return true;
     }
 
-    private async Task RunCrossfadeAsync(int nextIndex, TrackDto nextTrack, double trackLength, double currentPosition, CancellationToken cancellationToken)
+    private async Task RunCrossfadeAsync(int nextIndex, TrackDto nextTrack, double trackLength, double positionAtDecisionTime, CancellationToken cancellationToken)
     {
-        double remainingTime = Math.Max(0, trackLength - currentPosition);
+        double remainingTime = Math.Max(0, trackLength - positionAtDecisionTime);
         double crossfadeDurationSeconds = Math.Min(_player.CrossfadeDelay, remainingTime);
 
         if (crossfadeDurationSeconds <= 0)
@@ -604,7 +604,8 @@ public class PlayerService : IPlayerService, IDisposable
             return;
         }
 
-        double timeToWaitBeforeCrossfade = Math.Max(0, trackLength - currentPosition - crossfadeDurationSeconds);
+        double freshPosition = _player.Position;
+        double timeToWaitBeforeCrossfade = Math.Max(0, trackLength - freshPosition - crossfadeDurationSeconds);
 
         if (timeToWaitBeforeCrossfade > 0)
             await Task.Delay(TimeSpan.FromSeconds(timeToWaitBeforeCrossfade), cancellationToken);
