@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Timers;
 using Microsoft.Extensions.Logging;
 using NAudio;
@@ -226,6 +227,9 @@ public class NAudioMediaPlayer : IPlayerEngine, IDisposable
     /// <inheritdoc />
     public async Task CrossfadeToAsync(TrackDto nextTrack, double durationSeconds, double masterVolume, CancellationToken ct)
     {
+        if (durationSeconds <= 0)
+            return;
+
         AudioFileReader nextReader;
         try
         {
@@ -263,19 +267,22 @@ public class NAudioMediaPlayer : IPlayerEngine, IDisposable
             nextDevice.Play();
 
             const int intervalMs = 50;
-            int steps = Math.Max(1, (int)(durationSeconds * 1000 / intervalMs));
+            var sw = Stopwatch.StartNew();
 
-            for (int i = 0; i <= steps; i++)
+            while (true)
             {
                 ct.ThrowIfCancellationRequested();
 
-                double progress = Math.Clamp((double)i / steps, 0.0, 1.0);
+                double progress = Math.Clamp(sw.Elapsed.TotalSeconds / durationSeconds, 0.0, 1.0);
 
                 double fadeOutVolume = Math.Max(0, DbInterpolate(progress, masterVolume));
                 SetVolume(fadeOutVolume);
 
                 double fadeInVolume = Math.Max(0, DbInterpolate(1.0 - progress, masterVolume));
                 nextReader.Volume = (float)Math.Clamp(fadeInVolume / 100.0, 0.0, 1.0);
+
+                if (progress >= 1.0)
+                    break;
 
                 await Task.Delay(intervalMs, ct);
             }
