@@ -36,6 +36,12 @@ public partial class PlaylistViewModel : ObservableObject
         set => Playlist.TrackMaximum = value;
     }
 
+    public double TrackMaximumValue
+    {
+        get => TrackMaximum;
+        set => TrackMaximum = (int)value;
+    }
+
     public string Name
     {
         get => Playlist.Name;
