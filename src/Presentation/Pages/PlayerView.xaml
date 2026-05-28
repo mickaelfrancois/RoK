@@ -363,7 +363,8 @@
         <!-- Player extra commands -->
         <Grid x:Name="playerCommands" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="0,0,4,0">
             <CommandBar HorizontalAlignment="Right" Background="Transparent" DefaultLabelPosition="Collapsed" RequestedTheme="Dark">
-                <AppBarButton Icon="MusicInfo" Command="{x:Bind ViewModel.OpenListeningCommand}" Foreground="White">
+                <AppBarButton Icon="MusicInfo" Command="{x:Bind ViewModel.OpenListeningCommand}" Foreground="White"
+                              Visibility="{x:Bind ViewModel.IsMusicMode, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">
                     <ToolTipService.ToolTip>
                         <TextBlock x:Uid="PlayerCurrentListeningToolTips" Text="Show current playlist" />
                     </ToolTipService.ToolTip>
@@ -396,7 +397,8 @@
                         </AppBarButton.Icon>
                     </AppBarButton>
 
-                    <AppBarButton x:Uid="playerFullscreenAppBarButton" Command="{x:Bind ViewModel.FullscreenCommand}">
+                    <AppBarButton x:Uid="playerFullscreenAppBarButton" Command="{x:Bind ViewModel.FullscreenCommand}"
+                                  Visibility="{x:Bind ViewModel.IsMusicMode, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">
                         <AppBarButton.Icon>
                             <SymbolIcon Symbol="FullScreen" />
                         </AppBarButton.Icon>
