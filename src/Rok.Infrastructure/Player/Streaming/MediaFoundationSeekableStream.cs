@@ -33,7 +33,11 @@ internal sealed class MediaFoundationSeekableStream : Stream
     public override bool CanSeek => true;
     public override bool CanWrite => false;
 
-    public override long Length => long.MaxValue;
+    // Reporting Length = 0 hints Media Foundation that we are a streaming
+    // source with no known end. Returning long.MaxValue makes the source
+    // reader scan the whole "file" to estimate duration, which on a live
+    // radio capped at the broadcaster's bitrate takes hours and never plays.
+    public override long Length => 0;
 
     public override long Position
     {
