@@ -139,6 +139,7 @@ Additions:
 EPlaybackMode Mode { get; }
 RadioStationDto? CurrentStation { get; }
 string? CurrentStreamTitle { get; }
+bool IsBuffering { get; }
 
 void PlayRadioStation(RadioStationDto station);
 ```
@@ -166,17 +167,19 @@ The `PlayerService.Position` setter early-returns when `Mode == Radio`. Same for
 
 ### `IPlayerEngine` evolution
 
-Add one method, one event, one read-only property:
+Add one method, one event, two read-only properties:
 
 ```csharp
 bool SetStream(RadioStationDto station);
 event EventHandler<string>? OnMetadataChanged;
 bool IsLive { get; }
+bool IsBuffering { get; }
 ```
 
 Documented invariants on the new code path:
 
 - `IsLive` is `true` when the active source is a stream.
+- `IsBuffering` is `true` while the buffer is being filled at startup or after an underflow; see [Buffering strategy](#buffering-strategy).
 - `Length` is `0` while `IsLive` (and Music-mode UI bindings ignore Length when `Mode == Radio`).
 - `SetPosition` is a no-op when `IsLive`.
 - `CrossfadeToAsync` returns immediately when `IsLive`.
@@ -238,9 +241,52 @@ Both broadcast via `IMessenger`. Presentation subscribes for UI updates; `Discor
 3. A background task reads from the underlying `Stream`: every `icy-metaint` bytes of audio are forwarded to a `BufferedWaveProvider`, the inline metadata block is parsed for `StreamTitle='...'`, and `OnMetadataChanged` is raised when the value changes.
 4. Audio bytes feed an `Mp3FileReader` or `StreamMediaFoundationReader` (content-type sniffing: `audio/mpeg` → MP3, `audio/aac` / `audio/aacp` → AAC via Media Foundation).
 5. The reader is wired through the existing `Equalizer` and then to `WaveOutEvent` — identical to the file path from `Init` onwards.
-6. The `BufferedWaveProvider` (≈ 10 s capacity) absorbs network jitter. Underflow > 2 s surfaces a "Buffering" indicator via a separate `IsBuffering` property + `BufferingChanged` message (see [open question 2](#open-questions)).
+6. The `BufferedWaveProvider` absorbs network jitter. Sizing, pre-buffering, and underflow handling are described in [Buffering strategy](#buffering-strategy) below.
 
 Reconnection policy (MVP): on `IOException`, read returning 0 bytes, or HTTP non-success after the read started, retry **twice** with 1 s and 2 s back-off. On third failure, raise `OnMediaEnded` and let `PlayerService` flip `PlaybackState` to `Ended` with `Mode = Radio` (UI shows "Stream stopped").
+
+### Buffering strategy
+
+Goal: avoid micro-cuts on slow / jittery networks, and avoid UI flicker on transient micro-underflows.
+
+#### Sizing
+
+`BufferedWaveProvider.BufferDuration` is set in **seconds** (not bytes), so the same code works for any bitrate (320 kbps MP3 ≈ 600 KB, 64 kbps AAC ≈ 120 KB for the same 15 s):
+
+| Parameter | Value | Rationale |
+|---|---|---|
+| `BufferDuration` (total capacity) | **15 s** | Comfortable headroom over the pre-buffer target, room to absorb a ~10 s network hiccup. |
+| Pre-buffer before first `Play()` | **3 s** | Avoids an immediate "Buffering" state on stream startup. `WaveOutEvent.Play()` is deferred until `BufferedBytes / AverageBytesPerSecond ≥ 3.0`. |
+| Resume threshold after underflow | **2 s rebuffered** | Higher than the trigger threshold so we don't oscillate between Playing and Buffering. |
+| UI "Buffering" trigger | underflow > **500 ms** | Lower than the resume threshold; ignores micro-glitches (< 500 ms) to prevent flicker. |
+| "Error" terminal threshold | no new bytes from network for **5 s** while playback is stalled | Distinct from underflow: this means the *fetch* is dead, not just slow. Triggers the retry policy described above. |
+
+The "average bytes per second" is read from the wave format produced by `Mp3FileReader` / `StreamMediaFoundationReader` once the first decode is complete; pre-buffer measurement waits until that is available.
+
+#### States and transitions
+
+The engine tracks two orthogonal axes:
+
+- `PlaybackState`: `Playing` / `Paused` / `Stopped` / `Ended` (unchanged).
+- `IsBuffering`: `true` / `false` (new in Phase 1, surfaced via `BufferingChanged` message).
+
+Transitions during a stream session:
+
+| From | Trigger | To |
+|---|---|---|
+| (stream starts) | fetch initiated, < 3 s buffered | `PlaybackState = Playing`, `IsBuffering = true` |
+| `IsBuffering = true` (startup) | buffered ≥ 3 s | `WaveOutEvent.Play()`, `IsBuffering = false` |
+| `IsBuffering = false` | underflow > 500 ms while playing | `IsBuffering = true` (audio stays paused naturally as the provider drains) |
+| `IsBuffering = true` (mid-stream) | buffered ≥ 2 s again | `IsBuffering = false` |
+| any | network silent > 5 s | retry policy; eventually `PlaybackState = Ended` |
+
+Pause initiated by the user (Pause / call detection / SMTC) does **not** flip `IsBuffering`. The buffer keeps filling in the background up to `BufferDuration`; on resume, playback is instant if the buffer is non-empty.
+
+#### Implementation notes
+
+- A single `Timer` (250 ms tick — same cadence as `_positionTimer`) checks buffered seconds and applies the transitions above. No new threads beyond the existing fetch task.
+- The "5 s without new bytes" terminal threshold is tracked by a `Stopwatch` reset on each successful read; if `Elapsed > TimeSpan.FromSeconds(5)` and the buffer is empty, the retry path is invoked.
+- `IsBuffering` is exposed on `IPlayerEngine` (read-only) and surfaced on `IPlayerService` (read-only). The `BufferingChanged(bool isBuffering)` message is broadcast via `IMessenger` for UI subscribers.
 
 ### Playlist file parser (`RadioStreamUrlResolver`)
 
@@ -351,17 +397,18 @@ No automated network tests in CI (external streams are flaky and out of our cont
 | ARM64 audio path differs from x64. | Smoke-test on ARM64 build before merging. |
 | ICY parsing edge cases (truncated UTF-8, escaped quotes, multi-byte titles). | Tolerant parser: skip malformed blocks, never throw, log at debug level. |
 | `Length` getter currently coerces `<= 0` to `1` (NAudioMediaPlayer.cs line 41) — leaks to UI progress binding if Music-mode UI doesn't check `Mode` first. | Bind UI progress to `Mode == Music` plus `Length`; do not change the getter (see open question 1). |
-| Buffer underflow confused with permanent failure. | Distinguish via duration (> 5 s without bytes = error; ≤ 5 s = buffering, no state change). |
+| Buffer underflow confused with permanent failure. | Distinct thresholds in [Buffering strategy](#buffering-strategy): underflow > 500 ms = `IsBuffering = true`; no network bytes for > 5 s = retry → eventually `Ended`. |
+| Micro-cuts on slow / jittery networks at startup. | 3 s pre-buffer before `WaveOutEvent.Play()`; 2 s resume threshold after mid-stream underflow (higher than the 500 ms trigger to avoid oscillation). |
 
 ## Open questions
 
 1. **`Length` getter coercion**: the current `Length` getter returns `1` when the backing field is `<= 0`. In Radio mode we want effective `0`. Two options: (a) change the getter to return `0` and audit existing UI bindings, or (b) keep the coercion and rely on the new `IsLive` flag for UI gating. **Recommendation: (b)** — safer for existing bindings.
 
-2. **"Buffering" state representation**: `EPlaybackState` is currently `{ Playing, Paused, Stopped, Ended }`. Adding `Buffering` is invasive (UI/SMTC/Discord switches must all handle it). Alternative: keep `Playing` and expose a separate `bool IsBuffering` property + `BufferingChanged` message. **Recommendation: separate property** — non-breaking.
+2. **Persistence path for "Play a URL"**: should the play dialog persist the URL? **Recommendation: no.** "Play a URL" is ad-hoc and ephemeral; saving is an explicit second action via "Add to favorites". The `PlayRadioUrlRequest` handler builds an in-memory `RadioStationDto(Id: 0, Name: "Ad-hoc stream", StreamUrl: <resolved>, …)` and never touches the repository. This matches the "no listening history" rule.
 
-3. **Persistence path for "Play a URL"**: should the play dialog persist the URL? **Recommendation: no.** "Play a URL" is ad-hoc and ephemeral; saving is an explicit second action via "Add to favorites". The `PlayRadioUrlRequest` handler builds an in-memory `RadioStationDto(Id: 0, Name: "Ad-hoc stream", StreamUrl: <resolved>, …)` and never touches the repository. This matches the "no listening history" rule.
+(Previously open: the "Buffering" state representation. **Resolved**: separate `IsBuffering` property + `BufferingChanged` message — see [Buffering strategy](#buffering-strategy).)
 
-These three questions are deliberately left open in this spec; they should be resolved in the implementation plan or during early implementation.
+These two remaining questions are deliberately left open in this spec; they should be resolved in the implementation plan or during early implementation.
 
 ## Acceptance criteria
 
