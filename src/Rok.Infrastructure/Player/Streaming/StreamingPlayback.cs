@@ -88,10 +88,10 @@ internal sealed class StreamingPlayback : IDisposable
                 }
 
                 // AAC / other: use StreamMediaFoundationReader. MediaFoundation
-                // rewinds to position 0 after sniffing the container header, so
-                // we wrap the non-seekable ICY stream in a buffer that supports
-                // limited rewinds.
-                Stream mfSource = new MediaFoundationSeekableStream(_icy.AudioStream);
+                // seeks around while sniffing the container header, so wrap the
+                // non-seekable ICY stream in a buffer that supports rewinds
+                // within the probe region.
+                Stream mfSource = new MediaFoundationSeekableStream(_icy.AudioStream, _logger);
                 _decoded = new StreamMediaFoundationReader(mfSource);
 
                 _buffer = new BufferedWaveProvider(_decoded.WaveFormat)
