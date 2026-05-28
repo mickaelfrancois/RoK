@@ -77,7 +77,8 @@ internal sealed class StreamingPlayback : IDisposable
     public void Stop()
     {
         _cts?.Cancel();
-        try { _pumpTask?.Wait(TimeSpan.FromSeconds(2)); } catch { /* ignore */ }
+        try { _pumpTask?.Wait(TimeSpan.FromSeconds(2)); }
+        catch (AggregateException) { /* pump cancelled */ }
         DisposeResources();
     }
 
@@ -146,6 +147,10 @@ internal sealed class StreamingPlayback : IDisposable
 
             double bufferedSec = _buffer.BufferedBytes / bytesPerSecond;
 
+            // During underflow we surface IsBuffering=true to the UI but leave _output
+            // playing. WaveOutEvent will naturally output silence while the buffer is
+            // drained and resume as soon as new samples arrive; pausing/resuming the
+            // output device would add clock drift and pop artifacts.
             if (!IsBuffering && bufferedSec < BufferingTriggerSeconds)
                 SetBuffering(true);
             else if (IsBuffering && bufferedSec >= ResumeAfterUnderflowSeconds)

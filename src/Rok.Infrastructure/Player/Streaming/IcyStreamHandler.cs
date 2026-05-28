@@ -7,7 +7,6 @@ internal sealed class IcyStreamHandler : IDisposable
 {
     private readonly HttpClient _httpClient;
     private readonly ILogger _logger;
-    private readonly CancellationTokenSource _cts = new();
 
     public event EventHandler<string>? MetadataChanged;
 
@@ -26,7 +25,15 @@ internal sealed class IcyStreamHandler : IDisposable
         req.Headers.TryAddWithoutValidation("Icy-MetaData", "1");
 
         HttpResponseMessage resp = await _httpClient.SendAsync(req, HttpCompletionOption.ResponseHeadersRead, cancellationToken);
-        resp.EnsureSuccessStatusCode();
+        try
+        {
+            resp.EnsureSuccessStatusCode();
+        }
+        catch
+        {
+            resp.Dispose();
+            throw;
+        }
 
         ContentType = resp.Content.Headers.ContentType?.MediaType;
 
@@ -50,9 +57,7 @@ internal sealed class IcyStreamHandler : IDisposable
 
     public void Dispose()
     {
-        _cts.Cancel();
         AudioStream.Dispose();
-        _cts.Dispose();
     }
 
     private sealed class IcyDemuxStream : Stream

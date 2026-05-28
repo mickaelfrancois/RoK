@@ -1,6 +1,6 @@
 namespace Rok.Infrastructure.Player.Streaming;
 
-public static class IcyMetadataParser
+internal static class IcyMetadataParser
 {
     private const string Prefix = "StreamTitle='";
 
