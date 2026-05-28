@@ -423,5 +423,33 @@
                 </CommandBar.SecondaryCommands>
             </CommandBar>
         </Grid>
+
+        <!-- Radio mode panel — rendered last so it appears above music elements -->
+        <Grid x:Name="radioPanel"
+              Visibility="{x:Bind ViewModel.IsRadioMode, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}"
+              Background="{ThemeResource BrandPrimaryBrush}"
+              HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+              ColumnSpacing="16" Padding="12,4">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <StackPanel Grid.Column="0" Orientation="Vertical" VerticalAlignment="Center" Spacing="2">
+                <Border Background="Red" CornerRadius="4" HorizontalAlignment="Left" Padding="6,2">
+                    <TextBlock Text="LIVE" Foreground="White" FontSize="11" FontWeight="Bold" />
+                </Border>
+                <TextBlock Text="{x:Bind ViewModel.CurrentStationName, Mode=OneWay}"
+                           FontSize="16" FontWeight="SemiBold" Foreground="White"
+                           TextTrimming="CharacterEllipsis" />
+                <TextBlock Text="{x:Bind ViewModel.CurrentStreamTitle, Mode=OneWay}"
+                           FontSize="13" Foreground="White" Opacity="0.8"
+                           TextTrimming="CharacterEllipsis"
+                           Visibility="{x:Bind ViewModel.CurrentStreamTitle, Mode=OneWay, Converter={StaticResource StringToVisibilityConverter}}" />
+                <TextBlock Text="Buffering…" FontSize="12" Foreground="White" Opacity="0.7"
+                           Visibility="{x:Bind ViewModel.IsBuffering, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" />
+            </StackPanel>
+            <Button Grid.Column="1" Content="Stop" VerticalAlignment="Center"
+                    Command="{x:Bind ViewModel.StopPlaybackCommand}" />
+        </Grid>
     </Grid>
 </UserControl>
