@@ -12,12 +12,14 @@ public sealed partial class RadiosPage : Page
 {
     public RadiosViewModel ViewModel { get; set; }
     private readonly ILogger<RadiosPage> _logger;
+    private readonly ResourceLoader _resourceLoader;
 
     public RadiosPage()
     {
         InitializeComponent();
 
         _logger = App.ServiceProvider.GetRequiredService<ILogger<RadiosPage>>();
+        _resourceLoader = App.ServiceProvider.GetRequiredService<ResourceLoader>();
         ViewModel = App.ServiceProvider.GetRequiredService<RadiosViewModel>();
     }
 
@@ -59,5 +61,25 @@ public sealed partial class RadiosPage : Page
     {
         if (e.ClickedItem is RadioStationDto station)
             _ = ViewModel.PlayCommand.ExecuteAsync(station);
+    }
+
+    private async void OnDeleteMenuClick(object sender, RoutedEventArgs e)
+    {
+        if (sender is not MenuFlyoutItem { Tag: RadioStationDto station })
+            return;
+
+        ContentDialog dialog = new()
+        {
+            XamlRoot = XamlRoot,
+            Title = _resourceLoader.GetString("DeleteConfirmationTitle"),
+            Content = $"Delete radio \"{station.Name}\"?",
+            PrimaryButtonText = _resourceLoader.GetString("YesButton"),
+            CloseButtonText = _resourceLoader.GetString("CancelButton"),
+            DefaultButton = ContentDialogButton.Close
+        };
+
+        ContentDialogResult result = await dialog.ShowAsync();
+        if (result == ContentDialogResult.Primary)
+            await ViewModel.DeleteCommand.ExecuteAsync(station);
     }
 }

@@ -22,8 +22,8 @@
                             </MenuFlyoutItem.Icon>
                         </MenuFlyoutItem>
                         <MenuFlyoutItem Text="Delete"
-                                        Command="{Binding ElementName=radiosView, Path=ViewModel.DeleteCommand}"
-                                        CommandParameter="{x:Bind}">
+                                        Click="OnDeleteMenuClick"
+                                        Tag="{x:Bind}">
                             <MenuFlyoutItem.Icon>
                                 <SymbolIcon Symbol="Delete" />
                             </MenuFlyoutItem.Icon>
