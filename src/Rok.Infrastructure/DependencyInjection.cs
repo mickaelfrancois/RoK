@@ -2,6 +2,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Rok.Application.Features.Playlists.IO;
+using Rok.Application.Features.Radios.Services;
 using Rok.Application.Interfaces;
 using Rok.Application.Interfaces.Pictures;
 using Rok.Application.Interfaces.Repositories;
@@ -90,6 +91,7 @@ public static class DependencyInjection
         services.AddSingleton<IPlaylistFormatResolver, PlaylistFormatResolver>();
 
         services.AddHttpClient("MusicDataDownload");
+        services.AddHttpClient<IRadioStreamUrlResolver, RadioStreamUrlResolver>();
 
         services.AddSingleton<ITagService, TagService>();
         services.AddSingleton<IMusicDataApiService, MusicDataApiService>();
