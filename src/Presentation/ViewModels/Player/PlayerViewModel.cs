@@ -225,6 +225,26 @@ public partial class PlayerViewModel : ObservableObject, IDisposable
         _subscriptions.Add(_messenger.Subscribe<RadioStationChanged>(OnRadioStationChanged));
         _subscriptions.Add(_messenger.Subscribe<RadioMetadataChanged>(OnRadioMetadataChanged));
         _subscriptions.Add(_messenger.Subscribe<BufferingChanged>(OnBufferingChanged));
+        _subscriptions.Add(_messenger.Subscribe<CompactModeMessage>(_ => OnCompactModeToggled()));
+    }
+
+    private void OnCompactModeToggled()
+    {
+        // The compact-mode toggle Collapses/Restores MainGrid which contains
+        // the PlayerView. WinUI x:Bind bindings that target null-propagating
+        // paths (e.g. ViewModel.CurrentTrack.Title) sometimes fall through to
+        // the parent DataContext after the visibility flip, displaying the
+        // ViewModel's ToString() instead of the underlying value. Re-raising
+        // the mode-driven flags forces every dependent binding to refresh.
+        _stateManager.ExecuteOnUIThread(() =>
+        {
+            OnPropertyChanged(nameof(Mode));
+            OnPropertyChanged(nameof(IsMusicMode));
+            OnPropertyChanged(nameof(IsRadioMode));
+            OnPropertyChanged(nameof(CurrentStationName));
+            OnPropertyChanged(nameof(CurrentStreamTitle));
+            OnPropertyChanged(nameof(CurrentTrack));
+        });
     }
 
     partial void OnModeChanged(EPlaybackMode value)

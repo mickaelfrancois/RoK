@@ -301,16 +301,16 @@
 
                 <!--Title line-->
                 <StackPanel x:Name="trackTitleLine" Grid.Column="1" Grid.Row="0" Orientation="Horizontal" Margin="6,0,0,0">
-                    <HyperlinkButton Grid.Column="0" x:Name="trackTitle" HorizontalAlignment="Left" HorizontalContentAlignment="Left" MinWidth="100" MaxWidth="200" Style="{StaticResource MiniLinkStyle}" Command="{x:Bind ViewModel.CurrentTrack.TrackOpenCommand, Mode=OneWay}" Content="{x:Bind ViewModel.CurrentTrack.Title, Mode=OneWay}" ContentTemplate="{StaticResource EllipsisTemplate}" ToolTipService.ToolTip="{x:Bind ViewModel.CurrentTrack.Title, Mode=OneWay}" />
-                    <commons:RatingControlDarkControl x:Name="trackScore" Margin="30,0,0,0" HorizontalAlignment="Right" InitialValue="{x:Bind ViewModel.CurrentTrack.Score, Mode=OneWay}" Value="{x:Bind ViewModel.CurrentTrack.Score, Mode=TwoWay}" Width="150" VerticalAlignment="Center">
+                    <HyperlinkButton Grid.Column="0" x:Name="trackTitle" HorizontalAlignment="Left" HorizontalContentAlignment="Left" MinWidth="100" MaxWidth="200" Style="{StaticResource MiniLinkStyle}" Command="{x:Bind ViewModel.CurrentTrack.TrackOpenCommand, Mode=OneWay}" Content="{x:Bind ViewModel.CurrentTrack.Title, Mode=OneWay, FallbackValue=''}" ContentTemplate="{StaticResource EllipsisTemplate}" ToolTipService.ToolTip="{x:Bind ViewModel.CurrentTrack.Title, Mode=OneWay, FallbackValue=''}" Visibility="{x:Bind ViewModel.IsMusicMode, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" />
+                    <commons:RatingControlDarkControl x:Name="trackScore" Margin="30,0,0,0" HorizontalAlignment="Right" InitialValue="{x:Bind ViewModel.CurrentTrack.Score, Mode=OneWay}" Value="{x:Bind ViewModel.CurrentTrack.Score, Mode=TwoWay}" Width="150" VerticalAlignment="Center" Visibility="{x:Bind ViewModel.IsMusicMode, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">
                     </commons:RatingControlDarkControl>
                 </StackPanel>
 
                 <!--Track info line-->
                 <StackPanel Grid.Column="1" Grid.Row="1" Orientation="Horizontal" Margin="6,0,0,0">
-                    <HyperlinkButton Style="{StaticResource MiniLinkStyle}" x:Name="trackArtist" MaxWidth="200" Command="{x:Bind ViewModel.CurrentTrack.ArtistOpenCommand, Mode=OneWay}" Content="{x:Bind ViewModel.CurrentTrack.ArtistName, Mode=OneWay}" ContentTemplate="{StaticResource EllipsisTemplate}" ToolTipService.ToolTip="{x:Bind ViewModel.CurrentTrack.ArtistName, Mode=OneWay}" />
-                    <TextBlock Text="•" Foreground="White" FontSize="12" VerticalAlignment="Center" Margin="6,0,6,0" />
-                    <HyperlinkButton Style="{StaticResource MiniLinkStyle}" x:Name="trackAlbum" MaxWidth="200" Command="{x:Bind ViewModel.CurrentTrack.AlbumOpenCommand, Mode=OneWay}" Content="{x:Bind ViewModel.CurrentTrack.AlbumName, Mode=OneWay}" ContentTemplate="{StaticResource EllipsisTemplate}" ToolTipService.ToolTip="{x:Bind ViewModel.CurrentTrack.AlbumName, Mode=OneWay}" />
+                    <HyperlinkButton Style="{StaticResource MiniLinkStyle}" x:Name="trackArtist" MaxWidth="200" Command="{x:Bind ViewModel.CurrentTrack.ArtistOpenCommand, Mode=OneWay}" Content="{x:Bind ViewModel.CurrentTrack.ArtistName, Mode=OneWay, FallbackValue=''}" ContentTemplate="{StaticResource EllipsisTemplate}" ToolTipService.ToolTip="{x:Bind ViewModel.CurrentTrack.ArtistName, Mode=OneWay, FallbackValue=''}" Visibility="{x:Bind ViewModel.IsMusicMode, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" />
+                    <TextBlock Text="•" Foreground="White" FontSize="12" VerticalAlignment="Center" Margin="6,0,6,0" Visibility="{x:Bind ViewModel.IsMusicMode, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" />
+                    <HyperlinkButton Style="{StaticResource MiniLinkStyle}" x:Name="trackAlbum" MaxWidth="200" Command="{x:Bind ViewModel.CurrentTrack.AlbumOpenCommand, Mode=OneWay}" Content="{x:Bind ViewModel.CurrentTrack.AlbumName, Mode=OneWay, FallbackValue=''}" ContentTemplate="{StaticResource EllipsisTemplate}" ToolTipService.ToolTip="{x:Bind ViewModel.CurrentTrack.AlbumName, Mode=OneWay, FallbackValue=''}" Visibility="{x:Bind ViewModel.IsMusicMode, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" />
                 </StackPanel>
             </Grid>
         </Grid>
@@ -457,10 +457,10 @@
                                VerticalAlignment="Center"
                                Visibility="{x:Bind ViewModel.IsBuffering, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" />
                 </StackPanel>
-                <TextBlock Text="{x:Bind ViewModel.CurrentStationName, Mode=OneWay}"
+                <TextBlock Text="{x:Bind ViewModel.CurrentStationName, Mode=OneWay, TargetNullValue=''}"
                            FontSize="14" FontWeight="SemiBold" Foreground="White"
                            TextTrimming="CharacterEllipsis" />
-                <TextBlock Text="{x:Bind ViewModel.CurrentStreamTitle, Mode=OneWay}"
+                <TextBlock Text="{x:Bind ViewModel.CurrentStreamTitle, Mode=OneWay, TargetNullValue=''}"
                            FontSize="12" Foreground="White" Opacity="0.8"
                            TextTrimming="CharacterEllipsis"
                            Visibility="{x:Bind ViewModel.CurrentStreamTitle, Mode=OneWay, Converter={StaticResource StringToVisibilityConverter}}" />
