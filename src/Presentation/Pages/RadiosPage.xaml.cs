@@ -55,15 +55,9 @@ public sealed partial class RadiosPage : Page
         await dialog.ShowAsync();
     }
 
-    private void OnPlayClick(object sender, RoutedEventArgs e)
+    private void OnItemClick(object sender, ItemClickEventArgs e)
     {
-        if (sender is Button { Tag: RadioStationDto dto })
-            _ = ViewModel.PlayCommand.ExecuteAsync(dto);
-    }
-
-    private void OnDeleteClick(object sender, RoutedEventArgs e)
-    {
-        if (sender is Button { Tag: RadioStationDto dto })
-            _ = ViewModel.DeleteCommand.ExecuteAsync(dto);
+        if (e.ClickedItem is RadioStationDto station)
+            _ = ViewModel.PlayCommand.ExecuteAsync(station);
     }
 }

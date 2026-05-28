@@ -4,46 +4,107 @@
       xmlns:local="using:Rok.Pages"
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+      xmlns:common="using:Rok.Commons"
       xmlns:dto="using:Rok.Application.Dto"
       mc:Ignorable="d"
       x:Name="radiosView">
 
-    <Grid RowSpacing="16" Padding="24">
+    <Page.Resources>
+        <DataTemplate x:Key="RadioGridTemplate" x:DataType="dto:RadioStationDto">
+            <Grid Style="{StaticResource MainGridCoverStyle}">
+                <Grid.ContextFlyout>
+                    <MenuFlyout>
+                        <MenuFlyoutItem Text="Play"
+                                        Command="{Binding ElementName=radiosView, Path=ViewModel.PlayCommand}"
+                                        CommandParameter="{x:Bind}">
+                            <MenuFlyoutItem.Icon>
+                                <SymbolIcon Symbol="Play" />
+                            </MenuFlyoutItem.Icon>
+                        </MenuFlyoutItem>
+                        <MenuFlyoutItem Text="Delete"
+                                        Command="{Binding ElementName=radiosView, Path=ViewModel.DeleteCommand}"
+                                        CommandParameter="{x:Bind}">
+                            <MenuFlyoutItem.Icon>
+                                <SymbolIcon Symbol="Delete" />
+                            </MenuFlyoutItem.Icon>
+                        </MenuFlyoutItem>
+                    </MenuFlyout>
+                </Grid.ContextFlyout>
+
+                <!-- Cover placeholder: brand-coloured panel with a centred radio glyph -->
+                <Border CornerRadius="{StaticResource CornerRadiusMediumValue}" Background="{ThemeResource BrandPrimaryBrush}">
+                    <FontIcon Glyph="&#xE8D6;" FontFamily="Segoe Fluent Icons"
+                              FontSize="56" Foreground="White" Opacity="0.35"
+                              HorizontalAlignment="Center" VerticalAlignment="Center" />
+                </Border>
+
+                <!-- LIVE badge -->
+                <Border Background="{ThemeResource BadgeLiveBrush}"
+                        CornerRadius="4"
+                        HorizontalAlignment="Right" VerticalAlignment="Top"
+                        Margin="0,8,8,0" Padding="6,2">
+                    <TextBlock Text="LIVE" Foreground="White" FontSize="10" FontWeight="Bold" />
+                </Border>
+
+                <Grid x:Name="gridBottom" Style="{StaticResource GridCoverBottomStyle}">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="{StaticResource GridBottomFirstRowHeight}" />
+                        <RowDefinition Height="{StaticResource GridBottomSecondRowHeight}" />
+                    </Grid.RowDefinitions>
+
+                    <HyperlinkButton Content="{x:Bind Name}"
+                                     Command="{Binding ElementName=radiosView, Path=ViewModel.PlayCommand}"
+                                     CommandParameter="{x:Bind}"
+                                     Style="{StaticResource GridCoverButtonStyle}" />
+
+                    <TextBlock Grid.Row="1"
+                               Text="{x:Bind StreamUrl}"
+                               Style="{StaticResource GridCoverBottomSecondLineStyle}"
+                               Margin="4,6,0,0" />
+                </Grid>
+            </Grid>
+        </DataTemplate>
+    </Page.Resources>
+
+    <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
+            <RowDefinition Height="50" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
-        <StackPanel Orientation="Horizontal" Spacing="8">
-            <Button Content="Play a URL" Click="OnPlayUrlClick" />
-            <Button Content="Add to favourites" Click="OnAddClick" />
-        </StackPanel>
+        <CommandBar Grid.Row="0" DefaultLabelPosition="Right" Style="{StaticResource HeaderCommandBarListStyle}">
+            <CommandBar.Content>
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Spacing="{StaticResource SpacingSmall}">
+                    <AppBarButton Label="Play URL"
+                                  Style="{StaticResource AppBarButtonCompactStyle}"
+                                  Click="OnPlayUrlClick">
+                        <AppBarButton.Icon>
+                            <FontIcon Glyph="&#xE774;" />
+                        </AppBarButton.Icon>
+                    </AppBarButton>
 
-        <ListView Grid.Row="1" ItemsSource="{x:Bind ViewModel.Stations}" SelectionMode="None">
-            <ListView.ItemTemplate>
-                <DataTemplate x:DataType="dto:RadioStationDto">
-                    <Grid ColumnSpacing="12" Padding="8">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="Auto" />
-                            <ColumnDefinition Width="Auto" />
-                        </Grid.ColumnDefinitions>
+                    <AppBarButton Label="Add"
+                                  Icon="Add"
+                                  Style="{StaticResource AppBarButtonCompactStyle}"
+                                  Click="OnAddClick" />
+                </StackPanel>
+            </CommandBar.Content>
+        </CommandBar>
 
-                        <StackPanel VerticalAlignment="Center">
-                            <TextBlock Text="{x:Bind Name}" FontWeight="SemiBold" />
-                            <TextBlock Text="{x:Bind StreamUrl}" Opacity="0.6" FontSize="12" />
-                        </StackPanel>
+        <Grid Grid.Row="1" Style="{StaticResource GridListStyle}">
+            <common:GridViewExtended x:Name="grid"
+                                     ItemsSource="{x:Bind ViewModel.Stations}"
+                                     ItemTemplate="{StaticResource RadioGridTemplate}"
+                                     ItemsPanel="{StaticResource GridPanelTemplate}"
+                                     SelectionMode="None"
+                                     IsItemClickEnabled="True"
+                                     ItemClick="OnItemClick"
+                                     ScrollViewer.VerticalScrollMode="Enabled"
+                                     ScrollViewer.VerticalScrollBarVisibility="Auto" />
 
-                        <Button Grid.Column="1" Content="Play"
-                                Click="OnPlayClick"
-                                Tag="{x:Bind}" />
-
-                        <Button Grid.Column="2" Content="Delete"
-                                Click="OnDeleteClick"
-                                Tag="{x:Bind}" />
-                    </Grid>
-                </DataTemplate>
-            </ListView.ItemTemplate>
-        </ListView>
+            <common:EmptyStateControl Glyph="&#xE8D6;"
+                                      Message="No radios yet. Add one or play a URL to get started."
+                                      Visibility="{x:Bind ViewModel.HasNoData, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" />
+        </Grid>
     </Grid>
 </Page>
