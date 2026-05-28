@@ -39,6 +39,8 @@ internal sealed class StreamingPlayback : IDisposable
 
     public async Task StartAsync(RadioStationDto station, CancellationToken cancellationToken)
     {
+        Exception? lastError = null;
+
         for (int attempt = 1; attempt <= 3; attempt++)
         {
             try
@@ -85,8 +87,12 @@ internal sealed class StreamingPlayback : IDisposable
                     return;
                 }
 
-                // AAC / other: use StreamMediaFoundationReader
-                _decoded = new StreamMediaFoundationReader(_icy.AudioStream);
+                // AAC / other: use StreamMediaFoundationReader. MediaFoundation
+                // rewinds to position 0 after sniffing the container header, so
+                // we wrap the non-seekable ICY stream in a buffer that supports
+                // limited rewinds.
+                Stream mfSource = new MediaFoundationSeekableStream(_icy.AudioStream);
+                _decoded = new StreamMediaFoundationReader(mfSource);
 
                 _buffer = new BufferedWaveProvider(_decoded.WaveFormat)
                 {
@@ -101,14 +107,18 @@ internal sealed class StreamingPlayback : IDisposable
                 _pumpTask = Task.Run(() => PumpAsync(_cts.Token), _cts.Token);
                 return;
             }
-            catch (Exception ex) when (attempt < 3)
+            catch (Exception ex)
             {
-                _logger.LogWarning(ex, "Stream connect attempt {Attempt} failed", attempt);
-                await Task.Delay(TimeSpan.FromSeconds(attempt), cancellationToken);
+                lastError = ex;
+                _logger.LogWarning(ex, "Stream connect attempt {Attempt} failed for {Url}", attempt, station.StreamUrl);
                 DisposeResources();
+
+                if (attempt < 3)
+                    await Task.Delay(TimeSpan.FromSeconds(attempt), cancellationToken);
             }
         }
 
+        _logger.LogError(lastError, "Stream {Url} failed after 3 attempts", station.StreamUrl);
         PlaybackEnded?.Invoke(this, EventArgs.Empty);
     }
 
