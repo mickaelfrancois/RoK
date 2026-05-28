@@ -36,6 +36,7 @@ using Rok.ViewModels.Playlists.Interfaces;
 using Rok.ViewModels.Playlists.Services;
 using Rok.ViewModels.Search;
 using Rok.ViewModels.Start;
+using Rok.ViewModels.Radio;
 using Rok.ViewModels.Statistics;
 using Rok.ViewModels.Track;
 using Rok.ViewModels.Track.Services;
@@ -222,6 +223,9 @@ public static class DependencyInjection
             DispatcherQueue dispatcherQueue = Microsoft.UI.Dispatching.DispatcherQueue.GetForCurrentThread();
             return new PlayerStateManager(dispatcherQueue);
         });
+
+        // Radios ViewModel
+        services.AddTransient<RadiosViewModel>();
 
         // Insights ViewModel and services
         services.AddSingleton<InsightsViewModel>();
