@@ -12,6 +12,13 @@ public class WinUIMediaPlayer : IPlayerEngine, IDisposable
     public event EventHandler? OnMediaEnded;
     public event EventHandler? OnMediaStateChanged;
     public event EventHandler? OnMediaAboutToEnd;
+#pragma warning disable CS0067 // raised in a later streaming task
+    public event EventHandler<string>? OnMetadataChanged;
+#pragma warning restore CS0067
+
+    public bool IsLive => false;
+
+    public bool IsBuffering => false;
 
     private readonly MediaPlayer _player;
 
@@ -126,6 +133,11 @@ public class WinUIMediaPlayer : IPlayerEngine, IDisposable
         {
             return false;
         }
+    }
+
+    public bool SetStream(RadioStationDto station)
+    {
+        throw new NotImplementedException("Streaming is wired in a later task.");
     }
 
     public void SetEqualizerBand(int bandIndex, float gain)
