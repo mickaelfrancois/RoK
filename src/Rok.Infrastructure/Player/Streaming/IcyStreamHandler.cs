@@ -1,3 +1,4 @@
+using System.Net;
 using System.Text;
 using Microsoft.Extensions.Logging;
 
@@ -22,6 +23,13 @@ internal sealed class IcyStreamHandler : IDisposable
     public async Task ConnectAsync(string url, CancellationToken cancellationToken)
     {
         using HttpRequestMessage req = new(HttpMethod.Get, url);
+        // Force HTTP/1.0 so the response cannot use chunked transfer encoding.
+        // Many Shoutcast/Icecast servers advertise `Transfer-Encoding: chunked`
+        // but send the audio bytes as a raw continuous stream, which makes
+        // .NET's HttpClient throw `HttpIOException: invalid chunk terminator`
+        // as soon as the binary frames are parsed as chunk headers.
+        req.Version = HttpVersion.Version10;
+        req.VersionPolicy = HttpVersionPolicy.RequestVersionExact;
         req.Headers.TryAddWithoutValidation("Icy-MetaData", "1");
 
         HttpResponseMessage resp = await _httpClient.SendAsync(req, HttpCompletionOption.ResponseHeadersRead, cancellationToken);

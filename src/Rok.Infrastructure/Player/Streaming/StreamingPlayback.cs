@@ -219,7 +219,18 @@ internal sealed class StreamingPlayback : IDisposable
 
         while (!ct.IsCancellationRequested)
         {
-            int read = _decoded.Read(readBuffer, 0, readBuffer.Length);
+            int read = 0;
+
+            try
+            {
+                read = _decoded.Read(readBuffer, 0, readBuffer.Length);
+            }
+            catch (IOException ex)
+            {
+                _logger.LogWarning(ex, "AAC stream read failed; ending playback");
+                PlaybackEnded?.Invoke(this, EventArgs.Empty);
+                return;
+            }
 
             if (read > 0)
             {
