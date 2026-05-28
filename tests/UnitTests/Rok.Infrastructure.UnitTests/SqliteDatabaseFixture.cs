@@ -24,7 +24,7 @@ public class SqliteDatabaseFixture : IDisposable
         _sqliteConnection.Open();
         Connection = _sqliteConnection;
 
-        var migrations = new IMigration[] { new Migration2(), new Migration3(), new Migration4(), new Migration5(), new Migration6(), new Migration7(), new Migration8(), new Migration9(), new Migration10() };
+        var migrations = new IMigration[] { new Migration2(), new Migration3(), new Migration4(), new Migration5(), new Migration6(), new Migration7(), new Migration8(), new Migration9(), new Migration10(), new Migration11() };
         MigrationService migrationService = new(Connection, migrations, NullLogger<MigrationService>.Instance);
         migrationService.Initial();
         migrationService.MigrateToLatest();
