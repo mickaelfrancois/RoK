@@ -37,12 +37,12 @@ internal sealed class StreamingPlayback : IDisposable
 
     public async Task StartAsync(RadioStationDto station, CancellationToken cancellationToken)
     {
-        _cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
-
         for (int attempt = 1; attempt <= 3; attempt++)
         {
             try
             {
+                _cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+
                 _icy = new IcyStreamHandler(_httpClient, _logger);
                 _icy.MetadataChanged += (_, title) => MetadataChanged?.Invoke(this, title);
 

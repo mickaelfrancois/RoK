@@ -40,6 +40,8 @@ public class PlayerService : IPlayerService, IDisposable
 
     private volatile bool _isCrossfadeRunning;
 
+    private bool _lastIsBuffering;
+
     private ITimer? _smtcTimelineTimer;
 
     public EPlaybackState PlaybackState
@@ -271,7 +273,11 @@ public class PlayerService : IPlayerService, IDisposable
 
     private void OnMediaStateChanged(object? sender, EventArgs e)
     {
-        // Not used currently        
+        if (_mode == EPlaybackMode.Radio && _player.IsBuffering != _lastIsBuffering)
+        {
+            _lastIsBuffering = _player.IsBuffering;
+            _messenger.Send(new BufferingChanged(_lastIsBuffering));
+        }
     }
 
     private void OnMediaEnded(object? sender, EventArgs e)
@@ -529,9 +535,10 @@ public class PlayerService : IPlayerService, IDisposable
             return;
         }
 
-        _player.Play();
+        PlaybackState = EPlaybackState.Playing;
         _messenger.Send(new RadioStationChanged(station));
         _smtcService?.UpdateRadioStation(station);
+        _smtcService?.UpdatePlaybackState(PlaybackStatus.Playing);
         _discordService?.UpdateRadioStation(station);
     }
 
@@ -542,6 +549,7 @@ public class PlayerService : IPlayerService, IDisposable
             _player.Stop();
             _currentStation = null;
             _currentStreamTitle = null;
+            _lastIsBuffering = false;
         }
     }
 

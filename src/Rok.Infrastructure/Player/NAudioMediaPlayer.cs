@@ -276,21 +276,25 @@ public class NAudioMediaPlayer : IPlayerEngine, IDisposable
         _isLive = true;
         _length = 0;
 
-        try
+        Task.Run(async () =>
         {
-            _streaming.StartAsync(station, CancellationToken.None).GetAwaiter().GetResult();
-            OnMediaChanged?.Invoke(this, EventArgs.Empty);
-            OnMediaStateChanged?.Invoke(this, EventArgs.Empty);
-            return true;
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Failed to start stream {Url}", station.StreamUrl);
-            _streaming?.Dispose();
-            _streaming = null;
-            _isLive = false;
-            return false;
-        }
+            try
+            {
+                await _streaming.StartAsync(station, CancellationToken.None);
+                OnMediaChanged?.Invoke(this, EventArgs.Empty);
+                OnMediaStateChanged?.Invoke(this, EventArgs.Empty);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Failed to start stream {Url}", station.StreamUrl);
+                _streaming?.Dispose();
+                _streaming = null;
+                _isLive = false;
+                OnMediaEnded?.Invoke(this, EventArgs.Empty);
+            }
+        });
+
+        return true;
     }
 
     public void SetEqualizerBand(int bandIndex, float gain)
