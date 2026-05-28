@@ -92,6 +92,11 @@ public static class DependencyInjection
 
         services.AddHttpClient("MusicDataDownload");
         services.AddHttpClient<IRadioStreamUrlResolver, RadioStreamUrlResolver>();
+        services.AddHttpClient("RadioStream", c =>
+        {
+            c.Timeout = Timeout.InfiniteTimeSpan;
+            c.DefaultRequestHeaders.UserAgent.ParseAdd("Rok/1.0");
+        });
 
         services.AddSingleton<ITagService, TagService>();
         services.AddSingleton<IMusicDataApiService, MusicDataApiService>();
