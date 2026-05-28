@@ -52,7 +52,21 @@ internal sealed class StreamingPlayback : IDisposable
 
                 await _icy.ConnectAsync(station.StreamUrl, _cts.Token);
 
-                bool isMp3 = (_icy.ContentType?.ToLowerInvariant() ?? string.Empty) is "audio/mpeg" or "";
+                string contentType = _icy.ContentType?.ToLowerInvariant() ?? string.Empty;
+                bool isMp3 = contentType is "audio/mpeg" or "";
+                bool isAac = contentType is "audio/aac" or "audio/aacp" or "audio/x-aac";
+
+                if (isAac)
+                {
+                    // Live ADTS AAC streams currently fail with StreamMediaFoundationReader:
+                    // MF either scans the entire "file" to estimate duration (with
+                    // Length = long.MaxValue this takes hours on a real-time stream) or
+                    // rejects the source outright. Proper support needs a dedicated ADTS
+                    // frame parser feeding the MF AAC decoder transform — tracked for
+                    // Phase 2.
+                    throw new NotSupportedException(
+                        $"AAC live streams ({contentType}) are not supported yet. Try an MP3 stream.");
+                }
 
                 if (isMp3)
                 {
