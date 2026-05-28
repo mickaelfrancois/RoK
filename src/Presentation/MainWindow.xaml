@@ -116,6 +116,11 @@
                                 <SymbolIcon Symbol="Shop" />
                             </NavigationViewItem.Icon>
                         </NavigationViewItem>
+                        <NavigationViewItem x:Uid="menuRadios" Tag="Radios" x:Name="radiosItem">
+                            <NavigationViewItem.Icon>
+                                <FontIcon Glyph="&#xE8D6;" FontFamily="Segoe Fluent Icons" />
+                            </NavigationViewItem.Icon>
+                        </NavigationViewItem>
 
                         <NavigationViewItem x:Uid="menuInsight" Content="Insights" Tag="Insights" x:Name="insightsItem" Icon="OutlineStar" />
 

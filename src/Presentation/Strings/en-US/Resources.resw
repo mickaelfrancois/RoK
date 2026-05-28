@@ -444,6 +444,9 @@
   <data name="menuPlaylists.Content" xml:space="preserve">
     <value>Playlists</value>
   </data>
+  <data name="menuRadios.Content" xml:space="preserve">
+    <value>Radios</value>
+  </data>
   <data name="groupDefaultName" xml:space="preserve">
     <value>New group</value>
   </data>

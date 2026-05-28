@@ -385,6 +385,9 @@
   <data name="menuPlaylists.Content" xml:space="preserve">
     <value>Плейлисти</value>
   </data>
+  <data name="menuRadios.Content" xml:space="preserve">
+    <value>Radios</value>
+  </data>
   <data name="groupDefaultName" xml:space="preserve">
     <value>Нова група</value>
   </data>
