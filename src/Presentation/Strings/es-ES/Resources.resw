@@ -1738,4 +1738,25 @@
   <data name="KeyboardShortcutsDialog.PrimaryButtonText" xml:space="preserve">
     <value>Cerrar</value>
   </data>
+  <data name="radiosPlayUrl.Label" xml:space="preserve">
+    <value>Reproducir URL</value>
+  </data>
+  <data name="radiosAdd.Label" xml:space="preserve">
+    <value>Añadir</value>
+  </data>
+  <data name="radiosFlyoutPlay.Text" xml:space="preserve">
+    <value>Reproducir</value>
+  </data>
+  <data name="radiosFlyoutDelete.Text" xml:space="preserve">
+    <value>Eliminar</value>
+  </data>
+  <data name="radiosNoData.Message" xml:space="preserve">
+    <value>Aún no hay radios. Añade una o reproduce una URL para empezar.</value>
+  </data>
+  <data name="radiosDeleteConfirmation" xml:space="preserve">
+    <value>¿Eliminar la radio «{0}»?</value>
+  </data>
+  <data name="playerBuffering.Text" xml:space="preserve">
+    <value>Almacenando en búfer…</value>
+  </data>
 </root>

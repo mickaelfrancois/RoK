@@ -1796,4 +1796,25 @@
   <data name="KeyboardShortcutsDialog.PrimaryButtonText" xml:space="preserve">
     <value>Закрити</value>
   </data>
+  <data name="radiosPlayUrl.Label" xml:space="preserve">
+    <value>Відтворити URL</value>
+  </data>
+  <data name="radiosAdd.Label" xml:space="preserve">
+    <value>Додати</value>
+  </data>
+  <data name="radiosFlyoutPlay.Text" xml:space="preserve">
+    <value>Відтворити</value>
+  </data>
+  <data name="radiosFlyoutDelete.Text" xml:space="preserve">
+    <value>Видалити</value>
+  </data>
+  <data name="radiosNoData.Message" xml:space="preserve">
+    <value>Поки що немає радіо. Додайте одну або відтворіть URL, щоб почати.</value>
+  </data>
+  <data name="radiosDeleteConfirmation" xml:space="preserve">
+    <value>Видалити радіо «{0}»?</value>
+  </data>
+  <data name="playerBuffering.Text" xml:space="preserve">
+    <value>Буферизація…</value>
+  </data>
 </root>

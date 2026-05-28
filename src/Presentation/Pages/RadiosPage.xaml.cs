@@ -72,7 +72,7 @@ public sealed partial class RadiosPage : Page
         {
             XamlRoot = XamlRoot,
             Title = _resourceLoader.GetString("DeleteConfirmationTitle"),
-            Content = $"Delete radio \"{station.Name}\"?",
+            Content = string.Format(_resourceLoader.GetString("radiosDeleteConfirmation"), station.Name),
             PrimaryButtonText = _resourceLoader.GetString("YesButton"),
             CloseButtonText = _resourceLoader.GetString("CancelButton"),
             DefaultButton = ContentDialogButton.Close

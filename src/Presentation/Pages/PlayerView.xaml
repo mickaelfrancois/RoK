@@ -452,7 +452,7 @@
                     <Border Background="{ThemeResource BadgeLiveBrush}" CornerRadius="4" Padding="6,1">
                         <TextBlock Text="LIVE" Foreground="White" FontSize="10" FontWeight="Bold" />
                     </Border>
-                    <TextBlock Text="Buffering…" FontSize="11" Foreground="White" Opacity="0.7"
+                    <TextBlock x:Uid="playerBuffering" FontSize="11" Foreground="White" Opacity="0.7"
                                VerticalAlignment="Center"
                                Visibility="{x:Bind ViewModel.IsBuffering, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" />
                 </StackPanel>

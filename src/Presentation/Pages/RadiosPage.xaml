@@ -14,14 +14,14 @@
             <Grid Style="{StaticResource MainGridCoverStyle}">
                 <Grid.ContextFlyout>
                     <MenuFlyout>
-                        <MenuFlyoutItem Text="Play"
+                        <MenuFlyoutItem x:Uid="radiosFlyoutPlay"
                                         Command="{Binding ElementName=radiosView, Path=ViewModel.PlayCommand}"
                                         CommandParameter="{x:Bind}">
                             <MenuFlyoutItem.Icon>
                                 <SymbolIcon Symbol="Play" />
                             </MenuFlyoutItem.Icon>
                         </MenuFlyoutItem>
-                        <MenuFlyoutItem Text="Delete"
+                        <MenuFlyoutItem x:Uid="radiosFlyoutDelete"
                                         Click="OnDeleteMenuClick"
                                         Tag="{x:Bind}">
                             <MenuFlyoutItem.Icon>
@@ -75,7 +75,7 @@
         <CommandBar Grid.Row="0" DefaultLabelPosition="Right" Style="{StaticResource HeaderCommandBarListStyle}">
             <CommandBar.Content>
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Spacing="{StaticResource SpacingSmall}">
-                    <AppBarButton Label="Play URL"
+                    <AppBarButton x:Uid="radiosPlayUrl"
                                   Style="{StaticResource AppBarButtonCompactStyle}"
                                   Click="OnPlayUrlClick">
                         <AppBarButton.Icon>
@@ -83,7 +83,7 @@
                         </AppBarButton.Icon>
                     </AppBarButton>
 
-                    <AppBarButton Label="Add"
+                    <AppBarButton x:Uid="radiosAdd"
                                   Icon="Add"
                                   Style="{StaticResource AppBarButtonCompactStyle}"
                                   Click="OnAddClick" />
@@ -102,8 +102,8 @@
                                      ScrollViewer.VerticalScrollMode="Enabled"
                                      ScrollViewer.VerticalScrollBarVisibility="Auto" />
 
-            <common:EmptyStateControl Glyph="&#xE8D6;"
-                                      Message="No radios yet. Add one or play a URL to get started."
+            <common:EmptyStateControl x:Uid="radiosNoData"
+                                      Glyph="&#xE8D6;"
                                       Visibility="{x:Bind ViewModel.HasNoData, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" />
         </Grid>
     </Grid>
