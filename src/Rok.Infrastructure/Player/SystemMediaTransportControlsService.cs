@@ -140,6 +140,9 @@ public sealed class SystemMediaTransportControlsService(ILogger<SystemMediaTrans
 
         try
         {
+            _smtc.IsNextEnabled = true;
+            _smtc.IsPreviousEnabled = true;
+
             SystemMediaTransportControlsDisplayUpdater updater = _smtc.DisplayUpdater;
             updater.Type = MediaPlaybackType.Music;
             updater.MusicProperties.Title = track.Title;
@@ -196,6 +199,63 @@ public sealed class SystemMediaTransportControlsService(ILogger<SystemMediaTrans
         {
             logger.LogDebug(ex, "Failed to update SMTC timeline");
         }
+    }
+
+    public void UpdateRadioStation(RadioStationDto station)
+    {
+        if (_smtc is null)
+            return;
+
+        try
+        {
+            SystemMediaTransportControlsDisplayUpdater updater = _smtc.DisplayUpdater;
+            updater.Type = MediaPlaybackType.Music;
+            updater.MusicProperties.Title = station.Name;
+            updater.MusicProperties.Artist = station.Name;
+            updater.MusicProperties.AlbumArtist = station.Name;
+            updater.Thumbnail = null;
+            updater.Update();
+
+            _smtc.IsNextEnabled = false;
+            _smtc.IsPreviousEnabled = false;
+            _smtc.UpdateTimelineProperties(new SystemMediaTransportControlsTimelineProperties());
+
+            logger.LogDebug("SMTC: Updated radio station — {Station}", station.Name);
+        }
+        catch (Exception ex)
+        {
+            logger.LogWarning(ex, "Failed to update SMTC radio station info");
+        }
+    }
+
+    public void UpdateRadioMetadata(string streamTitle)
+    {
+        if (_smtc is null)
+            return;
+
+        try
+        {
+            SystemMediaTransportControlsDisplayUpdater updater = _smtc.DisplayUpdater;
+            string fallbackArtist = updater.MusicProperties.AlbumArtist ?? string.Empty;
+            (string artist, string title) = ParseIcyTitle(streamTitle, fallbackArtist);
+            updater.MusicProperties.Title = title;
+            updater.MusicProperties.Artist = artist;
+            updater.Update();
+
+            logger.LogDebug("SMTC: Updated radio metadata — {Artist} / {Title}", artist, title);
+        }
+        catch (Exception ex)
+        {
+            logger.LogWarning(ex, "Failed to update SMTC radio metadata");
+        }
+    }
+
+    private static (string Artist, string Title) ParseIcyTitle(string streamTitle, string fallbackArtist)
+    {
+        int sep = streamTitle.IndexOf(" - ", StringComparison.Ordinal);
+        if (sep > 0)
+            return (streamTitle[..sep].Trim(), streamTitle[(sep + 3)..].Trim());
+        return (fallbackArtist, streamTitle.Trim());
     }
 
     public void Dispose()
