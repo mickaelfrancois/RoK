@@ -83,6 +83,7 @@ public static class DependencyInjection
         services.AddScoped<IPlaylistTrackGenerateRepository, PlaylistTrackGenerateRepository>();
         services.AddScoped<IListeningEventRepository, ListeningEventRepository>();
         services.AddScoped<IEqualizerPresetRepository, EqualizerPresetRepository>();
+        services.AddTransient<IRadioStationRepository, RadioStationRepository>();
 
         services.AddSingleton<IPlaylistFormatReader, M3u8PlaylistReader>();
         services.AddSingleton<IPlaylistFormatWriter, M3u8PlaylistWriter>();
