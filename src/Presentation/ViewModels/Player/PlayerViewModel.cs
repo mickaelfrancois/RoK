@@ -470,7 +470,7 @@ public partial class PlayerViewModel : ObservableObject, IDisposable
     }
 
     [RelayCommand]
-    public void StopPlayback()
+    private void StopPlayback()
     {
         _player.Stop(true);
         Mode = EPlaybackMode.None;

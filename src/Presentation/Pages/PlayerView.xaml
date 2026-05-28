@@ -435,7 +435,7 @@
                 <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
             <StackPanel Grid.Column="0" Orientation="Vertical" VerticalAlignment="Center" Spacing="2">
-                <Border Background="Red" CornerRadius="4" HorizontalAlignment="Left" Padding="6,2">
+                <Border Background="{ThemeResource BadgeLiveBrush}" CornerRadius="4" HorizontalAlignment="Left" Padding="6,2">
                     <TextBlock Text="LIVE" Foreground="White" FontSize="11" FontWeight="Bold" />
                 </Border>
                 <TextBlock Text="{x:Bind ViewModel.CurrentStationName, Mode=OneWay}"
