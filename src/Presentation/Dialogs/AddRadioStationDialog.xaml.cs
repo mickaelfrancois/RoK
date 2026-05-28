@@ -11,10 +11,12 @@ namespace Rok.Dialogs;
 public sealed partial class AddRadioStationDialog : ContentDialog
 {
     private readonly IMediator _mediator;
+    private readonly ResourceLoader _resourceLoader;
 
     public AddRadioStationDialog(IMediator mediator)
     {
         _mediator = mediator;
+        _resourceLoader = App.ServiceProvider.GetRequiredService<ResourceLoader>();
         InitializeComponent();
     }
 
@@ -43,10 +45,10 @@ public sealed partial class AddRadioStationDialog : ContentDialog
 
             string message = result.Errors.FirstOrDefault() switch
             {
-                ConflictError => "A station with this URL already exists.",
+                ConflictError => _resourceLoader.GetString("radioErrorDuplicate"),
                 ValidationError ve => string.Join('\n', ve.Failures.Select(f => f.Message)),
                 Error e => e.Message,
-                _ => "Unknown error."
+                _ => _resourceLoader.GetString("radioErrorUnknown")
             };
 
             ErrorText.Text = message;

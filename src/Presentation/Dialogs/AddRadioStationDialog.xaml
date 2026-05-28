@@ -1,15 +1,13 @@
 <ContentDialog x:Class="Rok.Dialogs.AddRadioStationDialog"
                xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-               Title="Add a webradio"
-               PrimaryButtonText="Save"
-               CloseButtonText="Cancel"
+               x:Uid="addRadioDialog"
                DefaultButton="Primary"
                PrimaryButtonClick="OnSaveClick">
     <StackPanel Spacing="12" MinWidth="380">
-        <TextBox x:Name="NameBox" Header="Name" PlaceholderText="My favourite station"/>
-        <TextBox x:Name="UrlBox" Header="Stream URL or playlist (.pls / .m3u)" PlaceholderText="https://stream.example.com/audio.mp3"/>
-        <TextBox x:Name="HomepageBox" Header="Homepage (optional)" PlaceholderText="https://station.example.com"/>
+        <TextBox x:Name="NameBox" x:Uid="addRadioName" />
+        <TextBox x:Name="UrlBox" x:Uid="addRadioUrl" />
+        <TextBox x:Name="HomepageBox" x:Uid="addRadioHomepage" />
         <TextBlock x:Name="ErrorText" Foreground="Red" TextWrapping="Wrap" Visibility="Collapsed"/>
     </StackPanel>
 </ContentDialog>

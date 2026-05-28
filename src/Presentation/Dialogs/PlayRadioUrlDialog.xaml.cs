@@ -9,10 +9,12 @@ namespace Rok.Dialogs;
 public sealed partial class PlayRadioUrlDialog : ContentDialog
 {
     private readonly IMediator _mediator;
+    private readonly ResourceLoader _resourceLoader;
 
     public PlayRadioUrlDialog(IMediator mediator)
     {
         _mediator = mediator;
+        _resourceLoader = App.ServiceProvider.GetRequiredService<ResourceLoader>();
         InitializeComponent();
     }
 
@@ -35,12 +37,12 @@ public sealed partial class PlayRadioUrlDialog : ContentDialog
             string code = result.Errors.FirstOrDefault()?.Code ?? "unknown";
             ErrorText.Text = code switch
             {
-                "radio.hls_unsupported" => "HLS streams are not supported.",
-                "radio.no_stream_in_playlist" => "No usable stream URL found in this playlist.",
-                "radio.fetch_failed" => "Cannot reach this URL.",
-                "radio.unsupported_format" => "This URL format is not supported.",
-                "radio.invalid_url" => "Invalid URL.",
-                _ => result.Errors.FirstOrDefault()?.Message ?? "Unknown error."
+                "radio.hls_unsupported" => _resourceLoader.GetString("radioErrorHlsUnsupported"),
+                "radio.no_stream_in_playlist" => _resourceLoader.GetString("radioErrorNoStreamInPlaylist"),
+                "radio.fetch_failed" => _resourceLoader.GetString("radioErrorFetchFailed"),
+                "radio.unsupported_format" => _resourceLoader.GetString("radioErrorUnsupportedFormat"),
+                "radio.invalid_url" => _resourceLoader.GetString("radioErrorInvalidUrl"),
+                _ => result.Errors.FirstOrDefault()?.Message ?? _resourceLoader.GetString("radioErrorUnknown")
             };
 
             ErrorText.Visibility = Visibility.Visible;

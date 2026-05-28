@@ -1,15 +1,12 @@
 <ContentDialog x:Class="Rok.Dialogs.PlayRadioUrlDialog"
                xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-               Title="Play a webradio URL"
-               PrimaryButtonText="Play"
-               CloseButtonText="Cancel"
+               x:Uid="playRadioUrlDialog"
                DefaultButton="Primary"
                PrimaryButtonClick="OnPlayClick">
     <StackPanel Spacing="12" MinWidth="380">
-        <TextBox x:Name="UrlBox" Header="Stream URL or playlist" PlaceholderText="https://stream.example.com/audio.mp3"/>
-        <TextBlock Foreground="Gray" TextWrapping="Wrap"
-                   Text="Supports MP3 and AAC streams. .pls and .m3u playlists are resolved automatically. HLS (.m3u8 segment manifests) is not supported."/>
+        <TextBox x:Name="UrlBox" x:Uid="playRadioUrl" />
+        <TextBlock x:Uid="playRadioUrlHint" Foreground="Gray" TextWrapping="Wrap" />
         <TextBlock x:Name="ErrorText" Foreground="Red" TextWrapping="Wrap" Visibility="Collapsed"/>
     </StackPanel>
 </ContentDialog>

@@ -1875,4 +1875,70 @@
   <data name="playerBuffering.Text" xml:space="preserve">
     <value>Mise en mémoire tampon…</value>
   </data>
+  <data name="addRadioDialog.Title" xml:space="preserve">
+    <value>Ajouter une webradio</value>
+  </data>
+  <data name="addRadioDialog.PrimaryButtonText" xml:space="preserve">
+    <value>Enregistrer</value>
+  </data>
+  <data name="addRadioDialog.CloseButtonText" xml:space="preserve">
+    <value>Annuler</value>
+  </data>
+  <data name="addRadioName.Header" xml:space="preserve">
+    <value>Nom</value>
+  </data>
+  <data name="addRadioName.PlaceholderText" xml:space="preserve">
+    <value>Ma station favorite</value>
+  </data>
+  <data name="addRadioUrl.Header" xml:space="preserve">
+    <value>URL du flux ou playlist (.pls / .m3u)</value>
+  </data>
+  <data name="addRadioUrl.PlaceholderText" xml:space="preserve">
+    <value>https://stream.example.com/audio.mp3</value>
+  </data>
+  <data name="addRadioHomepage.Header" xml:space="preserve">
+    <value>Site web (facultatif)</value>
+  </data>
+  <data name="addRadioHomepage.PlaceholderText" xml:space="preserve">
+    <value>https://station.example.com</value>
+  </data>
+  <data name="playRadioUrlDialog.Title" xml:space="preserve">
+    <value>Lire une URL de webradio</value>
+  </data>
+  <data name="playRadioUrlDialog.PrimaryButtonText" xml:space="preserve">
+    <value>Lire</value>
+  </data>
+  <data name="playRadioUrlDialog.CloseButtonText" xml:space="preserve">
+    <value>Annuler</value>
+  </data>
+  <data name="playRadioUrl.Header" xml:space="preserve">
+    <value>URL du flux ou playlist</value>
+  </data>
+  <data name="playRadioUrl.PlaceholderText" xml:space="preserve">
+    <value>https://stream.example.com/audio.mp3</value>
+  </data>
+  <data name="playRadioUrlHint.Text" xml:space="preserve">
+    <value>Prend en charge les flux MP3 et AAC. Les playlists .pls et .m3u sont résolues automatiquement. HLS (manifestes .m3u8 segmentés) non supporté.</value>
+  </data>
+  <data name="radioErrorDuplicate" xml:space="preserve">
+    <value>Une station avec cette URL existe déjà.</value>
+  </data>
+  <data name="radioErrorHlsUnsupported" xml:space="preserve">
+    <value>Les flux HLS ne sont pas pris en charge.</value>
+  </data>
+  <data name="radioErrorNoStreamInPlaylist" xml:space="preserve">
+    <value>Aucun flux exploitable trouvé dans cette playlist.</value>
+  </data>
+  <data name="radioErrorFetchFailed" xml:space="preserve">
+    <value>Impossible de joindre cette URL.</value>
+  </data>
+  <data name="radioErrorUnsupportedFormat" xml:space="preserve">
+    <value>Ce format d'URL n'est pas pris en charge.</value>
+  </data>
+  <data name="radioErrorInvalidUrl" xml:space="preserve">
+    <value>URL invalide.</value>
+  </data>
+  <data name="radioErrorUnknown" xml:space="preserve">
+    <value>Erreur inconnue.</value>
+  </data>
 </root>

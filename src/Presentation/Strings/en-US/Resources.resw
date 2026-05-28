@@ -1876,4 +1876,70 @@
   <data name="playerBuffering.Text" xml:space="preserve">
     <value>Buffering…</value>
   </data>
+  <data name="addRadioDialog.Title" xml:space="preserve">
+    <value>Add a webradio</value>
+  </data>
+  <data name="addRadioDialog.PrimaryButtonText" xml:space="preserve">
+    <value>Save</value>
+  </data>
+  <data name="addRadioDialog.CloseButtonText" xml:space="preserve">
+    <value>Cancel</value>
+  </data>
+  <data name="addRadioName.Header" xml:space="preserve">
+    <value>Name</value>
+  </data>
+  <data name="addRadioName.PlaceholderText" xml:space="preserve">
+    <value>My favourite station</value>
+  </data>
+  <data name="addRadioUrl.Header" xml:space="preserve">
+    <value>Stream URL or playlist (.pls / .m3u)</value>
+  </data>
+  <data name="addRadioUrl.PlaceholderText" xml:space="preserve">
+    <value>https://stream.example.com/audio.mp3</value>
+  </data>
+  <data name="addRadioHomepage.Header" xml:space="preserve">
+    <value>Homepage (optional)</value>
+  </data>
+  <data name="addRadioHomepage.PlaceholderText" xml:space="preserve">
+    <value>https://station.example.com</value>
+  </data>
+  <data name="playRadioUrlDialog.Title" xml:space="preserve">
+    <value>Play a webradio URL</value>
+  </data>
+  <data name="playRadioUrlDialog.PrimaryButtonText" xml:space="preserve">
+    <value>Play</value>
+  </data>
+  <data name="playRadioUrlDialog.CloseButtonText" xml:space="preserve">
+    <value>Cancel</value>
+  </data>
+  <data name="playRadioUrl.Header" xml:space="preserve">
+    <value>Stream URL or playlist</value>
+  </data>
+  <data name="playRadioUrl.PlaceholderText" xml:space="preserve">
+    <value>https://stream.example.com/audio.mp3</value>
+  </data>
+  <data name="playRadioUrlHint.Text" xml:space="preserve">
+    <value>Supports MP3 and AAC streams. .pls and .m3u playlists are resolved automatically. HLS (.m3u8 segment manifests) is not supported.</value>
+  </data>
+  <data name="radioErrorDuplicate" xml:space="preserve">
+    <value>A station with this URL already exists.</value>
+  </data>
+  <data name="radioErrorHlsUnsupported" xml:space="preserve">
+    <value>HLS streams are not supported.</value>
+  </data>
+  <data name="radioErrorNoStreamInPlaylist" xml:space="preserve">
+    <value>No usable stream URL found in this playlist.</value>
+  </data>
+  <data name="radioErrorFetchFailed" xml:space="preserve">
+    <value>Cannot reach this URL.</value>
+  </data>
+  <data name="radioErrorUnsupportedFormat" xml:space="preserve">
+    <value>This URL format is not supported.</value>
+  </data>
+  <data name="radioErrorInvalidUrl" xml:space="preserve">
+    <value>Invalid URL.</value>
+  </data>
+  <data name="radioErrorUnknown" xml:space="preserve">
+    <value>Unknown error.</value>
+  </data>
 </root>
