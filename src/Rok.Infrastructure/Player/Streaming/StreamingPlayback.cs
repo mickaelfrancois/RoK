@@ -58,14 +58,29 @@ internal sealed class StreamingPlayback : IDisposable
 
                 if (isAac)
                 {
-                    // Live ADTS AAC streams currently fail with StreamMediaFoundationReader:
-                    // MF either scans the entire "file" to estimate duration (with
-                    // Length = long.MaxValue this takes hours on a real-time stream) or
-                    // rejects the source outright. Proper support needs a dedicated ADTS
-                    // frame parser feeding the MF AAC decoder transform — tracked for
-                    // Phase 2.
-                    throw new NotSupportedException(
-                        $"AAC live streams ({contentType}) are not supported yet. Try an MP3 stream.");
+                    // StreamMediaFoundationReader can't handle live ADTS over a
+                    // non-seekable HTTP stream. Close the ICY connection we just
+                    // opened (we lose stream-title metadata for AAC in exchange)
+                    // and let Media Foundation use its own networking stack via
+                    // the URL constructor — MF's HTTP source knows about live
+                    // sources and doesn't try to scan the whole file.
+                    _icy.Dispose();
+                    _icy = null;
+
+                    _decoded = new MediaFoundationReader(station.StreamUrl);
+
+                    _buffer = new BufferedWaveProvider(_decoded.WaveFormat)
+                    {
+                        BufferDuration = TimeSpan.FromSeconds(BufferDurationSeconds),
+                        DiscardOnBufferOverflow = true
+                    };
+
+                    _output = new WaveOutEvent();
+                    _output.Init(_buffer);
+
+                    SetBuffering(true);
+                    _pumpTask = Task.Run(() => PumpAsync(_cts.Token), _cts.Token);
+                    return;
                 }
 
                 if (isMp3)
