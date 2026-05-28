@@ -244,7 +244,8 @@
         </Grid>
 
         <!-- Current track info -->
-        <Grid x:Name="currentTrack">
+        <Grid x:Name="currentTrack"
+              Visibility="{x:Bind ViewModel.IsMusicMode, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">
             <VisualStateManager.VisualStateGroups>
                 <VisualStateGroup x:Name="visualChangeGroup">
                     <VisualState x:Name="changeTrackTitleAnimation">
@@ -327,9 +328,9 @@
                     <ColumnDefinition Width="60"></ColumnDefinition>
                 </Grid.ColumnDefinitions>
 
-                <TextBlock Grid.Column="0" Text="{x:Bind ViewModel.ListenDurationStr, Mode=OneWay}" Foreground="White" HorizontalAlignment="Right" Margin="0,0,10,0" VerticalAlignment="Center" FontSize="14" />
-                <Slider x:Name="progressSlider" Grid.Column="1" Margin="0,2,0,0" VerticalAlignment="Center" HorizontalAlignment="Stretch" Value="{x:Bind ViewModel.ListenDuration, Mode=OneWay, Converter={StaticResource TimeSpanToDoubleConverter}}" Maximum="{x:Bind ViewModel.DurationTotal, Mode=OneWay, Converter={StaticResource TimeSpanToDoubleConverter}}" ThumbToolTipValueConverter="{StaticResource DoubleToTimespanConverter}" IsThumbToolTipEnabled="True" LargeChange="7" SmallChange="5" PointerCaptureLost="Slider_PointerCaptureLost" ManipulationStarted="Slider_ManipulationStarted" ManipulationMode="All" />
-                <TextBlock Grid.Column="2" Text="{x:Bind ViewModel.DurationTotalStr, Mode=OneWay}" Foreground="White" HorizontalAlignment="Left" Margin="10,0,0,0" VerticalAlignment="Center" FontSize="14" />
+                <TextBlock Grid.Column="0" Text="{x:Bind ViewModel.ListenDurationStr, Mode=OneWay}" Foreground="White" HorizontalAlignment="Right" Margin="0,0,10,0" VerticalAlignment="Center" FontSize="14" Visibility="{x:Bind ViewModel.IsMusicMode, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" />
+                <Slider x:Name="progressSlider" Grid.Column="1" Margin="0,2,0,0" VerticalAlignment="Center" HorizontalAlignment="Stretch" IsEnabled="{x:Bind ViewModel.IsMusicMode, Mode=OneWay}" Value="{x:Bind ViewModel.ListenDuration, Mode=OneWay, Converter={StaticResource TimeSpanToDoubleConverter}}" Maximum="{x:Bind ViewModel.DurationTotal, Mode=OneWay, Converter={StaticResource TimeSpanToDoubleConverter}}" ThumbToolTipValueConverter="{StaticResource DoubleToTimespanConverter}" IsThumbToolTipEnabled="True" LargeChange="7" SmallChange="5" PointerCaptureLost="Slider_PointerCaptureLost" ManipulationStarted="Slider_ManipulationStarted" ManipulationMode="All" />
+                <TextBlock Grid.Column="2" Text="{x:Bind ViewModel.DurationTotalStr, Mode=OneWay}" Foreground="White" HorizontalAlignment="Left" Margin="10,0,0,0" VerticalAlignment="Center" FontSize="14" Visibility="{x:Bind ViewModel.IsMusicMode, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" />
             </Grid>
 
 
@@ -424,32 +425,39 @@
             </CommandBar>
         </Grid>
 
-        <!-- Radio mode panel — rendered last so it appears above music elements -->
+        <!-- Radio mode panel — takes the same slot as currentTrack so player controls remain visible -->
         <Grid x:Name="radioPanel"
               Visibility="{x:Bind ViewModel.IsRadioMode, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}"
-              Background="{ThemeResource BrandPrimaryBrush}"
-              HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
-              ColumnSpacing="16" Padding="12,4">
+              HorizontalAlignment="Left" VerticalAlignment="Center"
+              Width="{x:Bind currentTrack.Width, Mode=OneWay}"
+              ColumnSpacing="12">
             <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="70" />
                 <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
-            <StackPanel Grid.Column="0" Orientation="Vertical" VerticalAlignment="Center" Spacing="2">
-                <Border Background="{ThemeResource BadgeLiveBrush}" CornerRadius="4" HorizontalAlignment="Left" Padding="6,2">
-                    <TextBlock Text="LIVE" Foreground="White" FontSize="11" FontWeight="Bold" />
-                </Border>
+            <Border Grid.Column="0" CornerRadius="4" Width="70" Height="70"
+                    Background="{ThemeResource BadgeLiveBrush}">
+                <FontIcon Glyph="&#xE8D6;" FontFamily="Segoe Fluent Icons"
+                          FontSize="32" Foreground="White"
+                          HorizontalAlignment="Center" VerticalAlignment="Center" />
+            </Border>
+            <StackPanel Grid.Column="1" Orientation="Vertical" VerticalAlignment="Center" Spacing="2" Margin="6,0,0,0">
+                <StackPanel Orientation="Horizontal" Spacing="6">
+                    <Border Background="{ThemeResource BadgeLiveBrush}" CornerRadius="4" Padding="6,1">
+                        <TextBlock Text="LIVE" Foreground="White" FontSize="10" FontWeight="Bold" />
+                    </Border>
+                    <TextBlock Text="Buffering…" FontSize="11" Foreground="White" Opacity="0.7"
+                               VerticalAlignment="Center"
+                               Visibility="{x:Bind ViewModel.IsBuffering, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" />
+                </StackPanel>
                 <TextBlock Text="{x:Bind ViewModel.CurrentStationName, Mode=OneWay}"
-                           FontSize="16" FontWeight="SemiBold" Foreground="White"
+                           FontSize="14" FontWeight="SemiBold" Foreground="White"
                            TextTrimming="CharacterEllipsis" />
                 <TextBlock Text="{x:Bind ViewModel.CurrentStreamTitle, Mode=OneWay}"
-                           FontSize="13" Foreground="White" Opacity="0.8"
+                           FontSize="12" Foreground="White" Opacity="0.8"
                            TextTrimming="CharacterEllipsis"
                            Visibility="{x:Bind ViewModel.CurrentStreamTitle, Mode=OneWay, Converter={StaticResource StringToVisibilityConverter}}" />
-                <TextBlock Text="Buffering…" FontSize="12" Foreground="White" Opacity="0.7"
-                           Visibility="{x:Bind ViewModel.IsBuffering, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" />
             </StackPanel>
-            <Button Grid.Column="1" Content="Stop" VerticalAlignment="Center"
-                    Command="{x:Bind ViewModel.StopPlaybackCommand}" />
         </Grid>
     </Grid>
 </UserControl>

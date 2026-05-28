@@ -240,6 +240,8 @@ public partial class PlayerViewModel : ObservableObject, IDisposable
             CurrentStationName = message.Station.Name;
             CurrentStreamTitle = null;
             Mode = EPlaybackMode.Radio;
+            CanSkipNext = false;
+            CanSkipPrevious = false;
         });
     }
 
