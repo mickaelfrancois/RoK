@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using Microsoft.Extensions.Logging;
 using NAudio.Wave;
+using NAudio.Wave.Compression;
 using Rok.Application.Dto;
 
 namespace Rok.Infrastructure.Player.Streaming;
@@ -20,6 +21,7 @@ internal sealed class StreamingPlayback : IDisposable
     private WaveOutEvent? _output;
     private CancellationTokenSource? _cts;
     private Task? _pumpTask;
+    private AcmMp3FrameDecompressor? _mp3Decompressor;
 
     private const double BufferDurationSeconds = 15.0;
     private const double PreBufferSeconds = 3.0;
@@ -48,7 +50,43 @@ internal sealed class StreamingPlayback : IDisposable
 
                 await _icy.ConnectAsync(station.StreamUrl, _cts.Token);
 
-                _decoded = CreateDecoder(_icy.AudioStream, _icy.ContentType);
+                bool isMp3 = (_icy.ContentType?.ToLowerInvariant() ?? string.Empty) is "audio/mpeg" or "";
+
+                if (isMp3)
+                {
+                    Stream mp3Source = new ReadFullyStream(_icy.AudioStream);
+
+                    Mp3Frame? firstFrame = Mp3Frame.LoadFromStream(mp3Source);
+                    if (firstFrame is null)
+                        throw new InvalidOperationException("Stream did not yield a single MP3 frame");
+
+                    WaveFormat mp3WaveFormat = new Mp3WaveFormat(
+                        firstFrame.SampleRate,
+                        firstFrame.ChannelMode == ChannelMode.Mono ? 1 : 2,
+                        firstFrame.FrameLength,
+                        firstFrame.BitRate);
+
+                    _mp3Decompressor = new AcmMp3FrameDecompressor(mp3WaveFormat);
+                    _buffer = new BufferedWaveProvider(_mp3Decompressor.OutputFormat)
+                    {
+                        BufferDuration = TimeSpan.FromSeconds(BufferDurationSeconds),
+                        DiscardOnBufferOverflow = true
+                    };
+
+                    byte[] firstDecodeBuffer = new byte[16384];
+                    int firstDecoded = _mp3Decompressor.DecompressFrame(firstFrame, firstDecodeBuffer, 0);
+                    _buffer.AddSamples(firstDecodeBuffer, 0, firstDecoded);
+
+                    _output = new WaveOutEvent();
+                    _output.Init(_buffer);
+
+                    SetBuffering(true);
+                    _pumpTask = Task.Run(() => PumpMp3Async(mp3Source, _cts.Token), _cts.Token);
+                    return;
+                }
+
+                // AAC / other: use StreamMediaFoundationReader
+                _decoded = new StreamMediaFoundationReader(_icy.AudioStream);
 
                 _buffer = new BufferedWaveProvider(_decoded.WaveFormat)
                 {
@@ -92,14 +130,60 @@ internal sealed class StreamingPlayback : IDisposable
         _output.Volume = (float)Math.Clamp(percent / 100.0, 0.0, 1.0);
     }
 
-    private static IWaveProvider CreateDecoder(Stream stream, string? contentType)
+    private async Task PumpMp3Async(Stream mp3Source, CancellationToken ct)
     {
-        return contentType?.ToLowerInvariant() switch
+        if (_buffer is null || _output is null || _mp3Decompressor is null)
+            return;
+
+        byte[] decodeBuffer = new byte[16384];
+        double bytesPerSecond = _mp3Decompressor.OutputFormat.AverageBytesPerSecond;
+        Stopwatch dryStopwatch = new();
+
+        // Pre-buffer
+        while (!ct.IsCancellationRequested
+               && _buffer.BufferedBytes < bytesPerSecond * PreBufferSeconds)
         {
-            "audio/aac" or "audio/aacp" or "audio/mp4" =>
-                new StreamMediaFoundationReader(stream),
-            _ => new Mp3FileReader(stream)
-        };
+            Mp3Frame? frame = Mp3Frame.LoadFromStream(mp3Source);
+            if (frame is null) { await Task.Delay(50, ct); continue; }
+            int decoded = _mp3Decompressor.DecompressFrame(frame, decodeBuffer, 0);
+            _buffer.AddSamples(decodeBuffer, 0, decoded);
+        }
+
+        SetBuffering(false);
+        _output.Play();
+
+        while (!ct.IsCancellationRequested)
+        {
+            Mp3Frame? frame = null;
+            try { frame = Mp3Frame.LoadFromStream(mp3Source); }
+            catch (Exception ex) when (ex is EndOfStreamException or IOException) { }
+
+            if (frame is not null)
+            {
+                int decoded = _mp3Decompressor.DecompressFrame(frame, decodeBuffer, 0);
+                _buffer.AddSamples(decodeBuffer, 0, decoded);
+                dryStopwatch.Reset();
+            }
+            else
+            {
+                if (!dryStopwatch.IsRunning) dryStopwatch.Start();
+
+                if (dryStopwatch.Elapsed.TotalSeconds >= TerminalNoBytesSeconds)
+                {
+                    PlaybackEnded?.Invoke(this, EventArgs.Empty);
+                    return;
+                }
+
+                await Task.Delay(100, ct);
+            }
+
+            double bufferedSec = _buffer.BufferedBytes / bytesPerSecond;
+
+            if (!IsBuffering && bufferedSec < BufferingTriggerSeconds)
+                SetBuffering(true);
+            else if (IsBuffering && bufferedSec >= ResumeAfterUnderflowSeconds)
+                SetBuffering(false);
+        }
     }
 
     private async Task PumpAsync(CancellationToken ct)
@@ -170,6 +254,7 @@ internal sealed class StreamingPlayback : IDisposable
         try { _output?.Stop(); } catch { }
         _output?.Dispose(); _output = null;
         (_decoded as IDisposable)?.Dispose(); _decoded = null;
+        _mp3Decompressor?.Dispose(); _mp3Decompressor = null;
         _buffer = null;
         _icy?.Dispose(); _icy = null;
         _cts?.Dispose(); _cts = null;
