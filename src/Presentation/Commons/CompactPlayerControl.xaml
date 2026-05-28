@@ -136,7 +136,7 @@
                                Visibility="{x:Bind PlayerViewModel.CurrentStreamTitle, Mode=OneWay, Converter={StaticResource StringToVisibilityConverter}}" />
                 </StackPanel>
 
-                <!-- Progress (music only) -->
+                <!-- Progress (music): elapsed / total -->
                 <ProgressBar Grid.Row="1"
                              Margin="12,4,12,8"
                              Minimum="0"
@@ -147,6 +147,15 @@
                              Foreground="{ThemeResource AccentFillColorDefaultBrush}"
                              Background="{ThemeResource ControlStrokeColorDefaultBrush}"
                              Visibility="{x:Bind PlayerViewModel.IsMusicMode, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" />
+
+                <!-- Buffering pulse (radio): visible only while the stream is rebuffering -->
+                <ProgressBar Grid.Row="1"
+                             Margin="12,4,12,8"
+                             IsIndeterminate="True"
+                             Height="2"
+                             Foreground="{ThemeResource BadgeLiveBrush}"
+                             Background="Transparent"
+                             Visibility="{x:Bind PlayerViewModel.IsBuffering, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" />
 
                 <!-- Controls -->
                 <CommandBar Grid.Row="2"
