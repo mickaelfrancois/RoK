@@ -208,6 +208,7 @@ public class PlayerService : IPlayerService, IDisposable
             _currentStreamTitle = title;
             _messenger.Send(new RadioMetadataChanged(title));
             _smtcService?.UpdateRadioMetadata(title);
+            _discordService?.UpdateRadioMetadata(title);
         };
 
         _callDetectionService.CallStateChanged += (s, inCall) =>
@@ -531,6 +532,7 @@ public class PlayerService : IPlayerService, IDisposable
         _player.Play();
         _messenger.Send(new RadioStationChanged(station));
         _smtcService?.UpdateRadioStation(station);
+        _discordService?.UpdateRadioStation(station);
     }
 
     private void StopForModeSwitch()
