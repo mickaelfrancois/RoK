@@ -11,9 +11,20 @@
           Padding="0"
           Background="Transparent"
           DoubleTapped="Grid_DoubleTapped">
+
+        <!-- Music background: artist / album cover -->
         <Image Source="{x:Bind PlayerViewModel.CurrentArtist.Picture, Mode=OneWay, TargetNullValue={Binding PlayerViewModel.MediaList.CurrentItem.Cover}}"
                Stretch="UniformToFill"
-               Opacity="0.55" />
+               Opacity="0.55"
+               Visibility="{x:Bind PlayerViewModel.IsMusicMode, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" />
+
+        <!-- Radio background: brand-coloured panel with a centred radio glyph -->
+        <Grid Background="{ThemeResource BrandPrimaryBrush}"
+              Visibility="{x:Bind PlayerViewModel.IsRadioMode, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">
+            <FontIcon Glyph="&#xE8D6;" FontFamily="Segoe Fluent Icons"
+                      FontSize="96" Foreground="White" Opacity="0.25"
+                      HorizontalAlignment="Center" VerticalAlignment="Center" />
+        </Grid>
 
         <Grid VerticalAlignment="Bottom"
               Height="130">
@@ -36,12 +47,13 @@
                     <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
 
-                <!-- Track info with shadowed text -->
+                <!-- Music info: track title + artist -->
                 <StackPanel Grid.Row="0"
                             Orientation="Vertical"
                             HorizontalAlignment="Center"
                             VerticalAlignment="Top"
-                            Margin="10,6,10,4">
+                            Margin="10,6,10,4"
+                            Visibility="{x:Bind PlayerViewModel.IsMusicMode, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">
 
                     <!-- Title shadow + text -->
                     <Grid>
@@ -88,7 +100,43 @@
                     </Grid>
                 </StackPanel>
 
-                <!-- Progress -->
+                <!-- Radio info: LIVE badge + station name + stream title -->
+                <StackPanel Grid.Row="0"
+                            Orientation="Vertical"
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Top"
+                            Margin="10,6,10,4"
+                            Spacing="4"
+                            Visibility="{x:Bind PlayerViewModel.IsRadioMode, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">
+
+                    <Border Background="{ThemeResource BadgeLiveBrush}"
+                            CornerRadius="4"
+                            HorizontalAlignment="Center"
+                            Padding="8,2">
+                        <TextBlock Text="LIVE" Foreground="White" FontSize="11" FontWeight="Bold" />
+                    </Border>
+
+                    <TextBlock Text="{x:Bind PlayerViewModel.CurrentStationName, Mode=OneWay}"
+                               Foreground="White"
+                               FontWeight="Bold"
+                               FontSize="22"
+                               TextWrapping="NoWrap"
+                               TextTrimming="CharacterEllipsis"
+                               MaxWidth="260"
+                               HorizontalAlignment="Center" />
+
+                    <TextBlock Text="{x:Bind PlayerViewModel.CurrentStreamTitle, Mode=OneWay}"
+                               Foreground="White"
+                               Opacity="0.85"
+                               FontSize="14"
+                               TextWrapping="NoWrap"
+                               TextTrimming="CharacterEllipsis"
+                               MaxWidth="260"
+                               HorizontalAlignment="Center"
+                               Visibility="{x:Bind PlayerViewModel.CurrentStreamTitle, Mode=OneWay, Converter={StaticResource StringToVisibilityConverter}}" />
+                </StackPanel>
+
+                <!-- Progress (music only) -->
                 <ProgressBar Grid.Row="1"
                              Margin="12,4,12,8"
                              Minimum="0"
@@ -97,7 +145,8 @@
                              IsIndeterminate="False"
                              Height="2"
                              Foreground="{ThemeResource AccentFillColorDefaultBrush}"
-                             Background="{ThemeResource ControlStrokeColorDefaultBrush}" />
+                             Background="{ThemeResource ControlStrokeColorDefaultBrush}"
+                             Visibility="{x:Bind PlayerViewModel.IsMusicMode, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" />
 
                 <!-- Controls -->
                 <CommandBar Grid.Row="2"
@@ -113,7 +162,8 @@
                                   Style="{StaticResource AppBarButtonRevealStyle}"
                                   Icon="Previous"
                                   Command="{x:Bind PlayerViewModel.SkipPreviousCommand}"
-                                  IsEnabled="{x:Bind PlayerViewModel.CanSkipPrevious, Mode=OneWay}" />
+                                  IsEnabled="{x:Bind PlayerViewModel.CanSkipPrevious, Mode=OneWay}"
+                                  Visibility="{x:Bind PlayerViewModel.IsMusicMode, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" />
 
                     <AppBarButton RequestedTheme="Dark"
                                   Style="{StaticResource AppBarButtonRevealStyle}"
@@ -125,7 +175,8 @@
                                   Style="{StaticResource AppBarButtonRevealStyle}"
                                   Icon="Next"
                                   Command="{x:Bind PlayerViewModel.SkipNextCommand}"
-                                  IsEnabled="{x:Bind PlayerViewModel.CanSkipNext, Mode=OneWay}" />
+                                  IsEnabled="{x:Bind PlayerViewModel.CanSkipNext, Mode=OneWay}"
+                                  Visibility="{x:Bind PlayerViewModel.IsMusicMode, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" />
                 </CommandBar>
             </Grid>
         </Grid>
