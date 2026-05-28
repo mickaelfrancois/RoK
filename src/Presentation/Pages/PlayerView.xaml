@@ -169,6 +169,7 @@
                         <Setter Target="currentTrack.Visibility" Value="Visible" />
                         <Setter Target="currentTrack.Width" Value="500" />
                         <Setter Target="currentTrack.HorizontalAlignment" Value="Left" />
+                        <Setter Target="radioPanel.Width" Value="500" />
                         <Setter Target="playerControls.Width" Value="350" />
                         <Setter Target="playerControls.HorizontalAlignment" Value="Center" />
                         <Setter Target="playerCommands.Width" Value="300" />
@@ -186,6 +187,7 @@
                         <Setter Target="currentTrack.Visibility" Value="Visible" />
                         <Setter Target="currentTrack.Width" Value="350" />
                         <Setter Target="currentTrack.HorizontalAlignment" Value="Left" />
+                        <Setter Target="radioPanel.Width" Value="350" />
                         <Setter Target="playerControls.Width" Value="300" />
                         <Setter Target="playerControls.HorizontalAlignment" Value="Center" />
                         <Setter Target="playerCommands.Width" Value="200" />
@@ -205,6 +207,7 @@
                         <Setter Target="currentTrack.Visibility" Value="Visible" />
                         <Setter Target="currentTrack.Width" Value="250" />
                         <Setter Target="currentTrack.HorizontalAlignment" Value="Left" />
+                        <Setter Target="radioPanel.Width" Value="250" />
                         <Setter Target="playerControls.Width" Value="250" />
                         <Setter Target="playerControls.HorizontalAlignment" Value="Center" />
                         <Setter Target="playerCommands.Visibility" Value="Collapsed" />
@@ -224,6 +227,7 @@
                     </VisualState.StateTriggers>
                     <VisualState.Setters>
                         <Setter Target="currentTrack.Visibility" Value="Collapsed" />
+                        <Setter Target="radioPanel.Visibility" Value="Collapsed" />
                         <Setter Target="playerControls.Width" Value="Auto" />
                         <Setter Target="playerControls.HorizontalAlignment" Value="Stretch" />
                         <Setter Target="playerControls.Margin" Value="0" />
@@ -425,11 +429,11 @@
             </CommandBar>
         </Grid>
 
-        <!-- Radio mode panel — takes the same slot as currentTrack so player controls remain visible -->
+        <!-- Radio mode panel — takes the same slot as currentTrack so player controls remain visible.
+             Width is driven by the same VisualStates as currentTrack. -->
         <Grid x:Name="radioPanel"
               Visibility="{x:Bind ViewModel.IsRadioMode, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}"
               HorizontalAlignment="Left" VerticalAlignment="Center"
-              Width="{x:Bind currentTrack.Width, Mode=OneWay}"
               ColumnSpacing="12">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="70" />
