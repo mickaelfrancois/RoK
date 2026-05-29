@@ -5,6 +5,7 @@
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
       xmlns:common="using:Rok.Commons"
+      xmlns:converters="using:Rok.Converters"
       xmlns:dto="using:Rok.Application.Dto"
       mc:Ignorable="d"
       x:Name="radiosView">
@@ -50,6 +51,15 @@
                     <TextBlock Text="LIVE" Foreground="White" FontSize="10" FontWeight="Bold" />
                 </Border>
 
+                <!-- Country flag badge (only when CountryCode is known) -->
+                <Border CornerRadius="2"
+                        HorizontalAlignment="Left" VerticalAlignment="Top"
+                        Margin="8,8,0,0"
+                        Visibility="{x:Bind CountryCode, Converter={StaticResource StringToVisibilityConverter}}">
+                    <Image Width="22" Height="15"
+                           Source="{x:Bind CountryCode, Converter={StaticResource CountryCodeToImageSourceConverter}}" />
+                </Border>
+
                 <Grid x:Name="gridBottom" Style="{StaticResource GridCoverBottomStyle}">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="{StaticResource GridBottomFirstRowHeight}" />
@@ -62,7 +72,7 @@
                                      Style="{StaticResource GridCoverButtonStyle}" />
 
                     <TextBlock Grid.Row="1"
-                               Text="{x:Bind StreamUrl}"
+                               Text="{x:Bind common:RadioDisplay.FormatTechnical(Codec, Bitrate)}"
                                Style="{StaticResource GridCoverBottomSecondLineStyle}"
                                Margin="4,6,0,0" />
                 </Grid>

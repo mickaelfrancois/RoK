@@ -88,7 +88,7 @@
                                            TextWrapping="NoWrap"/>
                                 <TextBlock Foreground="{ThemeResource TextFillColorSecondaryBrush}"
                                            FontSize="12"
-                                           Text="{x:Bind Codec, FallbackValue=''}"
+                                           Text="{x:Bind common:RadioDisplay.FormatTechnical(Codec, Bitrate)}"
                                            TextTrimming="CharacterEllipsis"
                                            TextWrapping="NoWrap"/>
                             </StackPanel>
