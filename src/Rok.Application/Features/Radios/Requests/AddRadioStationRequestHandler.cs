@@ -13,6 +13,11 @@ public class AddRadioStationRequestHandler(IRadioStationRepository repository, T
             Name = message.Name,
             StreamUrl = message.StreamUrl,
             HomepageUrl = message.HomepageUrl,
+            StationUuid = message.StationUuid,
+            FaviconUrl = message.FaviconUrl,
+            CountryCode = message.CountryCode,
+            Codec = message.Codec,
+            Bitrate = message.Bitrate,
             AddedAt = timeProvider.GetUtcNow().UtcDateTime
         };
 
