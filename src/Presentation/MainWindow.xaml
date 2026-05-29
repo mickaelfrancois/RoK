@@ -118,7 +118,7 @@
                         </NavigationViewItem>
                         <NavigationViewItem x:Uid="menuRadios" Tag="Radios" x:Name="radiosItem">
                             <NavigationViewItem.Icon>
-                                <FontIcon Glyph="&#xF623;" FontFamily="Segoe Fluent Icons" />
+                                <FontIcon Glyph="&#xE704;" FontFamily="Segoe Fluent Icons" />
                             </NavigationViewItem.Icon>
                         </NavigationViewItem>
 
