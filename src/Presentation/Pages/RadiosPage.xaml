@@ -29,6 +29,13 @@
                                 <SymbolIcon Symbol="Edit" />
                             </MenuFlyoutItem.Icon>
                         </MenuFlyoutItem>
+                        <MenuFlyoutItem x:Uid="radiosFlyoutPickImage"
+                                        Click="OnPickImageMenuClick"
+                                        Tag="{x:Bind}">
+                            <MenuFlyoutItem.Icon>
+                                <SymbolIcon Symbol="Pictures" />
+                            </MenuFlyoutItem.Icon>
+                        </MenuFlyoutItem>
                         <MenuFlyoutItem x:Uid="radiosFlyoutDelete"
                                         Click="OnDeleteMenuClick"
                                         Tag="{x:Bind}">

@@ -4,6 +4,7 @@ using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Navigation;
 using Rok.Dialogs;
 using Rok.ViewModels.Radio;
+using Rok.ViewModels.Radio.Services;
 
 namespace Rok.Pages;
 
@@ -88,6 +89,18 @@ public sealed partial class RadiosPage : Page
         ContentDialogResult result = await dialog.ShowAsync();
         if (result == ContentDialogResult.Primary && dialog.Saved)
             await ViewModel.LoadAsync();
+    }
+
+    private async void OnPickImageMenuClick(object sender, RoutedEventArgs e)
+    {
+        if (sender is not MenuFlyoutItem { Tag: RadioTileViewModel tile })
+            return;
+
+        RadioPictureService pictureService = App.ServiceProvider.GetRequiredService<RadioPictureService>();
+        BitmapImage? picked = await pictureService.SelectAndSavePictureAsync(tile.Id);
+
+        if (picked is not null)
+            tile.ReloadPicture();
     }
 
     private async void OnDeleteMenuClick(object sender, RoutedEventArgs e)
