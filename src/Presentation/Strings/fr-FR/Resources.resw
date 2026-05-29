@@ -1941,4 +1941,43 @@
   <data name="radioErrorUnknown" xml:space="preserve">
     <value>Erreur inconnue.</value>
   </data>
+  <data name="radiosSearch.[Label]" xml:space="preserve">
+    <value>Rechercher</value>
+  </data>
+  <data name="radiosSearch.[ToolTipService.ToolTip]" xml:space="preserve">
+    <value>Rechercher des webradios</value>
+  </data>
+  <data name="searchRadioDialog.Title" xml:space="preserve">
+    <value>Rechercher une webradio</value>
+  </data>
+  <data name="searchRadioDialog.CloseButtonText" xml:space="preserve">
+    <value>Fermer</value>
+  </data>
+  <data name="searchRadioQuery.PlaceholderText" xml:space="preserve">
+    <value>Nom de la station...</value>
+  </data>
+  <data name="searchRadioSubmit.[ToolTipService.ToolTip]" xml:space="preserve">
+    <value>Rechercher</value>
+  </data>
+  <data name="searchRadioPlay.[ToolTipService.ToolTip]" xml:space="preserve">
+    <value>Lire</value>
+  </data>
+  <data name="searchRadioAdd.[ToolTipService.ToolTip]" xml:space="preserve">
+    <value>Ajouter aux favoris</value>
+  </data>
+  <data name="searchRadioNoResults.Message" xml:space="preserve">
+    <value>Aucun résultat. Essaie un autre nom.</value>
+  </data>
+  <data name="error.radio.search_failed" xml:space="preserve">
+    <value>Impossible de joindre Radio-Browser. Vérifie ta connexion.</value>
+  </data>
+  <data name="error.radio.search_timeout" xml:space="preserve">
+    <value>La recherche a expiré, réessaie.</value>
+  </data>
+  <data name="radioFavoriteAdded" xml:space="preserve">
+    <value>Ajoutée aux favoris.</value>
+  </data>
+  <data name="radioFavoriteDuplicate" xml:space="preserve">
+    <value>Cette station est déjà dans tes favoris.</value>
+  </data>
 </root>
