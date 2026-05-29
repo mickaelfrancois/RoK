@@ -78,10 +78,15 @@
                             </Border>
 
                             <StackPanel Grid.Column="1" VerticalAlignment="Center">
-                                <TextBlock Text="{x:Bind Name}" FontWeight="SemiBold"/>
+                                <TextBlock Text="{x:Bind Name}"
+                                           FontWeight="SemiBold"
+                                           TextTrimming="CharacterEllipsis"
+                                           TextWrapping="NoWrap"/>
                                 <TextBlock Foreground="{ThemeResource TextFillColorSecondaryBrush}"
                                            FontSize="12"
-                                           Text="{x:Bind Codec, FallbackValue=''}"/>
+                                           Text="{x:Bind Codec, FallbackValue=''}"
+                                           TextTrimming="CharacterEllipsis"
+                                           TextWrapping="NoWrap"/>
                             </StackPanel>
 
                             <Image Grid.Column="2" Width="20" Height="14"
