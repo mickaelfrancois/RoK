@@ -2,7 +2,6 @@ using CleanArch.DevKit.Mediator;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Navigation;
-using Rok.Application.Dto;
 using Rok.Dialogs;
 using Rok.ViewModels.Radio;
 
@@ -71,18 +70,18 @@ public sealed partial class RadiosPage : Page
 
     private void OnTileNameClick(object sender, RoutedEventArgs e)
     {
-        if (sender is FrameworkElement { Tag: RadioStationDto station })
-            _ = ViewModel.PlayCommand.ExecuteAsync(station);
+        if (sender is FrameworkElement { Tag: RadioTileViewModel tile })
+            _ = ViewModel.PlayCommand.ExecuteAsync(tile);
     }
 
     private async void OnEditMenuClick(object sender, RoutedEventArgs e)
     {
-        if (sender is not MenuFlyoutItem { Tag: RadioStationDto station })
+        if (sender is not MenuFlyoutItem { Tag: RadioTileViewModel tile })
             return;
 
         AddRadioStationDialog dialog = new(
             App.ServiceProvider.GetRequiredService<IMediator>(),
-            station)
+            tile.Station)
         {
             XamlRoot = XamlRoot
         };
@@ -93,14 +92,14 @@ public sealed partial class RadiosPage : Page
 
     private async void OnDeleteMenuClick(object sender, RoutedEventArgs e)
     {
-        if (sender is not MenuFlyoutItem { Tag: RadioStationDto station })
+        if (sender is not MenuFlyoutItem { Tag: RadioTileViewModel tile })
             return;
 
         ContentDialog dialog = new()
         {
             XamlRoot = XamlRoot,
             Title = _resourceLoader.GetString("DeleteConfirmationTitle"),
-            Content = string.Format(_resourceLoader.GetString("radiosDeleteConfirmation"), station.Name),
+            Content = string.Format(_resourceLoader.GetString("radiosDeleteConfirmation"), tile.Name),
             PrimaryButtonText = _resourceLoader.GetString("YesButton"),
             CloseButtonText = _resourceLoader.GetString("CancelButton"),
             DefaultButton = ContentDialogButton.Close
@@ -108,6 +107,6 @@ public sealed partial class RadiosPage : Page
 
         ContentDialogResult result = await dialog.ShowAsync();
         if (result == ContentDialogResult.Primary)
-            await ViewModel.DeleteCommand.ExecuteAsync(station);
+            await ViewModel.DeleteCommand.ExecuteAsync(tile);
     }
 }
