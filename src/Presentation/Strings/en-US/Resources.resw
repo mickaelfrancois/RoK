@@ -1864,6 +1864,9 @@
   <data name="radiosFlyoutPlay.Text" xml:space="preserve">
     <value>Play</value>
   </data>
+  <data name="radiosFlyoutEdit.Text" xml:space="preserve">
+    <value>Edit</value>
+  </data>
   <data name="radiosFlyoutDelete.Text" xml:space="preserve">
     <value>Delete</value>
   </data>
@@ -1884,6 +1887,12 @@
   </data>
   <data name="addRadioDialog.CloseButtonText" xml:space="preserve">
     <value>Cancel</value>
+  </data>
+  <data name="editRadioDialog.Title" xml:space="preserve">
+    <value>Edit webradio</value>
+  </data>
+  <data name="editRadioDialog.PrimaryButtonText" xml:space="preserve">
+    <value>Save</value>
   </data>
   <data name="addRadioName.Header" xml:space="preserve">
     <value>Name</value>
