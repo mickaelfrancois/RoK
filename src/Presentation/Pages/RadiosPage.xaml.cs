@@ -57,7 +57,9 @@ public sealed partial class RadiosPage : Page
         };
 
         await dialog.ShowAsync();
-        await ViewModel.LoadAsync();
+
+        if (dialog.DidAddFavorite)
+            await ViewModel.LoadAsync();
     }
 
     private async void OnPlayUrlClick(object sender, RoutedEventArgs e)

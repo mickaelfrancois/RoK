@@ -56,8 +56,7 @@
 
             <ListView ItemsSource="{x:Bind ViewModel.Results}"
                       SelectionMode="None"
-                      IsItemClickEnabled="True"
-                      ItemClick="OnResultItemClick"
+                      IsItemClickEnabled="False"
                       HorizontalContentAlignment="Stretch">
                 <ListView.ItemContainerStyle>
                     <Style TargetType="ListViewItem">

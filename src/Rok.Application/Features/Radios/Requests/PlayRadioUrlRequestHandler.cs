@@ -1,6 +1,3 @@
-using CleanArch.DevKit.Mediator;
-using CleanArch.DevKit.Mediator.Results;
-using Rok.Application.Dto;
 using Rok.Application.Features.Radios.Services;
 using Rok.Application.Player;
 
@@ -8,7 +5,8 @@ namespace Rok.Application.Features.Radios.Requests;
 
 public class PlayRadioUrlRequestHandler(
     IRadioStreamUrlResolver resolver,
-    IPlayerService playerService)
+    IPlayerService playerService,
+    TimeProvider timeProvider)
     : IRequestHandler<PlayRadioUrlRequest, Result<bool>>
 {
     public async Task<Result<bool>> Handle(PlayRadioUrlRequest message, CancellationToken cancellationToken)
@@ -28,7 +26,7 @@ public class PlayRadioUrlRequestHandler(
             CountryCode: null,
             Codec: null,
             Bitrate: null,
-            AddedAt: DateTime.UtcNow,
+            AddedAt: timeProvider.GetUtcNow().UtcDateTime,
             LastListen: null);
 
         playerService.PlayRadioStation(adHoc);

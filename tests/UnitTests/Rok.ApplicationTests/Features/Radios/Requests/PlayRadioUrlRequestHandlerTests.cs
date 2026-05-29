@@ -15,7 +15,7 @@ public class PlayRadioUrlRequestHandlerTests
         resolver.Setup(r => r.ResolveAsync("http://radio/stream.pls", It.IsAny<CancellationToken>()))
                 .ReturnsAsync(Result<string>.Ok("http://stream/audio.mp3"));
         Mock<IPlayerService> player = new();
-        PlayRadioUrlRequestHandler handler = new(resolver.Object, player.Object);
+        PlayRadioUrlRequestHandler handler = new(resolver.Object, player.Object, TimeProvider.System);
 
         // Act
         Result<bool> result = await handler.Handle(new PlayRadioUrlRequest { Url = "http://radio/stream.pls" }, CancellationToken.None);
@@ -33,7 +33,7 @@ public class PlayRadioUrlRequestHandlerTests
         resolver.Setup(r => r.ResolveAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(Result<string>.Fail(new OperationError("radio.hls_unsupported", "HLS not supported.")));
         Mock<IPlayerService> player = new();
-        PlayRadioUrlRequestHandler handler = new(resolver.Object, player.Object);
+        PlayRadioUrlRequestHandler handler = new(resolver.Object, player.Object, TimeProvider.System);
 
         // Act
         Result<bool> result = await handler.Handle(new PlayRadioUrlRequest { Url = "http://radio/live.m3u8" }, CancellationToken.None);

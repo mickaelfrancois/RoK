@@ -23,10 +23,12 @@ public sealed partial class SearchRadioStationsViewModel : ObservableObject
     private readonly RadioPictureService _pictureService;
 
     [ObservableProperty]
+    [NotifyCanExecuteChangedFor(nameof(SearchCommand))]
     public partial string Query { get; set; } = string.Empty;
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(HasNoResults))]
+    [NotifyCanExecuteChangedFor(nameof(SearchCommand))]
     public partial bool IsSearching { get; set; }
 
     [ObservableProperty]
@@ -69,6 +71,7 @@ public sealed partial class SearchRadioStationsViewModel : ObservableObject
     private async Task SearchAsync(CancellationToken ct)
     {
         IsSearching = true;
+        HasSearched = false;
         ErrorMessage = null;
         FeedbackMessage = null;
         FeedbackKind = SearchFeedbackKind.None;
@@ -80,6 +83,9 @@ public sealed partial class SearchRadioStationsViewModel : ObservableObject
                 await _mediator.Send(
                     new SearchRadioStationsRequest { Query = Query.Trim(), Limit = 50 },
                     ct);
+
+            if (ct.IsCancellationRequested)
+                return;
 
             HasSearched = true;
 
@@ -122,7 +128,7 @@ public sealed partial class SearchRadioStationsViewModel : ObservableObject
         if (result.IsSuccess)
         {
             SetFeedback(_resourceLoader.GetString("radioFavoriteAdded"), SearchFeedbackKind.Success);
-            _ = DownloadPictureInBackgroundAsync(result.Value, r.FaviconUrl);
+            _ = _pictureService.DownloadAndSaveAsync(result.Value, r.FaviconUrl ?? string.Empty);
         }
         else if (result.Errors.FirstOrDefault() is ConflictError)
         {
@@ -134,18 +140,11 @@ public sealed partial class SearchRadioStationsViewModel : ObservableObject
         }
     }
 
-    private async Task DownloadPictureInBackgroundAsync(long stationId, string? faviconUrl)
-    {
-        if (string.IsNullOrWhiteSpace(faviconUrl))
-            return;
-
-        await _pictureService.DownloadAndSaveAsync(stationId, faviconUrl);
-    }
-
     private void SetFeedback(string message, SearchFeedbackKind kind)
     {
-        FeedbackMessage = message;
+        // FeedbackKind set first so subscribers reading FeedbackMessage notice the correct severity.
         FeedbackKind = kind;
+        FeedbackMessage = message;
     }
 
     public void ClearFeedback()

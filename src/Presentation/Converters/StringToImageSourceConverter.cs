@@ -1,3 +1,5 @@
+using Rok.Application.Validation;
+
 namespace Rok.Converters;
 
 public partial class StringToImageSourceConverter : IValueConverter
@@ -6,18 +8,12 @@ public partial class StringToImageSourceConverter : IValueConverter
     {
         string? url = (value as string)?.Trim();
 
-        if (string.IsNullOrWhiteSpace(url))
-            return null;
-
-        if (!Uri.TryCreate(url, UriKind.Absolute, out Uri? uri))
-            return null;
-
-        if (uri.Scheme != Uri.UriSchemeHttp && uri.Scheme != Uri.UriSchemeHttps)
+        if (!HttpUriValidation.IsAbsoluteHttpUri(url))
             return null;
 
         try
         {
-            return new BitmapImage(uri);
+            return new BitmapImage(new Uri(url!));
         }
         catch
         {

@@ -17,11 +17,6 @@ public sealed class UpdateRadioStationRequestValidator : Validator<UpdateRadioSt
     {
         Rule(x => x.Id).Must(id => id > 0).Message("Id must be positive.");
         Rule(x => x.Name).Required().MaxLength(200);
-        Rule(x => x.StreamUrl).Required().Must(BeAbsoluteHttpUri).Message("Must be an absolute http(s) URL.");
+        Rule(x => x.StreamUrl).Required().Must(HttpUriValidation.IsAbsoluteHttpUri).Message("Must be an absolute http(s) URL.");
     }
-
-    private static bool BeAbsoluteHttpUri(string? value) =>
-        value is not null &&
-        Uri.TryCreate(value, UriKind.Absolute, out Uri? uri) &&
-        (uri.Scheme == Uri.UriSchemeHttp || uri.Scheme == Uri.UriSchemeHttps);
 }

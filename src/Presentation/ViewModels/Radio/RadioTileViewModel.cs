@@ -26,7 +26,7 @@ public sealed partial class RadioTileViewModel : ObservableObject
     {
         Station = station;
         _pictureService = pictureService;
-        Picture = _pictureService.LoadPicture(station.Id);
+        ReloadPicture();
     }
 
     public void ReloadPicture()

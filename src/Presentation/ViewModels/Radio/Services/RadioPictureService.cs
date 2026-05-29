@@ -17,10 +17,11 @@ public class RadioPictureService(
     {
         try
         {
-            if (!radioPicture.PictureFileExists(stationId))
+            string filePath = radioPicture.GetPictureFile(stationId);
+
+            if (!File.Exists(filePath))
                 return null;
 
-            string filePath = radioPicture.GetPictureFile(stationId);
             return new BitmapImage(new Uri(filePath, UriKind.Absolute));
         }
         catch (Exception ex)
@@ -68,31 +69,31 @@ public class RadioPictureService(
             (uri.Scheme != Uri.UriSchemeHttp && uri.Scheme != Uri.UriSchemeHttps))
             return false;
 
+        string destinationPath = radioPicture.GetPictureFile(stationId);
+
         try
         {
             using HttpClient http = httpClientFactory.CreateClient();
             http.Timeout = DownloadTimeout;
 
-            using HttpResponseMessage response = await http.GetAsync(uri, cancellationToken);
+            using HttpResponseMessage response = await http.GetAsync(uri, HttpCompletionOption.ResponseHeadersRead, cancellationToken);
             response.EnsureSuccessStatusCode();
 
-            byte[] bytes = await response.Content.ReadAsByteArrayAsync(cancellationToken);
-            if (bytes.Length == 0)
+            // The @Radios folder is created once by RadioPicture's ctor — no need to re-create it here.
+            await using FileStream destination = File.Create(destinationPath);
+            await response.Content.CopyToAsync(destination, cancellationToken);
+
+            if (destination.Length == 0)
+            {
+                destination.Close();
+                File.Delete(destinationPath);
                 return false;
-
-            string destinationPath = radioPicture.GetPictureFile(stationId);
-            string? folderPath = Path.GetDirectoryName(destinationPath);
-
-            if (string.IsNullOrEmpty(folderPath))
-                return false;
-
-            Directory.CreateDirectory(folderPath);
-            await File.WriteAllBytesAsync(destinationPath, bytes, cancellationToken);
+            }
 
             logger.LogDebug("Cached radio picture for station {StationId} from {Url}", stationId, url);
             return true;
         }
-        catch (Exception ex) when (ex is HttpRequestException or TaskCanceledException or IOException)
+        catch (Exception ex)
         {
             logger.LogWarning(ex, "Failed to download picture for radio station {StationId} from {Url}", stationId, url);
             return false;
