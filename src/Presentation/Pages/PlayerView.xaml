@@ -169,11 +169,11 @@
                         <Setter Target="currentTrack.Visibility" Value="Visible" />
                         <Setter Target="currentTrack.Width" Value="500" />
                         <Setter Target="currentTrack.HorizontalAlignment" Value="Left" />
+                        <Setter Target="radioPanel.Width" Value="500" />
                         <Setter Target="playerControls.Width" Value="350" />
                         <Setter Target="playerControls.HorizontalAlignment" Value="Center" />
                         <Setter Target="playerCommands.Width" Value="300" />
                         <Setter Target="playerCommands.Visibility" Value="Visible" />
-                        <Setter Target="trackScore.Visibility" Value="Visible" />
                         <Setter Target="trackColumn.Width" Value="430" />
                     </VisualState.Setters>
                 </VisualState>
@@ -186,6 +186,7 @@
                         <Setter Target="currentTrack.Visibility" Value="Visible" />
                         <Setter Target="currentTrack.Width" Value="350" />
                         <Setter Target="currentTrack.HorizontalAlignment" Value="Left" />
+                        <Setter Target="radioPanel.Width" Value="350" />
                         <Setter Target="playerControls.Width" Value="300" />
                         <Setter Target="playerControls.HorizontalAlignment" Value="Center" />
                         <Setter Target="playerCommands.Width" Value="200" />
@@ -205,6 +206,7 @@
                         <Setter Target="currentTrack.Visibility" Value="Visible" />
                         <Setter Target="currentTrack.Width" Value="250" />
                         <Setter Target="currentTrack.HorizontalAlignment" Value="Left" />
+                        <Setter Target="radioPanel.Width" Value="250" />
                         <Setter Target="playerControls.Width" Value="250" />
                         <Setter Target="playerControls.HorizontalAlignment" Value="Center" />
                         <Setter Target="playerCommands.Visibility" Value="Collapsed" />
@@ -224,6 +226,7 @@
                     </VisualState.StateTriggers>
                     <VisualState.Setters>
                         <Setter Target="currentTrack.Visibility" Value="Collapsed" />
+                        <Setter Target="radioPanel.Visibility" Value="Collapsed" />
                         <Setter Target="playerControls.Width" Value="Auto" />
                         <Setter Target="playerControls.HorizontalAlignment" Value="Stretch" />
                         <Setter Target="playerControls.Margin" Value="0" />
@@ -244,7 +247,8 @@
         </Grid>
 
         <!-- Current track info -->
-        <Grid x:Name="currentTrack">
+        <Grid x:Name="currentTrack"
+              Visibility="{x:Bind ViewModel.IsMusicMode, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">
             <VisualStateManager.VisualStateGroups>
                 <VisualStateGroup x:Name="visualChangeGroup">
                     <VisualState x:Name="changeTrackTitleAnimation">
@@ -296,16 +300,16 @@
 
                 <!--Title line-->
                 <StackPanel x:Name="trackTitleLine" Grid.Column="1" Grid.Row="0" Orientation="Horizontal" Margin="6,0,0,0">
-                    <HyperlinkButton Grid.Column="0" x:Name="trackTitle" HorizontalAlignment="Left" HorizontalContentAlignment="Left" MinWidth="100" MaxWidth="200" Style="{StaticResource MiniLinkStyle}" Command="{x:Bind ViewModel.CurrentTrack.TrackOpenCommand, Mode=OneWay}" Content="{x:Bind ViewModel.CurrentTrack.Title, Mode=OneWay}" ContentTemplate="{StaticResource EllipsisTemplate}" ToolTipService.ToolTip="{x:Bind ViewModel.CurrentTrack.Title, Mode=OneWay}" />
-                    <commons:RatingControlDarkControl x:Name="trackScore" Margin="30,0,0,0" HorizontalAlignment="Right" InitialValue="{x:Bind ViewModel.CurrentTrack.Score, Mode=OneWay}" Value="{x:Bind ViewModel.CurrentTrack.Score, Mode=TwoWay}" Width="150" VerticalAlignment="Center">
+                    <HyperlinkButton Grid.Column="0" x:Name="trackTitle" HorizontalAlignment="Left" HorizontalContentAlignment="Left" MinWidth="100" MaxWidth="200" Style="{StaticResource MiniLinkStyle}" Command="{x:Bind ViewModel.CurrentTrack.TrackOpenCommand, Mode=OneWay}" Content="{x:Bind ViewModel.CurrentTrack.Title, Mode=OneWay, FallbackValue=''}" ContentTemplate="{StaticResource EllipsisTemplate}" ToolTipService.ToolTip="{x:Bind ViewModel.CurrentTrack.Title, Mode=OneWay, FallbackValue=''}" Visibility="{x:Bind ViewModel.IsMusicMode, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" />
+                    <commons:RatingControlDarkControl x:Name="trackScore" Margin="30,0,0,0" HorizontalAlignment="Right" InitialValue="{x:Bind ViewModel.CurrentTrack.Score, Mode=OneWay}" Value="{x:Bind ViewModel.CurrentTrack.Score, Mode=TwoWay}" Width="150" VerticalAlignment="Center" Visibility="{x:Bind ViewModel.IsMusicMode, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">
                     </commons:RatingControlDarkControl>
                 </StackPanel>
 
                 <!--Track info line-->
                 <StackPanel Grid.Column="1" Grid.Row="1" Orientation="Horizontal" Margin="6,0,0,0">
-                    <HyperlinkButton Style="{StaticResource MiniLinkStyle}" x:Name="trackArtist" MaxWidth="200" Command="{x:Bind ViewModel.CurrentTrack.ArtistOpenCommand, Mode=OneWay}" Content="{x:Bind ViewModel.CurrentTrack.ArtistName, Mode=OneWay}" ContentTemplate="{StaticResource EllipsisTemplate}" ToolTipService.ToolTip="{x:Bind ViewModel.CurrentTrack.ArtistName, Mode=OneWay}" />
-                    <TextBlock Text="•" Foreground="White" FontSize="12" VerticalAlignment="Center" Margin="6,0,6,0" />
-                    <HyperlinkButton Style="{StaticResource MiniLinkStyle}" x:Name="trackAlbum" MaxWidth="200" Command="{x:Bind ViewModel.CurrentTrack.AlbumOpenCommand, Mode=OneWay}" Content="{x:Bind ViewModel.CurrentTrack.AlbumName, Mode=OneWay}" ContentTemplate="{StaticResource EllipsisTemplate}" ToolTipService.ToolTip="{x:Bind ViewModel.CurrentTrack.AlbumName, Mode=OneWay}" />
+                    <HyperlinkButton Style="{StaticResource MiniLinkStyle}" x:Name="trackArtist" MaxWidth="200" Command="{x:Bind ViewModel.CurrentTrack.ArtistOpenCommand, Mode=OneWay}" Content="{x:Bind ViewModel.CurrentTrack.ArtistName, Mode=OneWay, FallbackValue=''}" ContentTemplate="{StaticResource EllipsisTemplate}" ToolTipService.ToolTip="{x:Bind ViewModel.CurrentTrack.ArtistName, Mode=OneWay, FallbackValue=''}" Visibility="{x:Bind ViewModel.IsMusicMode, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" />
+                    <TextBlock Text="•" Foreground="White" FontSize="12" VerticalAlignment="Center" Margin="6,0,6,0" Visibility="{x:Bind ViewModel.IsMusicMode, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" />
+                    <HyperlinkButton Style="{StaticResource MiniLinkStyle}" x:Name="trackAlbum" MaxWidth="200" Command="{x:Bind ViewModel.CurrentTrack.AlbumOpenCommand, Mode=OneWay}" Content="{x:Bind ViewModel.CurrentTrack.AlbumName, Mode=OneWay, FallbackValue=''}" ContentTemplate="{StaticResource EllipsisTemplate}" ToolTipService.ToolTip="{x:Bind ViewModel.CurrentTrack.AlbumName, Mode=OneWay, FallbackValue=''}" Visibility="{x:Bind ViewModel.IsMusicMode, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" />
                 </StackPanel>
             </Grid>
         </Grid>
@@ -327,9 +331,10 @@
                     <ColumnDefinition Width="60"></ColumnDefinition>
                 </Grid.ColumnDefinitions>
 
-                <TextBlock Grid.Column="0" Text="{x:Bind ViewModel.ListenDurationStr, Mode=OneWay}" Foreground="White" HorizontalAlignment="Right" Margin="0,0,10,0" VerticalAlignment="Center" FontSize="14" />
-                <Slider x:Name="progressSlider" Grid.Column="1" Margin="0,2,0,0" VerticalAlignment="Center" HorizontalAlignment="Stretch" Value="{x:Bind ViewModel.ListenDuration, Mode=OneWay, Converter={StaticResource TimeSpanToDoubleConverter}}" Maximum="{x:Bind ViewModel.DurationTotal, Mode=OneWay, Converter={StaticResource TimeSpanToDoubleConverter}}" ThumbToolTipValueConverter="{StaticResource DoubleToTimespanConverter}" IsThumbToolTipEnabled="True" LargeChange="7" SmallChange="5" PointerCaptureLost="Slider_PointerCaptureLost" ManipulationStarted="Slider_ManipulationStarted" ManipulationMode="All" />
-                <TextBlock Grid.Column="2" Text="{x:Bind ViewModel.DurationTotalStr, Mode=OneWay}" Foreground="White" HorizontalAlignment="Left" Margin="10,0,0,0" VerticalAlignment="Center" FontSize="14" />
+                <TextBlock Grid.Column="0" Text="{x:Bind ViewModel.ListenDurationStr, Mode=OneWay}" Foreground="White" HorizontalAlignment="Right" Margin="0,0,10,0" VerticalAlignment="Center" FontSize="14" Visibility="{x:Bind ViewModel.IsMusicMode, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" />
+                <Slider x:Name="progressSlider" Grid.Column="1" Margin="0,2,0,0" VerticalAlignment="Center" HorizontalAlignment="Stretch" Visibility="{x:Bind ViewModel.IsMusicMode, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" Value="{x:Bind ViewModel.ListenDuration, Mode=OneWay, Converter={StaticResource TimeSpanToDoubleConverter}}" Maximum="{x:Bind ViewModel.DurationTotal, Mode=OneWay, Converter={StaticResource TimeSpanToDoubleConverter}}" ThumbToolTipValueConverter="{StaticResource DoubleToTimespanConverter}" IsThumbToolTipEnabled="True" LargeChange="7" SmallChange="5" PointerCaptureLost="Slider_PointerCaptureLost" ManipulationStarted="Slider_ManipulationStarted" ManipulationMode="All" />
+                <ProgressBar Grid.Column="1" Margin="0,2,0,0" VerticalAlignment="Center" HorizontalAlignment="Stretch" Height="2" IsIndeterminate="True" Foreground="{ThemeResource BadgeLiveBrush}" Background="Transparent" Visibility="{x:Bind ViewModel.IsBuffering, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" />
+                <TextBlock Grid.Column="2" Text="{x:Bind ViewModel.DurationTotalStr, Mode=OneWay}" Foreground="White" HorizontalAlignment="Left" Margin="10,0,0,0" VerticalAlignment="Center" FontSize="14" Visibility="{x:Bind ViewModel.IsMusicMode, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" />
             </Grid>
 
 
@@ -358,7 +363,8 @@
         <!-- Player extra commands -->
         <Grid x:Name="playerCommands" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="0,0,4,0">
             <CommandBar HorizontalAlignment="Right" Background="Transparent" DefaultLabelPosition="Collapsed" RequestedTheme="Dark">
-                <AppBarButton Icon="MusicInfo" Command="{x:Bind ViewModel.OpenListeningCommand}" Foreground="White">
+                <AppBarButton Icon="MusicInfo" Command="{x:Bind ViewModel.OpenListeningCommand}" Foreground="White"
+                              Visibility="{x:Bind ViewModel.IsMusicMode, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">
                     <ToolTipService.ToolTip>
                         <TextBlock x:Uid="PlayerCurrentListeningToolTips" Text="Show current playlist" />
                     </ToolTipService.ToolTip>
@@ -391,7 +397,8 @@
                         </AppBarButton.Icon>
                     </AppBarButton>
 
-                    <AppBarButton x:Uid="playerFullscreenAppBarButton" Command="{x:Bind ViewModel.FullscreenCommand}">
+                    <AppBarButton x:Uid="playerFullscreenAppBarButton" Command="{x:Bind ViewModel.FullscreenCommand}"
+                                  Visibility="{x:Bind ViewModel.IsMusicMode, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">
                         <AppBarButton.Icon>
                             <SymbolIcon Symbol="FullScreen" />
                         </AppBarButton.Icon>
@@ -422,6 +429,45 @@
                     </AppBarButton>
                 </CommandBar.SecondaryCommands>
             </CommandBar>
+        </Grid>
+
+        <!-- Radio mode panel — takes the same slot as currentTrack so player controls remain visible.
+             Width is driven by the same VisualStates as currentTrack. -->
+        <Grid x:Name="radioPanel"
+              Visibility="{x:Bind ViewModel.IsRadioMode, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}"
+              HorizontalAlignment="Left" VerticalAlignment="Center"
+              ColumnSpacing="12">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="70" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+            <Border Grid.Column="0" CornerRadius="4" Width="70" Height="70"
+                    Background="{ThemeResource BadgeLiveBrush}">
+                <Grid>
+                    <FontIcon Glyph="&#xE8D6;" FontFamily="Segoe Fluent Icons"
+                              FontSize="32" Foreground="White"
+                              HorizontalAlignment="Center" VerticalAlignment="Center" />
+                    <Image Source="{x:Bind ViewModel.CurrentStationImage, Mode=OneWay}"
+                           Stretch="UniformToFill" />
+                </Grid>
+            </Border>
+            <StackPanel Grid.Column="1" Orientation="Vertical" VerticalAlignment="Center" Spacing="2" Margin="6,0,0,0">
+                <StackPanel Orientation="Horizontal" Spacing="6">
+                    <Border Background="{ThemeResource BadgeLiveBrush}" CornerRadius="4" Padding="6,1">
+                        <TextBlock Text="LIVE" Foreground="White" FontSize="10" FontWeight="Bold" />
+                    </Border>
+                    <TextBlock x:Uid="playerBuffering" FontSize="11" Foreground="White" Opacity="0.7"
+                               VerticalAlignment="Center"
+                               Visibility="{x:Bind ViewModel.IsBuffering, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" />
+                </StackPanel>
+                <TextBlock Text="{x:Bind ViewModel.CurrentStationName, Mode=OneWay, TargetNullValue=''}"
+                           FontSize="14" FontWeight="SemiBold" Foreground="White"
+                           TextTrimming="CharacterEllipsis" />
+                <TextBlock Text="{x:Bind ViewModel.CurrentStreamTitle, Mode=OneWay, TargetNullValue=''}"
+                           FontSize="12" Foreground="White" Opacity="0.8"
+                           TextTrimming="CharacterEllipsis"
+                           Visibility="{x:Bind ViewModel.CurrentStreamTitle, Mode=OneWay, Converter={StaticResource StringToVisibilityConverter}}" />
+            </StackPanel>
         </Grid>
     </Grid>
 </UserControl>

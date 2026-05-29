@@ -1,5 +1,5 @@
-﻿using Microsoft.Extensions.Logging;
-using CleanArch.DevKit.Guards;
+﻿using CleanArch.DevKit.Guards;
+using Microsoft.Extensions.Logging;
 using Rok.Application.Interfaces;
 using Rok.Application.Interfaces.Pictures;
 using Rok.Application.Messages;
@@ -11,6 +11,12 @@ namespace Rok.Application.Player;
 public class PlayerService : IPlayerService, IDisposable
 {
     private EPlaybackState _playerState = EPlaybackState.Stopped;
+
+    private EPlaybackMode _mode = EPlaybackMode.None;
+
+    private RadioStationDto? _currentStation;
+
+    private string? _currentStreamTitle;
 
     private readonly IDiscordRichPresenceService? _discordService;
 
@@ -33,6 +39,8 @@ public class PlayerService : IPlayerService, IDisposable
     private static readonly TimeSpan KCallReconciliationWindow = TimeSpan.FromSeconds(3);
 
     private volatile bool _isCrossfadeRunning;
+
+    private bool _lastIsBuffering;
 
     private ITimer? _smtcTimelineTimer;
 
@@ -68,15 +76,21 @@ public class PlayerService : IPlayerService, IDisposable
     public double Position
     {
         get => _player.Position;
-        set => Task.Run(() =>
+        set
         {
-            double seek = Math.Max(0, value);
+            if (_mode == EPlaybackMode.Radio)
+                return;
 
-            if (PlaybackState == EPlaybackState.Paused || PlaybackState == EPlaybackState.Ended)
-                Play();
+            Task.Run(() =>
+            {
+                double seek = Math.Max(0, value);
 
-            _player.SetPosition(seek);
-        });
+                if (PlaybackState == EPlaybackState.Paused || PlaybackState == EPlaybackState.Ended)
+                    Play();
+
+                _player.SetPosition(seek);
+            });
+        }
     }
 
     public List<TrackDto> Playlist { get; private set; } = [];
@@ -122,6 +136,9 @@ public class PlayerService : IPlayerService, IDisposable
     {
         get
         {
+            if (_mode == EPlaybackMode.Radio)
+                return false;
+
             if (IsLoopingEnabled)
                 return true;
 
@@ -133,12 +150,23 @@ public class PlayerService : IPlayerService, IDisposable
     {
         get
         {
+            if (_mode == EPlaybackMode.Radio)
+                return false;
+
             if (IsLoopingEnabled)
                 return true;
 
             return _currentIndex - 1 >= 0;
         }
     }
+
+    public EPlaybackMode Mode => _mode;
+
+    public RadioStationDto? CurrentStation => _currentStation;
+
+    public string? CurrentStreamTitle => _currentStreamTitle;
+
+    public bool IsBuffering => _player.IsBuffering;
 
     private readonly IPlayerEngine _player;
 
@@ -177,6 +205,13 @@ public class PlayerService : IPlayerService, IDisposable
         _player.OnMediaChanged += OnMediaChanged;
         _player.OnMediaEnded += OnMediaEnded;
         _player.OnMediaStateChanged += OnMediaStateChanged;
+        _player.OnMetadataChanged += (_, title) =>
+        {
+            _currentStreamTitle = title;
+            _messenger.Send(new RadioMetadataChanged(title));
+            _smtcService?.UpdateRadioMetadata(title);
+            _discordService?.UpdateRadioMetadata(title);
+        };
 
         _callDetectionService.CallStateChanged += (s, inCall) =>
         {
@@ -238,7 +273,11 @@ public class PlayerService : IPlayerService, IDisposable
 
     private void OnMediaStateChanged(object? sender, EventArgs e)
     {
-        // Not used currently        
+        if (_mode == EPlaybackMode.Radio && _player.IsBuffering != _lastIsBuffering)
+        {
+            _lastIsBuffering = _player.IsBuffering;
+            _messenger.Send(new BufferingChanged(_lastIsBuffering));
+        }
     }
 
     private void OnMediaEnded(object? sender, EventArgs e)
@@ -279,10 +318,14 @@ public class PlayerService : IPlayerService, IDisposable
     {
         Guard.NotNull(tracks);
 
+        StopForModeSwitch();
+
         if (CurrentTrack != null)
             _messenger.Send(new MediaEvent(EPlaybackState.Ended, CurrentTrack));
 
         Stop(false);
+
+        _mode = EPlaybackMode.Music;
 
         Playlist = tracks;
         _currentIndex = 0;
@@ -394,6 +437,10 @@ public class PlayerService : IPlayerService, IDisposable
         _crossfadeCts?.Cancel();
         _player.Stop();
 
+        _mode = EPlaybackMode.None;
+        _currentStation = null;
+        _currentStreamTitle = null;
+
         if (firePlaybackStateChange)
             PlaybackState = EPlaybackState.Stopped;
 
@@ -410,6 +457,9 @@ public class PlayerService : IPlayerService, IDisposable
 
     public void Next()
     {
+        if (_mode == EPlaybackMode.Radio)
+            return;
+
         // Cancel any ongoing crossfade
         _crossfadeCts?.Cancel();
         _isCrossfadeRunning = false;
@@ -438,6 +488,9 @@ public class PlayerService : IPlayerService, IDisposable
 
     public void Previous()
     {
+        if (_mode == EPlaybackMode.Radio)
+            return;
+
         if (_currentIndex - 1 < 0)
         {
             if (IsLoopingEnabled)
@@ -460,6 +513,44 @@ public class PlayerService : IPlayerService, IDisposable
         TracksRandomizer.ArtistBalancedTrackRandomize(Playlist, _currentIndex);
 
         _messenger.Send(new PlaylistChanged(Playlist));
+    }
+
+    public void PlayRadioStation(RadioStationDto station)
+    {
+        Guard.NotNull(station);
+
+        StopForModeSwitch();
+
+        Playlist.Clear();
+        _currentTrack = null;
+        _currentStation = station;
+        _currentStreamTitle = null;
+        _mode = EPlaybackMode.Radio;
+
+        if (!_player.SetStream(station))
+        {
+            _currentStation = null;
+            _mode = EPlaybackMode.None;
+            PlaybackState = EPlaybackState.Stopped;
+            return;
+        }
+
+        PlaybackState = EPlaybackState.Playing;
+        _messenger.Send(new RadioStationChanged(station));
+        _smtcService?.UpdateRadioStation(station);
+        _smtcService?.UpdatePlaybackState(PlaybackStatus.Playing);
+        _discordService?.UpdateRadioStation(station);
+    }
+
+    private void StopForModeSwitch()
+    {
+        if (_mode == EPlaybackMode.Radio)
+        {
+            _player.Stop();
+            _currentStation = null;
+            _currentStreamTitle = null;
+            _lastIsBuffering = false;
+        }
     }
 
     #region Engine

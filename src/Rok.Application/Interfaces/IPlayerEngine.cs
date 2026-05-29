@@ -1,4 +1,4 @@
-﻿namespace Rok.Application.Interfaces;
+namespace Rok.Application.Interfaces;
 
 public interface IPlayerEngine
 {
@@ -10,11 +10,17 @@ public interface IPlayerEngine
 
     event EventHandler? OnMediaAboutToEnd;
 
+    event EventHandler<string>? OnMetadataChanged;
+
     double Position { get; }
 
     double Length { get; set; }
 
     int CrossfadeDelay { get; }
+
+    bool IsLive { get; }
+
+    bool IsBuffering { get; }
 
     void Pause();
 
@@ -27,6 +33,8 @@ public interface IPlayerEngine
     void SetVolume(double volume);
 
     bool SetTrack(TrackDto track);
+
+    bool SetStream(RadioStationDto station);
 
     void SetEqualizerBand(int bandIndex, float gain);
 

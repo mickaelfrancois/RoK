@@ -5,6 +5,7 @@ using NAudio;
 using NAudio.Wave;
 using Rok.Application.Dto;
 using Rok.Application.Interfaces;
+using Rok.Infrastructure.Player.Streaming;
 
 namespace Rok.Infrastructure.Player;
 
@@ -14,12 +15,21 @@ public class NAudioMediaPlayer : IPlayerEngine, IDisposable
     public event EventHandler? OnMediaEnded;
     public event EventHandler? OnMediaStateChanged;
     public event EventHandler? OnMediaAboutToEnd;
+    public event EventHandler<string>? OnMetadataChanged;
+
+    public bool IsLive => _isLive;
+
+    public bool IsBuffering => _streaming?.IsBuffering ?? false;
 
     private IWavePlayer? _outputDevice;
     private AudioFileReader? _audioFileReader;
     private Equalizer? _equalizer;
     private readonly System.Timers.Timer _positionTimer;
     private readonly ILogger<NAudioMediaPlayer> _logger;
+    private readonly IHttpClientFactory _httpClientFactory;
+
+    private StreamingPlayback? _streaming;
+    private bool _isLive;
 
     private readonly int _crossfadeDelay = 5;
     private readonly int _aboutToEndDelay = 15;
@@ -44,9 +54,10 @@ public class NAudioMediaPlayer : IPlayerEngine, IDisposable
         set => _length = value;
     }
 
-    public NAudioMediaPlayer(ILogger<NAudioMediaPlayer> logger)
+    public NAudioMediaPlayer(ILogger<NAudioMediaPlayer> logger, IHttpClientFactory httpClientFactory)
     {
         _logger = logger;
+        _httpClientFactory = httpClientFactory;
 
         _positionTimer = new System.Timers.Timer(250)
         {
@@ -59,6 +70,13 @@ public class NAudioMediaPlayer : IPlayerEngine, IDisposable
 
     public void Pause()
     {
+        if (_isLive)
+        {
+            _streaming?.Pause();
+            OnMediaStateChanged?.Invoke(this, EventArgs.Empty);
+            return;
+        }
+
         if (_outputDevice is not null && _outputDevice.PlaybackState == PlaybackState.Playing)
         {
             _outputDevice.Pause();
@@ -69,6 +87,13 @@ public class NAudioMediaPlayer : IPlayerEngine, IDisposable
 
     public void Play()
     {
+        if (_isLive)
+        {
+            _streaming?.Resume();
+            OnMediaStateChanged?.Invoke(this, EventArgs.Empty);
+            return;
+        }
+
         if (_outputDevice is not null && _outputDevice.PlaybackState != PlaybackState.Playing)
         {
             try
@@ -114,6 +139,18 @@ public class NAudioMediaPlayer : IPlayerEngine, IDisposable
 
     public void Stop()
     {
+        if (_isLive)
+        {
+            _streaming?.Stop();
+            _streaming?.Dispose();
+            _streaming = null;
+            _isLive = false;
+            _length = 0;
+            _aboutToEndRaised = false;
+            OnMediaStateChanged?.Invoke(this, EventArgs.Empty);
+            return;
+        }
+
         _positionTimer.Stop();
 
         if (_outputDevice is not null)
@@ -140,6 +177,8 @@ public class NAudioMediaPlayer : IPlayerEngine, IDisposable
 
     public void SetPosition(double position)
     {
+        if (_isLive) return;
+
         if (_audioFileReader is null)
             return;
 
@@ -154,6 +193,12 @@ public class NAudioMediaPlayer : IPlayerEngine, IDisposable
 
     public void SetVolume(double volume)
     {
+        if (_isLive)
+        {
+            _streaming?.SetVolume(volume);
+            return;
+        }
+
         if (_audioFileReader is not null)
         {
             float clampVolume = (float)Math.Clamp(volume / 100.0, 0.0, 1.0);
@@ -219,6 +264,39 @@ public class NAudioMediaPlayer : IPlayerEngine, IDisposable
         }
     }
 
+    public bool SetStream(RadioStationDto station)
+    {
+        Stop();
+
+        _streaming = new StreamingPlayback(_httpClientFactory.CreateClient("RadioStream"), _logger);
+        _streaming.MetadataChanged += (_, title) => OnMetadataChanged?.Invoke(this, title);
+        _streaming.PlaybackEnded += (_, _) => OnMediaEnded?.Invoke(this, EventArgs.Empty);
+        _streaming.BufferingChanged += (_, _) => OnMediaStateChanged?.Invoke(this, EventArgs.Empty);
+
+        _isLive = true;
+        _length = 0;
+
+        Task.Run(async () =>
+        {
+            try
+            {
+                await _streaming.StartAsync(station, CancellationToken.None);
+                OnMediaChanged?.Invoke(this, EventArgs.Empty);
+                OnMediaStateChanged?.Invoke(this, EventArgs.Empty);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Failed to start stream {Url}", station.StreamUrl);
+                _streaming?.Dispose();
+                _streaming = null;
+                _isLive = false;
+                OnMediaEnded?.Invoke(this, EventArgs.Empty);
+            }
+        });
+
+        return true;
+    }
+
     public void SetEqualizerBand(int bandIndex, float gain)
     {
         _equalizer?.UpdateBand(bandIndex, gain);
@@ -227,6 +305,8 @@ public class NAudioMediaPlayer : IPlayerEngine, IDisposable
     /// <inheritdoc />
     public async Task CrossfadeToAsync(TrackDto nextTrack, double durationSeconds, double masterVolume, CancellationToken ct)
     {
+        if (_isLive) return;
+
         if (durationSeconds <= 0)
             return;
 
@@ -378,6 +458,10 @@ public class NAudioMediaPlayer : IPlayerEngine, IDisposable
         {
             if (disposing)
             {
+                _streaming?.Stop();
+                _streaming?.Dispose();
+                _streaming = null;
+
                 _positionTimer.Stop();
                 _positionTimer.Elapsed -= PositionTimer_Elapsed;
                 _positionTimer.Dispose();

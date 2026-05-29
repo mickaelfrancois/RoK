@@ -444,6 +444,9 @@
   <data name="menuPlaylists.Content" xml:space="preserve">
     <value>Playlists</value>
   </data>
+  <data name="menuRadios.Content" xml:space="preserve">
+    <value>Radios</value>
+  </data>
   <data name="groupDefaultName" xml:space="preserve">
     <value>New group</value>
   </data>
@@ -1851,5 +1854,143 @@
   </data>
   <data name="KeyboardShortcutsDialog.PrimaryButtonText" xml:space="preserve">
     <value>Close</value>
+  </data>
+  <data name="radiosPlayUrl.Label" xml:space="preserve">
+    <value>Play URL</value>
+  </data>
+  <data name="radiosAdd.Label" xml:space="preserve">
+    <value>Add</value>
+  </data>
+  <data name="radiosFlyoutPlay.Text" xml:space="preserve">
+    <value>Play</value>
+  </data>
+  <data name="radiosFlyoutEdit.Text" xml:space="preserve">
+    <value>Edit</value>
+  </data>
+  <data name="radiosFlyoutPickImage.Text" xml:space="preserve">
+    <value>Choose image...</value>
+  </data>
+  <data name="radiosFlyoutDelete.Text" xml:space="preserve">
+    <value>Delete</value>
+  </data>
+  <data name="radiosNoData.Message" xml:space="preserve">
+    <value>No radios yet. Add one or play a URL to get started.</value>
+  </data>
+  <data name="radiosDeleteConfirmation" xml:space="preserve">
+    <value>Delete radio "{0}"?</value>
+  </data>
+  <data name="playerBuffering.Text" xml:space="preserve">
+    <value>Buffering…</value>
+  </data>
+  <data name="addRadioDialog.Title" xml:space="preserve">
+    <value>Add a webradio</value>
+  </data>
+  <data name="addRadioDialog.PrimaryButtonText" xml:space="preserve">
+    <value>Save</value>
+  </data>
+  <data name="addRadioDialog.CloseButtonText" xml:space="preserve">
+    <value>Cancel</value>
+  </data>
+  <data name="editRadioDialog.Title" xml:space="preserve">
+    <value>Edit webradio</value>
+  </data>
+  <data name="editRadioDialog.PrimaryButtonText" xml:space="preserve">
+    <value>Save</value>
+  </data>
+  <data name="addRadioName.Header" xml:space="preserve">
+    <value>Name</value>
+  </data>
+  <data name="addRadioName.PlaceholderText" xml:space="preserve">
+    <value>My favourite station</value>
+  </data>
+  <data name="addRadioUrl.Header" xml:space="preserve">
+    <value>Stream URL or playlist (.pls / .m3u)</value>
+  </data>
+  <data name="addRadioUrl.PlaceholderText" xml:space="preserve">
+    <value>https://stream.example.com/audio.mp3</value>
+  </data>
+  <data name="addRadioHomepage.Header" xml:space="preserve">
+    <value>Homepage (optional)</value>
+  </data>
+  <data name="addRadioHomepage.PlaceholderText" xml:space="preserve">
+    <value>https://station.example.com</value>
+  </data>
+  <data name="playRadioUrlDialog.Title" xml:space="preserve">
+    <value>Play a webradio URL</value>
+  </data>
+  <data name="playRadioUrlDialog.PrimaryButtonText" xml:space="preserve">
+    <value>Play</value>
+  </data>
+  <data name="playRadioUrlDialog.CloseButtonText" xml:space="preserve">
+    <value>Cancel</value>
+  </data>
+  <data name="playRadioUrl.Header" xml:space="preserve">
+    <value>Stream URL or playlist</value>
+  </data>
+  <data name="playRadioUrl.PlaceholderText" xml:space="preserve">
+    <value>https://stream.example.com/audio.mp3</value>
+  </data>
+  <data name="playRadioUrlHint.Text" xml:space="preserve">
+    <value>Supports MP3 and AAC streams. .pls and .m3u playlists are resolved automatically. HLS (.m3u8 segment manifests) is not supported.</value>
+  </data>
+  <data name="radioErrorDuplicate" xml:space="preserve">
+    <value>A station with this URL already exists.</value>
+  </data>
+  <data name="radioErrorHlsUnsupported" xml:space="preserve">
+    <value>HLS streams are not supported.</value>
+  </data>
+  <data name="radioErrorNoStreamInPlaylist" xml:space="preserve">
+    <value>No usable stream URL found in this playlist.</value>
+  </data>
+  <data name="radioErrorFetchFailed" xml:space="preserve">
+    <value>Cannot reach this URL.</value>
+  </data>
+  <data name="radioErrorUnsupportedFormat" xml:space="preserve">
+    <value>This URL format is not supported.</value>
+  </data>
+  <data name="radioErrorInvalidUrl" xml:space="preserve">
+    <value>Invalid URL.</value>
+  </data>
+  <data name="radioErrorUnknown" xml:space="preserve">
+    <value>Unknown error.</value>
+  </data>
+  <data name="radiosSearch.Label" xml:space="preserve">
+    <value>Search</value>
+  </data>
+  <data name="radiosSearch.ToolTipService.ToolTip" xml:space="preserve">
+    <value>Search webradios</value>
+  </data>
+  <data name="searchRadioDialog.Title" xml:space="preserve">
+    <value>Search webradio</value>
+  </data>
+  <data name="searchRadioDialog.CloseButtonText" xml:space="preserve">
+    <value>Close</value>
+  </data>
+  <data name="searchRadioQuery.PlaceholderText" xml:space="preserve">
+    <value>Station name...</value>
+  </data>
+  <data name="searchRadioSubmit.ToolTipService.ToolTip" xml:space="preserve">
+    <value>Search</value>
+  </data>
+  <data name="searchRadioPlay.ToolTipService.ToolTip" xml:space="preserve">
+    <value>Play</value>
+  </data>
+  <data name="searchRadioAdd.ToolTipService.ToolTip" xml:space="preserve">
+    <value>Add to favorites</value>
+  </data>
+  <data name="searchRadioNoResults.Message" xml:space="preserve">
+    <value>No results. Try a different name.</value>
+  </data>
+  <data name="error.radio.search_failed" xml:space="preserve">
+    <value>Cannot reach Radio-Browser. Check your connection.</value>
+  </data>
+  <data name="error.radio.search_timeout" xml:space="preserve">
+    <value>Search timed out, try again.</value>
+  </data>
+  <data name="radioFavoriteAdded" xml:space="preserve">
+    <value>Added to favorites.</value>
+  </data>
+  <data name="radioFavoriteDuplicate" xml:space="preserve">
+    <value>This station is already in your favorites.</value>
   </data>
 </root>

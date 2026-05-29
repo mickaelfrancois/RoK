@@ -176,6 +176,7 @@ public partial class App : Microsoft.UI.Xaml.Application
         services.Configure<MusicDataApiOptions>(config.GetSection("MusicDataApi"));
         services.Configure<TranslateApiOptions>(config.GetSection("TranslateApi"));
         services.Configure<DiscordOptions>(config.GetSection("Discord"));
+        services.Configure<RadioBrowserOptions>(config.GetSection("RadioBrowser"));
 
         services.AddHttpClient();
 

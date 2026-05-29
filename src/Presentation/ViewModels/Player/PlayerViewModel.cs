@@ -3,11 +3,13 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Rok.Application.Dto.Lyrics;
 using Rok.Application.Features.Tracks.Requests;
+using Rok.Application.Messages;
 using Rok.Application.Player;
 using Rok.Services;
 using Rok.ViewModels.Album;
 using Rok.ViewModels.Artist;
 using Rok.ViewModels.Player.Services;
+using Rok.ViewModels.Radio.Services;
 using Rok.ViewModels.Track;
 
 namespace Rok.ViewModels.Player;
@@ -28,6 +30,7 @@ public partial class PlayerViewModel : ObservableObject, IDisposable
     private readonly PlayerListenTracker _listenTracker;
     private readonly PlayerTimerManager _timerManager;
     private readonly PlayerStateManager _stateManager;
+    private readonly RadioPictureService _radioPictureService;
     private readonly IMessenger _messenger;
     private readonly List<IDisposable> _subscriptions = new();
 
@@ -52,6 +55,24 @@ public partial class PlayerViewModel : ObservableObject, IDisposable
         get => _stateManager.PlaybackState;
         set => _stateManager.PlaybackState = value;
     }
+
+    [ObservableProperty]
+    public partial EPlaybackMode Mode { get; set; }
+
+    [ObservableProperty]
+    public partial string? CurrentStationName { get; set; }
+
+    [ObservableProperty]
+    public partial BitmapImage? CurrentStationImage { get; set; }
+
+    [ObservableProperty]
+    public partial string? CurrentStreamTitle { get; set; }
+
+    [ObservableProperty]
+    public partial bool IsBuffering { get; set; }
+
+    public bool IsMusicMode => Mode == EPlaybackMode.Music;
+    public bool IsRadioMode => Mode == EPlaybackMode.Radio;
 
     public bool IsSleepModeActive => _playerSleepModeService.IsSleepTimerActive;
     public int RemainingSleepTime => _playerSleepModeService.GetRemainingSleepTimeInSeconds();
@@ -158,6 +179,7 @@ public partial class PlayerViewModel : ObservableObject, IDisposable
         ResourceLoader resourceLoader,
         IPlayerSleepModeService playerSleepModeService,
         ITelemetryClient telemetryClient,
+        RadioPictureService radioPictureService,
         ILogger<PlayerViewModel> logger)
     {
         _player = Guard.NotNull(player);
@@ -174,6 +196,7 @@ public partial class PlayerViewModel : ObservableObject, IDisposable
         _resourceLoader = Guard.NotNull(resourceLoader);
         _playerSleepModeService = Guard.NotNull(playerSleepModeService);
         _telemetryClient = Guard.NotNull(telemetryClient);
+        _radioPictureService = Guard.NotNull(radioPictureService);
         _logger = Guard.NotNull(logger);
 
         _stateManager.PropertyChanged += OnStateManagerPropertyChanged;
@@ -206,6 +229,65 @@ public partial class PlayerViewModel : ObservableObject, IDisposable
         _subscriptions.Add(_messenger.Subscribe<MediaAboutToEndEvent>(OnMediaAboutToEnd));
         _subscriptions.Add(_messenger.Subscribe<TrackScoreUpdateMessage>(OnTrackScoreUpdated));
         _subscriptions.Add(_messenger.Subscribe<PlaylistChanged>(OnPlaylistChanged));
+        _subscriptions.Add(_messenger.Subscribe<RadioStationChanged>(OnRadioStationChanged));
+        _subscriptions.Add(_messenger.Subscribe<RadioMetadataChanged>(OnRadioMetadataChanged));
+        _subscriptions.Add(_messenger.Subscribe<BufferingChanged>(OnBufferingChanged));
+        _subscriptions.Add(_messenger.Subscribe<CompactModeMessage>(_ => OnCompactModeToggled()));
+    }
+
+    private void OnCompactModeToggled()
+    {
+        // The compact-mode toggle Collapses/Restores MainGrid which contains
+        // the PlayerView. WinUI x:Bind bindings that target null-propagating
+        // paths (e.g. ViewModel.CurrentTrack.Title) sometimes fall through to
+        // the parent DataContext after the visibility flip, displaying the
+        // ViewModel's ToString() instead of the underlying value. Re-raising
+        // the mode-driven flags forces every dependent binding to refresh.
+        _stateManager.ExecuteOnUIThread(() =>
+        {
+            OnPropertyChanged(nameof(Mode));
+            OnPropertyChanged(nameof(IsMusicMode));
+            OnPropertyChanged(nameof(IsRadioMode));
+            OnPropertyChanged(nameof(CurrentStationName));
+            OnPropertyChanged(nameof(CurrentStationImage));
+            OnPropertyChanged(nameof(CurrentStreamTitle));
+            OnPropertyChanged(nameof(CurrentTrack));
+        });
+    }
+
+    partial void OnModeChanged(EPlaybackMode value)
+    {
+        OnPropertyChanged(nameof(IsMusicMode));
+        OnPropertyChanged(nameof(IsRadioMode));
+    }
+
+    private void OnRadioStationChanged(RadioStationChanged message)
+    {
+        _stateManager.ExecuteOnUIThread(() =>
+        {
+            CurrentStationName = message.Station.Name;
+            CurrentStationImage = _radioPictureService.LoadPicture(message.Station.Id);
+            CurrentStreamTitle = null;
+            Mode = EPlaybackMode.Radio;
+            CanSkipNext = false;
+            CanSkipPrevious = false;
+        });
+    }
+
+    private void OnRadioMetadataChanged(RadioMetadataChanged message)
+    {
+        _stateManager.ExecuteOnUIThread(() =>
+        {
+            CurrentStreamTitle = message.StreamTitle;
+        });
+    }
+
+    private void OnBufferingChanged(BufferingChanged message)
+    {
+        _stateManager.ExecuteOnUIThread(() =>
+        {
+            IsBuffering = message.IsBuffering;
+        });
     }
 
     private void SubscribeToTimers()
@@ -358,6 +440,9 @@ public partial class PlayerViewModel : ObservableObject, IDisposable
             PlaybackState = message.State;
             CanSkipNext = _player.CanNext;
             CanSkipPrevious = _player.CanPrevious;
+
+            if (_player.Mode != EPlaybackMode.Radio)
+                Mode = _player.Mode;
         });
     }
 
@@ -413,6 +498,13 @@ public partial class PlayerViewModel : ObservableObject, IDisposable
         OnPropertyChanged(nameof(LyricsExist));
         OnPropertyChanged(nameof(IsSynchronizedLyrics));
         OnPropertyChanged(nameof(PlainLyrics));
+    }
+
+    [RelayCommand]
+    private void StopPlayback()
+    {
+        _player.Stop(true);
+        Mode = EPlaybackMode.None;
     }
 
     [RelayCommand]

@@ -385,6 +385,9 @@
   <data name="menuPlaylists.Content" xml:space="preserve">
     <value>Плейлисти</value>
   </data>
+  <data name="menuRadios.Content" xml:space="preserve">
+    <value>Radios</value>
+  </data>
   <data name="groupDefaultName" xml:space="preserve">
     <value>Нова група</value>
   </data>
@@ -1792,5 +1795,92 @@
   </data>
   <data name="KeyboardShortcutsDialog.PrimaryButtonText" xml:space="preserve">
     <value>Закрити</value>
+  </data>
+  <data name="radiosPlayUrl.Label" xml:space="preserve">
+    <value>Відтворити URL</value>
+  </data>
+  <data name="radiosAdd.Label" xml:space="preserve">
+    <value>Додати</value>
+  </data>
+  <data name="radiosFlyoutPlay.Text" xml:space="preserve">
+    <value>Відтворити</value>
+  </data>
+  <data name="radiosFlyoutDelete.Text" xml:space="preserve">
+    <value>Видалити</value>
+  </data>
+  <data name="radiosNoData.Message" xml:space="preserve">
+    <value>Поки що немає радіо. Додайте одну або відтворіть URL, щоб почати.</value>
+  </data>
+  <data name="radiosDeleteConfirmation" xml:space="preserve">
+    <value>Видалити радіо «{0}»?</value>
+  </data>
+  <data name="playerBuffering.Text" xml:space="preserve">
+    <value>Буферизація…</value>
+  </data>
+  <data name="addRadioDialog.Title" xml:space="preserve">
+    <value>Додати веб-радіо</value>
+  </data>
+  <data name="addRadioDialog.PrimaryButtonText" xml:space="preserve">
+    <value>Зберегти</value>
+  </data>
+  <data name="addRadioDialog.CloseButtonText" xml:space="preserve">
+    <value>Скасувати</value>
+  </data>
+  <data name="addRadioName.Header" xml:space="preserve">
+    <value>Назва</value>
+  </data>
+  <data name="addRadioName.PlaceholderText" xml:space="preserve">
+    <value>Моя улюблена станція</value>
+  </data>
+  <data name="addRadioUrl.Header" xml:space="preserve">
+    <value>URL потоку або плейлист (.pls / .m3u)</value>
+  </data>
+  <data name="addRadioUrl.PlaceholderText" xml:space="preserve">
+    <value>https://stream.example.com/audio.mp3</value>
+  </data>
+  <data name="addRadioHomepage.Header" xml:space="preserve">
+    <value>Веб-сайт (необов'язково)</value>
+  </data>
+  <data name="addRadioHomepage.PlaceholderText" xml:space="preserve">
+    <value>https://station.example.com</value>
+  </data>
+  <data name="playRadioUrlDialog.Title" xml:space="preserve">
+    <value>Відтворити URL веб-радіо</value>
+  </data>
+  <data name="playRadioUrlDialog.PrimaryButtonText" xml:space="preserve">
+    <value>Відтворити</value>
+  </data>
+  <data name="playRadioUrlDialog.CloseButtonText" xml:space="preserve">
+    <value>Скасувати</value>
+  </data>
+  <data name="playRadioUrl.Header" xml:space="preserve">
+    <value>URL потоку або плейлист</value>
+  </data>
+  <data name="playRadioUrl.PlaceholderText" xml:space="preserve">
+    <value>https://stream.example.com/audio.mp3</value>
+  </data>
+  <data name="playRadioUrlHint.Text" xml:space="preserve">
+    <value>Підтримує потоки MP3 та AAC. Плейлисти .pls і .m3u обробляються автоматично. HLS (.m3u8 сегментовані маніфести) не підтримується.</value>
+  </data>
+  <data name="radioErrorDuplicate" xml:space="preserve">
+    <value>Станція з такою URL вже існує.</value>
+  </data>
+  <data name="radioErrorHlsUnsupported" xml:space="preserve">
+    <value>Потоки HLS не підтримуються.</value>
+  </data>
+  <data name="radioErrorNoStreamInPlaylist" xml:space="preserve">
+    <value>У цьому плейлисті немає придатного для відтворення URL.</value>
+  </data>
+  <data name="radioErrorFetchFailed" xml:space="preserve">
+    <value>Не вдається отримати доступ до цієї URL.</value>
+  </data>
+  <data name="radioErrorUnsupportedFormat" xml:space="preserve">
+    <value>Цей формат URL не підтримується.</value>
+  </data>
+  <data name="radioErrorInvalidUrl" xml:space="preserve">
+    <value>Недійсна URL.</value>
+  </data>
+  <data name="radioErrorUnknown" xml:space="preserve">
+    <value>Невідома помилка.</value>
   </data>
 </root>

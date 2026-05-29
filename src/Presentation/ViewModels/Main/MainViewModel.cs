@@ -19,6 +19,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
     private readonly IDialogService _dialogService;
     private readonly ResourceLoader _resourceLoader;
     private readonly IDisposable _mediaChangedSubscription;
+    private readonly IDisposable _radioStationChangedSubscription;
     private bool _disposed;
 
     [ObservableProperty]
@@ -40,10 +41,19 @@ public partial class MainViewModel : ObservableObject, IDisposable
         SearchSuggestions = searchSuggestions;
 
         _mediaChangedSubscription = _messenger.Subscribe<MediaChangedMessage>(OnMediaChanged);
+        _radioStationChangedSubscription = _messenger.Subscribe<RadioStationChanged>(OnRadioStationChanged);
     }
 
 
     private void OnMediaChanged(MediaChangedMessage message)
+    {
+        DispatcherQueue.TryEnqueue(() =>
+        {
+            PlayerVisible = true;
+        });
+    }
+
+    private void OnRadioStationChanged(RadioStationChanged message)
     {
         DispatcherQueue.TryEnqueue(() =>
         {
@@ -125,6 +135,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
             return;
 
         _mediaChangedSubscription.Dispose();
+        _radioStationChangedSubscription.Dispose();
         _disposed = true;
         GC.SuppressFinalize(this);
     }

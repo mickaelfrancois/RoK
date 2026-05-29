@@ -28,6 +28,10 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<InternalsVisibleTo Include="Rok.Infrastructure.UnitTests" />
+	</ItemGroup>
+
+	<ItemGroup>
 	  <Compile Update="Telemetry\TelemetryClient.cs">
 	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 	  </Compile>

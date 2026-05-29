@@ -1,4 +1,5 @@
-﻿using Rok.Application.Messages;
+﻿using Rok.Application.Dto;
+using Rok.Application.Messages;
 
 namespace Rok.Application.Player;
 
@@ -11,6 +12,14 @@ public interface IPlayerService
     bool CanSeek { get; set; }
 
     TrackDto? CurrentTrack { get; }
+
+    EPlaybackMode Mode { get; }
+
+    RadioStationDto? CurrentStation { get; }
+
+    string? CurrentStreamTitle { get; }
+
+    bool IsBuffering { get; }
 
     bool IsLoopingEnabled { get; set; }
 
@@ -51,4 +60,6 @@ public interface IPlayerService
     List<TrackDto> GetQueue();
 
     void HandleMediaControlCommand(MediaControlCommandMessage message);
+
+    void PlayRadioStation(RadioStationDto station);
 }

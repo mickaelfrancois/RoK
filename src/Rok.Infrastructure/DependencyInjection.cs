@@ -1,10 +1,13 @@
 ﻿using Microsoft.Data.Sqlite;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Rok.Application.Features.Playlists.IO;
+using Rok.Application.Features.Radios.Services;
 using Rok.Application.Interfaces;
 using Rok.Application.Interfaces.Pictures;
 using Rok.Application.Interfaces.Repositories;
+using Rok.Application.Options;
 using Rok.Application.Player;
 using Rok.Application.Tag;
 using Rok.Infrastructure.Files;
@@ -17,6 +20,7 @@ using Rok.Infrastructure.MusicData;
 using Rok.Infrastructure.Player;
 using Rok.Infrastructure.Playlists;
 using Rok.Infrastructure.Playlists.Formats;
+using Rok.Infrastructure.RadioBrowser;
 using Rok.Infrastructure.Repositories;
 using Rok.Infrastructure.Social;
 using Rok.Infrastructure.Tag;
@@ -47,6 +51,7 @@ public static class DependencyInjection
         services.AddSingleton<ISettingsFile>(c => new SettingsFileService(applicationLocalPath, c.GetRequiredService<IFolderResolver>(), c.GetRequiredService<IFileSystem>()));
         services.AddSingleton<IArtistPicture, ArtistPicture>();
         services.AddSingleton<IAlbumPicture, AlbumPicture>();
+        services.AddSingleton<IRadioPicture, RadioPicture>();
         services.AddSingleton<BackdropPicture>();
         services.AddSingleton<IBackdropPicture, BackdropPicture>();
         services.AddSingleton<IDominantColorCalculator, DominantColorCalculator>();
@@ -70,6 +75,8 @@ public static class DependencyInjection
         services.AddSingleton<IMigration, Migration8>();
         services.AddSingleton<IMigration, Migration9>();
         services.AddSingleton<IMigration, Migration10>();
+        services.AddSingleton<IMigration, Migration11>();
+        services.AddSingleton<IMigration, Migration12>();
 
         services.AddScoped<IArtistRepository, ArtistRepository>();
         services.AddScoped<IAlbumRepository, AlbumRepository>();
@@ -82,12 +89,26 @@ public static class DependencyInjection
         services.AddScoped<IPlaylistTrackGenerateRepository, PlaylistTrackGenerateRepository>();
         services.AddScoped<IListeningEventRepository, ListeningEventRepository>();
         services.AddScoped<IEqualizerPresetRepository, EqualizerPresetRepository>();
+        services.AddTransient<IRadioStationRepository, RadioStationRepository>();
 
         services.AddSingleton<IPlaylistFormatReader, M3u8PlaylistReader>();
         services.AddSingleton<IPlaylistFormatWriter, M3u8PlaylistWriter>();
         services.AddSingleton<IPlaylistFormatResolver, PlaylistFormatResolver>();
 
         services.AddHttpClient("MusicDataDownload");
+        services.AddHttpClient<IRadioStreamUrlResolver, RadioStreamUrlResolver>();
+        services.AddHttpClient("RadioStream", c =>
+        {
+            c.Timeout = Timeout.InfiniteTimeSpan;
+            c.DefaultRequestHeaders.UserAgent.ParseAdd("Rok/1.0");
+        });
+        services.AddHttpClient<IRadioBrowserClient, RadioBrowserClient>((sp, client) =>
+        {
+            RadioBrowserOptions opts = sp.GetRequiredService<IOptions<RadioBrowserOptions>>().Value;
+            client.BaseAddress = new Uri(opts.BaseAddress);
+            client.Timeout = TimeSpan.FromSeconds(opts.TimeoutSeconds);
+            client.DefaultRequestHeaders.UserAgent.ParseAdd(opts.UserAgent);
+        });
 
         services.AddSingleton<ITagService, TagService>();
         services.AddSingleton<IMusicDataApiService, MusicDataApiService>();

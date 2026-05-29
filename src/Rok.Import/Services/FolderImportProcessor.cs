@@ -1,6 +1,6 @@
+using CleanArch.DevKit.Guards;
 using CleanArch.DevKit.Messaging;
 using Microsoft.Extensions.Logging;
-using CleanArch.DevKit.Guards;
 using Rok.Application.Dto;
 using Rok.Application.Interfaces;
 using Rok.Application.Messages;

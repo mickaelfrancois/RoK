@@ -6,4 +6,5 @@ global using CleanArch.DevKit.Messaging;
 global using Rok.Application.Dto;
 global using Rok.Application.Errors;
 global using Rok.Application.Mapping;
+global using Rok.Application.Validation;
 global using Rok.Domain.Entities;

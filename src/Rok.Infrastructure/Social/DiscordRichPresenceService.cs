@@ -2,6 +2,7 @@
 using DiscordRPC.Logging;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Rok.Application.Dto;
 using Rok.Application.Interfaces;
 using Rok.Application.Options;
 
@@ -14,6 +15,7 @@ public class DiscordRichPresenceService : IDisposable, IDiscordRichPresenceServi
     private readonly object _lock = new();
     private bool _isInitialized;
     private bool _disposed;
+    private string _currentStationName = string.Empty;
 
     public DiscordRichPresenceService(ILogger<DiscordRichPresenceService> logger, IOptions<DiscordOptions> discordOptions)
     {
@@ -112,12 +114,78 @@ public class DiscordRichPresenceService : IDisposable, IDiscordRichPresenceServi
         }
     }
 
+    public void UpdateRadioStation(RadioStationDto station)
+    {
+        lock (_lock)
+        {
+            if (_disposed || _client == null || !_isInitialized)
+                return;
+
+            _currentStationName = station.Name;
+
+            try
+            {
+                RichPresence presence = new()
+                {
+                    Details = $"Listening to {station.Name}",
+                    State = string.Empty,
+                    StatusDisplay = StatusDisplayType.Details,
+                    Type = ActivityType.Listening,
+                    Buttons =
+                    [
+                        new Button { Label = "Download Rok", Url = "https://apps.microsoft.com/store/detail/9NX19R28Q92S?cid=DevShareMCLPCS" }
+                    ]
+                };
+
+                _client.SetPresence(presence);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while updating Discord radio station presence");
+            }
+        }
+    }
+
+    public void UpdateRadioMetadata(string streamTitle)
+    {
+        lock (_lock)
+        {
+            if (_disposed || _client == null || !_isInitialized)
+                return;
+
+            string state = streamTitle.Length > 128 ? streamTitle[..128] : streamTitle;
+
+            try
+            {
+                RichPresence presence = new()
+                {
+                    Details = $"Listening to {_currentStationName}",
+                    State = state,
+                    StatusDisplay = StatusDisplayType.Details,
+                    Type = ActivityType.Listening,
+                    Buttons =
+                    [
+                        new Button { Label = "Download Rok", Url = "https://apps.microsoft.com/store/detail/9NX19R28Q92S?cid=DevShareMCLPCS" }
+                    ]
+                };
+
+                _client.SetPresence(presence);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while updating Discord radio metadata presence");
+            }
+        }
+    }
+
     public void ClearPresence()
     {
         lock (_lock)
         {
             if (_disposed || _client == null || !_isInitialized)
                 return;
+
+            _currentStationName = string.Empty;
 
             try
             {
