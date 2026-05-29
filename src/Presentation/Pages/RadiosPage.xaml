@@ -67,8 +67,8 @@
                     </Grid.RowDefinitions>
 
                     <HyperlinkButton Content="{x:Bind Name}"
-                                     Command="{Binding ElementName=radiosView, Path=ViewModel.PlayCommand}"
-                                     CommandParameter="{x:Bind}"
+                                     Click="OnTileNameClick"
+                                     Tag="{x:Bind}"
                                      Style="{StaticResource GridCoverButtonStyle}" />
 
                     <TextBlock Grid.Row="1"

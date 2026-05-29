@@ -75,6 +75,12 @@ public sealed partial class RadiosPage : Page
             _ = ViewModel.PlayCommand.ExecuteAsync(station);
     }
 
+    private void OnTileNameClick(object sender, RoutedEventArgs e)
+    {
+        if (sender is FrameworkElement { Tag: RadioStationDto station })
+            _ = ViewModel.PlayCommand.ExecuteAsync(station);
+    }
+
     private async void OnDeleteMenuClick(object sender, RoutedEventArgs e)
     {
         if (sender is not MenuFlyoutItem { Tag: RadioStationDto station })
