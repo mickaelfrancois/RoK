@@ -136,7 +136,14 @@ public partial class TrackViewModel : ObservableObject, IDisposable, IFilterable
 
     public string PlainLyrics => _lyrics?.PlainLyrics ?? string.Empty;
 
-    public ELyricsType LyricsType => _lyricsType ?? ELyricsType.None;
+    public ELyricsType LyricsType
+    {
+        get
+        {
+            _lyricsType ??= _lyricsService.CheckLyricsType(Track.MusicFile);
+            return _lyricsType.Value;
+        }
+    }
 
     public bool LyricsExists => LyricsType != ELyricsType.None;
 
