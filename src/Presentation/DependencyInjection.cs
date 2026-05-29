@@ -224,8 +224,9 @@ public static class DependencyInjection
             return new PlayerStateManager(dispatcherQueue);
         });
 
-        // Radios ViewModel
+        // Radios ViewModels
         services.AddTransient<RadiosViewModel>();
+        services.AddTransient<SearchRadioStationsViewModel>();
 
         // Insights ViewModel and services
         services.AddSingleton<InsightsViewModel>();
