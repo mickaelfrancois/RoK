@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics;
 using System.Runtime.CompilerServices;
-using Microsoft.Extensions.Logging;
 using CleanArch.DevKit.Guards;
+using Microsoft.Extensions.Logging;
 
 namespace Rok.Shared;
 
