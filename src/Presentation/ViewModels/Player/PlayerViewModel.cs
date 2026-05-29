@@ -9,6 +9,7 @@ using Rok.Services;
 using Rok.ViewModels.Album;
 using Rok.ViewModels.Artist;
 using Rok.ViewModels.Player.Services;
+using Rok.ViewModels.Radio.Services;
 using Rok.ViewModels.Track;
 
 namespace Rok.ViewModels.Player;
@@ -29,6 +30,7 @@ public partial class PlayerViewModel : ObservableObject, IDisposable
     private readonly PlayerListenTracker _listenTracker;
     private readonly PlayerTimerManager _timerManager;
     private readonly PlayerStateManager _stateManager;
+    private readonly RadioPictureService _radioPictureService;
     private readonly IMessenger _messenger;
     private readonly List<IDisposable> _subscriptions = new();
 
@@ -61,7 +63,7 @@ public partial class PlayerViewModel : ObservableObject, IDisposable
     public partial string? CurrentStationName { get; set; }
 
     [ObservableProperty]
-    public partial string? CurrentStationFaviconUrl { get; set; }
+    public partial BitmapImage? CurrentStationImage { get; set; }
 
     [ObservableProperty]
     public partial string? CurrentStreamTitle { get; set; }
@@ -177,6 +179,7 @@ public partial class PlayerViewModel : ObservableObject, IDisposable
         ResourceLoader resourceLoader,
         IPlayerSleepModeService playerSleepModeService,
         ITelemetryClient telemetryClient,
+        RadioPictureService radioPictureService,
         ILogger<PlayerViewModel> logger)
     {
         _player = Guard.NotNull(player);
@@ -193,6 +196,7 @@ public partial class PlayerViewModel : ObservableObject, IDisposable
         _resourceLoader = Guard.NotNull(resourceLoader);
         _playerSleepModeService = Guard.NotNull(playerSleepModeService);
         _telemetryClient = Guard.NotNull(telemetryClient);
+        _radioPictureService = Guard.NotNull(radioPictureService);
         _logger = Guard.NotNull(logger);
 
         _stateManager.PropertyChanged += OnStateManagerPropertyChanged;
@@ -245,7 +249,7 @@ public partial class PlayerViewModel : ObservableObject, IDisposable
             OnPropertyChanged(nameof(IsMusicMode));
             OnPropertyChanged(nameof(IsRadioMode));
             OnPropertyChanged(nameof(CurrentStationName));
-            OnPropertyChanged(nameof(CurrentStationFaviconUrl));
+            OnPropertyChanged(nameof(CurrentStationImage));
             OnPropertyChanged(nameof(CurrentStreamTitle));
             OnPropertyChanged(nameof(CurrentTrack));
         });
@@ -262,7 +266,7 @@ public partial class PlayerViewModel : ObservableObject, IDisposable
         _stateManager.ExecuteOnUIThread(() =>
         {
             CurrentStationName = message.Station.Name;
-            CurrentStationFaviconUrl = message.Station.FaviconUrl;
+            CurrentStationImage = _radioPictureService.LoadPicture(message.Station.Id);
             CurrentStreamTitle = null;
             Mode = EPlaybackMode.Radio;
             CanSkipNext = false;
