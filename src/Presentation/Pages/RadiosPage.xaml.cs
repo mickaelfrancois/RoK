@@ -48,6 +48,18 @@ public sealed partial class RadiosPage : Page
             await ViewModel.LoadAsync();
     }
 
+    private async void OnSearchClick(object sender, RoutedEventArgs e)
+    {
+        SearchRadioStationsDialog dialog = new(
+            App.ServiceProvider.GetRequiredService<SearchRadioStationsViewModel>())
+        {
+            XamlRoot = XamlRoot
+        };
+
+        await dialog.ShowAsync();
+        await ViewModel.LoadAsync();
+    }
+
     private async void OnPlayUrlClick(object sender, RoutedEventArgs e)
     {
         PlayRadioUrlDialog dialog = new(App.ServiceProvider.GetRequiredService<IMediator>())

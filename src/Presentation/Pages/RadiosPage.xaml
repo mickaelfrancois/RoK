@@ -75,6 +75,14 @@
         <CommandBar Grid.Row="0" DefaultLabelPosition="Right" Style="{StaticResource HeaderCommandBarListStyle}">
             <CommandBar.Content>
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Spacing="{StaticResource SpacingSmall}">
+                    <AppBarButton x:Uid="radiosSearch"
+                                  Style="{StaticResource AppBarButtonCompactStyle}"
+                                  Click="OnSearchClick">
+                        <AppBarButton.Icon>
+                            <SymbolIcon Symbol="Find"/>
+                        </AppBarButton.Icon>
+                    </AppBarButton>
+
                     <AppBarButton x:Uid="radiosPlayUrl"
                                   Style="{StaticResource AppBarButtonCompactStyle}"
                                   Click="OnPlayUrlClick">
