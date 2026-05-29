@@ -51,6 +51,7 @@ public static class DependencyInjection
         services.AddSingleton<ISettingsFile>(c => new SettingsFileService(applicationLocalPath, c.GetRequiredService<IFolderResolver>(), c.GetRequiredService<IFileSystem>()));
         services.AddSingleton<IArtistPicture, ArtistPicture>();
         services.AddSingleton<IAlbumPicture, AlbumPicture>();
+        services.AddSingleton<IRadioPicture, RadioPicture>();
         services.AddSingleton<BackdropPicture>();
         services.AddSingleton<IBackdropPicture, BackdropPicture>();
         services.AddSingleton<IDominantColorCalculator, DominantColorCalculator>();
