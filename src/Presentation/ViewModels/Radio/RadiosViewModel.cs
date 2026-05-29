@@ -6,20 +6,23 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Rok.Application.Dto;
 using Rok.Application.Features.Radios.Requests;
+using Rok.ViewModels.Radio.Services;
 
 namespace Rok.ViewModels.Radio;
 
 public sealed partial class RadiosViewModel : ObservableObject
 {
     private readonly IMediator _mediator;
+    private readonly RadioPictureService _pictureService;
 
-    public ObservableCollection<RadioStationDto> Stations { get; } = [];
+    public ObservableCollection<RadioTileViewModel> Stations { get; } = [];
 
     public bool HasNoData => Stations.Count == 0;
 
-    public RadiosViewModel(IMediator mediator)
+    public RadiosViewModel(IMediator mediator, RadioPictureService pictureService)
     {
         _mediator = mediator;
+        _pictureService = pictureService;
         Stations.CollectionChanged += OnStationsChanged;
     }
 
@@ -34,18 +37,21 @@ public sealed partial class RadiosViewModel : ObservableObject
 
         Stations.Clear();
         foreach (RadioStationDto station in result.Value)
-            Stations.Add(station);
+            Stations.Add(new RadioTileViewModel(station, _pictureService));
     }
 
     [RelayCommand]
-    public Task PlayAsync(RadioStationDto station) =>
-        _mediator.Send(new PlayRadioStationByIdRequest { Id = station.Id });
+    public Task PlayAsync(RadioTileViewModel tile) =>
+        _mediator.Send(new PlayRadioStationByIdRequest { Id = tile.Id });
 
     [RelayCommand]
-    public async Task DeleteAsync(RadioStationDto station)
+    public async Task DeleteAsync(RadioTileViewModel tile)
     {
-        Result<bool> result = await _mediator.Send(new DeleteRadioStationRequest { Id = station.Id });
+        Result<bool> result = await _mediator.Send(new DeleteRadioStationRequest { Id = tile.Id });
         if (result.IsSuccess)
-            Stations.Remove(station);
+        {
+            await _pictureService.DeletePictureAsync(tile.Id);
+            Stations.Remove(tile);
+        }
     }
 }
