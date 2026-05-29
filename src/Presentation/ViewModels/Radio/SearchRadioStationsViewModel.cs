@@ -3,6 +3,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Rok.Application.Errors;
 using Rok.Application.Features.Radios.Requests;
+using Rok.ViewModels.Radio.Services;
 using Windows.ApplicationModel.Resources;
 
 namespace Rok.ViewModels.Radio;
@@ -19,6 +20,7 @@ public sealed partial class SearchRadioStationsViewModel : ObservableObject
 {
     private readonly IMediator _mediator;
     private readonly ResourceLoader _resourceLoader;
+    private readonly RadioPictureService _pictureService;
 
     [ObservableProperty]
     public partial string Query { get; set; } = string.Empty;
@@ -52,10 +54,11 @@ public sealed partial class SearchRadioStationsViewModel : ObservableObject
 
     public bool HasNoResults => HasSearched && !IsSearching && Results.Count == 0 && !HasError;
 
-    public SearchRadioStationsViewModel(IMediator mediator, ResourceLoader resourceLoader)
+    public SearchRadioStationsViewModel(IMediator mediator, ResourceLoader resourceLoader, RadioPictureService pictureService)
     {
         _mediator = mediator;
         _resourceLoader = resourceLoader;
+        _pictureService = pictureService;
         Results.CollectionChanged += OnResultsChanged;
     }
 
@@ -117,11 +120,26 @@ public sealed partial class SearchRadioStationsViewModel : ObservableObject
         });
 
         if (result.IsSuccess)
+        {
             SetFeedback(_resourceLoader.GetString("radioFavoriteAdded"), SearchFeedbackKind.Success);
+            _ = DownloadPictureInBackgroundAsync(result.Value, r.FaviconUrl);
+        }
         else if (result.Errors.FirstOrDefault() is ConflictError)
+        {
             SetFeedback(_resourceLoader.GetString("radioFavoriteDuplicate"), SearchFeedbackKind.Info);
+        }
         else
+        {
             SetFeedback(ResolveErrorMessage(result.Errors.First()), SearchFeedbackKind.Error);
+        }
+    }
+
+    private async Task DownloadPictureInBackgroundAsync(long stationId, string? faviconUrl)
+    {
+        if (string.IsNullOrWhiteSpace(faviconUrl))
+            return;
+
+        await _pictureService.DownloadAndSaveAsync(stationId, faviconUrl);
     }
 
     private void SetFeedback(string message, SearchFeedbackKind kind)
