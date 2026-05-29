@@ -61,6 +61,9 @@ public partial class PlayerViewModel : ObservableObject, IDisposable
     public partial string? CurrentStationName { get; set; }
 
     [ObservableProperty]
+    public partial string? CurrentStationFaviconUrl { get; set; }
+
+    [ObservableProperty]
     public partial string? CurrentStreamTitle { get; set; }
 
     [ObservableProperty]
@@ -242,6 +245,7 @@ public partial class PlayerViewModel : ObservableObject, IDisposable
             OnPropertyChanged(nameof(IsMusicMode));
             OnPropertyChanged(nameof(IsRadioMode));
             OnPropertyChanged(nameof(CurrentStationName));
+            OnPropertyChanged(nameof(CurrentStationFaviconUrl));
             OnPropertyChanged(nameof(CurrentStreamTitle));
             OnPropertyChanged(nameof(CurrentTrack));
         });
@@ -258,6 +262,7 @@ public partial class PlayerViewModel : ObservableObject, IDisposable
         _stateManager.ExecuteOnUIThread(() =>
         {
             CurrentStationName = message.Station.Name;
+            CurrentStationFaviconUrl = message.Station.FaviconUrl;
             CurrentStreamTitle = null;
             Mode = EPlaybackMode.Radio;
             CanSkipNext = false;

@@ -443,9 +443,13 @@
             </Grid.ColumnDefinitions>
             <Border Grid.Column="0" CornerRadius="4" Width="70" Height="70"
                     Background="{ThemeResource BadgeLiveBrush}">
-                <FontIcon Glyph="&#xE8D6;" FontFamily="Segoe Fluent Icons"
-                          FontSize="32" Foreground="White"
-                          HorizontalAlignment="Center" VerticalAlignment="Center" />
+                <Grid>
+                    <FontIcon Glyph="&#xE8D6;" FontFamily="Segoe Fluent Icons"
+                              FontSize="32" Foreground="White"
+                              HorizontalAlignment="Center" VerticalAlignment="Center" />
+                    <Image Source="{x:Bind ViewModel.CurrentStationFaviconUrl, Mode=OneWay, Converter={StaticResource StringToImageSourceConverter}}"
+                           Stretch="UniformToFill" />
+                </Grid>
             </Border>
             <StackPanel Grid.Column="1" Orientation="Vertical" VerticalAlignment="Center" Spacing="2" Margin="6,0,0,0">
                 <StackPanel Orientation="Horizontal" Spacing="6">

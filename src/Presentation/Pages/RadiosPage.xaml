@@ -31,11 +31,15 @@
                     </MenuFlyout>
                 </Grid.ContextFlyout>
 
-                <!-- Cover placeholder: brand-coloured panel with a centred radio glyph -->
+                <!-- Cover: station favicon (if available) over a brand-coloured fallback panel with a centred radio glyph -->
                 <Border CornerRadius="{StaticResource CornerRadiusMediumValue}" Background="{ThemeResource BrandPrimaryBrush}">
-                    <FontIcon Glyph="&#xE8D6;" FontFamily="Segoe Fluent Icons"
-                              FontSize="56" Foreground="White" Opacity="0.35"
-                              HorizontalAlignment="Center" VerticalAlignment="Center" />
+                    <Grid>
+                        <FontIcon Glyph="&#xE8D6;" FontFamily="Segoe Fluent Icons"
+                                  FontSize="56" Foreground="White" Opacity="0.35"
+                                  HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        <Image Source="{x:Bind FaviconUrl, Converter={StaticResource StringToImageSourceConverter}}"
+                               Stretch="UniformToFill" />
+                    </Grid>
                 </Border>
 
                 <!-- LIVE badge -->
