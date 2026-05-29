@@ -1866,6 +1866,9 @@
   <data name="radiosFlyoutEdit.Text" xml:space="preserve">
     <value>Modifier</value>
   </data>
+  <data name="radiosFlyoutPickImage.Text" xml:space="preserve">
+    <value>Choisir une image...</value>
+  </data>
   <data name="radiosFlyoutDelete.Text" xml:space="preserve">
     <value>Supprimer</value>
   </data>
