@@ -53,7 +53,14 @@
             <ListView ItemsSource="{x:Bind ViewModel.Results}"
                       SelectionMode="None"
                       IsItemClickEnabled="True"
-                      ItemClick="OnResultItemClick">
+                      ItemClick="OnResultItemClick"
+                      HorizontalContentAlignment="Stretch">
+                <ListView.ItemContainerStyle>
+                    <Style TargetType="ListViewItem">
+                        <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+                        <Setter Property="Padding" Value="0"/>
+                    </Style>
+                </ListView.ItemContainerStyle>
                 <ListView.ItemTemplate>
                     <DataTemplate x:DataType="dto:RadioSearchResultDto">
                         <Grid Padding="8" ColumnSpacing="12">
