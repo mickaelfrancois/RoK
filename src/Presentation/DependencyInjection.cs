@@ -35,6 +35,7 @@ using Rok.ViewModels.Playlists.Handlers;
 using Rok.ViewModels.Playlists.Interfaces;
 using Rok.ViewModels.Playlists.Services;
 using Rok.ViewModels.Radio;
+using Rok.ViewModels.Radio.Services;
 using Rok.ViewModels.Search;
 using Rok.ViewModels.Start;
 using Rok.ViewModels.Statistics;
@@ -226,6 +227,8 @@ public static class DependencyInjection
 
         // Radios ViewModels
         services.AddTransient<RadiosViewModel>();
+        services.AddSingleton<IRadioPictureService, RadioPictureService>();
+        services.AddSingleton<RadioPictureService>(sp => (RadioPictureService)sp.GetRequiredService<IRadioPictureService>());
         services.AddTransient<SearchRadioStationsViewModel>();
 
         // Insights ViewModel and services
