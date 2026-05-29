@@ -119,8 +119,7 @@
                                      ItemTemplate="{StaticResource RadioGridTemplate}"
                                      ItemsPanel="{StaticResource GridPanelTemplate}"
                                      SelectionMode="None"
-                                     IsItemClickEnabled="True"
-                                     ItemClick="OnItemClick"
+                                     IsItemClickEnabled="False"
                                      ScrollViewer.VerticalScrollMode="Enabled"
                                      ScrollViewer.VerticalScrollBarVisibility="Auto" />
 

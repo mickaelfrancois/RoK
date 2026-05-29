@@ -69,12 +69,6 @@ public sealed partial class RadiosPage : Page
         await dialog.ShowAsync();
     }
 
-    private void OnItemClick(object sender, ItemClickEventArgs e)
-    {
-        if (e.ClickedItem is RadioStationDto station)
-            _ = ViewModel.PlayCommand.ExecuteAsync(station);
-    }
-
     private void OnTileNameClick(object sender, RoutedEventArgs e)
     {
         if (sender is FrameworkElement { Tag: RadioStationDto station })
