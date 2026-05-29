@@ -1942,10 +1942,10 @@
   <data name="radioErrorUnknown" xml:space="preserve">
     <value>Unknown error.</value>
   </data>
-  <data name="radiosSearch.[Label]" xml:space="preserve">
+  <data name="radiosSearch.Label" xml:space="preserve">
     <value>Search</value>
   </data>
-  <data name="radiosSearch.[ToolTipService.ToolTip]" xml:space="preserve">
+  <data name="radiosSearch.ToolTipService.ToolTip" xml:space="preserve">
     <value>Search webradios</value>
   </data>
   <data name="searchRadioDialog.Title" xml:space="preserve">
@@ -1957,13 +1957,13 @@
   <data name="searchRadioQuery.PlaceholderText" xml:space="preserve">
     <value>Station name...</value>
   </data>
-  <data name="searchRadioSubmit.[ToolTipService.ToolTip]" xml:space="preserve">
+  <data name="searchRadioSubmit.ToolTipService.ToolTip" xml:space="preserve">
     <value>Search</value>
   </data>
-  <data name="searchRadioPlay.[ToolTipService.ToolTip]" xml:space="preserve">
+  <data name="searchRadioPlay.ToolTipService.ToolTip" xml:space="preserve">
     <value>Play</value>
   </data>
-  <data name="searchRadioAdd.[ToolTipService.ToolTip]" xml:space="preserve">
+  <data name="searchRadioAdd.ToolTipService.ToolTip" xml:space="preserve">
     <value>Add to favorites</value>
   </data>
   <data name="searchRadioNoResults.Message" xml:space="preserve">
