@@ -24,6 +24,7 @@
             <converters:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter" />
             <converters:BoolToInvertBoolConverter x:Key="BoolToInvertBoolConverter" />
             <converters:CountryCodeToImageSourceConverter x:Key="CountryCodeToImageSourceConverter" />
+            <converters:StringToImageSourceConverter x:Key="StringToImageSourceConverter" />
             <converters:StringToVisibilityConverter x:Key="StringToVisibilityConverter" />
             <converters:IntToVisibilityConverter x:Key="IntToVisibilityConverter" />
             <converters:IntToBoolConverter x:Key="IntToBoolConverter" />

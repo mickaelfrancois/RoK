@@ -66,7 +66,8 @@
 
                             <Border Width="40" Height="40" CornerRadius="6"
                                     Background="{ThemeResource BrandPrimaryBrush}">
-                                <Image Source="{x:Bind FaviconUrl}" Stretch="UniformToFill"/>
+                                <Image Source="{x:Bind FaviconUrl, Converter={StaticResource StringToImageSourceConverter}}"
+                                       Stretch="UniformToFill"/>
                             </Border>
 
                             <StackPanel Grid.Column="1" VerticalAlignment="Center">
@@ -81,13 +82,13 @@
 
                             <StackPanel Grid.Column="3" Orientation="Horizontal" Spacing="4">
                                 <Button x:Uid="searchRadioPlay"
-                                        Command="{Binding ElementName=Root, Path=ViewModel.PlayCommand}"
-                                        CommandParameter="{x:Bind}">
+                                        Click="OnPlayButtonClick"
+                                        Tag="{x:Bind}">
                                     <SymbolIcon Symbol="Play"/>
                                 </Button>
                                 <Button x:Uid="searchRadioAdd"
-                                        Command="{Binding ElementName=Root, Path=ViewModel.AddToFavoritesCommand}"
-                                        CommandParameter="{x:Bind}">
+                                        Click="OnAddFavoriteButtonClick"
+                                        Tag="{x:Bind}">
                                     <FontIcon Glyph="&#xE734;"/>
                                 </Button>
                             </StackPanel>

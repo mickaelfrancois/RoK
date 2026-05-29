@@ -1,3 +1,4 @@
+using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
 using Rok.Application.Dto;
@@ -56,6 +57,18 @@ public sealed partial class SearchRadioStationsDialog : ContentDialog
     {
         if (e.ClickedItem is RadioSearchResultDto r)
             _ = ViewModel.PlayCommand.ExecuteAsync(r);
+    }
+
+    private void OnPlayButtonClick(object sender, RoutedEventArgs e)
+    {
+        if (sender is FrameworkElement { Tag: RadioSearchResultDto r })
+            _ = ViewModel.PlayCommand.ExecuteAsync(r);
+    }
+
+    private void OnAddFavoriteButtonClick(object sender, RoutedEventArgs e)
+    {
+        if (sender is FrameworkElement { Tag: RadioSearchResultDto r })
+            _ = ViewModel.AddToFavoritesCommand.ExecuteAsync(r);
     }
 
     private void OnFeedbackCloseClick(InfoBar sender, object args) =>
