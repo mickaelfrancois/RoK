@@ -167,4 +167,66 @@ public class RadioStationRepositoryTests
         Assert.Null(loaded.Codec);
         Assert.Null(loaded.Bitrate);
     }
+
+    [Fact(DisplayName = "update_should_change_name_url_and_homepage")]
+    public async Task Update_ShouldChangeNameUrlAndHomepage()
+    {
+        using SqliteDatabaseFixture fixture = new();
+        RadioStationRepository repo = CreateRepository(fixture);
+        long id = await repo.AddAsync(NewStation(name: "Old", url: "https://old.example/stream.mp3"), CancellationToken.None);
+
+        await repo.UpdateAsync(id, "New name", "https://new.example/stream.mp3", "https://new.example", CancellationToken.None);
+
+        RadioStationEntity? loaded = await repo.GetByIdAsync(id, CancellationToken.None);
+        Assert.NotNull(loaded);
+        Assert.Equal("New name", loaded!.Name);
+        Assert.Equal("https://new.example/stream.mp3", loaded.StreamUrl);
+        Assert.Equal("https://new.example", loaded.HomepageUrl);
+    }
+
+    [Fact(DisplayName = "update_should_preserve_enriched_metadata")]
+    public async Task Update_ShouldPreserveEnrichedMetadata()
+    {
+        using SqliteDatabaseFixture fixture = new();
+        RadioStationRepository repo = CreateRepository(fixture);
+        RadioStationEntity original = new()
+        {
+            Name = "Jazz FM",
+            StreamUrl = "https://stream.example/jazz-update-001",
+            StationUuid = "uuid-jazz",
+            FaviconUrl = "https://jazz.example/logo.png",
+            CountryCode = "fr",
+            Codec = "MP3",
+            Bitrate = 128,
+            AddedAt = DateTime.UtcNow
+        };
+        long id = await repo.AddAsync(original, CancellationToken.None);
+
+        await repo.UpdateAsync(id, "Renamed Jazz", "https://stream.example/jazz-update-002", null, CancellationToken.None);
+
+        RadioStationEntity? loaded = await repo.GetByIdAsync(id, CancellationToken.None);
+        Assert.NotNull(loaded);
+        Assert.Equal("Renamed Jazz", loaded!.Name);
+        Assert.Equal("https://stream.example/jazz-update-002", loaded.StreamUrl);
+        Assert.Null(loaded.HomepageUrl);
+        Assert.Equal("uuid-jazz", loaded.StationUuid);
+        Assert.Equal("https://jazz.example/logo.png", loaded.FaviconUrl);
+        Assert.Equal("fr", loaded.CountryCode);
+        Assert.Equal("MP3", loaded.Codec);
+        Assert.Equal(128, loaded.Bitrate);
+    }
+
+    [Fact(DisplayName = "update_should_throw_sqlite_exception_when_url_collides_with_other_station")]
+    public async Task Update_ShouldThrowSqliteException_WhenUrlCollidesWithOtherStation()
+    {
+        using SqliteDatabaseFixture fixture = new();
+        RadioStationRepository repo = CreateRepository(fixture);
+        await repo.AddAsync(NewStation(name: "A", url: "https://a.example/stream.mp3"), CancellationToken.None);
+        long idB = await repo.AddAsync(NewStation(name: "B", url: "https://b.example/stream.mp3"), CancellationToken.None);
+
+        SqliteException ex = await Assert.ThrowsAsync<SqliteException>(
+            () => repo.UpdateAsync(idB, "B", "https://a.example/stream.mp3", null, CancellationToken.None));
+
+        Assert.Equal(19, ex.SqliteErrorCode);
+    }
 }

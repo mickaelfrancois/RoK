@@ -32,6 +32,14 @@ public class RadioStationRepository(IDbConnection db, ILogger<RadioStationReposi
         FROM RadioStations WHERE StreamUrl = @StreamUrl
         """;
 
+    private const string UpdateSql = """
+        UPDATE RadioStations
+        SET Name = @Name,
+            StreamUrl = @StreamUrl,
+            HomepageUrl = @HomepageUrl
+        WHERE Id = @Id
+        """;
+
     private const string DeleteSql = "DELETE FROM RadioStations WHERE Id = @Id";
 
     private const string TouchSql = "UPDATE RadioStations SET LastListen = @LastListen WHERE Id = @Id";
@@ -58,6 +66,12 @@ public class RadioStationRepository(IDbConnection db, ILogger<RadioStationReposi
 
         return rows.ToList();
     }
+
+    public Task UpdateAsync(long id, string name, string streamUrl, string? homepageUrl, CancellationToken cancellationToken) =>
+        _db.ExecuteAsync(new CommandDefinition(
+            UpdateSql,
+            new { Id = id, Name = name, StreamUrl = streamUrl, HomepageUrl = homepageUrl },
+            cancellationToken: cancellationToken));
 
     public Task DeleteAsync(long id, CancellationToken cancellationToken) =>
         _db.ExecuteAsync(new CommandDefinition(DeleteSql, new { Id = id }, cancellationToken: cancellationToken));
