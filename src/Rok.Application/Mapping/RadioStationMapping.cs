@@ -3,7 +3,7 @@ namespace Rok.Application.Mapping;
 public static class RadioStationMapping
 {
     public static RadioStationDto ToDto(this RadioStationEntity entity) =>
-        new(entity.Id, entity.Name, entity.StreamUrl, entity.HomepageUrl, entity.AddedAt, entity.LastListen);
+        new(entity.Id, entity.Name, entity.StreamUrl, entity.HomepageUrl, entity.StationUuid, entity.FaviconUrl, entity.CountryCode, entity.Codec, entity.Bitrate, entity.AddedAt, entity.LastListen);
 
     public static RadioStationEntity ToEntity(this RadioStationDto dto) =>
         new()

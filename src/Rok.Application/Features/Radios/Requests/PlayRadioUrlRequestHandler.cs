@@ -23,6 +23,11 @@ public class PlayRadioUrlRequestHandler(
             Name: "Ad-hoc stream",
             StreamUrl: resolved.Value,
             HomepageUrl: null,
+            StationUuid: null,
+            FaviconUrl: null,
+            CountryCode: null,
+            Codec: null,
+            Bitrate: null,
             AddedAt: DateTime.UtcNow,
             LastListen: null);
 

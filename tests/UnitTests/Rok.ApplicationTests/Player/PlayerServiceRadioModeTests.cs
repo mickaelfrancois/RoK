@@ -39,7 +39,7 @@ public class PlayerServiceRadioModeTests
         (PlayerService service, Mock<IPlayerEngine> engine) = CreateService();
         engine.Setup(e => e.SetStream(It.IsAny<RadioStationDto>())).Returns(true);
         service.LoadPlaylist([new TrackDto { Id = 1, Title = "T", MusicFile = "C:\\tmp.mp3" }], null);
-        RadioStationDto station = new(0, "Nova", "http://stream/nova.mp3", null, DateTime.UtcNow, null);
+        RadioStationDto station = new(Id: 0, Name: "Nova", StreamUrl: "http://stream/nova.mp3", HomepageUrl: null, StationUuid: null, FaviconUrl: null, CountryCode: null, Codec: null, Bitrate: null, AddedAt: DateTime.UtcNow, LastListen: null);
 
         // Act
         service.PlayRadioStation(station);
@@ -58,7 +58,7 @@ public class PlayerServiceRadioModeTests
         // Arrange
         (PlayerService service, Mock<IPlayerEngine> engine) = CreateService();
         engine.Setup(e => e.SetStream(It.IsAny<RadioStationDto>())).Returns(true);
-        service.PlayRadioStation(new RadioStationDto(0, "N", "http://s/", null, DateTime.UtcNow, null));
+        service.PlayRadioStation(new RadioStationDto(Id: 0, Name: "N", StreamUrl: "http://s/", HomepageUrl: null, StationUuid: null, FaviconUrl: null, CountryCode: null, Codec: null, Bitrate: null, AddedAt: DateTime.UtcNow, LastListen: null));
 
         // Act
         service.Next();
@@ -75,7 +75,7 @@ public class PlayerServiceRadioModeTests
         (PlayerService service, Mock<IPlayerEngine> engine) = CreateService();
         engine.Setup(e => e.SetStream(It.IsAny<RadioStationDto>())).Returns(true);
         engine.Setup(e => e.SetTrack(It.IsAny<TrackDto>())).Returns(true);
-        service.PlayRadioStation(new RadioStationDto(0, "N", "http://s/", null, DateTime.UtcNow, null));
+        service.PlayRadioStation(new RadioStationDto(Id: 0, Name: "N", StreamUrl: "http://s/", HomepageUrl: null, StationUuid: null, FaviconUrl: null, CountryCode: null, Codec: null, Bitrate: null, AddedAt: DateTime.UtcNow, LastListen: null));
 
         // Act
         service.LoadPlaylist([new TrackDto { Id = 1, Title = "T", MusicFile = "C:\\tmp.mp3" }], null);
@@ -92,7 +92,7 @@ public class PlayerServiceRadioModeTests
         // Arrange
         (PlayerService service, Mock<IPlayerEngine> engine) = CreateService();
         engine.Setup(e => e.SetStream(It.IsAny<RadioStationDto>())).Returns(true);
-        service.PlayRadioStation(new RadioStationDto(0, "N", "http://s/", null, DateTime.UtcNow, null));
+        service.PlayRadioStation(new RadioStationDto(Id: 0, Name: "N", StreamUrl: "http://s/", HomepageUrl: null, StationUuid: null, FaviconUrl: null, CountryCode: null, Codec: null, Bitrate: null, AddedAt: DateTime.UtcNow, LastListen: null));
 
         // Act
         service.Position = 42;
