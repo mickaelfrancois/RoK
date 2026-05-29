@@ -22,6 +22,13 @@
                                 <SymbolIcon Symbol="Play" />
                             </MenuFlyoutItem.Icon>
                         </MenuFlyoutItem>
+                        <MenuFlyoutItem x:Uid="radiosFlyoutEdit"
+                                        Click="OnEditMenuClick"
+                                        Tag="{x:Bind}">
+                            <MenuFlyoutItem.Icon>
+                                <SymbolIcon Symbol="Edit" />
+                            </MenuFlyoutItem.Icon>
+                        </MenuFlyoutItem>
                         <MenuFlyoutItem x:Uid="radiosFlyoutDelete"
                                         Click="OnDeleteMenuClick"
                                         Tag="{x:Bind}">

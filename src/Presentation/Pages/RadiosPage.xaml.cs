@@ -75,6 +75,22 @@ public sealed partial class RadiosPage : Page
             _ = ViewModel.PlayCommand.ExecuteAsync(station);
     }
 
+    private async void OnEditMenuClick(object sender, RoutedEventArgs e)
+    {
+        if (sender is not MenuFlyoutItem { Tag: RadioStationDto station })
+            return;
+
+        AddRadioStationDialog dialog = new(
+            App.ServiceProvider.GetRequiredService<IMediator>(),
+            station)
+        {
+            XamlRoot = XamlRoot
+        };
+        ContentDialogResult result = await dialog.ShowAsync();
+        if (result == ContentDialogResult.Primary && dialog.Saved)
+            await ViewModel.LoadAsync();
+    }
+
     private async void OnDeleteMenuClick(object sender, RoutedEventArgs e)
     {
         if (sender is not MenuFlyoutItem { Tag: RadioStationDto station })
