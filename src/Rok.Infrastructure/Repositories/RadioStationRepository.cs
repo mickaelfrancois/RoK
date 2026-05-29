@@ -11,24 +11,24 @@ public class RadioStationRepository(IDbConnection db, ILogger<RadioStationReposi
     private readonly TimeProvider _timeProvider = Guard.NotNull(timeProvider);
 
     private const string InsertSql = """
-        INSERT INTO RadioStations (Name, StreamUrl, HomepageUrl, AddedAt, LastListen)
-        VALUES (@Name, @StreamUrl, @HomepageUrl, @AddedAt, @LastListen);
+        INSERT INTO RadioStations (Name, StreamUrl, HomepageUrl, StationUuid, FaviconUrl, CountryCode, Codec, Bitrate, AddedAt, LastListen)
+        VALUES (@Name, @StreamUrl, @HomepageUrl, @StationUuid, @FaviconUrl, @CountryCode, @Codec, @Bitrate, @AddedAt, @LastListen);
         SELECT last_insert_rowid();
         """;
 
     private const string SelectAllSql = """
-        SELECT Id, Name, StreamUrl, HomepageUrl, AddedAt, LastListen
+        SELECT Id, Name, StreamUrl, HomepageUrl, StationUuid, FaviconUrl, CountryCode, Codec, Bitrate, AddedAt, LastListen
         FROM RadioStations
         ORDER BY LastListen DESC NULLS LAST, AddedAt DESC
         """;
 
     private const string SelectByIdSql = """
-        SELECT Id, Name, StreamUrl, HomepageUrl, AddedAt, LastListen
+        SELECT Id, Name, StreamUrl, HomepageUrl, StationUuid, FaviconUrl, CountryCode, Codec, Bitrate, AddedAt, LastListen
         FROM RadioStations WHERE Id = @Id
         """;
 
     private const string SelectByUrlSql = """
-        SELECT Id, Name, StreamUrl, HomepageUrl, AddedAt, LastListen
+        SELECT Id, Name, StreamUrl, HomepageUrl, StationUuid, FaviconUrl, CountryCode, Codec, Bitrate, AddedAt, LastListen
         FROM RadioStations WHERE StreamUrl = @StreamUrl
         """;
 

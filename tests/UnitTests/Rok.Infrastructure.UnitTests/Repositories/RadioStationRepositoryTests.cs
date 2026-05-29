@@ -107,4 +107,64 @@ public class RadioStationRepositoryTests
         Assert.NotNull(loaded);
         Assert.Equal(now, loaded!.LastListen);
     }
+
+    [Fact(DisplayName = "add_should_persist_all_extended_columns")]
+    public async Task Add_ShouldPersistAllExtendedColumns()
+    {
+        // Arrange
+        using SqliteDatabaseFixture fixture = new();
+        RadioStationRepository repo = CreateRepository(fixture);
+        RadioStationEntity entity = new()
+        {
+            Name = "Jazz FM",
+            StreamUrl = "https://stream.example/jazz-task4-001",
+            HomepageUrl = "https://jazz.example",
+            StationUuid = "uuid-jazz-001",
+            FaviconUrl = "https://jazz.example/logo.png",
+            CountryCode = "fr",
+            Codec = "MP3",
+            Bitrate = 128,
+            AddedAt = DateTime.UtcNow
+        };
+
+        // Act
+        long id = await repo.AddAsync(entity, CancellationToken.None);
+        RadioStationEntity? loaded = (await repo.ListAsync(CancellationToken.None))
+            .FirstOrDefault(s => s.Id == id);
+
+        // Assert
+        Assert.NotNull(loaded);
+        Assert.Equal("uuid-jazz-001", loaded!.StationUuid);
+        Assert.Equal("https://jazz.example/logo.png", loaded.FaviconUrl);
+        Assert.Equal("fr", loaded.CountryCode);
+        Assert.Equal("MP3", loaded.Codec);
+        Assert.Equal(128, loaded.Bitrate);
+    }
+
+    [Fact(DisplayName = "add_should_persist_null_extended_columns")]
+    public async Task Add_ShouldPersistNullExtendedColumns()
+    {
+        // Arrange
+        using SqliteDatabaseFixture fixture = new();
+        RadioStationRepository repo = CreateRepository(fixture);
+        RadioStationEntity entity = new()
+        {
+            Name = "Manual entry",
+            StreamUrl = "https://stream.example/manual-task4-002",
+            AddedAt = DateTime.UtcNow
+        };
+
+        // Act
+        long id = await repo.AddAsync(entity, CancellationToken.None);
+        RadioStationEntity? loaded = (await repo.ListAsync(CancellationToken.None))
+            .FirstOrDefault(s => s.Id == id);
+
+        // Assert
+        Assert.NotNull(loaded);
+        Assert.Null(loaded!.StationUuid);
+        Assert.Null(loaded.FaviconUrl);
+        Assert.Null(loaded.CountryCode);
+        Assert.Null(loaded.Codec);
+        Assert.Null(loaded.Bitrate);
+    }
 }
