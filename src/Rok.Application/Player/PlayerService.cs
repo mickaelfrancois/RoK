@@ -588,7 +588,7 @@ public class PlayerService : IPlayerService, IDisposable
                     artistName: track.ArtistName,
                     albumName: track.AlbumName,
                     elapsed: TimeSpan.FromSeconds(_player.Position),
-                    duration: TimeSpan.FromMilliseconds(track.Duration)
+                    duration: TimeSpan.FromSeconds(track.Duration)
                 );
             }
             else
@@ -767,7 +767,7 @@ public class PlayerService : IPlayerService, IDisposable
             return;
 
         TimeSpan position = TimeSpan.FromSeconds(_player.Position);
-        TimeSpan duration = TimeSpan.FromMilliseconds(CurrentTrack.Duration);
+        TimeSpan duration = TimeSpan.FromSeconds(CurrentTrack.Duration);
 
         _smtcService.UpdateTimeline(position, duration);
     }

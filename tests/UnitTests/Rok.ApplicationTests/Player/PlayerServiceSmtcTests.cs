@@ -172,4 +172,48 @@ public class PlayerServiceSmtcTests
         // Assert
         smtc.Verify(s => s.UpdateTimeline(It.IsAny<TimeSpan>(), It.IsAny<TimeSpan>()), Times.Exactly(3));
     }
+
+    [Fact(DisplayName = "when_timeline_updates_duration_is_track_duration_in_seconds")]
+    public void When_timeline_updates_duration_is_track_duration_in_seconds()
+    {
+        // Arrange
+        Mock<ISystemMediaTransportControlsService> smtc = new();
+        Mock<IPlayerEngine> engine = new();
+        engine.Setup(o => o.SetTrack(It.IsAny<TrackDto>())).Returns(true);
+        engine.SetupGet(e => e.Position).Returns(10d);
+        engine.SetupGet(e => e.Length).Returns(180d);
+        Mock<ICallDetectionService> callMock = new();
+        Mock<IAppOptions> optionsMock = new();
+        optionsMock.SetupGet(o => o.CrossFade).Returns(false);
+        Mock<IAlbumPicture> picture = new();
+        FakeTimeProvider time = new();
+
+        const long durationSeconds = 180;
+        TrackDto track = new()
+        {
+            Title = "T",
+            ArtistName = "A",
+            AlbumName = "Alb",
+            MusicFile = @"C:\Music\01.mp3",
+            Duration = durationSeconds
+        };
+
+        TimeSpan capturedDuration = TimeSpan.MinValue;
+        smtc.Setup(s => s.UpdateTimeline(It.IsAny<TimeSpan>(), It.IsAny<TimeSpan>()))
+            .Callback<TimeSpan, TimeSpan>((_, duration) => capturedDuration = duration);
+
+        PlayerService sut = new(
+            callMock.Object, engine.Object, optionsMock.Object,
+            discordService: null, smtcService: smtc.Object, albumPicture: picture.Object,
+            timeProvider: time, messenger: new Messenger(), logger: NullLogger<PlayerService>.Instance);
+
+        sut.LoadPlaylist(new List<TrackDto> { track });
+        smtc.Invocations.Clear();
+
+        // Act
+        time.Advance(TimeSpan.FromSeconds(1));
+
+        // Assert
+        Assert.Equal(TimeSpan.FromSeconds(durationSeconds), capturedDuration);
+    }
 }
