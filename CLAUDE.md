@@ -38,7 +38,7 @@ Husky-driven git hooks live in `.husky/` (`task-runner.json`):
 - **pre-push**: `dotnet test --no-build /p:Platform=x64`
 - **commit-msg**: enforces Conventional Commits (`feat|fix|docs|style|refactor|test|chore|build|ci|perf|revert(scope)?: …`)
 
-`appsettings.json` is gitignored; copy `src/Presentation/appsettings.template.json` to `src/Presentation/appsettings.json` and fill in the API keys (Telemetry, MusicDataApi, Discord) before running the app.
+`appsettings.json` is gitignored — and so is `appsettings.template.json`, because the `appsettings.*.json` rule in `.gitignore` matches it too, so neither file is in the repo. Create `src/Presentation/appsettings.json` yourself with the sections bound in `App.xaml.cs` (`Telemetry`, `NovaApi`, `MusicDataApi`, `TranslateApi`, `Discord`, `RadioBrowser`) and fill in the API keys before running the app.
 
 ## Architecture
 
