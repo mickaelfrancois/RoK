@@ -1,5 +1,22 @@
 ﻿# ChangeLog
 
+## [1.12.0] Store – 30 mai 2026
+
+### Ajouté
+
+- Lecture de webradios.
+
+### Corrigé
+
+- Durée des pistes corrigée dans l'overlay média de Windows (SMTC) et dans la présence Discord (elle était affichée 1000 fois trop courte).
+- Un échec réseau temporaire ne laisse plus les paroles et pochettes vides pendant 24 h : seules les réponses définitives sont désormais mises en cache.
+- Réaffichage des badges de paroles dans les listes de pistes.
+- Fondu enchaîné (crossfade) au minutage désormais fiable.
+- Saisie numérique fiabilisée dans les playlists intelligentes.
+- Normalisation des noms d'artiste, d'album et de genre à l'import pour éviter les doublons dus aux tirets Unicode.
+
+--
+
 ## [1.11.2] Store – 15 mai 2026
 
 ### Modifié
