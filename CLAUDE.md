@@ -93,7 +93,7 @@ ViewModels use `CommunityToolkit.Mvvm` (`ObservableObject`, source-gen commands)
 
 ### Persistence
 
-- SQLite via Dapper. Repositories live in `Rok.Infrastructure/Repositories/`; new tables/columns are added through a new `MigrationN` class and registered in `MigrationService`. The current head is `Migration10`.
+- SQLite via Dapper. Repositories live in `Rok.Infrastructure/Repositories/`; new tables/columns are added through a new `MigrationN` class implementing `IMigration` and registered in `Rok.Infrastructure/DependencyInjection.cs` (discovered by `MigrationService` via `IEnumerable<IMigration>`). The current head is `Migration12`.
 - `DateOnlyTypeHandler` is registered globally for Dapper.
 - Domain entities use `[Table("…")]` attributes (see `Rok.Domain/Attributes/`).
 
