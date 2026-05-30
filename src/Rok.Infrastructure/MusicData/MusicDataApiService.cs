@@ -91,20 +91,17 @@ public class MusicDataApiService : IMusicDataApiService, IDisposable
         if (artistName is null)
             return null;
 
-        MusicDataArtistDto? artist;
-        string url;
+        if (_artistCache.TryGetValue(artistName, out MusicDataArtistDto? cached))
+            return cached;
 
-        if (!_artistCache.TryGetValue(artistName, out artist!))
-        {
-            if (string.IsNullOrEmpty(musicBrainzId))
-                url = $"v1/artists/byname/{Uri.EscapeDataString(artistName)}";
-            else
-                url = $"v1/artists/bymbid/{Uri.EscapeDataString(musicBrainzId)}";
+        string url = string.IsNullOrEmpty(musicBrainzId)
+            ? $"v1/artists/byname/{Uri.EscapeDataString(artistName)}"
+            : $"v1/artists/bymbid/{Uri.EscapeDataString(musicBrainzId)}";
 
-            artist = await GetAsync<MusicDataArtistDto>(url);
+        (bool cacheable, MusicDataArtistDto? artist) = await GetAsync<MusicDataArtistDto>(url);
 
+        if (cacheable)
             SaveArtistToCache(artistName, artist);
-        }
 
         return artist;
     }
@@ -123,22 +120,19 @@ public class MusicDataApiService : IMusicDataApiService, IDisposable
         if (albumMusicBrainzId is null && artistMusicBrainzId is not null)
             artistMusicBrainzId = null;
 
-        MusicDataAlbumDto? album;
-        string url;
-
         string key = $"{artistName}_{albumName}";
 
-        if (!_albumCache.TryGetValue(key, out album!))
-        {
-            if (string.IsNullOrEmpty(albumMusicBrainzId))
-                url = $"v1/albums/byname/{Uri.EscapeDataString(artistName)}/{Uri.EscapeDataString(albumName)}";
-            else
-                url = $"v1/albums/bymbid/{Uri.EscapeDataString(artistMusicBrainzId!)}/{Uri.EscapeDataString(albumMusicBrainzId)}";
+        if (_albumCache.TryGetValue(key, out MusicDataAlbumDto? cached))
+            return cached;
 
-            album = await GetAsync<MusicDataAlbumDto>(url);
+        string url = string.IsNullOrEmpty(albumMusicBrainzId)
+            ? $"v1/albums/byname/{Uri.EscapeDataString(artistName)}/{Uri.EscapeDataString(albumName)}"
+            : $"v1/albums/bymbid/{Uri.EscapeDataString(artistMusicBrainzId!)}/{Uri.EscapeDataString(albumMusicBrainzId)}";
 
+        (bool cacheable, MusicDataAlbumDto? album) = await GetAsync<MusicDataAlbumDto>(url);
+
+        if (cacheable)
             SaveAlbumToCache(key, album);
-        }
 
         return album;
     }
@@ -154,16 +148,17 @@ public class MusicDataApiService : IMusicDataApiService, IDisposable
         if (string.IsNullOrEmpty(title))
             return null;
 
-        MusicDataLyricsDto? lyrics;
         string key = $"{artistName}_{title}";
 
-        if (!_lyricsCache.TryGetValue(key, out lyrics))
-        {
-            string url = $"v1/lyrics?artistName={Uri.EscapeDataString(artistName)}&albumName={Uri.EscapeDataString(albumName)}&title={Uri.EscapeDataString(title)}&duration={duration}";
-            lyrics = await GetAsync<MusicDataLyricsDto>(url);
+        if (_lyricsCache.TryGetValue(key, out MusicDataLyricsDto? cached))
+            return cached;
 
+        string url = $"v1/lyrics?artistName={Uri.EscapeDataString(artistName)}&albumName={Uri.EscapeDataString(albumName)}&title={Uri.EscapeDataString(title)}&duration={duration}";
+
+        (bool cacheable, MusicDataLyricsDto? lyrics) = await GetAsync<MusicDataLyricsDto>(url);
+
+        if (cacheable)
             SaveLyricsToCache(key, lyrics);
-        }
 
         return lyrics;
     }
@@ -290,14 +285,17 @@ public class MusicDataApiService : IMusicDataApiService, IDisposable
         entry.AbsoluteExpiration = DateTime.UtcNow.AddMinutes(KCacheDelayMinutes);
     }
 
-    private async Task<T?> GetAsync<T>(string url, CancellationToken cancellationToken = default)
+    // Cacheable is true only when the API gave a definitive answer (a 2xx
+    // response — even an empty one — or a 404 "not found"). Transient outcomes
+    // (active rate-limit window, busy concurrency limiter, cancellation, network
+    // errors, auth/server errors) return Cacheable = false so the caller retries
+    // on the next request instead of caching the failure for hours.
+    private async Task<(bool Cacheable, T? Value)> GetAsync<T>(string url, CancellationToken cancellationToken = default)
     {
-        T? result = default;
-
         if (IsRateLimitActive(out DateTime ignoreUntilSnapshot))
         {
             _logger.LogDebug("Skipping request due to active rate-limit window until {Until} for {Url}", ignoreUntilSnapshot, url);
-            return result;
+            return (false, default);
         }
 
         bool acquired;
@@ -309,52 +307,59 @@ public class MusicDataApiService : IMusicDataApiService, IDisposable
         catch (OperationCanceledException ex)
         {
             _logger.LogWarning(ex, "Request cancelled before entering limiter {Url}", url);
-            return result;
+            return (false, default);
         }
 
-        if (acquired)
+        if (!acquired)
+        {
+            _logger.LogWarning("Concurrency limiter timed out for {Url}", url);
+            return (false, default);
+        }
+
+        try
+        {
+            _logger.LogDebug("Sending request to RoK API {Url}", url);
+
+            HttpResponseMessage response = await _httpClient.GetAsync(url, cancellationToken);
+
+            if (response.IsSuccessStatusCode)
+            {
+                _logger.LogDebug("RoK API response successful {Url}", url);
+
+                using Stream stream = await response.Content.ReadAsStreamAsync(cancellationToken);
+                T? result = await JsonSerializer.DeserializeAsync<T>(stream, _jsonOptions, cancellationToken);
+
+                return (true, result);
+            }
+
+            _logger.LogError("RoK API response {Error} {Url}", response.StatusCode, url);
+            HandleErrorResponse(response);
+
+            bool isDefinitiveNegative = response.StatusCode == System.Net.HttpStatusCode.NotFound;
+
+            return (isDefinitiveNegative, default);
+        }
+        catch (OperationCanceledException)
+        {
+            // Cancellation requested by caller — expected, no action needed
+            return (false, default);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "HTTP error {Url}", url);
+            return (false, default);
+        }
+        finally
         {
             try
             {
-                _logger.LogDebug("Sending request to RoK API {Url}", url);
-
-                HttpResponseMessage response = await _httpClient.GetAsync(url, cancellationToken);
-
-                if (response.IsSuccessStatusCode)
-                {
-                    _logger.LogDebug("RoK API response successful {Url}", url);
-
-                    using Stream stream = await response.Content.ReadAsStreamAsync(cancellationToken);
-                    result = await JsonSerializer.DeserializeAsync<T>(stream, _jsonOptions, cancellationToken);
-                }
-                else
-                {
-                    _logger.LogError("RoK API response {Error} {Url}", response.StatusCode, url);
-                    HandleErrorResponse(response);
-                }
+                _concurrencyLimiter.Release();
             }
-            catch (OperationCanceledException)
+            catch (SemaphoreFullException ex)
             {
-                // Cancellation requested by caller — expected, no action needed
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "HTTP error {Url}", url);
-            }
-            finally
-            {
-                try
-                {
-                    _concurrencyLimiter.Release();
-                }
-                catch (SemaphoreFullException ex)
-                {
-                    _logger.LogWarning(ex, "Semaphore release called when full for {Url}", url);
-                }
+                _logger.LogWarning(ex, "Semaphore release called when full for {Url}", url);
             }
         }
-
-        return result;
     }
 
     private void HandleErrorResponse(HttpResponseMessage response)
