@@ -17,7 +17,7 @@ public class TracksDataLoader(IMediator mediator, ITrackViewModelFactory trackVi
         {
             IEnumerable<TrackDto> tracks = await mediator.Send(new GetAllTracksRequest());
 
-            List<TrackDto> trackList = tracks.ToList();
+            List<TrackDto> trackList = tracks as List<TrackDto> ?? tracks.ToList();
 
             using (new PerfLogger(logger).Parameters($"Tracks: VM create ({trackList.Count})"))
             {
