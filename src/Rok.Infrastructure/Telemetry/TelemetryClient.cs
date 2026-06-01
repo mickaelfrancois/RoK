@@ -1,4 +1,5 @@
 ﻿using System.Net.Http.Json;
+using System.Runtime.InteropServices;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Rok.Application.Interfaces;
@@ -76,7 +77,7 @@ public class TelemetryClient : ITelemetryClient
             EventType = "screen",
             EventName = screenName,
             AppVersion = _appVersion,
-            OsVersion = Environment.OSVersion.Platform.ToString(),
+            OsVersion = GetOsVersion(),
             Language = System.Globalization.CultureInfo.CurrentCulture.Name,
             TimeZone = TimeZoneInfo.Local.StandardName,
         };
@@ -105,7 +106,7 @@ public class TelemetryClient : ITelemetryClient
             EventType = eventType,
             EventName = eventName,
             AppVersion = _appVersion,
-            OsVersion = Environment.OSVersion.Platform.ToString(),
+            OsVersion = GetOsVersion(),
             Language = System.Globalization.CultureInfo.CurrentCulture.Name,
             TimeZone = TimeZoneInfo.Local.StandardName,
             Payload = properties is not null ? System.Text.Json.JsonSerializer.Serialize(properties) : string.Empty
@@ -134,9 +135,10 @@ public class TelemetryClient : ITelemetryClient
             CorrelationId = _correlationId,
             Type = ex.GetType().FullName ?? ex.GetType().Name,
             Message = BuildFullMessage(ex),
+            HResult = FormatHResult(ResolveHResult(ex)),
             StackTrace = BuildFullStackTrace(ex),
             AppVersion = _appVersion,
-            OsVersion = Environment.OSVersion.Platform.ToString(),
+            OsVersion = GetOsVersion(),
             Language = System.Globalization.CultureInfo.CurrentCulture.Name,
             TimeZone = TimeZoneInfo.Local.StandardName
         };
@@ -153,7 +155,7 @@ public class TelemetryClient : ITelemetryClient
         }
     }
 
-    private static string BuildFullMessage(Exception ex)
+    internal static string BuildFullMessage(Exception ex)
     {
         var parts = new System.Text.StringBuilder();
         Exception? current = ex;
@@ -161,11 +163,27 @@ public class TelemetryClient : ITelemetryClient
         {
             if (parts.Length > 0)
                 parts.Append(" ---> ");
-            parts.Append($"[{current.GetType().Name}] {current.Message}");
+            parts.Append($"[{current.GetType().Name} {FormatHResult(current.HResult)}] {current.Message}");
             current = current.InnerException;
         }
         return parts.ToString();
     }
+
+    internal static int ResolveHResult(Exception ex)
+    {
+        Exception? current = ex;
+        while (current is not null)
+        {
+            if (current is COMException)
+                return current.HResult;
+            current = current.InnerException;
+        }
+        return ex.HResult;
+    }
+
+    internal static string FormatHResult(int hresult) => $"0x{hresult:X8}";
+
+    private static string GetOsVersion() => RuntimeInformation.OSDescription;
 
     private static string BuildFullStackTrace(Exception ex)
     {
@@ -201,6 +219,7 @@ public class TelemetryClient : ITelemetryClient
         public string CorrelationId { get; init; } = string.Empty;
         public string Type { get; init; } = string.Empty;
         public string Message { get; init; } = string.Empty;
+        public string HResult { get; init; } = string.Empty;
         public string StackTrace { get; init; } = string.Empty;
         public string AppVersion { get; init; } = string.Empty;
         public string OsVersion { get; init; } = string.Empty;
