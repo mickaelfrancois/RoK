@@ -1,6 +1,7 @@
 ﻿using System.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Microsoft.UI.Dispatching;
 using Rok.Application.Features.Playlists.Messages;
 using Rok.ViewModels.Playlist;
 using Rok.ViewModels.Playlists.Handlers;
@@ -19,6 +20,7 @@ public partial class PlaylistsViewModel : ObservableObject, IDisposable
     private readonly PlaylistImportedMessageHandler _importedHandler;
     private readonly IAppOptions _appOptions;
     private readonly IMessenger _messenger;
+    private readonly DispatcherQueue _dispatcherQueue = DispatcherQueue.GetForCurrentThread();
     private readonly List<IDisposable> _subscriptions = new();
 
     public RangeObservableCollection<PlaylistViewModel> Playlists { get; private set; } = [];
@@ -71,7 +73,7 @@ public partial class PlaylistsViewModel : ObservableObject, IDisposable
 
     private void OnDataChanged(object? sender, EventArgs e)
     {
-        RefreshPlaylists();
+        _dispatcherQueue.TryEnqueue(() => RefreshPlaylists());
     }
 
     public async Task LoadDataAsync(bool forceReload)
