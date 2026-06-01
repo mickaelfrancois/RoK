@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Logging;
 using Moq;
 using Rok.Application.Features.Tracks.Requests;
 using Rok.Application.Interfaces.Repositories;
@@ -53,13 +54,31 @@ public class GetAllTracksQueryHandlerTests
         };
         Mock<ITrackRepository> repository = new();
         repository.Setup(r => r.GetAllAsync(It.IsAny<RepositoryConnectionKind>())).ReturnsAsync(tracks);
-        GetAllTracksRequestHandler handler = new(repository.Object);
+        GetAllTracksRequestHandler handler = new(repository.Object, new Mock<ILogger<GetAllTracksRequestHandler>>().Object);
 
         // Act
         IEnumerable<TrackDto> result = await handler.Handle(new GetAllTracksRequest(), CancellationToken.None);
 
         // Assert
         Assert.Equal(2, result.Count());
+    }
+
+    [Fact(DisplayName = "Handle should materialize the mapping so it runs only once")]
+    public async Task Handle_ShouldMaterializeMapping_RunningItOnlyOnce()
+    {
+        // Arrange
+        List<TrackEntity> tracks = new() { new() { Id = 1, Title = "One" } };
+        Mock<ITrackRepository> repository = new();
+        repository.Setup(r => r.GetAllAsync(It.IsAny<RepositoryConnectionKind>())).ReturnsAsync(tracks);
+        GetAllTracksRequestHandler handler = new(repository.Object, new Mock<ILogger<GetAllTracksRequestHandler>>().Object);
+
+        // Act
+        IEnumerable<TrackDto> result = await handler.Handle(new GetAllTracksRequest(), CancellationToken.None);
+        TrackDto firstEnumeration = result.First();
+        TrackDto secondEnumeration = result.First();
+
+        // Assert
+        Assert.Same(firstEnumeration, secondEnumeration);
     }
 }
 

@@ -16,7 +16,13 @@ public class TracksDataLoader(IMediator mediator, ITrackViewModelFactory trackVi
         using (PerfLogger perfLogger = new PerfLogger(logger).Parameters("Tracks loaded"))
         {
             IEnumerable<TrackDto> tracks = await mediator.Send(new GetAllTracksRequest());
-            ViewModels = TrackViewModelMap.CreateViewModels(tracks, trackViewModelFactory);
+
+            List<TrackDto> trackList = tracks as List<TrackDto> ?? tracks.ToList();
+
+            using (new PerfLogger(logger).Parameters($"Tracks: VM create ({trackList.Count})"))
+            {
+                ViewModels = TrackViewModelMap.CreateViewModels(trackList, trackViewModelFactory);
+            }
         }
     }
 
