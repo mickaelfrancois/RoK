@@ -1,4 +1,5 @@
 using System.ComponentModel;
+using System.Threading;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Navigation;
 using Rok.Commons;
@@ -147,7 +148,13 @@ public sealed partial class TracksPage : Page, IDisposable
 
     public void Dispose()
     {
-        if (_disposed)
+        if (!this.DispatcherQueue.HasThreadAccess)
+        {
+            this.DispatcherQueue.TryEnqueue(() => Dispose());
+            return;
+        }
+
+        if (Interlocked.Exchange(ref _disposed, true))
             return;
 
         try
@@ -158,7 +165,10 @@ public sealed partial class TracksPage : Page, IDisposable
             _durationAnimation.Dispose();
 
             if (ViewModel != null)
+            {
                 ViewModel.PropertyChanged -= ViewModel_PropertyChanged;
+                ViewModel.GroupedItems.CollectionChanged -= GroupedItems_CollectionChanged;
+            }
 
             if (tracksList is not null)
                 tracksList.ItemsSource = null;
@@ -178,7 +188,5 @@ public sealed partial class TracksPage : Page, IDisposable
         {
             _logger.LogError(ex, "Error during Dispose in TracksPage");
         }
-
-        _disposed = true;
     }
 }
