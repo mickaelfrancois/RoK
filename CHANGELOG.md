@@ -1,5 +1,22 @@
 ﻿# ChangeLog
 
+## [1.12.1] Store – 1 juin 2026
+
+### Ajouté
+
+- Rapports de plantage enrichis avec le code d'erreur (HResult) et la version réelle de Windows pour faciliter le diagnostic.
+
+### Modifié
+
+- Premier chargement de la page Titres optimisé.
+
+### Corrigé
+
+- Plantage lors de la navigation répétée vers la page Titres.
+- Plantage lors du rafraîchissement des listes de lecture.
+
+--
+
 ## [1.12.0] Store – 30 mai 2026
 
 ### Ajouté
