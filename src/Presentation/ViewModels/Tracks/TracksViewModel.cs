@@ -94,7 +94,10 @@ public partial class TracksViewModel : ObservableObject, IDisposable
 
         await _trackProvider.LoadAsync();
 
-        FilterAndSort();
+        using (new PerfLogger(_logger).Parameters("Tracks: FilterAndSort"))
+        {
+            FilterAndSort();
+        }
     }
 
     public void SetData(List<TrackDto> tracks)
