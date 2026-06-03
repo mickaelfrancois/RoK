@@ -328,12 +328,14 @@ public partial class TrackViewModel : ObservableObject, IDisposable, IFilterable
     {
         await LoadLyricsAsync();
 
-        if (!string.IsNullOrEmpty(PlainLyrics))
+        string lyrics = _lyrics?.DisplayText ?? string.Empty;
+
+        if (!string.IsNullOrEmpty(lyrics))
         {
             string? rawLanguage = Windows.Globalization.ApplicationLanguages.Languages.FirstOrDefault();
             string language = LanguageHelpers.NormalizeLanguageCode(rawLanguage, "fr");
 
-            await _dialogService.ShowTextAsync($"{ArtistName} - {Title}", PlainLyrics, showTranslateButton: _appOptions.NovaApiEnabled, language);
+            await _dialogService.ShowTextAsync($"{ArtistName} - {Title}", lyrics, showTranslateButton: _appOptions.NovaApiEnabled, language);
         }
     }
 
