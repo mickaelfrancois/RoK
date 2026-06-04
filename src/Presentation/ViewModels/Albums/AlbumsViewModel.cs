@@ -16,6 +16,7 @@ public partial class AlbumsViewModel : ObservableObject, IDisposable
     private readonly AlbumsSelectionManager _selectionManager;
     private readonly AlbumsStateManager _stateManager;
     private readonly AlbumsPlaybackService _playbackService;
+    private readonly ITelemetryClient _telemetryClient;
     private readonly DispatcherQueue _dispatcherQueue = DispatcherQueue.GetForCurrentThread();
     private bool _stateLoaded = false;
     private bool _libraryUpdated = false;
@@ -65,7 +66,7 @@ public partial class AlbumsViewModel : ObservableObject, IDisposable
     public string GroupById => SelectedGroupBy;
     public string GroupByText => _albumProvider.GetGroupByLabel(SelectedGroupBy);
 
-    public AlbumsViewModel(TagsProvider tagProvider, IAlbumProvider albumProvider, IAlbumLibraryMonitor libraryMonitor, AlbumsSelectionManager selectionManager, AlbumsStateManager stateManager, AlbumsPlaybackService playbackService, ILogger<AlbumsViewModel> logger)
+    public AlbumsViewModel(TagsProvider tagProvider, IAlbumProvider albumProvider, IAlbumLibraryMonitor libraryMonitor, AlbumsSelectionManager selectionManager, AlbumsStateManager stateManager, AlbumsPlaybackService playbackService, ITelemetryClient telemetryClient, ILogger<AlbumsViewModel> logger)
     {
         _tagsProvider = tagProvider;
         _albumProvider = albumProvider;
@@ -73,6 +74,7 @@ public partial class AlbumsViewModel : ObservableObject, IDisposable
         _selectionManager = selectionManager;
         _stateManager = stateManager;
         _playbackService = playbackService;
+        _telemetryClient = telemetryClient;
         _logger = logger;
 
         IsGridView = _stateManager.GetGridView();
@@ -282,6 +284,8 @@ public partial class AlbumsViewModel : ObservableObject, IDisposable
 
         if (pool.Count == 0)
             return;
+
+        _ = _telemetryClient.CaptureEventAsync("Event", "SurpriseMe", new Dictionary<string, object> { ["source"] = "Albums" });
 
         long randomAlbumId = pool[Random.Shared.Next(pool.Count)].Album.Id;
         await _playbackService.PlayAlbumsAsync([randomAlbumId]);

@@ -91,6 +91,7 @@ public static class DependencyInjection
                         sp.GetRequiredService<AlbumsSelectionManager>(),
                         sp.GetRequiredService<AlbumsStateManager>(),
                         sp.GetRequiredService<AlbumsPlaybackService>(),
+                        sp.GetRequiredService<ITelemetryClient>(),
                         sp.GetRequiredService<ILogger<AlbumsViewModel>>()
                        );
         });
@@ -132,6 +133,7 @@ public static class DependencyInjection
                         sp.GetRequiredService<ArtistsStateManager>(),
                         sp.GetRequiredService<ArtistsPlaybackService>(),
                         sp.GetRequiredService<IAppOptions>(),
+                        sp.GetRequiredService<ITelemetryClient>(),
                         sp.GetRequiredService<ILogger<ArtistsViewModel>>()
                        );
         });
