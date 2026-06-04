@@ -2,6 +2,7 @@
 using System.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Rok.Application.Features.Albums;
 using Rok.Application.Features.Albums.Services;
 using Rok.Application.Features.Playlists.PlaylistMenu;
 using Rok.Application.Player;
@@ -77,6 +78,14 @@ public partial class AlbumViewModel : ObservableObject, IFilterableAlbum, IGroup
 
     [ObservableProperty]
     public partial bool ShowNewBadge { get; set; }
+
+    [ObservableProperty]
+    public partial bool ShowAnniversaryBadge { get; set; }
+
+    [ObservableProperty]
+    public partial string AnniversaryTooltip { get; set; } = string.Empty;
+
+    public AlbumListeningStatsViewModel ListeningStats { get; } = new();
 
     public List<string> Tags => Album.GetTags();
 
@@ -206,6 +215,8 @@ public partial class AlbumViewModel : ObservableObject, IFilterableAlbum, IGroup
 
         IsNew = Album.CreatDate > DateTime.UtcNow.AddDays(-_appOptions.AlbumRecentThresholdDays);
 
+        UpdateAnniversaryBadge();
+
         if (Album.PictureDominantColor.HasValue)
             DominantColor = ColorHelper.FromArgb(Album.PictureDominantColor.Value);
     }
@@ -228,6 +239,11 @@ public partial class AlbumViewModel : ObservableObject, IFilterableAlbum, IGroup
             return;
 
         await UpdateStatisticsIfNeededAsync();
+
+        if (cancellationToken.IsCancellationRequested)
+            return;
+
+        await LoadListeningStatsAsync();
 
         if (cancellationToken.IsCancellationRequested)
             return;
@@ -281,8 +297,43 @@ public partial class AlbumViewModel : ObservableObject, IFilterableAlbum, IGroup
             Album = album;
             IsNew = Album.CreatDate > DateTime.UtcNow.AddDays(-_appOptions.AlbumRecentThresholdDays);
 
+            UpdateAnniversaryBadge();
             LoadBackrop();
         }
+    }
+
+    private void UpdateAnniversaryBadge()
+    {
+        int? age = AlbumsFilter.GetAnniversaryAge(Album.ReleaseDate, DateOnly.FromDateTime(DateTime.Now));
+
+        ShowAnniversaryBadge = age is not null;
+
+        if (age is not null)
+        {
+            string resourceKey = age == 1 ? "albumAnniversaryTooltipOne" : "albumAnniversaryTooltipMany";
+            AnniversaryTooltip = string.Format(_resourceLoader.GetString(resourceKey), age);
+        }
+    }
+
+    private async Task LoadListeningStatsAsync()
+    {
+        HashSet<long> listenedTrackIds = [];
+
+        try
+        {
+            AlbumListeningStatsDto stats = await _dataLoader.LoadListeningStatsAsync(Album.Id);
+            ListeningStats.SetStats(stats);
+            listenedTrackIds = stats.ListenedTrackIds.ToHashSet();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "Failed to load listening stats for album {AlbumId}", Album.Id);
+        }
+
+        // A track counts as listened from either source: the legacy counter (history predating
+        // listening events, resettable by the user) or a completed listening event.
+        int listenedCount = Tracks.Count(t => t.Track.ListenCount > 0 || listenedTrackIds.Contains(t.Track.Id));
+        ListeningStats.SetProgression(listenedCount, Tracks.Count);
     }
 
     public void LoadPicture()

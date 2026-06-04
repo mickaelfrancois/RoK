@@ -1,4 +1,5 @@
 using Moq;
+using Rok.Application.Features.Albums;
 using Rok.Application.Features.Albums.Requests;
 using Rok.Application.Interfaces;
 using Rok.Application.Interfaces.Repositories;
@@ -39,6 +40,26 @@ public class GetAlbumByIdRequestHandlerTests
 
         // Assert
         result.Should().BeFailure().And.HaveError<NotFoundError>().And.HaveErrorWithCode("album.not_found");
+    }
+}
+
+public class GetAlbumListeningStatsRequestHandlerTests
+{
+    [Fact(DisplayName = "Handle should return stats from repository for the requested album")]
+    public async Task Handle_ShouldReturnStatsFromRepository_ForRequestedAlbum()
+    {
+        // Arrange
+        AlbumListeningStatsDto stats = new() { CompletedListenCount = 47, TotalDurationPlayedSeconds = 43200, PeakHour = 18 };
+        Mock<IListeningEventRepository> repository = new();
+        repository.Setup(r => r.GetAlbumListeningStatsAsync(5)).ReturnsAsync(stats);
+        GetAlbumListeningStatsRequestHandler handler = new(repository.Object);
+
+        // Act
+        AlbumListeningStatsDto result = await handler.Handle(new GetAlbumListeningStatsRequest(5), CancellationToken.None);
+
+        // Assert
+        Assert.Same(stats, result);
+        repository.Verify(r => r.GetAlbumListeningStatsAsync(5), Times.Once);
     }
 }
 

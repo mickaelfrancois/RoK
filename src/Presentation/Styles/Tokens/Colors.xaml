@@ -24,6 +24,7 @@
     <Color x:Key="BadgeCompilation">DarkViolet</Color>
     <Color x:Key="BadgeNew">DarkOrange</Color>
     <Color x:Key="BadgeBestOf">DarkBlue</Color>
+    <Color x:Key="BadgeAnniversary">DarkGoldenrod</Color>
 
     <Color x:Key="LastFm">#D51007</Color>
     <Color x:Key="Wikipedia">#000000</Color>

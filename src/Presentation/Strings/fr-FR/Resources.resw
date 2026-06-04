@@ -1998,4 +1998,37 @@
   <data name="radioFavoriteDuplicate" xml:space="preserve">
     <value>Cette station est déjà dans tes favoris.</value>
   </data>
+  <data name="badgeAnniversary.Text" xml:space="preserve">
+    <value>anniversaire</value>
+  </data>
+  <data name="albumAnniversaryTooltipOne" xml:space="preserve">
+    <value>Sorti il y a 1 an</value>
+  </data>
+  <data name="albumAnniversaryTooltipMany" xml:space="preserve">
+    <value>Sorti il y a {0} ans</value>
+  </data>
+  <data name="albumStatsHeader.Text" xml:space="preserve">
+    <value>Statistiques d'écoute</value>
+  </data>
+  <data name="albumStatsNeverListened.Text" xml:space="preserve">
+    <value>Jamais écouté</value>
+  </data>
+  <data name="albumStatsListensLabel.Text" xml:space="preserve">
+    <value>écoutes complètes</value>
+  </data>
+  <data name="albumStatsDurationLabel.Text" xml:space="preserve">
+    <value>temps d'écoute</value>
+  </data>
+  <data name="albumStatsSinceLabel.Text" xml:space="preserve">
+    <value>première écoute</value>
+  </data>
+  <data name="albumStatsPeakLabel.Text" xml:space="preserve">
+    <value>pic d'écoute</value>
+  </data>
+  <data name="albumStatsTrendLabel.Text" xml:space="preserve">
+    <value>12 derniers mois</value>
+  </data>
+  <data name="albumStatsProgressionLabel.Text" xml:space="preserve">
+    <value>pistes écoutées</value>
+  </data>
 </root>

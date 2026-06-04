@@ -37,10 +37,19 @@ public class AlbumsFilter(IResourceService resourceLoader, TimeProvider timeProv
     /// Returns true when the album celebrates a release anniversary (one year or older)
     /// within <see cref="AnniversaryWindowDays"/> days around <paramref name="today"/>.
     /// </summary>
-    internal static bool IsAnniversary(DateTime? releaseDate, DateOnly today)
+    public static bool IsAnniversary(DateTime? releaseDate, DateOnly today)
+    {
+        return GetAnniversaryAge(releaseDate, today) is not null;
+    }
+
+    /// <summary>
+    /// Returns the age in years of the release anniversary celebrated within
+    /// <see cref="AnniversaryWindowDays"/> days around <paramref name="today"/>, or null when none.
+    /// </summary>
+    public static int? GetAnniversaryAge(DateTime? releaseDate, DateOnly today)
     {
         if (releaseDate is null)
-            return false;
+            return null;
 
         DateOnly release = DateOnly.FromDateTime(releaseDate.Value);
 
@@ -50,10 +59,10 @@ public class AlbumsFilter(IResourceService resourceLoader, TimeProvider timeProv
             int age = candidate.Year - release.Year;
 
             if (age >= 1 && release.AddYears(age) == candidate)
-                return true;
+                return age;
         }
 
-        return false;
+        return null;
     }
 
     public override string GetLabel(string filterBy)

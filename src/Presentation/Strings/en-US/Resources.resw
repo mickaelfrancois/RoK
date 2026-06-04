@@ -1999,4 +1999,37 @@
   <data name="radioFavoriteDuplicate" xml:space="preserve">
     <value>This station is already in your favorites.</value>
   </data>
+  <data name="badgeAnniversary.Text" xml:space="preserve">
+    <value>anniversary</value>
+  </data>
+  <data name="albumAnniversaryTooltipOne" xml:space="preserve">
+    <value>Released 1 year ago</value>
+  </data>
+  <data name="albumAnniversaryTooltipMany" xml:space="preserve">
+    <value>Released {0} years ago</value>
+  </data>
+  <data name="albumStatsHeader.Text" xml:space="preserve">
+    <value>Listening stats</value>
+  </data>
+  <data name="albumStatsNeverListened.Text" xml:space="preserve">
+    <value>Never listened</value>
+  </data>
+  <data name="albumStatsListensLabel.Text" xml:space="preserve">
+    <value>completed listens</value>
+  </data>
+  <data name="albumStatsDurationLabel.Text" xml:space="preserve">
+    <value>time listened</value>
+  </data>
+  <data name="albumStatsSinceLabel.Text" xml:space="preserve">
+    <value>first listened</value>
+  </data>
+  <data name="albumStatsPeakLabel.Text" xml:space="preserve">
+    <value>peak hours</value>
+  </data>
+  <data name="albumStatsTrendLabel.Text" xml:space="preserve">
+    <value>last 12 months</value>
+  </data>
+  <data name="albumStatsProgressionLabel.Text" xml:space="preserve">
+    <value>tracks listened</value>
+  </data>
 </root>

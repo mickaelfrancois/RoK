@@ -3,6 +3,7 @@ using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using Rok.Application.Dto;
 using Rok.Application.Errors;
+using Rok.Application.Features.Albums;
 using Rok.Application.Features.Albums.Requests;
 using Rok.Application.Features.Tracks.Requests;
 using Rok.ViewModels.Album.Services;
@@ -90,5 +91,21 @@ public class AlbumDataLoaderTests
 
         // Assert
         Assert.Null(result);
+    }
+
+    [Fact(DisplayName = "LoadListeningStatsAsync should return the stats from the mediator")]
+    public async Task LoadListeningStatsAsync_ShouldReturnStats_FromMediator()
+    {
+        // Arrange
+        AlbumListeningStatsDto stats = new() { CompletedListenCount = 12 };
+        _mediator.Setup<GetAlbumListeningStatsRequest, AlbumListeningStatsDto>().Returns(stats);
+        AlbumDataLoader sut = BuildService();
+
+        // Act
+        AlbumListeningStatsDto result = await sut.LoadListeningStatsAsync(7);
+
+        // Assert
+        Assert.Same(stats, result);
+        Assert.Single(_mediator.Sent<GetAlbumListeningStatsRequest>());
     }
 }
