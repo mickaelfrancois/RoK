@@ -313,6 +313,9 @@
   <data name="albumsViewFilterByFavoriteGenreMenu.Text" xml:space="preserve">
     <value>улюблені жанри</value>
   </data>
+  <data name="albumsViewFilterByAnniversary" xml:space="preserve">
+    <value>річниці</value>
+  </data>
   <data name="albumsViewFilterByNeverListened" xml:space="preserve">
     <value>ніколи не слухав</value>
   </data>
@@ -904,6 +907,9 @@
   </data>
   <data name="filterneverlistened" xml:space="preserve">
     <value>Ніколи не слухав (-ла)</value>
+  </data>
+  <data name="filteranniversary" xml:space="preserve">
+    <value>Річниці</value>
   </data>
   <data name="filterfavorite" xml:space="preserve">
     <value>Обране</value>

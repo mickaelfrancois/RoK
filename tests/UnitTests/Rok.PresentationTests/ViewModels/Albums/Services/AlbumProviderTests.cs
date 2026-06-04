@@ -21,7 +21,7 @@ public class AlbumProviderTests
     private AlbumProvider BuildService()
     {
         AlbumsDataLoader loader = new(_mediator, _vmFactory.Object, NullLogger<AlbumsDataLoader>.Instance);
-        AlbumsFilter filter = new(_resource.Object);
+        AlbumsFilter filter = new(_resource.Object, TimeProvider.System);
         AlbumsGroupCategory grouper = new(_resource.Object);
         return new AlbumProvider(loader, filter, grouper);
     }
