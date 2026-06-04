@@ -142,4 +142,50 @@ public class PlayerListenTrackerTests
         // Assert
         Assert.Equal(2, _mediator.Sent<CreateListeningEventRequest>().Count);
     }
+
+    [Theory(DisplayName = "SessionListenedCount should increment only when at least half of the track was played")]
+    [InlineData(100, 200, 1)]
+    [InlineData(199, 200, 1)]
+    [InlineData(200, 200, 1)]
+    [InlineData(99, 200, 0)]
+    [InlineData(0, 200, 0)]
+    public async Task SessionListenedCount_ShouldIncrement_WhenHalfOfTrackPlayed(long durationPlayed, long durationTotal, int expectedCount)
+    {
+        // Arrange
+        PlayerListenTracker sut = BuildTracker();
+
+        // Act
+        await sut.UpdateListeningEventsAsync(1, null, null, null, durationPlayed, durationTotal);
+
+        // Assert
+        Assert.Equal(expectedCount, sut.SessionListenedCount);
+    }
+
+    [Fact(DisplayName = "SessionListenedCount should not increment when the track duration is unknown")]
+    public async Task SessionListenedCount_ShouldNotIncrement_WhenDurationTotalIsZero()
+    {
+        // Arrange
+        PlayerListenTracker sut = BuildTracker();
+
+        // Act
+        await sut.UpdateListeningEventsAsync(1, null, null, null, 50, 0);
+
+        // Assert
+        Assert.Equal(0, sut.SessionListenedCount);
+    }
+
+    [Fact(DisplayName = "SessionListenedCount should accumulate across tracks and survive ClearCache")]
+    public async Task SessionListenedCount_ShouldSurviveClearCache()
+    {
+        // Arrange
+        PlayerListenTracker sut = BuildTracker();
+        await sut.UpdateListeningEventsAsync(1, null, null, null, 100, 100);
+
+        // Act
+        sut.ClearCache();
+        await sut.UpdateListeningEventsAsync(2, null, null, null, 100, 100);
+
+        // Assert
+        Assert.Equal(2, sut.SessionListenedCount);
+    }
 }

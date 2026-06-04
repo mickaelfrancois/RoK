@@ -6,6 +6,7 @@ using Rok.Application.Player;
 using Rok.Import;
 using Rok.Infrastructure;
 using Rok.Services.PlayerCommand.Terminal;
+using Rok.ViewModels.Player.Services;
 using Serilog;
 using Windows.ApplicationModel.Activation;
 using Windows.Storage;
@@ -236,7 +237,11 @@ public partial class App : Microsoft.UI.Xaml.Application
         IImport importService = ServiceProvider.GetRequiredService<IImport>();
         await importService.StopAsync();
 
-        await telemetryClient.CaptureEventAsync("Event", "Stop");
+        PlayerListenTracker listenTracker = ServiceProvider.GetRequiredService<PlayerListenTracker>();
+        await telemetryClient.CaptureEventAsync("Event", "Stop", new Dictionary<string, object>
+        {
+            ["tracksListened"] = listenTracker.SessionListenedCount
+        });
 
         await settingFileService.SaveAsync(options);
 
