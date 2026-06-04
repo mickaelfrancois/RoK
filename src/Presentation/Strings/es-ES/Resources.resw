@@ -1864,4 +1864,7 @@
   <data name="albumStatsProgressionLabel.Text" xml:space="preserve">
     <value>pistas escuchadas</value>
   </data>
+  <data name="artistStatsProgressionLabel.Text" xml:space="preserve">
+    <value>álbumes escuchados</value>
+  </data>
 </root>

@@ -1,13 +1,13 @@
-using Rok.Application.Features.Albums;
-using Rok.ViewModels.Album;
+using Rok.Application.Features.ListeningEvents;
+using Rok.ViewModels.Common;
 
-namespace Rok.PresentationTests.ViewModels.Album;
+namespace Rok.PresentationTests.ViewModels.Common;
 
-public class AlbumListeningStatsViewModelTests
+public class ListeningStatsViewModelTests
 {
-    private static AlbumListeningStatsDto BuildStats(int listenCount = 5, long durationSeconds = 3600)
+    private static ListeningStatsDto BuildStats(int listenCount = 5, long durationSeconds = 3600)
     {
-        return new AlbumListeningStatsDto
+        return new ListeningStatsDto
         {
             CompletedListenCount = listenCount,
             TotalDurationPlayedSeconds = durationSeconds,
@@ -26,7 +26,7 @@ public class AlbumListeningStatsViewModelTests
     public void SetStats_ShouldExposeFormattedValues_WhenListened()
     {
         // Arrange
-        AlbumListeningStatsViewModel sut = new();
+        ListeningStatsViewModel sut = new();
 
         // Act
         sut.SetStats(BuildStats(listenCount: 47, durationSeconds: 7320));
@@ -44,8 +44,8 @@ public class AlbumListeningStatsViewModelTests
     public void SetStats_ShouldShowNeverListened_WhenNoCompletedListen()
     {
         // Arrange
-        AlbumListeningStatsViewModel sut = new();
-        AlbumListeningStatsDto stats = new();
+        ListeningStatsViewModel sut = new();
+        ListeningStatsDto stats = new();
 
         // Act
         sut.SetStats(stats);
@@ -59,7 +59,7 @@ public class AlbumListeningStatsViewModelTests
     public void SetStats_ShouldFormatShortDurations_InMinutes()
     {
         // Arrange
-        AlbumListeningStatsViewModel sut = new();
+        ListeningStatsViewModel sut = new();
 
         // Act
         sut.SetStats(BuildStats(durationSeconds: 2700));
@@ -72,8 +72,8 @@ public class AlbumListeningStatsViewModelTests
     public void SetStats_ShouldScaleMonthlyBars_RelativeToMostActiveMonth()
     {
         // Arrange
-        AlbumListeningStatsViewModel sut = new();
-        AlbumListeningStatsDto stats = BuildStats();
+        ListeningStatsViewModel sut = new();
+        ListeningStatsDto stats = BuildStats();
         stats.MonthlyListens =
         [
             new MonthlyListenCountDto { Year = 2026, Month = 2, Count = 0 },
@@ -95,7 +95,7 @@ public class AlbumListeningStatsViewModelTests
     public void SetStats_ShouldIncludeListenCount_InBarTooltips()
     {
         // Arrange
-        AlbumListeningStatsViewModel sut = new();
+        ListeningStatsViewModel sut = new();
 
         // Act
         sut.SetStats(BuildStats());
@@ -109,15 +109,15 @@ public class AlbumListeningStatsViewModelTests
     public void SetProgression_ShouldExposeCountsAndLabel()
     {
         // Arrange
-        AlbumListeningStatsViewModel sut = new();
+        ListeningStatsViewModel sut = new();
 
         // Act
         sut.SetProgression(12, 14);
 
         // Assert
         Assert.True(sut.ShowProgression);
-        Assert.Equal(12, sut.ListenedTrackCount);
-        Assert.Equal(14, sut.TotalTrackCount);
+        Assert.Equal(12, sut.ListenedItemCount);
+        Assert.Equal(14, sut.TotalItemCount);
         Assert.Equal("12/14", sut.ProgressionLabel);
     }
 
@@ -125,7 +125,7 @@ public class AlbumListeningStatsViewModelTests
     public void SetProgression_ShouldStayHidden_WhenNoTrack()
     {
         // Arrange
-        AlbumListeningStatsViewModel sut = new();
+        ListeningStatsViewModel sut = new();
 
         // Act
         sut.SetProgression(0, 0);

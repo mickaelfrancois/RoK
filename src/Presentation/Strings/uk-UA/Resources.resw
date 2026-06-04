@@ -1922,4 +1922,7 @@
   <data name="albumStatsProgressionLabel.Text" xml:space="preserve">
     <value>прослухані треки</value>
   </data>
+  <data name="artistStatsProgressionLabel.Text" xml:space="preserve">
+    <value>прослухані альбоми</value>
+  </data>
 </root>

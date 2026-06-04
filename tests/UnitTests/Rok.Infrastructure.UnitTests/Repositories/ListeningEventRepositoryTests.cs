@@ -1,8 +1,8 @@
 using Dapper;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Time.Testing;
-using Rok.Application.Features.Albums;
 using Rok.Application.Features.Insights;
+using Rok.Application.Features.ListeningEvents;
 using Rok.Infrastructure.Repositories;
 
 namespace Rok.Infrastructure.UnitTests.Repositories;
@@ -614,7 +614,7 @@ public class ListeningEventRepositoryTests
         ListeningEventRepository repo = CreateRepository(fixture, timeProvider);
 
         // Act
-        AlbumListeningStatsDto stats = await repo.GetAlbumListeningStatsAsync(1);
+        ListeningStatsDto stats = await repo.GetAlbumListeningStatsAsync(1);
 
         // Assert
         Assert.Equal(0, stats.CompletedListenCount);
@@ -641,7 +641,7 @@ public class ListeningEventRepositoryTests
         await InsertEventAsync(fixture, trackId: 3, artistId: 1, albumId: 1, genreId: 1, playedAt: apr5.AddMinutes(10), durationPlayed: 60, durationTotal: 180);
 
         // Act
-        AlbumListeningStatsDto stats = await repo.GetAlbumListeningStatsAsync(1);
+        ListeningStatsDto stats = await repo.GetAlbumListeningStatsAsync(1);
 
         // Assert
         long trackId = Assert.Single(stats.ListenedTrackIds);
@@ -660,7 +660,7 @@ public class ListeningEventRepositoryTests
         await InsertEventAsync(fixture, trackId: 3, artistId: 2, albumId: 2, genreId: 1, playedAt: apr5.AddMinutes(5));
 
         // Act
-        AlbumListeningStatsDto stats = await repo.GetAlbumListeningStatsAsync(1);
+        ListeningStatsDto stats = await repo.GetAlbumListeningStatsAsync(1);
 
         // Assert
         Assert.Equal(1, stats.CompletedListenCount);
@@ -679,7 +679,7 @@ public class ListeningEventRepositoryTests
         await InsertEventAsync(fixture, 2, 1, 1, 2, apr5.AddMinutes(5), wasSkipped: true, durationPlayed: 30);
 
         // Act
-        AlbumListeningStatsDto stats = await repo.GetAlbumListeningStatsAsync(1);
+        ListeningStatsDto stats = await repo.GetAlbumListeningStatsAsync(1);
 
         // Assert
         Assert.Equal(1, stats.CompletedListenCount);
@@ -700,7 +700,7 @@ public class ListeningEventRepositoryTests
         await InsertEventAsync(fixture, 2, 1, 1, 2, apr5.AddMinutes(5), durationPlayed: 60, durationTotal: 180);
 
         // Act
-        AlbumListeningStatsDto stats = await repo.GetAlbumListeningStatsAsync(1);
+        ListeningStatsDto stats = await repo.GetAlbumListeningStatsAsync(1);
 
         // Assert
         Assert.Equal(1, stats.CompletedListenCount);
@@ -720,7 +720,7 @@ public class ListeningEventRepositoryTests
         await InsertEventAsync(fixture, 1, 1, 1, 1, first);
 
         // Act
-        AlbumListeningStatsDto stats = await repo.GetAlbumListeningStatsAsync(1);
+        ListeningStatsDto stats = await repo.GetAlbumListeningStatsAsync(1);
 
         // Assert
         Assert.Equal(first, stats.FirstListenedAt);
@@ -740,7 +740,7 @@ public class ListeningEventRepositoryTests
         await InsertEventAsync(fixture, 1, 1, 1, 1, apr5.AddHours(18).AddMinutes(10));
 
         // Act
-        AlbumListeningStatsDto stats = await repo.GetAlbumListeningStatsAsync(1);
+        ListeningStatsDto stats = await repo.GetAlbumListeningStatsAsync(1);
 
         // Assert
         Assert.Equal(18, stats.PeakHour);
@@ -763,7 +763,7 @@ public class ListeningEventRepositoryTests
         await InsertEventAsync(fixture, 1, 1, 1, 1, tooOld);
 
         // Act
-        AlbumListeningStatsDto stats = await repo.GetAlbumListeningStatsAsync(1);
+        ListeningStatsDto stats = await repo.GetAlbumListeningStatsAsync(1);
 
         // Assert
         Assert.Equal(12, stats.MonthlyListens.Count);
@@ -775,5 +775,46 @@ public class ListeningEventRepositoryTests
         Assert.Equal(1, stats.MonthlyListens[9].Count);
         Assert.Equal(4, stats.CompletedListenCount);
         Assert.Equal(3, stats.MonthlyListens.Sum(m => m.Count));
+    }
+
+    [Fact(DisplayName = "GetArtistListeningStatsAsync should only aggregate events of the requested artist")]
+    public async Task GetArtistListeningStatsAsync_ShouldOnlyAggregateRequestedArtist()
+    {
+        // Arrange
+        using SqliteDatabaseFixture fixture = CreateFixture();
+        FakeTimeProvider timeProvider = new(new DateTimeOffset(2026, 4, 15, 12, 0, 0, TimeSpan.Zero));
+        ListeningEventRepository repo = CreateRepository(fixture, timeProvider);
+        DateTime apr5 = new(2026, 4, 5, 14, 0, 0, DateTimeKind.Utc);
+        await InsertEventAsync(fixture, trackId: 1, artistId: 1, albumId: 1, genreId: 1, playedAt: apr5);
+        await InsertEventAsync(fixture, trackId: 2, artistId: 1, albumId: 1, genreId: 2, playedAt: apr5.AddMinutes(5));
+        await InsertEventAsync(fixture, trackId: 3, artistId: 2, albumId: 2, genreId: 1, playedAt: apr5.AddMinutes(10));
+
+        // Act
+        ListeningStatsDto stats = await repo.GetArtistListeningStatsAsync(1);
+
+        // Assert
+        Assert.Equal(2, stats.CompletedListenCount);
+        Assert.Equal(360, stats.TotalDurationPlayedSeconds);
+    }
+
+    [Fact(DisplayName = "GetArtistListeningStatsAsync should return distinct listened album ids from completed listens")]
+    public async Task GetArtistListeningStatsAsync_ShouldReturnDistinctListenedAlbumIds()
+    {
+        // Arrange
+        using SqliteDatabaseFixture fixture = CreateFixture();
+        FakeTimeProvider timeProvider = new(new DateTimeOffset(2026, 4, 15, 12, 0, 0, TimeSpan.Zero));
+        ListeningEventRepository repo = CreateRepository(fixture, timeProvider);
+        DateTime apr5 = new(2026, 4, 5, 14, 0, 0, DateTimeKind.Utc);
+        await InsertEventAsync(fixture, trackId: 1, artistId: 1, albumId: 1, genreId: 1, playedAt: apr5);
+        await InsertEventAsync(fixture, trackId: 2, artistId: 1, albumId: 1, genreId: 2, playedAt: apr5.AddMinutes(5));
+        await InsertEventAsync(fixture, trackId: 3, artistId: 1, albumId: 2, genreId: 1, playedAt: apr5.AddMinutes(10), wasSkipped: true);
+        await InsertEventAsync(fixture, trackId: 1, artistId: 1, albumId: null, genreId: 1, playedAt: apr5.AddMinutes(15));
+
+        // Act
+        ListeningStatsDto stats = await repo.GetArtistListeningStatsAsync(1);
+
+        // Assert
+        long albumId = Assert.Single(stats.ListenedAlbumIds);
+        Assert.Equal(1, albumId);
     }
 }

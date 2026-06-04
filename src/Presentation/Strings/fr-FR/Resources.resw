@@ -2031,4 +2031,7 @@
   <data name="albumStatsProgressionLabel.Text" xml:space="preserve">
     <value>pistes écoutées</value>
   </data>
+  <data name="artistStatsProgressionLabel.Text" xml:space="preserve">
+    <value>albums écoutés</value>
+  </data>
 </root>

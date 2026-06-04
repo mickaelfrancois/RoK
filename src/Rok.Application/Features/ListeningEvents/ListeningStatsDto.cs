@@ -1,20 +1,20 @@
-namespace Rok.Application.Features.Albums;
+namespace Rok.Application.Features.ListeningEvents;
 
 /// <summary>
-/// Listening statistics of a single album, aggregated from listening events.
+/// Listening statistics of a scope (album or artist), aggregated from listening events.
 /// </summary>
-public class AlbumListeningStatsDto
+public class ListeningStatsDto
 {
     /// <summary>Number of completed listens (at least half of the track played, not skipped).</summary>
     public int CompletedListenCount { get; set; }
 
-    /// <summary>Total time spent listening to the album, in seconds (skipped events excluded).</summary>
+    /// <summary>Total time spent listening, in seconds (skipped events excluded).</summary>
     public long TotalDurationPlayedSeconds { get; set; }
 
-    /// <summary>Date of the first non-skipped listen, null when the album was never listened.</summary>
+    /// <summary>Date of the first non-skipped listen, null when never listened.</summary>
     public DateTime? FirstListenedAt { get; set; }
 
-    /// <summary>Date of the most recent non-skipped listen, null when the album was never listened.</summary>
+    /// <summary>Date of the most recent non-skipped listen, null when never listened.</summary>
     public DateTime? LastListenedAt { get; set; }
 
     /// <summary>Most active listening hour of the day, -1 when unknown.</summary>
@@ -23,8 +23,11 @@ public class AlbumListeningStatsDto
     /// <summary>Completed listens per month over the last twelve months, oldest first, zero-filled.</summary>
     public List<MonthlyListenCountDto> MonthlyListens { get; set; } = [];
 
-    /// <summary>Ids of the album tracks having at least one completed listen.</summary>
+    /// <summary>Ids of the tracks having at least one completed listen.</summary>
     public List<long> ListenedTrackIds { get; set; } = [];
+
+    /// <summary>Ids of the albums having at least one completed listen.</summary>
+    public List<long> ListenedAlbumIds { get; set; } = [];
 
     public string PeakHourRange => PeakHour >= 0
         ? $"{PeakHour:D2}h - {(PeakHour + 3) % 24:D2}h"

@@ -1,6 +1,6 @@
 using Moq;
-using Rok.Application.Features.Albums;
 using Rok.Application.Features.Albums.Requests;
+using Rok.Application.Features.ListeningEvents;
 using Rok.Application.Interfaces;
 using Rok.Application.Interfaces.Repositories;
 using Rok.Domain.Interfaces.Entities;
@@ -49,13 +49,13 @@ public class GetAlbumListeningStatsRequestHandlerTests
     public async Task Handle_ShouldReturnStatsFromRepository_ForRequestedAlbum()
     {
         // Arrange
-        AlbumListeningStatsDto stats = new() { CompletedListenCount = 47, TotalDurationPlayedSeconds = 43200, PeakHour = 18 };
+        ListeningStatsDto stats = new() { CompletedListenCount = 47, TotalDurationPlayedSeconds = 43200, PeakHour = 18 };
         Mock<IListeningEventRepository> repository = new();
         repository.Setup(r => r.GetAlbumListeningStatsAsync(5)).ReturnsAsync(stats);
         GetAlbumListeningStatsRequestHandler handler = new(repository.Object);
 
         // Act
-        AlbumListeningStatsDto result = await handler.Handle(new GetAlbumListeningStatsRequest(5), CancellationToken.None);
+        ListeningStatsDto result = await handler.Handle(new GetAlbumListeningStatsRequest(5), CancellationToken.None);
 
         // Assert
         Assert.Same(stats, result);

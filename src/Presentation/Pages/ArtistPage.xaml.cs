@@ -7,6 +7,9 @@ namespace Rok.Pages;
 
 public sealed partial class ArtistPage : Page
 {
+    /// <summary>Width reserved by the stats panel (250px) plus its paddings and grid margins.</summary>
+    private const double StatsPanelReservedWidth = 300;
+
     public ArtistViewModel ViewModel { get; set; } = null!;
     private readonly ILogger<ArtistPage> _logger;
 
@@ -29,6 +32,7 @@ public sealed partial class ArtistPage : Page
             DataContext = ViewModel;
 
             await ViewModel.LoadDataAsync(options.ArtistId);
+            UpdateStatsPanelVisibility(ActualWidth);
             base.OnNavigatedTo(e);
         }
         catch (OperationCanceledException) { }
@@ -45,6 +49,28 @@ public sealed partial class ArtistPage : Page
         base.OnNavigatedFrom(e);
     }
 
+
+    private void Page_SizeChanged(object sender, SizeChangedEventArgs e)
+    {
+        UpdateStatsPanelVisibility(e.NewSize.Width);
+    }
+
+    private void UpdateStatsPanelVisibility(double pageWidth)
+    {
+        // The tracks tab is the widest pivot content: title, album and score fixed columns.
+        double requiredTracksWidth = GetGridLengthResource("GridHeaderTracksTitleColumnWidth")
+                                   + GetGridLengthResource("GridHeaderTracksAlbumColumnWidth")
+                                   + GetGridLengthResource("GridHeaderTracksScoreColumnWidth");
+
+        statsPanel.Visibility = pageWidth >= requiredTracksWidth + StatsPanelReservedWidth
+            ? Visibility.Visible
+            : Visibility.Collapsed;
+    }
+
+    private static double GetGridLengthResource(string key)
+    {
+        return ((GridLength)Microsoft.UI.Xaml.Application.Current.Resources[key]).Value;
+    }
 
     private void grid_ContainerContentChanging(ListViewBase sender, ContainerContentChangingEventArgs args)
     {

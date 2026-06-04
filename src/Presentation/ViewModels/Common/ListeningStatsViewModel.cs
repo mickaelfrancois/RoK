@@ -1,14 +1,14 @@
 using System.Globalization;
 using CommunityToolkit.Mvvm.ComponentModel;
-using Rok.Application.Features.Albums;
+using Rok.Application.Features.ListeningEvents;
 
-namespace Rok.ViewModels.Album;
+namespace Rok.ViewModels.Common;
 
 /// <summary>
-/// Presentation model of the album listening statistics panel:
-/// formatted stat values, monthly sparkline bars and album listening progression.
+/// Presentation model of a listening statistics panel (album or artist page):
+/// formatted stat values, monthly sparkline bars and listening progression.
 /// </summary>
-public partial class AlbumListeningStatsViewModel : ObservableObject
+public partial class ListeningStatsViewModel : ObservableObject
 {
     private const double MaxBarHeight = 40;
     private const double MinVisibleBarHeight = 2;
@@ -35,17 +35,17 @@ public partial class AlbumListeningStatsViewModel : ObservableObject
     public partial string PeakHourValue { get; set; } = string.Empty;
 
     [ObservableProperty]
-    public partial int ListenedTrackCount { get; set; }
+    public partial int ListenedItemCount { get; set; }
 
     [ObservableProperty]
-    public partial int TotalTrackCount { get; set; }
+    public partial int TotalItemCount { get; set; }
 
     [ObservableProperty]
     public partial string ProgressionLabel { get; set; } = string.Empty;
 
     public ObservableCollection<MonthlyBarViewModel> MonthlyBars { get; } = [];
 
-    public void SetStats(AlbumListeningStatsDto stats)
+    public void SetStats(ListeningStatsDto stats)
     {
         ShowStats = stats.CompletedListenCount > 0;
         ShowNeverListened = stats.CompletedListenCount == 0;
@@ -58,12 +58,12 @@ public partial class AlbumListeningStatsViewModel : ObservableObject
         UpdateMonthlyBars(stats.MonthlyListens);
     }
 
-    public void SetProgression(int listenedTrackCount, int totalTrackCount)
+    public void SetProgression(int listenedItemCount, int totalItemCount)
     {
-        ListenedTrackCount = listenedTrackCount;
-        TotalTrackCount = totalTrackCount;
-        ProgressionLabel = $"{listenedTrackCount}/{totalTrackCount}";
-        ShowProgression = totalTrackCount > 0;
+        ListenedItemCount = listenedItemCount;
+        TotalItemCount = totalItemCount;
+        ProgressionLabel = $"{listenedItemCount}/{totalItemCount}";
+        ShowProgression = totalItemCount > 0;
     }
 
     private void UpdateMonthlyBars(List<MonthlyListenCountDto> monthlyListens)

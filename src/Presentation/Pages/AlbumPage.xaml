@@ -6,7 +6,7 @@
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
       xmlns:common="using:Rok.Commons"
-      xmlns:album="using:Rok.ViewModels.Album"
+      xmlns:vmcommon="using:Rok.ViewModels.Common"
       xmlns:tracks="using:Rok.ViewModels.Track"
       xmlns:controls="using:CommunityToolkit.WinUI.Controls"
       x:Name="albumPage"
@@ -184,7 +184,7 @@
                                     </ItemsPanelTemplate>
                                 </ItemsControl.ItemsPanel>
                                 <ItemsControl.ItemTemplate>
-                                    <DataTemplate x:DataType="album:MonthlyBarViewModel">
+                                    <DataTemplate x:DataType="vmcommon:MonthlyBarViewModel">
                                         <Rectangle Width="12" Height="{x:Bind Height}" VerticalAlignment="Bottom" RadiusX="2" RadiusY="2" Fill="{ThemeResource AccentFillColorDefaultBrush}" ToolTipService.ToolTip="{x:Bind Tooltip}" />
                                     </DataTemplate>
                                 </ItemsControl.ItemTemplate>
@@ -194,7 +194,7 @@
                     </StackPanel>
 
                     <StackPanel Spacing="4" Visibility="{x:Bind ViewModel.ListeningStats.ShowProgression, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">
-                        <ProgressBar Maximum="{x:Bind ViewModel.ListeningStats.TotalTrackCount, Mode=OneWay}" Value="{x:Bind ViewModel.ListeningStats.ListenedTrackCount, Mode=OneWay}" />
+                        <ProgressBar Maximum="{x:Bind ViewModel.ListeningStats.TotalItemCount, Mode=OneWay}" Value="{x:Bind ViewModel.ListeningStats.ListenedItemCount, Mode=OneWay}" />
                         <StackPanel Orientation="Horizontal" Spacing="6">
                             <TextBlock Text="{x:Bind ViewModel.ListeningStats.ProgressionLabel, Mode=OneWay}" Style="{ThemeResource CaptionTextBlockStyle}" />
                             <TextBlock x:Uid="albumStatsProgressionLabel" Style="{ThemeResource CaptionTextBlockStyle}" Opacity="0.7" />

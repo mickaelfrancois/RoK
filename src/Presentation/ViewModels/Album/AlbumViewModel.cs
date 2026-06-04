@@ -2,14 +2,15 @@
 using System.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using Rok.Application.Features.Albums;
 using Rok.Application.Features.Albums.Services;
+using Rok.Application.Features.ListeningEvents;
 using Rok.Application.Features.Playlists.PlaylistMenu;
 using Rok.Application.Player;
 using Rok.Application.Services.Filters;
 using Rok.Application.Services.Grouping;
 using Rok.Commons;
 using Rok.ViewModels.Album.Services;
+using Rok.ViewModels.Common;
 using Rok.ViewModels.Track;
 
 namespace Rok.ViewModels.Album;
@@ -85,7 +86,7 @@ public partial class AlbumViewModel : ObservableObject, IFilterableAlbum, IGroup
     [ObservableProperty]
     public partial string AnniversaryTooltip { get; set; } = string.Empty;
 
-    public AlbumListeningStatsViewModel ListeningStats { get; } = new();
+    public ListeningStatsViewModel ListeningStats { get; } = new();
 
     public List<string> Tags => Album.GetTags();
 
@@ -321,7 +322,7 @@ public partial class AlbumViewModel : ObservableObject, IFilterableAlbum, IGroup
 
         try
         {
-            AlbumListeningStatsDto stats = await _dataLoader.LoadListeningStatsAsync(Album.Id);
+            ListeningStatsDto stats = await _dataLoader.LoadListeningStatsAsync(Album.Id);
             ListeningStats.SetStats(stats);
             listenedTrackIds = stats.ListenedTrackIds.ToHashSet();
         }

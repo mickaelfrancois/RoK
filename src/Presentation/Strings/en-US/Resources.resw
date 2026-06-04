@@ -2032,4 +2032,7 @@
   <data name="albumStatsProgressionLabel.Text" xml:space="preserve">
     <value>tracks listened</value>
   </data>
+  <data name="artistStatsProgressionLabel.Text" xml:space="preserve">
+    <value>albums listened</value>
+  </data>
 </root>

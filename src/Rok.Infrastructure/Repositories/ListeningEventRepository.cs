@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Rok.Application.Features.Albums;
 using Rok.Application.Features.Insights;
+using Rok.Application.Features.ListeningEvents;
 using Rok.Application.Interfaces.Repositories;
 
 namespace Rok.Infrastructure.Repositories;
@@ -67,26 +67,39 @@ public class ListeningEventRepository(IDbConnection connection, [FromKeyedServic
         };
     }
 
-    public async Task<AlbumListeningStatsDto> GetAlbumListeningStatsAsync(long albumId)
+    public async Task<ListeningStatsDto> GetAlbumListeningStatsAsync(long albumId)
     {
-        IEnumerable<RawAlbumListeningEvent> rows = await _connection.QueryAsync<RawAlbumListeningEvent>(AlbumListeningEventsSql, new { albumId });
+        IEnumerable<RawScopedListeningEvent> rows = await _connection.QueryAsync<RawScopedListeningEvent>(AlbumListeningEventsSql, new { albumId });
 
-        List<RawAlbumListeningEvent> playedEvents = rows.Where(e => !e.WasSkipped).ToList();
-        List<RawAlbumListeningEvent> completedEvents = playedEvents.Where(e => e.DurationPlayed * 2 >= e.DurationTotal).ToList();
+        return BuildListeningStats(rows.ToList());
+    }
 
-        return new AlbumListeningStatsDto
+    public async Task<ListeningStatsDto> GetArtistListeningStatsAsync(long artistId)
+    {
+        IEnumerable<RawScopedListeningEvent> rows = await _connection.QueryAsync<RawScopedListeningEvent>(ArtistListeningEventsSql, new { artistId });
+
+        return BuildListeningStats(rows.ToList());
+    }
+
+    private ListeningStatsDto BuildListeningStats(List<RawScopedListeningEvent> events)
+    {
+        List<RawScopedListeningEvent> playedEvents = events.Where(e => !e.WasSkipped).ToList();
+        List<RawScopedListeningEvent> completedEvents = playedEvents.Where(e => e.DurationPlayed * 2 >= e.DurationTotal).ToList();
+
+        return new ListeningStatsDto
         {
             CompletedListenCount = completedEvents.Count,
             TotalDurationPlayedSeconds = playedEvents.Sum(e => e.DurationPlayed),
             FirstListenedAt = playedEvents.Count > 0 ? playedEvents.Min(e => e.PlayedAt) : null,
             LastListenedAt = playedEvents.Count > 0 ? playedEvents.Max(e => e.PlayedAt) : null,
-            PeakHour = GetAlbumPeakHour(playedEvents),
+            PeakHour = GetScopedPeakHour(playedEvents),
             MonthlyListens = GetMonthlyListens(completedEvents),
-            ListenedTrackIds = completedEvents.Select(e => e.TrackId).Distinct().ToList()
+            ListenedTrackIds = completedEvents.Select(e => e.TrackId).Distinct().ToList(),
+            ListenedAlbumIds = completedEvents.Where(e => e.AlbumId.HasValue).Select(e => e.AlbumId!.Value).Distinct().ToList()
         };
     }
 
-    private static int GetAlbumPeakHour(List<RawAlbumListeningEvent> events)
+    private static int GetScopedPeakHour(List<RawScopedListeningEvent> events)
     {
         if (events.Count == 0) return -1;
         return events
@@ -96,7 +109,7 @@ public class ListeningEventRepository(IDbConnection connection, [FromKeyedServic
             .First().Key;
     }
 
-    private List<MonthlyListenCountDto> GetMonthlyListens(List<RawAlbumListeningEvent> completedEvents)
+    private List<MonthlyListenCountDto> GetMonthlyListens(List<RawScopedListeningEvent> completedEvents)
     {
         DateTime now = _timeProvider.GetUtcNow().UtcDateTime;
         DateTime currentMonth = new(now.Year, now.Month, 1, 0, 0, 0, DateTimeKind.Utc);
@@ -482,12 +495,26 @@ public class ListeningEventRepository(IDbConnection connection, [FromKeyedServic
         """
             SELECT
                 le.TrackId,
+                le.AlbumId,
                 le.PlayedAt,
                 le.WasSkipped,
                 le.DurationPlayed,
                 le.DurationTotal
             FROM ListeningEvents le
             WHERE le.AlbumId = @albumId;
+            """;
+
+    private const string ArtistListeningEventsSql =
+        """
+            SELECT
+                le.TrackId,
+                le.AlbumId,
+                le.PlayedAt,
+                le.WasSkipped,
+                le.DurationPlayed,
+                le.DurationTotal
+            FROM ListeningEvents le
+            WHERE le.ArtistId = @artistId;
             """;
 
     private sealed class ListeningSession
@@ -511,9 +538,10 @@ public class ListeningEventRepository(IDbConnection connection, [FromKeyedServic
         public bool ContainsGenre(long genreId) => _events.Any(e => e.GenreId == genreId);
     }
 
-    private sealed record RawAlbumListeningEvent
+    private sealed record RawScopedListeningEvent
     {
         public long TrackId { get; set; } = default;
+        public long? AlbumId { get; set; } = null;
         public DateTime PlayedAt { get; set; } = DateTime.MinValue;
         public bool WasSkipped { get; set; } = false;
         public long DurationPlayed { get; set; } = 0;

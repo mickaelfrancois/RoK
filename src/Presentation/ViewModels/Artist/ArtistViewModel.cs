@@ -8,10 +8,12 @@ using Rok.Application.Player;
 using Rok.Application.Randomizer;
 using Rok.Application.Services.Filters;
 using Rok.Application.Services.Grouping;
+using Rok.Application.Features.ListeningEvents;
 using Rok.Commons;
 using Rok.Infrastructure.Files;
 using Rok.ViewModels.Album;
 using Rok.ViewModels.Artist.Services;
+using Rok.ViewModels.Common;
 using Rok.ViewModels.Track;
 
 namespace Rok.ViewModels.Artist;
@@ -46,6 +48,8 @@ public partial class ArtistViewModel : ObservableObject, IFilterableArtist, IGro
     public ArtistDto Artist { get; private set; } = new();
     public RangeObservableCollection<TrackViewModel> Tracks { get; set; } = [];
     public RangeObservableCollection<AlbumViewModel> Albums { get; set; } = [];
+
+    public ListeningStatsViewModel ListeningStats { get; } = new();
 
 
     public ObservableCollection<string> EditableTags { get; set; } = new();
@@ -313,6 +317,12 @@ public partial class ArtistViewModel : ObservableObject, IFilterableArtist, IGro
         if (cancellationToken.IsCancellationRequested)
             return;
 
+        if (loadAlbums)
+            await LoadListeningStatsAsync();
+
+        if (cancellationToken.IsCancellationRequested)
+            return;
+
         if (fetchApi)
             await GetDataFromApiAsync();
 
@@ -354,6 +364,27 @@ public partial class ArtistViewModel : ObservableObject, IFilterableArtist, IGro
 
             LoadBackdrop();
         }
+    }
+
+    private async Task LoadListeningStatsAsync()
+    {
+        HashSet<long> listenedAlbumIds = [];
+
+        try
+        {
+            ListeningStatsDto stats = await _dataLoader.LoadListeningStatsAsync(Artist.Id);
+            ListeningStats.SetStats(stats);
+            listenedAlbumIds = stats.ListenedAlbumIds.ToHashSet();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "Failed to load listening stats for artist {ArtistId}", Artist.Id);
+        }
+
+        // An album counts as listened from either source: the legacy counter (history predating
+        // listening events, resettable by the user) or a completed listening event.
+        int listenedCount = Albums.Count(a => a.Album.ListenCount > 0 || listenedAlbumIds.Contains(a.Album.Id));
+        ListeningStats.SetProgression(listenedCount, Albums.Count);
     }
 
     public void LoadPicture()

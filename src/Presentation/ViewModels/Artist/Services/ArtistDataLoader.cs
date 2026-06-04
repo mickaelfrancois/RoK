@@ -1,4 +1,5 @@
 ﻿using Rok.Application.Features.Albums.Requests;
+using Rok.Application.Features.ListeningEvents;
 using Rok.Application.Features.Tracks.Requests;
 using Rok.ViewModels.Album;
 using Rok.ViewModels.Albums.Interfaces;
@@ -36,5 +37,10 @@ public class ArtistDataLoader(IMediator mediator, IAlbumViewModelFactory albumVi
     {
         Result<ArtistDto> artistResult = await mediator.Send(new GetArtistByIdRequest(artistId));
         return artistResult.IsSuccess ? artistResult.Value : null;
+    }
+
+    public Task<ListeningStatsDto> LoadListeningStatsAsync(long artistId)
+    {
+        return mediator.Send(new GetArtistListeningStatsRequest(artistId));
     }
 }
