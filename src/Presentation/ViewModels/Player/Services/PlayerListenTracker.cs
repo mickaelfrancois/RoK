@@ -13,6 +13,11 @@ public class PlayerListenTracker(IMediator mediator)
     private readonly HashSet<long> _trackUpdatedCache = [];
     private readonly HashSet<long> _genreUpdatedCache = [];
 
+    /// <summary>
+    /// Number of tracks listened during the session (at least half of the track played).
+    /// </summary>
+    public int SessionListenedCount { get; private set; }
+
     public void ClearCache()
     {
         _artistUpdatedCache.Clear();
@@ -60,6 +65,9 @@ public class PlayerListenTracker(IMediator mediator)
 
     public Task UpdateListeningEventsAsync(long trackId, long? artistId, long? albumId, long? genreId, long durationPlayed, long durationTotal)
     {
+        if (durationTotal > 0 && durationPlayed * 2 >= durationTotal)
+            SessionListenedCount++;
+
         return mediator.Send(new CreateListeningEventRequest
         {
             TrackId = trackId,

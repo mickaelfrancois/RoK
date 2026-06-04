@@ -17,6 +17,7 @@ public partial class ArtistsViewModel : ObservableObject, IDisposable
     private readonly ArtistsSelectionManager _selectionManager;
     private readonly ArtistsStateManager _stateManager;
     private readonly ArtistsPlaybackService _playbackService;
+    private readonly ITelemetryClient _telemetryClient;
     private readonly DispatcherQueue _dispatcherQueue = DispatcherQueue.GetForCurrentThread();
     private bool _stateLoaded = false;
     private bool _libraryUpdated = false;
@@ -67,7 +68,7 @@ public partial class ArtistsViewModel : ObservableObject, IDisposable
     public string GroupByText => _artistProvider.GetGroupByLabel(SelectedGroupBy);
 
 
-    public ArtistsViewModel(TagsProvider tagProvider, IArtistProvider artistProvider, IArtistLibraryMonitor libraryMonitor, ArtistsSelectionManager selectionManager, ArtistsStateManager stateManager, ArtistsPlaybackService playbackService, IAppOptions appOptions, ILogger<ArtistsViewModel> logger)
+    public ArtistsViewModel(TagsProvider tagProvider, IArtistProvider artistProvider, IArtistLibraryMonitor libraryMonitor, ArtistsSelectionManager selectionManager, ArtistsStateManager stateManager, ArtistsPlaybackService playbackService, IAppOptions appOptions, ITelemetryClient telemetryClient, ILogger<ArtistsViewModel> logger)
     {
         _tagsProvider = tagProvider;
         _artistProvider = artistProvider;
@@ -76,6 +77,7 @@ public partial class ArtistsViewModel : ObservableObject, IDisposable
         _stateManager = stateManager;
         _playbackService = playbackService;
         _appOptions = appOptions;
+        _telemetryClient = telemetryClient;
         _logger = logger;
 
         IsGridView = _stateManager.GetGridView();
@@ -285,6 +287,8 @@ public partial class ArtistsViewModel : ObservableObject, IDisposable
 
         if (pool.Count == 0)
             return;
+
+        _ = _telemetryClient.CaptureEventAsync("Event", "SurpriseMe", new Dictionary<string, object> { ["source"] = "Artists" });
 
         long randomArtistId = pool[Random.Shared.Next(pool.Count)].Artist.Id;
         await _playbackService.PlayArtistsAsync([randomArtistId]);
