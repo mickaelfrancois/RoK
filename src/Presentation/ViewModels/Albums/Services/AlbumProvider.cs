@@ -34,14 +34,24 @@ public class AlbumProvider(AlbumsDataLoader dataLoader, AlbumsFilter filterServi
             filtered = filterService.FilterByTags(tagFilters, filtered);
 
         List<AlbumViewModel> filteredList = filtered.Cast<AlbumViewModel>().ToList();
-        List<AlbumsGroupCategoryViewModel> groups = groupService
-            .GetGroupedItems(groupBy, filteredList.Cast<IGroupableAlbum>().ToList())
-            .Select(g => new AlbumsGroupCategoryViewModel { Title = g.Title, Items = g.Items.Cast<AlbumViewModel>().ToList() })
-            .ToList();
+        List<AlbumsGroupCategoryViewModel> groups = filters.Contains(AlbumsFilter.KFilterByAnniversary)
+            ? BuildFlatGroup(filteredList)
+            : groupService
+                .GetGroupedItems(groupBy, filteredList.Cast<IGroupableAlbum>().ToList())
+                .Select(g => new AlbumsGroupCategoryViewModel { Title = g.Title, Items = g.Items.Cast<AlbumViewModel>().ToList() })
+                .ToList();
 
         bool isGroupingEnabled = groups.Count > 1 || !string.IsNullOrEmpty(groups.FirstOrDefault()?.Title ?? string.Empty);
 
         return new AlbumProviderResult(filteredList, groups, isGroupingEnabled);
+    }
+
+    private static List<AlbumsGroupCategoryViewModel> BuildFlatGroup(List<AlbumViewModel> albums)
+    {
+        if (albums.Count == 0)
+            return [];
+
+        return [new AlbumsGroupCategoryViewModel { Title = string.Empty, Items = [.. albums.OrderBy(a => a.Album.Name)] }];
     }
 
     public void Clear() => dataLoader.Clear();

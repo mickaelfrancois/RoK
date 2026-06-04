@@ -255,6 +255,9 @@
   <data name="albumsViewFilterByFavoriteGenreMenu.Text" xml:space="preserve">
     <value>géneros favoritos</value>
   </data>
+  <data name="albumsViewFilterByAnniversary" xml:space="preserve">
+    <value>aniversarios</value>
+  </data>
   <data name="albumsViewFilterByNeverListened" xml:space="preserve">
     <value>nunca escuchó</value>
   </data>
@@ -846,6 +849,9 @@
   </data>
   <data name="filterneverlistened" xml:space="preserve">
     <value>Nunca escuché</value>
+  </data>
+  <data name="filteranniversary" xml:space="preserve">
+    <value>Aniversarios</value>
   </data>
   <data name="filterfavorite" xml:space="preserve">
     <value>Favoritos</value>

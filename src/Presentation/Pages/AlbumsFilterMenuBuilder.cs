@@ -22,6 +22,7 @@ internal class AlbumsFilterMenuBuilder
         "COMPILATION",
         "ALBUM",
         "NEVERLISTENED",
+        "ANNIVERSARY",
     ];
 
 

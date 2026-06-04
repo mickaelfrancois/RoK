@@ -66,6 +66,8 @@ public partial class AlbumViewModel : ObservableObject, IFilterableAlbum, IGroup
 
     public bool IsAlbumFavorite => Album.IsFavorite;
 
+    public DateTime? ReleaseDate => Album.ReleaseDate;
+
     [ObservableProperty]
     public partial Windows.UI.Color DominantColor { get; set; }
     private int _dominantColorCalculating = 0;

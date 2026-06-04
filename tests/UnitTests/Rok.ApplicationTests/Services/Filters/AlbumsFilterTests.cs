@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Time.Testing;
 using Moq;
 using Rok.Application.Interfaces;
 using Rok.Application.Services.Filters;
@@ -6,7 +7,8 @@ namespace Rok.ApplicationTests.Services.Filters;
 
 public class AlbumsFilterTests
 {
-    private static AlbumsFilter CreateFilter(IResourceService? resource = null) => new(resource ?? Mock.Of<IResourceService>());
+    private static AlbumsFilter CreateFilter(IResourceService? resource = null, TimeProvider? timeProvider = null)
+        => new(resource ?? Mock.Of<IResourceService>(), timeProvider ?? new FakeTimeProvider());
 
     private sealed class FakeAlbum : IFilterableAlbum
     {
@@ -19,6 +21,7 @@ public class AlbumsFilterTests
         public bool IsCompilation { get; set; }
         public int ListenCount { get; set; }
         public long? GenreId { get; set; }
+        public DateTime? ReleaseDate { get; set; }
         public List<string> Tags { get; set; } = new();
     }
 
@@ -147,6 +150,90 @@ public class AlbumsFilterTests
         Assert.Single(result);
     }
 
+    [Theory(DisplayName = "AlbumsFilter IsAnniversary should match anniversaries within the window and ignore recent or future releases")]
+    [InlineData(2020, 6, 15, true)]   // exact anniversary day
+    [InlineData(2020, 6, 18, true)]   // window upper edge (+3 days)
+    [InlineData(2020, 6, 12, true)]   // window lower edge (-3 days)
+    [InlineData(2020, 6, 19, false)]  // one day outside the window
+    [InlineData(2020, 6, 11, false)]  // one day outside the window
+    [InlineData(2025, 6, 16, true)]   // first anniversary falls tomorrow, inside the window
+    [InlineData(2026, 6, 15, false)]  // released today, no anniversary yet
+    [InlineData(2027, 1, 1, false)]   // future release date
+    public void IsAnniversary_ShouldMatchWindowAndIgnoreRecentOrFutureReleases(int year, int month, int day, bool expected)
+    {
+        // Arrange
+        DateTime releaseDate = new(year, month, day);
+        DateOnly today = new(2026, 6, 15);
+
+        // Act
+        bool result = AlbumsFilter.IsAnniversary(releaseDate, today);
+
+        // Assert
+        Assert.Equal(expected, result);
+    }
+
+    [Fact(DisplayName = "AlbumsFilter IsAnniversary with no release date should return false")]
+    public void IsAnniversary_WithNoReleaseDate_ShouldReturnFalse()
+    {
+        // Arrange
+        DateOnly today = new(2026, 6, 15);
+
+        // Act
+        bool result = AlbumsFilter.IsAnniversary(null, today);
+
+        // Assert
+        Assert.False(result);
+    }
+
+    [Fact(DisplayName = "AlbumsFilter IsAnniversary with a leap day release should match february 28 on non leap years")]
+    public void IsAnniversary_WithLeapDayRelease_ShouldMatchFebruary28OnNonLeapYears()
+    {
+        // Arrange
+        DateTime releaseDate = new(2020, 2, 29);
+        DateOnly today = new(2026, 2, 28);
+
+        // Act
+        bool result = AlbumsFilter.IsAnniversary(releaseDate, today);
+
+        // Assert
+        Assert.True(result);
+    }
+
+    [Fact(DisplayName = "AlbumsFilter IsAnniversary should match across a year boundary")]
+    public void IsAnniversary_ShouldMatchAcrossYearBoundary()
+    {
+        // Arrange
+        DateTime releaseDate = new(2020, 12, 31);
+        DateOnly today = new(2026, 1, 2);
+
+        // Act
+        bool result = AlbumsFilter.IsAnniversary(releaseDate, today);
+
+        // Assert
+        Assert.True(result);
+    }
+
+    [Fact(DisplayName = "AlbumsFilter Filter by anniversary should keep only albums celebrating an anniversary")]
+    public void Filter_ByAnniversary_ShouldKeepOnlyAnniversaryAlbums()
+    {
+        // Arrange
+        FakeTimeProvider timeProvider = new(new DateTimeOffset(2026, 6, 15, 12, 0, 0, TimeSpan.Zero));
+        AlbumsFilter sut = CreateFilter(timeProvider: timeProvider);
+        List<IFilterableAlbum> input = new()
+        {
+            new FakeAlbum { ReleaseDate = new DateTime(2016, 6, 15) },
+            new FakeAlbum { ReleaseDate = new DateTime(2016, 9, 1) },
+            new FakeAlbum { ReleaseDate = null }
+        };
+
+        // Act
+        List<IFilterableAlbum> result = sut.Filter(AlbumsFilter.KFilterByAnniversary, input).ToList();
+
+        // Assert
+        Assert.Single(result);
+        Assert.Equal(new DateTime(2016, 6, 15), result[0].ReleaseDate);
+    }
+
     [Fact(DisplayName = "AlbumsFilter Filter with unknown key should return all items unchanged")]
     public void Filter_WithUnknownKey_ShouldReturnAllItemsUnchanged()
     {
@@ -170,6 +257,7 @@ public class AlbumsFilterTests
     [InlineData(AlbumsFilter.KFilterByBestOf, "albumsViewFilterByBestof")]
     [InlineData(AlbumsFilter.KFilterByCompilation, "albumsViewFilterByCompilation")]
     [InlineData(AlbumsFilter.KFilterByAlbum, "albumsViewFilterByAlbum")]
+    [InlineData(AlbumsFilter.KFilterByAnniversary, "albumsViewFilterByAnniversary")]
     [InlineData("UNKNOWN", "albumsViewFilterNone")]
     public void GetLabel_ShouldRequestExpectedResourceKey(string filterBy, string expectedResourceKey)
     {

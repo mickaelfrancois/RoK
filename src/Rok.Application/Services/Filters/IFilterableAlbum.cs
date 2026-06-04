@@ -8,4 +8,5 @@ public interface IFilterableAlbum : IFilterable
     bool IsLive { get; }
     bool IsBestOf { get; }
     bool IsCompilation { get; }
+    DateTime? ReleaseDate { get; }
 }
