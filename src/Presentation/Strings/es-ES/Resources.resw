@@ -1831,4 +1831,40 @@
   <data name="radioErrorUnknown" xml:space="preserve">
     <value>Error desconocido.</value>
   </data>
+  <data name="badgeAnniversary.Text" xml:space="preserve">
+    <value>aniversario</value>
+  </data>
+  <data name="albumAnniversaryTooltipOne" xml:space="preserve">
+    <value>Publicado hace 1 año</value>
+  </data>
+  <data name="albumAnniversaryTooltipMany" xml:space="preserve">
+    <value>Publicado hace {0} años</value>
+  </data>
+  <data name="albumStatsHeader.Text" xml:space="preserve">
+    <value>Estadísticas de escucha</value>
+  </data>
+  <data name="albumStatsNeverListened.Text" xml:space="preserve">
+    <value>Nunca escuchado</value>
+  </data>
+  <data name="albumStatsListensLabel.Text" xml:space="preserve">
+    <value>escuchas completas</value>
+  </data>
+  <data name="albumStatsDurationLabel.Text" xml:space="preserve">
+    <value>tiempo de escucha</value>
+  </data>
+  <data name="albumStatsSinceLabel.Text" xml:space="preserve">
+    <value>primera escucha</value>
+  </data>
+  <data name="albumStatsPeakLabel.Text" xml:space="preserve">
+    <value>horas punta</value>
+  </data>
+  <data name="albumStatsTrendLabel.Text" xml:space="preserve">
+    <value>últimos 12 meses</value>
+  </data>
+  <data name="albumStatsProgressionLabel.Text" xml:space="preserve">
+    <value>pistas escuchadas</value>
+  </data>
+  <data name="artistStatsProgressionLabel.Text" xml:space="preserve">
+    <value>álbumes escuchados</value>
+  </data>
 </root>

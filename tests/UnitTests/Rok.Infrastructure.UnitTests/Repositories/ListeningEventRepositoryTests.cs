@@ -1,6 +1,8 @@
 using Dapper;
 using Microsoft.Extensions.Logging.Abstractions;
+using Microsoft.Extensions.Time.Testing;
 using Rok.Application.Features.Insights;
+using Rok.Application.Features.ListeningEvents;
 using Rok.Infrastructure.Repositories;
 
 namespace Rok.Infrastructure.UnitTests.Repositories;
@@ -13,6 +15,9 @@ public class ListeningEventRepositoryTests
 
     private static ListeningEventRepository CreateRepository(SqliteDatabaseFixture fixture)
         => new(fixture.Connection, fixture.Connection, NullLogger<ListeningEventRepository>.Instance, TimeProvider.System);
+
+    private static ListeningEventRepository CreateRepository(SqliteDatabaseFixture fixture, TimeProvider timeProvider)
+        => new(fixture.Connection, fixture.Connection, NullLogger<ListeningEventRepository>.Instance, timeProvider);
 
     private static Task InsertEventAsync(
         SqliteDatabaseFixture fixture,
@@ -598,5 +603,257 @@ public class ListeningEventRepositoryTests
         Assert.Equal("Rock", insights.SessionStats.MostIntenseSession.DominantGenre);
         Assert.Equal(0, insights.SessionStats.MostActiveDayOfWeek);
         Assert.Equal(1, insights.SessionStats.MostActiveDaySessionCount);
+    }
+
+    [Fact(DisplayName = "GetAlbumListeningStatsAsync should return empty stats when album has no events")]
+    public async Task GetAlbumListeningStatsAsync_ShouldReturnEmptyStats_WhenNoEvents()
+    {
+        // Arrange
+        using SqliteDatabaseFixture fixture = CreateFixture();
+        FakeTimeProvider timeProvider = new(new DateTimeOffset(2026, 4, 15, 12, 0, 0, TimeSpan.Zero));
+        ListeningEventRepository repo = CreateRepository(fixture, timeProvider);
+
+        // Act
+        ListeningStatsDto stats = await repo.GetAlbumListeningStatsAsync(1);
+
+        // Assert
+        Assert.Equal(0, stats.CompletedListenCount);
+        Assert.Equal(0, stats.TotalDurationPlayedSeconds);
+        Assert.Null(stats.FirstListenedAt);
+        Assert.Null(stats.LastListenedAt);
+        Assert.Equal(-1, stats.PeakHour);
+        Assert.Equal(12, stats.MonthlyListens.Count);
+        Assert.All(stats.MonthlyListens, m => Assert.Equal(0, m.Count));
+        Assert.Empty(stats.ListenedTrackIds);
+    }
+
+    [Fact(DisplayName = "GetAlbumListeningStatsAsync should return distinct listened track ids from completed listens only")]
+    public async Task GetAlbumListeningStatsAsync_ShouldReturnDistinctListenedTrackIds_FromCompletedListensOnly()
+    {
+        // Arrange
+        using SqliteDatabaseFixture fixture = CreateFixture();
+        FakeTimeProvider timeProvider = new(new DateTimeOffset(2026, 4, 15, 12, 0, 0, TimeSpan.Zero));
+        ListeningEventRepository repo = CreateRepository(fixture, timeProvider);
+        DateTime apr5 = new(2026, 4, 5, 14, 0, 0, DateTimeKind.Utc);
+        await InsertEventAsync(fixture, trackId: 1, artistId: 1, albumId: 1, genreId: 1, playedAt: apr5);
+        await InsertEventAsync(fixture, trackId: 1, artistId: 1, albumId: 1, genreId: 1, playedAt: apr5.AddHours(1));
+        await InsertEventAsync(fixture, trackId: 2, artistId: 1, albumId: 1, genreId: 2, playedAt: apr5.AddMinutes(5), wasSkipped: true);
+        await InsertEventAsync(fixture, trackId: 3, artistId: 1, albumId: 1, genreId: 1, playedAt: apr5.AddMinutes(10), durationPlayed: 60, durationTotal: 180);
+
+        // Act
+        ListeningStatsDto stats = await repo.GetAlbumListeningStatsAsync(1);
+
+        // Assert
+        long trackId = Assert.Single(stats.ListenedTrackIds);
+        Assert.Equal(1, trackId);
+    }
+
+    [Fact(DisplayName = "GetAlbumListeningStatsAsync should only aggregate events of the requested album")]
+    public async Task GetAlbumListeningStatsAsync_ShouldOnlyAggregateRequestedAlbum()
+    {
+        // Arrange
+        using SqliteDatabaseFixture fixture = CreateFixture();
+        FakeTimeProvider timeProvider = new(new DateTimeOffset(2026, 4, 15, 12, 0, 0, TimeSpan.Zero));
+        ListeningEventRepository repo = CreateRepository(fixture, timeProvider);
+        DateTime apr5 = new(2026, 4, 5, 14, 0, 0, DateTimeKind.Utc);
+        await InsertEventAsync(fixture, trackId: 1, artistId: 1, albumId: 1, genreId: 1, playedAt: apr5);
+        await InsertEventAsync(fixture, trackId: 3, artistId: 2, albumId: 2, genreId: 1, playedAt: apr5.AddMinutes(5));
+
+        // Act
+        ListeningStatsDto stats = await repo.GetAlbumListeningStatsAsync(1);
+
+        // Assert
+        Assert.Equal(1, stats.CompletedListenCount);
+        Assert.Equal(180, stats.TotalDurationPlayedSeconds);
+    }
+
+    [Fact(DisplayName = "GetAlbumListeningStatsAsync should exclude skipped events from all stats")]
+    public async Task GetAlbumListeningStatsAsync_ShouldExcludeSkippedEvents()
+    {
+        // Arrange
+        using SqliteDatabaseFixture fixture = CreateFixture();
+        FakeTimeProvider timeProvider = new(new DateTimeOffset(2026, 4, 15, 12, 0, 0, TimeSpan.Zero));
+        ListeningEventRepository repo = CreateRepository(fixture, timeProvider);
+        DateTime apr5 = new(2026, 4, 5, 14, 0, 0, DateTimeKind.Utc);
+        await InsertEventAsync(fixture, 1, 1, 1, 1, apr5, wasSkipped: false, durationPlayed: 200);
+        await InsertEventAsync(fixture, 2, 1, 1, 2, apr5.AddMinutes(5), wasSkipped: true, durationPlayed: 30);
+
+        // Act
+        ListeningStatsDto stats = await repo.GetAlbumListeningStatsAsync(1);
+
+        // Assert
+        Assert.Equal(1, stats.CompletedListenCount);
+        Assert.Equal(200, stats.TotalDurationPlayedSeconds);
+        Assert.Equal(apr5, stats.FirstListenedAt);
+        Assert.Equal(apr5, stats.LastListenedAt);
+    }
+
+    [Fact(DisplayName = "GetAlbumListeningStatsAsync should not count partial listens as completed but include their duration")]
+    public async Task GetAlbumListeningStatsAsync_ShouldNotCountPartialListensAsCompleted()
+    {
+        // Arrange
+        using SqliteDatabaseFixture fixture = CreateFixture();
+        FakeTimeProvider timeProvider = new(new DateTimeOffset(2026, 4, 15, 12, 0, 0, TimeSpan.Zero));
+        ListeningEventRepository repo = CreateRepository(fixture, timeProvider);
+        DateTime apr5 = new(2026, 4, 5, 14, 0, 0, DateTimeKind.Utc);
+        await InsertEventAsync(fixture, 1, 1, 1, 1, apr5, durationPlayed: 90, durationTotal: 180);
+        await InsertEventAsync(fixture, 2, 1, 1, 2, apr5.AddMinutes(5), durationPlayed: 60, durationTotal: 180);
+
+        // Act
+        ListeningStatsDto stats = await repo.GetAlbumListeningStatsAsync(1);
+
+        // Assert
+        Assert.Equal(1, stats.CompletedListenCount);
+        Assert.Equal(150, stats.TotalDurationPlayedSeconds);
+    }
+
+    [Fact(DisplayName = "GetAlbumListeningStatsAsync should compute first and last listen dates")]
+    public async Task GetAlbumListeningStatsAsync_ShouldComputeFirstAndLastListenDates()
+    {
+        // Arrange
+        using SqliteDatabaseFixture fixture = CreateFixture();
+        FakeTimeProvider timeProvider = new(new DateTimeOffset(2026, 4, 15, 12, 0, 0, TimeSpan.Zero));
+        ListeningEventRepository repo = CreateRepository(fixture, timeProvider);
+        DateTime first = new(2025, 7, 10, 9, 0, 0, DateTimeKind.Utc);
+        DateTime last = new(2026, 4, 5, 21, 0, 0, DateTimeKind.Utc);
+        await InsertEventAsync(fixture, 1, 1, 1, 1, last);
+        await InsertEventAsync(fixture, 1, 1, 1, 1, first);
+
+        // Act
+        ListeningStatsDto stats = await repo.GetAlbumListeningStatsAsync(1);
+
+        // Assert
+        Assert.Equal(first, stats.FirstListenedAt);
+        Assert.Equal(last, stats.LastListenedAt);
+    }
+
+    [Fact(DisplayName = "GetAlbumListeningStatsAsync should compute peak hour as the most active hour")]
+    public async Task GetAlbumListeningStatsAsync_ShouldComputePeakHour()
+    {
+        // Arrange
+        using SqliteDatabaseFixture fixture = CreateFixture();
+        FakeTimeProvider timeProvider = new(new DateTimeOffset(2026, 4, 15, 12, 0, 0, TimeSpan.Zero));
+        ListeningEventRepository repo = CreateRepository(fixture, timeProvider);
+        DateTime apr5 = new(2026, 4, 5, 0, 0, 0, DateTimeKind.Utc);
+        await InsertEventAsync(fixture, 1, 1, 1, 1, apr5.AddHours(8));
+        await InsertEventAsync(fixture, 2, 1, 1, 2, apr5.AddHours(18));
+        await InsertEventAsync(fixture, 1, 1, 1, 1, apr5.AddHours(18).AddMinutes(10));
+
+        // Act
+        ListeningStatsDto stats = await repo.GetAlbumListeningStatsAsync(1);
+
+        // Assert
+        Assert.Equal(18, stats.PeakHour);
+        Assert.Equal("18h - 21h", stats.PeakHourRange);
+    }
+
+    [Fact(DisplayName = "GetAlbumListeningStatsAsync should return twelve monthly buckets oldest first with zero fill")]
+    public async Task GetAlbumListeningStatsAsync_ShouldReturnTwelveMonthlyBuckets()
+    {
+        // Arrange
+        using SqliteDatabaseFixture fixture = CreateFixture();
+        FakeTimeProvider timeProvider = new(new DateTimeOffset(2026, 4, 15, 12, 0, 0, TimeSpan.Zero));
+        ListeningEventRepository repo = CreateRepository(fixture, timeProvider);
+        DateTime apr5 = new(2026, 4, 5, 14, 0, 0, DateTimeKind.Utc);
+        DateTime feb10 = new(2026, 2, 10, 14, 0, 0, DateTimeKind.Utc);
+        DateTime tooOld = new(2025, 3, 1, 14, 0, 0, DateTimeKind.Utc);
+        await InsertEventAsync(fixture, 1, 1, 1, 1, apr5);
+        await InsertEventAsync(fixture, 2, 1, 1, 2, apr5.AddMinutes(5));
+        await InsertEventAsync(fixture, 1, 1, 1, 1, feb10);
+        await InsertEventAsync(fixture, 1, 1, 1, 1, tooOld);
+
+        // Act
+        ListeningStatsDto stats = await repo.GetAlbumListeningStatsAsync(1);
+
+        // Assert
+        Assert.Equal(12, stats.MonthlyListens.Count);
+        Assert.Equal(2025, stats.MonthlyListens[0].Year);
+        Assert.Equal(5, stats.MonthlyListens[0].Month);
+        Assert.Equal(2026, stats.MonthlyListens[11].Year);
+        Assert.Equal(4, stats.MonthlyListens[11].Month);
+        Assert.Equal(2, stats.MonthlyListens[11].Count);
+        Assert.Equal(1, stats.MonthlyListens[9].Count);
+        Assert.Equal(4, stats.CompletedListenCount);
+        Assert.Equal(3, stats.MonthlyListens.Sum(m => m.Count));
+    }
+
+    [Fact(DisplayName = "GetArtistListeningStatsAsync should only aggregate events of the requested artist")]
+    public async Task GetArtistListeningStatsAsync_ShouldOnlyAggregateRequestedArtist()
+    {
+        // Arrange
+        using SqliteDatabaseFixture fixture = CreateFixture();
+        FakeTimeProvider timeProvider = new(new DateTimeOffset(2026, 4, 15, 12, 0, 0, TimeSpan.Zero));
+        ListeningEventRepository repo = CreateRepository(fixture, timeProvider);
+        DateTime apr5 = new(2026, 4, 5, 14, 0, 0, DateTimeKind.Utc);
+        await InsertEventAsync(fixture, trackId: 1, artistId: 1, albumId: 1, genreId: 1, playedAt: apr5);
+        await InsertEventAsync(fixture, trackId: 2, artistId: 1, albumId: 1, genreId: 2, playedAt: apr5.AddMinutes(5));
+        await InsertEventAsync(fixture, trackId: 3, artistId: 2, albumId: null, genreId: 1, playedAt: apr5.AddMinutes(10));
+
+        // Act
+        ListeningStatsDto stats = await repo.GetArtistListeningStatsAsync(1);
+
+        // Assert
+        Assert.Equal(2, stats.CompletedListenCount);
+        Assert.Equal(360, stats.TotalDurationPlayedSeconds);
+    }
+
+    [Fact(DisplayName = "GetArtistListeningStatsAsync should return distinct listened album ids from completed listens")]
+    public async Task GetArtistListeningStatsAsync_ShouldReturnDistinctListenedAlbumIds()
+    {
+        // Arrange
+        using SqliteDatabaseFixture fixture = CreateFixture();
+        FakeTimeProvider timeProvider = new(new DateTimeOffset(2026, 4, 15, 12, 0, 0, TimeSpan.Zero));
+        ListeningEventRepository repo = CreateRepository(fixture, timeProvider);
+        DateTime apr5 = new(2026, 4, 5, 14, 0, 0, DateTimeKind.Utc);
+        await InsertEventAsync(fixture, trackId: 1, artistId: 1, albumId: 1, genreId: 1, playedAt: apr5);
+        await InsertEventAsync(fixture, trackId: 2, artistId: 1, albumId: 1, genreId: 2, playedAt: apr5.AddMinutes(5));
+        await InsertEventAsync(fixture, trackId: 3, artistId: 1, albumId: 2, genreId: 1, playedAt: apr5.AddMinutes(10), wasSkipped: true);
+        await InsertEventAsync(fixture, trackId: 1, artistId: 1, albumId: null, genreId: 1, playedAt: apr5.AddMinutes(15));
+
+        // Act
+        ListeningStatsDto stats = await repo.GetArtistListeningStatsAsync(1);
+
+        // Assert
+        long albumId = Assert.Single(stats.ListenedAlbumIds);
+        Assert.Equal(1, albumId);
+    }
+
+    [Fact(DisplayName = "GetArtistListeningStatsAsync should count an album listened through another track artist (compilation case)")]
+    public async Task GetArtistListeningStatsAsync_ShouldCountAlbumListenedThroughAnotherTrackArtist()
+    {
+        // Arrange: album 1 belongs to artist 1, but the completed listen carries the track artist 2
+        using SqliteDatabaseFixture fixture = CreateFixture();
+        FakeTimeProvider timeProvider = new(new DateTimeOffset(2026, 4, 15, 12, 0, 0, TimeSpan.Zero));
+        ListeningEventRepository repo = CreateRepository(fixture, timeProvider);
+        DateTime apr5 = new(2026, 4, 5, 14, 0, 0, DateTimeKind.Utc);
+        await InsertEventAsync(fixture, trackId: 1, artistId: 2, albumId: 1, genreId: 1, playedAt: apr5);
+
+        // Act
+        ListeningStatsDto stats = await repo.GetArtistListeningStatsAsync(1);
+
+        // Assert: the event counts for both the stats and the listened albums (consistent scope)
+        Assert.Equal(1, stats.CompletedListenCount);
+        long albumId = Assert.Single(stats.ListenedAlbumIds);
+        Assert.Equal(1, albumId);
+    }
+
+    [Fact(DisplayName = "GetArtistListeningStatsAsync should exclude events on albums owned by another artist")]
+    public async Task GetArtistListeningStatsAsync_ShouldExcludeEventsOnAlbumsOwnedByAnotherArtist()
+    {
+        // Arrange: album 3 belongs to artist 2; its events must not leak into artist 1's scope
+        using SqliteDatabaseFixture fixture = CreateFixture();
+        FakeTimeProvider timeProvider = new(new DateTimeOffset(2026, 4, 15, 12, 0, 0, TimeSpan.Zero));
+        ListeningEventRepository repo = CreateRepository(fixture, timeProvider);
+        DateTime apr5 = new(2026, 4, 5, 14, 0, 0, DateTimeKind.Utc);
+        await InsertEventAsync(fixture, trackId: 3, artistId: 2, albumId: 3, genreId: 1, playedAt: apr5);
+        await InsertEventAsync(fixture, trackId: 1, artistId: 1, albumId: 1, genreId: 1, playedAt: apr5.AddMinutes(5));
+
+        // Act
+        ListeningStatsDto stats = await repo.GetArtistListeningStatsAsync(1);
+
+        // Assert
+        Assert.Equal(1, stats.CompletedListenCount);
+        long albumId = Assert.Single(stats.ListenedAlbumIds);
+        Assert.Equal(1, albumId);
     }
 }

@@ -69,6 +69,7 @@
     <SolidColorBrush x:Key="BadgeCompilationBrush" Color="{StaticResource BadgeCompilation}" />
     <SolidColorBrush x:Key="BadgeNewBrush" Color="{StaticResource BadgeNew}" />
     <SolidColorBrush x:Key="BadgeBestOfBrush" Color="{StaticResource BadgeBestOf}" />
+    <SolidColorBrush x:Key="BadgeAnniversaryBrush" Color="{StaticResource BadgeAnniversary}" />
 
     <!-- Social networks brush -->
     <SolidColorBrush x:Key="LastFmBrush" Color="{StaticResource LastFm}" />

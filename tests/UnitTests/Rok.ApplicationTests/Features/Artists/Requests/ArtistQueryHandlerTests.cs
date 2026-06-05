@@ -1,8 +1,29 @@
 using Moq;
 using Rok.Application.Features.Artists.Requests;
+using Rok.Application.Features.ListeningEvents;
 using Rok.Application.Interfaces.Repositories;
 
 namespace Rok.ApplicationTests.Features.Artists.Requests;
+
+public class GetArtistListeningStatsRequestHandlerTests
+{
+    [Fact(DisplayName = "Handle should return stats from repository for the requested artist")]
+    public async Task Handle_ShouldReturnStatsFromRepository_ForRequestedArtist()
+    {
+        // Arrange
+        ListeningStatsDto stats = new() { CompletedListenCount = 156, TotalDurationPlayedSeconds = 136800, PeakHour = 20 };
+        Mock<IListeningEventRepository> repository = new();
+        repository.Setup(r => r.GetArtistListeningStatsAsync(9)).ReturnsAsync(stats);
+        GetArtistListeningStatsRequestHandler handler = new(repository.Object);
+
+        // Act
+        ListeningStatsDto result = await handler.Handle(new GetArtistListeningStatsRequest(9), CancellationToken.None);
+
+        // Assert
+        Assert.Same(stats, result);
+        repository.Verify(r => r.GetArtistListeningStatsAsync(9), Times.Once);
+    }
+}
 
 public class GetArtistByIdRequestHandlerTests
 {

@@ -6,6 +6,9 @@ namespace Rok.Pages;
 
 public sealed partial class AlbumPage : Page
 {
+    /// <summary>Width reserved by the stats panel (250px) plus its paddings and grid margins.</summary>
+    private const double StatsPanelReservedWidth = 300;
+
     public AlbumViewModel ViewModel { get; set; }
     private readonly ILogger<AlbumPage> _logger;
 
@@ -27,6 +30,7 @@ public sealed partial class AlbumPage : Page
         try
         {
             await ViewModel.LoadDataAsync(options.AlbumId);
+            UpdateStatsPanelVisibility(ActualWidth);
             base.OnNavigatedTo(e);
         }
         catch (OperationCanceledException) { }
@@ -42,6 +46,29 @@ public sealed partial class AlbumPage : Page
         base.OnNavigatedFrom(e);
     }
 
+
+    private void Page_SizeChanged(object sender, SizeChangedEventArgs e)
+    {
+        UpdateStatsPanelVisibility(e.NewSize.Width);
+    }
+
+    private void UpdateStatsPanelVisibility(double pageWidth)
+    {
+        double requiredTracksWidth = GetGridLengthResource("GridHeaderTracksTitleColumnWidth")
+                                   + GetGridLengthResource("GridHeaderTracksScoreColumnWidth");
+
+        if (ViewModel.Album.IsCompilation)
+            requiredTracksWidth += GetGridLengthResource("GridHeaderTracksArtistColumnWidth");
+
+        statsPanel.Visibility = pageWidth >= requiredTracksWidth + StatsPanelReservedWidth
+            ? Visibility.Visible
+            : Visibility.Collapsed;
+    }
+
+    private static double GetGridLengthResource(string key)
+    {
+        return ((GridLength)Microsoft.UI.Xaml.Application.Current.Resources[key]).Value;
+    }
 
     private void tracksList_ContainerContentChanging(ListViewBase sender, ContainerContentChangingEventArgs args)
     {

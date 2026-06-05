@@ -213,6 +213,48 @@ public class AlbumsFilterTests
         Assert.True(result);
     }
 
+    [Fact(DisplayName = "AlbumsFilter GetAnniversaryAge should return the age in years on the anniversary day")]
+    public void GetAnniversaryAge_ShouldReturnAgeInYears_OnAnniversaryDay()
+    {
+        // Arrange
+        DateTime releaseDate = new(2001, 6, 15);
+        DateOnly today = new(2026, 6, 15);
+
+        // Act
+        int? age = AlbumsFilter.GetAnniversaryAge(releaseDate, today);
+
+        // Assert
+        Assert.Equal(25, age);
+    }
+
+    [Fact(DisplayName = "AlbumsFilter GetAnniversaryAge should return the celebrated age across a year boundary")]
+    public void GetAnniversaryAge_ShouldReturnCelebratedAge_AcrossYearBoundary()
+    {
+        // Arrange: anniversary celebrated on 2025-12-31, today is already 2026
+        DateTime releaseDate = new(2020, 12, 31);
+        DateOnly today = new(2026, 1, 2);
+
+        // Act
+        int? age = AlbumsFilter.GetAnniversaryAge(releaseDate, today);
+
+        // Assert
+        Assert.Equal(5, age);
+    }
+
+    [Fact(DisplayName = "AlbumsFilter GetAnniversaryAge should return null when no anniversary is in the window")]
+    public void GetAnniversaryAge_ShouldReturnNull_WhenNoAnniversaryInWindow()
+    {
+        // Arrange
+        DateTime releaseDate = new(2020, 6, 15);
+        DateOnly today = new(2026, 2, 1);
+
+        // Act
+        int? age = AlbumsFilter.GetAnniversaryAge(releaseDate, today);
+
+        // Assert
+        Assert.Null(age);
+    }
+
     [Fact(DisplayName = "AlbumsFilter Filter by anniversary should keep only albums celebrating an anniversary")]
     public void Filter_ByAnniversary_ShouldKeepOnlyAnniversaryAlbums()
     {

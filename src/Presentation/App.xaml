@@ -20,6 +20,7 @@
 
             <converters:BoolToGridLengthAutoConverter x:Key="BoolToGridLengthAutoConverter" />
             <converters:ColorToBrushConverter x:Key="ColorToBrushConverter" />
+            <converters:ColorToAccentBrushConverter x:Key="ColorToAccentBrushConverter" />
             <converters:ColorToGradientBrushConverter x:Key="ColorToGradientBrushConverter" />
             <converters:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter" />
             <converters:BoolToInvertBoolConverter x:Key="BoolToInvertBoolConverter" />

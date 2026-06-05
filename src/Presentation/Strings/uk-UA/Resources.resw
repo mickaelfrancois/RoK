@@ -1889,4 +1889,40 @@
   <data name="radioErrorUnknown" xml:space="preserve">
     <value>Невідома помилка.</value>
   </data>
+  <data name="badgeAnniversary.Text" xml:space="preserve">
+    <value>річниця</value>
+  </data>
+  <data name="albumAnniversaryTooltipOne" xml:space="preserve">
+    <value>Випущено 1 рік тому</value>
+  </data>
+  <data name="albumAnniversaryTooltipMany" xml:space="preserve">
+    <value>Випущено {0} р. тому</value>
+  </data>
+  <data name="albumStatsHeader.Text" xml:space="preserve">
+    <value>Статистика прослуховування</value>
+  </data>
+  <data name="albumStatsNeverListened.Text" xml:space="preserve">
+    <value>Ще не прослухано</value>
+  </data>
+  <data name="albumStatsListensLabel.Text" xml:space="preserve">
+    <value>повних прослуховувань</value>
+  </data>
+  <data name="albumStatsDurationLabel.Text" xml:space="preserve">
+    <value>час прослуховування</value>
+  </data>
+  <data name="albumStatsSinceLabel.Text" xml:space="preserve">
+    <value>перше прослуховування</value>
+  </data>
+  <data name="albumStatsPeakLabel.Text" xml:space="preserve">
+    <value>пікові години</value>
+  </data>
+  <data name="albumStatsTrendLabel.Text" xml:space="preserve">
+    <value>останні 12 місяців</value>
+  </data>
+  <data name="albumStatsProgressionLabel.Text" xml:space="preserve">
+    <value>прослухані треки</value>
+  </data>
+  <data name="artistStatsProgressionLabel.Text" xml:space="preserve">
+    <value>прослухані альбоми</value>
+  </data>
 </root>

@@ -8,10 +8,12 @@ using Rok.Application.Player;
 using Rok.Application.Randomizer;
 using Rok.Application.Services.Filters;
 using Rok.Application.Services.Grouping;
+using Rok.Application.Features.ListeningEvents;
 using Rok.Commons;
 using Rok.Infrastructure.Files;
 using Rok.ViewModels.Album;
 using Rok.ViewModels.Artist.Services;
+using Rok.ViewModels.Common;
 using Rok.ViewModels.Track;
 
 namespace Rok.ViewModels.Artist;
@@ -46,6 +48,8 @@ public partial class ArtistViewModel : ObservableObject, IFilterableArtist, IGro
     public ArtistDto Artist { get; private set; } = new();
     public RangeObservableCollection<TrackViewModel> Tracks { get; set; } = [];
     public RangeObservableCollection<AlbumViewModel> Albums { get; set; } = [];
+
+    public ListeningStatsViewModel ListeningStats { get; } = new();
 
 
     public ObservableCollection<string> EditableTags { get; set; } = new();
@@ -279,8 +283,14 @@ public partial class ArtistViewModel : ObservableObject, IFilterableArtist, IGro
         Artist = Guard.NotNull(artist);
         IsNew = Artist.CreatDate > DateTime.UtcNow.AddDays(-_appOptions.ArtistRecentThresholdDays);
 
-        if (Artist.PictureDominantColor.HasValue)
-            DominantColor = ColorHelper.FromArgb(Artist.PictureDominantColor.Value);
+        UpdateDominantColor();
+    }
+
+    private void UpdateDominantColor()
+    {
+        DominantColor = Artist.PictureDominantColor.HasValue
+            ? ColorHelper.FromArgb(Artist.PictureDominantColor.Value)
+            : default;
     }
 
     public async Task LoadDataAsync(long artistId, bool loadAlbums = true, bool loadTracks = true, bool fetchApi = true)
@@ -290,9 +300,9 @@ public partial class ArtistViewModel : ObservableObject, IFilterableArtist, IGro
         Stopwatch stopwatch = new();
         stopwatch.Start();
 
-        await LoadArtistAsync(artistId);
+        bool artistLoaded = await LoadArtistAsync(artistId);
 
-        if (cancellationToken.IsCancellationRequested)
+        if (!artistLoaded || cancellationToken.IsCancellationRequested)
             return;
 
         if (loadAlbums)
@@ -309,6 +319,12 @@ public partial class ArtistViewModel : ObservableObject, IFilterableArtist, IGro
 
         if (loadAlbums && loadTracks)
             await UpdateStatisticsIfNeededAsync();
+
+        if (cancellationToken.IsCancellationRequested)
+            return;
+
+        if (loadAlbums)
+            await LoadListeningStatsAsync();
 
         if (cancellationToken.IsCancellationRequested)
             return;
@@ -344,16 +360,40 @@ public partial class ArtistViewModel : ObservableObject, IFilterableArtist, IGro
     }
 
 
-    private async Task LoadArtistAsync(long artistId)
+    private async Task<bool> LoadArtistAsync(long artistId)
     {
         ArtistDto? artist = await _dataLoader.LoadArtistAsync(artistId);
-        if (artist != null)
-        {
-            Artist = artist;
-            IsNew = Artist.CreatDate > DateTime.UtcNow.AddDays(-_appOptions.ArtistRecentThresholdDays);
+        if (artist == null)
+            return false;
 
-            LoadBackdrop();
+        Artist = artist;
+        IsNew = Artist.CreatDate > DateTime.UtcNow.AddDays(-_appOptions.ArtistRecentThresholdDays);
+
+        UpdateDominantColor();
+        LoadBackdrop();
+
+        return true;
+    }
+
+    private async Task LoadListeningStatsAsync()
+    {
+        HashSet<long> listenedAlbumIds = [];
+
+        try
+        {
+            ListeningStatsDto stats = await _dataLoader.LoadListeningStatsAsync(Artist.Id);
+            ListeningStats.SetStats(stats);
+            listenedAlbumIds = stats.ListenedAlbumIds.ToHashSet();
         }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "Failed to load listening stats for artist {ArtistId}", Artist.Id);
+        }
+
+        // An album counts as listened from either source: the legacy counter (history predating
+        // listening events, resettable by the user) or a completed listening event.
+        int listenedCount = Albums.Count(a => a.Album.ListenCount > 0 || listenedAlbumIds.Contains(a.Album.Id));
+        ListeningStats.SetProgression(listenedCount, Albums.Count);
     }
 
     public void LoadPicture()
@@ -397,6 +437,7 @@ public partial class ArtistViewModel : ObservableObject, IFilterableArtist, IGro
             long? packed = await _dominantColorCalculator.CalculateAsync(filePath);
 
             Artist.PictureDominantColor = packed;
+            UpdateDominantColor();
 
             if (packed.HasValue)
                 await _editService.UpdatePictureDominantColorAsync(Artist.Id, packed);
@@ -488,7 +529,10 @@ public partial class ArtistViewModel : ObservableObject, IFilterableArtist, IGro
         {
             ArtistDto? refreshedArtist = await _dataLoader.ReloadArtistAsync(Artist.Id);
             if (refreshedArtist != null)
+            {
                 Artist = refreshedArtist;
+                UpdateDominantColor();
+            }
 
             _messenger.Send(new ArtistUpdateMessage(Artist.Id, ActionType.Update));
         }

@@ -4,6 +4,7 @@ using Moq;
 using Rok.Application.Dto;
 using Rok.Application.Errors;
 using Rok.Application.Features.Albums.Requests;
+using Rok.Application.Features.ListeningEvents;
 using Rok.Application.Features.Tracks.Requests;
 using Rok.ViewModels.Album.Services;
 using Rok.ViewModels.Track;
@@ -90,5 +91,21 @@ public class AlbumDataLoaderTests
 
         // Assert
         Assert.Null(result);
+    }
+
+    [Fact(DisplayName = "LoadListeningStatsAsync should return the stats from the mediator")]
+    public async Task LoadListeningStatsAsync_ShouldReturnStats_FromMediator()
+    {
+        // Arrange
+        ListeningStatsDto stats = new() { CompletedListenCount = 12 };
+        _mediator.Setup<GetAlbumListeningStatsRequest, ListeningStatsDto>().Returns(stats);
+        AlbumDataLoader sut = BuildService();
+
+        // Act
+        ListeningStatsDto result = await sut.LoadListeningStatsAsync(7);
+
+        // Assert
+        Assert.Same(stats, result);
+        Assert.Single(_mediator.Sent<GetAlbumListeningStatsRequest>());
     }
 }

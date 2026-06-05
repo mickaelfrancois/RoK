@@ -8,7 +8,9 @@
       xmlns:common="using:Rok.Commons"
       xmlns:tracks="using:Rok.ViewModels.Track"
       xmlns:albums="using:Rok.ViewModels.Album"
+      xmlns:vmcommon="using:Rok.ViewModels.Common"
       xmlns:controls="using:CommunityToolkit.WinUI.Controls"
+      SizeChanged="Page_SizeChanged"
       mc:Ignorable="d">
 
     <Grid>
@@ -88,6 +90,11 @@
 
         <!-- Content -->
         <Grid Grid.Row="1" Style="{StaticResource FileGridStyle}">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+
             <Pivot>
                 <!-- Albums -->
                 <PivotItem x:Uid="artistViewTabAlbums">
@@ -194,6 +201,72 @@
                     </Grid>
                 </PivotItem>
             </Pivot>
+
+            <!-- Listening statistics panel -->
+            <Border x:Name="statsPanel" Grid.Column="1" Width="250" Margin="0,8,12,12" Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1" CornerRadius="8">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+
+                    <Border Height="3" CornerRadius="7,7,0,0" Background="{x:Bind ViewModel.DominantColor, Mode=OneWay, Converter={StaticResource ColorToAccentBrushConverter}}" />
+
+                    <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" Padding="16,12,16,16">
+                        <StackPanel Spacing="16">
+                            <TextBlock x:Uid="albumStatsHeader" Style="{ThemeResource BodyStrongTextBlockStyle}" />
+
+                            <TextBlock x:Uid="albumStatsNeverListened" Style="{ThemeResource CaptionTextBlockStyle}" Opacity="0.7" Visibility="{x:Bind ViewModel.ListeningStats.ShowNeverListened, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" />
+
+                            <StackPanel Spacing="16" Visibility="{x:Bind ViewModel.ListeningStats.ShowStats, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">
+                                <StackPanel>
+                                    <TextBlock Text="{x:Bind ViewModel.ListeningStats.ListenCountValue, Mode=OneWay}" Style="{ThemeResource SubtitleTextBlockStyle}" />
+                                    <TextBlock x:Uid="albumStatsListensLabel" Style="{ThemeResource CaptionTextBlockStyle}" Opacity="0.7" />
+                                </StackPanel>
+
+                                <StackPanel>
+                                    <TextBlock Text="{x:Bind ViewModel.ListeningStats.DurationValue, Mode=OneWay}" Style="{ThemeResource SubtitleTextBlockStyle}" />
+                                    <TextBlock x:Uid="albumStatsDurationLabel" Style="{ThemeResource CaptionTextBlockStyle}" Opacity="0.7" />
+                                </StackPanel>
+
+                                <StackPanel>
+                                    <TextBlock Text="{x:Bind ViewModel.ListeningStats.SinceValue, Mode=OneWay}" Style="{ThemeResource SubtitleTextBlockStyle}" />
+                                    <TextBlock x:Uid="albumStatsSinceLabel" Style="{ThemeResource CaptionTextBlockStyle}" Opacity="0.7" />
+                                </StackPanel>
+
+                                <StackPanel>
+                                    <TextBlock Text="{x:Bind ViewModel.ListeningStats.PeakHourValue, Mode=OneWay}" Style="{ThemeResource SubtitleTextBlockStyle}" />
+                                    <TextBlock x:Uid="albumStatsPeakLabel" Style="{ThemeResource CaptionTextBlockStyle}" Opacity="0.7" />
+                                </StackPanel>
+
+                                <StackPanel Spacing="4">
+                                    <ItemsControl Height="40" ItemsSource="{x:Bind ViewModel.ListeningStats.MonthlyBars, Mode=OneWay}">
+                                        <ItemsControl.ItemsPanel>
+                                            <ItemsPanelTemplate>
+                                                <StackPanel Orientation="Horizontal" Spacing="4" VerticalAlignment="Bottom" />
+                                            </ItemsPanelTemplate>
+                                        </ItemsControl.ItemsPanel>
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate x:DataType="vmcommon:MonthlyBarViewModel">
+                                                <Rectangle Width="12" Height="{x:Bind Height}" VerticalAlignment="Bottom" RadiusX="2" RadiusY="2" Fill="{ThemeResource AccentFillColorDefaultBrush}" ToolTipService.ToolTip="{x:Bind Tooltip}" />
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+                                    <TextBlock x:Uid="albumStatsTrendLabel" Style="{ThemeResource CaptionTextBlockStyle}" Opacity="0.7" />
+                                </StackPanel>
+                            </StackPanel>
+
+                            <StackPanel Spacing="4" Visibility="{x:Bind ViewModel.ListeningStats.ShowProgression, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">
+                                <ProgressBar Maximum="{x:Bind ViewModel.ListeningStats.TotalItemCount, Mode=OneWay}" Value="{x:Bind ViewModel.ListeningStats.ListenedItemCount, Mode=OneWay}" />
+                                <StackPanel Orientation="Horizontal" Spacing="6">
+                                    <TextBlock Text="{x:Bind ViewModel.ListeningStats.ProgressionLabel, Mode=OneWay}" Style="{ThemeResource CaptionTextBlockStyle}" />
+                                    <TextBlock x:Uid="artistStatsProgressionLabel" Style="{ThemeResource CaptionTextBlockStyle}" Opacity="0.7" />
+                                </StackPanel>
+                            </StackPanel>
+                        </StackPanel>
+                    </ScrollViewer>
+                </Grid>
+            </Border>
         </Grid>
     </Grid>
 </Page>
