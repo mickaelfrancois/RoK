@@ -294,9 +294,9 @@ public partial class ArtistViewModel : ObservableObject, IFilterableArtist, IGro
         Stopwatch stopwatch = new();
         stopwatch.Start();
 
-        await LoadArtistAsync(artistId);
+        bool artistLoaded = await LoadArtistAsync(artistId);
 
-        if (cancellationToken.IsCancellationRequested)
+        if (!artistLoaded || cancellationToken.IsCancellationRequested)
             return;
 
         if (loadAlbums)
@@ -354,16 +354,18 @@ public partial class ArtistViewModel : ObservableObject, IFilterableArtist, IGro
     }
 
 
-    private async Task LoadArtistAsync(long artistId)
+    private async Task<bool> LoadArtistAsync(long artistId)
     {
         ArtistDto? artist = await _dataLoader.LoadArtistAsync(artistId);
-        if (artist != null)
-        {
-            Artist = artist;
-            IsNew = Artist.CreatDate > DateTime.UtcNow.AddDays(-_appOptions.ArtistRecentThresholdDays);
+        if (artist == null)
+            return false;
 
-            LoadBackdrop();
-        }
+        Artist = artist;
+        IsNew = Artist.CreatDate > DateTime.UtcNow.AddDays(-_appOptions.ArtistRecentThresholdDays);
+
+        LoadBackdrop();
+
+        return true;
     }
 
     private async Task LoadListeningStatsAsync()

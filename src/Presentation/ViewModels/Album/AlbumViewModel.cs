@@ -33,6 +33,7 @@ public partial class AlbumViewModel : ObservableObject, IFilterableAlbum, IGroup
     private readonly AlbumEditService _editService;
     private readonly IDominantColorCalculator _dominantColorCalculator;
     private readonly IMessenger _messenger;
+    private readonly TimeProvider _timeProvider;
 
     private CancellationTokenSource _navigationCts = new();
 
@@ -190,6 +191,7 @@ public partial class AlbumViewModel : ObservableObject, IFilterableAlbum, IGroup
         IDialogService dialogService,
         IPlaylistMenuService playlistMenuService,
         IMessenger messenger,
+        TimeProvider timeProvider,
         ILogger<AlbumViewModel> logger)
     {
         _backdropLoader = Guard.NotNull(backdropLoader);
@@ -207,6 +209,7 @@ public partial class AlbumViewModel : ObservableObject, IFilterableAlbum, IGroup
         _appOptions = Guard.NotNull(appOptions);
         _dialogService = Guard.NotNull(dialogService);
         PlaylistMenuService = Guard.NotNull(playlistMenuService);
+        _timeProvider = Guard.NotNull(timeProvider);
         _logger = Guard.NotNull(logger);
     }
 
@@ -229,9 +232,9 @@ public partial class AlbumViewModel : ObservableObject, IFilterableAlbum, IGroup
         Stopwatch stopwatch = new();
         stopwatch.Start();
 
-        await LoadAlbumAsync(albumId);
+        bool albumLoaded = await LoadAlbumAsync(albumId);
 
-        if (cancellationToken.IsCancellationRequested)
+        if (!albumLoaded || cancellationToken.IsCancellationRequested)
             return;
 
         await LoadTracksAsync(albumId, cancellationToken);
@@ -290,22 +293,24 @@ public partial class AlbumViewModel : ObservableObject, IFilterableAlbum, IGroup
         Tracks.InitWithAddRange(tracks);
     }
 
-    private async Task LoadAlbumAsync(long albumId)
+    private async Task<bool> LoadAlbumAsync(long albumId)
     {
         AlbumDto? album = await _dataLoader.LoadAlbumAsync(albumId);
-        if (album != null)
-        {
-            Album = album;
-            IsNew = Album.CreatDate > DateTime.UtcNow.AddDays(-_appOptions.AlbumRecentThresholdDays);
+        if (album == null)
+            return false;
 
-            UpdateAnniversaryBadge();
-            LoadBackrop();
-        }
+        Album = album;
+        IsNew = Album.CreatDate > DateTime.UtcNow.AddDays(-_appOptions.AlbumRecentThresholdDays);
+
+        UpdateAnniversaryBadge();
+        LoadBackrop();
+
+        return true;
     }
 
     private void UpdateAnniversaryBadge()
     {
-        int? age = AlbumsFilter.GetAnniversaryAge(Album.ReleaseDate, DateOnly.FromDateTime(DateTime.Now));
+        int? age = AlbumsFilter.GetAnniversaryAge(Album.ReleaseDate, DateOnly.FromDateTime(_timeProvider.GetLocalNow().DateTime));
 
         ShowAnniversaryBadge = age is not null;
 

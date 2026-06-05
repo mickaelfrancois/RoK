@@ -817,4 +817,23 @@ public class ListeningEventRepositoryTests
         long albumId = Assert.Single(stats.ListenedAlbumIds);
         Assert.Equal(1, albumId);
     }
+
+    [Fact(DisplayName = "GetArtistListeningStatsAsync should count an album listened through another track artist (compilation case)")]
+    public async Task GetArtistListeningStatsAsync_ShouldCountAlbumListenedThroughAnotherTrackArtist()
+    {
+        // Arrange: album 1 belongs to artist 1, but the completed listen carries the track artist 2
+        using SqliteDatabaseFixture fixture = CreateFixture();
+        FakeTimeProvider timeProvider = new(new DateTimeOffset(2026, 4, 15, 12, 0, 0, TimeSpan.Zero));
+        ListeningEventRepository repo = CreateRepository(fixture, timeProvider);
+        DateTime apr5 = new(2026, 4, 5, 14, 0, 0, DateTimeKind.Utc);
+        await InsertEventAsync(fixture, trackId: 1, artistId: 2, albumId: 1, genreId: 1, playedAt: apr5);
+
+        // Act
+        ListeningStatsDto stats = await repo.GetArtistListeningStatsAsync(1);
+
+        // Assert
+        Assert.Equal(0, stats.CompletedListenCount);
+        long albumId = Assert.Single(stats.ListenedAlbumIds);
+        Assert.Equal(1, albumId);
+    }
 }
