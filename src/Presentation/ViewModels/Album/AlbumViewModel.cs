@@ -225,8 +225,9 @@ public partial class AlbumViewModel : ObservableObject, IFilterableAlbum, IGroup
 
     private void UpdateDominantColor()
     {
-        if (Album.PictureDominantColor.HasValue)
-            DominantColor = ColorHelper.FromArgb(Album.PictureDominantColor.Value);
+        DominantColor = Album.PictureDominantColor.HasValue
+            ? ColorHelper.FromArgb(Album.PictureDominantColor.Value)
+            : default;
     }
 
     public async Task LoadDataAsync(long albumId)
@@ -493,7 +494,11 @@ public partial class AlbumViewModel : ObservableObject, IFilterableAlbum, IGroup
         {
             AlbumDto? refreshedAlbum = await _dataLoader.ReloadAlbumAsync(Album.Id);
             if (refreshedAlbum != null)
+            {
                 Album = refreshedAlbum;
+                UpdateAnniversaryBadge();
+                UpdateDominantColor();
+            }
 
             _messenger.Send(new AlbumUpdateMessage(Album.Id, ActionType.Update));
         }

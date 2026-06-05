@@ -288,8 +288,9 @@ public partial class ArtistViewModel : ObservableObject, IFilterableArtist, IGro
 
     private void UpdateDominantColor()
     {
-        if (Artist.PictureDominantColor.HasValue)
-            DominantColor = ColorHelper.FromArgb(Artist.PictureDominantColor.Value);
+        DominantColor = Artist.PictureDominantColor.HasValue
+            ? ColorHelper.FromArgb(Artist.PictureDominantColor.Value)
+            : default;
     }
 
     public async Task LoadDataAsync(long artistId, bool loadAlbums = true, bool loadTracks = true, bool fetchApi = true)
@@ -528,7 +529,10 @@ public partial class ArtistViewModel : ObservableObject, IFilterableArtist, IGro
         {
             ArtistDto? refreshedArtist = await _dataLoader.ReloadArtistAsync(Artist.Id);
             if (refreshedArtist != null)
+            {
                 Artist = refreshedArtist;
+                UpdateDominantColor();
+            }
 
             _messenger.Send(new ArtistUpdateMessage(Artist.Id, ActionType.Update));
         }

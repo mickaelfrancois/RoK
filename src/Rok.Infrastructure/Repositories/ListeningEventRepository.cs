@@ -506,19 +506,18 @@ public class ListeningEventRepository(IDbConnection connection, [FromKeyedServic
 
     // The artist scope covers events credited to the artist as track artist plus events on the
     // artist's discography: compilation tracks carry their own artist id on listening events.
+    // Two UNION branches keep both lookups on their indexes (an OR across the join would force
+    // a full scan of ListeningEvents); le.Id makes rows unique so UNION only dedups the overlap.
     private const string ArtistListeningEventsSql =
         """
-            SELECT
-                le.TrackId,
-                le.AlbumId,
-                le.PlayedAt,
-                le.WasSkipped,
-                le.DurationPlayed,
-                le.DurationTotal
+            SELECT le.Id, le.TrackId, le.AlbumId, le.PlayedAt, le.WasSkipped, le.DurationPlayed, le.DurationTotal
             FROM ListeningEvents le
-            LEFT JOIN Albums a ON a.Id = le.AlbumId
             WHERE le.ArtistId = @artistId
-               OR a.ArtistId = @artistId;
+            UNION
+            SELECT le.Id, le.TrackId, le.AlbumId, le.PlayedAt, le.WasSkipped, le.DurationPlayed, le.DurationTotal
+            FROM ListeningEvents le
+            INNER JOIN Albums a ON a.Id = le.AlbumId
+            WHERE a.ArtistId = @artistId;
             """;
 
     private sealed class ListeningSession
