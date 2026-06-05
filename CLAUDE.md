@@ -96,6 +96,10 @@ ViewModels use `CommunityToolkit.Mvvm` (`ObservableObject`, source-gen commands)
 - SQLite via Dapper. Repositories live in `Rok.Infrastructure/Repositories/`; new tables/columns are added through a new `MigrationN` class implementing `IMigration` and registered in `Rok.Infrastructure/DependencyInjection.cs` (discovered by `MigrationService` via `IEnumerable<IMigration>`). The current head is `Migration12`.
 - `DateOnlyTypeHandler` is registered globally for Dapper.
 - Domain entities use `[Table("…")]` attributes (see `Rok.Domain/Attributes/`).
+- A real test database (populated with the developer's library) is available locally at
+  `C:\Users\micka\AppData\Local\Packages\dev-Rokapp.Rokmusicplayer_k3w9s3grwk0dt\LocalState\database.sqlite`
+  (MSIX LocalState of the installed app). Use it to validate query changes against real data
+  (e.g. `sqlite3 <path> "EXPLAIN QUERY PLAN …"`) — open it read-only and never modify it.
 
 ### Audio engine
 
