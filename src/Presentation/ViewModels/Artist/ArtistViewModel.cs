@@ -283,6 +283,11 @@ public partial class ArtistViewModel : ObservableObject, IFilterableArtist, IGro
         Artist = Guard.NotNull(artist);
         IsNew = Artist.CreatDate > DateTime.UtcNow.AddDays(-_appOptions.ArtistRecentThresholdDays);
 
+        UpdateDominantColor();
+    }
+
+    private void UpdateDominantColor()
+    {
         if (Artist.PictureDominantColor.HasValue)
             DominantColor = ColorHelper.FromArgb(Artist.PictureDominantColor.Value);
     }
@@ -363,6 +368,7 @@ public partial class ArtistViewModel : ObservableObject, IFilterableArtist, IGro
         Artist = artist;
         IsNew = Artist.CreatDate > DateTime.UtcNow.AddDays(-_appOptions.ArtistRecentThresholdDays);
 
+        UpdateDominantColor();
         LoadBackdrop();
 
         return true;
@@ -430,6 +436,7 @@ public partial class ArtistViewModel : ObservableObject, IFilterableArtist, IGro
             long? packed = await _dominantColorCalculator.CalculateAsync(filePath);
 
             Artist.PictureDominantColor = packed;
+            UpdateDominantColor();
 
             if (packed.HasValue)
                 await _editService.UpdatePictureDominantColorAsync(Artist.Id, packed);

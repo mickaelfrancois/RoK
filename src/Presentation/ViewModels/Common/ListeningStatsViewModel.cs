@@ -60,8 +60,9 @@ public partial class ListeningStatsViewModel : ObservableObject
 
     public void SetProgression(int listenedItemCount, int totalItemCount)
     {
-        ListenedItemCount = listenedItemCount;
+        // The bound ProgressBar clamps Value to Maximum, so Maximum must grow first.
         TotalItemCount = totalItemCount;
+        ListenedItemCount = listenedItemCount;
         ProgressionLabel = $"{listenedItemCount}/{totalItemCount}";
         ShowProgression = totalItemCount > 0;
     }

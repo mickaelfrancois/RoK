@@ -787,7 +787,7 @@ public class ListeningEventRepositoryTests
         DateTime apr5 = new(2026, 4, 5, 14, 0, 0, DateTimeKind.Utc);
         await InsertEventAsync(fixture, trackId: 1, artistId: 1, albumId: 1, genreId: 1, playedAt: apr5);
         await InsertEventAsync(fixture, trackId: 2, artistId: 1, albumId: 1, genreId: 2, playedAt: apr5.AddMinutes(5));
-        await InsertEventAsync(fixture, trackId: 3, artistId: 2, albumId: 2, genreId: 1, playedAt: apr5.AddMinutes(10));
+        await InsertEventAsync(fixture, trackId: 3, artistId: 2, albumId: null, genreId: 1, playedAt: apr5.AddMinutes(10));
 
         // Act
         ListeningStatsDto stats = await repo.GetArtistListeningStatsAsync(1);
@@ -831,8 +831,8 @@ public class ListeningEventRepositoryTests
         // Act
         ListeningStatsDto stats = await repo.GetArtistListeningStatsAsync(1);
 
-        // Assert
-        Assert.Equal(0, stats.CompletedListenCount);
+        // Assert: the event counts for both the stats and the listened albums (consistent scope)
+        Assert.Equal(1, stats.CompletedListenCount);
         long albumId = Assert.Single(stats.ListenedAlbumIds);
         Assert.Equal(1, albumId);
     }

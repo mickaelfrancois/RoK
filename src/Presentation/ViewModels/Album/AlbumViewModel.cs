@@ -220,7 +220,11 @@ public partial class AlbumViewModel : ObservableObject, IFilterableAlbum, IGroup
         IsNew = Album.CreatDate > DateTime.UtcNow.AddDays(-_appOptions.AlbumRecentThresholdDays);
 
         UpdateAnniversaryBadge();
+        UpdateDominantColor();
+    }
 
+    private void UpdateDominantColor()
+    {
         if (Album.PictureDominantColor.HasValue)
             DominantColor = ColorHelper.FromArgb(Album.PictureDominantColor.Value);
     }
@@ -303,6 +307,7 @@ public partial class AlbumViewModel : ObservableObject, IFilterableAlbum, IGroup
         IsNew = Album.CreatDate > DateTime.UtcNow.AddDays(-_appOptions.AlbumRecentThresholdDays);
 
         UpdateAnniversaryBadge();
+        UpdateDominantColor();
         LoadBackrop();
 
         return true;
@@ -382,6 +387,7 @@ public partial class AlbumViewModel : ObservableObject, IFilterableAlbum, IGroup
             long? packed = await _dominantColorCalculator.CalculateAsync(filePath);
 
             Album.PictureDominantColor = packed;
+            UpdateDominantColor();
 
             if (packed.HasValue)
                 await _editService.UpdatePictureDominantColorAsync(Album.Id, packed);

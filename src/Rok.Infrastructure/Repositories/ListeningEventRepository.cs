@@ -78,14 +78,7 @@ public class ListeningEventRepository(IDbConnection connection, [FromKeyedServic
     {
         IEnumerable<RawScopedListeningEvent> rows = await _connection.QueryAsync<RawScopedListeningEvent>(ArtistListeningEventsSql, new { artistId });
 
-        ListeningStatsDto stats = BuildListeningStats(rows.ToList());
-
-        // Compilation tracks carry their own artist id on listening events, so the artist filter
-        // above misses them; resolve listened albums through the albums' artist instead.
-        IEnumerable<long> listenedAlbumIds = await _connection.QueryAsync<long>(ArtistListenedAlbumIdsSql, new { artistId });
-        stats.ListenedAlbumIds = listenedAlbumIds.ToList();
-
-        return stats;
+        return BuildListeningStats(rows.ToList());
     }
 
     private ListeningStatsDto BuildListeningStats(List<RawScopedListeningEvent> events)
@@ -511,6 +504,8 @@ public class ListeningEventRepository(IDbConnection connection, [FromKeyedServic
             WHERE le.AlbumId = @albumId;
             """;
 
+    // The artist scope covers events credited to the artist as track artist plus events on the
+    // artist's discography: compilation tracks carry their own artist id on listening events.
     private const string ArtistListeningEventsSql =
         """
             SELECT
@@ -521,17 +516,9 @@ public class ListeningEventRepository(IDbConnection connection, [FromKeyedServic
                 le.DurationPlayed,
                 le.DurationTotal
             FROM ListeningEvents le
-            WHERE le.ArtistId = @artistId;
-            """;
-
-    private const string ArtistListenedAlbumIdsSql =
-        """
-            SELECT DISTINCT le.AlbumId
-            FROM ListeningEvents le
-            INNER JOIN Albums a ON a.Id = le.AlbumId
-            WHERE a.ArtistId = @artistId
-              AND le.WasSkipped = 0
-              AND le.DurationPlayed * 2 >= le.DurationTotal;
+            LEFT JOIN Albums a ON a.Id = le.AlbumId
+            WHERE le.ArtistId = @artistId
+               OR a.ArtistId = @artistId;
             """;
 
     private sealed class ListeningSession
