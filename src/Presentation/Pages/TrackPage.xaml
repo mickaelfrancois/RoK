@@ -24,16 +24,16 @@
 
         <!-- Header -->
         <StackPanel Grid.Row="0" Orientation="Vertical" Padding="6" Spacing="4">
-            <TextBlock x:Uid="trackTitle" x:Name="trackTitle" Text="{x:Bind ViewModel.Track.Title}" FontSize="{StaticResource FontSizeLarge}" FontWeight="Bold" Foreground="{ThemeResource BrandAccentBrush }" />
+            <TextBlock x:Uid="trackTitle" x:Name="trackTitle" Text="{x:Bind ViewModel.Track.Title}" FontSize="{StaticResource FontSizeLarge}" FontWeight="Bold" Foreground="{ThemeResource BrandAccentBrush}" />
 
             <StackPanel Orientation="Horizontal">
                 <TextBlock x:Uid="genByLabel" FontSize="{StaticResource FontSizeMedium}" Margin="0,0,6,0" />
-                <HyperlinkButton x:Name="artistName" Content="{x:Bind ViewModel.ArtistName, Mode=OneWay}" Command="{x:Bind ViewModel.ArtistOpenCommand}" FontSize="{StaticResource FontSizeMedium}" FontWeight="SemiBold" Padding="0" Margin="0" Foreground="White" Style="{StaticResource HeaderHyperlinkStyle}" />
+                <HyperlinkButton x:Name="artistName" Content="{x:Bind ViewModel.ArtistName, Mode=OneWay}" Command="{x:Bind ViewModel.ArtistOpenCommand}" FontSize="{StaticResource FontSizeMedium}" FontWeight="SemiBold" Padding="0" Style="{StaticResource HeaderHyperlinkStyle}" />
             </StackPanel>
 
             <StackPanel Orientation="Horizontal">
                 <TextBlock x:Uid="genOnLabel" FontSize="{StaticResource FontSizeXMedium}" Margin="0,0,6,0" />
-                <HyperlinkButton x:Name="albumName" Content="{x:Bind ViewModel.AlbumName, Mode=OneWay}" Command="{x:Bind ViewModel.AlbumOpenCommand}" FontSize="{StaticResource FontSizeXMedium}" FontStyle="Italic" Padding="0" Margin="0" Foreground="White" Style="{StaticResource HeaderHyperlinkStyle}" />
+                <HyperlinkButton x:Name="albumName" Content="{x:Bind ViewModel.AlbumName, Mode=OneWay}" Command="{x:Bind ViewModel.AlbumOpenCommand}" FontSize="{StaticResource FontSizeXMedium}" FontStyle="Italic" Padding="0" Style="{StaticResource HeaderHyperlinkStyle}" />
             </StackPanel>
 
             <CommandBar Style="{StaticResource HeaderCommandBarStyle}" HorizontalAlignment="Left">
