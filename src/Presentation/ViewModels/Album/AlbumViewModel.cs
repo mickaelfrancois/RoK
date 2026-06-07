@@ -247,30 +247,53 @@ public partial class AlbumViewModel : ObservableObject, IFilterableAlbum, IGroup
         if (cancellationToken.IsCancellationRequested)
             return;
 
-        await UpdateStatisticsIfNeededAsync();
-
-        if (cancellationToken.IsCancellationRequested)
-            return;
-
-        await LoadListeningStatsAsync();
-
-        if (cancellationToken.IsCancellationRequested)
-            return;
-
-        await GetDataFromApiAsync();
-
-        if (cancellationToken.IsCancellationRequested)
-            return;
-
-        await InitializeTagsAsync();
-
-        if (cancellationToken.IsCancellationRequested)
-            return;
-
-        await CalculatePictureDominantColorAsync();
-
         stopwatch.Stop();
-        _logger.LogInformation("Album {AlbumId} loaded in {ElapsedMilliseconds} ms", albumId, stopwatch.ElapsedMilliseconds);
+        _logger.LogInformation("Album {AlbumId} essential data loaded in {ElapsedMilliseconds} ms", albumId, stopwatch.ElapsedMilliseconds);
+
+        _ = LoadSecondaryDataAsync(albumId, cancellationToken);
+    }
+
+    /// <summary>
+    /// Loads everything the first render does not need (statistics, API metadata, tags,
+    /// dominant color). Runs detached from the navigation path so the header and track
+    /// list show up immediately; each panel fills in when its data arrives.
+    /// </summary>
+    private async Task LoadSecondaryDataAsync(long albumId, CancellationToken cancellationToken)
+    {
+        try
+        {
+            Stopwatch stopwatch = new();
+            stopwatch.Start();
+
+            await UpdateStatisticsIfNeededAsync();
+
+            if (cancellationToken.IsCancellationRequested)
+                return;
+
+            await LoadListeningStatsAsync();
+
+            if (cancellationToken.IsCancellationRequested)
+                return;
+
+            await GetDataFromApiAsync();
+
+            if (cancellationToken.IsCancellationRequested)
+                return;
+
+            await InitializeTagsAsync();
+
+            if (cancellationToken.IsCancellationRequested)
+                return;
+
+            await CalculatePictureDominantColorAsync();
+
+            stopwatch.Stop();
+            _logger.LogInformation("Album {AlbumId} secondary data loaded in {ElapsedMilliseconds} ms", albumId, stopwatch.ElapsedMilliseconds);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to load secondary data for album {AlbumId}", albumId);
+        }
     }
 
     public void OnNavigatedFrom()
