@@ -2047,4 +2047,7 @@
   <data name="artistFavoriteButton.AutomationProperties.Name" xml:space="preserve">
     <value>Add or remove from favorites</value>
   </data>
+  <data name="PlaylistTrackCount.Text" xml:space="preserve">
+    <value>Track count:</value>
+  </data>
 </root>

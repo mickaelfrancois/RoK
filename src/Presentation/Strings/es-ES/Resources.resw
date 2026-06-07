@@ -1879,4 +1879,7 @@
   <data name="artistFavoriteButton.AutomationProperties.Name" xml:space="preserve">
     <value>Añadir o quitar de favoritos</value>
   </data>
+  <data name="PlaylistTrackCount.Text" xml:space="preserve">
+    <value>Número de pistas:</value>
+  </data>
 </root>

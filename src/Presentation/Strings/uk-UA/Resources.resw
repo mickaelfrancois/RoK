@@ -1937,4 +1937,7 @@
   <data name="artistFavoriteButton.AutomationProperties.Name" xml:space="preserve">
     <value>Додати або вилучити з улюблених</value>
   </data>
+  <data name="PlaylistTrackCount.Text" xml:space="preserve">
+    <value>Кількість треків:</value>
+  </data>
 </root>

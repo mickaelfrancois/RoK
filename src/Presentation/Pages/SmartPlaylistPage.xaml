@@ -57,26 +57,26 @@
                     </Grid.RowDefinitions>
 
                     <StackPanel Orientation="Horizontal">
-                        <TextBlock x:Uid="PlaylistTrackCount" VerticalAlignment="Center" Margin="0,0,8,0" Text="Nombre de titres :"></TextBlock>
+                        <TextBlock x:Uid="PlaylistTrackCount" VerticalAlignment="Center" Margin="0,0,8,0" />
                         <NumberBox VerticalAlignment="Center" Value="{x:Bind ViewModel.TrackMaximumValue, Mode=TwoWay}" Width="50" HorizontalAlignment="Left" />
                     </StackPanel>
 
                     <StackPanel Grid.Row="1" Orientation="Horizontal" VerticalAlignment="Top">
-                        <Button Grid.Row="2" Click="PlaylistSave_Click" Margin="0,0,8,0">
+                        <Button Click="PlaylistSave_Click" Margin="0,0,8,0">
                             <StackPanel Orientation="Horizontal">
                                 <SymbolIcon Symbol="Save"></SymbolIcon>
-                                <TextBlock x:Uid="playlistSave" FontFamily="Segoe UI" Margin="2,0,0,0" VerticalAlignment="Center"></TextBlock>
+                                <TextBlock x:Uid="playlistSave" Margin="2,0,0,0" VerticalAlignment="Center"></TextBlock>
                             </StackPanel>
                         </Button>
                         <Button Click="GroupNew_Click">
                             <StackPanel Orientation="Horizontal">
                                 <SymbolIcon Symbol="Add"></SymbolIcon>
-                                <TextBlock x:Uid="playlistGroupNew" Text="Nouveau groupe" FontFamily="Segoe UI" Margin="2,0,0,0" VerticalAlignment="Center"></TextBlock>
+                                <TextBlock x:Uid="playlistGroupNew" Margin="2,0,0,0" VerticalAlignment="Center"></TextBlock>
                             </StackPanel>
                         </Button>
                     </StackPanel>
 
-                    <ListBox x:Name="lvGroup" Grid.Row="2" Background="Transparent" BorderThickness="0,1,0,0" BorderBrush="Gray" />
+                    <ListBox x:Name="lvGroup" Grid.Row="2" Background="Transparent" BorderThickness="0,1,0,0" BorderBrush="{ThemeResource DividerStrokeColorDefaultBrush}" />
                 </Grid>
             </PivotItem>
 
@@ -138,7 +138,7 @@
 
                                     <Grid.ContextFlyout>
                                         <MenuFlyout ShowMode="TransientWithDismissOnPointerMoveAway">
-                                            <MenuFlyoutItem x:Uid="trackFlyoutRemoveFromPlaylist" Command="{Binding ViewModel.RemoveFromPlaylistCommand, ElementName=playlistPage}" CommandParameter="{x:Bind Track.Id}">
+                                            <MenuFlyoutItem x:Uid="trackFlyoutRemoveFromPlaylist" Command="{Binding ViewModel.RemoveFromPlaylistCommand, ElementName=smartPlaylistPage}" CommandParameter="{x:Bind Track.Id}">
                                                 <MenuFlyoutItem.Icon>
                                                     <FontIcon Glyph="&#xECC9;" />
                                                 </MenuFlyoutItem.Icon>
