@@ -8,7 +8,6 @@
       xmlns:artists="using:Rok.ViewModels.Artist"
       xmlns:common="using:Rok.Commons"
       xmlns:artists1="using:Rok.ViewModels.Artists"
-      x:Name="artistsView"
       mc:Ignorable="d">
 
     <Page.Resources>
@@ -56,12 +55,13 @@
                     <HyperlinkButton Content="{x:Bind Artist.Name}" x:Phase="0" Command="{x:Bind ArtistOpenCommand}" Style="{StaticResource GridCoverButtonStyle}" />
                     
                     <TextBlock x:Name="subTitle" Grid.Row="1" Style="{StaticResource GridCoverBottomSecondLineStyle}" Margin="4,6,0,0" Text="{x:Bind SubTitle, Mode=OneWay}" Opacity="1" x:Phase="1" />
-                    <HyperlinkButton x:Name="genreName" Grid.Row="1" Style="{StaticResource GridCoverButtonStyle}" Content="{x:Bind Artist.GenreName, Mode=OneWay}" Command="{x:Bind GenreOpenCommand}" Opacity="0" x:Phase="1" />
+                    <HyperlinkButton x:Name="genreName" Grid.Row="1" IsTabStop="False" Style="{StaticResource GridCoverButtonStyle}" Content="{x:Bind Artist.GenreName, Mode=OneWay}" Command="{x:Bind GenreOpenCommand}" Opacity="0" x:Phase="1" />
 
                     <common:AnimatedButton x:Name="favoriteButton"
-                                           Grid.Row="0" Grid.Column="1"                                           
+                                           x:Uid="artistFavoriteButton"
+                                           Grid.Row="0" Grid.Column="1"
+                                           IsTabStop="False"
                                            HorizontalAlignment="Right" VerticalAlignment="Stretch"
-                                           Margin="0"
                                            Opacity="{x:Bind IsFavorite, Converter={StaticResource BoolToOpacityConverter}, Mode=OneWay}"
                                            Icon="{StaticResource HeartPath}"
                                            Color="{x:Bind IsFavorite, Converter={StaticResource FavoriteToColorConverter}, Mode=OneWay}"
@@ -103,7 +103,7 @@
                 <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="12,0,0,0">
                     <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingSmall}">
                         <HyperlinkButton Content="{x:Bind Artist.Name}" Command="{x:Bind ArtistOpenCommand}" Style="{StaticResource HyperlinkSmallButtonStyle}" Margin="4,0,0,0" FontSize="{StaticResource FontSizeXMedium}" FontWeight="SemiBold" />
-                        <common:AnimatedButton x:Name="favoriteButton" HorizontalAlignment="Right" VerticalAlignment="Center" Icon="{StaticResource HeartPath}" Color="{x:Bind IsFavorite, Converter={StaticResource FavoriteToColorConverter}, Mode=OneWay}" Opacity="0" Command="{x:Bind ArtistFavoriteCommand}" CommandParameter="{x:Bind IsFavorite, Converter={StaticResource BoolToInvertBoolConverter}, Mode=OneWay}" />
+                        <common:AnimatedButton x:Name="favoriteButton" x:Uid="artistFavoriteButton" IsTabStop="False" HorizontalAlignment="Right" VerticalAlignment="Center" Icon="{StaticResource HeartPath}" Color="{x:Bind IsFavorite, Converter={StaticResource FavoriteToColorConverter}, Mode=OneWay}" Opacity="{x:Bind IsFavorite, Converter={StaticResource BoolToOpacityConverter}, Mode=OneWay}" Command="{x:Bind ArtistFavoriteCommand}" CommandParameter="{x:Bind IsFavorite, Converter={StaticResource BoolToInvertBoolConverter}, Mode=OneWay}" />
                     </StackPanel>
 
                     <Grid Height="20">
@@ -174,7 +174,7 @@
 
                     <AutoSuggestBox x:Uid="inlineListSearch" QueryIcon="Find" Style="{StaticResource InlineSearchStyle}" Text="{x:Bind ViewModel.SearchText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                     <AppBarSeparator />
-                    <AppBarButton x:Name="gridListModeButton" Style="{StaticResource AppBarButtonCompactStyle}" Icon="{x:Bind ViewModel.IsGridView, Mode=OneWay, Converter={StaticResource GridListIconConverter}}" Command="{x:Bind ViewModel.ToggleDisplayModeCommand}" />
+                    <AppBarButton x:Name="gridListModeButton" x:Uid="gridListModeButton" Style="{StaticResource AppBarButtonCompactStyle}" Icon="{x:Bind ViewModel.IsGridView, Mode=OneWay, Converter={StaticResource GridListIconConverter}}" Command="{x:Bind ViewModel.ToggleDisplayModeCommand}" />
                     <AppBarSeparator />
 
                     <!-- Info about albums count and duration -->
@@ -207,7 +207,6 @@
                                              SelectionMode="Multiple"
                                              IsMultiSelectCheckBoxEnabled="{x:Bind ViewModel.IsSelectedItems, Mode=OneWay}"
                                              IsItemClickEnabled="True"
-                                             Margin="0"
                                              ScrollViewer.VerticalScrollMode="Enabled"
                                              ScrollViewer.VerticalScrollBarVisibility="Auto">
                         <GridView.GroupStyle>
@@ -221,7 +220,7 @@
                                                 <TextBlock Text="{x:Bind Count}" Style="{StaticResource GroupHeaderCountTextStyle}" />
                                             </Border>
 
-                                            <Button Style="{StaticResource GroupHeaderListenButtonStyle}" Command="{Binding ElementName=artistsView, Path=DataContext.ListenGroupCommand}" CommandParameter="{x:Bind}" Tapped="GroupButton_Tapped">
+                                            <Button Style="{StaticResource GroupHeaderListenButtonStyle}" Click="GroupListenButton_Click" Tapped="GroupButton_Tapped">
                                                 <StackPanel Orientation="Horizontal">
                                                     <FontIcon Glyph="&#xEE4A;" Margin="0,0,6,0" FontSize="{ThemeResource ControlContentThemeFontSize}" VerticalAlignment="Center" />
                                                     <TextBlock x:Uid="artistsViewListenListGroup" />

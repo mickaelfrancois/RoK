@@ -1934,4 +1934,7 @@
   <data name="albumFavoriteButton.AutomationProperties.Name" xml:space="preserve">
     <value>Додати або вилучити з улюблених</value>
   </data>
+  <data name="artistFavoriteButton.AutomationProperties.Name" xml:space="preserve">
+    <value>Додати або вилучити з улюблених</value>
+  </data>
 </root>

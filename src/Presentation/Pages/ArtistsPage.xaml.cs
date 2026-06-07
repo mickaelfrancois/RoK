@@ -7,7 +7,6 @@ using Microsoft.UI.Xaml.Navigation;
 using Rok.Commons;
 using Rok.ViewModels.Artist;
 using Rok.ViewModels.Artists;
-using Rok.ViewModels.Playlists;
 
 namespace Rok.Pages;
 
@@ -37,7 +36,6 @@ public sealed partial class ArtistsPage : Page, IDisposable
 
         _logger = App.ServiceProvider.GetRequiredService<ILogger<ArtistsPage>>();
         ViewModel = App.ServiceProvider.GetRequiredService<ArtistsViewModel>();
-        DataContext = ViewModel;
 
         Loaded += Page_Loaded;
         ViewModel.PropertyChanged += ViewModel_PropertyChanged;
@@ -98,7 +96,7 @@ public sealed partial class ArtistsPage : Page, IDisposable
             return;
         }
 
-        if (e.PropertyName == nameof(PlaylistsViewModel.IsGridView))
+        if (e.PropertyName == nameof(ViewModel.IsGridView))
         {
             UpdateVisualState();
             return;
@@ -154,16 +152,13 @@ public sealed partial class ArtistsPage : Page, IDisposable
     private void gridBottom_PointerEntered(object sender, PointerRoutedEventArgs e)
     {
         Grid? gridItem = sender as Grid;
-        if (gridItem != null && gridItem.DataContext is ArtistViewModel artistViewModel)
+        if (gridItem != null && gridItem.DataContext is ArtistViewModel)
         {
             Storyboard? showGenreStoryboard = gridItem.Resources["ShowGenreNameStoryboard"] as Storyboard;
             showGenreStoryboard?.Begin();
 
-            if (!artistViewModel.IsFavorite)
-            {
-                Storyboard? showFavoriteButtonStoryboard = gridItem.Resources["ShowFavoriteButtonStoryboard"] as Storyboard;
-                showFavoriteButtonStoryboard?.Begin();
-            }
+            Storyboard? showFavoriteButtonStoryboard = gridItem.Resources["ShowFavoriteButtonStoryboard"] as Storyboard;
+            showFavoriteButtonStoryboard?.Begin();
         }
     }
 
@@ -176,7 +171,13 @@ public sealed partial class ArtistsPage : Page, IDisposable
             Storyboard? showSubTitleStoryboard = gridItem.Resources["ShowSubTitleStoryboard"] as Storyboard;
             showSubTitleStoryboard?.Begin();
 
-            if (!artistViewModel.IsFavorite)
+            if (artistViewModel.IsFavorite)
+            {
+                // Release the animated values so the {x:Bind} on Opacity stays authoritative for favorites.
+                StopStoryboard(gridItem, "ShowFavoriteButtonStoryboard");
+                StopStoryboard(gridItem, "HideFavoriteButtonStoryboard");
+            }
+            else
             {
                 Storyboard? hideFavoriteButtonStoryboard = gridItem.Resources["HideFavoriteButtonStoryboard"] as Storyboard;
                 hideFavoriteButtonStoryboard?.Begin();
@@ -189,11 +190,32 @@ public sealed partial class ArtistsPage : Page, IDisposable
         e.Handled = true;
     }
 
+    private void GroupListenButton_Click(object sender, RoutedEventArgs e)
+    {
+        if (sender is Button { DataContext: ArtistsGroupCategoryViewModel group })
+            ViewModel.ListenGroupCommand.Execute(group);
+    }
 
     private void GridContainerContentChanging(ListViewBase sender, ContainerContentChangingEventArgs args)
     {
+        if (args.InRecycleQueue && args.ItemContainer?.ContentTemplateRoot is Grid root)
+        {
+            // Release storyboard holds so {x:Bind} values re-apply when the container is reused for another artist.
+            StopStoryboard(root, "ShowGenreNameStoryboard");
+            StopStoryboard(root, "ShowSubTitleStoryboard");
+            StopStoryboard(root, "ShowFavoriteButtonStoryboard");
+            StopStoryboard(root, "HideFavoriteButtonStoryboard");
+            return;
+        }
+
         if (args.Item is ArtistViewModel item && item.Picture == null)
             item.LoadPicture();
+    }
+
+    private static void StopStoryboard(Grid root, string key)
+    {
+        if (root.Resources.TryGetValue(key, out object? value) && value is Storyboard storyboard)
+            storyboard.Stop();
     }
 
     private void GroupByFlyout_Opened(object sender, object e)
@@ -242,8 +264,6 @@ public sealed partial class ArtistsPage : Page, IDisposable
                 groupedItemsViewSource.Source = null;
                 groupedItemsViewSource.IsSourceGrouped = false;
             }
-
-            DataContext = null;
         }
         catch (Exception ex)
         {
