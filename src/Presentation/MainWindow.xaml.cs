@@ -383,20 +383,16 @@ public sealed partial class MainWindow : Window
             return;
         }
 
-        // Ensure that the navigation menu selection is cleared if the navigated page is not one of the expected pages.
-        Type[] menuPages =
-        [
-            typeof(Pages.ArtistsPage),
-            typeof(Pages.AlbumsPage),
-            typeof(Pages.TracksPage),
-            typeof(Pages.PlaylistsPage),
-            typeof(Pages.InsightsPage),
-            typeof(Pages.OptionsPage),
-            typeof(Pages.ListeningPage)
-        ];
+        // Keep the menu selection in sync with the displayed page (back navigation included);
+        // pages without a menu entry clear the selection.
+        navMenu.SelectedItem = FindMenuItemForPage(e.Content.GetType());
+    }
 
-        if (!menuPages.Contains(e.Content.GetType()))
-            navMenu.SelectedItem = null;
+    private NavigationViewItem? FindMenuItemForPage(Type pageType)
+    {
+        return navMenu.MenuItems
+            .OfType<NavigationViewItem>()
+            .FirstOrDefault(item => item.Tag is string tag && pageType.FullName == "Rok.Pages." + tag + "Page");
     }
 
 
