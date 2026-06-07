@@ -5,7 +5,6 @@
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
       xmlns:common="using:Rok.Commons"
-      xmlns:converters="using:Rok.Converters"
       xmlns:vm="using:Rok.ViewModels.Radio"
       mc:Ignorable="d"
       x:Name="radiosView">
@@ -16,8 +15,8 @@
                 <Grid.ContextFlyout>
                     <MenuFlyout>
                         <MenuFlyoutItem x:Uid="radiosFlyoutPlay"
-                                        Command="{Binding ElementName=radiosView, Path=ViewModel.PlayCommand}"
-                                        CommandParameter="{x:Bind}">
+                                        Click="OnTileNameClick"
+                                        Tag="{x:Bind}">
                             <MenuFlyoutItem.Icon>
                                 <SymbolIcon Symbol="Play" />
                             </MenuFlyoutItem.Icon>
@@ -49,7 +48,7 @@
                 <!-- Cover: cached station picture (if available) over a brand-coloured fallback panel with a centred radio glyph -->
                 <Border CornerRadius="{StaticResource CornerRadiusMediumValue}" Background="{ThemeResource BrandPrimaryBrush}">
                     <Grid>
-                        <FontIcon Glyph="&#xE8D6;" FontFamily="Segoe Fluent Icons"
+                        <FontIcon Glyph="&#xE8D6;"
                                   FontSize="56" Foreground="White" Opacity="0.35"
                                   HorizontalAlignment="Center" VerticalAlignment="Center" />
                         <Image Source="{x:Bind Picture, Mode=OneWay}"
