@@ -5,7 +5,7 @@ using Rok.ViewModels.Insights;
 namespace Rok.Pages;
 
 
-public sealed partial class InsightsPage : Page
+public sealed partial class InsightsPage : Page, IDisposable
 {
     public InsightsViewModel ViewModel { get; set; }
     private readonly ILogger<InsightsPage> _logger;
@@ -32,5 +32,18 @@ public sealed partial class InsightsPage : Page
         {
             _logger.LogError(ex, "Navigation to InsightsPage failed");
         }
+    }
+
+    protected override void OnNavigatingFrom(NavigatingCancelEventArgs e)
+    {
+        Dispose();
+        base.OnNavigatingFrom(e);
+    }
+
+    public void Dispose()
+    {
+        // InsightsViewModel is a singleton; releasing the x:Bind tracking lets the page be collected.
+        Bindings.StopTracking();
+        DataContext = null;
     }
 }

@@ -1958,4 +1958,13 @@
   <data name="compactExitButton.ToolTipService.ToolTip" xml:space="preserve">
     <value>Вийти з компактного режиму</value>
   </data>
+  <data name="Insights_ProfileDiversity.Text" xml:space="preserve">
+    <value>• Різноманітність: </value>
+  </data>
+  <data name="Insights_ProfileSkipRate.Text" xml:space="preserve">
+    <value>• Частота пропусків: </value>
+  </data>
+  <data name="Insights_ProfileReplayRate.Text" xml:space="preserve">
+    <value>• Частота повторів: </value>
+  </data>
 </root>

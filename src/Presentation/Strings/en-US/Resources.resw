@@ -2068,4 +2068,13 @@
   <data name="compactExitButton.ToolTipService.ToolTip" xml:space="preserve">
     <value>Exit compact mode</value>
   </data>
+  <data name="Insights_ProfileDiversity.Text" xml:space="preserve">
+    <value>• Diversity: </value>
+  </data>
+  <data name="Insights_ProfileSkipRate.Text" xml:space="preserve">
+    <value>• Skip rate: </value>
+  </data>
+  <data name="Insights_ProfileReplayRate.Text" xml:space="preserve">
+    <value>• Replay rate: </value>
+  </data>
 </root>

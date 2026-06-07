@@ -2067,4 +2067,13 @@
   <data name="compactExitButton.ToolTipService.ToolTip" xml:space="preserve">
     <value>Quitter le mode compact</value>
   </data>
+  <data name="Insights_ProfileDiversity.Text" xml:space="preserve">
+    <value>• Diversité : </value>
+  </data>
+  <data name="Insights_ProfileSkipRate.Text" xml:space="preserve">
+    <value>• Taux de skip : </value>
+  </data>
+  <data name="Insights_ProfileReplayRate.Text" xml:space="preserve">
+    <value>• Taux de réécoute : </value>
+  </data>
 </root>

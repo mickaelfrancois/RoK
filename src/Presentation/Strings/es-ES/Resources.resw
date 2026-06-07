@@ -1900,4 +1900,13 @@
   <data name="compactExitButton.ToolTipService.ToolTip" xml:space="preserve">
     <value>Salir del modo compacto</value>
   </data>
+  <data name="Insights_ProfileDiversity.Text" xml:space="preserve">
+    <value>• Diversidad: </value>
+  </data>
+  <data name="Insights_ProfileSkipRate.Text" xml:space="preserve">
+    <value>• Tasa de saltos: </value>
+  </data>
+  <data name="Insights_ProfileReplayRate.Text" xml:space="preserve">
+    <value>• Tasa de repetición: </value>
+  </data>
 </root>
