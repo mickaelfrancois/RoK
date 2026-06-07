@@ -37,6 +37,13 @@ public sealed partial class PlaylistsPage : Page, IDisposable
         }
     }
 
+    protected override void OnNavigatingFrom(NavigatingCancelEventArgs e)
+    {
+        Dispose();
+
+        base.OnNavigatingFrom(e);
+    }
+
     private void OnViewModelPropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
         if (e.PropertyName == nameof(PlaylistsViewModel.IsGridView))
