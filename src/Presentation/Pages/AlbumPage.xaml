@@ -135,7 +135,7 @@
 
                             <StackPanel Grid.Column="0" Orientation="Horizontal">
                                 <TextBlock x:Name="RowIndexText" Style="{StaticResource GridTracksRowIndexTextBlockStyle}" />
-                                <HyperlinkButton Style="{StaticResource GridTracksTitleHyperlinkButtonStyle}" Command="{Binding DataContext.ListenCommand, ElementName=albumPage}" CommandParameter="{Binding}" />
+                                <HyperlinkButton Style="{StaticResource GridTracksTitleHyperlinkButtonStyle}" Click="OnTrackTitleClick" Tag="{x:Bind}" />
                                 <HyperlinkButton Visibility="{x:Bind LyricsType, Converter={StaticResource LyricsTypeVisibilityConverter}, ConverterParameter=Synchronized, Mode=OneWay}" Style="{StaticResource GridTracksSyncLyricsBadgeStyle}" Command="{x:Bind LyricsOpenCommand}" />
                                 <HyperlinkButton Visibility="{x:Bind LyricsType, Converter={StaticResource LyricsTypeVisibilityConverter}, ConverterParameter=Plain, Mode=OneWay}" Style="{StaticResource GridTracksPlainLyricsBadgeStyle}" Command="{x:Bind LyricsOpenCommand}" />
                             </StackPanel>
