@@ -7,6 +7,7 @@
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
       xmlns:common="using:Rok.Commons"
       xmlns:media="using:Microsoft.UI.Xaml.Media"
+      xmlns:start="using:Rok.ViewModels.Start"
       mc:Ignorable="d">
 
     <Page.Resources>
@@ -118,13 +119,13 @@
                         </ItemsPanelTemplate>
                     </GridView.ItemsPanel>
                     <GridView.ItemTemplate>
-                        <DataTemplate>
+                        <DataTemplate x:DataType="start:AlbumImportedModel">
                             <Grid Width="220" Height="220" Margin="6" CornerRadius="12">
                                 <Grid.Shadow>
                                     <ThemeShadow />
                                 </Grid.Shadow>
                                 <Grid CornerRadius="12">
-                                    <common:PictureControl Cover="{Binding Picture, Mode=OneWay}"
+                                    <common:PictureControl Cover="{x:Bind Picture}"
                                                            VerticalAlignment="Center"
                                                            HorizontalAlignment="Center"
                                                            PlayButtonVisibility="Collapsed" />
@@ -136,13 +137,13 @@
                                             </LinearGradientBrush>
                                         </Grid.Background>
                                         <StackPanel Padding="10,20,10,10" Spacing="2">
-                                            <TextBlock Text="{Binding Name}"
+                                            <TextBlock Text="{x:Bind Name}"
                                                        FontSize="13"
                                                        FontWeight="SemiBold"
                                                        Foreground="White"
                                                        TextTrimming="CharacterEllipsis"
                                                        MaxLines="1" />
-                                            <TextBlock Text="{Binding ArtistName}"
+                                            <TextBlock Text="{x:Bind ArtistName}"
                                                        FontSize="11"
                                                        Foreground="White"
                                                        Opacity="0.7"
