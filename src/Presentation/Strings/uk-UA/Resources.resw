@@ -1946,4 +1946,16 @@
   <data name="optionsLanguageAutoTranslation.Text" xml:space="preserve">
     <value> (автоматичний переклад)</value>
   </data>
+  <data name="playerVolumeButton.AutomationProperties.Name" xml:space="preserve">
+    <value>Гучність</value>
+  </data>
+  <data name="playerVolumeButton.ToolTipService.ToolTip" xml:space="preserve">
+    <value>Гучність</value>
+  </data>
+  <data name="compactExitButton.AutomationProperties.Name" xml:space="preserve">
+    <value>Вийти з компактного режиму</value>
+  </data>
+  <data name="compactExitButton.ToolTipService.ToolTip" xml:space="preserve">
+    <value>Вийти з компактного режиму</value>
+  </data>
 </root>

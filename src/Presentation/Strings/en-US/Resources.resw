@@ -2056,4 +2056,16 @@
   <data name="optionsLanguageAutoTranslation.Text" xml:space="preserve">
     <value> (Automatic Translation)</value>
   </data>
+  <data name="playerVolumeButton.AutomationProperties.Name" xml:space="preserve">
+    <value>Volume</value>
+  </data>
+  <data name="playerVolumeButton.ToolTipService.ToolTip" xml:space="preserve">
+    <value>Volume</value>
+  </data>
+  <data name="compactExitButton.AutomationProperties.Name" xml:space="preserve">
+    <value>Exit compact mode</value>
+  </data>
+  <data name="compactExitButton.ToolTipService.ToolTip" xml:space="preserve">
+    <value>Exit compact mode</value>
+  </data>
 </root>
