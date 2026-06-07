@@ -42,6 +42,16 @@ public sealed partial class GenrePage : Page
 
     private void grid_ContainerContentChanging(ListViewBase sender, ContainerContentChangingEventArgs args)
     {
+        if (args.InRecycleQueue && args.ItemContainer?.ContentTemplateRoot is Grid root)
+        {
+            // Release storyboard holds so {x:Bind} values re-apply when the container is reused for another album.
+            StopStoryboard(root, "ShowArtistNameStoryboard");
+            StopStoryboard(root, "ShowSubTitleStoryboard");
+            StopStoryboard(root, "ShowFavoriteButtonStoryboard");
+            StopStoryboard(root, "HideFavoriteButtonStoryboard");
+            return;
+        }
+
         if (args.Item is AlbumViewModel item && item.Picture == null)
         {
             item.LoadPicture();
@@ -51,16 +61,13 @@ public sealed partial class GenrePage : Page
     private void gridBottom_PointerEntered(object sender, PointerRoutedEventArgs e)
     {
         Grid? gridItem = sender as Grid;
-        if (gridItem != null && gridItem.DataContext is AlbumViewModel albumViewModel)
+        if (gridItem != null && gridItem.DataContext is AlbumViewModel)
         {
             Storyboard? showArtistStoryboard = gridItem.Resources["ShowArtistNameStoryboard"] as Storyboard;
             showArtistStoryboard?.Begin();
 
-            if (!albumViewModel.IsFavorite)
-            {
-                Storyboard? showFavoriteButtonStoryboard = gridItem.Resources["ShowFavoriteButtonStoryboard"] as Storyboard;
-                showFavoriteButtonStoryboard?.Begin();
-            }
+            Storyboard? showFavoriteButtonStoryboard = gridItem.Resources["ShowFavoriteButtonStoryboard"] as Storyboard;
+            showFavoriteButtonStoryboard?.Begin();
         }
     }
 
@@ -72,11 +79,23 @@ public sealed partial class GenrePage : Page
             Storyboard? showSubTitleStoryboard = gridItem.Resources["ShowSubTitleStoryboard"] as Storyboard;
             showSubTitleStoryboard?.Begin();
 
-            if (!albumViewModel.IsFavorite)
+            if (albumViewModel.IsFavorite)
+            {
+                // Release the animated values so the {x:Bind} on Opacity stays authoritative for favorites.
+                StopStoryboard(gridItem, "ShowFavoriteButtonStoryboard");
+                StopStoryboard(gridItem, "HideFavoriteButtonStoryboard");
+            }
+            else
             {
                 Storyboard? hideFavoriteButtonStoryboard = gridItem.Resources["HideFavoriteButtonStoryboard"] as Storyboard;
                 hideFavoriteButtonStoryboard?.Begin();
             }
         }
+    }
+
+    private static void StopStoryboard(Grid root, string key)
+    {
+        if (root.Resources.TryGetValue(key, out object? value) && value is Storyboard storyboard)
+            storyboard.Stop();
     }
 }

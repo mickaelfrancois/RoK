@@ -1,4 +1,3 @@
-using System.ComponentModel;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Navigation;
 using Rok.ViewModels.Playlist;
@@ -6,7 +5,7 @@ using Rok.ViewModels.Playlists;
 
 namespace Rok.Pages;
 
-public sealed partial class PlaylistsPage : Page, IDisposable
+public sealed partial class PlaylistsPage : Page
 {
     public PlaylistsViewModel ViewModel { get; set; }
     private readonly ILogger<PlaylistsPage> _logger;
@@ -18,7 +17,6 @@ public sealed partial class PlaylistsPage : Page, IDisposable
 
         _logger = App.ServiceProvider.GetRequiredService<ILogger<PlaylistsPage>>();
         ViewModel = App.ServiceProvider.GetRequiredService<PlaylistsViewModel>();
-        ViewModel.PropertyChanged += OnViewModelPropertyChanged;
     }
 
 
@@ -27,7 +25,6 @@ public sealed partial class PlaylistsPage : Page, IDisposable
         try
         {
             await ViewModel.LoadDataAsync(forceReload: false);
-            UpdateVisualState();
             base.OnNavigatedTo(e);
         }
         catch (OperationCanceledException) { }
@@ -35,31 +32,6 @@ public sealed partial class PlaylistsPage : Page, IDisposable
         {
             _logger.LogError(ex, "Navigation to PlaylistsPage failed");
         }
-    }
-
-    protected override void OnNavigatingFrom(NavigatingCancelEventArgs e)
-    {
-        Dispose();
-
-        base.OnNavigatingFrom(e);
-    }
-
-    private void OnViewModelPropertyChanged(object? sender, PropertyChangedEventArgs e)
-    {
-        if (e.PropertyName == nameof(PlaylistsViewModel.IsGridView))
-        {
-            UpdateVisualState();
-        }
-    }
-
-    private void UpdateVisualState()
-    {
-        VisualStateManager.GoToState(this, ViewModel.IsGridView ? "GridViewState" : "ListViewState", true);
-    }
-
-    public void Dispose()
-    {
-        ViewModel.PropertyChanged -= OnViewModelPropertyChanged;
     }
 
     private void grid_ContainerContentChanging(ListViewBase sender, ContainerContentChangingEventArgs args)
