@@ -35,7 +35,6 @@ public sealed partial class AlbumsPage : Page, IDisposable
 
         _logger = App.ServiceProvider.GetRequiredService<ILogger<AlbumsPage>>();
         ViewModel = App.ServiceProvider.GetRequiredService<AlbumsViewModel>();
-        DataContext = ViewModel;
 
         Loaded += Page_Loaded;
         ViewModel.PropertyChanged += ViewModel_PropertyChanged;
@@ -151,13 +150,31 @@ public sealed partial class AlbumsPage : Page, IDisposable
         e.Handled = true;
     }
 
-    private async void GridContainerContentChanging(ListViewBase sender, ContainerContentChangingEventArgs args)
+    private void GroupListenButton_Click(object sender, RoutedEventArgs e)
     {
-        if (args.Item is AlbumViewModel item && item.Picture == null)
-        {
-            // Seems to never be hit. Investigate to see if this code can be removed.
-            item.LoadPicture();
-        }
+        if (sender is Button { DataContext: AlbumsGroupCategoryViewModel group })
+            ViewModel.ListenGroupCommand.Execute(group);
+    }
+
+    private void GridContainerContentChanging(ListViewBase sender, ContainerContentChangingEventArgs args)
+    {
+        // Release storyboard holds so {x:Bind} values re-apply when the container is reused for another album.
+        if (args.InRecycleQueue && args.ItemContainer?.ContentTemplateRoot is Grid root)
+            StopHoverStoryboards(root);
+    }
+
+    private static void StopHoverStoryboards(Grid root)
+    {
+        StopStoryboard(root, "ShowArtistNameStoryboard");
+        StopStoryboard(root, "ShowSubTitleStoryboard");
+        StopStoryboard(root, "ShowFavoriteButtonStoryboard");
+        StopStoryboard(root, "HideFavoriteButtonStoryboard");
+    }
+
+    private static void StopStoryboard(Grid root, string key)
+    {
+        if (root.Resources.TryGetValue(key, out object? value) && value is Storyboard storyboard)
+            storyboard.Stop();
     }
 
     private void GroupByFlyout_Opened(object sender, object e)
@@ -168,16 +185,13 @@ public sealed partial class AlbumsPage : Page, IDisposable
     private void gridBottom_PointerEntered(object sender, PointerRoutedEventArgs e)
     {
         Grid? gridItem = sender as Grid;
-        if (gridItem != null && gridItem.DataContext is AlbumViewModel albumViewModel)
+        if (gridItem != null && gridItem.DataContext is AlbumViewModel)
         {
             Storyboard? showArtistStoryboard = gridItem.Resources["ShowArtistNameStoryboard"] as Storyboard;
             showArtistStoryboard?.Begin();
 
-            if (!albumViewModel.IsFavorite)
-            {
-                Storyboard? showFavoriteButtonStoryboard = gridItem.Resources["ShowFavoriteButtonStoryboard"] as Storyboard;
-                showFavoriteButtonStoryboard?.Begin();
-            }
+            Storyboard? showFavoriteButtonStoryboard = gridItem.Resources["ShowFavoriteButtonStoryboard"] as Storyboard;
+            showFavoriteButtonStoryboard?.Begin();
         }
     }
 
@@ -189,7 +203,13 @@ public sealed partial class AlbumsPage : Page, IDisposable
             Storyboard? showSubTitleStoryboard = gridItem.Resources["ShowSubTitleStoryboard"] as Storyboard;
             showSubTitleStoryboard?.Begin();
 
-            if (!albumViewModel.IsFavorite)
+            if (albumViewModel.IsFavorite)
+            {
+                // Release the animated values so the {x:Bind} on Opacity stays authoritative for favorites.
+                StopStoryboard(gridItem, "ShowFavoriteButtonStoryboard");
+                StopStoryboard(gridItem, "HideFavoriteButtonStoryboard");
+            }
+            else
             {
                 Storyboard? hideFavoriteButtonStoryboard = gridItem.Resources["HideFavoriteButtonStoryboard"] as Storyboard;
                 hideFavoriteButtonStoryboard?.Begin();
@@ -238,8 +258,6 @@ public sealed partial class AlbumsPage : Page, IDisposable
                 groupedItemsViewSource.Source = null;
                 groupedItemsViewSource.IsSourceGrouped = false;
             }
-
-            DataContext = null;
         }
         catch (Exception ex)
         {

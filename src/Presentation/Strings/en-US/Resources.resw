@@ -2035,4 +2035,13 @@
   <data name="artistStatsProgressionLabel.Text" xml:space="preserve">
     <value>albums listened</value>
   </data>
+  <data name="gridListModeButton.ToolTipService.ToolTip" xml:space="preserve">
+    <value>Switch between grid and list view</value>
+  </data>
+  <data name="gridListModeButton.AutomationProperties.Name" xml:space="preserve">
+    <value>Switch between grid and list view</value>
+  </data>
+  <data name="albumFavoriteButton.AutomationProperties.Name" xml:space="preserve">
+    <value>Add or remove from favorites</value>
+  </data>
 </root>

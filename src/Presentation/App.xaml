@@ -59,7 +59,6 @@
                 <ResourceDictionary Source="ms-appx:///Styles/ButtonStyles.xaml" />
                 <ResourceDictionary Source="ms-appx:///Styles/ControlsStyles.xaml" />
                 <ResourceDictionary Source="ms-appx:///Styles/RatingControlStyles.xaml" />
-                <ResourceDictionary Source="ms-appx:///Styles/AlbumTemplates.xaml" />
 
                 <!-- Tokens -->
                 <ResourceDictionary Source="ms-appx:///Styles/Tokens/Colors.xaml" />

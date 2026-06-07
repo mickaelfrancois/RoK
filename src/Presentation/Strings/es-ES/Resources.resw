@@ -1867,4 +1867,13 @@
   <data name="artistStatsProgressionLabel.Text" xml:space="preserve">
     <value>álbumes escuchados</value>
   </data>
+  <data name="gridListModeButton.ToolTipService.ToolTip" xml:space="preserve">
+    <value>Cambiar entre vista de cuadrícula y lista</value>
+  </data>
+  <data name="gridListModeButton.AutomationProperties.Name" xml:space="preserve">
+    <value>Cambiar entre vista de cuadrícula y lista</value>
+  </data>
+  <data name="albumFavoriteButton.AutomationProperties.Name" xml:space="preserve">
+    <value>Añadir o quitar de favoritos</value>
+  </data>
 </root>

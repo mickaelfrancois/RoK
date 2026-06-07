@@ -1925,4 +1925,13 @@
   <data name="artistStatsProgressionLabel.Text" xml:space="preserve">
     <value>прослухані альбоми</value>
   </data>
+  <data name="gridListModeButton.ToolTipService.ToolTip" xml:space="preserve">
+    <value>Перемкнути між сіткою та списком</value>
+  </data>
+  <data name="gridListModeButton.AutomationProperties.Name" xml:space="preserve">
+    <value>Перемкнути між сіткою та списком</value>
+  </data>
+  <data name="albumFavoriteButton.AutomationProperties.Name" xml:space="preserve">
+    <value>Додати або вилучити з улюблених</value>
+  </data>
 </root>
