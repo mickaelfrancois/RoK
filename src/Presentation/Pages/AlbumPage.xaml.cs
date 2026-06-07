@@ -1,6 +1,7 @@
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Navigation;
 using Rok.ViewModels.Album;
+using Rok.ViewModels.Track;
 
 namespace Rok.Pages;
 
@@ -68,6 +69,12 @@ public sealed partial class AlbumPage : Page
     private static double GetGridLengthResource(string key)
     {
         return ((GridLength)Microsoft.UI.Xaml.Application.Current.Resources[key]).Value;
+    }
+
+    private void OnTrackTitleClick(object sender, RoutedEventArgs e)
+    {
+        if (sender is FrameworkElement { Tag: TrackViewModel track })
+            ViewModel.ListenCommand.Execute(track);
     }
 
     private void tracksList_ContainerContentChanging(ListViewBase sender, ContainerContentChangingEventArgs args)

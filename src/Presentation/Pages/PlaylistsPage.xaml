@@ -82,7 +82,7 @@
                                   Icon="OpenFile"
                                   Command="{x:Bind ViewModel.ImportPlaylistsCommand}" />
                     <AppBarSeparator />
-                    <AppBarButton Icon="{x:Bind ViewModel.IsGridView, Mode=OneWay, Converter={StaticResource GridListIconConverter}}" Style="{StaticResource AppBarButtonCompactStyle}" Command="{x:Bind ViewModel.ToggleDisplayModeCommand}" />
+                    <AppBarButton x:Uid="gridListModeButton" Icon="{x:Bind ViewModel.IsGridView, Mode=OneWay, Converter={StaticResource GridListIconConverter}}" Style="{StaticResource AppBarButtonCompactStyle}" Command="{x:Bind ViewModel.ToggleDisplayModeCommand}" />
                 </StackPanel>
             </CommandBar.Content>
         </CommandBar>

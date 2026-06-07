@@ -32,7 +32,6 @@ public sealed partial class TracksPage : Page, IDisposable
         _logger = App.ServiceProvider.GetRequiredService<ILogger<TracksPage>>();
 
         ViewModel = App.ServiceProvider.GetRequiredService<TracksViewModel>();
-        DataContext = ViewModel;
 
         Loaded += Page_Loaded;
         ViewModel.PropertyChanged += ViewModel_PropertyChanged;
@@ -141,6 +140,12 @@ public sealed partial class TracksPage : Page, IDisposable
         e.Handled = true;
     }
 
+    private void GroupListenButton_Click(object sender, RoutedEventArgs e)
+    {
+        if (sender is Button { DataContext: TracksGroupCategoryViewModel group })
+            ViewModel.ListenGroupCommand.Execute(group);
+    }
+
     private void GroupByFlyout_Opened(object sender, object e)
     {
         _groupByMenuBuilder.PopulateGroupByMenu(groupByMenu, ViewModel);
@@ -181,8 +186,6 @@ public sealed partial class TracksPage : Page, IDisposable
                 groupedItemsViewSource.Source = null;
                 groupedItemsViewSource.IsSourceGrouped = false;
             }
-
-            DataContext = null;
         }
         catch (Exception ex)
         {

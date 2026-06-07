@@ -1,4 +1,5 @@
 using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Navigation;
 using Rok.ViewModels.Listening;
 using Rok.ViewModels.Track;
 
@@ -16,6 +17,12 @@ public sealed partial class ListeningPage : Page, IDisposable
 
         ViewModel = App.ServiceProvider.GetRequiredService<ListeningViewModel>();
         DataContext = ViewModel;
+    }
+
+    protected override void OnNavigatingFrom(NavigatingCancelEventArgs e)
+    {
+        Dispose();
+        base.OnNavigatingFrom(e);
     }
 
     private void SleepFlyout_Opening(object sender, object e)
@@ -46,5 +53,8 @@ public sealed partial class ListeningPage : Page, IDisposable
 
     public void Dispose()
     {
+        // ListeningViewModel is a singleton; releasing the x:Bind tracking lets the page be collected.
+        Bindings.StopTracking();
+        DataContext = null;
     }
 }

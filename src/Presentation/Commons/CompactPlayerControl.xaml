@@ -70,8 +70,7 @@
                                    MaxWidth="260"
                                    HorizontalAlignment="Center"
                                    Margin="8,2,8,0" />
-                        <TextBlock x:Name="title"
-                                   Text="{x:Bind PlayerViewModel.CurrentTrack.Title, Mode=OneWay}"
+                        <TextBlock Text="{x:Bind PlayerViewModel.CurrentTrack.Title, Mode=OneWay}"
                                    Foreground="#FFFFFFFF"
                                    FontWeight="Bold"
                                    FontSize="24"
@@ -92,8 +91,7 @@
                                    MaxWidth="260"
                                    HorizontalAlignment="Center"
                                    Margin="8,2,8,0" />
-                        <TextBlock x:Name="artist"
-                                   Text="{x:Bind PlayerViewModel.CurrentTrack.ArtistName, Mode=OneWay}"
+                        <TextBlock Text="{x:Bind PlayerViewModel.CurrentTrack.ArtistName, Mode=OneWay}"
                                    Foreground="#FFFFFFFF"
                                    FontSize="20"
                                    TextWrapping="NoWrap"
@@ -203,7 +201,7 @@
                 Command="{x:Bind PlayerViewModel.CompactModeCommand}"
                 Margin="0,6,6,0"
                 Padding="6"
-                ToolTipService.ToolTip="Exit compact mode">
+                x:Uid="compactExitButton">
             <SymbolIcon Symbol="StopSlideShow" />
         </Button>
     </Grid>

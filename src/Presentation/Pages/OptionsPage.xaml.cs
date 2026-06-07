@@ -81,12 +81,6 @@ public sealed partial class OptionsPage : Page
         }
     }
 
-    private void StorePageButton_Click(object sender, RoutedEventArgs e)
-    {
-        Uri uri = new("https://apps.microsoft.com/store/detail/9NX19R28Q92S?cid=DevShareMCLPCS");
-        _ = Windows.System.Launcher.LaunchUriAsync(uri);
-    }
-
     private void GitHubPageButton_Click(object sender, RoutedEventArgs e)
     {
         Uri uri = new("https://github.com/mickaelfrancois/RoK");

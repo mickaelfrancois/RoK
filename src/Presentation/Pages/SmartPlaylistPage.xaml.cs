@@ -2,6 +2,7 @@ using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Navigation;
 using Rok.Commons;
 using Rok.ViewModels.Playlist;
+using Rok.ViewModels.Track;
 
 namespace Rok.Pages;
 
@@ -130,6 +131,12 @@ public sealed partial class SmartPlaylistPage : Page
             ViewModel.DeleteCommand.Execute(null);
     }
 
+
+    private void OnTrackTitleClick(object sender, RoutedEventArgs e)
+    {
+        if (sender is FrameworkElement { Tag: TrackViewModel track })
+            ViewModel.ListenCommand.Execute(track);
+    }
 
     private void TracksListContainerContentChanging(ListViewBase sender, ContainerContentChangingEventArgs args)
     {

@@ -835,10 +835,6 @@
         <Setter Property="HorizontalAlignment" Value="Left" />
         <Setter Property="Width" Value="{StaticResource CoverSize}" />
         <Setter Property="Height" Value="{StaticResource CoverSize}" />
-        <Setter Property="Padding" Value="0" />
-        <Setter Property="Margin" Value="0" />
-        <Setter Property="BorderBrush" Value="Gray" />
-        <Setter Property="BorderThickness" Value="0" />
         <Setter Property="CornerRadius" Value="{StaticResource CornerRadiusMediumValue}" />
     </Style>
 

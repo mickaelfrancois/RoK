@@ -1,4 +1,6 @@
 using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Input;
+using Microsoft.UI.Xaml.Media.Animation;
 using Microsoft.UI.Xaml.Navigation;
 using Rok.ViewModels.Album;
 using Rok.ViewModels.Artist;
@@ -74,10 +76,51 @@ public sealed partial class ArtistPage : Page
 
     private void grid_ContainerContentChanging(ListViewBase sender, ContainerContentChangingEventArgs args)
     {
+        if (args.InRecycleQueue && args.ItemContainer?.ContentTemplateRoot is Grid root)
+        {
+            // Release storyboard holds so {x:Bind} values re-apply when the container is reused for another album.
+            StopStoryboard(root, "ShowFavoriteButtonStoryboard");
+            StopStoryboard(root, "HideFavoriteButtonStoryboard");
+            return;
+        }
+
         if (args.Item is AlbumViewModel item && item.Picture == null)
         {
             item.LoadPicture();
         }
+    }
+
+    private void gridBottom_PointerEntered(object sender, PointerRoutedEventArgs e)
+    {
+        if (sender is Grid gridItem && gridItem.DataContext is AlbumViewModel)
+        {
+            Storyboard? showFavoriteButtonStoryboard = gridItem.Resources["ShowFavoriteButtonStoryboard"] as Storyboard;
+            showFavoriteButtonStoryboard?.Begin();
+        }
+    }
+
+    private void gridBottom_PointerExited(object sender, PointerRoutedEventArgs e)
+    {
+        if (sender is Grid gridItem && gridItem.DataContext is AlbumViewModel albumViewModel)
+        {
+            if (albumViewModel.IsFavorite)
+            {
+                // Release the animated values so the {x:Bind} on Opacity stays authoritative for favorites.
+                StopStoryboard(gridItem, "ShowFavoriteButtonStoryboard");
+                StopStoryboard(gridItem, "HideFavoriteButtonStoryboard");
+            }
+            else
+            {
+                Storyboard? hideFavoriteButtonStoryboard = gridItem.Resources["HideFavoriteButtonStoryboard"] as Storyboard;
+                hideFavoriteButtonStoryboard?.Begin();
+            }
+        }
+    }
+
+    private static void StopStoryboard(Grid root, string key)
+    {
+        if (root.Resources.TryGetValue(key, out object? value) && value is Storyboard storyboard)
+            storyboard.Stop();
     }
 
 

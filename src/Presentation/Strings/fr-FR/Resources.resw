@@ -2028,10 +2028,73 @@
   <data name="albumStatsTrendLabel.Text" xml:space="preserve">
     <value>12 derniers mois</value>
   </data>
-  <data name="albumStatsProgressionLabel.Text" xml:space="preserve">
+  <data name="albumStatsPanel.ProgressionUnitText" xml:space="preserve">
     <value>pistes écoutées</value>
   </data>
-  <data name="artistStatsProgressionLabel.Text" xml:space="preserve">
+  <data name="artistStatsPanel.ProgressionUnitText" xml:space="preserve">
     <value>albums écoutés</value>
+  </data>
+  <data name="gridListModeButton.ToolTipService.ToolTip" xml:space="preserve">
+    <value>Basculer entre l'affichage grille et liste</value>
+  </data>
+  <data name="gridListModeButton.AutomationProperties.Name" xml:space="preserve">
+    <value>Basculer entre l'affichage grille et liste</value>
+  </data>
+  <data name="albumFavoriteButton.AutomationProperties.Name" xml:space="preserve">
+    <value>Ajouter ou retirer des favoris</value>
+  </data>
+  <data name="artistFavoriteButton.AutomationProperties.Name" xml:space="preserve">
+    <value>Ajouter ou retirer des favoris</value>
+  </data>
+  <data name="PlaylistTrackCount.Text" xml:space="preserve">
+    <value>Nombre de titres :</value>
+  </data>
+  <data name="optionsLanguageLabel.Text" xml:space="preserve">
+    <value>Langue</value>
+  </data>
+  <data name="optionsLanguageAutoTranslation.Text" xml:space="preserve">
+    <value> (traduction automatique)</value>
+  </data>
+  <data name="playerVolumeButton.AutomationProperties.Name" xml:space="preserve">
+    <value>Volume</value>
+  </data>
+  <data name="playerVolumeButton.ToolTipService.ToolTip" xml:space="preserve">
+    <value>Volume</value>
+  </data>
+  <data name="compactExitButton.AutomationProperties.Name" xml:space="preserve">
+    <value>Quitter le mode compact</value>
+  </data>
+  <data name="compactExitButton.ToolTipService.ToolTip" xml:space="preserve">
+    <value>Quitter le mode compact</value>
+  </data>
+  <data name="Insights_ProfileDiversity.Text" xml:space="preserve">
+    <value>• Diversité : </value>
+  </data>
+  <data name="Insights_ProfileSkipRate.Text" xml:space="preserve">
+    <value>• Taux de skip : </value>
+  </data>
+  <data name="Insights_ProfileReplayRate.Text" xml:space="preserve">
+    <value>• Taux de réécoute : </value>
+  </data>
+  <data name="playerSleepOff.Text" xml:space="preserve">
+    <value>Désactivé</value>
+  </data>
+  <data name="playerSleep5.Text" xml:space="preserve">
+    <value>5 minutes</value>
+  </data>
+  <data name="playerSleep10.Text" xml:space="preserve">
+    <value>10 minutes</value>
+  </data>
+  <data name="playerSleep15.Text" xml:space="preserve">
+    <value>15 minutes</value>
+  </data>
+  <data name="playerSleep30.Text" xml:space="preserve">
+    <value>30 minutes</value>
+  </data>
+  <data name="playerSleep45.Text" xml:space="preserve">
+    <value>45 minutes</value>
+  </data>
+  <data name="playerSleep60.Text" xml:space="preserve">
+    <value>60 minutes</value>
   </data>
 </root>

@@ -8,7 +8,6 @@
       xmlns:common="using:Rok.Commons"
       xmlns:tracks="using:Rok.ViewModels.Track"
       xmlns:albums="using:Rok.ViewModels.Album"
-      xmlns:vmcommon="using:Rok.ViewModels.Common"
       xmlns:controls="using:CommunityToolkit.WinUI.Controls"
       SizeChanged="Page_SizeChanged"
       mc:Ignorable="d">
@@ -40,7 +39,7 @@
             <RelativePanel x:Name="headerPanel" Grid.Column="1" Margin="6,0,0,0">
                 <TextBlock x:Name="artistName" Style="{StaticResource HeaderTitleTextStyle}" Text="{x:Bind ViewModel.Artist.Name, Mode=OneWay}" />
 
-                <Button x:Name="buttonCountry" Style="{StaticResource ButtonTextBlockStyle}" RelativePanel.RightOf="artistName" RelativePanel.AlignVerticalCenterWith="artistName" Visibility="{x:Bind ViewModel.Artist.CountryCode, Converter={StaticResource StringToVisibilityConverter}}" Margin="6,0,0,0"                         ToolTipService.ToolTip="{x:Bind ViewModel.Artist.CountryName}">
+                <Button x:Name="buttonCountry" Style="{StaticResource ButtonTextBlockStyle}" RelativePanel.RightOf="artistName" RelativePanel.AlignVerticalCenterWith="artistName" Visibility="{x:Bind ViewModel.Artist.CountryCode, Converter={StaticResource StringToVisibilityConverter}}" Margin="6,0,0,0" AutomationProperties.Name="{x:Bind ViewModel.Artist.CountryName}" ToolTipService.ToolTip="{x:Bind ViewModel.Artist.CountryName}">
                     <Image Source="{x:Bind ViewModel.Artist.CountryCode, Converter={StaticResource CountryCodeToImageSourceConverter}}" Height="{StaticResource CountryFlagHeight}"/>
                 </Button>
 
@@ -76,13 +75,11 @@
                     <AppBarButton x:Uid="artistViewListen" Style="{StaticResource ListenAppBarButtonStyle}" Command="{x:Bind ViewModel.ListenCommand}" />
                     <AppBarToggleButton x:Uid="artistViewLike" x:Name="artistAppBarLike" Style="{StaticResource HeaderLikeButtonStyle}" IsChecked="{x:Bind ViewModel.IsFavorite, Mode=OneWay}" Command="{x:Bind ViewModel.ArtistFavoriteCommand}" />
                     <AppBarButton x:Uid="artistViewBiography" Style="{StaticResource HeaderGenericButtonStyle}" Icon="Library" Command="{x:Bind ViewModel.OpenBiographyCommand}" Visibility="{x:Bind ViewModel.Artist.Biography, Converter={StaticResource StringToVisibilityConverter}}" />
-                    <AppBarButton x:Uid="artistViewPlaylist" Style="{StaticResource HeaderGenericButtonStyle}" Icon="Add" Visibility="Collapsed" IsEnabled="False" />
                     <AppBarButton x:Uid="albumViewPlaylist" Style="{StaticResource HeaderGenericButtonStyle}" Icon="Add">
                         <AppBarButton.Flyout>
                             <MenuFlyout x:Name="albumPlaylistFlyout" common:MenuFlyoutExtensions.PlaylistMenuService="{x:Bind ViewModel.PlaylistMenuService}" common:MenuFlyoutExtensions.ArtistId="{x:Bind ViewModel.Artist.Id}" common:MenuFlyoutExtensions.FlattenPlaylistMenu="True" />
                         </AppBarButton.Flyout>
                     </AppBarButton>
-                    <AppBarButton x:Uid="artistViewEdit" Style="{StaticResource HeaderGenericButtonStyle}" Icon="Edit" Visibility="Collapsed" IsEnabled="False" />
                 </CommandBar>
             </RelativePanel>
         </Grid>
@@ -98,10 +95,19 @@
             <Pivot>
                 <!-- Albums -->
                 <PivotItem x:Uid="artistViewTabAlbums">
-                    <common:GridViewExtended x:Name="grid" ItemsPanel="{StaticResource GridPanelTemplate}" ItemsSource="{x:Bind ViewModel.Albums}" ContainerContentChanging="grid_ContainerContentChanging" Margin="0" ScrollViewer.VerticalScrollMode="Enabled" ScrollViewer.VerticalScrollBarVisibility="Auto">
+                    <common:GridViewExtended x:Name="grid" ItemsPanel="{StaticResource GridPanelTemplate}" ItemsSource="{x:Bind ViewModel.Albums}" ContainerContentChanging="grid_ContainerContentChanging" ScrollViewer.VerticalScrollMode="Enabled" ScrollViewer.VerticalScrollBarVisibility="Auto">
                         <GridView.ItemTemplate>
                             <DataTemplate x:DataType="albums:AlbumViewModel">
-                                <Grid Style="{StaticResource MainGridCoverStyle}">
+                                <Grid Style="{StaticResource MainGridCoverStyle}" PointerEntered="gridBottom_PointerEntered" PointerExited="gridBottom_PointerExited" Background="Transparent">
+                                    <Grid.Resources>
+                                        <Storyboard x:Key="ShowFavoriteButtonStoryboard">
+                                            <DoubleAnimation Storyboard.TargetName="favoriteButton" Storyboard.TargetProperty="Opacity" To="1" Duration="0:0:0.6" />
+                                        </Storyboard>
+                                        <Storyboard x:Key="HideFavoriteButtonStoryboard">
+                                            <DoubleAnimation Storyboard.TargetName="favoriteButton" Storyboard.TargetProperty="Opacity" To="0" Duration="0:0:0.2" />
+                                        </Storyboard>
+                                    </Grid.Resources>
+
                                     <Border CornerRadius="{StaticResource CornerRadiusMediumValue}">
                                         <common:PictureControl Style="{StaticResource PictureCoverStyle}" Cover="{x:Bind Picture, Mode=OneWay}" x:Phase="2" PlayButtonVisibility="Visible" Command="{x:Bind ListenCommand}" />
                                     </Border>
@@ -127,7 +133,7 @@
                                         <HyperlinkButton Content="{x:Bind Album.Name}" x:Phase="0" Command="{x:Bind AlbumOpenCommand}" Style="{StaticResource GridCoverButtonStyle}" />
                                         <TextBlock x:Name="subTitle" Grid.Row="1" Style="{StaticResource GridCoverBottomSecondLineStyle}" Margin="4,6,0,0" Text="{x:Bind SubTitle, Mode=OneWay}" Opacity="1" x:Phase="1" />
 
-                                        <common:AnimatedButton x:Name="favoriteButton" Grid.Column="1" HorizontalAlignment="Right" VerticalAlignment="Stretch" Margin="0" Opacity="{x:Bind IsFavorite, Converter={StaticResource BoolToOpacityConverter}, Mode=OneWay}" Icon="{StaticResource HeartPath}" Color="{x:Bind IsFavorite, Converter={StaticResource FavoriteToColorConverter}, Mode=OneWay}" Command="{x:Bind AlbumFavoriteCommand}" CommandParameter="{x:Bind IsFavorite, Converter={StaticResource BoolToInvertBoolConverter}, Mode=OneWay}" />
+                                        <common:AnimatedButton x:Name="favoriteButton" x:Uid="albumFavoriteButton" Grid.Column="1" IsTabStop="False" HorizontalAlignment="Right" VerticalAlignment="Stretch" Opacity="{x:Bind IsFavorite, Converter={StaticResource BoolToOpacityConverter}, Mode=OneWay}" Icon="{StaticResource HeartPath}" Color="{x:Bind IsFavorite, Converter={StaticResource FavoriteToColorConverter}, Mode=OneWay}" Command="{x:Bind AlbumFavoriteCommand}" CommandParameter="{x:Bind IsFavorite, Converter={StaticResource BoolToInvertBoolConverter}, Mode=OneWay}" />
                                     </Grid>
                                 </Grid>
                             </DataTemplate>
@@ -203,70 +209,9 @@
             </Pivot>
 
             <!-- Listening statistics panel -->
-            <Border x:Name="statsPanel" Grid.Column="1" Width="250" Margin="0,8,12,12" Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1" CornerRadius="8">
-                <Grid>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition Height="*" />
-                    </Grid.RowDefinitions>
-
-                    <Border Height="3" CornerRadius="7,7,0,0" Background="{x:Bind ViewModel.DominantColor, Mode=OneWay, Converter={StaticResource ColorToAccentBrushConverter}}" />
-
-                    <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" Padding="16,12,16,16">
-                        <StackPanel Spacing="16">
-                            <TextBlock x:Uid="albumStatsHeader" Style="{ThemeResource BodyStrongTextBlockStyle}" />
-
-                            <TextBlock x:Uid="albumStatsNeverListened" Style="{ThemeResource CaptionTextBlockStyle}" Opacity="0.7" Visibility="{x:Bind ViewModel.ListeningStats.ShowNeverListened, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" />
-
-                            <StackPanel Spacing="16" Visibility="{x:Bind ViewModel.ListeningStats.ShowStats, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">
-                                <StackPanel>
-                                    <TextBlock Text="{x:Bind ViewModel.ListeningStats.ListenCountValue, Mode=OneWay}" Style="{ThemeResource SubtitleTextBlockStyle}" />
-                                    <TextBlock x:Uid="albumStatsListensLabel" Style="{ThemeResource CaptionTextBlockStyle}" Opacity="0.7" />
-                                </StackPanel>
-
-                                <StackPanel>
-                                    <TextBlock Text="{x:Bind ViewModel.ListeningStats.DurationValue, Mode=OneWay}" Style="{ThemeResource SubtitleTextBlockStyle}" />
-                                    <TextBlock x:Uid="albumStatsDurationLabel" Style="{ThemeResource CaptionTextBlockStyle}" Opacity="0.7" />
-                                </StackPanel>
-
-                                <StackPanel>
-                                    <TextBlock Text="{x:Bind ViewModel.ListeningStats.SinceValue, Mode=OneWay}" Style="{ThemeResource SubtitleTextBlockStyle}" />
-                                    <TextBlock x:Uid="albumStatsSinceLabel" Style="{ThemeResource CaptionTextBlockStyle}" Opacity="0.7" />
-                                </StackPanel>
-
-                                <StackPanel>
-                                    <TextBlock Text="{x:Bind ViewModel.ListeningStats.PeakHourValue, Mode=OneWay}" Style="{ThemeResource SubtitleTextBlockStyle}" />
-                                    <TextBlock x:Uid="albumStatsPeakLabel" Style="{ThemeResource CaptionTextBlockStyle}" Opacity="0.7" />
-                                </StackPanel>
-
-                                <StackPanel Spacing="4">
-                                    <ItemsControl Height="40" ItemsSource="{x:Bind ViewModel.ListeningStats.MonthlyBars, Mode=OneWay}">
-                                        <ItemsControl.ItemsPanel>
-                                            <ItemsPanelTemplate>
-                                                <StackPanel Orientation="Horizontal" Spacing="4" VerticalAlignment="Bottom" />
-                                            </ItemsPanelTemplate>
-                                        </ItemsControl.ItemsPanel>
-                                        <ItemsControl.ItemTemplate>
-                                            <DataTemplate x:DataType="vmcommon:MonthlyBarViewModel">
-                                                <Rectangle Width="12" Height="{x:Bind Height}" VerticalAlignment="Bottom" RadiusX="2" RadiusY="2" Fill="{ThemeResource AccentFillColorDefaultBrush}" ToolTipService.ToolTip="{x:Bind Tooltip}" />
-                                            </DataTemplate>
-                                        </ItemsControl.ItemTemplate>
-                                    </ItemsControl>
-                                    <TextBlock x:Uid="albumStatsTrendLabel" Style="{ThemeResource CaptionTextBlockStyle}" Opacity="0.7" />
-                                </StackPanel>
-                            </StackPanel>
-
-                            <StackPanel Spacing="4" Visibility="{x:Bind ViewModel.ListeningStats.ShowProgression, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">
-                                <ProgressBar Maximum="{x:Bind ViewModel.ListeningStats.TotalItemCount, Mode=OneWay}" Value="{x:Bind ViewModel.ListeningStats.ListenedItemCount, Mode=OneWay}" />
-                                <StackPanel Orientation="Horizontal" Spacing="6">
-                                    <TextBlock Text="{x:Bind ViewModel.ListeningStats.ProgressionLabel, Mode=OneWay}" Style="{ThemeResource CaptionTextBlockStyle}" />
-                                    <TextBlock x:Uid="artistStatsProgressionLabel" Style="{ThemeResource CaptionTextBlockStyle}" Opacity="0.7" />
-                                </StackPanel>
-                            </StackPanel>
-                        </StackPanel>
-                    </ScrollViewer>
-                </Grid>
-            </Border>
+            <common:ListeningStatsPanel x:Name="statsPanel" x:Uid="artistStatsPanel" Grid.Column="1" Width="250" Margin="0,8,12,12"
+                                        Stats="{x:Bind ViewModel.ListeningStats, Mode=OneWay}"
+                                        AccentBrush="{x:Bind ViewModel.DominantColor, Mode=OneWay, Converter={StaticResource ColorToAccentBrushConverter}}" />
         </Grid>
     </Grid>
 </Page>

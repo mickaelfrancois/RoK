@@ -91,7 +91,7 @@
                 </HyperlinkButton>
             </Grid>
 
-            <common:ListViewExtended x:Name="tracksList" ItemsSource="{x:Bind ViewModel.Tracks}" ContainerContentChanging="TracksListContainerContentChanging" Grid.Row="1" BorderThickness="0" ItemContainerStyle="{StaticResource TracksListViewItemStyle}" Margin="0" IsItemClickEnabled="True">
+            <common:ListViewExtended x:Name="tracksList" ItemsSource="{x:Bind ViewModel.Tracks}" ContainerContentChanging="TracksListContainerContentChanging" Grid.Row="1" BorderThickness="0" ItemContainerStyle="{StaticResource TracksListViewItemStyle}" IsItemClickEnabled="True" CanReorderItems="True" CanDragItems="True" AllowDrop="True" DragItemsCompleted="tracksList_DragItemsCompleted">
                 <ListView.ItemTemplate>
                     <DataTemplate x:DataType="track:TrackViewModel">
                         <Grid Background="Transparent">
@@ -129,7 +129,7 @@
 
                             <StackPanel Grid.Column="0" Orientation="Horizontal">
                                 <TextBlock x:Name="RowIndexText" Style="{StaticResource GridTracksRowIndexTextBlockStyle}" />
-                                <HyperlinkButton Style="{StaticResource GridTracksTitleHyperlinkButtonStyle}" Command="{Binding DataContext.ListenCommand, ElementName=smartPlaylistPage}" CommandParameter="{Binding}" />
+                                <HyperlinkButton Style="{StaticResource GridTracksTitleHyperlinkButtonStyle}" Command="{Binding DataContext.ListenCommand, ElementName=playlistPage}" CommandParameter="{Binding}" />
                                 <HyperlinkButton Visibility="{x:Bind LyricsType, Converter={StaticResource LyricsTypeVisibilityConverter}, ConverterParameter=Synchronized, Mode=OneWay}" Style="{StaticResource GridTracksSyncLyricsBadgeStyle}" Command="{x:Bind LyricsOpenCommand}" />
                                 <HyperlinkButton Visibility="{x:Bind LyricsType, Converter={StaticResource LyricsTypeVisibilityConverter}, ConverterParameter=Plain, Mode=OneWay}" Style="{StaticResource GridTracksPlainLyricsBadgeStyle}" Command="{x:Bind LyricsOpenCommand}" />
                             </StackPanel>
