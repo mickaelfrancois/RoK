@@ -1940,4 +1940,10 @@
   <data name="PlaylistTrackCount.Text" xml:space="preserve">
     <value>Кількість треків:</value>
   </data>
+  <data name="optionsLanguageLabel.Text" xml:space="preserve">
+    <value>Мова</value>
+  </data>
+  <data name="optionsLanguageAutoTranslation.Text" xml:space="preserve">
+    <value> (автоматичний переклад)</value>
+  </data>
 </root>

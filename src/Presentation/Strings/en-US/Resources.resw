@@ -2050,4 +2050,10 @@
   <data name="PlaylistTrackCount.Text" xml:space="preserve">
     <value>Track count:</value>
   </data>
+  <data name="optionsLanguageLabel.Text" xml:space="preserve">
+    <value>Language</value>
+  </data>
+  <data name="optionsLanguageAutoTranslation.Text" xml:space="preserve">
+    <value> (Automatic Translation)</value>
+  </data>
 </root>

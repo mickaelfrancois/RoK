@@ -1882,4 +1882,10 @@
   <data name="PlaylistTrackCount.Text" xml:space="preserve">
     <value>Número de pistas:</value>
   </data>
+  <data name="optionsLanguageLabel.Text" xml:space="preserve">
+    <value>Idioma</value>
+  </data>
+  <data name="optionsLanguageAutoTranslation.Text" xml:space="preserve">
+    <value> (traducción automática)</value>
+  </data>
 </root>
