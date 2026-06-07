@@ -1967,4 +1967,25 @@
   <data name="Insights_ProfileReplayRate.Text" xml:space="preserve">
     <value>• Частота повторів: </value>
   </data>
+  <data name="playerSleepOff.Text" xml:space="preserve">
+    <value>Вимкнено</value>
+  </data>
+  <data name="playerSleep5.Text" xml:space="preserve">
+    <value>5 хвилин</value>
+  </data>
+  <data name="playerSleep10.Text" xml:space="preserve">
+    <value>10 хвилин</value>
+  </data>
+  <data name="playerSleep15.Text" xml:space="preserve">
+    <value>15 хвилин</value>
+  </data>
+  <data name="playerSleep30.Text" xml:space="preserve">
+    <value>30 хвилин</value>
+  </data>
+  <data name="playerSleep45.Text" xml:space="preserve">
+    <value>45 хвилин</value>
+  </data>
+  <data name="playerSleep60.Text" xml:space="preserve">
+    <value>60 хвилин</value>
+  </data>
 </root>

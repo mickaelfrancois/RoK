@@ -1909,4 +1909,25 @@
   <data name="Insights_ProfileReplayRate.Text" xml:space="preserve">
     <value>• Tasa de repetición: </value>
   </data>
+  <data name="playerSleepOff.Text" xml:space="preserve">
+    <value>Desactivado</value>
+  </data>
+  <data name="playerSleep5.Text" xml:space="preserve">
+    <value>5 minutos</value>
+  </data>
+  <data name="playerSleep10.Text" xml:space="preserve">
+    <value>10 minutos</value>
+  </data>
+  <data name="playerSleep15.Text" xml:space="preserve">
+    <value>15 minutos</value>
+  </data>
+  <data name="playerSleep30.Text" xml:space="preserve">
+    <value>30 minutos</value>
+  </data>
+  <data name="playerSleep45.Text" xml:space="preserve">
+    <value>45 minutos</value>
+  </data>
+  <data name="playerSleep60.Text" xml:space="preserve">
+    <value>60 minutos</value>
+  </data>
 </root>

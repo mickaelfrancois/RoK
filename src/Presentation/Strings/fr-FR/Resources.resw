@@ -2076,4 +2076,25 @@
   <data name="Insights_ProfileReplayRate.Text" xml:space="preserve">
     <value>• Taux de réécoute : </value>
   </data>
+  <data name="playerSleepOff.Text" xml:space="preserve">
+    <value>Désactivé</value>
+  </data>
+  <data name="playerSleep5.Text" xml:space="preserve">
+    <value>5 minutes</value>
+  </data>
+  <data name="playerSleep10.Text" xml:space="preserve">
+    <value>10 minutes</value>
+  </data>
+  <data name="playerSleep15.Text" xml:space="preserve">
+    <value>15 minutes</value>
+  </data>
+  <data name="playerSleep30.Text" xml:space="preserve">
+    <value>30 minutes</value>
+  </data>
+  <data name="playerSleep45.Text" xml:space="preserve">
+    <value>45 minutes</value>
+  </data>
+  <data name="playerSleep60.Text" xml:space="preserve">
+    <value>60 minutes</value>
+  </data>
 </root>
