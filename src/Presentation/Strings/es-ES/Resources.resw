@@ -1861,10 +1861,10 @@
   <data name="albumStatsTrendLabel.Text" xml:space="preserve">
     <value>últimos 12 meses</value>
   </data>
-  <data name="albumStatsProgressionLabel.Text" xml:space="preserve">
+  <data name="albumStatsPanel.ProgressionUnitText" xml:space="preserve">
     <value>pistas escuchadas</value>
   </data>
-  <data name="artistStatsProgressionLabel.Text" xml:space="preserve">
+  <data name="artistStatsPanel.ProgressionUnitText" xml:space="preserve">
     <value>álbumes escuchados</value>
   </data>
   <data name="gridListModeButton.ToolTipService.ToolTip" xml:space="preserve">

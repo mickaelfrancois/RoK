@@ -1919,10 +1919,10 @@
   <data name="albumStatsTrendLabel.Text" xml:space="preserve">
     <value>останні 12 місяців</value>
   </data>
-  <data name="albumStatsProgressionLabel.Text" xml:space="preserve">
+  <data name="albumStatsPanel.ProgressionUnitText" xml:space="preserve">
     <value>прослухані треки</value>
   </data>
-  <data name="artistStatsProgressionLabel.Text" xml:space="preserve">
+  <data name="artistStatsPanel.ProgressionUnitText" xml:space="preserve">
     <value>прослухані альбоми</value>
   </data>
   <data name="gridListModeButton.ToolTipService.ToolTip" xml:space="preserve">

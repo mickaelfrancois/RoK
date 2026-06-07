@@ -2029,10 +2029,10 @@
   <data name="albumStatsTrendLabel.Text" xml:space="preserve">
     <value>last 12 months</value>
   </data>
-  <data name="albumStatsProgressionLabel.Text" xml:space="preserve">
+  <data name="albumStatsPanel.ProgressionUnitText" xml:space="preserve">
     <value>tracks listened</value>
   </data>
-  <data name="artistStatsProgressionLabel.Text" xml:space="preserve">
+  <data name="artistStatsPanel.ProgressionUnitText" xml:space="preserve">
     <value>albums listened</value>
   </data>
   <data name="gridListModeButton.ToolTipService.ToolTip" xml:space="preserve">
