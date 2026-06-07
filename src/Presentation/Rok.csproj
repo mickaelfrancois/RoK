@@ -78,7 +78,6 @@
 		<None Remove="Pages\ArtistPage.xaml" />
 		<None Remove="Pages\ArtistsPage.xaml" />
 		<None Remove="Pages\GenrePage.xaml" />
-		<None Remove="Pages\GenresPage.xaml" />
 		<None Remove="Pages\ListeningPage.xaml" />
 		<None Remove="Pages\OptionsPage.xaml" />
 		<None Remove="Pages\PlayerView.xaml" />
@@ -277,11 +276,6 @@
 	</ItemGroup>
 	<ItemGroup>
 		<Page Update="Pages\TrackPage.xaml">
-			<Generator>MSBuild:Compile</Generator>
-		</Page>
-	</ItemGroup>
-	<ItemGroup>
-		<Page Update="Pages\GenresPage.xaml">
 			<Generator>MSBuild:Compile</Generator>
 		</Page>
 	</ItemGroup>
