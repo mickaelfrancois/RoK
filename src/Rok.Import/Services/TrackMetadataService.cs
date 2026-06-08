@@ -77,6 +77,8 @@ public class TrackMetadataService(TrackImport importTrack, ILogger<TrackMetadata
         track.TrackNumber = file.TrackNumber;
         track.Duration = (long)Math.Round(file.Duration.TotalSeconds, 0);
         track.FileDate = file.FileDateModified.DateTime;
+
+        TagMetadataMapper.ApplyTrackMetadata(track, file, MetadataWritePolicy.Mirror);
     }
 
     private async Task UpdateTrackFileDateAsync(TrackEntity track, DateTime fileDate)

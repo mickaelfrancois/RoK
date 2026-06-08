@@ -39,11 +39,28 @@ public class TagService(ILogger<TagService> logger) : ITagService
             track.Duration = tag.Properties.Duration;
             track.Bitrate = tag.Properties.AudioBitrate * 1000;
 
-            track.MusicbrainzAlbumID = tag.Tag.MusicBrainzDiscId;
+            track.MusicbrainzAlbumID = tag.Tag.MusicBrainzReleaseId;
             track.MusicbrainzArtistID = tag.Tag.MusicBrainzArtistId;
             track.MusicbrainzTrackID = tag.Tag.MusicBrainzTrackId;
 
             track.Lyrics = tag.Tag.Lyrics;
+
+            track.Disc = tag.Tag.Disc > 0 ? (int)tag.Tag.Disc : null;
+            track.DiscCount = tag.Tag.DiscCount > 0 ? (int)tag.Tag.DiscCount : null;
+            track.Bpm = tag.Tag.BeatsPerMinute > 0 ? (int)tag.Tag.BeatsPerMinute : null;
+            track.Composers = tag.Tag.JoinedComposers?.Trim() ?? "";
+
+            track.SampleRate = tag.Properties.AudioSampleRate;
+            track.BitsPerSample = tag.Properties.BitsPerSample;
+            track.Channels = tag.Properties.AudioChannels;
+
+            track.ReplayGainTrackGain = double.IsNaN(tag.Tag.ReplayGainTrackGain) ? null : tag.Tag.ReplayGainTrackGain;
+            track.ReplayGainTrackPeak = double.IsNaN(tag.Tag.ReplayGainTrackPeak) ? null : tag.Tag.ReplayGainTrackPeak;
+            track.ReplayGainAlbumGain = double.IsNaN(tag.Tag.ReplayGainAlbumGain) ? null : tag.Tag.ReplayGainAlbumGain;
+            track.ReplayGainAlbumPeak = double.IsNaN(tag.Tag.ReplayGainAlbumPeak) ? null : tag.Tag.ReplayGainAlbumPeak;
+
+            track.MusicBrainzReleaseType = tag.Tag.MusicBrainzReleaseType?.Trim() ?? "";
+            track.MusicBrainzReleaseCountry = tag.Tag.MusicBrainzReleaseCountry?.Trim() ?? "";
         }
         catch (TagLib.CorruptFileException ex)
         {

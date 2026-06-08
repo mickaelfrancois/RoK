@@ -4,6 +4,7 @@ using Rok.Application.Interfaces.Repositories;
 using Rok.Application.Tag;
 using Rok.Domain.Entities;
 using Rok.Import.Models;
+using Rok.Import.Services;
 using Rok.Shared.Extensions;
 
 namespace Rok.Import;
@@ -112,9 +113,10 @@ public class AlbumImport(IAlbumRepository _albumRepository, TimeProvider _timePr
             IsBestOf = isBestOf,
             IsLive = isLive,
             AlbumPath = Path.GetDirectoryName(track.FullPath)!,
-            MusicBrainzID = track.MusicbrainzAlbumID,
             CreatDate = _timeProvider.GetLocalNow().DateTime
         };
+
+        TagMetadataMapper.ApplyAlbumMetadata(album, track, MetadataWritePolicy.Mirror);
 
         long id = await _albumRepository.AddAsync(album, RepositoryConnectionKind.Background);
 

@@ -59,4 +59,30 @@ public class TrackFile
     public string MusicbrainzTrackID { get; set; } = string.Empty;
 
     public string Lyrics { get; set; } = string.Empty;
+
+    public int? Disc { get; set; }
+
+    public int? DiscCount { get; set; }
+
+    public int? Bpm { get; set; }
+
+    public string Composers { get; set; } = string.Empty;
+
+    public int SampleRate { get; set; }
+
+    public int BitsPerSample { get; set; }
+
+    public int Channels { get; set; }
+
+    public double? ReplayGainTrackGain { get; set; }
+
+    public double? ReplayGainTrackPeak { get; set; }
+
+    public double? ReplayGainAlbumGain { get; set; }
+
+    public double? ReplayGainAlbumPeak { get; set; }
+
+    public string MusicBrainzReleaseType { get; set; } = string.Empty;
+
+    public string MusicBrainzReleaseCountry { get; set; } = string.Empty;
 }

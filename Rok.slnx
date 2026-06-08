@@ -37,4 +37,11 @@
   <Project Path="src/Rok.Import/Rok.Import.csproj" Id="60b6b0db-da95-4e34-8575-ecc901ce61fe" />
   <Project Path="src/Rok.Infrastructure/Rok.Infrastructure.csproj" Id="4e901456-0119-4ead-a5a9-aa09f5a2e145" />
   <Project Path="src/Rok.Shared/Rok.Shared.csproj" Id="ed68b8fa-0ff7-4c55-8fa6-ed5241eb3aab" />
+  <Folder Name="/tools/">
+    <Project Path="tools/Rok.MetadataTool/Rok.MetadataTool.csproj">
+      <Platform Solution="*|ARM64" Project="x64" />
+      <Platform Solution="*|x64" Project="x64" />
+      <Platform Solution="*|x86" Project="x64" />
+    </Project>
+  </Folder>
 </Solution>
