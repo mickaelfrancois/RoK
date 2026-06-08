@@ -120,7 +120,7 @@
                     <GridViewHeaderItem FontSize="{StaticResource FontSizeLarge}" FontWeight="Bold" HorizontalAlignment="Left">
                         <GridViewHeaderItem.Content>
                             <StackPanel Orientation="Horizontal">
-                                <SymbolIcon Symbol="Shop" Margin="4,0,4,0" />
+                                <FontIcon Glyph="&#xE8FD;" FontFamily="Segoe Fluent Icons" Margin="4,0,4,0" />
                                 <TextBlock x:Uid="playlistHeader" />
                             </StackPanel>
                         </GridViewHeaderItem.Content>
