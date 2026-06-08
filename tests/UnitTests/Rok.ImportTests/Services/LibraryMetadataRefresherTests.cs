@@ -17,6 +17,12 @@ public class LibraryMetadataRefresherTests
     private readonly Mock<ILyricsService> _lyricsService = new();
     private readonly Mock<IFileSystem> _fileSystem = new();
 
+    public LibraryMetadataRefresherTests()
+    {
+        _albumRepository.Setup(r => r.GetAllAsync(It.IsAny<RepositoryConnectionKind>())).ReturnsAsync([]);
+        _fileSystem.Setup(f => f.FileExists(It.IsAny<string>())).Returns(true);
+    }
+
     private LibraryMetadataRefresher CreateSut()
     {
         EmbeddedLyricsImporter lyricsImporter = new(_lyricsService.Object, NullLogger<EmbeddedLyricsImporter>.Instance);
@@ -32,25 +38,29 @@ public class LibraryMetadataRefresherTests
 
     private void SetupTracks(params TrackEntity[] tracks)
     {
-        _trackRepository.Setup(r => r.GetAllAsync(It.IsAny<RepositoryConnectionKind>()))
-                        .ReturnsAsync(tracks);
+        _trackRepository.Setup(r => r.GetAllAsync(It.IsAny<RepositoryConnectionKind>())).ReturnsAsync(tracks);
     }
 
-    private void SetupTagReader(Action<TrackFile> configure)
+    private void SetupAlbums(params AlbumEntity[] albums)
+    {
+        _albumRepository.Setup(r => r.GetAllAsync(It.IsAny<RepositoryConnectionKind>())).ReturnsAsync(albums);
+    }
+
+    // Each invocation of FillProperties gets the tag values for the matching file path.
+    private void SetupTagReader(Func<string, Action<TrackFile>> configureByPath)
     {
         _tagService.Setup(s => s.FillProperties(It.IsAny<string>(), It.IsAny<TrackFile>()))
-                   .Callback<string, TrackFile>((_, file) => configure(file));
+                   .Callback<string, TrackFile>((path, file) => configureByPath(path)(file));
     }
+
+    private void SetupTagReader(Action<TrackFile> configure) => SetupTagReader(_ => configure);
 
     [Fact(DisplayName = "dry_run_counts_changes_without_writing_to_the_repositories")]
     public async Task DryRun_DoesNotPersist()
     {
         // Arrange
-        TrackEntity track = new() { Id = 1, MusicFile = @"C:\music\song.mp3", AlbumId = 10 };
-        SetupTracks(track);
-        _fileSystem.Setup(f => f.FileExists(It.IsAny<string>())).Returns(true);
-        _albumRepository.Setup(r => r.GetByIdAsync(10, It.IsAny<RepositoryConnectionKind>()))
-                        .ReturnsAsync(new AlbumEntity { Id = 10 });
+        SetupTracks(new TrackEntity { Id = 1, MusicFile = @"C:\music\song.mp3", AlbumId = 10 });
+        SetupAlbums(new AlbumEntity { Id = 10 });
         SetupTagReader(file =>
         {
             file.Disc = 2;
@@ -76,11 +86,8 @@ public class LibraryMetadataRefresherTests
     public async Task Apply_PersistsTrackAndAlbum()
     {
         // Arrange
-        TrackEntity track = new() { Id = 1, MusicFile = @"C:\music\song.mp3", AlbumId = 10 };
-        SetupTracks(track);
-        _fileSystem.Setup(f => f.FileExists(It.IsAny<string>())).Returns(true);
-        _albumRepository.Setup(r => r.GetByIdAsync(10, It.IsAny<RepositoryConnectionKind>()))
-                        .ReturnsAsync(new AlbumEntity { Id = 10 });
+        SetupTracks(new TrackEntity { Id = 1, MusicFile = @"C:\music\song.mp3", AlbumId = 10 });
+        SetupAlbums(new AlbumEntity { Id = 10 });
         _trackRepository.Setup(r => r.UpdateAsync(It.IsAny<TrackEntity>(), It.IsAny<RepositoryConnectionKind>())).ReturnsAsync(true);
         _albumRepository.Setup(r => r.UpdateAsync(It.IsAny<AlbumEntity>(), It.IsAny<RepositoryConnectionKind>())).ReturnsAsync(true);
         SetupTagReader(file =>
@@ -110,13 +117,14 @@ public class LibraryMetadataRefresherTests
             It.IsAny<RepositoryConnectionKind>()), Times.Once);
     }
 
-    [Fact(DisplayName = "missing_file_is_counted_and_skipped_without_reading_the_tag")]
-    public async Task MissingFile_IsSkipped()
+    [Fact(DisplayName = "a_present_tag_value_overwrites_a_different_existing_database_value")]
+    public async Task PresentTag_OverwritesDifferentValue()
     {
         // Arrange
-        TrackEntity track = new() { Id = 1, MusicFile = @"C:\music\gone.mp3", AlbumId = 10 };
+        TrackEntity track = new() { Id = 1, MusicFile = @"C:\music\song.mp3", Disc = 5 };
         SetupTracks(track);
-        _fileSystem.Setup(f => f.FileExists(It.IsAny<string>())).Returns(false);
+        _trackRepository.Setup(r => r.UpdateAsync(It.IsAny<TrackEntity>(), It.IsAny<RepositoryConnectionKind>())).ReturnsAsync(true);
+        SetupTagReader(file => file.Disc = 2);
 
         LibraryMetadataRefresher sut = CreateSut();
 
@@ -124,10 +132,9 @@ public class LibraryMetadataRefresherTests
         LibraryMetadataRefreshReport report = await sut.RefreshAsync(apply: true);
 
         // Assert
-        Assert.Equal(1, report.FilesMissing);
-        Assert.Equal(0, report.TracksUpdated);
-        _tagService.Verify(s => s.FillProperties(It.IsAny<string>(), It.IsAny<TrackFile>()), Times.Never);
-        _trackRepository.Verify(r => r.UpdateAsync(It.IsAny<TrackEntity>(), It.IsAny<RepositoryConnectionKind>()), Times.Never);
+        Assert.Equal(1, report.TracksUpdated);
+        Assert.Equal(2, track.Disc);
+        _trackRepository.Verify(r => r.UpdateAsync(It.IsAny<TrackEntity>(), It.IsAny<RepositoryConnectionKind>()), Times.Once);
     }
 
     [Fact(DisplayName = "an_existing_value_is_not_blanked_when_the_tag_has_no_value")]
@@ -136,7 +143,6 @@ public class LibraryMetadataRefresherTests
         // Arrange
         TrackEntity track = new() { Id = 1, MusicFile = @"C:\music\song.mp3", Disc = 5, SampleRate = 48000 };
         SetupTracks(track);
-        _fileSystem.Setup(f => f.FileExists(It.IsAny<string>())).Returns(true);
         SetupTagReader(_ => { /* tag carries no extended metadata */ });
 
         LibraryMetadataRefresher sut = CreateSut();
@@ -151,13 +157,53 @@ public class LibraryMetadataRefresherTests
         _trackRepository.Verify(r => r.UpdateAsync(It.IsAny<TrackEntity>(), It.IsAny<RepositoryConnectionKind>()), Times.Never);
     }
 
+    [Fact(DisplayName = "album_metadata_is_aggregated_from_a_later_track_when_the_first_lacks_it")]
+    public async Task AlbumMetadata_AggregatedAcrossTracks()
+    {
+        // Arrange: first track has no album-level disc count, the second one does.
+        SetupTracks(
+            new TrackEntity { Id = 1, MusicFile = @"C:\music\d1.mp3", AlbumId = 10 },
+            new TrackEntity { Id = 2, MusicFile = @"C:\music\d2.mp3", AlbumId = 10 });
+        SetupAlbums(new AlbumEntity { Id = 10 });
+        _albumRepository.Setup(r => r.UpdateAsync(It.IsAny<AlbumEntity>(), It.IsAny<RepositoryConnectionKind>())).ReturnsAsync(true);
+        SetupTagReader(path => path.EndsWith("d2.mp3", StringComparison.Ordinal)
+            ? file => file.DiscCount = 2
+            : _ => { });
+
+        LibraryMetadataRefresher sut = CreateSut();
+
+        // Act
+        LibraryMetadataRefreshReport report = await sut.RefreshAsync(apply: true);
+
+        // Assert
+        Assert.Equal(1, report.AlbumsUpdated);
+        _albumRepository.Verify(r => r.UpdateAsync(It.Is<AlbumEntity>(a => a.DiscCount == 2), It.IsAny<RepositoryConnectionKind>()), Times.Once);
+    }
+
+    [Fact(DisplayName = "missing_file_is_counted_and_skipped_without_reading_the_tag")]
+    public async Task MissingFile_IsSkipped()
+    {
+        // Arrange
+        SetupTracks(new TrackEntity { Id = 1, MusicFile = @"C:\music\gone.mp3", AlbumId = 10 });
+        _fileSystem.Setup(f => f.FileExists(It.IsAny<string>())).Returns(false);
+
+        LibraryMetadataRefresher sut = CreateSut();
+
+        // Act
+        LibraryMetadataRefreshReport report = await sut.RefreshAsync(apply: true);
+
+        // Assert
+        Assert.Equal(1, report.FilesMissing);
+        Assert.Equal(0, report.TracksUpdated);
+        _tagService.Verify(s => s.FillProperties(It.IsAny<string>(), It.IsAny<TrackFile>()), Times.Never);
+        _trackRepository.Verify(r => r.UpdateAsync(It.IsAny<TrackEntity>(), It.IsAny<RepositoryConnectionKind>()), Times.Never);
+    }
+
     [Fact(DisplayName = "embedded_lyrics_sidecar_is_counted_when_no_sidecar_exists")]
     public async Task EmbeddedLyrics_AreCounted()
     {
         // Arrange
-        TrackEntity track = new() { Id = 1, MusicFile = @"C:\music\song.mp3" };
-        SetupTracks(track);
-        _fileSystem.Setup(f => f.FileExists(It.IsAny<string>())).Returns(true);
+        SetupTracks(new TrackEntity { Id = 1, MusicFile = @"C:\music\song.mp3" });
         _lyricsService.Setup(s => s.CheckLyricsFileExists(It.IsAny<string>())).Returns(ELyricsType.None);
         _lyricsService.Setup(s => s.GetPlainLyricsFileName(It.IsAny<string>())).Returns(@"C:\music\song.txt");
         _lyricsService.Setup(s => s.SaveLyricsAsync(It.IsAny<LyricsModel>())).Returns(Task.CompletedTask);

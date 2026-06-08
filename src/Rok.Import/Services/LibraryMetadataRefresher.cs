@@ -1,4 +1,3 @@
-using CleanArch.DevKit.Guards;
 using Microsoft.Extensions.Logging;
 using Rok.Application.Interfaces;
 using Rok.Application.Interfaces.Repositories;
@@ -23,18 +22,22 @@ public sealed record LibraryMetadataRefreshReport
     public int AlbumsUpdated { get; init; }
 
     public int LyricsSidecarsCreated { get; init; }
+
+    public int LyricsSidecarsFailed { get; init; }
 }
 
 /// <summary>
 /// Re-reads the audio tag of every track already in the database and refreshes the
 /// extended metadata columns introduced by the import-enrichment work, plus the album
-/// MusicBrainz id. Iterates over database tracks (never discovers new files) and also
-/// replays the embedded-lyrics sidecar extraction.
+/// MusicBrainz id, and replays the embedded-lyrics sidecar extraction. Iterates over
+/// database tracks only (never discovers new files).
 ///
-/// Write policy: a value is written only when the tag actually provides one
-/// (non-null / non-empty / non-zero); an existing database value is never blanked.
-/// When <c>apply</c> is <see langword="false"/> the run is a dry-run that only counts
-/// what would change.
+/// Write policy (<see cref="MetadataWritePolicy.FillFromTag"/>): a value is written only
+/// when the tag actually provides one; an existing database value is never blanked, but a
+/// present-and-different tag value does overwrite (the tag is authoritative). Album-level
+/// fields are aggregated across all of the album's tracks (first non-empty value wins) so a
+/// gap on one track does not leave the album empty. When <c>apply</c> is <see langword="false"/>
+/// the run is a dry-run that only counts what would change.
 /// </summary>
 public class LibraryMetadataRefresher(
     ITrackRepository trackRepository,
@@ -46,13 +49,16 @@ public class LibraryMetadataRefresher(
 {
     public async Task<LibraryMetadataRefreshReport> RefreshAsync(bool apply, CancellationToken cancellationToken = default)
     {
+        Dictionary<long, AlbumEntity> albums = (await albumRepository.GetAllAsync(RepositoryConnectionKind.Background))
+            .ToDictionary(album => album.Id);
+
+        Dictionary<long, TrackFile> albumTagAggregates = [];
+
         int scanned = 0;
         int missing = 0;
         int tracksUpdated = 0;
-        int albumsUpdated = 0;
         int lyricsCreated = 0;
-
-        HashSet<long> processedAlbums = [];
+        int lyricsFailed = 0;
 
         IEnumerable<TrackEntity> tracks = await trackRepository.GetAllAsync(RepositoryConnectionKind.Background);
 
@@ -79,7 +85,7 @@ public class LibraryMetadataRefresher(
                 continue;
             }
 
-            if (ApplyTrackChanges(track, file))
+            if (TagMetadataMapper.ApplyTrackMetadata(track, file, MetadataWritePolicy.FillFromTag))
             {
                 tracksUpdated++;
 
@@ -87,12 +93,23 @@ public class LibraryMetadataRefresher(
                     await trackRepository.UpdateAsync(track, RepositoryConnectionKind.Background);
             }
 
-            if (track.AlbumId is long albumId && processedAlbums.Add(albumId) && await RefreshAlbumAsync(albumId, file, apply))
-                albumsUpdated++;
+            if (track.AlbumId is long albumId && albums.ContainsKey(albumId))
+                AccumulateAlbumTags(GetOrCreateAggregate(albumTagAggregates, albumId), file);
 
-            if (apply ? await embeddedLyricsImporter.ExtractAsync(file, cancellationToken) : embeddedLyricsImporter.WouldWriteSidecar(file))
+            if (apply)
+            {
+                if (await embeddedLyricsImporter.ExtractAsync(file, cancellationToken))
+                    lyricsCreated++;
+                else if (embeddedLyricsImporter.WouldWriteSidecar(file))
+                    lyricsFailed++;
+            }
+            else if (embeddedLyricsImporter.WouldWriteSidecar(file))
+            {
                 lyricsCreated++;
+            }
         }
+
+        int albumsUpdated = await RefreshAlbumsAsync(albums, albumTagAggregates, apply);
 
         return new LibraryMetadataRefreshReport
         {
@@ -101,81 +118,63 @@ public class LibraryMetadataRefresher(
             FilesMissing = missing,
             TracksUpdated = tracksUpdated,
             AlbumsUpdated = albumsUpdated,
-            LyricsSidecarsCreated = lyricsCreated
+            LyricsSidecarsCreated = lyricsCreated,
+            LyricsSidecarsFailed = lyricsFailed
         };
     }
 
-    private async Task<bool> RefreshAlbumAsync(long albumId, TrackFile file, bool apply)
+    private async Task<int> RefreshAlbumsAsync(
+        Dictionary<long, AlbumEntity> albums,
+        Dictionary<long, TrackFile> aggregates,
+        bool apply)
     {
-        AlbumEntity? album = await albumRepository.GetByIdAsync(albumId, RepositoryConnectionKind.Background);
+        int updated = 0;
 
-        if (album is null)
-            return false;
+        foreach ((long albumId, TrackFile aggregate) in aggregates)
+        {
+            if (!albums.TryGetValue(albumId, out AlbumEntity? album))
+                continue;
 
-        bool changed = false;
+            if (!TagMetadataMapper.ApplyAlbumMetadata(album, aggregate, MetadataWritePolicy.FillFromTag))
+                continue;
 
-        changed |= SetNullableInt(file.DiscCount, album.DiscCount, value => album.DiscCount = value);
-        changed |= SetNullableDouble(file.ReplayGainAlbumGain, album.ReplayGainAlbumGain, value => album.ReplayGainAlbumGain = value);
-        changed |= SetNullableDouble(file.ReplayGainAlbumPeak, album.ReplayGainAlbumPeak, value => album.ReplayGainAlbumPeak = value);
-        changed |= SetText(file.MusicBrainzReleaseType, album.MusicBrainzReleaseType, value => album.MusicBrainzReleaseType = value);
-        changed |= SetText(file.MusicBrainzReleaseCountry, album.MusicBrainzReleaseCountry, value => album.MusicBrainzReleaseCountry = value);
-        changed |= SetText(file.MusicbrainzAlbumID, album.MusicBrainzID, value => album.MusicBrainzID = value);
+            updated++;
 
-        if (changed && apply)
-            await albumRepository.UpdateAsync(album, RepositoryConnectionKind.Background);
+            if (apply)
+                await albumRepository.UpdateAsync(album, RepositoryConnectionKind.Background);
+        }
 
-        return changed;
+        return updated;
     }
 
-    private static bool ApplyTrackChanges(TrackEntity track, TrackFile file)
+    private static TrackFile GetOrCreateAggregate(Dictionary<long, TrackFile> aggregates, long albumId)
     {
-        bool changed = false;
+        if (!aggregates.TryGetValue(albumId, out TrackFile? aggregate))
+        {
+            aggregate = new TrackFile();
+            aggregates[albumId] = aggregate;
+        }
 
-        changed |= SetNullableInt(file.Disc, track.Disc, value => track.Disc = value);
-        changed |= SetNullableInt(file.Bpm, track.Bpm, value => track.Bpm = value);
-        changed |= SetText(file.Composers, track.Composers, value => track.Composers = value);
-        changed |= SetPositiveInt(file.SampleRate, track.SampleRate, value => track.SampleRate = value);
-        changed |= SetPositiveInt(file.BitsPerSample, track.BitsPerSample, value => track.BitsPerSample = value);
-        changed |= SetPositiveInt(file.Channels, track.Channels, value => track.Channels = value);
-        changed |= SetNullableDouble(file.ReplayGainTrackGain, track.ReplayGainTrackGain, value => track.ReplayGainTrackGain = value);
-        changed |= SetNullableDouble(file.ReplayGainTrackPeak, track.ReplayGainTrackPeak, value => track.ReplayGainTrackPeak = value);
-
-        return changed;
+        return aggregate;
     }
 
-    private static bool SetNullableInt(int? tagValue, int? current, Action<int?> setter)
+    /// <summary>
+    /// Folds one track's album-level tag values into the album aggregate, keeping the first
+    /// non-empty value seen for each field (so a later track never overwrites an earlier value).
+    /// </summary>
+    private static void AccumulateAlbumTags(TrackFile aggregate, TrackFile file)
     {
-        if (!tagValue.HasValue || tagValue == current)
-            return false;
+        aggregate.DiscCount ??= file.DiscCount;
+        aggregate.ReplayGainAlbumGain ??= file.ReplayGainAlbumGain;
+        aggregate.ReplayGainAlbumPeak ??= file.ReplayGainAlbumPeak;
 
-        setter(tagValue);
-        return true;
-    }
+        if (string.IsNullOrEmpty(aggregate.MusicBrainzReleaseType))
+            aggregate.MusicBrainzReleaseType = file.MusicBrainzReleaseType;
 
-    private static bool SetPositiveInt(int tagValue, int current, Action<int> setter)
-    {
-        if (tagValue <= 0 || tagValue == current)
-            return false;
+        if (string.IsNullOrEmpty(aggregate.MusicBrainzReleaseCountry))
+            aggregate.MusicBrainzReleaseCountry = file.MusicBrainzReleaseCountry;
 
-        setter(tagValue);
-        return true;
-    }
-
-    private static bool SetNullableDouble(double? tagValue, double? current, Action<double?> setter)
-    {
-        if (!tagValue.HasValue || tagValue == current)
-            return false;
-
-        setter(tagValue);
-        return true;
-    }
-
-    private static bool SetText(string? tagValue, string? current, Action<string?> setter)
-    {
-        if (string.IsNullOrEmpty(tagValue) || tagValue == current)
-            return false;
-
-        setter(tagValue);
-        return true;
+        if (string.IsNullOrEmpty(aggregate.MusicbrainzAlbumID))
+            aggregate.MusicbrainzAlbumID = file.MusicbrainzAlbumID;
     }
 }

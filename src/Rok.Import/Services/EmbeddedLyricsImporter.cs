@@ -16,13 +16,9 @@ namespace Rok.Import.Services;
 /// </summary>
 public partial class EmbeddedLyricsImporter(ILyricsService lyricsService, ILogger<EmbeddedLyricsImporter> logger)
 {
-    [GeneratedRegex(@"\[\d{1,2}:\d{2}", RegexOptions.Compiled, matchTimeoutMilliseconds: 1000)]
+    [GeneratedRegex(@"^\s*\[\d{1,2}:\d{2}", RegexOptions.Compiled | RegexOptions.Multiline, matchTimeoutMilliseconds: 1000)]
     private static partial Regex SynchronizedTimestampRegex();
 
-    /// <summary>
-    /// Writes a lyrics sidecar from the embedded tag when appropriate.
-    /// </summary>
-    /// <returns><see langword="true"/> when a sidecar was written, <see langword="false"/> otherwise.</returns>
     /// <summary>
     /// Indicates whether <see cref="ExtractAsync"/> would write a sidecar for this file
     /// (embedded lyrics present and no <c>.lrc</c>/<c>.txt</c> sidecar yet). Lets callers
@@ -41,6 +37,11 @@ public partial class EmbeddedLyricsImporter(ILyricsService lyricsService, ILogge
         return lyricsService.CheckLyricsFileExists(file.FullPath) == ELyricsType.None;
     }
 
+    /// <summary>
+    /// Writes a lyrics sidecar from the embedded tag when appropriate (see <see cref="WouldWriteSidecar"/>):
+    /// a <c>.lrc</c> when the content carries <c>[mm:ss]</c> timestamps, a <c>.txt</c> otherwise.
+    /// </summary>
+    /// <returns><see langword="true"/> when a sidecar was written, <see langword="false"/> otherwise.</returns>
     public async Task<bool> ExtractAsync(TrackFile file, CancellationToken cancellationToken = default)
     {
         if (!WouldWriteSidecar(file))

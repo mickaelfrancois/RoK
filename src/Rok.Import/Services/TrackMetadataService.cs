@@ -78,14 +78,7 @@ public class TrackMetadataService(TrackImport importTrack, ILogger<TrackMetadata
         track.Duration = (long)Math.Round(file.Duration.TotalSeconds, 0);
         track.FileDate = file.FileDateModified.DateTime;
 
-        track.Disc = file.Disc;
-        track.Bpm = file.Bpm;
-        track.Composers = string.IsNullOrEmpty(file.Composers) ? null : file.Composers;
-        track.SampleRate = file.SampleRate;
-        track.BitsPerSample = file.BitsPerSample;
-        track.Channels = file.Channels;
-        track.ReplayGainTrackGain = file.ReplayGainTrackGain;
-        track.ReplayGainTrackPeak = file.ReplayGainTrackPeak;
+        TagMetadataMapper.ApplyTrackMetadata(track, file, MetadataWritePolicy.Mirror);
     }
 
     private async Task UpdateTrackFileDateAsync(TrackEntity track, DateTime fileDate)
