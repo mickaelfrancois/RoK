@@ -249,5 +249,8 @@
                 </Grid>
             </StackPanel>
         </ScrollViewer>
+
+        <common:EmptyStateControl x:Uid="searchViewNoResults" Glyph="&#xE721;" Grid.Row="1"
+                                  Visibility="{x:Bind ViewModel.HasNoResults, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" />
     </Grid>
 </Page>

@@ -1075,6 +1075,30 @@
   <data name="artistsPageArtists.Text" xml:space="preserve">
     <value>artistas</value>
   </data>
+  <data name="playlistsViewNoData.Message" xml:space="preserve">
+    <value>No hay listas de reproducción</value>
+  </data>
+  <data name="searchViewNoResults.Message" xml:space="preserve">
+    <value>No se encontraron resultados</value>
+  </data>
+  <data name="albumPageNoTracks.Message" xml:space="preserve">
+    <value>No hay canciones en este álbum</value>
+  </data>
+  <data name="artistPageNoAlbums.Message" xml:space="preserve">
+    <value>Sin álbumes</value>
+  </data>
+  <data name="artistPageNoTracks.Message" xml:space="preserve">
+    <value>Sin canciones</value>
+  </data>
+  <data name="genrePageNoAlbums.Message" xml:space="preserve">
+    <value>Sin álbumes</value>
+  </data>
+  <data name="playlistPageNoTracks.Message" xml:space="preserve">
+    <value>Esta lista está vacía</value>
+  </data>
+  <data name="smartPlaylistNoTracks.Message" xml:space="preserve">
+    <value>No hay canciones coincidentes</value>
+  </data>
   <data name="albumsViewNoData.Message" xml:space="preserve">
     <value>No se encontraron álbumes</value>
   </data>

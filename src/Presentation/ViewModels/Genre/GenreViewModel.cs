@@ -26,6 +26,8 @@ public partial class GenreViewModel : ObservableObject
     public RangeObservableCollection<AlbumViewModel> Albums { get; set; } = [];
     public GenreDto Genre { get; private set; } = new();
 
+    public bool HasNoAlbums => Albums.Count == 0;
+
     public bool IsFavorite
     {
         get => Genre.IsFavorite;
@@ -208,6 +210,7 @@ public partial class GenreViewModel : ObservableObject
             return;
 
         Albums.InitWithAddRange(albums);
+        OnPropertyChanged(nameof(HasNoAlbums));
 
         if (albums.Count == 0)
             return;

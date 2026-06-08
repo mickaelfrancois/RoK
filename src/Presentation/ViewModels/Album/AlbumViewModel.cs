@@ -40,6 +40,8 @@ public partial class AlbumViewModel : ObservableObject, IFilterableAlbum, IGroup
     public RangeObservableCollection<TrackViewModel> Tracks { get; set; } = [];
     private IEnumerable<TrackDto>? _tracks = null;
 
+    public bool HasNoTracks => Tracks.Count == 0;
+
     public AlbumDto Album { get; private set; } = new();
     public IPlaylistMenuService PlaylistMenuService { get; }
 
@@ -319,6 +321,7 @@ public partial class AlbumViewModel : ObservableObject, IFilterableAlbum, IGroup
 
         _tracks = tracks.Select(t => t.Track);
         Tracks.InitWithAddRange(tracks);
+        OnPropertyChanged(nameof(HasNoTracks));
     }
 
     private async Task<bool> LoadAlbumAsync(long albumId)

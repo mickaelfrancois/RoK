@@ -27,6 +27,8 @@ public partial class PlaylistsViewModel : ObservableObject, IDisposable
 
     public RangeObservableCollection<PlaylistViewModel> SmartPlaylists { get; private set; } = [];
 
+    public bool HasNoData => Playlists.Count == 0 && SmartPlaylists.Count == 0;
+
     [ObservableProperty]
     public partial bool IsGridView { get; set; }
     partial void OnIsGridViewChanged(bool value)
@@ -107,6 +109,8 @@ public partial class PlaylistsViewModel : ObservableObject, IDisposable
 
         SmartPlaylists.Clear();
         SmartPlaylists.AddRange(_dataLoader.ViewModels.Where(c => c.Playlist.IsSmart));
+
+        OnPropertyChanged(nameof(HasNoData));
     }
 
     [RelayCommand]

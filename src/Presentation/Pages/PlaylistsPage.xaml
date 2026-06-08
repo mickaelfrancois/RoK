@@ -145,6 +145,9 @@
                               IsItemClickEnabled="True" />
                 </StackPanel>
             </ScrollViewer>
+
+            <common:EmptyStateControl x:Uid="playlistsViewNoData" Glyph="&#xE8D6;"
+                                      Visibility="{x:Bind ViewModel.HasNoData, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" />
         </Grid>
     </Grid>
 </Page>

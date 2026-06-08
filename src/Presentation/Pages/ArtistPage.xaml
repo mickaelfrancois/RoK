@@ -95,6 +95,7 @@
             <Pivot>
                 <!-- Albums -->
                 <PivotItem x:Uid="artistViewTabAlbums">
+                    <Grid>
                     <common:GridViewExtended x:Name="grid" ItemsPanel="{StaticResource GridPanelTemplate}" ItemsSource="{x:Bind ViewModel.Albums}" ContainerContentChanging="grid_ContainerContentChanging" ScrollViewer.VerticalScrollMode="Enabled" ScrollViewer.VerticalScrollBarVisibility="Auto">
                         <GridView.ItemTemplate>
                             <DataTemplate x:DataType="albums:AlbumViewModel">
@@ -139,6 +140,10 @@
                             </DataTemplate>
                         </GridView.ItemTemplate>
                     </common:GridViewExtended>
+
+                        <common:EmptyStateControl x:Uid="artistPageNoAlbums" Glyph="&#xE93C;"
+                                                  Visibility="{x:Bind ViewModel.HasNoAlbums, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" />
+                    </Grid>
                 </PivotItem>
 
                 <!-- Tracks-->
@@ -204,6 +209,9 @@
                                 </DataTemplate>
                             </ListView.ItemTemplate>
                         </ListView>
+
+                        <common:EmptyStateControl x:Uid="artistPageNoTracks" Glyph="&#xE8D6;" Grid.Row="1"
+                                                  Visibility="{x:Bind ViewModel.HasNoTracks, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" />
                     </Grid>
                 </PivotItem>
             </Pivot>

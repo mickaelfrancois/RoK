@@ -147,6 +147,9 @@
                 </ListView.ItemTemplate>
             </ListView>
 
+            <common:EmptyStateControl x:Uid="albumPageNoTracks" Glyph="&#xE8D6;" Grid.Row="1"
+                                      Visibility="{x:Bind ViewModel.HasNoTracks, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" />
+
             <!-- Listening statistics panel -->
             <common:ListeningStatsPanel x:Name="statsPanel" x:Uid="albumStatsPanel" Grid.Column="1" Grid.RowSpan="2" Width="250" Margin="0,8,12,12"
                                         Stats="{x:Bind ViewModel.ListeningStats, Mode=OneWay}"

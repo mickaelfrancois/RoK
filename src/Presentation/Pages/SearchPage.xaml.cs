@@ -50,6 +50,8 @@ public sealed partial class SearchPage : Page
         ArtistsViewModel.SetData(openArgs.SearchResult.Artists);
         AlbumsViewModel.SetData(openArgs.SearchResult.Albums);
         TracksViewModel.SetData(openArgs.SearchResult.Tracks);
+
+        ViewModel.HasNoResults = TrackCount == 0 && ArtistCount == 0 && AlbumCount == 0;
     }
 
     private void grid_ContainerContentChanging(ListViewBase sender, ContainerContentChangingEventArgs args)
