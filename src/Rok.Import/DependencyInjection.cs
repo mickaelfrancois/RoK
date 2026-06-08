@@ -27,6 +27,7 @@ public static class DependencyInjection
         services.AddScoped<FileSystemService>();
         services.AddScoped<TrackFileProcessor>();
         services.AddScoped<TrackMetadataService>();
+        services.AddScoped<EmbeddedLyricsImporter>();
         services.AddScoped<FolderImportProcessor>();
         services.AddScoped<IImport, ImportService>();
 

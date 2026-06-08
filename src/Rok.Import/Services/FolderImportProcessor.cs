@@ -19,6 +19,7 @@ public class FolderImportProcessor(
     FileSystemService fileSystemService,
     TrackFileProcessor trackFileProcessor,
     TrackMetadataService metadataService,
+    EmbeddedLyricsImporter embeddedLyricsImporter,
     ImportTrackingService trackingService,
     ITagService tagService,
     ImportMessageThrottler messageThrottler,
@@ -33,6 +34,7 @@ public class FolderImportProcessor(
     private readonly FileSystemService _fileSystemService = Guard.NotNull(fileSystemService);
     private readonly TrackFileProcessor _trackFileProcessor = Guard.NotNull(trackFileProcessor);
     private readonly TrackMetadataService _metadataService = Guard.NotNull(metadataService);
+    private readonly EmbeddedLyricsImporter _embeddedLyricsImporter = Guard.NotNull(embeddedLyricsImporter);
     private readonly ImportTrackingService _trackingService = Guard.NotNull(trackingService);
     private readonly ITagService _tagService = Guard.NotNull(tagService);
     private readonly ImportMessageThrottler _messageThrottler = Guard.NotNull(messageThrottler);
@@ -88,6 +90,8 @@ public class FolderImportProcessor(
         UpdateStatisticsForTrack(track);
 
         await UpdateTrackAsync(track, statistics).ConfigureAwait(false);
+
+        await _embeddedLyricsImporter.ExtractAsync(file, cancellationToken).ConfigureAwait(false);
     }
 
     private long? DetermineGenreId(ArtistCacheItem? artist, GenreCacheItem? genre)
