@@ -76,7 +76,10 @@ try
     }
 
     LibraryMetadataRefresher refresher = provider.GetRequiredService<LibraryMetadataRefresher>();
-    LibraryMetadataRefreshReport report = await refresher.RefreshAsync(apply);
+    ConsoleProgressReporter reporter = new();
+    LibraryMetadataRefreshReport report = await refresher.RefreshAsync(apply, reporter);
+    reporter.Complete();
+    Console.WriteLine();
 
     PrintReport(report);
 }
@@ -165,5 +168,31 @@ static void PrintReport(LibraryMetadataRefreshReport report)
     {
         Console.WriteLine();
         Console.WriteLine("Run again with --apply to persist these changes.");
+    }
+}
+
+/// <summary>
+/// Renders refresh progress on a single console line that is rewritten in place, starting a
+/// new line whenever the phase changes so each completed phase stays visible.
+/// </summary>
+internal sealed class ConsoleProgressReporter : IProgress<LibraryMetadataRefreshProgress>
+{
+    private string? _phase;
+
+    public void Report(LibraryMetadataRefreshProgress value)
+    {
+        if (_phase is not null && _phase != value.Phase)
+            Console.WriteLine();
+
+        _phase = value.Phase;
+
+        int percent = value.Total == 0 ? 100 : (int)(value.Processed * 100L / value.Total);
+        Console.Write($"\r{value.Phase}: {value.Processed}/{value.Total} ({percent}%)   ");
+    }
+
+    public void Complete()
+    {
+        if (_phase is not null)
+            Console.WriteLine();
     }
 }

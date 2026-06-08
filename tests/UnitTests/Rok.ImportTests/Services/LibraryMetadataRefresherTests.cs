@@ -218,4 +218,27 @@ public class LibraryMetadataRefresherTests
         Assert.Equal(1, report.LyricsSidecarsCreated);
         _lyricsService.Verify(s => s.SaveLyricsAsync(It.IsAny<LyricsModel>()), Times.Once);
     }
+
+    [Fact(DisplayName = "progress_is_reported_through_the_end_of_the_tracks_phase")]
+    public async Task Progress_IsReported()
+    {
+        // Arrange
+        SetupTracks(
+            new TrackEntity { Id = 1, MusicFile = @"C:\music\a.mp3" },
+            new TrackEntity { Id = 2, MusicFile = @"C:\music\b.mp3" });
+        SetupTagReader(_ => { });
+
+        List<LibraryMetadataRefreshProgress> reports = [];
+        Mock<IProgress<LibraryMetadataRefreshProgress>> progress = new();
+        progress.Setup(p => p.Report(It.IsAny<LibraryMetadataRefreshProgress>()))
+                .Callback<LibraryMetadataRefreshProgress>(reports.Add);
+
+        LibraryMetadataRefresher sut = CreateSut();
+
+        // Act
+        await sut.RefreshAsync(apply: false, progress.Object);
+
+        // Assert
+        Assert.Contains(reports, r => r.Phase == "Tracks" && r.Processed == 2 && r.Total == 2);
+    }
 }

@@ -27,6 +27,13 @@ public sealed record LibraryMetadataRefreshReport
 }
 
 /// <summary>
+/// Progress emitted by a <see cref="LibraryMetadataRefresher"/> run. <paramref name="Phase"/>
+/// is the current stage ("Tracks" or "Albums"), <paramref name="Processed"/> of
+/// <paramref name="Total"/> items done.
+/// </summary>
+public sealed record LibraryMetadataRefreshProgress(string Phase, int Processed, int Total);
+
+/// <summary>
 /// Re-reads the audio tag of every track already in the database and refreshes the
 /// extended metadata columns introduced by the import-enrichment work, plus the album
 /// MusicBrainz id, and replays the embedded-lyrics sidecar extraction. Iterates over
@@ -47,7 +54,10 @@ public class LibraryMetadataRefresher(
     IFileSystem fileSystem,
     ILogger<LibraryMetadataRefresher> logger)
 {
-    public async Task<LibraryMetadataRefreshReport> RefreshAsync(bool apply, CancellationToken cancellationToken = default)
+    public async Task<LibraryMetadataRefreshReport> RefreshAsync(
+        bool apply,
+        IProgress<LibraryMetadataRefreshProgress>? progress = null,
+        CancellationToken cancellationToken = default)
     {
         Dictionary<long, AlbumEntity> albums = (await albumRepository.GetAllAsync(RepositoryConnectionKind.Background))
             .ToDictionary(album => album.Id);
@@ -60,12 +70,17 @@ public class LibraryMetadataRefresher(
         int lyricsCreated = 0;
         int lyricsFailed = 0;
 
-        IEnumerable<TrackEntity> tracks = await trackRepository.GetAllAsync(RepositoryConnectionKind.Background);
+        List<TrackEntity> tracks = (await trackRepository.GetAllAsync(RepositoryConnectionKind.Background)).ToList();
+        int total = tracks.Count;
+        int reportEvery = Math.Max(1, total / 100);
 
         foreach (TrackEntity track in tracks)
         {
             cancellationToken.ThrowIfCancellationRequested();
             scanned++;
+
+            if (progress is not null && (scanned % reportEvery == 0 || scanned == total))
+                progress.Report(new LibraryMetadataRefreshProgress("Tracks", scanned, total));
 
             if (string.IsNullOrEmpty(track.MusicFile) || !fileSystem.FileExists(track.MusicFile))
             {
@@ -109,7 +124,7 @@ public class LibraryMetadataRefresher(
             }
         }
 
-        int albumsUpdated = await RefreshAlbumsAsync(albums, albumTagAggregates, apply);
+        int albumsUpdated = await RefreshAlbumsAsync(albums, albumTagAggregates, apply, progress);
 
         return new LibraryMetadataRefreshReport
         {
@@ -126,12 +141,21 @@ public class LibraryMetadataRefresher(
     private async Task<int> RefreshAlbumsAsync(
         Dictionary<long, AlbumEntity> albums,
         Dictionary<long, TrackFile> aggregates,
-        bool apply)
+        bool apply,
+        IProgress<LibraryMetadataRefreshProgress>? progress)
     {
         int updated = 0;
+        int processed = 0;
+        int total = aggregates.Count;
+        int reportEvery = Math.Max(1, total / 100);
 
         foreach ((long albumId, TrackFile aggregate) in aggregates)
         {
+            processed++;
+
+            if (progress is not null && (processed % reportEvery == 0 || processed == total))
+                progress.Report(new LibraryMetadataRefreshProgress("Albums", processed, total));
+
             if (!albums.TryGetValue(albumId, out AlbumEntity? album))
                 continue;
 
