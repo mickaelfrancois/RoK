@@ -105,15 +105,19 @@
                                 <FontIcon Glyph="&#xe93c;" FontFamily="Segoe Fluent Icons" />
                             </NavigationViewItem.Icon>
                         </NavigationViewItem>
-                        <NavigationViewItem x:Uid="menuArtists" Tag="Artists" x:Name="artistsItem" Icon="People" />
+                        <NavigationViewItem x:Uid="menuArtists" Tag="Artists" x:Name="artistsItem">
+                            <NavigationViewItem.Icon>
+                                <FontIcon Glyph="&#xE716;" FontFamily="Segoe Fluent Icons" />
+                            </NavigationViewItem.Icon>
+                        </NavigationViewItem>
                         <NavigationViewItem x:Uid="menuTracks" Tag="Tracks" x:Name="tracksItem">
                             <NavigationViewItem.Icon>
-                                <SymbolIcon Symbol="Audio" />
+                                <FontIcon Glyph="&#xE8D6;" FontFamily="Segoe Fluent Icons" />
                             </NavigationViewItem.Icon>
                         </NavigationViewItem>
                         <NavigationViewItem x:Uid="menuPlaylists" Tag="Playlists" x:Name="playlistItem">
                             <NavigationViewItem.Icon>
-                                <SymbolIcon Symbol="Shop" />
+                                <FontIcon Glyph="&#xE8FD;" FontFamily="Segoe Fluent Icons" />
                             </NavigationViewItem.Icon>
                         </NavigationViewItem>
                         <NavigationViewItem x:Uid="menuRadios" Tag="Radios" x:Name="radiosItem">
@@ -122,7 +126,11 @@
                             </NavigationViewItem.Icon>
                         </NavigationViewItem>
 
-                        <NavigationViewItem x:Uid="menuInsight" Content="Insights" Tag="Insights" x:Name="insightsItem" Icon="OutlineStar" />
+                        <NavigationViewItem x:Uid="menuInsight" Content="Insights" Tag="Insights" x:Name="insightsItem">
+                            <NavigationViewItem.Icon>
+                                <FontIcon Glyph="&#xE1CE;" FontFamily="Segoe Fluent Icons" />
+                            </NavigationViewItem.Icon>
+                        </NavigationViewItem>
 
                     </NavigationView.MenuItems>
 
