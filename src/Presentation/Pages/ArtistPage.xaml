@@ -112,7 +112,7 @@
                                         <common:PictureControl Style="{StaticResource PictureCoverStyle}" Cover="{x:Bind Picture, Mode=OneWay}" x:Phase="2" PlayButtonVisibility="Visible" Command="{x:Bind ListenCommand}" />
                                     </Border>
 
-                                    <StackPanel HorizontalAlignment="Right" VerticalAlignment="Top" Orientation="Vertical" Spacing="{StaticResource SpacingXSmall}" Margin="0,8,8,0">
+                                    <StackPanel HorizontalAlignment="Right" VerticalAlignment="Top" Orientation="Vertical" Spacing="{StaticResource SpacingXSmall}" Margin="{StaticResource CoverBadgeMargin}">
                                         <common:BadgeControl x:Uid="badgeLive" Visibility="{x:Bind IsLive, Converter={StaticResource BoolToVisibilityConverter}}" BadgeBackground="{StaticResource BadgeLiveBrush}"/>
                                         <common:BadgeControl x:Uid="badgeBestof" Visibility="{x:Bind IsBestOf, Converter={StaticResource BoolToVisibilityConverter}}" BadgeBackground="{StaticResource BadgeBestOfBrush}" />
                                         <common:BadgeControl x:Uid="badgeCompilation" Visibility="{x:Bind IsCompilation, Converter={StaticResource BoolToVisibilityConverter}}" BadgeBackground="{StaticResource BadgeCompilationBrush}" />
@@ -131,7 +131,7 @@
                                         </Grid.ColumnDefinitions>
 
                                         <HyperlinkButton Content="{x:Bind Album.Name}" x:Phase="0" Command="{x:Bind AlbumOpenCommand}" Style="{StaticResource GridCoverButtonStyle}" />
-                                        <TextBlock x:Name="subTitle" Grid.Row="1" Style="{StaticResource GridCoverBottomSecondLineStyle}" Margin="4,6,0,0" Text="{x:Bind SubTitle, Mode=OneWay}" Opacity="1" x:Phase="1" />
+                                        <TextBlock x:Name="subTitle" Grid.Row="1" Style="{StaticResource GridCoverBottomSecondLineStyle}" Margin="{StaticResource CoverSubtitleMargin}" Text="{x:Bind SubTitle, Mode=OneWay}" Opacity="1" x:Phase="1" />
 
                                         <common:AnimatedButton x:Name="favoriteButton" x:Uid="albumFavoriteButton" Grid.Column="1" IsTabStop="False" HorizontalAlignment="Right" VerticalAlignment="Stretch" Opacity="{x:Bind IsFavorite, Converter={StaticResource BoolToOpacityConverter}, Mode=OneWay}" Icon="{StaticResource HeartPath}" Color="{x:Bind IsFavorite, Converter={StaticResource FavoriteToColorConverter}, Mode=OneWay}" Command="{x:Bind AlbumFavoriteCommand}" CommandParameter="{x:Bind IsFavorite, Converter={StaticResource BoolToInvertBoolConverter}, Mode=OneWay}" />
                                     </Grid>

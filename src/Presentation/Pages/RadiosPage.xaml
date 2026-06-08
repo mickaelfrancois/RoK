@@ -60,7 +60,7 @@
                 <Border Background="{ThemeResource BadgeLiveBrush}"
                         CornerRadius="4"
                         HorizontalAlignment="Right" VerticalAlignment="Top"
-                        Margin="0,8,8,0" Padding="6,2">
+                        Margin="{StaticResource CoverBadgeMargin}" Padding="6,2">
                     <TextBlock Text="LIVE" Foreground="White" FontSize="10" FontWeight="Bold" />
                 </Border>
 
@@ -87,7 +87,7 @@
                     <TextBlock Grid.Row="1"
                                Text="{x:Bind common:RadioDisplay.FormatTechnical(Codec, Bitrate)}"
                                Style="{StaticResource GridCoverBottomSecondLineStyle}"
-                               Margin="4,6,0,0" />
+                               Margin="{StaticResource CoverSubtitleMargin}" />
                 </Grid>
             </Grid>
         </DataTemplate>

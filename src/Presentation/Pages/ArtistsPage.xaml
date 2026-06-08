@@ -37,7 +37,7 @@
                     <common:PictureControl Style="{StaticResource PictureCoverStyle}" Cover="{x:Bind Picture, Mode=OneWay}" x:Phase="2" PlayButtonVisibility="Visible" Command="{x:Bind ListenCommand}" />
                 </Border>
 
-                <StackPanel HorizontalAlignment="Right" VerticalAlignment="Top" Orientation="Vertical" Spacing="{StaticResource SpacingXSmall}" Margin="0,8,8,0">
+                <StackPanel HorizontalAlignment="Right" VerticalAlignment="Top" Orientation="Vertical" Spacing="{StaticResource SpacingXSmall}" Margin="{StaticResource CoverBadgeMargin}">
                     <common:BadgeControl x:Uid="badgeNew" Visibility="{x:Bind ShowNewBadge, Converter={StaticResource BoolToVisibilityConverter}}" BadgeBackground="{StaticResource BadgeNewBrush}" />
                 </StackPanel>
 
@@ -54,7 +54,7 @@
 
                     <HyperlinkButton Content="{x:Bind Artist.Name}" x:Phase="0" Command="{x:Bind ArtistOpenCommand}" Style="{StaticResource GridCoverButtonStyle}" />
                     
-                    <TextBlock x:Name="subTitle" Grid.Row="1" Style="{StaticResource GridCoverBottomSecondLineStyle}" Margin="4,6,0,0" Text="{x:Bind SubTitle, Mode=OneWay}" Opacity="1" x:Phase="1" />
+                    <TextBlock x:Name="subTitle" Grid.Row="1" Style="{StaticResource GridCoverBottomSecondLineStyle}" Margin="{StaticResource CoverSubtitleMargin}" Text="{x:Bind SubTitle, Mode=OneWay}" Opacity="1" x:Phase="1" />
                     <HyperlinkButton x:Name="genreName" Grid.Row="1" IsTabStop="False" Style="{StaticResource GridCoverButtonStyle}" Content="{x:Bind Artist.GenreName, Mode=OneWay}" Command="{x:Bind GenreOpenCommand}" Opacity="0" x:Phase="1" />
 
                     <common:AnimatedButton x:Name="favoriteButton"
@@ -72,7 +72,7 @@
         </DataTemplate>
 
         <DataTemplate x:Key="ArtistListTemplate" x:DataType="artists:ArtistViewModel">
-            <Grid Padding="12,4" HorizontalAlignment="Stretch" Background="Transparent" PointerEntered="gridBottom_PointerEntered" PointerExited="gridBottom_PointerExited">
+            <Grid Padding="{StaticResource ListItemPadding}" HorizontalAlignment="Stretch" Background="Transparent" PointerEntered="gridBottom_PointerEntered" PointerExited="gridBottom_PointerExited">
                 <Grid.Resources>
                     <Storyboard x:Key="ShowGenreNameStoryboard">
                         <DoubleAnimation Storyboard.TargetName="genreName" Storyboard.TargetProperty="Opacity" To="1" Duration="0:0:0.6" />
@@ -100,7 +100,7 @@
                     <common:PictureControl Cover="{x:Bind Picture, Mode=OneWay}" PlayButtonVisibility="Visible" Command="{x:Bind ListenCommand}" />
                 </Border>
 
-                <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="12,0,0,0">
+                <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="{StaticResource ListItemTextMargin}">
                     <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingSmall}">
                         <HyperlinkButton Content="{x:Bind Artist.Name}" Command="{x:Bind ArtistOpenCommand}" Style="{StaticResource HyperlinkSmallButtonStyle}" Margin="4,0,0,0" FontSize="{StaticResource FontSizeXMedium}" FontWeight="SemiBold" />
                         <common:AnimatedButton x:Name="favoriteButton" x:Uid="artistFavoriteButton" IsTabStop="False" HorizontalAlignment="Right" VerticalAlignment="Center" Icon="{StaticResource HeartPath}" Color="{x:Bind IsFavorite, Converter={StaticResource FavoriteToColorConverter}, Mode=OneWay}" Opacity="{x:Bind IsFavorite, Converter={StaticResource BoolToOpacityConverter}, Mode=OneWay}" Command="{x:Bind ArtistFavoriteCommand}" CommandParameter="{x:Bind IsFavorite, Converter={StaticResource BoolToInvertBoolConverter}, Mode=OneWay}" />
@@ -178,7 +178,7 @@
                     <AppBarSeparator />
 
                     <!-- Info about albums count and duration -->
-                    <StackPanel Style="{StaticResource CommandBarStatInfoPanelStyle}" Margin="12,0,0,0">
+                    <StackPanel Style="{StaticResource CommandBarStatInfoPanelStyle}">
                         <FontIcon Glyph="&#xE93C;" Style="{StaticResource CommandBarStatInfoIconStyle}" />
                         <TextBlock Style="{StaticResource CommandBarStatInfoTextStyle}">
                              <Run x:Name="artistCountRun" FontWeight="SemiBold" />
