@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0-windows10.0.26100.0</TargetFramework>
+    <LangVersion>preview</LangVersion>
+    <RootNamespace>Rok.MetadataTool</RootNamespace>
+    <Platforms>x64</Platforms>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Rok.Infrastructure\Rok.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\src\Rok.Import\Rok.Import.csproj" />
+  </ItemGroup>
+
+</Project>

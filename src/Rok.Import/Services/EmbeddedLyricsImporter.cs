@@ -19,18 +19,32 @@ public partial class EmbeddedLyricsImporter(ILyricsService lyricsService, ILogge
     [GeneratedRegex(@"\[\d{1,2}:\d{2}", RegexOptions.Compiled, matchTimeoutMilliseconds: 1000)]
     private static partial Regex SynchronizedTimestampRegex();
 
-    public async Task ExtractAsync(TrackFile file, CancellationToken cancellationToken = default)
+    /// <summary>
+    /// Writes a lyrics sidecar from the embedded tag when appropriate.
+    /// </summary>
+    /// <returns><see langword="true"/> when a sidecar was written, <see langword="false"/> otherwise.</returns>
+    /// <summary>
+    /// Indicates whether <see cref="ExtractAsync"/> would write a sidecar for this file
+    /// (embedded lyrics present and no <c>.lrc</c>/<c>.txt</c> sidecar yet). Lets callers
+    /// report a planned write without performing it.
+    /// </summary>
+    public bool WouldWriteSidecar(TrackFile file)
     {
         Guard.NotNull(file);
 
         if (string.IsNullOrWhiteSpace(file.Lyrics))
-            return;
+            return false;
 
         if (string.IsNullOrEmpty(file.FullPath))
-            return;
+            return false;
 
-        if (lyricsService.CheckLyricsFileExists(file.FullPath) != ELyricsType.None)
-            return;
+        return lyricsService.CheckLyricsFileExists(file.FullPath) == ELyricsType.None;
+    }
+
+    public async Task<bool> ExtractAsync(TrackFile file, CancellationToken cancellationToken = default)
+    {
+        if (!WouldWriteSidecar(file))
+            return false;
 
         bool isSynchronized = SynchronizedTimestampRegex().IsMatch(file.Lyrics);
 
@@ -48,10 +62,12 @@ public partial class EmbeddedLyricsImporter(ILyricsService lyricsService, ILogge
             });
 
             logger.LogTrace("Embedded lyrics extracted to {File}", fileName);
+            return true;
         }
         catch (Exception ex)
         {
             logger.LogWarning(ex, "Failed to write embedded lyrics sidecar for '{File}'", file.FullPath);
+            return false;
         }
     }
 }
