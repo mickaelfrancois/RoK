@@ -1,5 +1,33 @@
 ﻿# ChangeLog
 
+## [1.13.0] Store – 8 juin 2026
+
+### Ajouté
+
+- Panneau de statistiques d'écoute présenté en carte avec couleur dominante sur les fiches Album et Artiste, accompagné de la progression d'écoute et d'un badge anniversaire sur l'album.
+- Filtre par anniversaire sur la page Albums.
+- Télémétrie : nombre de pistes écoutées durant la session à la fermeture de l'application, et suivi de l'usage de « Surprends-moi » sur les pages Albums et Artistes.
+
+### Modifié
+
+- Premier rendu de la page Album accéléré (chargement des données secondaires différé).
+- Index SQLite optimisés à partir des mesures de plans de requête.
+- Passe de revue qualité, accessibilité et localisation sur l'ensemble des pages et contrôles (Albums, Artistes, Titres, Genres, Listes de lecture, Recherche, Radios, Lecteur, Réglages, Insights).
+
+### Corrigé
+
+- Sélection du menu restaurée lors du retour vers une page racine.
+- Fuite mémoire de la page Listes de lecture corrigée (libération à la navigation).
+- Fuite de la page d'écoutes corrigée (arrêt du suivi des liaisons à la navigation).
+- Détection de l'audio des appels du nouveau Teams, désormais routé via WebView2.
+- Affichage du contenu .lrc brut lorsque les paroles analysées sont vides.
+- Lisibilité du nom d'artiste rétablie en thème clair.
+- Boutons « écouter » réparés dans les listes de pistes et de lecture, avec réorganisation par glisser-déposer.
+- Commande de retrait d'une playlist intelligente réparée.
+- Couleur dominante et couleur d'accent fiabilisées sur les panneaux de statistiques (calcul, rafraîchissement à la navigation, requête d'artiste optimisée).
+
+--
+
 ## [1.12.1] Store – 1 juin 2026
 
 ### Ajouté
