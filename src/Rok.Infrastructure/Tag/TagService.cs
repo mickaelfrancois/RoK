@@ -39,7 +39,7 @@ public class TagService(ILogger<TagService> logger) : ITagService
             track.Duration = tag.Properties.Duration;
             track.Bitrate = tag.Properties.AudioBitrate * 1000;
 
-            track.MusicbrainzAlbumID = tag.Tag.MusicBrainzDiscId;
+            track.MusicbrainzAlbumID = tag.Tag.MusicBrainzReleaseId;
             track.MusicbrainzArtistID = tag.Tag.MusicBrainzArtistId;
             track.MusicbrainzTrackID = tag.Tag.MusicBrainzTrackId;
 
