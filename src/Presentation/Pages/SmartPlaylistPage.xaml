@@ -178,14 +178,8 @@
                     </common:ListViewExtended>
 
                     <!-- Empty state -->
-                    <StackPanel Grid.Row="1"
-                                Visibility="{x:Bind ViewModel.IsTracksEmpty, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}"
-                                HorizontalAlignment="Center" VerticalAlignment="Center"
-                                Spacing="12">
-                        <TextBlock Text="🎵" FontSize="48" HorizontalAlignment="Center" />
-                        <TextBlock x:Uid="SmartPlaylist_EmptyTracksTitle" Style="{StaticResource SubtitleTextBlockStyle}" HorizontalAlignment="Center" />
-                        <TextBlock x:Uid="SmartPlaylist_EmptyTracksDescription" Style="{ThemeResource BodyTextBlockStyle}" HorizontalAlignment="Center" Opacity="0.7" />
-                    </StackPanel>
+                    <common:EmptyStateControl x:Uid="smartPlaylistNoTracks" Glyph="&#xE8D6;" Grid.Row="1"
+                                              Visibility="{x:Bind ViewModel.IsTracksEmpty, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" />
                 </Grid>
             </PivotItem>
         </Pivot>

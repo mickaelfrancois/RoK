@@ -103,6 +103,9 @@
                     </DataTemplate>
                 </GridView.ItemTemplate>
             </common:GridViewExtended>
+
+            <common:EmptyStateControl x:Uid="genrePageNoAlbums" Glyph="&#xE93C;"
+                                      Visibility="{x:Bind ViewModel.HasNoAlbums, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" />
         </Grid>
     </Grid>
 </Page>

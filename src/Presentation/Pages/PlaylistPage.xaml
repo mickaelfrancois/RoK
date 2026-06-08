@@ -142,6 +142,9 @@
                     </DataTemplate>
                 </ListView.ItemTemplate>
             </common:ListViewExtended>
+
+            <common:EmptyStateControl x:Uid="playlistPageNoTracks" Glyph="&#xE8D6;" Grid.Row="1"
+                                      Visibility="{x:Bind ViewModel.IsTracksEmpty, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" />
         </Grid>
     </Grid>
 </Page>

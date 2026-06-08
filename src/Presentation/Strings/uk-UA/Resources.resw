@@ -1133,6 +1133,30 @@
   <data name="artistsPageArtists.Text" xml:space="preserve">
     <value>Митці</value>
   </data>
+  <data name="playlistsViewNoData.Message" xml:space="preserve">
+    <value>Немає плейлистів</value>
+  </data>
+  <data name="searchViewNoResults.Message" xml:space="preserve">
+    <value>Нічого не знайдено</value>
+  </data>
+  <data name="albumPageNoTracks.Message" xml:space="preserve">
+    <value>У цьому альбомі немає треків</value>
+  </data>
+  <data name="artistPageNoAlbums.Message" xml:space="preserve">
+    <value>Немає альбомів</value>
+  </data>
+  <data name="artistPageNoTracks.Message" xml:space="preserve">
+    <value>Немає треків</value>
+  </data>
+  <data name="genrePageNoAlbums.Message" xml:space="preserve">
+    <value>Немає альбомів</value>
+  </data>
+  <data name="playlistPageNoTracks.Message" xml:space="preserve">
+    <value>Цей плейлист порожній</value>
+  </data>
+  <data name="smartPlaylistNoTracks.Message" xml:space="preserve">
+    <value>Немає відповідних треків</value>
+  </data>
   <data name="albumsViewNoData.Message" xml:space="preserve">
     <value>Альбомів не знайдено</value>
   </data>

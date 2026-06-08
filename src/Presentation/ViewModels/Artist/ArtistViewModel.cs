@@ -49,6 +49,9 @@ public partial class ArtistViewModel : ObservableObject, IFilterableArtist, IGro
     public RangeObservableCollection<TrackViewModel> Tracks { get; set; } = [];
     public RangeObservableCollection<AlbumViewModel> Albums { get; set; } = [];
 
+    public bool HasNoAlbums => Albums.Count == 0;
+    public bool HasNoTracks => Tracks.Count == 0;
+
     public ListeningStatsViewModel ListeningStats { get; } = new();
 
 
@@ -456,6 +459,7 @@ public partial class ArtistViewModel : ObservableObject, IFilterableArtist, IGro
             return;
 
         Albums.InitWithAddRange(albums);
+        OnPropertyChanged(nameof(HasNoAlbums));
     }
 
     private async Task LoadTracksAsync(long artistId, CancellationToken cancellationToken)
@@ -468,6 +472,7 @@ public partial class ArtistViewModel : ObservableObject, IFilterableArtist, IGro
         _tracks = tracks.Select(t => t.Track);
         Tracks.InitWithAddRange(tracks);
 
+        OnPropertyChanged(nameof(HasNoTracks));
         OnPropertyChanged(nameof(DurationTotal));
     }
 
