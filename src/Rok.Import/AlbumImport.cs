@@ -113,6 +113,11 @@ public class AlbumImport(IAlbumRepository _albumRepository, TimeProvider _timePr
             IsLive = isLive,
             AlbumPath = Path.GetDirectoryName(track.FullPath)!,
             MusicBrainzID = track.MusicbrainzAlbumID,
+            DiscCount = track.DiscCount,
+            ReplayGainAlbumGain = track.ReplayGainAlbumGain,
+            ReplayGainAlbumPeak = track.ReplayGainAlbumPeak,
+            MusicBrainzReleaseType = string.IsNullOrEmpty(track.MusicBrainzReleaseType) ? null : track.MusicBrainzReleaseType,
+            MusicBrainzReleaseCountry = string.IsNullOrEmpty(track.MusicBrainzReleaseCountry) ? null : track.MusicBrainzReleaseCountry,
             CreatDate = _timeProvider.GetLocalNow().DateTime
         };
 

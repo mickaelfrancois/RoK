@@ -42,6 +42,22 @@ public class TrackEntity : BaseEntity
 
     public DateTime? GetLyricsLastAttempt { get; set; }
 
+    public int? Disc { get; set; }
+
+    public int? Bpm { get; set; }
+
+    public string? Composers { get; set; }
+
+    public int SampleRate { get; set; }
+
+    public int BitsPerSample { get; set; }
+
+    public int Channels { get; set; }
+
+    public double? ReplayGainTrackGain { get; set; }
+
+    public double? ReplayGainTrackPeak { get; set; }
+
 
     [Write(false)]
     public string AlbumName { get; set; } = string.Empty;

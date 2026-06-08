@@ -76,6 +76,16 @@ public class AlbumEntity : BaseEntity, IAlbumEntity
 
     public bool IsLock { get; set; }
 
+    public int? DiscCount { get; set; }
+
+    public double? ReplayGainAlbumGain { get; set; }
+
+    public double? ReplayGainAlbumPeak { get; set; }
+
+    public string? MusicBrainzReleaseType { get; set; }
+
+    public string? MusicBrainzReleaseCountry { get; set; }
+
     /* -- */
 
     [Write(false)]
