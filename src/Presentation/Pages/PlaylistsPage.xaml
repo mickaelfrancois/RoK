@@ -39,7 +39,7 @@
         </DataTemplate>
 
         <DataTemplate x:Key="PlaylistListTemplate" x:DataType="a:PlaylistViewModel">
-            <Grid Padding="12,4" HorizontalAlignment="Stretch" Background="Transparent">
+            <Grid Padding="{StaticResource ListItemPadding}" HorizontalAlignment="Stretch" Background="Transparent">
                 <Grid.ContextFlyout>
                     <MenuFlyout>
                         <MenuFlyoutItem x:Uid="playlistFlyoutExport"
@@ -54,7 +54,7 @@
                     <common:PictureControl Cover="{x:Bind Picture, Mode=OneWay}" PlayButtonVisibility="Visible" Command="{x:Bind ListenCommand}" />
                 </Border>
 
-                <StackPanel VerticalAlignment="Center" Margin="12,0,0,0">
+                <StackPanel VerticalAlignment="Center" Margin="{StaticResource ListItemTextMargin}">
                     <HyperlinkButton Content="{x:Bind Playlist.Name}" Command="{x:Bind PlaylistOpenCommand}" Style="{StaticResource HyperlinkSmallButtonStyle}" Margin="4,0,0,0" FontSize="{StaticResource FontSizeXMedium}" FontWeight="SemiBold" />
 
                     <Grid Height="20">
