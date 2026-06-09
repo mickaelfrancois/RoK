@@ -1,4 +1,5 @@
 ﻿using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Navigation;
 using Rok.Pages;
 using Rok.ViewModels.Album;
 using Rok.ViewModels.Artist;
@@ -11,7 +12,34 @@ namespace Rok.Services;
 
 public class NavigationService(ITelemetryClient telemetryClient)
 {
-    public Frame MainFrame { set; get; } = default!;
+    private Frame _mainFrame = default!;
+
+    public Frame MainFrame
+    {
+        get => _mainFrame;
+        set
+        {
+            if (_mainFrame is not null)
+                _mainFrame.Navigated -= OnFrameNavigated;
+
+            _mainFrame = value;
+
+            if (_mainFrame is not null)
+                _mainFrame.Navigated += OnFrameNavigated;
+        }
+    }
+
+    // Tracked for crash telemetry: a bare MeasureOverride COMException carries no app frame,
+    // so the current/previous page is the only clue to which screen triggered it.
+    public string? CurrentPageName { get; private set; }
+
+    public string? PreviousPageName { get; private set; }
+
+    private void OnFrameNavigated(object sender, NavigationEventArgs e)
+    {
+        PreviousPageName = CurrentPageName;
+        CurrentPageName = e.SourcePageType?.Name ?? e.Content?.GetType().Name;
+    }
 
     public void NavigateTo(Type pageType)
     {
