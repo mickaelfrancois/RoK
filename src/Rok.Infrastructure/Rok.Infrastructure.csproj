@@ -8,11 +8,11 @@
 	<ItemGroup>
 		<PackageReference Include="Dapper" Version="2.1.72" />
 		<PackageReference Include="DiscordRichPresence" Version="1.6.1.70" />
-		<PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="10.0.5" />
-		<PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="10.0.5" />
-		<PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.5" />
-		<PackageReference Include="Microsoft.Extensions.Http" Version="10.0.5" />
-		<PackageReference Include="Microsoft.Extensions.Logging" Version="10.0.5" />
+		<PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="10.0.9" />
+		<PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="10.0.9" />
+		<PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.9" />
+		<PackageReference Include="Microsoft.Extensions.Http" Version="10.0.9" />
+		<PackageReference Include="Microsoft.Extensions.Logging" Version="10.0.9" />
 		<PackageReference Include="CleanArch.DevKit.Guards" Version="1.1.1" />
 		<PackageReference Include="NAudio" Version="2.3.0" />
 		<PackageReference Include="Serilog.Extensions.Logging" Version="10.0.0" />
