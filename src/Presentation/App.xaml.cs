@@ -261,6 +261,8 @@ public partial class App : Microsoft.UI.Xaml.Application
             CrashStore crashStore = new();
             crashStore.IncrementCrashCount();
 
+            CaptureCrashContext(e.Exception);
+
             ITelemetryClient telemetry = ServiceProvider.GetRequiredService<ITelemetryClient>();
             _ = telemetry.CaptureExceptionAsync(e.Exception);
 #endif
@@ -270,6 +272,36 @@ public partial class App : Microsoft.UI.Xaml.Application
             // Ignore any logging errors to avoid masking the original exception.
         }
     }
+
+#if !DEBUG
+    // The flaky MeasureOverride COMException has a bare framework-only stack (no app frame),
+    // so the current/previous page is the only signal for which screen triggered it. Emit it as
+    // a "crash" event (CaptureEventAsync persists the payload) and block briefly so it ships
+    // before the process is torn down.
+    private void CaptureCrashContext(Exception exception)
+    {
+        try
+        {
+            Rok.Services.NavigationService? navigation = ServiceProvider.GetService<Rok.Services.NavigationService>();
+            ITelemetryClient telemetry = ServiceProvider.GetRequiredService<ITelemetryClient>();
+
+            Dictionary<string, object> properties = new()
+            {
+                ["currentPage"] = navigation?.CurrentPageName ?? "unknown",
+                ["previousPage"] = navigation?.PreviousPageName ?? "unknown",
+                ["exceptionType"] = exception.GetType().FullName ?? exception.GetType().Name,
+                ["hresult"] = exception.HResult
+            };
+
+            Task.Run(async () => await telemetry.CaptureEventAsync("crash", exception.GetType().Name, properties))
+                .Wait(TimeSpan.FromSeconds(2));
+        }
+        catch
+        {
+            // Never let crash diagnostics throw inside an exception handler.
+        }
+    }
+#endif
 
     private void HookGlobalDiagnostics()
     {
@@ -291,6 +323,8 @@ public partial class App : Microsoft.UI.Xaml.Application
             {
                 CrashStore crashStore = new();
                 crashStore.IncrementCrashCount();
+
+                CaptureCrashContext(ex);
 
                 ITelemetryClient telemetry = ServiceProvider.GetRequiredService<ITelemetryClient>();
                 Task.Run(async () => await telemetry.CaptureExceptionAsync(ex))
