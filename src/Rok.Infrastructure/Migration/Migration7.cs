@@ -6,8 +6,8 @@ public class Migration7 : IMigration
 
     public void Apply(IDbConnection connection)
     {
-        connection.ExecuteAsync("UPDATE artists SET totalDurationSeconds = (SELECT COALESCE(SUM(duration), 0) FROM tracks WHERE tracks.artistId = artists.id);");
-        connection.ExecuteAsync("UPDATE genres SET totalDurationSeconds = (SELECT COALESCE(SUM(duration), 0) FROM tracks WHERE tracks.genreId = genres.id);");
-        connection.ExecuteAsync("UPDATE albums SET duration = (SELECT COALESCE(SUM(duration), 0) FROM tracks WHERE tracks.albumId = albums.id);");
+        connection.Execute("UPDATE artists SET totalDurationSeconds = (SELECT COALESCE(SUM(duration), 0) FROM tracks WHERE tracks.artistId = artists.id);");
+        connection.Execute("UPDATE genres SET totalDurationSeconds = (SELECT COALESCE(SUM(duration), 0) FROM tracks WHERE tracks.genreId = genres.id);");
+        connection.Execute("UPDATE albums SET duration = (SELECT COALESCE(SUM(duration), 0) FROM tracks WHERE tracks.albumId = albums.id);");
     }
 }
