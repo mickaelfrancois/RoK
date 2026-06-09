@@ -57,9 +57,7 @@ public partial class TrackViewModel : ObservableObject, IDisposable, IFilterable
 
             OnPropertyChanged(nameof(Score));
 
-#pragma warning disable 4014
-            SetScoreAsync(Track.Score);
-#pragma warning restore 4014
+            _ = SetScoreAsync(Track.Score);
         }
     }
 

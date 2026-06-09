@@ -81,7 +81,7 @@ public sealed class PlayerService : IPlayerService, IDisposable
             if (_mode == EPlaybackMode.Radio)
                 return;
 
-            Task.Run(() =>
+            _ = Task.Run(() =>
             {
                 double seek = Math.Max(0, value);
 

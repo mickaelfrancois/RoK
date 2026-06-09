@@ -276,7 +276,7 @@ public class NAudioMediaPlayer : IPlayerEngine, IDisposable
         _isLive = true;
         _length = 0;
 
-        Task.Run(async () =>
+        _ = Task.Run(async () =>
         {
             try
             {

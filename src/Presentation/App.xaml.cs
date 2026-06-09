@@ -138,7 +138,7 @@ public partial class App : Microsoft.UI.Xaml.Application
     private void HandleCliCommand(string? arguments)
     {
         IPlayerCommandHandler handler = ServiceProvider.GetRequiredService<IPlayerCommandHandler>();
-        MainWindow?.DispatcherQueue.TryEnqueue(() => handler.HandleAsync(arguments));
+        MainWindow?.DispatcherQueue.TryEnqueue(() => _ = handler.HandleAsync(arguments));
     }
 
     [Conditional("DEBUG")]

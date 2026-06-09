@@ -67,7 +67,7 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
         {
             string message = _resourceLoader.GetString("NoLibraryFoldersMessage");
             string title = _resourceLoader.GetString("NoLibraryFoldersTitleMessage");
-            _dialogService.ShowTextAsync(title, message);
+            _ = _dialogService.ShowTextAsync(title, message);
             return false;
         }
 

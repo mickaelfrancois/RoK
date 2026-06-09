@@ -79,9 +79,7 @@ public sealed partial class ListeningViewModel : ObservableObject, IDisposable
         if (_playerService.Playlist != null)
         {
             _playlistManager.LoadTracksList(_playerService.Playlist);
-#pragma warning disable CS4014
-            _playlistManager.SetCurrentTrackAsync(_playerService.CurrentTrack);
-#pragma warning restore CS4014
+            _ = _playlistManager.SetCurrentTrackAsync(_playerService.CurrentTrack);
         }
     }
 

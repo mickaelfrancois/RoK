@@ -268,7 +268,7 @@ public sealed class DialogService(ResourceLoader resourceLoader, ITranslateServi
         bool enqueued = App.MainWindow.DispatcherQueue.TryEnqueue(() =>
         {
             Task task = func();
-            task.ContinueWith(t =>
+            _ = task.ContinueWith(t =>
             {
                 if (t.IsFaulted)
                     tcs.SetException(t.Exception!.Flatten());
