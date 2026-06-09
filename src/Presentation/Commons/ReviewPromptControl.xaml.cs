@@ -29,7 +29,12 @@ public sealed partial class ReviewPromptControl : UserControl
         ((Storyboard)Resources["ShowStoryboard"]).Begin();
 
         _tcs = new TaskCompletionSource<bool?>();
+
+        // The TCS is completed by button clicks / storyboard callbacks on the UI thread;
+        // returning its Task is the intended dialog-result pattern, no cross-context deadlock.
+#pragma warning disable VSTHRD003
         return _tcs.Task;
+#pragma warning restore VSTHRD003
     }
 
     private async Task HideAsync()

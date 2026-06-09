@@ -6,7 +6,7 @@ using Rok.Application.Player;
 
 namespace Rok.Services;
 
-public partial class PlaylistMenuService : IPlaylistMenuService, IDisposable
+public sealed partial class PlaylistMenuService : IPlaylistMenuService, IDisposable
 {
     private readonly IMediator _mediator;
     private readonly IMessenger _messenger;
@@ -314,6 +314,5 @@ public partial class PlaylistMenuService : IPlaylistMenuService, IDisposable
         _subscriptions.Clear();
 
         _cacheSemaphore?.Dispose();
-        GC.SuppressFinalize(this);
     }
 }

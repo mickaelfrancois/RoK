@@ -2,7 +2,7 @@ using Rok.ViewModels.Start;
 
 namespace Rok.PresentationTests.ViewModels.Start;
 
-public class FolderValidatorTests : IDisposable
+public sealed class FolderValidatorTests : IDisposable
 {
     private readonly DirectoryInfo _tempDir = Directory.CreateTempSubdirectory("FolderValidatorTests_");
 

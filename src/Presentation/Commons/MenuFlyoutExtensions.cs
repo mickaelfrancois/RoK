@@ -311,7 +311,7 @@ public static class MenuFlyoutExtensions
                 SetAlbumId(menuItem, albumId);
                 SetArtistId(menuItem, artistId);
 
-                RoutedEventHandler handler = MenuItemStaticClickHandlerAsync;
+                RoutedEventHandler handler = MenuItemStaticClickHandler;
                 menuItem.Click += handler;
                 SetMenuItemClickHandler(menuItem, handler);
 
@@ -340,7 +340,7 @@ public static class MenuFlyoutExtensions
         SetAlbumId(newPlaylistItem, albumId);
         SetArtistId(newPlaylistItem, artistId);
 
-        RoutedEventHandler newHandler = NewPlaylistStaticClickHandlerAsync;
+        RoutedEventHandler newHandler = NewPlaylistStaticClickHandler;
         newPlaylistItem.Click += newHandler;
         SetMenuItemClickHandler(newPlaylistItem, newHandler);
 
@@ -359,7 +359,7 @@ public static class MenuFlyoutExtensions
         SetAlbumId(addToCurrentListeningItem, albumId);
         SetArtistId(addToCurrentListeningItem, artistId);
 
-        RoutedEventHandler addToCurrentListeningHandler = AddToCurrentListeningStaticClickHandlerAsync;
+        RoutedEventHandler addToCurrentListeningHandler = AddToCurrentListeningStaticClickHandler;
         addToCurrentListeningItem.Click += addToCurrentListeningHandler;
         SetMenuItemClickHandler(addToCurrentListeningItem, addToCurrentListeningHandler);
 
@@ -381,7 +381,7 @@ public static class MenuFlyoutExtensions
         }
     }
 
-    private static async void MenuItemStaticClickHandlerAsync(object? sender, RoutedEventArgs e)
+    private static async void MenuItemStaticClickHandler(object? sender, RoutedEventArgs e)
     {
         if (sender is not MenuFlyoutItem mi)
             return;
@@ -413,7 +413,7 @@ public static class MenuFlyoutExtensions
         }
     }
 
-    private static async void NewPlaylistStaticClickHandlerAsync(object? sender, RoutedEventArgs e)
+    private static async void NewPlaylistStaticClickHandler(object? sender, RoutedEventArgs e)
     {
         if (sender is not MenuFlyoutItem mi)
             return;
@@ -449,7 +449,7 @@ public static class MenuFlyoutExtensions
     }
 
 
-    private static async void AddToCurrentListeningStaticClickHandlerAsync(object? sender, RoutedEventArgs e)
+    private static async void AddToCurrentListeningStaticClickHandler(object? sender, RoutedEventArgs e)
     {
         if (sender is not MenuFlyoutItem mi)
             return;

@@ -8,7 +8,7 @@ using Rok.Services.Player;
 
 namespace Rok.Application.Player;
 
-public class PlayerService : IPlayerService, IDisposable
+public sealed class PlayerService : IPlayerService, IDisposable
 {
     private EPlaybackState _playerState = EPlaybackState.Stopped;
 
@@ -81,7 +81,7 @@ public class PlayerService : IPlayerService, IDisposable
             if (_mode == EPlaybackMode.Radio)
                 return;
 
-            Task.Run(() =>
+            _ = Task.Run(() =>
             {
                 double seek = Math.Max(0, value);
 

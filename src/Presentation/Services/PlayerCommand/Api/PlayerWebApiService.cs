@@ -52,7 +52,7 @@ public sealed partial class PlayerWebApiService(
 
             logger.LogInformation("Player Web API started on http://localhost:{Port}", ActivePort);
 
-            Task.Run(() => ListenAsync(_cts.Token), _cts.Token);
+            _ = Task.Run(() => ListenAsync(_cts.Token), _cts.Token);
         }
         catch (HttpListenerException ex)
         {

@@ -7,7 +7,7 @@ using Rok.Infrastructure.Repositories;
 
 namespace Rok.Infrastructure.UnitTests;
 
-public class SqliteDatabaseFixture : IDisposable
+public sealed class SqliteDatabaseFixture : IDisposable
 {
     static SqliteDatabaseFixture()
     {

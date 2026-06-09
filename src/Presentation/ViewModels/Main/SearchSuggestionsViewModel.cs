@@ -5,7 +5,7 @@ using Rok.Application.Services;
 
 namespace Rok.ViewModels.Main;
 
-public partial class SearchSuggestionsViewModel : ObservableObject, IDisposable
+public sealed partial class SearchSuggestionsViewModel : ObservableObject, IDisposable
 {
     private readonly IMediator _mediator;
     private readonly IDisposable _libraryRefreshSubscription;
@@ -110,7 +110,6 @@ public partial class SearchSuggestionsViewModel : ObservableObject, IDisposable
         _libraryRefreshSubscription.Dispose();
         _debounceCts?.Dispose();
         _disposed = true;
-        GC.SuppressFinalize(this);
     }
 
 

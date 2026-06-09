@@ -8,7 +8,7 @@ using Rok.Application.Options;
 
 namespace Rok.Infrastructure.Social;
 
-public class DiscordRichPresenceService : IDisposable, IDiscordRichPresenceService
+public sealed class DiscordRichPresenceService : IDisposable, IDiscordRichPresenceService
 {
     private readonly DiscordRpcClient? _client;
     private readonly ILogger<DiscordRichPresenceService> _logger;
@@ -200,18 +200,12 @@ public class DiscordRichPresenceService : IDisposable, IDiscordRichPresenceServi
 
     public void Dispose()
     {
-        Dispose(true);
-        GC.SuppressFinalize(this);
-    }
-
-    protected virtual void Dispose(bool disposing)
-    {
         lock (_lock)
         {
             if (_disposed)
                 return;
 
-            if (disposing && _client != null)
+            if (_client != null)
             {
                 try
                 {

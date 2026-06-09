@@ -66,9 +66,11 @@ public class TagsProviderTests
         // Arrange
         TagsProvider sut = new(_mediator, new Messenger());
 
-        // Act
+        // Act — deliberate double dispose to verify idempotency; using-declaration would defeat the test
+#pragma warning disable IDISP017
         sut.Dispose();
         sut.Dispose();
+#pragma warning restore IDISP017
 
         // Assert — no exception
     }
