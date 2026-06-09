@@ -9,7 +9,7 @@ using ResourceLoader = Windows.ApplicationModel.Resources.ResourceLoader;
 
 namespace Rok.ViewModels.Listening;
 
-public partial class ListeningViewModel : ObservableObject, IDisposable
+public sealed partial class ListeningViewModel : ObservableObject, IDisposable
 {
     private readonly ILogger<ListeningViewModel> _logger;
     private readonly IPlayerService _playerService;
@@ -182,6 +182,5 @@ public partial class ListeningViewModel : ObservableObject, IDisposable
             subscription.Dispose();
         _subscriptions.Clear();
         _disposed = true;
-        GC.SuppressFinalize(this);
     }
 }

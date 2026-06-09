@@ -6,7 +6,7 @@ using Rok.ViewModels.Search;
 
 namespace Rok.ViewModels.Main;
 
-public partial class MainViewModel : ObservableObject, IDisposable
+public sealed partial class MainViewModel : ObservableObject, IDisposable
 {
     private DispatcherQueue? _dispatcherQueue;
     private DispatcherQueue DispatcherQueue => _dispatcherQueue ??= DispatcherQueue.GetForCurrentThread();
@@ -137,6 +137,5 @@ public partial class MainViewModel : ObservableObject, IDisposable
         _mediaChangedSubscription.Dispose();
         _radioStationChangedSubscription.Dispose();
         _disposed = true;
-        GC.SuppressFinalize(this);
     }
 }

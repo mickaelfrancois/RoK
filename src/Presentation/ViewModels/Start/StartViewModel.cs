@@ -9,7 +9,7 @@ using Windows.Storage.AccessCache;
 
 namespace Rok.ViewModels.Start;
 
-public partial class StartViewModel : ObservableObject, IDisposable
+public sealed partial class StartViewModel : ObservableObject, IDisposable
 {
     private const int KDisplayIntervalMs = 300;
 
@@ -125,7 +125,6 @@ public partial class StartViewModel : ObservableObject, IDisposable
 
         UnregisterEvents();
         _disposed = true;
-        GC.SuppressFinalize(this);
     }
 
     private async Task LibraryRefreshChangeAsync(LibraryRefreshMessage message)

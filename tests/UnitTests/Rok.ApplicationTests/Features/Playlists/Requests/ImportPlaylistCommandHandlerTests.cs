@@ -11,7 +11,7 @@ using Rok.Application.Interfaces.Repositories;
 
 namespace Rok.ApplicationTests.Features.Playlists.Requests;
 
-public class ImportPlaylistRequestHandlerTests : IDisposable
+public sealed class ImportPlaylistRequestHandlerTests : IDisposable
 {
     private readonly SqliteConnection _connection;
     private readonly Mock<IPlaylistFormatResolver> _resolver = new();

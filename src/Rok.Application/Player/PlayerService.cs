@@ -8,7 +8,7 @@ using Rok.Services.Player;
 
 namespace Rok.Application.Player;
 
-public class PlayerService : IPlayerService, IDisposable
+public sealed class PlayerService : IPlayerService, IDisposable
 {
     private EPlaybackState _playerState = EPlaybackState.Stopped;
 

@@ -125,22 +125,12 @@ public sealed partial class ListViewExtended : ListView, IDisposable
         }
     }
 
-    private void Dispose(bool disposing)
-    {
-        if (!disposedValue)
-        {
-            if (disposing)
-            {
-                SelectionChanged -= OnSelectionChanged;
-            }
-
-            disposedValue = true;
-        }
-    }
-
     public void Dispose()
     {
-        Dispose(disposing: true);
-        GC.SuppressFinalize(this);
+        if (disposedValue)
+            return;
+
+        SelectionChanged -= OnSelectionChanged;
+        disposedValue = true;
     }
 }
