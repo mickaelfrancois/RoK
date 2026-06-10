@@ -9,7 +9,8 @@
              mc:Ignorable="d">
 
     <Grid PointerExited="Cover_PointerExited"
-          PointerEntered="Cover_PointerEntered">
+          PointerEntered="Cover_PointerEntered"
+          Loaded="OnRootLoaded">
         <VisualStateManager.VisualStateGroups>
             <VisualStateGroup x:Name="CommonStates">
                 <VisualState x:Name="Normal">
@@ -58,49 +59,28 @@
                     </Storyboard>
                 </VisualState>
             </VisualStateGroup>
-
-            <VisualStateGroup x:Name="imgAnimation">
-                <VisualState x:Name="imgLoaded">
-                    <Storyboard>
-                        <DoubleAnimation Duration="0:0:0"
-                                         From="0.4"
-                                         To="0"
-                                         Storyboard.TargetProperty="Opacity"
-                                         Storyboard.TargetName="imgDefault" />
-                        <DoubleAnimation Duration="0:0:2"
-                                         From="0"
-                                         To="1.0"
-                                         Storyboard.TargetProperty="Opacity"
-                                         Storyboard.TargetName="img1" />
-
-                        <DoubleAnimation Storyboard.TargetName="img1Scale"
-                                         Storyboard.TargetProperty="ScaleX"
-                                         To="1.0"
-                                         Duration="0:0:0.2" />
-                        <DoubleAnimation Storyboard.TargetName="img1Scale"
-                                         Storyboard.TargetProperty="ScaleY"
-                                         To="1.0"
-                                         Duration="0:0:0.2" />
-                    </Storyboard>
-                </VisualState>
-            </VisualStateGroup>
         </VisualStateManager.VisualStateGroups>
 
-        <TextBlock FontFamily="Segoe MDL2 Assets"
-                   Text="{Binding ElementName=parent,Path=Icon}"
-                   x:Name="imgDefault"
-                   VerticalAlignment="Center"
-                   HorizontalAlignment="Center"
-                   FontSize="128"
-                   Opacity="0.4"
-                   Margin="0"></TextBlock>
+        <Grid x:Name="placeholderRoot">
+            <Image Source="{ThemeResource AlbumFallbackImage}"
+                   Stretch="UniformToFill"
+                   HorizontalAlignment="Stretch"
+                   VerticalAlignment="Stretch"
+                   Visibility="{Binding ElementName=parent, Path=UseArtistFallback, Converter={StaticResource BoolToInvertVisibilityConverter}}" />
+            <Image Source="{ThemeResource ArtistFallbackImage}"
+                   Stretch="UniformToFill"
+                   HorizontalAlignment="Stretch"
+                   VerticalAlignment="Stretch"
+                   Visibility="{Binding ElementName=parent, Path=UseArtistFallback, Converter={StaticResource BoolToVisibilityConverter}}" />
+        </Grid>
 
         <Grid Width="{Binding ElementName=parent,Path=Width}"
               Height="{Binding ElementName=parent,Path=Height}">
             <Image x:Name="img1"
                    Margin="0"
+                   Opacity="0"
                    Source="{Binding ElementName=parent,Path=Cover}"
-                   Loaded="ImgLoaded"
+                   ImageOpened="ImgOpened"
                    SizeChanged="ImgSizeChanged"
                    UseLayoutRounding="True"
                    HorizontalAlignment="Center"

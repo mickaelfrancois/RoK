@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 288.4 290.02">
+  <g id="Calque_1" data-name="Calque 1">
+    <rect width="288.4" height="290.02" fill="#2f333b"/>
+    <circle cx="144.13" cy="135.1" r="82.92" fill="#262a30" stroke="#636c79" stroke-miterlimit="10"/>
+  </g>
+  <g id="Calque_2" data-name="Calque 2">
+    <circle cx="145.88" cy="134.49" r="74.22" fill="#262a30" stroke="#636c79" stroke-miterlimit="10"/>
+    <circle cx="145.88" cy="134.19" r="66.44" fill="#262a30" stroke="#2e3239" stroke-miterlimit="10"/>
+    <circle cx="145.88" cy="133.23" r="57.69" fill="#262a30" stroke="#636c79" stroke-miterlimit="10"/>
+    <circle cx="145.88" cy="134.17" r="49.07" fill="#262a30" stroke="#2e3239" stroke-miterlimit="10"/>
+    <circle cx="145.88" cy="134.03" r="42.74" fill="#262a30" stroke="#636c79" stroke-miterlimit="10"/>
+    <circle cx="145.88" cy="134.36" r="36.33" fill="#262a30" stroke="#636c79" stroke-miterlimit="10"/>
+    <circle cx="146.01" cy="134.39" r="20.8" fill="#262a30" stroke="#2e3239" stroke-miterlimit="10"/>
+  </g>
+  <g id="Calque_3" data-name="Calque 3">
+    <rect x="76.88" y="85.03" width="7.69" height="25.13" transform="translate(59.62 -27.29) rotate(30)" fill="#262a30"/>
+    <rect x="112.65" y="104.94" width="7.69" height="25.13" transform="translate(74.36 -42.5) rotate(30)" fill="#262a30"/>
+    <rect x="202.25" y="95.64" width="7.69" height="25.13" transform="translate(-26.13 92.28) rotate(-23.78)" fill="#262a30"/>
+    <rect x="165.24" y="173.5" width="7.69" height="25.13" transform="translate(264.2 -46.66) rotate(64.49)" fill="#262a30"/>
+    <rect x="155.53" y="65.7" width="7.69" height="25.13" transform="translate(279.7 -52.29) rotate(106.51)" fill="#262a30"/>
+    <rect x="98.36" y="169.43" width="7.69" height="44.12" transform="translate(318.66 207.79) rotate(122.4)" fill="#262a30"/>
+    <rect x="189.44" y="118.98" width="6.13" height="44.12" transform="translate(370.89 299.56) rotate(-174.6)" fill="#262a30"/>
+    <rect x="107.64" y="148.32" width="6.13" height="37.06" transform="translate(304.35 217.79) rotate(138.31)" fill="#262a30"/>
+    <rect x="140.59" y="94.89" width="6.13" height="7.44" transform="translate(59.26 251.05) rotate(-95.5)" fill="#262a30" stroke="#262a30" stroke-miterlimit="10"/>
+    <rect x="160.55" y="203.78" width="6.13" height="7.44" transform="translate(-27.26 390.25) rotate(-95.5)" fill="#262a30"/>
+    <rect x="144.57" y="129.96" width="6.13" height="7.44" transform="translate(28.71 293.45) rotate(-95.5)" fill="#262a30"/>
+    <rect x="133.23" y="105.84" width="82.57" height="1.98" transform="translate(-24.42 154.69) rotate(-45)" fill="#636c79" stroke="#636c79" stroke-miterlimit="10"/>
+  </g>
+</svg>

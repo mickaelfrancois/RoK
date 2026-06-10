@@ -20,9 +20,6 @@ namespace Rok.ViewModels.Artist;
 
 public partial class ArtistViewModel : ObservableObject, IFilterableArtist, IGroupableArtist
 {
-    private static string FallbackPictureUri => App.Current.Resources["ArtistFallbackPictureUri"] as string ?? "ms-appx:///Assets/artistFallback.png";
-    private static BitmapImage FallbackPicture => new(new Uri(FallbackPictureUri));
-
     private readonly NavigationService _navigationService;
     private readonly ResourceLoader _resourceLoader;
     private readonly ILogger<ArtistViewModel> _logger;
@@ -195,14 +192,15 @@ public partial class ArtistViewModel : ObservableObject, IFilterableArtist, IGro
     }
 
     private BitmapImage? _picture = null;
-    public BitmapImage Picture
+    private bool _pictureLoaded;
+    public BitmapImage? Picture
     {
         get
         {
-            if (_picture == null)
+            if (!_pictureLoaded)
                 LoadPicture();
 
-            return _picture ?? FallbackPicture;
+            return _picture;
         }
         set
         {
@@ -211,13 +209,7 @@ public partial class ArtistViewModel : ObservableObject, IFilterableArtist, IGro
         }
     }
 
-    public bool IsPictureAvailable
-    {
-        get
-        {
-            return _picture != null && _picture.UriSource != FallbackPicture.UriSource;
-        }
-    }
+    public bool IsPictureAvailable => _picture != null;
 
     public long? GenreId => Artist.GenreId;
 
@@ -401,12 +393,15 @@ public partial class ArtistViewModel : ObservableObject, IFilterableArtist, IGro
 
     public void LoadPicture()
     {
+        _pictureLoaded = true;
+
         try
         {
-            Picture = _pictureService.LoadPicture(Artist.Name);
-
-            if (!_pictureService.PictureExists(Artist.Name))
-                return;
+            // Return null when there is no real picture so PictureControl shows its themed
+            // (artist) vector placeholder instead of a non-theme-aware bitmap fallback.
+            Picture = _pictureService.PictureExists(Artist.Name)
+                ? _pictureService.LoadPicture(Artist.Name)
+                : null;
         }
         catch (Exception ex)
         {

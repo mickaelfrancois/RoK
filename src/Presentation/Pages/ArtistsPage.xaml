@@ -34,7 +34,7 @@
                 </Grid.Resources>
 
                 <Border CornerRadius="{StaticResource CornerRadiusMediumValue}">
-                    <common:PictureControl Style="{StaticResource PictureCoverStyle}" Cover="{x:Bind Picture, Mode=OneWay}" x:Phase="2" PlayButtonVisibility="Visible" Command="{x:Bind ListenCommand}" />
+                    <common:PictureControl Style="{StaticResource PictureCoverStyle}" Cover="{x:Bind Picture, Mode=OneWay}" UseArtistFallback="True" x:Phase="2" PlayButtonVisibility="Visible" Command="{x:Bind ListenCommand}" />
                 </Border>
 
                 <StackPanel HorizontalAlignment="Right" VerticalAlignment="Top" Orientation="Vertical" Spacing="{StaticResource SpacingXSmall}" Margin="{StaticResource CoverBadgeMargin}">
@@ -97,7 +97,7 @@
                 </Grid.ColumnDefinitions>
 
                 <Border CornerRadius="{StaticResource ControlCornerRadius}" Width="{StaticResource ListCoverWidth}" Height="{StaticResource ListCoverHeight}" VerticalAlignment="Center">
-                    <common:PictureControl Cover="{x:Bind Picture, Mode=OneWay}" PlayButtonVisibility="Visible" Command="{x:Bind ListenCommand}" />
+                    <common:PictureControl Cover="{x:Bind Picture, Mode=OneWay}" UseArtistFallback="True" PlayButtonVisibility="Visible" Command="{x:Bind ListenCommand}" />
                 </Border>
 
                 <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="{StaticResource ListItemTextMargin}">

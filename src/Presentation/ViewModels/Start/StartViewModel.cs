@@ -167,16 +167,12 @@ public sealed partial class StartViewModel : ObservableObject, IDisposable
     {
         _dispatcherQueue.TryEnqueue(() =>
         {
-            BitmapImage cover;
+            BitmapImage? cover = null;
 
             if (_albumPicture.PictureFileExists(message.AlbumPath))
             {
                 string filePath = _albumPicture.GetPictureFile(message.AlbumPath);
                 cover = new BitmapImage(new Uri(filePath, UriKind.Absolute));
-            }
-            else
-            {
-                cover = (BitmapImage)Microsoft.UI.Xaml.Application.Current.Resources["albumCoverFallback"];
             }
 
             _pendingAlbums.Enqueue(new AlbumImportedModel
