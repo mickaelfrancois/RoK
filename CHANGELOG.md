@@ -1,5 +1,21 @@
 ﻿# ChangeLog
 
+## [1.14.0] Store – 10 juin 2026
+
+### Ajouté
+
+- Enrichissement des métadonnées ID3 : colonnes étendues, import des paroles embarquées et outil de mise à jour de la bibliothèque.
+- États vides cohérents sur l'ensemble des pages.
+- Visuels de remplacement (pochette d'album et photo d'artiste) en thème clair et sombre, avec bascule automatique selon le thème, et crédit de la graphiste dans les réglages.
+- Capture de la page courante dans les rapports de plantage, pour faciliter le diagnostic.
+
+### Corrigé
+
+- Icônes de navigation homogénéisées et glyphe de la page Listes de lecture corrigé.
+- Position de défilement des listes (Albums, Artistes, Titres) restaurée lors du retour en arrière.
+
+--
+
 ## [1.13.0] Store – 8 juin 2026
 
 ### Ajouté
