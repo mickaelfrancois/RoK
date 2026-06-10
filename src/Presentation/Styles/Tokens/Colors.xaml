@@ -19,7 +19,7 @@
     <Color x:Key="Black85">#D9000000</Color>
 
     <Color x:Key="Gray950">#FF1F1F1F</Color>
-    
+
     <Color x:Key="BadgeLive">DarkCyan</Color>
     <Color x:Key="BadgeCompilation">DarkViolet</Color>
     <Color x:Key="BadgeNew">DarkOrange</Color>

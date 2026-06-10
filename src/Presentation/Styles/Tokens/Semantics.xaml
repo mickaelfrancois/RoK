@@ -20,6 +20,15 @@
 
             <StaticResource x:Key="OnNeutralSurfacePrimaryBrush" ResourceKey="SystemControlForegroundBaseHighBrush" />
 
+            <SvgImageSource x:Key="AlbumFallbackImage"
+                            UriSource="ms-appx:///Assets/albumFallbackDark.svg"
+                            RasterizePixelWidth="600"
+                            RasterizePixelHeight="600" />
+            <SvgImageSource x:Key="ArtistFallbackImage"
+                            UriSource="ms-appx:///Assets/artistFallbackDark.svg"
+                            RasterizePixelWidth="600"
+                            RasterizePixelHeight="600" />
+
             <SolidColorBrush x:Key="GridCoverBottomSecondLineBrush" Color="White"/>
             <SolidColorBrush x:Key="ListCoverBottomSecondLineBrush" Color="White"/>
 
@@ -41,8 +50,17 @@
             <SolidColorBrush x:Key="OnSurfaceAccentBrush" Color="{StaticResource Blue400}" />
 
             <SolidColorBrush x:Key="PlayerSurfaceBrush" Color="{StaticResource Gray950}" />
-            
+
             <StaticResource x:Key="OnNeutralSurfacePrimaryBrush" ResourceKey="SystemControlForegroundBaseHighBrush" />
+
+            <SvgImageSource x:Key="AlbumFallbackImage"
+                            UriSource="ms-appx:///Assets/albumFallbackLight.svg"
+                            RasterizePixelWidth="600"
+                            RasterizePixelHeight="600" />
+            <SvgImageSource x:Key="ArtistFallbackImage"
+                            UriSource="ms-appx:///Assets/artistFallbackLight.svg"
+                            RasterizePixelWidth="600"
+                            RasterizePixelHeight="600" />
 
             <SolidColorBrush x:Key="GridCoverBottomSecondLineBrush" Color="White"/>
             <SolidColorBrush x:Key="ListCoverBottomSecondLineBrush" Color="Black"/>

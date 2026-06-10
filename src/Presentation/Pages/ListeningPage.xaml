@@ -44,7 +44,7 @@
             </Grid.ColumnDefinitions>
 
             <Grid Margin="6" Padding="0" CornerRadius="{StaticResource CornerRadiusMediumValue}">
-                <common:PictureControl x:Name="artistPicture" Height="100" Width="100" Cover="{x:Bind ViewModel.Artist.Picture, Mode=OneWay}" Style="{StaticResource HeaderPictureStyle}" />
+                <common:PictureControl x:Name="artistPicture" Height="100" Width="100" Cover="{x:Bind ViewModel.Artist.Picture, Mode=OneWay}" UseArtistFallback="True" Style="{StaticResource HeaderPictureStyle}" />
                 <common:AnimatedButton x:Uid="artistFavoriteButton"
                                        HorizontalAlignment="Right"
                                        VerticalAlignment="Top"

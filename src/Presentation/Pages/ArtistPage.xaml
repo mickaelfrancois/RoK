@@ -32,7 +32,7 @@
             </Grid.ColumnDefinitions>
 
             <Grid Style="{StaticResource HeaderPictureGridStyle}">
-                <common:PictureControl x:Name="artistPicture" Style="{StaticResource HeaderPictureStyle}"  Cover="{x:Bind ViewModel.Picture, Mode=OneWay}" />
+                <common:PictureControl x:Name="artistPicture" Style="{StaticResource HeaderPictureStyle}" UseArtistFallback="True" Cover="{x:Bind ViewModel.Picture, Mode=OneWay}" />
                 <Button x:Uid="selectPicture" Style="{StaticResource HeaderPictureSelectButtonStyle}" Command="{x:Bind ViewModel.SelectPictureCommand}" />
             </Grid>
 

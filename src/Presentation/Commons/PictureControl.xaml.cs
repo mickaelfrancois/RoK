@@ -7,7 +7,7 @@ namespace Rok.Commons;
 public sealed partial class PictureControl : UserControl
 {
     public static readonly DependencyProperty CoverProperty =
-        DependencyProperty.Register(nameof(Cover), typeof(ImageSource), typeof(PictureControl), new PropertyMetadata(null));
+        DependencyProperty.Register(nameof(Cover), typeof(ImageSource), typeof(PictureControl), new PropertyMetadata(null, OnCoverChanged));
 
     public static readonly DependencyProperty PlayButtonVisibilityProperty =
         DependencyProperty.Register(nameof(PlayButtonVisibility), typeof(Visibility), typeof(PictureControl),
@@ -16,6 +16,9 @@ public sealed partial class PictureControl : UserControl
     public static readonly DependencyProperty AddPlaylistButtonVisibilityProperty =
         DependencyProperty.Register(nameof(AddPlaylistButtonVisibility), typeof(Visibility), typeof(PictureControl),
             new PropertyMetadata(Visibility.Collapsed, OnAddPlaylistButtonVisibilityChanged));
+
+    public static readonly DependencyProperty UseArtistFallbackProperty =
+        DependencyProperty.Register(nameof(UseArtistFallback), typeof(bool), typeof(PictureControl), new PropertyMetadata(false));
 
     public static readonly DependencyProperty CommandParameterProperty =
         DependencyProperty.Register(nameof(CommandParameter), typeof(object), typeof(PictureControl), new PropertyMetadata(null));
@@ -26,14 +29,9 @@ public sealed partial class PictureControl : UserControl
     public static readonly DependencyProperty FlyoutProperty =
         DependencyProperty.Register(nameof(Flyout), typeof(Microsoft.UI.Xaml.Controls.Flyout), typeof(PictureControl), new PropertyMetadata(null));
 
-    public static readonly DependencyProperty IconProperty =
-        DependencyProperty.Register(nameof(Icon), typeof(string), typeof(PictureControl), new PropertyMetadata(string.Empty));
-
-
     public PictureControl()
     {
         InitializeComponent();
-        Icon = "\uE81D";
     }
 
 
@@ -44,10 +42,23 @@ public sealed partial class PictureControl : UserControl
     }
 
 
-    public string Icon
+    public bool UseArtistFallback
     {
-        get => (string)GetValue(IconProperty);
-        set => SetValue(IconProperty, value);
+        get => (bool)GetValue(UseArtistFallbackProperty);
+        set => SetValue(UseArtistFallbackProperty, value);
+    }
+
+
+    private static void OnCoverChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+    {
+        if (d is not PictureControl pc || pc.placeholderRoot is null || pc.img1 is null)
+            return;
+
+        // Drive opacity directly (not via VisualState) so it is reliable regardless of template/decoding timing.
+        // No cover -> show the themed placeholder; a real cover is revealed on ImageOpened.
+        // Also covers virtualized-list recycling (cover -> none) and failed image decodes.
+        pc.placeholderRoot.Opacity = 1;
+        pc.img1.Opacity = e.NewValue is null ? 0 : 1;
     }
 
 
@@ -105,17 +116,19 @@ public sealed partial class PictureControl : UserControl
             pc.btAddPlaylist.Visibility = (Visibility)e.NewValue;
     }
 
-    private void Image_ImageFailed(object sender, ExceptionRoutedEventArgs e)
+    private void OnRootLoaded(object sender, RoutedEventArgs e)
     {
-    }
-
-    private void ImgLoaded(object sender, RoutedEventArgs e)
-    {
-        VisualStateManager.GoToState(this, "imgLoaded", true);
-
-        // appliquer les valeurs DP (au cas où elles ont été définies avant l'initialisation visuelle)
+        // Apply DP values once the template is realized (covers art-less items, which never raise ImageOpened).
         btPlay.Visibility = PlayButtonVisibility;
         btAddPlaylist.Visibility = AddPlaylistButtonVisibility;
+    }
+
+    private void ImgOpened(object sender, RoutedEventArgs e)
+    {
+        // A real image decoded: reveal it and hide the placeholder. Direct sets are timing-safe
+        // (covers the case where the cover was assigned before the template was realized).
+        img1.Opacity = 1;
+        placeholderRoot.Opacity = 0;
 
         CalculateScale(sender);
     }

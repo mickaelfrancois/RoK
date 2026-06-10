@@ -15,15 +15,14 @@ public class AlbumPictureService(IAlbumPicture albumPicture, ILogger<AlbumPictur
                 string filePath = albumPicture.GetPictureFile(albumPath);
                 return new BitmapImage(new Uri(filePath, UriKind.Absolute));
             }
-            else
-            {
-                return (BitmapImage)App.Current.Resources["albumCoverFallback"];
-            }
+
+            // No cover on disk: let PictureControl show its themed vector placeholder.
+            return null;
         }
         catch (Exception ex)
         {
             logger.LogError(ex, "Failed to load picture for album path: {AlbumPath}", albumPath);
-            return (BitmapImage)App.Current.Resources["albumCoverFallback"];
+            return null;
         }
     }
 

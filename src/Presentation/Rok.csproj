@@ -145,6 +145,18 @@
 		<ProjectReference Include="..\Rok.Infrastructure\Rok.Infrastructure.csproj" />
 	</ItemGroup>
 	<ItemGroup>
+	  <Content Include="Assets\albumFallbackLight.svg">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </Content>
+	  <Content Include="Assets\albumFallbackDark.svg">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </Content>
+	  <Content Include="Assets\artistFallbackLight.svg">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </Content>
+	  <Content Include="Assets\artistFallbackDark.svg">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </Content>
 	  <Content Update="Assets\albumFallback.png">
 	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 	  </Content>
