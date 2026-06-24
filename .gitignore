@@ -376,3 +376,6 @@ appsettings.*.json
 /.claude/settings.local.json
 
 .superpowers/
+
+# legion battle artifacts (local only)
+.legion/

@@ -31,6 +31,12 @@ public sealed partial class ListeningViewModel : ObservableObject, IDisposable
     public bool IsSleepModeActive => _playerSleepModeService.IsSleepTimerActive;
     public int RemainingSleepTime => _playerSleepModeService.GetRemainingSleepTimeInSeconds();
 
+    /// <summary>
+    /// Asks the view to confirm a multi-track removal from the queue, passing the number of tracks that would be removed.
+    /// Set by the page so the confirmation dialog stays out of the view model. Returns true when the user confirms.
+    /// </summary>
+    public Func<int, Task<bool>>? RemovalConfirmationRequested { get; set; }
+
     public ListeningViewModel(
         IPlayerService playerService,
         ListeningPlaylistManager playlistManager,
@@ -118,6 +124,67 @@ public sealed partial class ListeningViewModel : ObservableObject, IDisposable
     {
         IEnumerable<long> currentTrackIds = Tracks.Select(t => t.Track.Id);
         return _playbackService.AddMoreFromArtistAsync(track, currentTrackIds);
+    }
+
+    [RelayCommand]
+    private Task RemoveTrackFromQueueAsync(TrackViewModel track)
+        => RemoveFromQueueAsync(
+            _playerService.CountUpcomingByTrack(track.Track.Id),
+            () => _playerService.RemoveUpcomingByTrack(track.Track.Id));
+
+    [RelayCommand]
+    private Task RemoveAlbumFromQueueAsync(TrackViewModel track)
+    {
+        if (!track.Track.AlbumId.HasValue)
+            return Task.CompletedTask;
+
+        long albumId = track.Track.AlbumId.Value;
+
+        return RemoveFromQueueAsync(
+            _playerService.CountUpcomingByAlbum(albumId),
+            () => _playerService.RemoveUpcomingByAlbum(albumId));
+    }
+
+    [RelayCommand]
+    private Task RemoveArtistFromQueueAsync(TrackViewModel track)
+    {
+        if (!track.Track.ArtistId.HasValue)
+            return Task.CompletedTask;
+
+        long artistId = track.Track.ArtistId.Value;
+
+        return RemoveFromQueueAsync(
+            _playerService.CountUpcomingByArtist(artistId),
+            () => _playerService.RemoveUpcomingByArtist(artistId));
+    }
+
+    [RelayCommand]
+    private Task RemoveGenreFromQueueAsync(TrackViewModel track)
+    {
+        if (!track.Track.GenreId.HasValue)
+            return Task.CompletedTask;
+
+        long genreId = track.Track.GenreId.Value;
+
+        return RemoveFromQueueAsync(
+            _playerService.CountUpcomingByGenre(genreId),
+            () => _playerService.RemoveUpcomingByGenre(genreId));
+    }
+
+    private async Task RemoveFromQueueAsync(int upcomingCount, Func<int> remove)
+    {
+        if (upcomingCount <= 0)
+            return;
+
+        if (upcomingCount >= 2 && RemovalConfirmationRequested != null)
+        {
+            bool confirmed = await RemovalConfirmationRequested(upcomingCount);
+
+            if (!confirmed)
+                return;
+        }
+
+        remove();
     }
 
     [RelayCommand]

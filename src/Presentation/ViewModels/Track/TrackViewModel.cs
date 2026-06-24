@@ -36,6 +36,9 @@ public partial class TrackViewModel : ObservableObject, IDisposable, IFilterable
     [ObservableProperty]
     public partial bool Listening { get; set; }
 
+    [ObservableProperty]
+    public partial bool IsUpcoming { get; set; }
+
     public int Score
     {
         get

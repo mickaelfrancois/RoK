@@ -699,6 +699,24 @@
   <data name="trackFlyoutAddMoreFromArtist.Text" xml:space="preserve">
     <value>Añade más canciones de este artista</value>
   </data>
+  <data name="listeningFlyoutRemoveTrack.Text" xml:space="preserve">
+    <value>Quitar esta canción de la cola</value>
+  </data>
+  <data name="listeningFlyoutRemoveAlbum.Text" xml:space="preserve">
+    <value>Quitar este álbum de la cola</value>
+  </data>
+  <data name="listeningFlyoutRemoveArtist.Text" xml:space="preserve">
+    <value>Quitar este artista de la cola</value>
+  </data>
+  <data name="listeningFlyoutRemoveGenre.Text" xml:space="preserve">
+    <value>Quitar este género de la cola</value>
+  </data>
+  <data name="RemoveFromQueueConfirmationTitle" xml:space="preserve">
+    <value>Quitar de la cola</value>
+  </data>
+  <data name="RemoveFromQueueConfirmation" xml:space="preserve">
+    <value>Se quitarán {0} pistas de la cola. ¿Continuar?</value>
+  </data>
   <data name="welcomeWaiting.Text" xml:space="preserve">
     <value>Un momento más, estamos preparando sus datos...</value>
   </data>

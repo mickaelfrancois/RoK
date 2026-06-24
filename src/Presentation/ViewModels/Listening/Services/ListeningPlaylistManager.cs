@@ -59,6 +59,8 @@ public partial class ListeningPlaylistManager : ObservableObject
                 CurrentTrack.Listening = true;
                 OnPropertyChanged(nameof(CurrentTrack));
             }
+
+            UpdateUpcomingFlags();
         });
 
         await LoadArtistIfNeededAsync(track);
@@ -98,5 +100,13 @@ public partial class ListeningPlaylistManager : ObservableObject
 
         OnPropertyChanged(nameof(CurrentTrack));
         OnPropertyChanged(nameof(Artist));
+    }
+
+    private void UpdateUpcomingFlags()
+    {
+        int currentIndex = CurrentTrack != null ? Tracks.IndexOf(CurrentTrack) : -1;
+
+        for (int index = 0; index < Tracks.Count; index++)
+            Tracks[index].IsUpcoming = currentIndex >= 0 && index > currentIndex;
     }
 }

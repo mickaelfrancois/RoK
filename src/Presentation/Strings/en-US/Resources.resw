@@ -816,6 +816,24 @@
   <data name="trackFlyoutAddMoreFromArtist.Text" xml:space="preserve">
     <value>Add more songs from this artist</value>
   </data>
+  <data name="listeningFlyoutRemoveTrack.Text" xml:space="preserve">
+    <value>Remove this song from the queue</value>
+  </data>
+  <data name="listeningFlyoutRemoveAlbum.Text" xml:space="preserve">
+    <value>Remove this album from the queue</value>
+  </data>
+  <data name="listeningFlyoutRemoveArtist.Text" xml:space="preserve">
+    <value>Remove this artist from the queue</value>
+  </data>
+  <data name="listeningFlyoutRemoveGenre.Text" xml:space="preserve">
+    <value>Remove this genre from the queue</value>
+  </data>
+  <data name="RemoveFromQueueConfirmationTitle" xml:space="preserve">
+    <value>Remove from queue</value>
+  </data>
+  <data name="RemoveFromQueueConfirmation" xml:space="preserve">
+    <value>{0} tracks will be removed from the queue. Continue?</value>
+  </data>
   <data name="welcomeWaiting.Text" xml:space="preserve">
     <value>Just a moment longer, we are preparing your data...</value>
   </data>

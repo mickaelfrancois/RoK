@@ -341,6 +341,75 @@ public sealed class PlayerService : IPlayerService, IDisposable
         return Playlist.Skip(_currentIndex + 1).ToList();
     }
 
+    public int CountUpcomingByTrack(long trackId) => CountUpcoming(track => track.Id == trackId);
+
+    public int CountUpcomingByAlbum(long albumId) => CountUpcoming(track => track.AlbumId == albumId);
+
+    public int CountUpcomingByArtist(long artistId) => CountUpcoming(track => track.ArtistId == artistId);
+
+    public int CountUpcomingByGenre(long genreId) => CountUpcoming(track => track.GenreId == genreId);
+
+    public int RemoveUpcomingByTrack(long trackId) => RemoveUpcoming(track => track.Id == trackId);
+
+    public int RemoveUpcomingByAlbum(long albumId) => RemoveUpcoming(track => track.AlbumId == albumId);
+
+    public int RemoveUpcomingByArtist(long artistId) => RemoveUpcoming(track => track.ArtistId == artistId);
+
+    public int RemoveUpcomingByGenre(long genreId) => RemoveUpcoming(track => track.GenreId == genreId);
+
+    private int CountUpcoming(Func<TrackDto, bool> predicate)
+    {
+        if (_mode == EPlaybackMode.Radio)
+            return 0;
+
+        int count = 0;
+
+        for (int index = _currentIndex + 1; index < Playlist.Count; index++)
+        {
+            if (predicate(Playlist[index]))
+                count++;
+        }
+
+        return count;
+    }
+
+    private int RemoveUpcoming(Func<TrackDto, bool> predicate)
+    {
+        if (_mode == EPlaybackMode.Radio)
+            return 0;
+
+        int removed = 0;
+        bool imminentRemoved = false;
+
+        for (int index = Playlist.Count - 1; index > _currentIndex; index--)
+        {
+            if (!predicate(Playlist[index]))
+                continue;
+
+            if (index == _currentIndex + 1)
+                imminentRemoved = true;
+
+            Playlist.RemoveAt(index);
+            removed++;
+        }
+
+        if (removed == 0)
+            return 0;
+
+        if (imminentRemoved)
+            CancelCrossfade();
+
+        _messenger.Send(new PlaylistChanged(Playlist));
+
+        return removed;
+    }
+
+    private void CancelCrossfade()
+    {
+        _crossfadeCts?.Cancel();
+        _isCrossfadeRunning = false;
+    }
+
     public void AddTracksToPlaylist(List<TrackDto> tracks)
     {
         Guard.NotNull(tracks);
@@ -461,8 +530,7 @@ public sealed class PlayerService : IPlayerService, IDisposable
             return;
 
         // Cancel any ongoing crossfade
-        _crossfadeCts?.Cancel();
-        _isCrossfadeRunning = false;
+        CancelCrossfade();
 
         if (_currentIndex + 1 >= Playlist.Count)
         {
