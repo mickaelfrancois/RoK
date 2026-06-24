@@ -109,6 +109,7 @@ public class TrackRepository(IDbConnection db, [FromKeyedServices("BackgroundCon
         string sql = GetSelectQuery() +
                      "WHERE tracks.albumId IN @sampledAlbumIds " +
                      DefaultGroupBy +
+                     "ORDER BY RANDOM() " +
                      "LIMIT @limit";
 
         return await ExecuteQueryAsync(sql, kind, new { sampledAlbumIds, limit });
