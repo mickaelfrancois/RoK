@@ -15,6 +15,8 @@
 		</PackageReference>
 		<PackageReference Include="Dapper" Version="2.1.79" />
 		<PackageReference Include="Microsoft.Data.Sqlite" Version="10.0.9" />
+		<!-- Transitive override: patched native SQLite (>= 3.50.2) for CVE-2025-6965. See Rok.Domain.csproj. -->
+		<PackageReference Include="SQLitePCLRaw.bundle_e_sqlite3" Version="3.0.3" />
 		<PackageReference Include="Microsoft.Extensions.TimeProvider.Testing" Version="10.7.0" />
 		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.6.0" />
 		<PackageReference Include="Moq" Version="4.20.72" />
