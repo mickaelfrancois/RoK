@@ -162,6 +162,27 @@
                                             <FontIcon Glyph="&#xE90B;" />
                                         </MenuFlyoutItem.Icon>
                                     </MenuFlyoutItem>
+                                    <MenuFlyoutSeparator />
+                                    <MenuFlyoutItem x:Uid="listeningFlyoutRemoveTrack" Command="{Binding ElementName=PageRoot, Path=ViewModel.RemoveTrackFromQueueCommand}" CommandParameter="{x:Bind}" IsEnabled="{x:Bind IsUpcoming, Mode=OneWay}">
+                                        <MenuFlyoutItem.Icon>
+                                            <FontIcon Glyph="&#xECC9;" />
+                                        </MenuFlyoutItem.Icon>
+                                    </MenuFlyoutItem>
+                                    <MenuFlyoutItem x:Uid="listeningFlyoutRemoveAlbum" Command="{Binding ElementName=PageRoot, Path=ViewModel.RemoveAlbumFromQueueCommand}" CommandParameter="{x:Bind}" IsEnabled="{x:Bind Track.AlbumId.HasValue}">
+                                        <MenuFlyoutItem.Icon>
+                                            <FontIcon Glyph="&#xECC9;" />
+                                        </MenuFlyoutItem.Icon>
+                                    </MenuFlyoutItem>
+                                    <MenuFlyoutItem x:Uid="listeningFlyoutRemoveArtist" Command="{Binding ElementName=PageRoot, Path=ViewModel.RemoveArtistFromQueueCommand}" CommandParameter="{x:Bind}" IsEnabled="{x:Bind Track.ArtistId.HasValue}">
+                                        <MenuFlyoutItem.Icon>
+                                            <FontIcon Glyph="&#xECC9;" />
+                                        </MenuFlyoutItem.Icon>
+                                    </MenuFlyoutItem>
+                                    <MenuFlyoutItem x:Uid="listeningFlyoutRemoveGenre" Command="{Binding ElementName=PageRoot, Path=ViewModel.RemoveGenreFromQueueCommand}" CommandParameter="{x:Bind}" IsEnabled="{x:Bind Track.GenreId.HasValue}">
+                                        <MenuFlyoutItem.Icon>
+                                            <FontIcon Glyph="&#xECC9;" />
+                                        </MenuFlyoutItem.Icon>
+                                    </MenuFlyoutItem>
                                 </MenuFlyout>
                             </Grid.ContextFlyout>
 

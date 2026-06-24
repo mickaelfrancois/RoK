@@ -816,6 +816,24 @@
   <data name="trackFlyoutAddMoreFromArtist.Text" xml:space="preserve">
     <value>Ajouter plus de chansons de cet artiste</value>
   </data>
+  <data name="listeningFlyoutRemoveTrack.Text" xml:space="preserve">
+    <value>Retirer cette chanson de la file</value>
+  </data>
+  <data name="listeningFlyoutRemoveAlbum.Text" xml:space="preserve">
+    <value>Retirer cet album de la file</value>
+  </data>
+  <data name="listeningFlyoutRemoveArtist.Text" xml:space="preserve">
+    <value>Retirer cet artiste de la file</value>
+  </data>
+  <data name="listeningFlyoutRemoveGenre.Text" xml:space="preserve">
+    <value>Retirer ce genre de la file</value>
+  </data>
+  <data name="RemoveFromQueueConfirmationTitle" xml:space="preserve">
+    <value>Retirer de la file</value>
+  </data>
+  <data name="RemoveFromQueueConfirmation" xml:space="preserve">
+    <value>{0} titres seront retirés de la file. Continuer ?</value>
+  </data>
   <data name="welcomeWaiting.Text" xml:space="preserve">
     <value>Encore un petit instant, nous préparons vos données...</value>
   </data>

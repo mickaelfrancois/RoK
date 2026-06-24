@@ -757,6 +757,24 @@
   <data name="trackFlyoutAddMoreFromArtist.Text" xml:space="preserve">
     <value>Додати ще пісні цього виконавця</value>
   </data>
+  <data name="listeningFlyoutRemoveTrack.Text" xml:space="preserve">
+    <value>Прибрати цю пісню з черги</value>
+  </data>
+  <data name="listeningFlyoutRemoveAlbum.Text" xml:space="preserve">
+    <value>Прибрати цей альбом з черги</value>
+  </data>
+  <data name="listeningFlyoutRemoveArtist.Text" xml:space="preserve">
+    <value>Прибрати цього виконавця з черги</value>
+  </data>
+  <data name="listeningFlyoutRemoveGenre.Text" xml:space="preserve">
+    <value>Прибрати цей жанр з черги</value>
+  </data>
+  <data name="RemoveFromQueueConfirmationTitle" xml:space="preserve">
+    <value>Прибрати з черги</value>
+  </data>
+  <data name="RemoveFromQueueConfirmation" xml:space="preserve">
+    <value>З черги буде прибрано {0} пісень. Продовжити?</value>
+  </data>
   <data name="welcomeWaiting.Text" xml:space="preserve">
     <value>Ще хвилинку, ми готуємо ваші дані...</value>
   </data>
