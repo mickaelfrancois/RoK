@@ -732,4 +732,125 @@ public class TrackRepositoryTests
         // Assert
         Assert.Single(result);
     }
+
+    [Fact(DisplayName = "GetByAlbumIdAsync_WithManyAlbums_ReturnsTracksFromManyDistinctArtists")]
+    public async Task GetByAlbumIdAsync_WithManyAlbums_ReturnsTracksFromManyDistinctArtists()
+    {
+        // Arrange
+        // Seed 50 albums each belonging to a distinct artist, with 3 tracks each.
+        // Ids start at 9000+ to avoid collision with the global seed and other tests.
+        using SqliteDatabaseFixture fixture = CreateFixture();
+        TrackRepository repo = CreateRepository(fixture);
+        DateTime now = DateTime.UtcNow;
+        const int albumCount = 50;
+        const int tracksPerAlbum = 3;
+
+        var albumIds = new List<long>(albumCount);
+
+        for (int i = 0; i < albumCount; i++)
+        {
+            long artistId = 9000 + i;
+            long albumId = 9000 + i;
+
+            await fixture.Connection.ExecuteAsync(@"
+                INSERT INTO Artists(id, name, trackCount, albumCount, liveCount, compilationCount, bestofCount, totalDurationSeconds, disbanded, isFavorite, listenCount, creatDate)
+                VALUES (@artistId, @name, 0, 0, 0, 0, 0, 0, 0, 0, 0, @now)",
+                new { artistId, name = $"ManyArtist_{i}", now });
+
+            await fixture.Connection.ExecuteAsync(@"
+                INSERT INTO Albums(id, name, isLive, isCompilation, isBestof, trackCount, duration, isFavorite, listenCount, creatDate, artistId, genreId)
+                VALUES (@albumId, @name, 0, 0, 0, @trackCount, 600, 0, 0, @now, @artistId, 1)",
+                new { albumId, name = $"ManyAlbum_{i}", trackCount = tracksPerAlbum, artistId, now });
+
+            for (int t = 0; t < tracksPerAlbum; t++)
+            {
+                long trackId = 9000 + (i * tracksPerAlbum) + t;
+
+                await fixture.Connection.ExecuteAsync(@"
+                    INSERT INTO Tracks(id, title, duration, size, bitrate, musicFile, fileDate, isLive, score, listenCount, skipCount, creatDate, albumId, artistId, trackNumber)
+                    VALUES (@trackId, @title, 180, 1000, 128, @musicFile, @now, 0, 0, 0, 0, @now, @albumId, @artistId, @trackNumber)",
+                    new { trackId, title = $"Track_{i}_{t}", musicFile = $"/many/{trackId}", albumId, artistId, trackNumber = t + 1, now });
+            }
+
+            albumIds.Add(albumId);
+        }
+
+        // Act
+        List<TrackEntity> result = (await repo.GetByAlbumIdAsync(albumIds, limit: 100)).ToList();
+
+        // Assert
+        // The threshold is intentionally low relative to the expected value (~40 distinct artists)
+        // to absorb the variance of ORDER BY RANDOM() without flakiness.
+        // With 50 distinct artists and 150 candidate tracks, the probability of getting fewer
+        // than 25 distinct artists in a random draw of 100 is negligible.
+        int distinctArtistCount = result.Select(t => t.ArtistId).Distinct().Count();
+        Assert.True(distinctArtistCount >= 25,
+            $"Expected at least 25 distinct artists, but got {distinctArtistCount}. ORDER BY RANDOM() may be missing.");
+    }
+
+    [Fact(DisplayName = "GetByAlbumIdAsync_WithManyAlbums_TwoCallsProduceDifferentOrderings")]
+    public async Task GetByAlbumIdAsync_WithManyAlbums_TwoCallsProduceDifferentOrderings()
+    {
+        // Arrange
+        // Seed 50 albums each belonging to a distinct artist, with 3 tracks each.
+        // Ids start at 9500+ to avoid collision with the global seed and other tests.
+        using SqliteDatabaseFixture fixture = CreateFixture();
+        TrackRepository repo = CreateRepository(fixture);
+        DateTime now = DateTime.UtcNow;
+        const int albumCount = 50;
+        const int tracksPerAlbum = 3;
+
+        var albumIds = new List<long>(albumCount);
+
+        for (int i = 0; i < albumCount; i++)
+        {
+            long artistId = 9500 + i;
+            long albumId = 9500 + i;
+
+            await fixture.Connection.ExecuteAsync(@"
+                INSERT INTO Artists(id, name, trackCount, albumCount, liveCount, compilationCount, bestofCount, totalDurationSeconds, disbanded, isFavorite, listenCount, creatDate)
+                VALUES (@artistId, @name, 0, 0, 0, 0, 0, 0, 0, 0, 0, @now)",
+                new { artistId, name = $"OrderArtist_{i}", now });
+
+            await fixture.Connection.ExecuteAsync(@"
+                INSERT INTO Albums(id, name, isLive, isCompilation, isBestof, trackCount, duration, isFavorite, listenCount, creatDate, artistId, genreId)
+                VALUES (@albumId, @name, 0, 0, 0, @trackCount, 600, 0, 0, @now, @artistId, 1)",
+                new { albumId, name = $"OrderAlbum_{i}", trackCount = tracksPerAlbum, artistId, now });
+
+            for (int t = 0; t < tracksPerAlbum; t++)
+            {
+                long trackId = 9500 + (i * tracksPerAlbum) + t;
+
+                await fixture.Connection.ExecuteAsync(@"
+                    INSERT INTO Tracks(id, title, duration, size, bitrate, musicFile, fileDate, isLive, score, listenCount, skipCount, creatDate, albumId, artistId, trackNumber)
+                    VALUES (@trackId, @title, 180, 1000, 128, @musicFile, @now, 0, 0, 0, 0, @now, @albumId, @artistId, @trackNumber)",
+                    new { trackId, title = $"OrderTrack_{i}_{t}", musicFile = $"/order/{trackId}", albumId, artistId, trackNumber = t + 1, now });
+            }
+
+            albumIds.Add(albumId);
+        }
+
+        // Act
+        // Repeat a few times before concluding "identical": with ~150 candidate tracks and 100 drawn,
+        // the probability of two identical orderings is astronomically small — but we retry up to 3
+        // times to guard against any theoretical collision.
+        bool foundDifference = false;
+        for (int attempt = 0; attempt < 3; attempt++)
+        {
+            List<long> ids1 = (await repo.GetByAlbumIdAsync(albumIds, limit: 100))
+                .Select(t => t.Id).ToList();
+            List<long> ids2 = (await repo.GetByAlbumIdAsync(albumIds, limit: 100))
+                .Select(t => t.Id).ToList();
+
+            if (!ids1.SequenceEqual(ids2))
+            {
+                foundDifference = true;
+                break;
+            }
+        }
+
+        // Assert
+        Assert.True(foundDifference,
+            "Two successive calls to GetByAlbumIdAsync returned identical orderings across 3 attempts. ORDER BY RANDOM() may be missing.");
+    }
 }
