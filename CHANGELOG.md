@@ -1,5 +1,18 @@
 ﻿# ChangeLog
 
+## [1.15.0] Store – 24 juin 2026
+
+### Ajouté
+
+- Retrait de pistes de la file d'attente par titre, album, artiste ou genre.
+
+### Corrigé
+
+- File d'attente lue depuis plusieurs albums : meilleure diversité des artistes (la lecture ne ramène plus systématiquement les mêmes).
+- Correctif de sécurité du moteur de base de données SQLite et mise à jour des composants tiers.
+
+--
+
 ## [1.14.0] Store – 10 juin 2026
 
 ### Ajouté
