@@ -1,5 +1,6 @@
 ﻿using Microsoft.UI;
 using Microsoft.UI.Xaml.Controls;
+using Rok.Dialogs;
 using Windows.Foundation;
 using Windows.UI;
 using Windows.UI.Text;
@@ -8,6 +9,40 @@ namespace Rok.Services;
 
 public sealed class DialogService(ResourceLoader resourceLoader, ITranslateService translateService) : IDialogService
 {
+    public async Task<AlbumEditValues?> ShowEditAlbumAsync(AlbumEditValues current)
+    {
+        EditAlbumDialog dialog = new()
+        {
+            IsBestOf = current.IsBestOf,
+            IsLive = current.IsLive,
+            IsCompilation = current.IsCompilation,
+            MusicBrainzID = current.MusicBrainzID,
+            ReleaseGroupMusicBrainzId = current.ReleaseGroupMusicBrainzID,
+            IsLock = current.IsLock,
+            Biography = current.Biography,
+            LastFmUrl = current.LastFmUrl,
+
+            XamlRoot = App.MainWindow.Content.XamlRoot
+        };
+
+        ContentDialogResult result = await dialog.ShowAsync();
+
+        if (result != ContentDialogResult.Primary)
+            return null;
+
+        return new AlbumEditValues
+        {
+            IsBestOf = dialog.IsBestOf,
+            IsLive = dialog.IsLive,
+            IsCompilation = dialog.IsCompilation,
+            MusicBrainzID = dialog.MusicBrainzID,
+            ReleaseGroupMusicBrainzID = dialog.ReleaseGroupMusicBrainzId,
+            IsLock = dialog.IsLock,
+            Biography = dialog.Biography,
+            LastFmUrl = dialog.LastFmUrl
+        };
+    }
+
     public Task ShowTextAsync(string title, string content, bool showTranslateButton = false, string targetLanguage = "fr")
     {
         string closeButtonText = resourceLoader.GetString("Close");

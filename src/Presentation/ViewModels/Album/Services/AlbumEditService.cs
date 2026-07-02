@@ -1,30 +1,26 @@
-﻿using Microsoft.UI.Xaml.Controls;
-using Rok.Application.Features.Albums.Requests;
-using Rok.Dialogs;
+﻿using Rok.Application.Features.Albums.Requests;
 
 namespace Rok.ViewModels.Album.Services;
 
-public class AlbumEditService(IMediator mediator)
+public class AlbumEditService(IMediator mediator, IDialogService dialogService)
 {
     public async Task<bool> EditAlbumAsync(AlbumDto album)
     {
-        EditAlbumDialog dialog = new()
+        AlbumEditValues current = new()
         {
             IsBestOf = album.IsBestOf,
             IsLive = album.IsLive,
             IsCompilation = album.IsCompilation,
             MusicBrainzID = album.MusicBrainzID,
-            ReleaseGroupMusicBrainzId = album.ReleaseGroupMusicBrainzID,
+            ReleaseGroupMusicBrainzID = album.ReleaseGroupMusicBrainzID,
             IsLock = album.IsLock,
             Biography = album.Biography,
-            LastFmUrl = album.LastFmUrl,
-
-            XamlRoot = App.MainWindow.Content.XamlRoot
+            LastFmUrl = album.LastFmUrl
         };
 
-        ContentDialogResult result = await dialog.ShowAsync();
+        AlbumEditValues? edited = await dialogService.ShowEditAlbumAsync(current);
 
-        if (result != ContentDialogResult.Primary)
+        if (edited is null)
             return false;
 
         UpdateAlbumRequest command = new()
@@ -32,25 +28,25 @@ public class AlbumEditService(IMediator mediator)
             Id = album.Id,
         };
 
-        command.IsBestOf.Set(dialog.IsBestOf);
-        command.IsLive.Set(dialog.IsLive);
-        command.IsCompilation.Set(dialog.IsCompilation);
-        command.MusicBrainzID.Set(dialog.MusicBrainzID);
-        command.ReleaseGroupMusicBrainzID.Set(dialog.ReleaseGroupMusicBrainzId);
-        command.Biography.Set(dialog.Biography);
-        command.IsLock.Set(dialog.IsLock);
-        command.LastFmUrl.Set(dialog.LastFmUrl);
+        command.IsBestOf.Set(edited.IsBestOf);
+        command.IsLive.Set(edited.IsLive);
+        command.IsCompilation.Set(edited.IsCompilation);
+        command.MusicBrainzID.Set(edited.MusicBrainzID);
+        command.ReleaseGroupMusicBrainzID.Set(edited.ReleaseGroupMusicBrainzID);
+        command.Biography.Set(edited.Biography);
+        command.IsLock.Set(edited.IsLock);
+        command.LastFmUrl.Set(edited.LastFmUrl);
 
         await mediator.Send(command);
 
-        album.IsBestOf = dialog.IsBestOf;
-        album.IsLive = dialog.IsLive;
-        album.IsCompilation = dialog.IsCompilation;
-        album.MusicBrainzID = dialog.MusicBrainzID;
-        album.ReleaseGroupMusicBrainzID = dialog.ReleaseGroupMusicBrainzId;
-        album.Biography = dialog.Biography;
-        album.IsLock = dialog.IsLock;
-        album.LastFmUrl = dialog.LastFmUrl;
+        album.IsBestOf = edited.IsBestOf;
+        album.IsLive = edited.IsLive;
+        album.IsCompilation = edited.IsCompilation;
+        album.MusicBrainzID = edited.MusicBrainzID;
+        album.ReleaseGroupMusicBrainzID = edited.ReleaseGroupMusicBrainzID;
+        album.Biography = edited.Biography;
+        album.IsLock = edited.IsLock;
+        album.LastFmUrl = edited.LastFmUrl;
 
         return true;
     }
