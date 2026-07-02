@@ -88,8 +88,11 @@ public class TrackRepository(IDbConnection db, [FromKeyedServices("BackgroundCon
     {
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(albumId);
 
+        // A single album plays in its track order; the multi-album overload below randomizes for cross-album diversity.
         string sql = GetSelectQuery() +
-                     "WHERE tracks.albumId = @albumId " + DefaultGroupBy;
+                     "WHERE tracks.albumId = @albumId " +
+                     DefaultGroupBy +
+                     " ORDER BY tracks.trackNumber ASC";
 
         return await ExecuteQueryAsync(sql, kind, new { albumId });
     }

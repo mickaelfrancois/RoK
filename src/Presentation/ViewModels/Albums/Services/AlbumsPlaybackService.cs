@@ -8,13 +8,17 @@ public class AlbumsPlaybackService(IMediator mediator, IPlayerService playerServ
 {
     public async Task PlayAlbumsAsync(IEnumerable<long> albumIds)
     {
-        if (!albumIds.Any())
+        var ids = albumIds.ToList();
+
+        if (ids.Count == 0)
         {
             logger.LogDebug("No track to listen.");
             return;
         }
 
-        var tracks = (await mediator.Send(new GetTracksByAlbumListRequest { AlbumsId = albumIds.ToList() })).ToList();
+        var tracks = ids.Count == 1
+            ? (await mediator.Send(new GetTracksByAlbumIdRequest(ids[0]))).ToList()
+            : (await mediator.Send(new GetTracksByAlbumListRequest { AlbumsId = ids })).ToList();
 
         if (tracks.Count == 0)
         {
@@ -22,7 +26,7 @@ public class AlbumsPlaybackService(IMediator mediator, IPlayerService playerServ
             return;
         }
 
-        if (albumIds.Count() > 1)
+        if (ids.Count > 1)
             TracksRandomizer.ArtistBalancedTrackRandomize(tracks, 0);
 
         playerService.LoadPlaylist(tracks.ToList());
