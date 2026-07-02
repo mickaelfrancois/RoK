@@ -289,6 +289,36 @@ public class TrackRepositoryTests
     }
 
     [Fact]
+    public async Task GetByAlbumIdAsync_WithSingleAlbum_ReturnsTracksOrderedByTrackNumber()
+    {
+        // Arrange
+        using SqliteDatabaseFixture fixture = CreateFixture();
+        TrackRepository repo = CreateRepository(fixture);
+        DateTime now = DateTime.UtcNow;
+        long testAlbumId = 8210;
+
+        await fixture.Connection.ExecuteAsync(@"
+            INSERT INTO Albums(id, name, isLive, isCompilation, isBestof, trackCount, duration, isFavorite, listenCount, creatDate, artistId, genreId)
+            VALUES (@albumId, 'Ordered Album', 0, 0, 0, 3, 600, 0, 0, @now, 1, 1)",
+            new { albumId = testAlbumId, now });
+
+        // Insert tracks with ascending ids but track numbers out of order (3, 1, 2).
+        await fixture.Connection.ExecuteAsync(@"
+            INSERT INTO Tracks(id, title, duration, size, bitrate, musicFile, fileDate, isLive, score, listenCount, skipCount, creatDate, albumId, artistId, trackNumber)
+            VALUES
+            (8211, 'Third', 180, 1000, 128, '/test8211', @now, 0, 0, 0, 0, @now, @albumId, 1, 3),
+            (8212, 'First', 200, 1200, 128, '/test8212', @now, 0, 0, 0, 0, @now, @albumId, 1, 1),
+            (8213, 'Second', 200, 1200, 128, '/test8213', @now, 0, 0, 0, 0, @now, @albumId, 1, 2)",
+            new { albumId = testAlbumId, now });
+
+        // Act
+        List<TrackEntity> result = (await repo.GetByAlbumIdAsync(testAlbumId)).ToList();
+
+        // Assert
+        Assert.Equal(new int?[] { 1, 2, 3 }, result.Select(t => t.TrackNumber));
+    }
+
+    [Fact]
     public async Task GetByAlbumIdAsync_WithInvalidAlbumId_ThrowsArgumentOutOfRangeException()
     {
         // Arrange
