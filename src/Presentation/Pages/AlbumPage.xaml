@@ -42,9 +42,9 @@
                 <HyperlinkButton x:Name="artistName" Style="{StaticResource HeaderHyperlinkStyle}" Content="{x:Bind ViewModel.Album.ArtistName}" RelativePanel.Below="albumName" Command="{x:Bind ViewModel.ArtistOpenCommand}" />
 
                 <StackPanel x:Name="albumType" RelativePanel.RightOf="albumName" RelativePanel.AlignVerticalCenterWith="albumName" Orientation="Horizontal" Margin="4,0,0,0">
-                    <common:BadgeControl x:Uid="badgeLive" Visibility="{x:Bind ViewModel.Album.IsLive, Converter={StaticResource BoolToVisibilityConverter}}" BadgeBackground="{StaticResource BadgeLiveBrush}"/>
-                    <common:BadgeControl x:Uid="badgeBestof" Visibility="{x:Bind ViewModel.Album.IsBestOf, Converter={StaticResource BoolToVisibilityConverter}}" BadgeBackground="{StaticResource BadgeBestOfBrush}" />
-                    <common:BadgeControl x:Uid="badgeCompilation" Visibility="{x:Bind ViewModel.Album.IsCompilation, Converter={StaticResource BoolToVisibilityConverter}}" BadgeBackground="{StaticResource BadgeCompilationBrush}" />
+                    <common:BadgeControl x:Uid="badgeLive" Visibility="{x:Bind ViewModel.Album.IsLive, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" BadgeBackground="{StaticResource BadgeLiveBrush}"/>
+                    <common:BadgeControl x:Uid="badgeBestof" Visibility="{x:Bind ViewModel.Album.IsBestOf, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" BadgeBackground="{StaticResource BadgeBestOfBrush}" />
+                    <common:BadgeControl x:Uid="badgeCompilation" Visibility="{x:Bind ViewModel.Album.IsCompilation, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" BadgeBackground="{StaticResource BadgeCompilationBrush}" />
                     <common:BadgeControl x:Uid="badgeNew" Visibility="{x:Bind ViewModel.ShowNewBadge, Converter={StaticResource BoolToVisibilityConverter}}" BadgeBackground="{StaticResource BadgeNewBrush}" />
                     <common:BadgeControl x:Uid="badgeAnniversary" Visibility="{x:Bind ViewModel.ShowAnniversaryBadge, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" BadgeBackground="{StaticResource BadgeAnniversaryBrush}" ToolTipService.ToolTip="{x:Bind ViewModel.AnniversaryTooltip, Mode=OneWay}" />
                 </StackPanel>
@@ -69,7 +69,7 @@
                 <CommandBar RelativePanel.AlignBottomWithPanel="True" RelativePanel.AlignLeftWith="albumName" Style="{StaticResource HeaderCommandBarStyle}">
                     <AppBarButton x:Uid="albumViewListen" Style="{StaticResource ListenAppBarButtonStyle}" Command="{x:Bind ViewModel.ListenCommand}" />
                     <AppBarToggleButton x:Uid="albumViewLike" x:Name="albumAppBarLike" Style="{StaticResource HeaderLikeButtonStyle}" IsChecked="{x:Bind ViewModel.IsFavorite, Mode=OneWay}" Command="{x:Bind ViewModel.AlbumFavoriteCommand}" />
-                    <AppBarButton x:Uid="albumViewBiography" Style="{StaticResource HeaderGenericButtonStyle}" Icon="Library" Command="{x:Bind ViewModel.OpenBiographyCommand}" Visibility="{x:Bind ViewModel.Album.Biography, Converter={StaticResource StringToVisibilityConverter}}" />
+                    <AppBarButton x:Uid="albumViewBiography" Style="{StaticResource HeaderGenericButtonStyle}" Icon="Library" Command="{x:Bind ViewModel.OpenBiographyCommand}" Visibility="{x:Bind ViewModel.Album.Biography, Mode=OneWay, Converter={StaticResource StringToVisibilityConverter}}" />
                     <AppBarButton x:Uid="albumViewPlaylist" Style="{StaticResource HeaderGenericButtonStyle}" Icon="Add">
                         <AppBarButton.Flyout>
                             <MenuFlyout x:Name="albumPlaylistFlyout" common:MenuFlyoutExtensions.PlaylistMenuService="{x:Bind ViewModel.PlaylistMenuService}" common:MenuFlyoutExtensions.AlbumId="{x:Bind ViewModel.Album.Id}" common:MenuFlyoutExtensions.FlattenPlaylistMenu="True" />
