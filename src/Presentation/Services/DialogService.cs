@@ -43,6 +43,38 @@ public sealed class DialogService(ResourceLoader resourceLoader, ITranslateServi
         };
     }
 
+    public async Task<ArtistEditValues?> ShowEditArtistAsync(ArtistEditValues current)
+    {
+        EditArtistDialog dialog = new()
+        {
+            MusicBrainzID = current.MusicBrainzID,
+            FormedYear = current.FormedYear,
+            BornYear = current.BornYear,
+            DiedYear = current.DiedYear,
+            Disbanded = current.Disbanded,
+            Members = current.Members,
+            Biography = current.Biography,
+
+            XamlRoot = App.MainWindow.Content.XamlRoot
+        };
+
+        ContentDialogResult result = await dialog.ShowAsync();
+
+        if (result != ContentDialogResult.Primary)
+            return null;
+
+        return new ArtistEditValues
+        {
+            MusicBrainzID = dialog.MusicBrainzID,
+            FormedYear = dialog.FormedYear,
+            BornYear = dialog.BornYear,
+            DiedYear = dialog.DiedYear,
+            Disbanded = dialog.Disbanded,
+            Members = dialog.Members,
+            Biography = dialog.Biography
+        };
+    }
+
     public Task ShowTextAsync(string title, string content, bool showTranslateButton = false, string targetLanguage = "fr")
     {
         string closeButtonText = resourceLoader.GetString("Close");

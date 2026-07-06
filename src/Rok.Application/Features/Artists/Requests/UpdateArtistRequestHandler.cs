@@ -98,8 +98,7 @@ public class UpdateArtistRequestHandler(IArtistRepository _artistRepository) : I
         entity.Members = command.Members;
         entity.SimilarArtists = command.SimilarArtists;
 
-        if (!string.IsNullOrWhiteSpace(command.Biography))
-            entity.Biography = command.Biography;
+        entity.Biography = command.Biography;
 
         bool result = await _artistRepository.UpdateAsync(entity);
 

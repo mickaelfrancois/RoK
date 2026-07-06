@@ -1035,6 +1035,21 @@
   <data name="EditAlbumDialog.CloseButtonText" xml:space="preserve">
     <value>Annuler</value>
   </data>
+  <data name="EditArtistDialog.Title" xml:space="preserve">
+    <value>Modification artiste</value>
+  </data>
+  <data name="EditArtistDialog.PrimaryButtonText" xml:space="preserve">
+    <value>Enregistrer</value>
+  </data>
+  <data name="EditArtistDialog.CloseButtonText" xml:space="preserve">
+    <value>Annuler</value>
+  </data>
+  <data name="disbandedSwitch.OnContent" xml:space="preserve">
+    <value>Séparé</value>
+  </data>
+  <data name="disbandedSwitch.OffContent" xml:space="preserve">
+    <value>Séparé</value>
+  </data>
   <data name="liveSwitch.OnContent" xml:space="preserve">
     <value>Live</value>
   </data>

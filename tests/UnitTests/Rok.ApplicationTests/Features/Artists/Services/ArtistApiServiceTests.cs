@@ -202,6 +202,46 @@ public class ArtistApiServiceTests
         _musicData.Verify(m => m.DownloadArtistBackdropsAsync(It.IsAny<MusicDataArtistDto>(), It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.Never);
     }
 
+    [Fact(DisplayName = "GetAndUpdateArtistDataAsync should preserve the existing biography when the API returns a different one")]
+    public async Task GetAndUpdateArtistDataAsync_ShouldPreserveExistingBiography_WhenApiBiographyDiffers()
+    {
+        // Arrange
+        ArtistDto artist = new() { Id = 1, Name = "Beatles", Biography = "manual bio", FlickrUrl = "old-flickr" };
+        MusicDataArtistDto artistApi = new() { MusicBrainzID = "mbid", Biography = "api bio", Flickr = "new-flickr" };
+        _musicData.Setup(m => m.IsApiRetryAllowed(It.IsAny<DateTime?>())).Returns(true);
+        _musicData.Setup(m => m.GetArtistAsync(It.IsAny<string>(), It.IsAny<string?>())).ReturnsAsync(artistApi);
+        _pictureService.Setup(p => p.PictureExists(artist.Name)).Returns(true);
+        _backdropPicture.Setup(b => b.HasBackdrops(artist.Name)).Returns(true);
+        ArtistApiService sut = BuildService();
+
+        // Act
+        await sut.GetAndUpdateArtistDataAsync(artist, _pictureService.Object, _backdropPicture.Object);
+
+        // Assert
+        UpdateArtistRequest sent = Assert.Single(_mediator.Sent<UpdateArtistRequest>());
+        Assert.Equal("manual bio", sent.Biography);
+    }
+
+    [Fact(DisplayName = "GetAndUpdateArtistDataAsync should adopt the API biography when the current one is empty")]
+    public async Task GetAndUpdateArtistDataAsync_ShouldAdoptApiBiography_WhenCurrentIsEmpty()
+    {
+        // Arrange
+        ArtistDto artist = new() { Id = 1, Name = "Beatles", Biography = string.Empty, FlickrUrl = "old-flickr" };
+        MusicDataArtistDto artistApi = new() { MusicBrainzID = "mbid", Biography = "api bio", Flickr = "new-flickr" };
+        _musicData.Setup(m => m.IsApiRetryAllowed(It.IsAny<DateTime?>())).Returns(true);
+        _musicData.Setup(m => m.GetArtistAsync(It.IsAny<string>(), It.IsAny<string?>())).ReturnsAsync(artistApi);
+        _pictureService.Setup(p => p.PictureExists(artist.Name)).Returns(true);
+        _backdropPicture.Setup(b => b.HasBackdrops(artist.Name)).Returns(true);
+        ArtistApiService sut = BuildService();
+
+        // Act
+        await sut.GetAndUpdateArtistDataAsync(artist, _pictureService.Object, _backdropPicture.Object);
+
+        // Assert
+        UpdateArtistRequest sent = Assert.Single(_mediator.Sent<UpdateArtistRequest>());
+        Assert.Equal("api bio", sent.Biography);
+    }
+
     [Fact(DisplayName = "GetAndUpdateArtistDataAsync should report PictureDownloaded independently of DataUpdated")]
     public async Task GetAndUpdateArtistDataAsync_ShouldReportPictureDownloaded_EvenWhenNoDataChanged()
     {
