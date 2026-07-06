@@ -3,12 +3,12 @@ using System.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Rok.Application.Features.Artists.Services;
+using Rok.Application.Features.ListeningEvents;
 using Rok.Application.Features.Playlists.PlaylistMenu;
 using Rok.Application.Player;
 using Rok.Application.Randomizer;
 using Rok.Application.Services.Filters;
 using Rok.Application.Services.Grouping;
-using Rok.Application.Features.ListeningEvents;
 using Rok.Commons;
 using Rok.Infrastructure.Files;
 using Rok.ViewModels.Album;
@@ -581,6 +581,18 @@ public partial class ArtistViewModel : ObservableObject, IFilterableArtist, IGro
     private Task OpenOfficialSiteAsync()
     {
         return _editService.OpenOfficialSiteAsync(Artist);
+    }
+
+    [RelayCommand]
+    private async Task EditArtistAsync()
+    {
+        bool updated = await _editService.EditArtistAsync(Artist);
+
+        if (!updated)
+            return;
+
+        _messenger.Send(new ArtistUpdateMessage(Artist.Id, ActionType.Update));
+        OnPropertyChanged(nameof(Artist));
     }
 
     [RelayCommand]

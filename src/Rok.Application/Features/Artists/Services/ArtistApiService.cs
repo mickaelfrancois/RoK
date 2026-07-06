@@ -96,8 +96,7 @@ public class ArtistApiService(
             DiedYear = artistApi.EndYear ?? artist.DiedYear,
         };
 
-        if (string.IsNullOrEmpty(artist.Biography))
-            command.Biography = artistApi.Biography;
+        command.Biography = string.IsNullOrEmpty(artist.Biography) ? artistApi.Biography : artist.Biography;
 
         await mediator.Send(command);
 

@@ -75,6 +75,7 @@
                     <AppBarButton x:Uid="artistViewListen" Style="{StaticResource ListenAppBarButtonStyle}" Command="{x:Bind ViewModel.ListenCommand}" />
                     <AppBarToggleButton x:Uid="artistViewLike" x:Name="artistAppBarLike" Style="{StaticResource HeaderLikeButtonStyle}" IsChecked="{x:Bind ViewModel.IsFavorite, Mode=OneWay}" Command="{x:Bind ViewModel.ArtistFavoriteCommand}" />
                     <AppBarButton x:Uid="artistViewBiography" Style="{StaticResource HeaderGenericButtonStyle}" Icon="Library" Command="{x:Bind ViewModel.OpenBiographyCommand}" Visibility="{x:Bind ViewModel.Artist.Biography, Converter={StaticResource StringToVisibilityConverter}}" />
+                    <AppBarButton x:Uid="artistViewEdit" Style="{StaticResource HeaderGenericButtonStyle}" Icon="Edit" Command="{x:Bind ViewModel.EditArtistCommand}" />
                     <AppBarButton x:Uid="albumViewPlaylist" Style="{StaticResource HeaderGenericButtonStyle}" Icon="Add">
                         <AppBarButton.Flyout>
                             <MenuFlyout x:Name="albumPlaylistFlyout" common:MenuFlyoutExtensions.PlaylistMenuService="{x:Bind ViewModel.PlaylistMenuService}" common:MenuFlyoutExtensions.ArtistId="{x:Bind ViewModel.Artist.Id}" common:MenuFlyoutExtensions.FlattenPlaylistMenu="True" />

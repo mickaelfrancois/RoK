@@ -1,0 +1,78 @@
+<ContentDialog x:Class="Rok.Dialogs.EditArtistDialog"
+               xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+               xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+               xmlns:local="using:Rok.Dialogs"
+               x:Uid="EditArtistDialog"
+               Title=""
+               MinWidth="900"
+               MaxWidth="900"
+               Width="900"
+               PrimaryButtonText=""
+               CloseButtonText="">
+
+    <StackPanel>
+        <StackPanel Orientation="Horizontal">
+            <ToggleSwitch x:Uid="disbandedSwitch"
+                          IsOn="{x:Bind Disbanded, Mode=TwoWay}"></ToggleSwitch>
+        </StackPanel>
+        <MenuFlyoutSeparator></MenuFlyoutSeparator>
+
+        <TextBlock x:Uid="artistMusicBrainzId"
+                   Margin="0,8,0,0"
+                   Text="MusicBrainz ID"></TextBlock>
+        <TextBox x:Uid="artistMusicBrainzIdInput"
+                 Text="{x:Bind MusicBrainzID, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                 Margin="0,4,0,0"></TextBox>
+
+        <StackPanel Orientation="Horizontal" Spacing="16">
+            <StackPanel Width="180">
+                <TextBlock x:Uid="artistFormedYear"
+                           Margin="0,8,0,0"
+                           Text="Formed year" />
+                <TextBox x:Uid="artistFormedYearInput"
+                         Text="{x:Bind FormedYear, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                         Margin="0,4,0,0" />
+            </StackPanel>
+            <StackPanel Width="180">
+                <TextBlock x:Uid="artistBornYear"
+                           Margin="0,8,0,0"
+                           Text="Born year" />
+                <TextBox x:Uid="artistBornYearInput"
+                         Text="{x:Bind BornYear, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                         Margin="0,4,0,0" />
+            </StackPanel>
+            <StackPanel Width="180">
+                <TextBlock x:Uid="artistDiedYear"
+                           Margin="0,8,0,0"
+                           Text="Died year" />
+                <TextBox x:Uid="artistDiedYearInput"
+                         Text="{x:Bind DiedYear, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                         Margin="0,4,0,0" />
+            </StackPanel>
+        </StackPanel>
+
+        <TextBlock x:Uid="artistMembers"
+                   Margin="0,8,0,0"
+                   Text="Members" />
+        <TextBox x:Uid="artistMembersInput"
+                 Text="{x:Bind Members, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                 TextWrapping="Wrap"
+                 AcceptsReturn="True"
+                 Height="80"
+                 ScrollViewer.VerticalScrollBarVisibility="Auto"
+                 Margin="0,4,0,0" />
+
+        <TextBlock x:Uid="artistBiography"
+                   Margin="0,8,0,0"
+                   Text="Informations" />
+        <TextBox x:Uid="artistBiographyInput"
+                 Text="{x:Bind Biography, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                 TextWrapping="Wrap"
+                 AcceptsReturn="True"
+                 Height="200"
+                 Width="600"
+                 ScrollViewer.VerticalScrollBarVisibility="Auto"
+                 Margin="0,4,0,0"></TextBox>
+
+    </StackPanel>
+</ContentDialog>

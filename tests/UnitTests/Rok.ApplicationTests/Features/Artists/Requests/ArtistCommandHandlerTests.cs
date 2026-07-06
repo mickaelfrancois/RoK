@@ -63,8 +63,8 @@ public class UpdateArtistRequestHandlerTests
         Assert.True(entity.Disbanded);
     }
 
-    [Fact(DisplayName = "Handle should keep existing biography when new biography is blank")]
-    public async Task Handle_ShouldKeepExistingBiography_WhenNewBiographyIsBlank()
+    [Fact(DisplayName = "Handle should clear biography when command biography is blank")]
+    public async Task Handle_ShouldClearBiography_WhenCommandBiographyIsBlank()
     {
         // Arrange
         ArtistEntity entity = new() { Id = 1, Biography = "original bio" };
@@ -78,7 +78,7 @@ public class UpdateArtistRequestHandlerTests
 
         // Assert
         result.Should().BeSuccess();
-        Assert.Equal("original bio", entity.Biography);
+        Assert.Equal("  ", entity.Biography);
     }
 
     [Fact(DisplayName = "Handle should return failure when artist is not found")]
