@@ -1,5 +1,18 @@
 ﻿# ChangeLog
 
+## [1.16.0] Store – 9 juillet 2026
+
+### Ajouté
+
+- Édition manuelle des artistes via une boîte de dialogue dédiée.
+
+### Corrigé
+
+- Prise en compte des modifications enregistrées sur la page de détail d'un album.
+- Ordre des titres préservé lors de la lecture d'un album unique.
+
+--
+
 ## [1.15.0] Store – 24 juin 2026
 
 ### Ajouté
