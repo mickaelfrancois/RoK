@@ -25,6 +25,7 @@ public static class PlaylistHeadeDtoMapping
             GroupsJson = entity.GroupsJson,
             Type = entity.Type,
             ShuffleOnPlay = entity.ShuffleOnPlay,
+            RefreshOnPlay = entity.RefreshOnPlay,
             Groups = groups
         };
     }
@@ -55,7 +56,8 @@ public static class PlaylistHeadeDtoMapping
             DurationMaximum = command.DurationMaximum,
             GroupsJson = command.Groups is { Count: > 0 } ? JsonSerializer.Serialize(command.Groups) : string.Empty,
             Type = command.Type,
-            ShuffleOnPlay = command.ShuffleOnPlay
+            ShuffleOnPlay = command.ShuffleOnPlay,
+            RefreshOnPlay = command.RefreshOnPlay
         };
     }
 
@@ -85,6 +87,7 @@ public static class PlaylistHeadeDtoMapping
             DurationMaximum = dto.DurationMaximum,
             Type = dto.Type,
             ShuffleOnPlay = dto.ShuffleOnPlay,
+            RefreshOnPlay = dto.RefreshOnPlay,
             Groups = dto.Groups ?? new List<PlaylistGroupDto>()
         };
     }

@@ -1,3 +1,4 @@
+using Rok.Application.Features.Playlists;
 using Rok.Application.Features.Playlists.Requests;
 using Rok.ViewModels.Track;
 
@@ -29,18 +30,11 @@ public class PlaylistUpdateService(
             DurationMaximum = playlist.DurationMaximum,
             Picture = track?.ArtistName!,
             Groups = groups ?? playlist.Groups,
-            ShuffleOnPlay = playlist.ShuffleOnPlay
+            ShuffleOnPlay = playlist.ShuffleOnPlay,
+            RefreshOnPlay = playlist.RefreshOnPlay
         };
 
-        bool hasChanges = forceUpdate ||
-            command.Name != playlist.Name ||
-            command.Duration != playlist.Duration ||
-            command.TrackCount != playlist.TrackCount ||
-            command.TrackMaximum != playlist.TrackMaximum ||
-            command.DurationMaximum != playlist.DurationMaximum ||
-            command.Picture != playlist.Picture ||
-            command.Groups != playlist.Groups ||
-            command.ShuffleOnPlay != playlist.ShuffleOnPlay;
+        bool hasChanges = forceUpdate || await HasChangesAsync(command, playlist.Id);
 
         if (!hasChanges)
             return false;
@@ -64,10 +58,21 @@ public class PlaylistUpdateService(
         playlist.DurationMaximum = command.DurationMaximum;
         playlist.Groups = command.Groups;
         playlist.ShuffleOnPlay = command.ShuffleOnPlay;
+        playlist.RefreshOnPlay = command.RefreshOnPlay;
 
         messenger.Send(new PlaylistUpdatedMessage(playlist.Id, ActionType.Update));
 
         return true;
+    }
+
+    private async Task<bool> HasChangesAsync(UpdatePlaylistRequest command, long playlistId)
+    {
+        Result<PlaylistHeaderDto> persistedResult = await mediator.Send(new GetPlaylistByIdRequest(playlistId));
+
+        if (persistedResult.IsFailure)
+            return true;
+
+        return PlaylistHeaderChangeDetector.HasChanges(command, persistedResult.Value);
     }
 
     public async Task<bool> RemoveTrackAsync(long playlistId, long trackId)

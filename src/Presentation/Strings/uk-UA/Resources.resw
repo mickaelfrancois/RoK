@@ -962,6 +962,9 @@
   <data name="shuffleOnPlayButton.Label" xml:space="preserve">
     <value>Випадкове відтворення</value>
   </data>
+  <data name="refreshOnPlayButton.Label" xml:space="preserve">
+    <value>Оновити перед відтворенням</value>
+  </data>
   <data name="NoLibraryFoldersTitleMessage" xml:space="preserve">
     <value>Немає бібліотеки</value>
   </data>

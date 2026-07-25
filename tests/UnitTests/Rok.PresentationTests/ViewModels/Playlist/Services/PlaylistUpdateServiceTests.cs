@@ -24,8 +24,10 @@ public class PlaylistUpdateServiceTests
     [Fact(DisplayName = "SavePlaylistAsync should not call mediator when nothing has changed and forceUpdate is false")]
     public async Task SavePlaylistAsync_ShouldSkip_WhenNoChange()
     {
-        // Arrange — no track means command.Picture is null, so playlist.Picture must be null too for "no change"
+        // Arrange — persisted state mirrors the current playlist in every compared field
         PlaylistHeaderDto playlist = new() { Id = 1, Name = "Mix", Picture = null!, Duration = 0, TrackCount = 0, TrackMaximum = 0, DurationMaximum = 0 };
+        PlaylistHeaderDto persisted = new() { Id = 1, Name = "Mix", Picture = string.Empty, Duration = 0, TrackCount = 0, TrackMaximum = 0, DurationMaximum = 0 };
+        _mediator.Setup<GetPlaylistByIdRequest, Result<PlaylistHeaderDto>>().Returns(Result<PlaylistHeaderDto>.Ok(persisted));
         PlaylistUpdateService sut = BuildService();
 
         // Act
@@ -68,6 +70,75 @@ public class PlaylistUpdateServiceTests
         UpdatePlaylistRequest sent = Assert.Single(_mediator.Sent<UpdatePlaylistRequest>());
         Assert.True(sent.ShuffleOnPlay);
         Assert.True(playlist.ShuffleOnPlay);
+    }
+
+    [Fact(DisplayName = "SavePlaylistAsync should carry RefreshOnPlay into the update request and persist it on the playlist")]
+    public async Task SavePlaylistAsync_ShouldCarryRefreshOnPlay_IntoRequestAndPlaylist()
+    {
+        // Arrange
+        PlaylistHeaderDto playlist = new() { Id = 1, Name = "Mix", RefreshOnPlay = true };
+        _mediator.Setup<UpdatePlaylistRequest, Result>().Returns(Result.Ok());
+        PlaylistUpdateService sut = BuildService();
+
+        // Act
+        await sut.SavePlaylistAsync(playlist, Array.Empty<TrackViewModel>(), forceUpdate: true);
+
+        // Assert
+        UpdatePlaylistRequest sent = Assert.Single(_mediator.Sent<UpdatePlaylistRequest>());
+        Assert.True(sent.RefreshOnPlay);
+        Assert.True(playlist.RefreshOnPlay);
+    }
+
+    [Fact(DisplayName = "SavePlaylistAsync should reread persisted state and write when only a toggle changed")]
+    public async Task SavePlaylistAsync_ShouldRereadAndWrite_WhenOnlyToggleChanged()
+    {
+        // Arrange
+        PlaylistHeaderDto playlist = new() { Id = 1, Name = "Mix", Picture = string.Empty, RefreshOnPlay = true };
+        PlaylistHeaderDto persisted = new() { Id = 1, Name = "Mix", Picture = string.Empty, RefreshOnPlay = false };
+        _mediator.Setup<GetPlaylistByIdRequest, Result<PlaylistHeaderDto>>().Returns(Result<PlaylistHeaderDto>.Ok(persisted));
+        _mediator.Setup<UpdatePlaylistRequest, Result>().Returns(Result.Ok());
+        PlaylistUpdateService sut = BuildService();
+
+        // Act
+        bool result = await sut.SavePlaylistAsync(playlist, Array.Empty<TrackViewModel>(), forceUpdate: false);
+
+        // Assert
+        Assert.True(result);
+        UpdatePlaylistRequest sent = Assert.Single(_mediator.Sent<UpdatePlaylistRequest>());
+        Assert.True(sent.RefreshOnPlay);
+    }
+
+    [Fact(DisplayName = "SavePlaylistAsync should write when the reread of the persisted state fails")]
+    public async Task SavePlaylistAsync_ShouldWrite_WhenRereadFails()
+    {
+        // Arrange
+        PlaylistHeaderDto playlist = new() { Id = 1, Name = "Mix" };
+        _mediator.Setup<GetPlaylistByIdRequest, Result<PlaylistHeaderDto>>().Returns(Result<PlaylistHeaderDto>.Fail(new OperationError("playlist.not_found", "not found")));
+        _mediator.Setup<UpdatePlaylistRequest, Result>().Returns(Result.Ok());
+        PlaylistUpdateService sut = BuildService();
+
+        // Act
+        bool result = await sut.SavePlaylistAsync(playlist, Array.Empty<TrackViewModel>(), forceUpdate: false);
+
+        // Assert
+        Assert.True(result);
+        Assert.Single(_mediator.Sent<UpdatePlaylistRequest>());
+    }
+
+    [Fact(DisplayName = "SavePlaylistAsync should not reread persisted state when forceUpdate is true")]
+    public async Task SavePlaylistAsync_ShouldNotReread_WhenForced()
+    {
+        // Arrange
+        PlaylistHeaderDto playlist = new() { Id = 1, Name = "Mix" };
+        _mediator.Setup<UpdatePlaylistRequest, Result>().Returns(Result.Ok());
+        PlaylistUpdateService sut = BuildService();
+
+        // Act
+        bool result = await sut.SavePlaylistAsync(playlist, Array.Empty<TrackViewModel>(), forceUpdate: true);
+
+        // Assert
+        Assert.True(result);
+        Assert.Empty(_mediator.Sent<GetPlaylistByIdRequest>());
     }
 
     [Fact(DisplayName = "SavePlaylistAsync should return false when the mediator returns an error")]

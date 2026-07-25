@@ -86,6 +86,22 @@ public class UpdatePlaylistRequestHandlerTests
         result.Should().BeSuccess();
         repository.Verify(r => r.UpdateAsync(It.Is<PlaylistHeaderEntity>(e => e.ShuffleOnPlay), It.IsAny<RepositoryConnectionKind>()), Times.Once);
     }
+
+    [Fact(DisplayName = "Handle should pass refresh on play flag to repository")]
+    public async Task Handle_ShouldPassRefreshOnPlayToRepository()
+    {
+        // Arrange
+        Mock<IPlaylistHeaderRepository> repository = new();
+        repository.Setup(r => r.UpdateAsync(It.IsAny<PlaylistHeaderEntity>(), It.IsAny<RepositoryConnectionKind>())).ReturnsAsync(true);
+        UpdatePlaylistRequestHandler handler = new(repository.Object, Mock.Of<ILogger<UpdatePlaylistRequestHandler>>());
+
+        // Act
+        Result result = await handler.Handle(new UpdatePlaylistRequest { Id = 1, Name = "N", RefreshOnPlay = true }, CancellationToken.None);
+
+        // Assert
+        result.Should().BeSuccess();
+        repository.Verify(r => r.UpdateAsync(It.Is<PlaylistHeaderEntity>(e => e.RefreshOnPlay), It.IsAny<RepositoryConnectionKind>()), Times.Once);
+    }
 }
 
 public class DeletePlaylistRequestHandlerTests

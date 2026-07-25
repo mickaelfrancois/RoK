@@ -138,4 +138,27 @@ public class PlaylistHeaderRepositoryTests
         Assert.NotNull(fetched);
         Assert.True(fetched!.ShuffleOnPlay);
     }
+
+    [Fact(DisplayName = "Update should persist and reread RefreshOnPlay through GetSelectQuery")]
+    public async Task Update_ShouldPersistAndRereadRefreshOnPlay_ThroughGetSelectQuery()
+    {
+        // Arrange
+        using SqliteDatabaseFixture fixture = new();
+        PlaylistHeaderRepository repo = CreateRepository(fixture);
+        PlaylistHeaderEntity entity = new() { Name = "Refreshed", Type = 0, CreatDate = DateTime.UtcNow, RefreshOnPlay = false };
+        long id = await repo.AddAsync(entity);
+        PlaylistHeaderEntity? added = await repo.GetByIdAsync(id);
+        Assert.False(added!.RefreshOnPlay);
+
+        added.RefreshOnPlay = true;
+
+        // Act
+        bool updated = await repo.UpdateAsync(added);
+
+        // Assert
+        Assert.True(updated);
+        PlaylistHeaderEntity? fetched = await repo.GetByIdAsync(id);
+        Assert.NotNull(fetched);
+        Assert.True(fetched!.RefreshOnPlay);
+    }
 }
