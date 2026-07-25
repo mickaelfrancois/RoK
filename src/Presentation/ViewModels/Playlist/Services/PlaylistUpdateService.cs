@@ -28,7 +28,8 @@ public class PlaylistUpdateService(
             TrackMaximum = playlist.TrackMaximum,
             DurationMaximum = playlist.DurationMaximum,
             Picture = track?.ArtistName!,
-            Groups = groups ?? playlist.Groups
+            Groups = groups ?? playlist.Groups,
+            ShuffleOnPlay = playlist.ShuffleOnPlay
         };
 
         bool hasChanges = forceUpdate ||
@@ -38,7 +39,8 @@ public class PlaylistUpdateService(
             command.TrackMaximum != playlist.TrackMaximum ||
             command.DurationMaximum != playlist.DurationMaximum ||
             command.Picture != playlist.Picture ||
-            command.Groups != playlist.Groups;
+            command.Groups != playlist.Groups ||
+            command.ShuffleOnPlay != playlist.ShuffleOnPlay;
 
         if (!hasChanges)
             return false;
@@ -61,6 +63,7 @@ public class PlaylistUpdateService(
         playlist.TrackMaximum = command.TrackMaximum;
         playlist.DurationMaximum = command.DurationMaximum;
         playlist.Groups = command.Groups;
+        playlist.ShuffleOnPlay = command.ShuffleOnPlay;
 
         messenger.Send(new PlaylistUpdatedMessage(playlist.Id, ActionType.Update));
 

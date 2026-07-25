@@ -133,4 +133,67 @@ public class PlaylistHeaderDtoMappingTests
         Assert.Equal(3600, command.DurationMaximum);
         Assert.Single(command.Groups);
     }
+
+    [Theory(DisplayName = "Map entity to dto should propagate ShuffleOnPlay")]
+    [InlineData(true)]
+    [InlineData(false)]
+    public void MapEntityToDto_ShouldPropagateShuffleOnPlay(bool shuffleOnPlay)
+    {
+        // Arrange
+        PlaylistHeaderEntity entity = new()
+        {
+            Id = 1,
+            Name = "Plain",
+            Type = (int)PlaylistType.Classic,
+            ShuffleOnPlay = shuffleOnPlay
+        };
+
+        // Act
+        PlaylistHeaderDto dto = PlaylistHeadeDtoMapping.Map(entity);
+
+        // Assert
+        Assert.Equal(shuffleOnPlay, dto.ShuffleOnPlay);
+    }
+
+    [Theory(DisplayName = "Map update command to entity should propagate ShuffleOnPlay")]
+    [InlineData(true)]
+    [InlineData(false)]
+    public void MapUpdateCommandToEntity_ShouldPropagateShuffleOnPlay(bool shuffleOnPlay)
+    {
+        // Arrange
+        UpdatePlaylistRequest command = new()
+        {
+            Id = 1,
+            Name = "Plain",
+            Type = (int)PlaylistType.Classic,
+            ShuffleOnPlay = shuffleOnPlay
+        };
+
+        // Act
+        PlaylistHeaderEntity entity = PlaylistHeadeDtoMapping.Map(command);
+
+        // Assert
+        Assert.Equal(shuffleOnPlay, entity.ShuffleOnPlay);
+    }
+
+    [Theory(DisplayName = "MapToUpdatePlaylistRequest should propagate ShuffleOnPlay")]
+    [InlineData(true)]
+    [InlineData(false)]
+    public void MapToUpdatePlaylistRequest_ShouldPropagateShuffleOnPlay(bool shuffleOnPlay)
+    {
+        // Arrange
+        PlaylistHeaderDto dto = new()
+        {
+            Id = 1,
+            Name = "Plain",
+            Type = (int)PlaylistType.Classic,
+            ShuffleOnPlay = shuffleOnPlay
+        };
+
+        // Act
+        UpdatePlaylistRequest command = PlaylistHeadeDtoMapping.MapToUpdatePlaylistRequest(dto);
+
+        // Assert
+        Assert.Equal(shuffleOnPlay, command.ShuffleOnPlay);
+    }
 }

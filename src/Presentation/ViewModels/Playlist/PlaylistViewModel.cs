@@ -1,7 +1,9 @@
 ﻿using System.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Rok.Application.Dto;
 using Rok.Application.Player;
+using Rok.Application.Randomizer;
 using Rok.ViewModels.Playlist.Services;
 using Rok.ViewModels.Track;
 
@@ -48,6 +50,16 @@ public partial class PlaylistViewModel : ObservableObject
         set
         {
             Playlist.Name = value;
+            _ = SavePlaylistAsync();
+        }
+    }
+
+    public bool ShuffleOnPlay
+    {
+        get => Playlist.ShuffleOnPlay;
+        set
+        {
+            Playlist.ShuffleOnPlay = value;
             _ = SavePlaylistAsync();
         }
     }
@@ -245,8 +257,17 @@ public partial class PlaylistViewModel : ObservableObject
                 await LoadTracksAsync(Playlist.Id);
         }
 
-        if (_tracks?.Any() == true)
+        if (_tracks?.Any() != true)
+            return;
+
+        if (!Playlist.ShuffleOnPlay)
+        {
             _playerService.LoadPlaylist(_tracks.ToList(), track?.Track);
+            return;
+        }
+
+        List<TrackDto> ordered = PlaylistPlaybackOrderBuilder.BuildShuffledPlayOrder(_tracks, track?.Track);
+        _playerService.LoadPlaylist(ordered, track?.Track);
     }
 
     [RelayCommand]

@@ -40,6 +40,7 @@
                 <CommandBar RelativePanel.AlignBottomWithPanel="True" Style="{StaticResource HeaderCommandBarStyle}">
                     <AppBarButton x:Uid="playlistListen" Style="{StaticResource ListenAppBarButtonStyle}" Command="{x:Bind ViewModel.ListenCommand}" />
                     <AppBarButton x:Uid="shuffleButton" Style="{StaticResource AppBarButtonCompactStyle}" Icon="Shuffle" Command="{x:Bind ViewModel.ShufflePlaylistCommand}" />
+                    <AppBarToggleButton x:Uid="shuffleOnPlayButton" Style="{StaticResource AppBarToggleButtonCompactStyle}" Icon="Shuffle" IsChecked="{x:Bind ViewModel.ShuffleOnPlay, Mode=TwoWay}" />
                     <AppBarButton x:Uid="playlistDelete" Style="{StaticResource AppBarButtonCompactStyle}" Icon="Delete" Click="DeleteButton_Click" />
                     <AppBarButton x:Uid="playlistExport" Style="{StaticResource AppBarButtonCompactStyle}" Icon="Save" Command="{x:Bind ViewModel.ExportPlaylistCommand}" />
                 </CommandBar>

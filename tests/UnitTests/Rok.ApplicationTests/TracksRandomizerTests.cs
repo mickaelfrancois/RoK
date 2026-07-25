@@ -132,6 +132,74 @@ public class TracksRandomizerTests
         Assert.Equal(1, playlist[0].Id);
     }
 
+    [Fact(DisplayName = "when_shuffle_start_index_is_zero_first_track_is_preserved")]
+    public void ArtistBalancedTrackRandomize_ShouldPreserveFirstTrack_WhenShuffleStartIndexIsZero()
+    {
+        // Arrange
+        List<TrackDto> playlist = new()
+        {
+            new() { Id = 1, ArtistName = "Artist A" },
+            new() { Id = 2, ArtistName = "Artist B" },
+            new() { Id = 3, ArtistName = "Artist C" },
+            new() { Id = 4, ArtistName = "Artist D" },
+            new() { Id = 5, ArtistName = "Artist E" }
+        };
+        int shuffleStartIndex = 0;
+
+        // Act
+        TracksRandomizer.ArtistBalancedTrackRandomize(playlist, shuffleStartIndex, new Random(42));
+
+        // Assert
+        Assert.Equal(1, playlist[0].Id);
+        List<long> shuffledIds = playlist.Skip(1).Select(track => track.Id).ToList();
+        Assert.NotEqual(new List<long> { 2, 3, 4, 5 }, shuffledIds);
+    }
+
+    [Fact(DisplayName = "when_shuffle_start_index_is_zero_multiset_is_preserved")]
+    public void ArtistBalancedTrackRandomize_ShouldPreserveMultiset_WhenShuffleStartIndexIsZero()
+    {
+        // Arrange
+        List<TrackDto> playlist = new()
+        {
+            new() { Id = 1, ArtistName = "Artist A" },
+            new() { Id = 2, ArtistName = "Artist B" },
+            new() { Id = 3, ArtistName = "Artist C" },
+            new() { Id = 4, ArtistName = "Artist D" },
+            new() { Id = 5, ArtistName = "Artist E" }
+        };
+        int shuffleStartIndex = 0;
+        List<long> originalIds = playlist.Select(track => track.Id).ToList();
+
+        // Act
+        TracksRandomizer.ArtistBalancedTrackRandomize(playlist, shuffleStartIndex, new Random(42));
+
+        // Assert
+        List<long> resultingIds = playlist.Select(track => track.Id).ToList();
+        Assert.Equal(originalIds.Count, resultingIds.Count);
+        Assert.Equal(originalIds.OrderBy(id => id), resultingIds.OrderBy(id => id));
+        Assert.Equal(resultingIds.Distinct().Count(), resultingIds.Count);
+    }
+
+    [Fact(DisplayName = "when_playlist_has_one_or_zero_tracks_it_is_a_no_op")]
+    public void ArtistBalancedTrackRandomize_ShouldNoOp_WhenPlaylistHasOneOrZeroTracks()
+    {
+        // Arrange
+        List<TrackDto> emptyPlaylist = new();
+        List<TrackDto> singleTrackPlaylist = new()
+        {
+            new() { Id = 1, ArtistName = "Artist A" }
+        };
+
+        // Act
+        TracksRandomizer.ArtistBalancedTrackRandomize(emptyPlaylist, -1, new Random(42));
+        TracksRandomizer.ArtistBalancedTrackRandomize(singleTrackPlaylist, -1, new Random(42));
+
+        // Assert
+        Assert.Empty(emptyPlaylist);
+        Assert.Single(singleTrackPlaylist);
+        Assert.Equal(1, singleTrackPlaylist[0].Id);
+    }
+
     [Fact]
     public void Randomize_ShouldShuffleTracks()
     {

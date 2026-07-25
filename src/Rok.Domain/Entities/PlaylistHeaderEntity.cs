@@ -18,4 +18,6 @@ public class PlaylistHeaderEntity : BaseEntity
     public string GroupsJson { get; set; } = string.Empty;
 
     public int Type { get; set; }
+
+    public bool ShuffleOnPlay { get; set; }
 }

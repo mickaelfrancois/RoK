@@ -53,6 +53,23 @@ public class PlaylistUpdateServiceTests
         Assert.Equal(1, sent.Id);
     }
 
+    [Fact(DisplayName = "SavePlaylistAsync should carry ShuffleOnPlay into the update request and persist it on the playlist")]
+    public async Task SavePlaylistAsync_ShouldCarryShuffleOnPlay_IntoRequestAndPlaylist()
+    {
+        // Arrange
+        PlaylistHeaderDto playlist = new() { Id = 1, Name = "Mix", ShuffleOnPlay = true };
+        _mediator.Setup<UpdatePlaylistRequest, Result>().Returns(Result.Ok());
+        PlaylistUpdateService sut = BuildService();
+
+        // Act
+        await sut.SavePlaylistAsync(playlist, Array.Empty<TrackViewModel>(), forceUpdate: true);
+
+        // Assert
+        UpdatePlaylistRequest sent = Assert.Single(_mediator.Sent<UpdatePlaylistRequest>());
+        Assert.True(sent.ShuffleOnPlay);
+        Assert.True(playlist.ShuffleOnPlay);
+    }
+
     [Fact(DisplayName = "SavePlaylistAsync should return false when the mediator returns an error")]
     public async Task SavePlaylistAsync_ShouldReturnFalse_WhenMediatorFails()
     {
