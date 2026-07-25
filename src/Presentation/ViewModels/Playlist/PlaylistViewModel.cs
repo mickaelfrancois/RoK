@@ -2,6 +2,7 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Rok.Application.Dto;
+using Rok.Application.Features.Playlists;
 using Rok.Application.Player;
 using Rok.Application.Randomizer;
 using Rok.ViewModels.Playlist.Services;
@@ -60,6 +61,16 @@ public partial class PlaylistViewModel : ObservableObject
         set
         {
             Playlist.ShuffleOnPlay = value;
+            _ = SavePlaylistAsync();
+        }
+    }
+
+    public bool RefreshOnPlay
+    {
+        get => Playlist.RefreshOnPlay;
+        set
+        {
+            Playlist.RefreshOnPlay = value;
             _ = SavePlaylistAsync();
         }
     }
@@ -255,6 +266,10 @@ public partial class PlaylistViewModel : ObservableObject
                 await GenerateAsync();
             else
                 await LoadTracksAsync(Playlist.Id);
+        }
+        else if (PlaylistPlaybackPolicy.ShouldRegenerateBeforePlay(Playlist, trackClicked: track != null))
+        {
+            await GenerateAsync();
         }
 
         if (_tracks?.Any() != true)

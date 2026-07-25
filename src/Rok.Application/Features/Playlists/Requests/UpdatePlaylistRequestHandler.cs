@@ -27,6 +27,8 @@ public class UpdatePlaylistRequest : IRequest<Result>
     public int Type { get; set; } = 0;
 
     public bool ShuffleOnPlay { get; set; }
+
+    public bool RefreshOnPlay { get; set; }
 }
 
 public sealed class UpdatePlaylistRequestValidator : Validator<UpdatePlaylistRequest>

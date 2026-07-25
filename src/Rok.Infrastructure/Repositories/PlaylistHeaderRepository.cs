@@ -46,7 +46,7 @@ public class PlaylistHeaderRepository(IDbConnection connection, [FromKeyedServic
     public override string GetSelectQuery(string? whereParam = null)
     {
         string query = """
-                    SELECT id, name, picture, duration, trackCount, trackMaximum, durationMaximum, groupsJson, type, shuffleOnPlay, creatDate, editDate
+                    SELECT id, name, picture, duration, trackCount, trackMaximum, durationMaximum, groupsJson, type, shuffleOnPlay, refreshOnPlay, creatDate, editDate
                     FROM playlists
                 """;
 

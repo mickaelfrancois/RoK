@@ -1020,6 +1020,9 @@
   <data name="shuffleOnPlayButton.Label" xml:space="preserve">
     <value>Lecture aléatoire</value>
   </data>
+  <data name="refreshOnPlayButton.Label" xml:space="preserve">
+    <value>Actualiser au lancement</value>
+  </data>
   <data name="NoLibraryFoldersTitleMessage" xml:space="preserve">
     <value>Aucune librarie</value>
   </data>

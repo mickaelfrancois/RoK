@@ -196,4 +196,67 @@ public class PlaylistHeaderDtoMappingTests
         // Assert
         Assert.Equal(shuffleOnPlay, command.ShuffleOnPlay);
     }
+
+    [Theory(DisplayName = "Map entity to dto should propagate RefreshOnPlay")]
+    [InlineData(true)]
+    [InlineData(false)]
+    public void MapEntityToDto_ShouldPropagateRefreshOnPlay(bool refreshOnPlay)
+    {
+        // Arrange
+        PlaylistHeaderEntity entity = new()
+        {
+            Id = 1,
+            Name = "Plain",
+            Type = (int)PlaylistType.Classic,
+            RefreshOnPlay = refreshOnPlay
+        };
+
+        // Act
+        PlaylistHeaderDto dto = PlaylistHeadeDtoMapping.Map(entity);
+
+        // Assert
+        Assert.Equal(refreshOnPlay, dto.RefreshOnPlay);
+    }
+
+    [Theory(DisplayName = "Map update command to entity should propagate RefreshOnPlay")]
+    [InlineData(true)]
+    [InlineData(false)]
+    public void MapUpdateCommandToEntity_ShouldPropagateRefreshOnPlay(bool refreshOnPlay)
+    {
+        // Arrange
+        UpdatePlaylistRequest command = new()
+        {
+            Id = 1,
+            Name = "Plain",
+            Type = (int)PlaylistType.Classic,
+            RefreshOnPlay = refreshOnPlay
+        };
+
+        // Act
+        PlaylistHeaderEntity entity = PlaylistHeadeDtoMapping.Map(command);
+
+        // Assert
+        Assert.Equal(refreshOnPlay, entity.RefreshOnPlay);
+    }
+
+    [Theory(DisplayName = "MapToUpdatePlaylistRequest should propagate RefreshOnPlay")]
+    [InlineData(true)]
+    [InlineData(false)]
+    public void MapToUpdatePlaylistRequest_ShouldPropagateRefreshOnPlay(bool refreshOnPlay)
+    {
+        // Arrange
+        PlaylistHeaderDto dto = new()
+        {
+            Id = 1,
+            Name = "Plain",
+            Type = (int)PlaylistType.Classic,
+            RefreshOnPlay = refreshOnPlay
+        };
+
+        // Act
+        UpdatePlaylistRequest command = PlaylistHeadeDtoMapping.MapToUpdatePlaylistRequest(dto);
+
+        // Assert
+        Assert.Equal(refreshOnPlay, command.RefreshOnPlay);
+    }
 }

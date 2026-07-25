@@ -20,4 +20,6 @@ public class PlaylistHeaderEntity : BaseEntity
     public int Type { get; set; }
 
     public bool ShuffleOnPlay { get; set; }
+
+    public bool RefreshOnPlay { get; set; }
 }
