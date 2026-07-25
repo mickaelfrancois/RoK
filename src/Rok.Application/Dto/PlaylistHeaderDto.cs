@@ -24,6 +24,8 @@ public class PlaylistHeaderDto
 
     public int Type { get; set; }
 
+    public bool ShuffleOnPlay { get; set; }
+
     public bool IsSmart => Type == 0;
 
     public List<PlaylistGroupDto> Groups { get; set; } = [];

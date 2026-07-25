@@ -959,6 +959,9 @@
   <data name="shuffleButton.Label" xml:space="preserve">
     <value>Перемішати</value>
   </data>
+  <data name="shuffleOnPlayButton.Label" xml:space="preserve">
+    <value>Випадкове відтворення</value>
+  </data>
   <data name="NoLibraryFoldersTitleMessage" xml:space="preserve">
     <value>Немає бібліотеки</value>
   </data>

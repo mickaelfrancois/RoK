@@ -901,6 +901,9 @@
   <data name="shuffleButton.Label" xml:space="preserve">
     <value>Barajar</value>
   </data>
+  <data name="shuffleOnPlayButton.Label" xml:space="preserve">
+    <value>Reproducción aleatoria</value>
+  </data>
   <data name="NoLibraryFoldersTitleMessage" xml:space="preserve">
     <value>No se encuentra la biblioteca</value>
   </data>

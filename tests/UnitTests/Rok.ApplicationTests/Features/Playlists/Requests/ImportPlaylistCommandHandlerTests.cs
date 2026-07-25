@@ -23,7 +23,7 @@ public sealed class ImportPlaylistRequestHandlerTests : IDisposable
     {
         _connection = new SqliteConnection($"Data Source=ImportHandler_{Guid.NewGuid():N};Mode=Memory;Cache=Shared");
         _connection.Open();
-        _connection.Execute("CREATE TABLE playlists (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, picture TEXT, duration INTEGER, trackCount INTEGER, trackMaximum INTEGER, durationMaximum INTEGER, groupsJson TEXT, type INTEGER, creatDate TEXT, editDate TEXT)");
+        _connection.Execute("CREATE TABLE playlists (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, picture TEXT, duration INTEGER, trackCount INTEGER, trackMaximum INTEGER, durationMaximum INTEGER, groupsJson TEXT, type INTEGER, creatDate TEXT, editDate TEXT, shuffleOnPlay INTEGER NOT NULL DEFAULT 0)");
         _connection.Execute("CREATE TABLE playlisttracks (id INTEGER PRIMARY KEY AUTOINCREMENT, playlistId INTEGER, trackId INTEGER, position INTEGER, listened INTEGER, creatDate TEXT)");
     }
 
@@ -349,6 +349,33 @@ public sealed class ImportPlaylistRequestHandlerTests : IDisposable
             // Assert
             result.Should().BeFailure().And.HaveError<OperationError>().And.HaveErrorWithCode("playlist.database_error");
             Assert.Equal(0, _connection.ExecuteScalar<int>("SELECT COUNT(*) FROM playlists"));
+        }
+        finally
+        {
+            File.Delete(path);
+        }
+    }
+
+    [Fact(DisplayName = "imported_playlist_defaults_shuffle_on_play_to_false")]
+    public async Task Imported_playlist_defaults_shuffle_on_play_to_false()
+    {
+        // Arrange
+        string path = WritePlaylistFile("dummy");
+        try
+        {
+            _reader.Setup(r => r.ReadAsync(It.IsAny<Stream>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
+                   .ReturnsAsync(Model("Mix", ("D:\\a.mp3", null, null, null)));
+            _trackRepository.Setup(r => r.GetByFilePathAsync("D:\\a.mp3", It.IsAny<CancellationToken>())).ReturnsAsync(new TrackEntity { Id = 1 });
+
+            ImportPlaylistRequestHandler sut = BuildHandler();
+
+            // Act
+            Result<PlaylistImportResult> result = await sut.Handle(new ImportPlaylistRequest(path), CancellationToken.None);
+
+            // Assert
+            result.Should().BeSuccess();
+            int shuffleOnPlay = _connection.ExecuteScalar<int>("SELECT shuffleOnPlay FROM playlists WHERE id = @id", new { id = result.Value.PlaylistId });
+            Assert.Equal(0, shuffleOnPlay);
         }
         finally
         {

@@ -25,6 +25,8 @@ public class UpdatePlaylistRequest : IRequest<Result>
     public SmartPlaylistSelectBy Sorts { get; set; }
 
     public int Type { get; set; } = 0;
+
+    public bool ShuffleOnPlay { get; set; }
 }
 
 public sealed class UpdatePlaylistRequestValidator : Validator<UpdatePlaylistRequest>
