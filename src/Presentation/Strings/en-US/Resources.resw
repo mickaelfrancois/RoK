@@ -1327,6 +1327,12 @@
   <data name="ApiEndpointCurrentDesc.Text" xml:space="preserve">
     <value>Returns information about the current track (title, artist, album, duration)</value>
   </data>
+  <data name="ApiEndpointAlbumCoverDesc.Text" xml:space="preserve">
+    <value>Returns the album cover image of the current track</value>
+  </data>
+  <data name="ApiEndpointArtistImageDesc.Text" xml:space="preserve">
+    <value>Returns the artist image of the current track</value>
+  </data>
   <data name="ApiEndpointQueueDesc.Text" xml:space="preserve">
     <value>Returns the current playback queue</value>
   </data>

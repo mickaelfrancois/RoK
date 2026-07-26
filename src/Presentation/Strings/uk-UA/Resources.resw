@@ -1268,6 +1268,12 @@
   <data name="ApiEndpointCurrentDesc.Text" xml:space="preserve">
     <value>Повертає інформацію про поточну композицію (назву, виконавця, альбом, тривалість)</value>
   </data>
+  <data name="ApiEndpointAlbumCoverDesc.Text" xml:space="preserve">
+    <value>Повертає обкладинку альбому поточної композиції</value>
+  </data>
+  <data name="ApiEndpointArtistImageDesc.Text" xml:space="preserve">
+    <value>Повертає зображення виконавця поточної композиції</value>
+  </data>
   <data name="ApiEndpointQueueDesc.Text" xml:space="preserve">
     <value>Повертає поточну чергу відтворення</value>
   </data>

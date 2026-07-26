@@ -58,4 +58,29 @@ public class WebApiResultTests
         Assert.Equal(400, result.StatusCode);
         Assert.Equal("", result.Body);
     }
+
+    [Fact(DisplayName = "Binary should produce a 200 result carrying the bytes and content type")]
+    public void Binary_ShouldCarryBytesAndContentType()
+    {
+        // Arrange
+        byte[] bytes = [1, 2, 3];
+
+        // Act
+        WebApiResult result = WebApiResult.Binary(bytes, "image/png");
+
+        // Assert
+        Assert.Equal(200, result.StatusCode);
+        Assert.Equal(bytes, result.BinaryBody);
+        Assert.Equal("image/png", result.ContentType);
+        Assert.Equal("", result.Body);
+    }
+
+    [Fact(DisplayName = "JSON factories should leave the binary payload null")]
+    public void JsonFactories_ShouldLeaveBinaryBodyNull()
+    {
+        // Assert
+        Assert.Null(WebApiResult.Ok("x").BinaryBody);
+        Assert.Null(WebApiResult.NotFound().BinaryBody);
+        Assert.Null(WebApiResult.BadRequest().BinaryBody);
+    }
 }

@@ -179,6 +179,34 @@
                                             <Button Grid.Column="3" Tag="/current" Click="TestEndpoint_Click" Content="▶ Test" FontSize="11" Padding="8,3" HorizontalAlignment="Center" VerticalAlignment="Center" />
                                         </Grid>
 
+                                        <!-- /api/current/album-cover -->
+                                        <Grid Margin="0,4">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="56" />
+                                                <ColumnDefinition Width="210" />
+                                                <ColumnDefinition Width="*" />
+                                                <ColumnDefinition Width="120" />
+                                            </Grid.ColumnDefinitions>
+                                            <TextBlock Grid.Column="0" Text="GET" FontFamily="Consolas" FontSize="12" FontWeight="SemiBold" Foreground="{ThemeResource AccentFillColorDefaultBrush}" VerticalAlignment="Center" />
+                                            <TextBlock Grid.Column="1" Text="/current/album-cover" FontFamily="Consolas" FontSize="12" VerticalAlignment="Center" />
+                                            <TextBlock Grid.Column="2" x:Uid="ApiEndpointAlbumCoverDesc" Text="Returns the album cover image of the current track" FontSize="12" VerticalAlignment="Center" TextWrapping="Wrap" />
+                                            <Button Grid.Column="3" Tag="/current/album-cover" Click="TestEndpoint_Click" Content="▶ Test" FontSize="11" Padding="8,3" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                        </Grid>
+
+                                        <!-- /api/current/artist-image -->
+                                        <Grid Margin="0,4">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="56" />
+                                                <ColumnDefinition Width="210" />
+                                                <ColumnDefinition Width="*" />
+                                                <ColumnDefinition Width="120" />
+                                            </Grid.ColumnDefinitions>
+                                            <TextBlock Grid.Column="0" Text="GET" FontFamily="Consolas" FontSize="12" FontWeight="SemiBold" Foreground="{ThemeResource AccentFillColorDefaultBrush}" VerticalAlignment="Center" />
+                                            <TextBlock Grid.Column="1" Text="/current/artist-image" FontFamily="Consolas" FontSize="12" VerticalAlignment="Center" />
+                                            <TextBlock Grid.Column="2" x:Uid="ApiEndpointArtistImageDesc" Text="Returns the artist image of the current track" FontSize="12" VerticalAlignment="Center" TextWrapping="Wrap" />
+                                            <Button Grid.Column="3" Tag="/current/artist-image" Click="TestEndpoint_Click" Content="▶ Test" FontSize="11" Padding="8,3" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                        </Grid>
+
                                         <!-- /api/queue -->
                                         <Grid Margin="0,4">
                                             <Grid.ColumnDefinitions>

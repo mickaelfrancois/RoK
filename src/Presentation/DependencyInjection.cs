@@ -65,6 +65,11 @@ public static class DependencyInjection
         services.AddSingleton<IPlayerCommandService, PlayerCommandService>();
         services.AddSingleton<IPlayerCommandHandler, PlayerCommandHandler>();
         services.AddSingleton<IWebApiRouteHandler, ListenPlaylistRouteHandler>();
+        services.AddSingleton<IWebApiRouteHandler, ListenAlbumRouteHandler>();
+        services.AddSingleton<IWebApiRouteHandler, ListenArtistRouteHandler>();
+        services.AddSingleton<IWebApiRouteHandler, ListenGenreRouteHandler>();
+        services.AddSingleton<IWebApiRouteHandler, CurrentAlbumCoverRouteHandler>();
+        services.AddSingleton<IWebApiRouteHandler, CurrentArtistImageRouteHandler>();
 
         services.AddSingleton<TagsProvider>();
 

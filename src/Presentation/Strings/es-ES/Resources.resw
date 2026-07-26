@@ -1210,6 +1210,12 @@
   <data name="ApiEndpointCurrentDesc.Text" xml:space="preserve">
     <value>Devuelve información sobre la pista actual (título, artista, álbum, duración)</value>
   </data>
+  <data name="ApiEndpointAlbumCoverDesc.Text" xml:space="preserve">
+    <value>Devuelve la carátula del álbum de la pista actual</value>
+  </data>
+  <data name="ApiEndpointArtistImageDesc.Text" xml:space="preserve">
+    <value>Devuelve la imagen del artista de la pista actual</value>
+  </data>
   <data name="ApiEndpointQueueDesc.Text" xml:space="preserve">
     <value>Devuelve la cola de reproducción actual</value>
   </data>
