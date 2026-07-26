@@ -1326,6 +1326,12 @@
   <data name="ApiEndpointCurrentDesc.Text" xml:space="preserve">
     <value>Renvoie les informations relatives au morceau en cours (titre, artiste, album, durée)</value>
   </data>
+  <data name="ApiEndpointAlbumCoverDesc.Text" xml:space="preserve">
+    <value>Renvoie la pochette de l'album du morceau en cours</value>
+  </data>
+  <data name="ApiEndpointArtistImageDesc.Text" xml:space="preserve">
+    <value>Renvoie l'image de l'artiste du morceau en cours</value>
+  </data>
   <data name="ApiEndpointQueueDesc.Text" xml:space="preserve">
     <value>Renvoie la file d'attente de lecture actuelle</value>
   </data>

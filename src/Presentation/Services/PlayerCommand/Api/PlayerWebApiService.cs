@@ -143,14 +143,24 @@ public sealed partial class PlayerWebApiService(
 
             WebApiResult result = await ResolveAsync(method, path);
 
-            response.ContentType = "application/json";
             response.StatusCode = result.StatusCode;
 
-            if (!string.IsNullOrEmpty(result.Body))
+            if (result.BinaryBody is { } binaryBody)
             {
-                byte[] buffer = Encoding.UTF8.GetBytes(result.Body);
-                response.ContentLength64 = buffer.Length;
-                await response.OutputStream.WriteAsync(buffer);
+                response.ContentType = result.ContentType ?? "application/octet-stream";
+                response.ContentLength64 = binaryBody.Length;
+                await response.OutputStream.WriteAsync(binaryBody);
+            }
+            else
+            {
+                response.ContentType = "application/json";
+
+                if (!string.IsNullOrEmpty(result.Body))
+                {
+                    byte[] buffer = Encoding.UTF8.GetBytes(result.Body);
+                    response.ContentLength64 = buffer.Length;
+                    await response.OutputStream.WriteAsync(buffer);
+                }
             }
         }
         catch (Exception ex)
