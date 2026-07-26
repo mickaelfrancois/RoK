@@ -318,7 +318,8 @@ public partial class PlaylistViewModel : ObservableObject
         if (Tracks.Count == 0)
             return;
 
-        Tracks.Shuffle();
+        List<TrackViewModel> reordered = PlaylistShuffleReorderer.Reorder(Tracks.ToList(), track => track.Track);
+        Tracks.InitWithAddRange(reordered);
     }
 
     [RelayCommand]
