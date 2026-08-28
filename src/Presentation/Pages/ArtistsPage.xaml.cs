@@ -25,6 +25,8 @@ public sealed partial class ArtistsPage : Page, IDisposable
     private readonly AnimatedNumberHelper _countAnimation;
     private readonly AnimatedNumberHelper _durationAnimation;
 
+    private readonly GroupedItemsSourceBinder _binder;
+
 
 
     public ArtistsPage()
@@ -37,7 +39,10 @@ public sealed partial class ArtistsPage : Page, IDisposable
         _logger = App.ServiceProvider.GetRequiredService<ILogger<ArtistsPage>>();
         ViewModel = App.ServiceProvider.GetRequiredService<ArtistsViewModel>();
 
+        _binder = new GroupedItemsSourceBinder(grid, ZoomoutCollectionGrid, groupedItemsViewSource, ViewModel.GroupedItems, _logger);
+
         Loaded += Page_Loaded;
+        Unloaded += Page_Unloaded;
         ViewModel.PropertyChanged += ViewModel_PropertyChanged;
         ViewModel.GroupedItems.CollectionChanged += GroupedItems_CollectionChanged;
     }
@@ -80,6 +85,13 @@ public sealed partial class ArtistsPage : Page, IDisposable
         _durationAnimation.AnimateTo(ViewModel.DurationText);
     }
 
+    private void Page_Unloaded(object sender, RoutedEventArgs e)
+    {
+        // The page has left the visual tree: no container is realized any more, so releasing the
+        // sources here can no longer feed a null item to the generated bindings.
+        _binder.Release();
+    }
+
     private void ViewModel_PropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
         if (e.PropertyName == nameof(ViewModel.Count))
@@ -104,44 +116,24 @@ public sealed partial class ArtistsPage : Page, IDisposable
 
         if (e.PropertyName == nameof(ViewModel.IsGroupingEnabled))
         {
+            // The flag is published before the data, so the rewiring happens on the collection
+            // Reset that follows. Only the zoom state is handled here.
             if (!ViewModel.IsGroupingEnabled && !GridZoom.IsZoomedInViewActive)
-            {
                 GridZoom.IsZoomedInViewActive = true;
-            }
-
-            UpdateItemsSource();
         }
     }
 
     private void GroupedItems_CollectionChanged(object? sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
     {
+        if (ViewModel.GroupedItems.Count == 0 && !GridZoom.IsZoomedInViewActive)
+            GridZoom.IsZoomedInViewActive = true;
+
         UpdateItemsSource();
     }
 
     private void UpdateItemsSource()
     {
-        if (ViewModel.GroupedItems.Count == 0)
-            return;
-
-        grid.ItemsSource = null;
-        ZoomoutCollectionGrid.ItemsSource = null;
-
-        if (ViewModel.IsGroupingEnabled)
-        {
-            groupedItemsViewSource.Source = null;
-            groupedItemsViewSource.IsSourceGrouped = true;
-            groupedItemsViewSource.Source = ViewModel.GroupedItems;
-
-            grid.ItemsSource = groupedItemsViewSource.View;
-            ZoomoutCollectionGrid.ItemsSource = groupedItemsViewSource.View.CollectionGroups;
-        }
-        else
-        {
-            groupedItemsViewSource.Source = null;
-            groupedItemsViewSource.IsSourceGrouped = false;
-
-            grid.ItemsSource = ViewModel.GroupedItems[0].Items;
-        }
+        _binder.Apply(ViewModel.IsGroupingEnabled, ViewModel.GroupedItems.Count > 0 ? ViewModel.GroupedItems[0].Items : null);
     }
 
     private void FilterFlyout_Opened(object sender, object e)
@@ -253,23 +245,12 @@ public sealed partial class ArtistsPage : Page, IDisposable
                 ViewModel.GroupedItems.CollectionChanged -= GroupedItems_CollectionChanged;
             }
 
-            if (grid is not null)
-                grid.ItemsSource = null;
-
-            if (ZoomoutCollectionGrid is not null)
-                ZoomoutCollectionGrid.ItemsSource = null;
-
-            if (groupedItemsViewSource is not null)
-            {
-                groupedItemsViewSource.Source = null;
-                groupedItemsViewSource.IsSourceGrouped = false;
-            }
+            // The sources are released in Page_Unloaded, once the page has left the visual tree.
+            // Detaching them here would recycle containers while the page is still on screen.
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error during Dispose in ArtistsPage");
         }
-
-        _disposed = true;
     }
 }

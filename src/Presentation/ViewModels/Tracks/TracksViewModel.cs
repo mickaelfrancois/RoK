@@ -205,8 +205,10 @@ public partial class TracksViewModel : ObservableObject, IDisposable
                 .ToList();
         }
 
-        GroupedItems.InitWithAddRange(groups);
+        // Publish the grouping flag before the data: the page refreshes on the collection Reset,
+        // which must therefore be the last notification of the pass.
         IsGroupingEnabled = groups.Count > 1 || !string.IsNullOrEmpty(groups.FirstOrDefault()?.Title ?? string.Empty);
+        GroupedItems.InitWithAddRange(groups);
 
         OnPropertyChanged(nameof(Count));
         OnPropertyChanged(nameof(DurationText));
