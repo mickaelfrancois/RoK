@@ -2057,4 +2057,13 @@
   <data name="playerSleep60.Text" xml:space="preserve">
     <value>60 хвилин</value>
   </data>
+  <data name="albumPageNotFound.Message" xml:space="preserve">
+    <value>Цього альбому більше немає у вашій бібліотеці</value>
+  </data>
+  <data name="artistPageNotFound.Message" xml:space="preserve">
+    <value>Цього виконавця більше немає у вашій бібліотеці</value>
+  </data>
+  <data name="genrePageNotFound.Message" xml:space="preserve">
+    <value>Цього жанру більше немає у вашій бібліотеці</value>
+  </data>
 </root>

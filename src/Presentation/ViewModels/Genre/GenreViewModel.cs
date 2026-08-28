@@ -4,6 +4,7 @@ using Rok.Application.Player;
 using Rok.Application.Randomizer;
 using Rok.ViewModels.Album;
 using Rok.ViewModels.Artist.Services;
+using Rok.ViewModels.Common;
 using Rok.ViewModels.Genre.Services;
 
 namespace Rok.ViewModels.Genre;
@@ -13,7 +14,7 @@ public partial class GenreViewModel : ObservableObject
     private static string FallbackPictureUri => App.Current.Resources["ArtistFallbackPictureUri"] as string ?? "ms-appx:///Assets/artistFallback.png";
     private static BitmapImage FallbackPicture => new(new Uri(FallbackPictureUri));
 
-    private readonly ResourceLoader _resourceLoader;
+    private readonly IStringResourceProvider _resourceLoader;
     private readonly IPlayerService _playerService;
     private readonly GenreDataLoader _dataLoader;
     private readonly ILogger<GenreViewModel> _logger;
@@ -26,7 +27,18 @@ public partial class GenreViewModel : ObservableObject
     public RangeObservableCollection<AlbumViewModel> Albums { get; set; } = [];
     public GenreDto Genre { get; private set; } = new();
 
-    public bool HasNoAlbums => Albums.Count == 0;
+    public bool HasNoAlbums => LoadState == DetailLoadState.Loaded && Albums.Count == 0;
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(IsNotFound))]
+    [NotifyPropertyChangedFor(nameof(HasNoAlbums))]
+    [NotifyCanExecuteChangedFor(nameof(ListenCommand))]
+    [NotifyCanExecuteChangedFor(nameof(GenreFavoriteCommand))]
+    public partial DetailLoadState LoadState { get; set; } = DetailLoadState.Loading;
+
+    public bool IsNotFound => LoadState == DetailLoadState.NotFound;
+
+    private bool IsEntityLoaded => LoadState == DetailLoadState.Loaded;
 
     public bool IsFavorite
     {
@@ -141,7 +153,7 @@ public partial class GenreViewModel : ObservableObject
 
 
     public GenreViewModel(IPlayerService playerService,
-                          ResourceLoader resourceLoader,
+                          IStringResourceProvider resourceLoader,
                           GenreDataLoader dataLoader,
                           ArtistPictureService pictureService,
                           IBackdropLoader backdropLoader,
@@ -160,14 +172,16 @@ public partial class GenreViewModel : ObservableObject
 
     public async Task LoadDataAsync(long genreId, bool loadAlbums = true, bool loadTracks = true)
     {
+        LoadState = DetailLoadState.Loading;
+
         CancellationToken cancellationToken = InitNavigationCancellation();
 
         Stopwatch stopwatch = new();
         stopwatch.Start();
 
-        await LoadGenreAsync(genreId);
+        bool genreLoaded = await LoadGenreAsync(genreId);
 
-        if (cancellationToken.IsCancellationRequested)
+        if (!genreLoaded || cancellationToken.IsCancellationRequested)
             return;
 
         await LoadAlbumsAsync(genreId, cancellationToken);
@@ -193,12 +207,20 @@ public partial class GenreViewModel : ObservableObject
     }
 
 
-    private async Task LoadGenreAsync(long genreId)
+    private async Task<bool> LoadGenreAsync(long genreId)
     {
         GenreDto? genre = await _dataLoader.LoadGenreAsync(genreId);
 
-        if (genre != null)
-            Genre = genre;
+        if (genre == null)
+        {
+            LoadState = DetailLoadState.NotFound;
+            return false;
+        }
+
+        Genre = genre;
+        LoadState = DetailLoadState.Loaded;
+
+        return true;
     }
 
 
@@ -240,7 +262,7 @@ public partial class GenreViewModel : ObservableObject
     }
 
 
-    [RelayCommand]
+    [RelayCommand(CanExecute = nameof(IsEntityLoaded))]
     private async Task ListenAsync()
     {
         IEnumerable<TrackDto> tracks = await _dataLoader.LoadTracksAsync(Genre.Id);
@@ -253,7 +275,7 @@ public partial class GenreViewModel : ObservableObject
         }
     }
 
-    [RelayCommand]
+    [RelayCommand(CanExecute = nameof(IsEntityLoaded))]
     private async Task GenreFavoriteAsync()
     {
         bool newFavoriteState = !Genre.IsFavorite;

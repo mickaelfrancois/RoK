@@ -1,6 +1,7 @@
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using Rok.Application.Dto;
+using Rok.Application.Errors;
 using Rok.Application.Features.Tracks.Requests;
 using Rok.ViewModels.Artists.Interfaces;
 using Rok.ViewModels.Listening.Services;
@@ -21,7 +22,7 @@ public class ListeningDataLoaderTests
     public async Task GetTracksByArtistAsync_ShouldReturnEmpty_WhenNoTracks()
     {
         // Arrange
-        _mediator.Setup<GetTracksByArtistIdRequest, IEnumerable<TrackDto>>().Returns(new List<TrackDto>());
+        _mediator.Setup<GetTracksByArtistIdRequest, Result<IEnumerable<TrackDto>>>().Returns(Result<IEnumerable<TrackDto>>.Ok(new List<TrackDto>()));
         ListeningDataLoader sut = BuildService();
 
         // Act
@@ -36,7 +37,7 @@ public class ListeningDataLoaderTests
     {
         // Arrange
         List<TrackDto> tracks = Enumerable.Range(1, 5).Select(i => new TrackDto { Id = i }).ToList();
-        _mediator.Setup<GetTracksByArtistIdRequest, IEnumerable<TrackDto>>().Returns(tracks);
+        _mediator.Setup<GetTracksByArtistIdRequest, Result<IEnumerable<TrackDto>>>().Returns(Result<IEnumerable<TrackDto>>.Ok(tracks));
         ListeningDataLoader sut = BuildService();
 
         // Act
@@ -52,7 +53,7 @@ public class ListeningDataLoaderTests
     {
         // Arrange
         List<TrackDto> tracks = Enumerable.Range(1, 10).Select(i => new TrackDto { Id = i }).ToList();
-        _mediator.Setup<GetTracksByArtistIdRequest, IEnumerable<TrackDto>>().Returns(tracks);
+        _mediator.Setup<GetTracksByArtistIdRequest, Result<IEnumerable<TrackDto>>>().Returns(Result<IEnumerable<TrackDto>>.Ok(tracks));
         ListeningDataLoader sut = BuildService();
 
         // Act
@@ -60,5 +61,20 @@ public class ListeningDataLoaderTests
 
         // Assert
         Assert.Equal(3, result.Count);
+    }
+
+    [Fact(DisplayName = "when_the_artist_track_request_fails_then_no_track_is_returned")]
+    public async Task GetTracksByArtistAsync_ShouldReturnEmpty_WhenResultIsFailure()
+    {
+        // Arrange
+        _mediator.Setup<GetTracksByArtistIdRequest, Result<IEnumerable<TrackDto>>>()
+                 .Returns(Result<IEnumerable<TrackDto>>.Fail(new OperationError("track.load_failed", "Validation failed")));
+        ListeningDataLoader sut = BuildService();
+
+        // Act
+        List<TrackDto> result = await sut.GetTracksByArtistAsync(4, 10, Array.Empty<long>());
+
+        // Assert
+        Assert.Empty(result);
     }
 }

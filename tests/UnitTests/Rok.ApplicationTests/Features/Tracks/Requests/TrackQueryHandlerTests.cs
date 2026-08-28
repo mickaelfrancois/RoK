@@ -94,10 +94,11 @@ public class GetTracksByAlbumIdQueryHandlerTests
         GetTracksByAlbumIdRequestHandler handler = new(repository.Object);
 
         // Act
-        IEnumerable<TrackDto> result = await handler.Handle(new GetTracksByAlbumIdRequest(7), CancellationToken.None);
+        Result<IEnumerable<TrackDto>> result = await handler.Handle(new GetTracksByAlbumIdRequest(7), CancellationToken.None);
 
         // Assert
-        Assert.Single(result);
+        result.Should().BeSuccess();
+        Assert.Single(result.Value);
         repository.Verify(r => r.GetByAlbumIdAsync(7, It.IsAny<RepositoryConnectionKind>()), Times.Once);
     }
 }
@@ -114,10 +115,11 @@ public class GetTracksByArtistIdQueryHandlerTests
         GetTracksByArtistIdRequestHandler handler = new(repository.Object);
 
         // Act
-        IEnumerable<TrackDto> result = await handler.Handle(new GetTracksByArtistIdRequest(4), CancellationToken.None);
+        Result<IEnumerable<TrackDto>> result = await handler.Handle(new GetTracksByArtistIdRequest(4), CancellationToken.None);
 
         // Assert
-        Assert.Single(result);
+        result.Should().BeSuccess();
+        Assert.Single(result.Value);
         repository.Verify(r => r.GetByArtistIdAsync(4, It.IsAny<RepositoryConnectionKind>()), Times.Once);
     }
 }
@@ -134,10 +136,11 @@ public class GetTracksByGenreIdQueryHandlerTests
         GetTracksByGenreIdRequestHandler handler = new(repository.Object);
 
         // Act
-        IEnumerable<TrackDto> result = await handler.Handle(new GetTracksByGenreIdRequest(2), CancellationToken.None);
+        Result<IEnumerable<TrackDto>> result = await handler.Handle(new GetTracksByGenreIdRequest(2), CancellationToken.None);
 
         // Assert
-        Assert.Single(result);
+        result.Should().BeSuccess();
+        Assert.Single(result.Value);
         repository.Verify(r => r.GetByGenreIdAsync(2, It.IsAny<RepositoryConnectionKind>()), Times.Once);
     }
 }

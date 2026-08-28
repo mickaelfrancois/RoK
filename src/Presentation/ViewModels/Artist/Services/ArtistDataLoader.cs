@@ -29,8 +29,15 @@ public class ArtistDataLoader(IMediator mediator, IAlbumViewModelFactory albumVi
 
     public async Task<List<TrackViewModel>> LoadTracksAsync(long artistId)
     {
-        IEnumerable<TrackDto> tracks = await mediator.Send(new GetTracksByArtistIdRequest(artistId));
-        return TrackViewModelMap.CreateViewModels(tracks.ToList(), trackViewModelFactory);
+        Result<IEnumerable<TrackDto>> result = await mediator.Send(new GetTracksByArtistIdRequest(artistId));
+
+        if (result.IsFailure)
+        {
+            logger.LogError("Failed to load tracks for artist {ArtistId}", artistId);
+            return [];
+        }
+
+        return TrackViewModelMap.CreateViewModels(result.Value.ToList(), trackViewModelFactory);
     }
 
     public async Task<ArtistDto?> ReloadArtistAsync(long artistId)

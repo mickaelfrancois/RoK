@@ -1,6 +1,7 @@
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using Rok.Application.Dto;
+using Rok.Application.Errors;
 using Rok.Application.Features.Tracks.Requests;
 using Rok.Application.Player;
 using Rok.ViewModels.Albums.Services;
@@ -51,8 +52,8 @@ public class AlbumsPlaybackServiceTests
     {
         // Arrange
         List<TrackDto> ordered = new() { new TrackDto { Id = 1 }, new TrackDto { Id = 2 }, new TrackDto { Id = 3 } };
-        _mediator.Setup<GetTracksByAlbumIdRequest, IEnumerable<TrackDto>>()
-                 .Returns(ordered);
+        _mediator.Setup<GetTracksByAlbumIdRequest, Result<IEnumerable<TrackDto>>>()
+                 .Returns(Result<IEnumerable<TrackDto>>.Ok(ordered));
         AlbumsPlaybackService sut = BuildService();
 
         // Act
@@ -60,8 +61,23 @@ public class AlbumsPlaybackServiceTests
 
         // Assert
         GetTracksByAlbumIdRequest sent = Assert.Single(_mediator.Sent<GetTracksByAlbumIdRequest>());
-        Assert.Equal(42L, sent.GenreId);
+        Assert.Equal(42L, sent.AlbumId);
         Assert.Empty(_mediator.Sent<GetTracksByAlbumListRequest>());
         _player.Verify(p => p.LoadPlaylist(It.Is<List<TrackDto>>(l => l.SequenceEqual(ordered)), It.IsAny<TrackDto>()), Times.Once);
+    }
+
+    [Fact(DisplayName = "when_the_single_album_track_request_fails_then_nothing_is_played")]
+    public async Task PlayAlbumsAsync_ShouldNotLoadPlaylist_WhenResultIsFailure()
+    {
+        // Arrange
+        _mediator.Setup<GetTracksByAlbumIdRequest, Result<IEnumerable<TrackDto>>>()
+                 .Returns(Result<IEnumerable<TrackDto>>.Fail(new OperationError("track.load_failed", "Validation failed")));
+        AlbumsPlaybackService sut = BuildService();
+
+        // Act
+        await sut.PlayAlbumsAsync(new long[] { 42 });
+
+        // Assert
+        _player.Verify(p => p.LoadPlaylist(It.IsAny<List<TrackDto>>(), It.IsAny<TrackDto>()), Times.Never);
     }
 }

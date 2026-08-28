@@ -39,9 +39,15 @@ public class ListeningDataLoader(IMediator mediator, IArtistViewModelFactory art
 
     public async Task<List<TrackDto>> GetTracksByArtistAsync(long artistId, int maxTracks, IEnumerable<long> excludeTrackIds)
     {
-        IEnumerable<TrackDto> tracks = await mediator.Send(new GetTracksByArtistIdRequest(artistId));
+        Result<IEnumerable<TrackDto>> result = await mediator.Send(new GetTracksByArtistIdRequest(artistId));
 
-        List<TrackDto> shuffledTracks = tracks.ToList();
+        if (result.IsFailure)
+        {
+            logger.LogError("Failed to load tracks for artist {ArtistId} for listening view", artistId);
+            return [];
+        }
+
+        List<TrackDto> shuffledTracks = result.Value.ToList();
         if (shuffledTracks.Count == 0)
             return [];
 

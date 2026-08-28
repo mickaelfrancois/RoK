@@ -73,7 +73,8 @@ public sealed partial class AlbumPage : Page
 
     private void OnTrackTitleClick(object sender, RoutedEventArgs e)
     {
-        if (sender is FrameworkElement { Tag: TrackViewModel track })
+        // ICommand.Execute does not consult CanExecute: the guard has to be explicit here.
+        if (sender is FrameworkElement { Tag: TrackViewModel track } && ViewModel.ListenCommand.CanExecute(track))
             ViewModel.ListenCommand.Execute(track);
     }
 

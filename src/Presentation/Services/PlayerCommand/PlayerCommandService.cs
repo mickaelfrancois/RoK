@@ -60,8 +60,8 @@ public sealed class PlayerCommandService(IPlayerService playerService, IMediator
         if (album is null)
             return false;
 
-        IEnumerable<TrackDto> tracks = await mediator.Send(new GetTracksByAlbumIdRequest(album.Id));
-        return PlayTracks(tracks);
+        Result<IEnumerable<TrackDto>> result = await mediator.Send(new GetTracksByAlbumIdRequest(album.Id));
+        return result.IsSuccess && PlayTracks(result.Value);
     }
 
 
@@ -73,8 +73,8 @@ public sealed class PlayerCommandService(IPlayerService playerService, IMediator
         if (artist is null)
             return false;
 
-        IEnumerable<TrackDto> tracks = await mediator.Send(new GetTracksByArtistIdRequest(artist.Id));
-        return PlayTracks(tracks);
+        Result<IEnumerable<TrackDto>> result = await mediator.Send(new GetTracksByArtistIdRequest(artist.Id));
+        return result.IsSuccess && PlayTracks(result.Value);
     }
 
     public async Task<bool> ListenGenreAsync(string genreName)
@@ -85,8 +85,8 @@ public sealed class PlayerCommandService(IPlayerService playerService, IMediator
         if (genre is null)
             return false;
 
-        IEnumerable<TrackDto> tracks = await mediator.Send(new GetTracksByGenreIdRequest(genre.Id));
-        return PlayTracks(tracks);
+        Result<IEnumerable<TrackDto>> result = await mediator.Send(new GetTracksByGenreIdRequest(genre.Id));
+        return result.IsSuccess && PlayTracks(result.Value);
     }
 
 

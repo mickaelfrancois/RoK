@@ -21,7 +21,7 @@ namespace Rok.ViewModels.Artist;
 public partial class ArtistViewModel : ObservableObject, IFilterableArtist, IGroupableArtist
 {
     private readonly NavigationService _navigationService;
-    private readonly ResourceLoader _resourceLoader;
+    private readonly IStringResourceProvider _resourceLoader;
     private readonly ILogger<ArtistViewModel> _logger;
     private readonly IPlayerService _playerService;
     private readonly IBackdropLoader _backdropLoader;
@@ -46,8 +46,27 @@ public partial class ArtistViewModel : ObservableObject, IFilterableArtist, IGro
     public RangeObservableCollection<TrackViewModel> Tracks { get; set; } = [];
     public RangeObservableCollection<AlbumViewModel> Albums { get; set; } = [];
 
-    public bool HasNoAlbums => Albums.Count == 0;
-    public bool HasNoTracks => Tracks.Count == 0;
+    public bool HasNoAlbums => LoadState == DetailLoadState.Loaded && Albums.Count == 0;
+    public bool HasNoTracks => LoadState == DetailLoadState.Loaded && Tracks.Count == 0;
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(IsNotFound))]
+    [NotifyPropertyChangedFor(nameof(HasNoAlbums))]
+    [NotifyPropertyChangedFor(nameof(HasNoTracks))]
+    [NotifyCanExecuteChangedFor(nameof(ArtistOpenCommand))]
+    [NotifyCanExecuteChangedFor(nameof(GenreOpenCommand))]
+    [NotifyCanExecuteChangedFor(nameof(ListenCommand))]
+    [NotifyCanExecuteChangedFor(nameof(ArtistFavoriteCommand))]
+    [NotifyCanExecuteChangedFor(nameof(OpenOfficialSiteCommand))]
+    [NotifyCanExecuteChangedFor(nameof(EditArtistCommand))]
+    [NotifyCanExecuteChangedFor(nameof(SelectPictureCommand))]
+    [NotifyCanExecuteChangedFor(nameof(OpenUrlCommand))]
+    [NotifyCanExecuteChangedFor(nameof(OpenBiographyCommand))]
+    public partial DetailLoadState LoadState { get; set; } = DetailLoadState.Loading;
+
+    public bool IsNotFound => LoadState == DetailLoadState.NotFound;
+
+    private bool IsEntityLoaded => LoadState == DetailLoadState.Loaded;
 
     public ListeningStatsViewModel ListeningStats { get; } = new();
 
@@ -239,7 +258,7 @@ public partial class ArtistViewModel : ObservableObject, IFilterableArtist, IGro
         NavigationService navigationService,
         IPlayerService playerService,
         IDialogService dialogService,
-        ResourceLoader resourceLoader,
+        IStringResourceProvider resourceLoader,
         ArtistDataLoader dataLoader,
         TagsProvider tagsDataLoader,
         ArtistPictureService pictureService,
@@ -276,6 +295,11 @@ public partial class ArtistViewModel : ObservableObject, IFilterableArtist, IGro
     public void SetData(ArtistDto artist)
     {
         Artist = Guard.NotNull(artist);
+
+        // List tiles reuse this view model and never go through LoadDataAsync: without this the
+        // whole carousel would sit with disabled commands.
+        LoadState = DetailLoadState.Loaded;
+
         IsNew = Artist.CreatDate > DateTime.UtcNow.AddDays(-_appOptions.ArtistRecentThresholdDays);
 
         UpdateDominantColor();
@@ -290,6 +314,8 @@ public partial class ArtistViewModel : ObservableObject, IFilterableArtist, IGro
 
     public async Task LoadDataAsync(long artistId, bool loadAlbums = true, bool loadTracks = true, bool fetchApi = true)
     {
+        LoadState = DetailLoadState.Loading;
+
         CancellationToken cancellationToken = InitNavigationCancellation();
 
         Stopwatch stopwatch = new();
@@ -359,9 +385,14 @@ public partial class ArtistViewModel : ObservableObject, IFilterableArtist, IGro
     {
         ArtistDto? artist = await _dataLoader.LoadArtistAsync(artistId);
         if (artist == null)
+        {
+            LoadState = DetailLoadState.NotFound;
             return false;
+        }
 
         Artist = artist;
+        LoadState = DetailLoadState.Loaded;
+
         IsNew = Artist.CreatDate > DateTime.UtcNow.AddDays(-_appOptions.ArtistRecentThresholdDays);
 
         UpdateDominantColor();
@@ -540,20 +571,20 @@ public partial class ArtistViewModel : ObservableObject, IFilterableArtist, IGro
 
 
 
-    [RelayCommand]
+    [RelayCommand(CanExecute = nameof(IsEntityLoaded))]
     private void ArtistOpen()
     {
         _navigationService.NavigateToArtist(Artist.Id);
     }
 
-    [RelayCommand]
+    [RelayCommand(CanExecute = nameof(IsEntityLoaded))]
     private void GenreOpen()
     {
         if (Artist.GenreId.HasValue)
             _navigationService.NavigateToGenre(Artist.GenreId.Value);
     }
 
-    [RelayCommand]
+    [RelayCommand(CanExecute = nameof(IsEntityLoaded))]
     private async Task ListenAsync()
     {
         if (_tracks == null)
@@ -567,7 +598,7 @@ public partial class ArtistViewModel : ObservableObject, IFilterableArtist, IGro
         }
     }
 
-    [RelayCommand]
+    [RelayCommand(CanExecute = nameof(IsEntityLoaded))]
     private async Task ArtistFavoriteAsync()
     {
         bool newFavoriteState = !Artist.IsFavorite;
@@ -577,13 +608,13 @@ public partial class ArtistViewModel : ObservableObject, IFilterableArtist, IGro
         _messenger.Send(new ArtistUpdateMessage(Artist.Id, ActionType.Update));
     }
 
-    [RelayCommand]
+    [RelayCommand(CanExecute = nameof(IsEntityLoaded))]
     private Task OpenOfficialSiteAsync()
     {
         return _editService.OpenOfficialSiteAsync(Artist);
     }
 
-    [RelayCommand]
+    [RelayCommand(CanExecute = nameof(IsEntityLoaded))]
     private async Task EditArtistAsync()
     {
         bool updated = await _editService.EditArtistAsync(Artist);
@@ -595,7 +626,7 @@ public partial class ArtistViewModel : ObservableObject, IFilterableArtist, IGro
         OnPropertyChanged(nameof(Artist));
     }
 
-    [RelayCommand]
+    [RelayCommand(CanExecute = nameof(IsEntityLoaded))]
     private async Task SelectPictureAsync()
     {
         CancellationToken token = _navigationCts.Token;
@@ -613,7 +644,7 @@ public partial class ArtistViewModel : ObservableObject, IFilterableArtist, IGro
         _messenger.Send(new ArtistUpdateMessage(Artist.Id, ActionType.Picture));
     }
 
-    [RelayCommand]
+    [RelayCommand(CanExecute = nameof(IsEntityLoaded))]
     private void OpenUrl(string url)
     {
         if (string.IsNullOrEmpty(url))
@@ -628,7 +659,7 @@ public partial class ArtistViewModel : ObservableObject, IFilterableArtist, IGro
             _ = Windows.System.Launcher.LaunchUriAsync(uri);
     }
 
-    [RelayCommand]
+    [RelayCommand(CanExecute = nameof(IsEntityLoaded))]
     private async Task OpenBiographyAsync()
     {
         if (!string.IsNullOrEmpty(Artist.Biography))

@@ -106,6 +106,9 @@
 
             <common:EmptyStateControl x:Uid="genrePageNoAlbums" Glyph="&#xE93C;"
                                       Visibility="{x:Bind ViewModel.HasNoAlbums, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" />
+
+            <common:EmptyStateControl x:Uid="genrePageNotFound" Glyph="&#xE783;"
+                                      Visibility="{x:Bind ViewModel.IsNotFound, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" />
         </Grid>
     </Grid>
 </Page>

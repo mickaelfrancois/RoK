@@ -192,8 +192,8 @@ public class PlaylistMenuServiceTests
     {
         // Arrange
         List<TrackDto> tracks = new() { new TrackDto { Id = 1 }, new TrackDto { Id = 2 } };
-        _mediator.Setup<GetTracksByArtistIdRequest, IEnumerable<TrackDto>>()
-                 .Returns(tracks);
+        _mediator.Setup<GetTracksByArtistIdRequest, Result<IEnumerable<TrackDto>>>()
+                 .Returns(Result<IEnumerable<TrackDto>>.Ok(tracks));
         PlaylistMenuService sut = BuildService();
 
         // Act
@@ -207,8 +207,8 @@ public class PlaylistMenuServiceTests
     public async Task AddArtistToCurrentListeningAsync_SendsError_WhenNoTracks()
     {
         // Arrange
-        _mediator.Setup<GetTracksByArtistIdRequest, IEnumerable<TrackDto>>()
-                 .Returns(Enumerable.Empty<TrackDto>());
+        _mediator.Setup<GetTracksByArtistIdRequest, Result<IEnumerable<TrackDto>>>()
+                 .Returns(Result<IEnumerable<TrackDto>>.Ok(Enumerable.Empty<TrackDto>()));
         ShowNotificationMessage? notification = null;
         void Listen(ShowNotificationMessage m) => notification = m;
         _messenger.Subscribe<ShowNotificationMessage>(Listen);
@@ -237,8 +237,8 @@ public class PlaylistMenuServiceTests
     {
         // Arrange
         List<TrackDto> tracks = new() { new TrackDto { Id = 10 }, new TrackDto { Id = 11 } };
-        _mediator.Setup<GetTracksByAlbumIdRequest, IEnumerable<TrackDto>>()
-                 .Returns(tracks);
+        _mediator.Setup<GetTracksByAlbumIdRequest, Result<IEnumerable<TrackDto>>>()
+                 .Returns(Result<IEnumerable<TrackDto>>.Ok(tracks));
         PlaylistMenuService sut = BuildService();
 
         // Act
@@ -252,8 +252,8 @@ public class PlaylistMenuServiceTests
     public async Task AddAlbumToCurrentListeningAsync_SendsError_WhenNoTracks()
     {
         // Arrange
-        _mediator.Setup<GetTracksByAlbumIdRequest, IEnumerable<TrackDto>>()
-                 .Returns(Enumerable.Empty<TrackDto>());
+        _mediator.Setup<GetTracksByAlbumIdRequest, Result<IEnumerable<TrackDto>>>()
+                 .Returns(Result<IEnumerable<TrackDto>>.Ok(Enumerable.Empty<TrackDto>()));
         ShowNotificationMessage? notification = null;
         void Listen(ShowNotificationMessage m) => notification = m;
         _messenger.Subscribe<ShowNotificationMessage>(Listen);
@@ -319,5 +319,59 @@ public class PlaylistMenuServiceTests
         {
             // _messenger is instance-scoped to this test, no manual unsubscribe needed
         }
+    }
+
+    [Fact(DisplayName = "when_the_album_track_request_fails_then_an_error_notification_is_sent")]
+    public async Task AddAlbumToCurrentListeningAsync_SendsError_WhenResultIsFailure()
+    {
+        // Arrange
+        _mediator.Setup<GetTracksByAlbumIdRequest, Result<IEnumerable<TrackDto>>>()
+                 .Returns(Result<IEnumerable<TrackDto>>.Fail(new OperationError("track.load_failed", "Validation failed")));
+        ShowNotificationMessage? notification = null;
+        void Listen(ShowNotificationMessage m) => notification = m;
+        _messenger.Subscribe<ShowNotificationMessage>(Listen);
+        try
+        {
+            PlaylistMenuService sut = BuildService();
+
+            // Act
+            await sut.AddAlbumToCurrentListeningAsync(42);
+        }
+        finally
+        {
+            // _messenger is instance-scoped to this test, no manual unsubscribe needed
+        }
+
+        // Assert
+        Assert.NotNull(notification);
+        Assert.Equal(NotificationType.Error, notification!.Type);
+        _playerService.Verify(p => p.AddTracksToPlaylist(It.IsAny<List<TrackDto>>()), Times.Never);
+    }
+
+    [Fact(DisplayName = "when_the_artist_track_request_fails_then_an_error_notification_is_sent")]
+    public async Task AddArtistToCurrentListeningAsync_SendsError_WhenResultIsFailure()
+    {
+        // Arrange
+        _mediator.Setup<GetTracksByArtistIdRequest, Result<IEnumerable<TrackDto>>>()
+                 .Returns(Result<IEnumerable<TrackDto>>.Fail(new OperationError("track.load_failed", "Validation failed")));
+        ShowNotificationMessage? notification = null;
+        void Listen(ShowNotificationMessage m) => notification = m;
+        _messenger.Subscribe<ShowNotificationMessage>(Listen);
+        try
+        {
+            PlaylistMenuService sut = BuildService();
+
+            // Act
+            await sut.AddArtistToCurrentListeningAsync(7);
+        }
+        finally
+        {
+            // _messenger is instance-scoped to this test, no manual unsubscribe needed
+        }
+
+        // Assert
+        Assert.NotNull(notification);
+        Assert.Equal(NotificationType.Error, notification!.Type);
+        _playerService.Verify(p => p.AddTracksToPlaylist(It.IsAny<List<TrackDto>>()), Times.Never);
     }
 }
