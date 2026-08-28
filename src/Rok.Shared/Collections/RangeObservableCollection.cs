@@ -1,38 +1,45 @@
-﻿using System.Collections.ObjectModel;
+using System.Collections.ObjectModel;
 using System.Collections.Specialized;
+using System.ComponentModel;
 
 namespace Rok.Shared.Collections;
 
 public class RangeObservableCollection<T> : ObservableCollection<T>
 {
-    private bool _suppressEvents;
-
     /// <summary>
-    /// Clear collection and add a list of items.
+    /// Replaces the whole content of the collection with <paramref name="items"/>.
+    /// Raises exactly one <see cref="NotifyCollectionChangedAction.Reset"/> notification:
+    /// subscribers never observe the intermediate empty state.
     /// </summary>
     public virtual void InitWithAddRange(IEnumerable<T> items)
     {
-        Clear();
-        AddRange(items);
+        ReplaceRange(items, clearFirst: true);
     }
 
+    /// <summary>
+    /// Appends <paramref name="items"/> to the collection.
+    /// Raises exactly one <see cref="NotifyCollectionChangedAction.Reset"/> notification,
+    /// whatever the number of appended items.
+    /// </summary>
     public virtual void AddRange(IEnumerable<T> items)
     {
-        _suppressEvents = true;
-
-        foreach (T item in items)
-            Add(item);
-
-        _suppressEvents = false;
-
-        OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
+        ReplaceRange(items, clearFirst: false);
     }
 
 
-    protected override void OnCollectionChanged(NotifyCollectionChangedEventArgs e)
+    private void ReplaceRange(IEnumerable<T> items, bool clearFirst)
     {
-        if (!_suppressEvents)
-            base.OnCollectionChanged(e);
+        CheckReentrancy();
+
+        if (clearFirst)
+            Items.Clear();
+
+        foreach (T item in items)
+            Items.Add(item);
+
+        OnPropertyChanged(new PropertyChangedEventArgs(nameof(Count)));
+        OnPropertyChanged(new PropertyChangedEventArgs("Item[]"));
+        OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
     }
 
 
