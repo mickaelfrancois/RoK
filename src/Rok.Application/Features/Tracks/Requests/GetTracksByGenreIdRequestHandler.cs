@@ -2,7 +2,7 @@ using Rok.Application.Interfaces.Repositories;
 
 namespace Rok.Application.Features.Tracks.Requests;
 
-public class GetTracksByGenreIdRequest(long genreId) : IRequest<IEnumerable<TrackDto>>
+public class GetTracksByGenreIdRequest(long genreId) : IRequest<Result<IEnumerable<TrackDto>>>
 {
     public long GenreId { get; } = genreId;
 }
@@ -17,12 +17,12 @@ public sealed class GetTracksByGenreIdRequestValidator : Validator<GetTracksByGe
 }
 
 
-public class GetTracksByGenreIdRequestHandler(ITrackRepository _trackRepository) : IRequestHandler<GetTracksByGenreIdRequest, IEnumerable<TrackDto>>
+public class GetTracksByGenreIdRequestHandler(ITrackRepository _trackRepository) : IRequestHandler<GetTracksByGenreIdRequest, Result<IEnumerable<TrackDto>>>
 {
-    public async Task<IEnumerable<TrackDto>> Handle(GetTracksByGenreIdRequest query, CancellationToken cancellationToken)
+    public async Task<Result<IEnumerable<TrackDto>>> Handle(GetTracksByGenreIdRequest query, CancellationToken cancellationToken)
     {
         IEnumerable<TrackEntity> tracks = await _trackRepository.GetByGenreIdAsync(query.GenreId);
 
-        return tracks.Select(a => TrackDtoMapping.Map(a));
+        return Result<IEnumerable<TrackDto>>.Ok(tracks.Select(a => TrackDtoMapping.Map(a)));
     }
 }

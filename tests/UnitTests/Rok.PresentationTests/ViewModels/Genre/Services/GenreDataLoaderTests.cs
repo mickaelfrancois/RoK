@@ -69,7 +69,7 @@ public class GenreDataLoaderTests
     {
         // Arrange
         List<TrackDto> tracks = new() { new TrackDto { Id = 1 }, new TrackDto { Id = 2 } };
-        _mediator.Setup<GetTracksByGenreIdRequest, IEnumerable<TrackDto>>().Returns(tracks);
+        _mediator.Setup<GetTracksByGenreIdRequest, Result<IEnumerable<TrackDto>>>().Returns(Result<IEnumerable<TrackDto>>.Ok(tracks));
         GenreDataLoader sut = BuildService();
 
         // Act
@@ -79,5 +79,20 @@ public class GenreDataLoaderTests
         Assert.Equal(2, result.Count);
         GetTracksByGenreIdRequest sent = Assert.Single(_mediator.Sent<GetTracksByGenreIdRequest>());
         Assert.Equal(7, sent.GenreId);
+    }
+
+    [Fact(DisplayName = "when_the_genre_track_request_fails_then_an_empty_list_is_returned")]
+    public async Task LoadTracksAsync_ShouldReturnEmpty_WhenResultIsFailure()
+    {
+        // Arrange
+        _mediator.Setup<GetTracksByGenreIdRequest, Result<IEnumerable<TrackDto>>>()
+                 .Returns(Result<IEnumerable<TrackDto>>.Fail(new OperationError("track.load_failed", "Validation failed")));
+        GenreDataLoader sut = BuildService();
+
+        // Act
+        IEnumerable<TrackDto> result = await sut.LoadTracksAsync(2);
+
+        // Assert
+        Assert.Empty(result);
     }
 }

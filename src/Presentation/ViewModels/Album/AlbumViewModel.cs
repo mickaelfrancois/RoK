@@ -18,7 +18,7 @@ namespace Rok.ViewModels.Album;
 public partial class AlbumViewModel : ObservableObject, IFilterableAlbum, IGroupableAlbum
 {
     private readonly NavigationService _navigationService;
-    private readonly ResourceLoader _resourceLoader;
+    private readonly IStringResourceProvider _resourceLoader;
     private readonly IPlayerService _playerService;
     private readonly ILogger<AlbumViewModel> _logger;
     private readonly IBackdropLoader _backdropLoader;
@@ -40,7 +40,26 @@ public partial class AlbumViewModel : ObservableObject, IFilterableAlbum, IGroup
     public RangeObservableCollection<TrackViewModel> Tracks { get; set; } = [];
     private IEnumerable<TrackDto>? _tracks = null;
 
-    public bool HasNoTracks => Tracks.Count == 0;
+    public bool HasNoTracks => LoadState == DetailLoadState.Loaded && Tracks.Count == 0;
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(IsNotFound))]
+    [NotifyPropertyChangedFor(nameof(HasNoTracks))]
+    [NotifyCanExecuteChangedFor(nameof(AlbumOpenCommand))]
+    [NotifyCanExecuteChangedFor(nameof(ArtistOpenCommand))]
+    [NotifyCanExecuteChangedFor(nameof(GenreOpenCommand))]
+    [NotifyCanExecuteChangedFor(nameof(ListenCommand))]
+    [NotifyCanExecuteChangedFor(nameof(AlbumFavoriteCommand))]
+    [NotifyCanExecuteChangedFor(nameof(GetDataFromApiCommand))]
+    [NotifyCanExecuteChangedFor(nameof(EditAlbumCommand))]
+    [NotifyCanExecuteChangedFor(nameof(SelectPictureCommand))]
+    [NotifyCanExecuteChangedFor(nameof(OpenUrlCommand))]
+    [NotifyCanExecuteChangedFor(nameof(OpenBiographyCommand))]
+    public partial DetailLoadState LoadState { get; set; } = DetailLoadState.Loading;
+
+    public bool IsNotFound => LoadState == DetailLoadState.NotFound;
+
+    private bool IsEntityLoaded => LoadState == DetailLoadState.Loaded;
 
     public AlbumDto Album { get; private set; } = new();
     public IPlaylistMenuService PlaylistMenuService { get; }
@@ -181,7 +200,7 @@ public partial class AlbumViewModel : ObservableObject, IFilterableAlbum, IGroup
         ILastFmClient lastFmClient,
         NavigationService navigationService,
         IPlayerService playerService,
-        ResourceLoader resourceLoader,
+        IStringResourceProvider resourceLoader,
         AlbumDataLoader dataLoader,
         TagsProvider tagsDataLoader,
         AlbumPictureService pictureService,
@@ -219,6 +238,10 @@ public partial class AlbumViewModel : ObservableObject, IFilterableAlbum, IGroup
     {
         Album = Guard.NotNull(album);
 
+        // List tiles reuse this view model and never go through LoadDataAsync: without this the
+        // whole carousel would sit with disabled commands.
+        LoadState = DetailLoadState.Loaded;
+
         IsNew = Album.CreatDate > DateTime.UtcNow.AddDays(-_appOptions.AlbumRecentThresholdDays);
 
         UpdateAnniversaryBadge();
@@ -234,6 +257,8 @@ public partial class AlbumViewModel : ObservableObject, IFilterableAlbum, IGroup
 
     public async Task LoadDataAsync(long albumId)
     {
+        LoadState = DetailLoadState.Loading;
+
         CancellationToken cancellationToken = InitNavigationCancellation();
 
         Stopwatch stopwatch = new();
@@ -328,9 +353,14 @@ public partial class AlbumViewModel : ObservableObject, IFilterableAlbum, IGroup
     {
         AlbumDto? album = await _dataLoader.LoadAlbumAsync(albumId);
         if (album == null)
+        {
+            LoadState = DetailLoadState.NotFound;
             return false;
+        }
 
         Album = album;
+        LoadState = DetailLoadState.Loaded;
+
         IsNew = Album.CreatDate > DateTime.UtcNow.AddDays(-_appOptions.AlbumRecentThresholdDays);
 
         UpdateAnniversaryBadge();
@@ -460,27 +490,27 @@ public partial class AlbumViewModel : ObservableObject, IFilterableAlbum, IGroup
             _messenger.Send(new AlbumUpdateMessage(Album.Id, ActionType.Update));
     }
 
-    [RelayCommand]
+    [RelayCommand(CanExecute = nameof(IsEntityLoaded))]
     private void AlbumOpen()
     {
         _navigationService.NavigateToAlbum(Album.Id);
     }
 
-    [RelayCommand]
+    [RelayCommand(CanExecute = nameof(IsEntityLoaded))]
     private void ArtistOpen()
     {
         if (Album.ArtistId.HasValue)
             _navigationService.NavigateToArtist(Album.ArtistId.Value);
     }
 
-    [RelayCommand]
+    [RelayCommand(CanExecute = nameof(IsEntityLoaded))]
     private void GenreOpen()
     {
         if (Album.GenreId.HasValue)
             _navigationService.NavigateToGenre(Album.GenreId.Value);
     }
 
-    [RelayCommand]
+    [RelayCommand(CanExecute = nameof(IsEntityLoaded))]
     private async Task ListenAsync(TrackViewModel? startTrack = null)
     {
         if (_tracks == null)
@@ -490,7 +520,7 @@ public partial class AlbumViewModel : ObservableObject, IFilterableAlbum, IGroup
             _playerService.LoadPlaylist(_tracks.ToList(), startTrack?.Track);
     }
 
-    [RelayCommand]
+    [RelayCommand(CanExecute = nameof(IsEntityLoaded))]
     private async Task AlbumFavoriteAsync()
     {
         bool newFavoriteState = !Album.IsFavorite;
@@ -500,7 +530,7 @@ public partial class AlbumViewModel : ObservableObject, IFilterableAlbum, IGroup
         _messenger.Send(new AlbumUpdateMessage(Album.Id, ActionType.Update));
     }
 
-    [RelayCommand]
+    [RelayCommand(CanExecute = nameof(IsEntityLoaded))]
     private async Task GetDataFromApiAsync()
     {
         CancellationToken token = _navigationCts.Token;
@@ -530,7 +560,7 @@ public partial class AlbumViewModel : ObservableObject, IFilterableAlbum, IGroup
         }
     }
 
-    [RelayCommand]
+    [RelayCommand(CanExecute = nameof(IsEntityLoaded))]
     private async Task EditAlbumAsync()
     {
         bool updated = await _editService.EditAlbumAsync(Album);
@@ -542,7 +572,7 @@ public partial class AlbumViewModel : ObservableObject, IFilterableAlbum, IGroup
         OnPropertyChanged(nameof(Album));
     }
 
-    [RelayCommand]
+    [RelayCommand(CanExecute = nameof(IsEntityLoaded))]
     private async Task SelectPictureAsync()
     {
         CancellationToken token = _navigationCts.Token;
@@ -560,7 +590,7 @@ public partial class AlbumViewModel : ObservableObject, IFilterableAlbum, IGroup
         _messenger.Send(new AlbumUpdateMessage(Album.Id, ActionType.Picture));
     }
 
-    [RelayCommand]
+    [RelayCommand(CanExecute = nameof(IsEntityLoaded))]
     private void OpenUrl(string url)
     {
         if (string.IsNullOrEmpty(url))
@@ -575,7 +605,7 @@ public partial class AlbumViewModel : ObservableObject, IFilterableAlbum, IGroup
             _ = Windows.System.Launcher.LaunchUriAsync(uri);
     }
 
-    [RelayCommand]
+    [RelayCommand(CanExecute = nameof(IsEntityLoaded))]
     private async Task OpenBiographyAsync()
     {
         if (string.IsNullOrEmpty(Album.Biography))

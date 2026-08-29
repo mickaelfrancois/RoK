@@ -53,7 +53,7 @@ public class AlbumDataLoaderTests
     public async Task LoadTracksAsync_ShouldReturnEmpty_WhenNoTracks()
     {
         // Arrange
-        _mediator.Setup<GetTracksByAlbumIdRequest, IEnumerable<TrackDto>>().Returns(new List<TrackDto>());
+        _mediator.Setup<GetTracksByAlbumIdRequest, Result<IEnumerable<TrackDto>>>().Returns(Result<IEnumerable<TrackDto>>.Ok(new List<TrackDto>()));
         AlbumDataLoader sut = BuildService();
 
         // Act
@@ -107,5 +107,21 @@ public class AlbumDataLoaderTests
         // Assert
         Assert.Same(stats, result);
         Assert.Single(_mediator.Sent<GetAlbumListeningStatsRequest>());
+    }
+
+    [Fact(DisplayName = "when_the_album_track_request_fails_then_an_empty_list_is_returned")]
+    public async Task LoadTracksAsync_ShouldReturnEmpty_WhenResultIsFailure()
+    {
+        // Arrange
+        _mediator.Setup<GetTracksByAlbumIdRequest, Result<IEnumerable<TrackDto>>>()
+                 .Returns(Result<IEnumerable<TrackDto>>.Fail(new OperationError("track.load_failed", "Validation failed")));
+        AlbumDataLoader sut = BuildService();
+
+        // Act
+        List<TrackViewModel> result = await sut.LoadTracksAsync(7);
+
+        // Assert
+        Assert.Empty(result);
+        _vmFactory.Verify(f => f.Create(), Times.Never);
     }
 }

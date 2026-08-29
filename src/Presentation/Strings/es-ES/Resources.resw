@@ -1999,4 +1999,13 @@
   <data name="playerSleep60.Text" xml:space="preserve">
     <value>60 minutos</value>
   </data>
+  <data name="albumPageNotFound.Message" xml:space="preserve">
+    <value>Este álbum ya no está en tu biblioteca</value>
+  </data>
+  <data name="artistPageNotFound.Message" xml:space="preserve">
+    <value>Este artista ya no está en tu biblioteca</value>
+  </data>
+  <data name="genrePageNotFound.Message" xml:space="preserve">
+    <value>Este género ya no está en tu biblioteca</value>
+  </data>
 </root>

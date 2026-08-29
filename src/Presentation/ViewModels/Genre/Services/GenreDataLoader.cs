@@ -26,8 +26,16 @@ public class GenreDataLoader(IMediator mediator, IAlbumViewModelFactory albumVie
     }
 
 
-    public Task<IEnumerable<TrackDto>> LoadTracksAsync(long genreId)
+    public async Task<IEnumerable<TrackDto>> LoadTracksAsync(long genreId)
     {
-        return mediator.Send(new GetTracksByGenreIdRequest(genreId));
+        Result<IEnumerable<TrackDto>> result = await mediator.Send(new GetTracksByGenreIdRequest(genreId));
+
+        if (result.IsFailure)
+        {
+            logger.LogError("Failed to load tracks for genre {GenreId}", genreId);
+            return [];
+        }
+
+        return result.Value;
     }
 }

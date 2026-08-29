@@ -211,15 +211,15 @@ public sealed partial class PlaylistMenuService : IPlaylistMenuService, IDisposa
     {
         try
         {
-            IEnumerable<TrackDto> tracks = await _mediator.Send(new GetTracksByArtistIdRequest(artistId));
-            if (tracks == null || !tracks.Any())
+            Result<IEnumerable<TrackDto>> result = await _mediator.Send(new GetTracksByArtistIdRequest(artistId));
+            if (result.IsFailure || !result.Value.Any())
             {
                 _messenger.Send(new ShowNotificationMessage() { Message = _resourceProvider.GetString("notification_playlist_track_add_error"), Type = NotificationType.Error });
                 _logger.LogWarning("No tracks found for artist '{ArtistId}'", artistId);
                 return;
             }
 
-            _playerService.AddTracksToPlaylist(tracks.ToList());
+            _playerService.AddTracksToPlaylist(result.Value.ToList());
         }
         catch (Exception ex)
         {
@@ -232,15 +232,15 @@ public sealed partial class PlaylistMenuService : IPlaylistMenuService, IDisposa
     {
         try
         {
-            IEnumerable<TrackDto> tracks = await _mediator.Send(new GetTracksByAlbumIdRequest(albumId));
-            if (tracks == null || !tracks.Any())
+            Result<IEnumerable<TrackDto>> result = await _mediator.Send(new GetTracksByAlbumIdRequest(albumId));
+            if (result.IsFailure || !result.Value.Any())
             {
                 _messenger.Send(new ShowNotificationMessage() { Message = _resourceProvider.GetString("notification_playlist_track_add_error"), Type = NotificationType.Error });
                 _logger.LogWarning("No tracks found for album '{AlbumId}'", albumId);
                 return;
             }
 
-            _playerService.AddTracksToPlaylist(tracks.ToList());
+            _playerService.AddTracksToPlaylist(result.Value.ToList());
         }
         catch (Exception ex)
         {

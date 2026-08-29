@@ -1,5 +1,6 @@
 using Moq;
 using Rok.Application.Dto;
+using Rok.Application.Errors;
 using Rok.Application.Features.Albums.Requests;
 using Rok.Application.Features.Artists.Requests;
 using Rok.Application.Features.Genres.Requests;
@@ -197,8 +198,8 @@ public class PlayerCommandServiceTests
         List<TrackDto> tracks = new() { new TrackDto { Id = 10 } };
         _mediator.Setup<GetAllAlbumsRequest, IEnumerable<AlbumDto>>()
                  .Returns(new List<AlbumDto> { album });
-        _mediator.Setup<GetTracksByAlbumIdRequest, IEnumerable<TrackDto>>()
-                 .Returns(tracks);
+        _mediator.Setup<GetTracksByAlbumIdRequest, Result<IEnumerable<TrackDto>>>()
+                 .Returns(Result<IEnumerable<TrackDto>>.Ok(tracks));
         PlayerCommandService sut = BuildService();
 
         // Act
@@ -233,8 +234,8 @@ public class PlayerCommandServiceTests
         List<TrackDto> tracks = new() { new TrackDto { Id = 10 } };
         _mediator.Setup<GetAllArtistsRequest, IEnumerable<ArtistDto>>()
                  .Returns(new List<ArtistDto> { artist });
-        _mediator.Setup<GetTracksByArtistIdRequest, IEnumerable<TrackDto>>()
-                 .Returns(tracks);
+        _mediator.Setup<GetTracksByArtistIdRequest, Result<IEnumerable<TrackDto>>>()
+                 .Returns(Result<IEnumerable<TrackDto>>.Ok(tracks));
         PlayerCommandService sut = BuildService();
 
         // Act
@@ -269,8 +270,8 @@ public class PlayerCommandServiceTests
         List<TrackDto> tracks = new() { new TrackDto { Id = 10 } };
         _mediator.Setup<GetAllGenresRequest, IEnumerable<GenreDto>>()
                  .Returns(new List<GenreDto> { genre });
-        _mediator.Setup<GetTracksByGenreIdRequest, IEnumerable<TrackDto>>()
-                 .Returns(tracks);
+        _mediator.Setup<GetTracksByGenreIdRequest, Result<IEnumerable<TrackDto>>>()
+                 .Returns(Result<IEnumerable<TrackDto>>.Ok(tracks));
         PlayerCommandService sut = BuildService();
 
         // Act
@@ -280,5 +281,59 @@ public class PlayerCommandServiceTests
         Assert.True(result);
         GetTracksByGenreIdRequest sent = Assert.Single(_mediator.Sent<GetTracksByGenreIdRequest>());
         Assert.Equal(3, sent.GenreId);
+    }
+
+    [Fact(DisplayName = "when_the_album_track_request_fails_then_listen_album_returns_false")]
+    public async Task ListenAlbumAsync_ShouldReturnFalse_WhenResultIsFailure()
+    {
+        // Arrange
+        _mediator.Setup<GetAllAlbumsRequest, IEnumerable<AlbumDto>>()
+                 .Returns(new List<AlbumDto> { new() { Id = 1, Name = "Best Of" } });
+        _mediator.Setup<GetTracksByAlbumIdRequest, Result<IEnumerable<TrackDto>>>()
+                 .Returns(Result<IEnumerable<TrackDto>>.Fail(new OperationError("track.load_failed", "Validation failed")));
+        PlayerCommandService sut = BuildService();
+
+        // Act
+        bool result = await sut.ListenAlbumAsync("Best Of");
+
+        // Assert
+        Assert.False(result);
+        _player.Verify(p => p.LoadPlaylist(It.IsAny<List<TrackDto>>(), It.IsAny<TrackDto>()), Times.Never);
+    }
+
+    [Fact(DisplayName = "when_the_artist_track_request_fails_then_listen_artist_returns_false")]
+    public async Task ListenArtistAsync_ShouldReturnFalse_WhenResultIsFailure()
+    {
+        // Arrange
+        _mediator.Setup<GetAllArtistsRequest, IEnumerable<ArtistDto>>()
+                 .Returns(new List<ArtistDto> { new() { Id = 7, Name = "Artist X" } });
+        _mediator.Setup<GetTracksByArtistIdRequest, Result<IEnumerable<TrackDto>>>()
+                 .Returns(Result<IEnumerable<TrackDto>>.Fail(new OperationError("track.load_failed", "Validation failed")));
+        PlayerCommandService sut = BuildService();
+
+        // Act
+        bool result = await sut.ListenArtistAsync("Artist X");
+
+        // Assert
+        Assert.False(result);
+        _player.Verify(p => p.LoadPlaylist(It.IsAny<List<TrackDto>>(), It.IsAny<TrackDto>()), Times.Never);
+    }
+
+    [Fact(DisplayName = "when_the_genre_track_request_fails_then_listen_genre_returns_false")]
+    public async Task ListenGenreAsync_ShouldReturnFalse_WhenResultIsFailure()
+    {
+        // Arrange
+        _mediator.Setup<GetAllGenresRequest, IEnumerable<GenreDto>>()
+                 .Returns(new List<GenreDto> { new() { Id = 3, Name = "Rock" } });
+        _mediator.Setup<GetTracksByGenreIdRequest, Result<IEnumerable<TrackDto>>>()
+                 .Returns(Result<IEnumerable<TrackDto>>.Fail(new OperationError("track.load_failed", "Validation failed")));
+        PlayerCommandService sut = BuildService();
+
+        // Act
+        bool result = await sut.ListenGenreAsync("Rock");
+
+        // Assert
+        Assert.False(result);
+        _player.Verify(p => p.LoadPlaylist(It.IsAny<List<TrackDto>>(), It.IsAny<TrackDto>()), Times.Never);
     }
 }

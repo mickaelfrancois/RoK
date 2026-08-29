@@ -4,8 +4,8 @@ namespace Rok.ApplicationTests.Features.Tracks.Validators;
 
 public class GetTracksByAlbumIdRequestValidatorTests
 {
-    [Fact(DisplayName = "fails_when_genre_id_is_zero")]
-    public async Task fails_when_genre_id_is_zero()
+    [Fact(DisplayName = "fails_when_album_id_is_zero")]
+    public async Task fails_when_album_id_is_zero()
     {
         GetTracksByAlbumIdRequestValidator sut = new();
         GetTracksByAlbumIdRequest request = new(0);
@@ -15,8 +15,8 @@ public class GetTracksByAlbumIdRequestValidatorTests
         Assert.False(result.IsValid);
     }
 
-    [Fact(DisplayName = "succeeds_when_genre_id_is_positive")]
-    public async Task succeeds_when_genre_id_is_positive()
+    [Fact(DisplayName = "succeeds_when_album_id_is_positive")]
+    public async Task succeeds_when_album_id_is_positive()
     {
         GetTracksByAlbumIdRequestValidator sut = new();
         GetTracksByAlbumIdRequest request = new(42);

@@ -2,9 +2,9 @@ using Rok.Application.Interfaces.Repositories;
 
 namespace Rok.Application.Features.Tracks.Requests;
 
-public class GetTracksByAlbumIdRequest(long genreId) : IRequest<IEnumerable<TrackDto>>
+public class GetTracksByAlbumIdRequest(long albumId) : IRequest<Result<IEnumerable<TrackDto>>>
 {
-    public long GenreId { get; } = genreId;
+    public long AlbumId { get; } = albumId;
 }
 
 
@@ -12,17 +12,17 @@ public sealed class GetTracksByAlbumIdRequestValidator : Validator<GetTracksByAl
 {
     public GetTracksByAlbumIdRequestValidator()
     {
-        Rule(x => x.GenreId).GreaterThan(0L);
+        Rule(x => x.AlbumId).GreaterThan(0L);
     }
 }
 
 
-public class GetTracksByAlbumIdRequestHandler(ITrackRepository _trackRepository) : IRequestHandler<GetTracksByAlbumIdRequest, IEnumerable<TrackDto>>
+public class GetTracksByAlbumIdRequestHandler(ITrackRepository _trackRepository) : IRequestHandler<GetTracksByAlbumIdRequest, Result<IEnumerable<TrackDto>>>
 {
-    public async Task<IEnumerable<TrackDto>> Handle(GetTracksByAlbumIdRequest query, CancellationToken cancellationToken)
+    public async Task<Result<IEnumerable<TrackDto>>> Handle(GetTracksByAlbumIdRequest query, CancellationToken cancellationToken)
     {
-        IEnumerable<TrackEntity> tracks = await _trackRepository.GetByAlbumIdAsync(query.GenreId);
+        IEnumerable<TrackEntity> tracks = await _trackRepository.GetByAlbumIdAsync(query.AlbumId);
 
-        return tracks.Select(a => TrackDtoMapping.Map(a));
+        return Result<IEnumerable<TrackDto>>.Ok(tracks.Select(a => TrackDtoMapping.Map(a)));
     }
 }

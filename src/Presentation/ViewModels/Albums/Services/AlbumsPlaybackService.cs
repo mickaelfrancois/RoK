@@ -16,9 +16,17 @@ public class AlbumsPlaybackService(IMediator mediator, IPlayerService playerServ
             return;
         }
 
-        var tracks = ids.Count == 1
-            ? (await mediator.Send(new GetTracksByAlbumIdRequest(ids[0]))).ToList()
-            : (await mediator.Send(new GetTracksByAlbumListRequest { AlbumsId = ids })).ToList();
+        List<TrackDto> tracks;
+
+        if (ids.Count == 1)
+        {
+            Result<IEnumerable<TrackDto>> result = await mediator.Send(new GetTracksByAlbumIdRequest(ids[0]));
+            tracks = result.IsFailure ? [] : result.Value.ToList();
+        }
+        else
+        {
+            tracks = (await mediator.Send(new GetTracksByAlbumListRequest { AlbumsId = ids })).ToList();
+        }
 
         if (tracks.Count == 0)
         {
