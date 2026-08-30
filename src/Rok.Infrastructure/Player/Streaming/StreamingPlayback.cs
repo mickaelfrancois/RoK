@@ -18,7 +18,7 @@ internal sealed class StreamingPlayback : IDisposable
     private IcyStreamHandler? _icy;
     private IWaveProvider? _decoded;
     private BufferedWaveProvider? _buffer;
-    private WaveOutEvent? _output;
+    private WaveOut? _output;
     private CancellationTokenSource? _cts;
     private Task? _pumpTask;
     private AcmMp3FrameDecompressor? _mp3Decompressor;
@@ -69,13 +69,12 @@ internal sealed class StreamingPlayback : IDisposable
 
                     _decoded = new MediaFoundationReader(station.StreamUrl);
 
-                    _buffer = new BufferedWaveProvider(_decoded.WaveFormat)
+                    _buffer = new BufferedWaveProvider(_decoded.WaveFormat, TimeSpan.FromSeconds(BufferDurationSeconds))
                     {
-                        BufferDuration = TimeSpan.FromSeconds(BufferDurationSeconds),
                         DiscardOnBufferOverflow = true
                     };
 
-                    _output = new WaveOutEvent();
+                    _output = new WaveOut();
                     _output.Init(_buffer);
 
                     SetBuffering(true);
@@ -98,9 +97,8 @@ internal sealed class StreamingPlayback : IDisposable
                         firstFrame.BitRate);
 
                     _mp3Decompressor = new AcmMp3FrameDecompressor(mp3WaveFormat);
-                    _buffer = new BufferedWaveProvider(_mp3Decompressor.OutputFormat)
+                    _buffer = new BufferedWaveProvider(_mp3Decompressor.OutputFormat, TimeSpan.FromSeconds(BufferDurationSeconds))
                     {
-                        BufferDuration = TimeSpan.FromSeconds(BufferDurationSeconds),
                         DiscardOnBufferOverflow = true
                     };
 
@@ -108,7 +106,7 @@ internal sealed class StreamingPlayback : IDisposable
                     int firstDecoded = _mp3Decompressor.DecompressFrame(firstFrame, firstDecodeBuffer, 0);
                     _buffer.AddSamples(firstDecodeBuffer, 0, firstDecoded);
 
-                    _output = new WaveOutEvent();
+                    _output = new WaveOut();
                     _output.Init(_buffer);
 
                     SetBuffering(true);
@@ -123,13 +121,12 @@ internal sealed class StreamingPlayback : IDisposable
                 Stream mfSource = new MediaFoundationSeekableStream(_icy.AudioStream, _logger);
                 _decoded = new StreamMediaFoundationReader(mfSource);
 
-                _buffer = new BufferedWaveProvider(_decoded.WaveFormat)
+                _buffer = new BufferedWaveProvider(_decoded.WaveFormat, TimeSpan.FromSeconds(BufferDurationSeconds))
                 {
-                    BufferDuration = TimeSpan.FromSeconds(BufferDurationSeconds),
                     DiscardOnBufferOverflow = true
                 };
 
-                _output = new WaveOutEvent();
+                _output = new WaveOut();
                 _output.Init(_buffer);
 
                 SetBuffering(true);
@@ -238,7 +235,7 @@ internal sealed class StreamingPlayback : IDisposable
         while (!ct.IsCancellationRequested
                && _buffer.BufferedBytes < bytesPerSecond * PreBufferSeconds)
         {
-            int read = _decoded.Read(readBuffer, 0, readBuffer.Length);
+            int read = _decoded.Read(readBuffer);
             if (read <= 0) { await Task.Delay(50, ct); continue; }
             _buffer.AddSamples(readBuffer, 0, read);
         }
@@ -252,7 +249,7 @@ internal sealed class StreamingPlayback : IDisposable
 
             try
             {
-                read = _decoded.Read(readBuffer, 0, readBuffer.Length);
+                read = _decoded.Read(readBuffer);
             }
             catch (IOException ex)
             {
@@ -282,7 +279,7 @@ internal sealed class StreamingPlayback : IDisposable
             double bufferedSec = _buffer.BufferedBytes / bytesPerSecond;
 
             // During underflow we surface IsBuffering=true to the UI but leave _output
-            // playing. WaveOutEvent will naturally output silence while the buffer is
+            // playing. WaveOut will naturally output silence while the buffer is
             // drained and resume as soon as new samples arrive; pausing/resuming the
             // output device would add clock drift and pop artifacts.
             if (!IsBuffering && bufferedSec < BufferingTriggerSeconds)

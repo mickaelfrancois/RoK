@@ -128,7 +128,7 @@ public class NAudioMediaPlayer : IPlayerEngine, IDisposable
             _outputDevice = null;
         }
 
-        _outputDevice = new WaveOutEvent();
+        _outputDevice = new WaveOut();
         _outputDevice.PlaybackStopped += OutputDevice_PlaybackStopped;
         _outputDevice.Init(_equalizer);
 
@@ -233,7 +233,7 @@ public class NAudioMediaPlayer : IPlayerEngine, IDisposable
 
             _equalizer = new Equalizer(_audioFileReader, bands);
 
-            _outputDevice = new WaveOutEvent();
+            _outputDevice = new WaveOut();
             _outputDevice.PlaybackStopped += OutputDevice_PlaybackStopped;
             _outputDevice.Init(_equalizer);
 
@@ -338,7 +338,7 @@ public class NAudioMediaPlayer : IPlayerEngine, IDisposable
 
         Equalizer nextEqualizer = new(nextReader, nextBands);
 
-        WaveOutEvent nextDevice = new();
+        WaveOut nextDevice = new();
 
         try
         {
