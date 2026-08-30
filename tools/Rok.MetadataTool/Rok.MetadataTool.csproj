@@ -13,4 +13,8 @@
     <ProjectReference Include="..\..\src\Rok.Import\Rok.Import.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <PackageReference Update="Roslynator.Analyzers" Version="5.0.0" />
+  </ItemGroup>
+
 </Project>

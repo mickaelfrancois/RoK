@@ -11,8 +11,8 @@
     <PackageReference Include="CleanArch.DevKit.Mediator.Results" Version="1.1.1" />
     <PackageReference Include="CleanArch.DevKit.Mediator.Validation" Version="1.1.1" />
     <PackageReference Include="Dapper" Version="2.1.79" />
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.9" />
-    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="10.0.9" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.11" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="10.0.11" />
     <PackageReference Include="CleanArch.DevKit.Messaging" Version="1.1.1" />
     <PackageReference Include="CleanArch.DevKit.Guards" Version="1.1.1" />
   </ItemGroup>
@@ -24,5 +24,9 @@
 
   <ItemGroup>
     <InternalsVisibleTo Include="Rok.ApplicationTests" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Update="Roslynator.Analyzers" Version="5.0.0" />
   </ItemGroup>
 </Project>
