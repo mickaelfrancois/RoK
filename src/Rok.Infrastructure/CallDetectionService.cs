@@ -100,10 +100,9 @@ public sealed class CallDetectionService : ICallDetectionService, IAudioSessionE
             TrackSession(sessions[i]);
     }
 
-    private void OnSessionCreated(object sender, IAudioSessionControl newSession)
+    private void OnSessionCreated(object sender, AudioSessionControl newSession)
     {
-        AudioSessionControl control = new(newSession);
-        TrackSession(control);
+        TrackSession(newSession);
     }
 
     private void TrackSession(AudioSessionControl session)

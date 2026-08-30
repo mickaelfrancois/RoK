@@ -24,9 +24,9 @@ public class Equalizer : ISampleProvider
         }
     }
 
-    public int Read(float[] buffer, int offset, int count)
+    public int Read(Span<float> buffer)
     {
-        int samplesRead = _sourceProvider.Read(buffer, offset, count);
+        int samplesRead = _sourceProvider.Read(buffer);
 
         for (int i = 0; i < samplesRead; i++)
         {
@@ -34,7 +34,7 @@ public class Equalizer : ISampleProvider
 
             foreach (EqualizerBand band in _bands)
             {
-                buffer[offset + i] = band.Transform(buffer[offset + i], channel);
+                buffer[i] = band.Transform(buffer[i], channel);
             }
         }
 
