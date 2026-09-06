@@ -212,8 +212,35 @@ public partial class PlayerStateManager : ObservableObject
         }
     }
 
+    /// <summary>
+    /// Queues a synchronous callback on the UI thread.
+    /// </summary>
+    /// <remarks>
+    /// Never pass an <c>async</c> lambda here: it binds as <c>async void</c> and any fault crashes
+    /// the process. Use the <see cref="ExecuteOnUIThread(Func{Task}, Action{Exception})"/> overload.
+    /// </remarks>
     public void ExecuteOnUIThread(Action action)
     {
         _dispatcherQueue.TryEnqueue(() => action());
+    }
+
+    /// <summary>
+    /// Queues an asynchronous callback on the UI thread. The callback runs detached, so a fault
+    /// reaching the dispatcher would tear the process down instead of failing the operation it
+    /// belongs to: every exception is routed to <paramref name="onError"/> instead.
+    /// </summary>
+    public void ExecuteOnUIThread(Func<Task> action, Action<Exception> onError)
+    {
+        _dispatcherQueue.TryEnqueue(async () =>
+        {
+            try
+            {
+                await action();
+            }
+            catch (Exception exception)
+            {
+                onError(exception);
+            }
+        });
     }
 }

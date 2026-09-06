@@ -428,7 +428,8 @@ public partial class PlayerViewModel : ObservableObject, IDisposable
             }
 
             OnPropertyChanged(string.Empty);
-        });
+        },
+        exception => _logger.LogError(exception, "Player VM failed to handle media changed: {Message}.", exception.Message));
     }
 
     private void OnMediaStateChanged(MediaStateChanged message)
