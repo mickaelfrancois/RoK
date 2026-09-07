@@ -11,16 +11,10 @@ public sealed partial class RatingControlDarkControl : UserControl
     private readonly ILogger<RatingControlDarkControl> _logger = App.ServiceProvider.GetRequiredService<ILogger<RatingControlDarkControl>>();
 
     private Storyboard? _runningGesture;
-    private int _currentScore;
-    private int? _pendingExternalScore;
 
     public RatingControlDarkControl()
     {
         InitializeComponent();
-
-        _currentScore = Value;
-
-        InnerRating.ValueChanged += OnInnerRatingValueChanged;
     }
 
     public int Value
@@ -60,45 +54,36 @@ public sealed partial class RatingControlDarkControl : UserControl
             new PropertyMetadata(true));
 
     /// <summary>
-    /// Records a score pushed in by the binding. Such a value always reaches this property before it
-    /// reaches the inner control, so the matching <see cref="RatingControl.ValueChanged"/> is an echo
-    /// and must not play a gesture. A score set by the user travels the other way around.
+    /// Tells a score set by the user from a score pushed in by the binding, by state rather than by
+    /// event order: the inner control already carries the new score when the change comes from it,
+    /// and still carries the previous one when the binding is the source.
     /// </summary>
     private static void OnValuePropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
     {
         RatingControlDarkControl control = (RatingControlDarkControl)d;
+        RatingControl? innerRating = control.InnerRating;
+
+        if (innerRating is null)
+            return;
+
+        int previousScore = (int)e.OldValue;
         int newScore = (int)e.NewValue;
 
-        if (newScore == control._currentScore)
+        if ((int)innerRating.Value != newScore)
+        {
+            control._logger.LogDebug("Rating row {RowName} received score {Score} from the binding", control.Name, newScore);
             return;
-
-        control._pendingExternalScore = newScore;
-
-        control._logger.LogDebug("Rating row {RowName} received score {Score} from the binding", control.Name, newScore);
-    }
-
-    private void OnInnerRatingValueChanged(RatingControl sender, object args)
-    {
-        int previousScore = _currentScore;
-        int newScore = (int)sender.Value;
-
-        _currentScore = newScore;
-
-        bool isBindingEcho = _pendingExternalScore == newScore;
-        _pendingExternalScore = null;
-
-        if (isBindingEcho)
-            return;
+        }
 
         ScoreAnimationPlan? plan = ScoreAnimationPlan.For(previousScore, newScore);
 
-        _logger.LogDebug("Rating row {RowName} score {PreviousScore} to {NewScore}, gesture scale {GestureScale}",
-            Name, previousScore, newScore, plan?.ScaleTo);
+        control._logger.LogDebug("Rating row {RowName} score {PreviousScore} to {NewScore} set by the user, gesture scale {GestureScale}",
+            control.Name, previousScore, newScore, plan?.ScaleTo);
 
         if (plan is null)
             return;
 
-        PlayGesture(plan);
+        control.PlayGesture(plan);
     }
 
     private void PlayGesture(ScoreAnimationPlan plan)

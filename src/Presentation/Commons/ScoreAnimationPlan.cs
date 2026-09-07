@@ -25,9 +25,9 @@ public sealed record ScoreAnimationPlan(double ScaleTo, double WobbleDegrees, bo
 
         return Normalize(newScore) switch
         {
-            1 or 2 => new ScoreAnimationPlan(1.06, 0, false, TimeSpan.FromMilliseconds(120)),
-            3 => new ScoreAnimationPlan(1.10, 0, true, TimeSpan.FromMilliseconds(160)),
-            _ => new ScoreAnimationPlan(1.16, 3, true, TimeSpan.FromMilliseconds(200)),
+            1 or 2 => new ScoreAnimationPlan(1.10, 0, false, TimeSpan.FromMilliseconds(140)),
+            3 => new ScoreAnimationPlan(1.16, 0, true, TimeSpan.FromMilliseconds(180)),
+            _ => new ScoreAnimationPlan(1.24, 3, true, TimeSpan.FromMilliseconds(220)),
         };
     }
 
