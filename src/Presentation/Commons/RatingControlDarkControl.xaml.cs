@@ -43,5 +43,5 @@ public sealed partial class RatingControlDarkControl : UserControl
     }
     public static readonly DependencyProperty IsClearEnabledProperty =
         DependencyProperty.Register(nameof(IsClearEnabled), typeof(bool), typeof(RatingControlDarkControl),
-            new PropertyMetadata(false));
+            new PropertyMetadata(true));
 }
