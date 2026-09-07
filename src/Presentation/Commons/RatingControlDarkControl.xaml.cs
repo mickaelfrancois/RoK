@@ -8,9 +8,11 @@ public sealed partial class RatingControlDarkControl : UserControl
 {
     private static readonly Color SelectedFlashColor = Color.FromArgb(255, 255, 243, 176);
 
+    private readonly ILogger<RatingControlDarkControl> _logger = App.ServiceProvider.GetRequiredService<ILogger<RatingControlDarkControl>>();
+
     private Storyboard? _runningGesture;
-    private bool _isPointerOver;
     private int _currentScore;
+    private int? _pendingExternalScore;
 
     public RatingControlDarkControl()
     {
@@ -19,9 +21,6 @@ public sealed partial class RatingControlDarkControl : UserControl
         _currentScore = Value;
 
         InnerRating.ValueChanged += OnInnerRatingValueChanged;
-        InnerRating.PointerEntered += (_, _) => _isPointerOver = true;
-        InnerRating.PointerExited += (_, _) => _isPointerOver = false;
-        InnerRating.PointerCaptureLost += (_, _) => _isPointerOver = false;
     }
 
     public int Value
@@ -31,7 +30,7 @@ public sealed partial class RatingControlDarkControl : UserControl
     }
     public static readonly DependencyProperty ValueProperty =
         DependencyProperty.Register(nameof(Value), typeof(int), typeof(RatingControlDarkControl),
-            new PropertyMetadata(0));
+            new PropertyMetadata(0, OnValuePropertyChanged));
 
     public int InitialValue
     {
@@ -60,17 +59,41 @@ public sealed partial class RatingControlDarkControl : UserControl
         DependencyProperty.Register(nameof(IsClearEnabled), typeof(bool), typeof(RatingControlDarkControl),
             new PropertyMetadata(true));
 
-    private bool IsScoreChangeUserDriven => _isPointerOver || InnerRating.FocusState != FocusState.Unfocused;
+    /// <summary>
+    /// Records a score pushed in by the binding. Such a value always reaches this property before it
+    /// reaches the inner control, so the matching <see cref="RatingControl.ValueChanged"/> is an echo
+    /// and must not play a gesture. A score set by the user travels the other way around.
+    /// </summary>
+    private static void OnValuePropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+    {
+        RatingControlDarkControl control = (RatingControlDarkControl)d;
+        int newScore = (int)e.NewValue;
+
+        if (newScore == control._currentScore)
+            return;
+
+        control._pendingExternalScore = newScore;
+
+        control._logger.LogDebug("Rating row {RowName} received score {Score} from the binding", control.Name, newScore);
+    }
 
     private void OnInnerRatingValueChanged(RatingControl sender, object args)
     {
         int previousScore = _currentScore;
-        _currentScore = (int)sender.Value;
+        int newScore = (int)sender.Value;
 
-        if (!IsScoreChangeUserDriven)
+        _currentScore = newScore;
+
+        bool isBindingEcho = _pendingExternalScore == newScore;
+        _pendingExternalScore = null;
+
+        if (isBindingEcho)
             return;
 
-        ScoreAnimationPlan? plan = ScoreAnimationPlan.For(previousScore, _currentScore);
+        ScoreAnimationPlan? plan = ScoreAnimationPlan.For(previousScore, newScore);
+
+        _logger.LogDebug("Rating row {RowName} score {PreviousScore} to {NewScore}, gesture scale {GestureScale}",
+            Name, previousScore, newScore, plan?.ScaleTo);
 
         if (plan is null)
             return;
