@@ -1,5 +1,13 @@
 ﻿# ChangeLog
 
+## [1.18.1] Store – 11 septembre 2026
+
+### Corrigé
+
+- Supprimer les références d'entités obsolètes avant d'insérer un événement d'écoute (#373)
+- permettre d'effacer la note d'un titre depuis la barre de lecture (#374)
+- Corriger un plantage au filtrage des listes Albums, Artistes et Titres lorsque le groupement est désactivé (#378)
+
 ## [1.18.0] Store – 01 septembre 2026
 
 ### Ajouté
@@ -7,11 +15,13 @@
 - Nouvelle barre de progression
 - Mise à jour NAudio 2.3.0 vers 3.0.1
 - Mise à jour des paquets Nuget standard
-- 
+
 ### Corrigé
 
 - Arrêter de reconfigurer les sources des listes groupées à chaque actualisation.
 - Protéger les pages de détails contre les entités non chargées
+
+--
 
 ## [1.16.0] Store – 9 juillet 2026
 
