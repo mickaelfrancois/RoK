@@ -5,18 +5,22 @@ namespace Rok.Commons;
 
 /// <summary>
 /// Wires the items source of a grouped list, and rewires it only when the wiring mode changes.
-/// Every redundant reassignment is a window where the framework can process a container whose item
-/// has already left the source, which throws inside the generated x:Bind bindings.
+/// In flat mode the list reads a collection this binder owns, so a filtering pass only refills it
+/// with a single Reset. Every reassignment of the items source is a window where the framework can
+/// process a container whose item has already left the source, which throws inside the generated
+/// x:Bind bindings.
 /// </summary>
 internal sealed class GroupedItemsSourceBinder
 {
-    private static readonly object[] EmptySource = [];
-
     private readonly ListViewBase _zoomedInView;
     private readonly ListViewBase _zoomedOutView;
     private readonly CollectionViewSource _viewSource;
     private readonly IEnumerable _groupedSource;
     private readonly ILogger _logger;
+
+    // The flat mode reads this collection, never the list the view model rebuilds on every
+    // filtering pass. Its instance outlives every filter, so the items source stays put.
+    private readonly RangeObservableCollection<object> _flatItems = [];
 
     private GroupedItemsSourceMode _mode = GroupedItemsSourceMode.None;
 
@@ -31,8 +35,8 @@ internal sealed class GroupedItemsSourceBinder
 
 
     /// <summary>
-    /// Applies the wiring the current state requires. Does nothing when the list is already wired
-    /// the right way.
+    /// Applies the wiring the current state requires. Refreshes the flat content first, then
+    /// rewires the list only when the mode changes.
     /// </summary>
     /// <param name="isGroupingEnabled">Whether the view model currently groups its items.</param>
     /// <param name="firstGroupItems">The items of the first group, or <c>null</c> when there is no group.</param>
@@ -40,13 +44,19 @@ internal sealed class GroupedItemsSourceBinder
     {
         GroupedItemsSourceMode next = GroupedItemsSourcePlanner.ResolveMode(isGroupingEnabled, firstGroupItems is not null, _mode);
 
+        // Refresh before the early return below: staying flat no longer rewires anything, so this
+        // single Reset is what a filtering pass shows. It also fills the collection before it
+        // becomes the source, so the list never reads an empty intermediate state.
+        if (GroupedItemsSourcePlanner.RequiresContentRefresh(next))
+            _flatItems.InitWithAddRange(firstGroupItems?.Cast<object>() ?? []);
+
         if (!GroupedItemsSourcePlanner.RequiresRewire(_mode, next))
             return;
 
         if (next == GroupedItemsSourceMode.Grouped)
             WireGrouped();
         else
-            WireFlat(firstGroupItems);
+            WireFlat();
 
         _mode = next;
 
@@ -64,6 +74,9 @@ internal sealed class GroupedItemsSourceBinder
         _viewSource.Source = null;
         _viewSource.IsSourceGrouped = false;
 
+        // Cleared last: no live list reads the collection any more, so this Reset reaches nobody.
+        _flatItems.Clear();
+
         _mode = GroupedItemsSourceMode.None;
     }
 
@@ -78,7 +91,7 @@ internal sealed class GroupedItemsSourceBinder
     }
 
 
-    private void WireFlat(IList? firstGroupItems)
+    private void WireFlat()
     {
         bool leavingGroupedMode = _mode == GroupedItemsSourceMode.Grouped;
 
@@ -86,9 +99,9 @@ internal sealed class GroupedItemsSourceBinder
         if (leavingGroupedMode)
             _zoomedOutView.ItemsSource = null;
 
-        // Assign the new source directly: going through null would recycle every container while
-        // the page is still on screen.
-        _zoomedInView.ItemsSource = firstGroupItems ?? EmptySource;
+        // Assign the stable collection directly: going through null would recycle every container
+        // while the page is still on screen.
+        _zoomedInView.ItemsSource = _flatItems;
 
         if (leavingGroupedMode)
         {

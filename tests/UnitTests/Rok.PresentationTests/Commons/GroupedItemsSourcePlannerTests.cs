@@ -70,15 +70,15 @@ public class GroupedItemsSourcePlannerTests
         Assert.False(requiresRewire);
     }
 
-    [Fact(DisplayName = "when_mode_stays_flat_then_rewire_is_required")]
-    public void RequiresRewire_StayingFlat_ShouldReturnTrue()
+    [Fact(DisplayName = "when_mode_stays_flat_then_rewire_is_not_required")]
+    public void RequiresRewire_StayingFlat_ShouldReturnFalse()
     {
         // Arrange
         // Act
         bool requiresRewire = GroupedItemsSourcePlanner.RequiresRewire(GroupedItemsSourceMode.Flat, GroupedItemsSourceMode.Flat);
 
         // Assert
-        Assert.True(requiresRewire);
+        Assert.False(requiresRewire);
     }
 
     [Theory(DisplayName = "when_mode_changes_then_rewire_is_required")]
@@ -107,5 +107,38 @@ public class GroupedItemsSourcePlannerTests
 
         // Assert
         Assert.False(requiresRewire);
+    }
+
+    [Fact(DisplayName = "when_mode_is_flat_then_content_refresh_is_required")]
+    public void RequiresContentRefresh_WithFlatMode_ShouldReturnTrue()
+    {
+        // Arrange
+        // Act
+        bool requiresContentRefresh = GroupedItemsSourcePlanner.RequiresContentRefresh(GroupedItemsSourceMode.Flat);
+
+        // Assert
+        Assert.True(requiresContentRefresh);
+    }
+
+    [Fact(DisplayName = "when_mode_is_grouped_then_content_refresh_is_not_required")]
+    public void RequiresContentRefresh_WithGroupedMode_ShouldReturnFalse()
+    {
+        // Arrange
+        // Act
+        bool requiresContentRefresh = GroupedItemsSourcePlanner.RequiresContentRefresh(GroupedItemsSourceMode.Grouped);
+
+        // Assert
+        Assert.False(requiresContentRefresh);
+    }
+
+    [Fact(DisplayName = "when_nothing_is_wired_then_content_refresh_is_not_required")]
+    public void RequiresContentRefresh_WithNoneMode_ShouldReturnFalse()
+    {
+        // Arrange
+        // Act
+        bool requiresContentRefresh = GroupedItemsSourcePlanner.RequiresContentRefresh(GroupedItemsSourceMode.None);
+
+        // Assert
+        Assert.False(requiresContentRefresh);
     }
 }
