@@ -21,6 +21,7 @@ public sealed partial class ArtistsPage : Page, IDisposable
 
     private bool _disposed;
     private bool _pageLoaded;
+    private string? _visualState;
 
     private readonly AnimatedNumberHelper _countAnimation;
     private readonly AnimatedNumberHelper _durationAnimation;
@@ -45,6 +46,10 @@ public sealed partial class ArtistsPage : Page, IDisposable
         Unloaded += Page_Unloaded;
         ViewModel.PropertyChanged += ViewModel_PropertyChanged;
         ViewModel.GroupedItems.CollectionChanged += GroupedItems_CollectionChanged;
+
+        // Apply the display mode while the list is still bare: swapping ItemTemplate, ItemsPanel
+        // and ItemContainerStyle on a populated list mutates it under realized containers.
+        UpdateVisualState();
     }
 
 
@@ -53,7 +58,6 @@ public sealed partial class ArtistsPage : Page, IDisposable
         try
         {
             await ViewModel.LoadDataAsync(forceReload: false);
-            UpdateVisualState();
             base.OnNavigatedTo(e);
         }
         catch (OperationCanceledException) { }
@@ -79,6 +83,9 @@ public sealed partial class ArtistsPage : Page, IDisposable
     private void Page_Loaded(object sender, RoutedEventArgs e)
     {
         _pageLoaded = true;
+
+        // The display mode must be settled before the list receives its items.
+        UpdateVisualState();
         UpdateItemsSource();
         ScrollStateHelper.RestoreScrollOffset(grid);
         _countAnimation.AnimateTo(ViewModel.Count);
@@ -217,7 +224,15 @@ public sealed partial class ArtistsPage : Page, IDisposable
 
     private void UpdateVisualState()
     {
-        VisualStateManager.GoToState(this, ViewModel.IsGridView ? "GridViewState" : "ListViewState", true);
+        string state = ViewModel.IsGridView ? "GridViewState" : "ListViewState";
+
+        if (state == _visualState)
+            return;
+
+        // A call made before the visual tree is built fails: leave _visualState unset so the next
+        // call retries instead of skipping the state for good.
+        if (VisualStateManager.GoToState(this, state, true))
+            _visualState = state;
     }
 
 

@@ -45,12 +45,21 @@ public static class GroupedItemsSourcePlanner
     /// <returns><c>true</c> when the items source must be reassigned.</returns>
     public static bool RequiresRewire(GroupedItemsSourceMode current, GroupedItemsSourceMode next)
     {
-        if (current != next)
-            return true;
+        // A mode that stays itself never needs a rewire: both modes read a collection whose
+        // instance never changes. Grouped goes through the CollectionViewSource, flat through the
+        // stable collection the binder owns, and both rebuild their content on a Reset.
+        return current != next;
+    }
 
-        // Staying grouped costs nothing: the CollectionViewSource observes a stable collection and
-        // rebuilds its groups on every Reset. Staying flat always needs a rewire, because the first
-        // group exposes a brand new List instance on every filtering pass.
+    /// <summary>
+    /// Tells whether the flat source must be refilled to show <paramref name="next"/>.
+    /// </summary>
+    /// <param name="next">The mode resolved by <see cref="ResolveMode"/>.</param>
+    /// <returns><c>true</c> when the stable flat collection must be refilled.</returns>
+    public static bool RequiresContentRefresh(GroupedItemsSourceMode next)
+    {
+        // Grouped reads the view model collection directly, so it needs no copy. Flat reads the
+        // collection the binder owns, which a new filtering pass leaves stale.
         return next == GroupedItemsSourceMode.Flat;
     }
 }
