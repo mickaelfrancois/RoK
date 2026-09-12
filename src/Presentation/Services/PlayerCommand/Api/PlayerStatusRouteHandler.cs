@@ -19,8 +19,8 @@ public sealed class PlayerStatusRouteHandler(IPlayerService playerService, Actio
     public async Task<WebApiResult> HandleAsync(string path)
     {
         string json = path == QueueRoute
-            ? await UiDispatch.ReadAsync(dispatch, () => JsonSerializer.Serialize(WebApiMapper.ToQueue(playerService), RokJson.Options))
-            : await UiDispatch.ReadAsync(dispatch, () => JsonSerializer.Serialize(WebApiMapper.ToStatus(playerService), RokJson.Options));
+            ? await UiDispatch.ReadAsync(dispatch, () => JsonSerializer.Serialize(WebApiMapper.ToQueue(playerService), RokJsonContext.Default.ListQueueEntry))
+            : await UiDispatch.ReadAsync(dispatch, () => JsonSerializer.Serialize(WebApiMapper.ToStatus(playerService), RokJsonContext.Default.PlayerStatus));
 
         return WebApiResult.Ok(json);
     }

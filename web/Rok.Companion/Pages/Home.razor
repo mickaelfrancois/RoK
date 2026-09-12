@@ -1,4 +1,5 @@
 @page "/"
+@page "/{*path}"
 @implements IAsyncDisposable
 @inject RokApiClient Api
 
@@ -8,7 +9,7 @@
 
     @if (_offline)
     {
-        <div class="banner" role="alert">Rok ne répond pas. Vérifie que l'application tourne sur le PC.</div>
+        <div class="banner" role="alert">Rok ne répond pas. Vérifie que l'application tourne sur le PC.<span class="banner-detail">@_error</span></div>
     }
 
     <section class="now">
@@ -145,6 +146,11 @@
 
     private Tab _tab = Tab.Playlists;
     private bool _offline;
+    private string? _error;
+
+    /// <summary>Absorbs any deep link so a reloaded or bookmarked URL still lands on the remote.</summary>
+    [Parameter]
+    public string? Path { get; set; }
     private bool _coverFailed;
 
     private bool _scrubbing;
@@ -196,10 +202,12 @@
         {
             _status = await Api.GetStatusAsync(_cancellation.Token);
             _offline = false;
+            _error = null;
         }
-        catch (HttpRequestException)
+        catch (Exception ex) when (ex is not OperationCanceledException)
         {
             _offline = true;
+            _error = ex.Message;
             return;
         }
 
@@ -230,9 +238,10 @@
         {
             _queue = await Api.GetQueueAsync(_cancellation.Token);
         }
-        catch (HttpRequestException)
+        catch (Exception ex) when (ex is not OperationCanceledException)
         {
             _offline = true;
+            _error = ex.Message;
         }
     }
 
@@ -243,9 +252,10 @@
         {
             _playlists = await Api.GetPlaylistsAsync(_cancellation.Token);
         }
-        catch (HttpRequestException)
+        catch (Exception ex) when (ex is not OperationCanceledException)
         {
             _offline = true;
+            _error = ex.Message;
         }
     }
 

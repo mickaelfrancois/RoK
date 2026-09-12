@@ -72,6 +72,17 @@ Rok renvoie les en-têtes CORS uniquement aux origines loopback ou en IP privée
 scénario sans exposer l'API aux sites web publics. En production le companion est servi par Rok
 lui-même : même origine, aucun CORS en jeu.
 
+## Contrainte à connaître : le trimming
+
+Le companion est publié *trimmé*. La sérialisation JSON par réflexion compile sans broncher puis
+échoue à l’exécution : les membres des records sont retirés, la désérialisation lève, et la page
+meurt avant son premier rendu — écran figé, aucune playlist, bouton qui ne bascule jamais.
+
+Toute forme traversée par le réseau doit donc être déclarée dans `RokJsonContext`, **listes comprises**,
+et les appels doivent passer les métadonnées (`RokJsonContext.Default.<Type>`) plutôt que des
+`JsonSerializerOptions`. Blazor masque ces avertissements par défaut ; le projet met
+`SuppressTrimAnalysisWarnings=false`, ce qui transforme `IL2026` en erreur de build.
+
 ## Routes utilisées
 
 Les routes historiques (`/status`, `/current`, `/queue`, `/play`, `/listen/...`) restent inchangées

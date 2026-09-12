@@ -58,7 +58,9 @@ public sealed class PlaylistsRouteHandler(IMediator mediator, IPlayerCommandServ
         IEnumerable<PlaylistHeaderDto> playlists =
             await UiDispatch.RunTaskAsync(dispatch, () => mediator.Send(new GetAllPlaylistsRequest()));
 
-        return JsonSerializer.Serialize(playlists.Select(WebApiMapper.ToPlaylistSummary), RokJson.Options);
+        List<PlaylistSummary> summaries = [.. playlists.Select(WebApiMapper.ToPlaylistSummary)];
+
+        return JsonSerializer.Serialize(summaries, RokJsonContext.Default.ListPlaylistSummary);
     }
 
 
@@ -67,7 +69,9 @@ public sealed class PlaylistsRouteHandler(IMediator mediator, IPlayerCommandServ
         IEnumerable<TrackDto> tracks =
             await UiDispatch.RunTaskAsync(dispatch, () => mediator.Send(new GetTracksByPlaylistIdRequest(playlistId)));
 
-        return JsonSerializer.Serialize(tracks.Select(WebApiMapper.ToLibraryTrack), RokJson.Options);
+        List<LibraryTrack> items = [.. tracks.Select(WebApiMapper.ToLibraryTrack)];
+
+        return JsonSerializer.Serialize(items, RokJsonContext.Default.ListLibraryTrack);
     }
 
 

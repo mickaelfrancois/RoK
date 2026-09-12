@@ -8,6 +8,12 @@
     <!-- Rok serves the published files as-is and never negotiates an encoding,
          so the .br and .gz variants would only be dead weight to copy. -->
     <CompressionEnabled>false</CompressionEnabled>
+    <!-- Blazor hides trim warnings by default; that is how reflection-based JSON shipped
+         broken once already. Surfacing them turns the mistake into a build error. -->
+    <SuppressTrimAnalysisWarnings>false</SuppressTrimAnalysisWarnings>
+    <!-- The Router component of the framework is not trim-clean, so its own diagnostics are muted.
+         IL2026 and IL3050, the ones that catch unsafe serialization in this code, stay fatal. -->
+    <NoWarn>$(NoWarn);IL2104;IL2110;IL2111</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>
