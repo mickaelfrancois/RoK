@@ -186,6 +186,16 @@ public sealed partial class PlayerWebApiService(
                 return;
             }
 
+            if (WebApiOriginGuard.IsStateChanging(method, path)
+                && WebApiOriginGuard.IsCrossSite(request.Headers["Origin"], request.Headers["Sec-Fetch-Site"]))
+            {
+                logger.LogWarning("Refused a cross-site {Method} {Path} from origin {Origin}",
+                    method, path, request.Headers["Origin"] ?? "(none)");
+
+                response.StatusCode = 403;
+                return;
+            }
+
             WebApiResult result = await ResolveAsync(method, path);
 
             response.StatusCode = result.StatusCode;
@@ -228,43 +238,13 @@ public sealed partial class PlayerWebApiService(
     {
         string? origin = request.Headers["Origin"];
 
-        if (string.IsNullOrEmpty(origin) || !IsLocalOrigin(origin))
+        if (string.IsNullOrEmpty(origin) || !WebApiOriginGuard.IsLocalOrigin(origin))
             return;
 
         response.AddHeader("Access-Control-Allow-Origin", origin);
         response.AddHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
         response.AddHeader("Access-Control-Allow-Headers", "Content-Type");
         response.AddHeader("Vary", "Origin");
-    }
-
-
-    private static bool IsLocalOrigin(string origin)
-    {
-        if (!Uri.TryCreate(origin, UriKind.Absolute, out Uri? uri))
-            return false;
-
-        if (uri.IsLoopback)
-            return true;
-
-        return IPAddress.TryParse(uri.Host, out IPAddress? address) && IsPrivateAddress(address);
-    }
-
-
-    private static bool IsPrivateAddress(IPAddress address)
-    {
-        if (address.AddressFamily != AddressFamily.InterNetwork)
-            return address.IsIPv6LinkLocal || address.IsIPv6SiteLocal;
-
-        byte[] bytes = address.GetAddressBytes();
-
-        return bytes[0] switch
-        {
-            10 => true,
-            172 => bytes[1] is >= 16 and <= 31,
-            192 => bytes[1] == 168,
-            169 => bytes[1] == 254,
-            _ => false
-        };
     }
 
 

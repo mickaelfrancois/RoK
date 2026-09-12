@@ -54,6 +54,10 @@ Depuis le PC pro : `http://<ip-du-pc-perso>:5075`.
 > réseau local peut piloter la lecture et lister les playlists et la file. La règle de pare-feu
 > ci-dessus est limitée au profil réseau *privé* ; n'ouvre jamais ce port sur Internet et ne crée pas
 > de redirection de port vers lui sur ta box.
+>
+> Rok refuse en revanche toute requête modifiante venue d'un autre site : une page web ouverte
+> dans ton navigateur ne peut pas piloter le lecteur, même en visant `localhost`. Les appels
+> scriptés (curl, PowerShell) passent toujours, eux n'envoient pas d'en-tête `Origin`.
 
 ## Développer
 
