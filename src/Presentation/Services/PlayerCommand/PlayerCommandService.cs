@@ -23,6 +23,61 @@ public sealed class PlayerCommandService(IPlayerService playerService, IMediator
 
     public void SetVolume(double volume) => playerService.Volume = Math.Clamp(volume, 0, 100);
 
+    public void Shuffle() => playerService.ShuffleTracks();
+
+    public void ToggleLoop() => playerService.IsLoopingEnabled = !playerService.IsLoopingEnabled;
+
+
+    public void Seek(double positionSeconds)
+    {
+        if (!playerService.CanSeek)
+            return;
+
+        playerService.Position = Math.Max(0, positionSeconds);
+    }
+
+
+    public bool PlayQueuedTrack(long trackId)
+    {
+        TrackDto? track = playerService.Playlist.Find(t => t.Id == trackId);
+
+        if (track is null)
+            return false;
+
+        playerService.Start(track);
+        return true;
+    }
+
+
+    public async Task<bool> SetScoreAsync(long trackId, int score)
+    {
+        int clamped = Math.Clamp(score, 0, 5);
+
+        Result<bool> result = await mediator.Send(new UpdateScoreRequest(trackId, clamped));
+
+        if (!result.IsSuccess)
+            return false;
+
+        foreach (TrackDto track in playerService.Playlist.Where(t => t.Id == trackId))
+            track.Score = clamped;
+
+        return true;
+    }
+
+
+    public async Task<bool> ListenPlaylistByIdAsync(long playlistId)
+    {
+        IEnumerable<TrackDto> tracks = await mediator.Send(new GetTracksByPlaylistIdRequest(playlistId));
+        List<TrackDto> list = tracks.ToList();
+
+        if (list.Count == 0)
+            return false;
+
+        playerService.LoadPlaylist(list);
+        playerService.Play();
+        return true;
+    }
+
 
     public void Toggle()
     {

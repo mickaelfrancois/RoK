@@ -43,21 +43,36 @@ public sealed partial class PlayerWebApiService(
     {
         try
         {
-            ActivePort = ResolveAvailablePort(options.WebApiPort);
+            bool allowLan = options.WebApiAllowLan;
 
+            ActivePort = ResolveAvailablePort(options.WebApiPort, allowLan);
             _cts = new CancellationTokenSource();
-            _listener = new HttpListener();
-            _listener.Prefixes.Add($"http://localhost:{ActivePort}/");
-            _listener.Start();
 
-            logger.LogInformation("Player Web API started on http://localhost:{Port}", ActivePort);
+            if (allowLan && TryStartListener($"http://+:{ActivePort}/"))
+            {
+                logger.LogInformation("Player Web API started on http://{Machine}:{Port} (reachable from the local network)",
+                    Environment.MachineName, ActivePort);
+            }
+            else
+            {
+                if (allowLan)
+                {
+                    logger.LogWarning(
+                        "Player Web API could not bind every interface; falling back to loopback. Grant the reservation once from an elevated prompt: netsh http add urlacl url=http://+:{Port}/ user={User}",
+                        ActivePort, Environment.UserName);
+                }
+
+                if (!TryStartListener($"http://localhost:{ActivePort}/"))
+                {
+                    logger.LogError("Failed to start Player Web API on port {Port}", ActivePort);
+                    Stop();
+                    return;
+                }
+
+                logger.LogInformation("Player Web API started on http://localhost:{Port}", ActivePort);
+            }
 
             _ = Task.Run(() => ListenAsync(_cts.Token), _cts.Token);
-        }
-        catch (HttpListenerException ex)
-        {
-            logger.LogError(ex, "Failed to start Player Web API on port {Port}", ActivePort);
-            Stop();
         }
         catch (Exception ex)
         {
@@ -67,18 +82,40 @@ public sealed partial class PlayerWebApiService(
     }
 
 
-    private static int ResolveAvailablePort(int preferredPort)
+    private bool TryStartListener(string prefix)
     {
+        HttpListener listener = new();
+
         try
         {
-            TcpListener probe = new(IPAddress.Loopback, preferredPort);
+            listener.Prefixes.Add(prefix);
+            listener.Start();
+            _listener = listener;
+            return true;
+        }
+        catch (HttpListenerException ex)
+        {
+            logger.LogDebug(ex, "Could not bind the Player Web API to {Prefix}", prefix);
+            listener.Close();
+            return false;
+        }
+    }
+
+
+    private static int ResolveAvailablePort(int preferredPort, bool allowLan)
+    {
+        IPAddress probeAddress = allowLan ? IPAddress.Any : IPAddress.Loopback;
+
+        try
+        {
+            TcpListener probe = new(probeAddress, preferredPort);
             probe.Start();
             probe.Stop();
             return preferredPort;
         }
         catch (SocketException)
         {
-            TcpListener probe = new(IPAddress.Loopback, 0);
+            TcpListener probe = new(probeAddress, 0);
             probe.Start();
             int port = ((IPEndPoint)probe.LocalEndpoint).Port;
             probe.Stop();
@@ -138,8 +175,16 @@ public sealed partial class PlayerWebApiService(
 
         try
         {
+            ApplyCorsHeaders(request, response);
+
             string path = request.Url?.AbsolutePath.TrimEnd('/').ToLowerInvariant() ?? string.Empty;
             string method = request.HttpMethod.ToUpperInvariant();
+
+            if (method == "OPTIONS")
+            {
+                response.StatusCode = 204;
+                return;
+            }
 
             WebApiResult result = await ResolveAsync(method, path);
 
@@ -173,6 +218,55 @@ public sealed partial class PlayerWebApiService(
             response.Close();
         }
     }
+
+    /// <summary>
+    /// Echoes the caller origin back when it belongs to this machine or a private network, so that the companion
+    /// served from a development server can call the API. Public origins are deliberately never allowed: with a
+    /// wildcard, any web page the user happens to visit could read the library through their browser.
+    /// </summary>
+    private static void ApplyCorsHeaders(HttpListenerRequest request, HttpListenerResponse response)
+    {
+        string? origin = request.Headers["Origin"];
+
+        if (string.IsNullOrEmpty(origin) || !IsLocalOrigin(origin))
+            return;
+
+        response.AddHeader("Access-Control-Allow-Origin", origin);
+        response.AddHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
+        response.AddHeader("Access-Control-Allow-Headers", "Content-Type");
+        response.AddHeader("Vary", "Origin");
+    }
+
+
+    private static bool IsLocalOrigin(string origin)
+    {
+        if (!Uri.TryCreate(origin, UriKind.Absolute, out Uri? uri))
+            return false;
+
+        if (uri.IsLoopback)
+            return true;
+
+        return IPAddress.TryParse(uri.Host, out IPAddress? address) && IsPrivateAddress(address);
+    }
+
+
+    private static bool IsPrivateAddress(IPAddress address)
+    {
+        if (address.AddressFamily != AddressFamily.InterNetwork)
+            return address.IsIPv6LinkLocal || address.IsIPv6SiteLocal;
+
+        byte[] bytes = address.GetAddressBytes();
+
+        return bytes[0] switch
+        {
+            10 => true,
+            172 => bytes[1] is >= 16 and <= 31,
+            192 => bytes[1] == 168,
+            169 => bytes[1] == 254,
+            _ => false
+        };
+    }
+
 
     private async Task<WebApiResult> ResolveAsync(string method, string path)
     {

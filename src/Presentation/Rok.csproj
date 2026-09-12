@@ -143,6 +143,7 @@
 		<ProjectReference Include="..\Rok.Import\Rok.Import.csproj" />
 		<ProjectReference Include="..\Rok.Shared\Rok.Shared.csproj" />
 		<ProjectReference Include="..\Rok.Infrastructure\Rok.Infrastructure.csproj" />
+		<ProjectReference Include="..\Rok.WebApi.Contracts\Rok.WebApi.Contracts.csproj" />
 	</ItemGroup>
 	<ItemGroup>
 	  <Content Include="Assets\albumFallbackLight.svg">
