@@ -11,6 +11,11 @@ namespace Rok.Services.PlayerCommand.Api;
 /// The assets deliberately live outside the application package, under the writable local folder, so that the
 /// companion is never shipped to the Store alongside Rok. This handler must stay registered last: it answers a
 /// very broad set of paths and would otherwise shadow the API routes.
+/// <para>
+/// Request paths reach handlers already lower-cased, while the published Blazor assets carry mixed-case
+/// fingerprinted names. That is harmless here because Rok is Windows-only and its file system resolves names
+/// case-insensitively; the bytes served, and therefore the integrity hashes the browser checks, are unaffected.
+/// </para>
 /// </remarks>
 /// <param name="defaultRoot">Folder used when no explicit root is configured in the options.</param>
 public sealed class WebAppRouteHandler(string defaultRoot, IAppOptions options, IFileSystem fileSystem, ILogger<WebAppRouteHandler> logger) : IWebApiRouteHandler
