@@ -1,0 +1,376 @@
+@page "/"
+@implements IAsyncDisposable
+@inject RokApiClient Api
+
+<PageTitle>Rok</PageTitle>
+
+<div class="remote">
+
+    @if (_offline)
+    {
+        <div class="banner" role="alert">Rok ne répond pas. Vérifie que l'application tourne sur le PC.</div>
+    }
+
+    <section class="now">
+        <div class="cover">
+            @if (Current is not null && !_coverFailed)
+            {
+                <img src="@RokApiClient.AlbumCoverUrl(Current.TrackId)" alt="Pochette" @onerror="OnCoverFailed" />
+            }
+            else
+            {
+                <div class="cover-empty" aria-hidden="true">&#9835;</div>
+            }
+        </div>
+
+        <div class="meta">
+            <h1>@(Current?.Title ?? "Rien en lecture")</h1>
+            <p class="artist">@(Current?.ArtistName ?? "—")</p>
+            <p class="album">@(Current?.StationName ?? Current?.AlbumName ?? string.Empty)</p>
+
+            @if (Current is not null)
+            {
+                <div class="stars" role="group" aria-label="Note">
+                    @for (int star = 1; star <= 5; star++)
+                    {
+                        int value = star;
+                        <button type="button"
+                                class="@(value <= Current.Score ? "star on" : "star")"
+                                aria-label="@($"Noter {value} sur 5")"
+                                @onclick="() => RateAsync(value)">&#9733;</button>
+                    }
+                </div>
+            }
+        </div>
+    </section>
+
+    <section class="progress">
+        <span class="time">@FormatTime(DisplayPosition)</span>
+        <input type="range" class="scrub"
+               min="0" max="@Math.Max(1, Current?.Duration ?? 1)" step="1"
+               value="@DisplayPosition"
+               disabled="@(_status?.CanSeek != true || Current is null)"
+               @oninput="OnScrubInput" @onchange="OnScrubCommitAsync" />
+        <span class="time">@FormatTime(Current?.Duration ?? 0)</span>
+    </section>
+
+    <section class="transport">
+        <button type="button" class="@(_status?.IsLooping == true ? "ghost active" : "ghost")" title="Répéter" @onclick="OnToggleLoopAsync">&#8635;</button>
+        <button type="button" class="ghost" title="Précédent" disabled="@(_status?.CanPrevious != true)" @onclick="OnPreviousAsync">&#9198;</button>
+        <button type="button" class="primary" title="Lecture ou pause" @onclick="OnToggleAsync">@(IsPlaying ? "⏸" : "▶")</button>
+        <button type="button" class="ghost" title="Suivant" disabled="@(_status?.CanNext != true)" @onclick="OnNextAsync">&#9197;</button>
+        <button type="button" class="ghost" title="Mélanger la file" @onclick="OnShuffleAsync">&#8644;</button>
+    </section>
+
+    <section class="volume">
+        <button type="button" class="@(_status?.IsMuted == true ? "ghost active" : "ghost")" title="Muet" @onclick="OnToggleMuteAsync">@(_status?.IsMuted == true ? "\U0001F507" : "\U0001F50A")</button>
+        <input type="range" min="0" max="100" step="1"
+               value="@DisplayVolume"
+               @oninput="OnVolumeInput" @onchange="OnVolumeCommitAsync" />
+        <span class="time">@((int)DisplayVolume)</span>
+    </section>
+
+    <nav class="tabs">
+        <button type="button" class="@(_tab == Tab.Playlists ? "on" : null)" @onclick="OnShowPlaylistsAsync">Playlists</button>
+        <button type="button" class="@(_tab == Tab.Queue ? "on" : null)" @onclick="OnShowQueueAsync">File (@(_status?.QueueLength ?? 0))</button>
+    </nav>
+
+    <section class="panel">
+        @if (_tab == Tab.Playlists)
+        {
+            @if (_playlists is null)
+            {
+                <p class="hint">Chargement…</p>
+            }
+            else if (_playlists.Count == 0)
+            {
+                <p class="hint">Aucune playlist.</p>
+            }
+            else
+            {
+                @foreach (PlaylistSummary playlist in _playlists)
+                {
+                    PlaylistSummary item = playlist;
+                    <button type="button" class="row" @onclick="() => PlayPlaylistAsync(item.Id)">
+                        <span class="row-main">
+                            <span class="row-title">@item.Name</span>
+                            <span class="row-sub">@item.TrackCount titres · @FormatTime(item.Duration)@(item.IsSmart ? " · smart" : string.Empty)</span>
+                        </span>
+                        <span class="row-action">&#9654;</span>
+                    </button>
+                }
+            }
+        }
+        else
+        {
+            @if (_queue is null || _queue.Count == 0)
+            {
+                <p class="hint">File vide.</p>
+            }
+            else
+            {
+                @foreach (QueueEntry queued in _queue)
+                {
+                    QueueEntry entry = queued;
+                    <button type="button" class="@(entry.IsCurrent ? "row current" : "row")" @onclick="() => PlayQueuedAsync(entry.TrackId)">
+                        <span class="row-main">
+                            <span class="row-title">@entry.Title</span>
+                            <span class="row-sub">@entry.ArtistName · @entry.AlbumName</span>
+                        </span>
+                        <span class="row-action">@FormatTime(entry.Duration)</span>
+                    </button>
+                }
+            }
+        }
+    </section>
+</div>
+
+@code {
+    private enum Tab
+    {
+        Playlists,
+        Queue
+    }
+
+    private static readonly TimeSpan PollInterval = TimeSpan.FromSeconds(1);
+
+    private readonly CancellationTokenSource _cancellation = new();
+
+    private PeriodicTimer? _timer;
+    private Task? _pollLoop;
+
+    private PlayerStatus? _status;
+    private List<PlaylistSummary>? _playlists;
+    private List<QueueEntry>? _queue;
+
+    private Tab _tab = Tab.Playlists;
+    private bool _offline;
+    private bool _coverFailed;
+
+    private bool _scrubbing;
+    private double _scrubValue;
+    private bool _adjustingVolume;
+    private double _volumeValue;
+
+    private long _lastTrackId = -1;
+    private int _lastQueueLength = -1;
+
+    private NowPlaying? Current => _status?.Current;
+
+    private bool IsPlaying => string.Equals(_status?.State, "Playing", StringComparison.OrdinalIgnoreCase);
+
+    private double DisplayPosition => _scrubbing ? _scrubValue : _status?.Position ?? 0;
+
+    private double DisplayVolume => _adjustingVolume ? _volumeValue : _status?.Volume ?? 0;
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        await RefreshStatusAsync();
+        await LoadPlaylistsAsync();
+
+        _timer = new PeriodicTimer(PollInterval);
+        _pollLoop = PollAsync();
+    }
+
+
+    private async Task PollAsync()
+    {
+        try
+        {
+            while (await _timer!.WaitForNextTickAsync(_cancellation.Token))
+            {
+                await RefreshStatusAsync();
+                await InvokeAsync(StateHasChanged);
+            }
+        }
+        catch (OperationCanceledException)
+        {
+        }
+    }
+
+
+    private async Task RefreshStatusAsync()
+    {
+        try
+        {
+            _status = await Api.GetStatusAsync(_cancellation.Token);
+            _offline = false;
+        }
+        catch (HttpRequestException)
+        {
+            _offline = true;
+            return;
+        }
+
+        long trackId = Current?.TrackId ?? -1;
+        bool trackChanged = trackId != _lastTrackId;
+
+        if (trackChanged)
+        {
+            _lastTrackId = trackId;
+            _coverFailed = false;
+        }
+
+        // The queue only changes when a new list is loaded or the playhead moves on, so it is refetched on
+        // those transitions rather than on every tick.
+        int queueLength = _status?.QueueLength ?? 0;
+
+        if (_tab == Tab.Queue && (trackChanged || queueLength != _lastQueueLength))
+        {
+            _lastQueueLength = queueLength;
+            await RefreshQueueAsync();
+        }
+    }
+
+
+    private async Task RefreshQueueAsync()
+    {
+        try
+        {
+            _queue = await Api.GetQueueAsync(_cancellation.Token);
+        }
+        catch (HttpRequestException)
+        {
+            _offline = true;
+        }
+    }
+
+
+    private async Task LoadPlaylistsAsync()
+    {
+        try
+        {
+            _playlists = await Api.GetPlaylistsAsync(_cancellation.Token);
+        }
+        catch (HttpRequestException)
+        {
+            _offline = true;
+        }
+    }
+
+
+    private void OnCoverFailed() => _coverFailed = true;
+
+    private Task OnToggleAsync() => Api.TogglePlaybackAsync();
+
+    private Task OnNextAsync() => Api.NextAsync();
+
+    private Task OnPreviousAsync() => Api.PreviousAsync();
+
+    private Task OnShuffleAsync() => Api.ShuffleAsync();
+
+    private Task OnToggleLoopAsync() => Api.ToggleLoopAsync();
+
+    private Task OnToggleMuteAsync() => Api.ToggleMuteAsync();
+
+    private Task OnShowPlaylistsAsync() => SwitchTabAsync(Tab.Playlists);
+
+    private Task OnShowQueueAsync() => SwitchTabAsync(Tab.Queue);
+
+
+    private async Task SwitchTabAsync(Tab tab)
+    {
+        _tab = tab;
+
+        if (tab == Tab.Queue)
+            await RefreshQueueAsync();
+        else if (_playlists is null)
+            await LoadPlaylistsAsync();
+    }
+
+
+    private void OnScrubInput(ChangeEventArgs args)
+    {
+        _scrubbing = true;
+        _scrubValue = ToDouble(args.Value);
+    }
+
+
+    private async Task OnScrubCommitAsync(ChangeEventArgs args)
+    {
+        double target = ToDouble(args.Value);
+
+        _scrubbing = false;
+        await Api.SeekAsync(target);
+    }
+
+
+    private void OnVolumeInput(ChangeEventArgs args)
+    {
+        _adjustingVolume = true;
+        _volumeValue = ToDouble(args.Value);
+    }
+
+
+    private async Task OnVolumeCommitAsync(ChangeEventArgs args)
+    {
+        double target = ToDouble(args.Value);
+
+        _adjustingVolume = false;
+        await Api.SetVolumeAsync(target);
+    }
+
+
+    /// <summary>Clicking the star already set clears the rating, mirroring how the desktop player behaves.</summary>
+    private async Task RateAsync(int score)
+    {
+        if (Current is null)
+            return;
+
+        int target = Current.Score == score ? 0 : score;
+
+        if (await Api.RateAsync(Current.TrackId, target))
+            await RefreshStatusAsync();
+    }
+
+
+    private async Task PlayPlaylistAsync(long playlistId)
+    {
+        if (await Api.PlayPlaylistAsync(playlistId))
+        {
+            await RefreshStatusAsync();
+            await RefreshQueueAsync();
+        }
+    }
+
+
+    private async Task PlayQueuedAsync(long trackId)
+    {
+        if (await Api.PlayQueuedTrackAsync(trackId))
+        {
+            await RefreshStatusAsync();
+            await RefreshQueueAsync();
+        }
+    }
+
+
+    private static double ToDouble(object? value) =>
+        double.TryParse(value?.ToString(), System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out double parsed)
+            ? parsed
+            : 0;
+
+
+    private static string FormatTime(double seconds)
+    {
+        TimeSpan span = TimeSpan.FromSeconds(Math.Max(0, seconds));
+
+        return span.TotalHours >= 1 ? span.ToString(@"h\:mm\:ss") : span.ToString(@"m\:ss");
+    }
+
+
+    public async ValueTask DisposeAsync()
+    {
+        await _cancellation.CancelAsync();
+
+        _timer?.Dispose();
+
+        if (_pollLoop is not null)
+        {
+            try { await _pollLoop; }
+            catch (OperationCanceledException) { }
+        }
+
+        _cancellation.Dispose();
+    }
+}
