@@ -88,6 +88,50 @@ public class PlayerStatusRouteHandlerTests
         Assert.False(document.RootElement.TryGetProperty("current", out _));
     }
 
+    [Fact(DisplayName = "The queue signature should change when the queue is reordered behind an unchanged length")]
+    public async Task QueueSignature_ShouldChange_WhenQueueIsReordered()
+    {
+        // Arrange
+        PlayerStatusRouteHandler sut = BuildHandler();
+        JsonElement before = await ReadStatusAsync(sut);
+
+        // Act
+        (_playlist[0], _playlist[2]) = (_playlist[2], _playlist[0]);
+        JsonElement after = await ReadStatusAsync(sut);
+
+        // Assert
+        Assert.Equal(before.GetProperty("queueLength").GetInt32(), after.GetProperty("queueLength").GetInt32());
+        Assert.Equal(
+            before.GetProperty("current").GetProperty("trackId").GetInt64(),
+            after.GetProperty("current").GetProperty("trackId").GetInt64());
+        Assert.NotEqual(
+            before.GetProperty("queueSignature").GetInt64(),
+            after.GetProperty("queueSignature").GetInt64());
+    }
+
+    [Fact(DisplayName = "The queue signature should hold steady while the queue does not move")]
+    public async Task QueueSignature_ShouldHoldSteady_WhenNothingMoves()
+    {
+        // Arrange
+        PlayerStatusRouteHandler sut = BuildHandler();
+
+        // Act
+        JsonElement first = await ReadStatusAsync(sut);
+        JsonElement second = await ReadStatusAsync(sut);
+
+        // Assert
+        Assert.Equal(
+            first.GetProperty("queueSignature").GetInt64(),
+            second.GetProperty("queueSignature").GetInt64());
+    }
+
+    private static async Task<JsonElement> ReadStatusAsync(PlayerStatusRouteHandler handler)
+    {
+        WebApiResult result = await handler.HandleAsync("/api/player/status");
+
+        return JsonDocument.Parse(result.Body).RootElement.Clone();
+    }
+
     [Fact(DisplayName = "HandleAsync should flag the playing entry by reference so duplicate identifiers stay distinct")]
     public async Task HandleAsync_ShouldFlagPlayingEntryByReference()
     {

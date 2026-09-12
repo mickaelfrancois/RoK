@@ -1,16 +1,22 @@
 :root {
     color-scheme: dark;
 
-    --bg: #0c0d11;
-    --surface: #16181f;
-    --surface-2: #1d202a;
-    --line: #272b37;
-    --text: #edeff5;
-    --muted: #8d93a6;
-    --accent: #ff4d6d;
-    --accent-soft: rgba(255, 77, 109, .16);
+    /* Mirrors Rok's own tokens: Blue400 accent, Blue300 hover, Blue800 pressed, Gray950 player surface,
+       and the neutral dark the app paints behind its window. Stars are blue in Rok, never gold. */
+    --bg: #17191a;
+    --surface: #1f1f1f;
+    --surface-2: #26292b;
+    --line: #343839;
+    --text: #ffffff;
+    --muted: #9ba1a6;
+    --accent: #257ef9;
+    --accent-hover: #5b9efa;
+    --accent-pressed: #123d7a;
+    --accent-soft: rgba(37, 126, 249, .16);
+    --star: #257ef9;
+    --star-hover: #92befc;
     --radius: 16px;
-    --shadow: 0 18px 40px rgba(0, 0, 0, .45);
+    --shadow: 0 18px 40px rgba(0, 0, 0, .5);
 }
 
 * {
@@ -25,16 +31,40 @@ body {
 
 body {
     background:
-        radial-gradient(1100px 620px at 50% -12%, #241b26 0%, transparent 62%),
+        radial-gradient(1100px 620px at 50% -14%, rgba(13, 42, 84, .8) 0%, transparent 62%),
         var(--bg);
     color: var(--text);
     font: 15px/1.5 "Segoe UI Variable Text", "Segoe UI", system-ui, -apple-system, sans-serif;
     -webkit-font-smoothing: antialiased;
 }
 
+.topbar {
+    align-items: center;
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    padding: 18px 16px 2px;
+}
+
+.topbar .mark {
+    height: 30px;
+    width: 30px;
+}
+
+.wordmark {
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: .16em;
+    text-transform: uppercase;
+}
+
+.wordmark-accent {
+    color: var(--accent);
+}
+
 .app-shell {
     display: block;
-    padding: 20px 16px 40px;
+    padding: 12px 16px 40px;
 }
 
 .remote {
@@ -54,10 +84,10 @@ body {
 }
 
 .banner {
-    background: var(--accent-soft);
-    border: 1px solid rgba(255, 77, 109, .4);
+    background: rgba(213, 16, 7, .14);
+    border: 1px solid rgba(213, 16, 7, .45);
     border-radius: 12px;
-    color: #ffd7de;
+    color: #ffc9c6;
     font-size: 14px;
     padding: 12px 14px;
 }
@@ -150,11 +180,12 @@ body {
 }
 
 .star:hover {
+    color: var(--star-hover);
     transform: scale(1.15);
 }
 
 .star.on {
-    color: #ffc94d;
+    color: var(--star);
 }
 
 /* Progress and volume -------------------------------------------------- */
@@ -273,7 +304,7 @@ input[type="range"]:disabled {
 .primary {
     background: var(--accent);
     border: 0;
-    box-shadow: 0 10px 24px rgba(255, 77, 109, .34);
+    box-shadow: 0 10px 24px rgba(37, 126, 249, .34);
     color: #fff;
     font-size: 24px;
     height: 62px;
@@ -281,7 +312,11 @@ input[type="range"]:disabled {
 }
 
 .primary:hover {
-    filter: brightness(1.08);
+    background: var(--accent-hover);
+}
+
+.primary:active {
+    background: var(--accent-pressed);
 }
 
 /* Surprise ------------------------------------------------------------- */
@@ -356,7 +391,7 @@ input[type="range"]:disabled {
 
 .tabs button.on {
     background: var(--surface-2);
-    color: var(--text);
+    color: var(--accent);
 }
 
 .panel {
@@ -385,7 +420,7 @@ input[type="range"]:disabled {
 
 .row.current {
     background: var(--accent-soft);
-    border-color: rgba(255, 77, 109, .45);
+    border-color: rgba(37, 126, 249, .45);
 }
 
 .row-main {

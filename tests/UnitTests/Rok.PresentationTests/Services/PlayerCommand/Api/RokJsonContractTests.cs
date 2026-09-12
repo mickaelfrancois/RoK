@@ -12,7 +12,7 @@ public class RokJsonContractTests
     private const string StatusPayload =
         """
         {"state":"Paused","mode":"Music","volume":26,"isMuted":false,"position":16.5,"canNext":true,
-        "canPrevious":false,"canSeek":true,"isLooping":false,"isBuffering":false,"queueLength":13,
+        "canPrevious":false,"canSeek":true,"isLooping":false,"isBuffering":false,"queueLength":13,"queueSignature":8153726311,
         "current":{"trackId":6932,"title":"Shake it out","artistName":"Suicidal tendencies","albumName":"13",
         "genreName":"Punk","duration":231,"score":0,"listenCount":0,"isArtistFavorite":false,
         "isAlbumFavorite":false,"isGenreFavorite":false}}
@@ -36,6 +36,7 @@ public class RokJsonContractTests
         Assert.Equal(26, status.Volume);
         Assert.Equal(16.5, status.Position);
         Assert.Equal(13, status.QueueLength);
+        Assert.Equal(8153726311, status.QueueSignature);
         Assert.True(status.CanNext);
         Assert.NotNull(status.Current);
         Assert.Equal(6932, status.Current.TrackId);
@@ -51,7 +52,7 @@ public class RokJsonContractTests
         const string payload =
             """
             {"state":"Stopped","mode":"None","volume":5,"isMuted":false,"position":0,"canNext":false,
-            "canPrevious":false,"canSeek":true,"isLooping":false,"isBuffering":false,"queueLength":0}
+            "canPrevious":false,"canSeek":true,"isLooping":false,"isBuffering":false,"queueLength":0,"queueSignature":0}
             """;
 
         // Act

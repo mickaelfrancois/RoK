@@ -14,6 +14,11 @@ namespace Rok.WebApi.Contracts;
 /// <param name="IsLooping">Whether looping is enabled.</param>
 /// <param name="IsBuffering">Whether the engine is currently buffering.</param>
 /// <param name="QueueLength">The number of tracks currently loaded in the queue.</param>
+/// <param name="QueueSignature">
+/// Fingerprint of the queue content, its order and the playhead position. A client can compare it between
+/// two polls to know whether the queue is worth fetching again. Shuffling changes neither the length nor the
+/// playing track, so without it a reordered queue would go unnoticed.
+/// </param>
 /// <param name="Current">The track being played, or <c>null</c> when nothing is loaded.</param>
 public sealed record PlayerStatus(
     string State,
@@ -27,4 +32,5 @@ public sealed record PlayerStatus(
     bool IsLooping,
     bool IsBuffering,
     int QueueLength,
+    long QueueSignature,
     NowPlaying? Current);

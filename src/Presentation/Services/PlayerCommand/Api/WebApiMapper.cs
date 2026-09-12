@@ -21,7 +21,27 @@ internal static class WebApiMapper
             player.IsLoopingEnabled,
             player.IsBuffering,
             player.Playlist.Count,
+            ComputeQueueSignature(player.Playlist, player.CurrentTrack),
             ToNowPlaying(player));
+
+
+    /// <summary>
+    /// Fingerprints the queue: how many tracks, in which order, and where the playhead sits. Reordering a queue
+    /// leaves its length and its playing track untouched, so this is the only signal telling a polling client
+    /// that a shuffle happened — whether it was asked from the companion or from the desktop window.
+    /// </summary>
+    private static long ComputeQueueSignature(List<TrackDto> playlist, TrackDto? current)
+    {
+        long signature = playlist.Count;
+
+        foreach (TrackDto track in playlist)
+            signature = (signature * 31) + track.Id;
+
+        // The playing entry is matched by reference: the same track may sit several times in one queue.
+        int currentIndex = current is null ? -1 : playlist.IndexOf(current);
+
+        return (signature * 31) + currentIndex + 1;
+    }
 
 
     public static NowPlaying? ToNowPlaying(IPlayerService player)

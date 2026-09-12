@@ -172,7 +172,7 @@
     private double _volumeValue;
 
     private long _lastTrackId = -1;
-    private int _lastQueueLength = -1;
+    private long _lastQueueSignature = -1;
 
     private NowPlaying? Current => _status?.Current;
 
@@ -232,21 +232,20 @@
         }
 
         long trackId = Current?.TrackId ?? -1;
-        bool trackChanged = trackId != _lastTrackId;
 
-        if (trackChanged)
+        if (trackId != _lastTrackId)
         {
             _lastTrackId = trackId;
             _coverFailed = false;
         }
 
-        // The queue only changes when a new list is loaded or the playhead moves on, so it is refetched on
-        // those transitions rather than on every tick.
-        int queueLength = _status?.QueueLength ?? 0;
+        // The queue is refetched on its fingerprint rather than on its length: shuffling reorders it without
+        // changing how many tracks it holds nor which one plays, so any other signal would miss it.
+        long signature = _status?.QueueSignature ?? 0;
 
-        if (_tab == Tab.Queue && (trackChanged || queueLength != _lastQueueLength))
+        if (_tab == Tab.Queue && signature != _lastQueueSignature)
         {
-            _lastQueueLength = queueLength;
+            _lastQueueSignature = signature;
             await RefreshQueueAsync();
         }
     }
@@ -288,7 +287,15 @@
 
     private Task OnPreviousAsync() => Api.PreviousAsync();
 
-    private Task OnShuffleAsync() => Api.ShuffleAsync();
+    /// <summary>Reorders the queue, then pulls it back so the new order shows without waiting for a poll.</summary>
+    private async Task OnShuffleAsync()
+    {
+        if (!await Api.ShuffleAsync())
+            return;
+
+        await RefreshStatusAsync();
+        await RefreshQueueAsync();
+    }
 
     private Task OnToggleLoopAsync() => Api.ToggleLoopAsync();
 
