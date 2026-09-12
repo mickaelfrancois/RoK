@@ -284,6 +284,52 @@ input[type="range"]:disabled {
     filter: brightness(1.08);
 }
 
+/* Surprise ------------------------------------------------------------- */
+
+.surprise {
+    display: grid;
+    gap: 8px;
+    grid-template-columns: 1fr 1fr;
+}
+
+.pill {
+    background: linear-gradient(140deg, var(--surface-2), var(--surface));
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    color: var(--text);
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 600;
+    padding: 12px;
+    transition: border-color .15s ease, color .15s ease, transform .1s ease;
+}
+
+.pill:hover:not(:disabled) {
+    border-color: var(--accent);
+    color: var(--accent);
+}
+
+.pill:active:not(:disabled) {
+    transform: scale(.97);
+}
+
+.pill:disabled {
+    cursor: default;
+    opacity: .5;
+}
+
+.pick {
+    color: var(--muted);
+    font-size: 13px;
+    margin: -8px 0 0;
+    text-align: center;
+}
+
+.pick strong {
+    color: var(--text);
+    font-weight: 600;
+}
+
 /* Tabs and lists ------------------------------------------------------- */
 
 .tabs {

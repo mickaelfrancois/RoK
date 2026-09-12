@@ -1,4 +1,6 @@
-﻿namespace Rok.Services.PlayerCommand;
+﻿using Rok.WebApi.Contracts;
+
+namespace Rok.Services.PlayerCommand;
 
 public interface IPlayerCommandService
 {
@@ -33,6 +35,12 @@ public interface IPlayerCommandService
 
     /// <summary>Loads and plays a playlist by identifier. Returns <c>false</c> when it holds no track.</summary>
     Task<bool> ListenPlaylistByIdAsync(long playlistId);
+
+    /// <summary>Draws a random album from the library and plays it in track order. Returns <c>null</c> when nothing playable was found.</summary>
+    Task<SurprisePick?> SurpriseAlbumAsync();
+
+    /// <summary>Draws a random artist from the library and plays their catalogue shuffled. Returns <c>null</c> when nothing playable was found.</summary>
+    Task<SurprisePick?> SurpriseArtistAsync();
 
     Task<bool> ListenPlaylistAsync(string playlistName);
 

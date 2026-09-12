@@ -71,6 +71,16 @@
         <span class="time">@((int)DisplayVolume)</span>
     </section>
 
+    <section class="surprise">
+        <button type="button" class="pill" disabled="@_drawing" @onclick="OnSurpriseAlbumAsync">Album surprise</button>
+        <button type="button" class="pill" disabled="@_drawing" @onclick="OnSurpriseArtistAsync">Artiste surprise</button>
+    </section>
+
+    @if (_lastPick is not null)
+    {
+        <p class="pick">Tirage : <strong>@_lastPick.Name</strong>@PickSuffix</p>
+    }
+
     <nav class="tabs">
         <button type="button" class="@(_tab == Tab.Playlists ? "on" : null)" @onclick="OnShowPlaylistsAsync">Playlists</button>
         <button type="button" class="@(_tab == Tab.Queue ? "on" : null)" @onclick="OnShowQueueAsync">File (@(_status?.QueueLength ?? 0))</button>
@@ -153,6 +163,9 @@
     public string? Path { get; set; }
     private bool _coverFailed;
 
+    private bool _drawing;
+    private SurprisePick? _lastPick;
+
     private bool _scrubbing;
     private double _scrubValue;
     private bool _adjustingVolume;
@@ -162,6 +175,13 @@
     private int _lastQueueLength = -1;
 
     private NowPlaying? Current => _status?.Current;
+
+    /// <summary>Names the artist behind a drawn album, and how many tracks were queued.</summary>
+    private string PickSuffix =>
+        _lastPick is null
+            ? string.Empty
+            : (_lastPick.ArtistName is null ? string.Empty : " — " + _lastPick.ArtistName)
+              + " · " + _lastPick.TrackCount + " titres";
 
     private bool IsPlaying => string.Equals(_status?.State, "Playing", StringComparison.OrdinalIgnoreCase);
 
@@ -287,6 +307,36 @@
             await RefreshQueueAsync();
         else if (_playlists is null)
             await LoadPlaylistsAsync();
+    }
+
+
+    private Task OnSurpriseAlbumAsync() => DrawAsync(Api.SurpriseAlbumAsync);
+
+    private Task OnSurpriseArtistAsync() => DrawAsync(Api.SurpriseArtistAsync);
+
+
+    /// <summary>
+    /// Runs a draw, then pulls the new state straight away rather than waiting for the next poll, so the
+    /// queue and the cover follow the click without a visible lag.
+    /// </summary>
+    private async Task DrawAsync(Func<Task<SurprisePick?>> draw)
+    {
+        if (_drawing)
+            return;
+
+        _drawing = true;
+
+        try
+        {
+            _lastPick = await draw();
+
+            await RefreshStatusAsync();
+            await RefreshQueueAsync();
+        }
+        finally
+        {
+            _drawing = false;
+        }
     }
 
 

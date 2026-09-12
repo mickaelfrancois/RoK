@@ -74,6 +74,7 @@ public static class DependencyInjection
         services.AddSingleton<IWebApiRouteHandler, PlayerControlRouteHandler>();
         services.AddSingleton<IWebApiRouteHandler, PlaylistsRouteHandler>();
         services.AddSingleton<IWebApiRouteHandler, TrackScoreRouteHandler>();
+        services.AddSingleton<IWebApiRouteHandler, SurpriseRouteHandler>();
 
         services.AddSingleton<TagsProvider>();
 

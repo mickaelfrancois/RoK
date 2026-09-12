@@ -51,6 +51,32 @@ public sealed class RokApiClient(HttpClient http)
     public Task<bool> RateAsync(long trackId, int score) => PostAsync($"api/tracks/{trackId}/score/{score}");
 
 
+    /// <summary>Draws a random album, plays it, and reports what came up.</summary>
+    public Task<SurprisePick?> SurpriseAlbumAsync() => DrawAsync("api/surprise/album");
+
+    /// <summary>Draws a random artist, plays their catalogue, and reports what came up.</summary>
+    public Task<SurprisePick?> SurpriseArtistAsync() => DrawAsync("api/surprise/artist");
+
+
+    private async Task<SurprisePick?> DrawAsync(string route)
+    {
+        try
+        {
+            using StringContent body = new(string.Empty);
+            using HttpResponseMessage response = await http.PostAsync(route, body);
+
+            if (!response.IsSuccessStatusCode)
+                return null;
+
+            return await response.Content.ReadFromJsonAsync(RokJsonContext.Default.SurprisePick);
+        }
+        catch (HttpRequestException)
+        {
+            return null;
+        }
+    }
+
+
     private static string Number(double value) =>
         value.ToString("0.##", System.Globalization.CultureInfo.InvariantCulture);
 

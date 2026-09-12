@@ -100,7 +100,14 @@ pour le companion terminal. Le companion web utilise l'espace `/api/` :
 | GET | `/api/playlists/{id}/tracks` | pistes d'une playlist |
 | POST | `/api/playlists/{id}/play` | charger et lancer une playlist |
 | POST | `/api/tracks/{id}/score/{0-5}` | noter une piste (0 efface la note) |
+| POST | `/api/surprise/album` | tire un album au hasard et le joue dans l’ordre des pistes |
+| POST | `/api/surprise/artist` | tire un artiste au hasard et joue son catalogue mélangé |
 | GET | `/current/album-cover` | pochette de la piste courante |
+
+Les deux routes `surprise` répondent avec ce qui a été tiré (`kind`, `name`, `artistName`,
+`trackCount`) et reproduisent exactement la commande du bureau : un album garde son ordre de pistes,
+un artiste est mélangé. Un tirage tombant sur une entrée sans piste en retente une autre, puis
+renvoie 404 si la bibliothèque n’offre rien de jouable.
 
 Les mutations sont en `POST` : un navigateur qui précharge un lien ne doit pas pouvoir passer au
 titre suivant. Durées et positions sont exprimées en secondes.

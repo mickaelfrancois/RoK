@@ -23,4 +23,5 @@ namespace Rok.WebApi.Contracts;
 [JsonSerializable(typeof(List<PlaylistSummary>))]
 [JsonSerializable(typeof(LibraryTrack))]
 [JsonSerializable(typeof(List<LibraryTrack>))]
+[JsonSerializable(typeof(SurprisePick))]
 public sealed partial class RokJsonContext : JsonSerializerContext;
