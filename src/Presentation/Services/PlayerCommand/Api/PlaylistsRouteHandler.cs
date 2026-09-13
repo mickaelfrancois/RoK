@@ -58,7 +58,9 @@ public sealed class PlaylistsRouteHandler(IMediator mediator, IPlayerCommandServ
         IEnumerable<PlaylistHeaderDto> playlists =
             await UiDispatch.RunTaskAsync(dispatch, () => mediator.Send(new GetAllPlaylistsRequest()));
 
-        List<PlaylistSummary> summaries = [.. playlists.Select(WebApiMapper.ToPlaylistSummary)];
+        // The query carries no ORDER BY, so each consumer orders for itself; the desktop list sorts by
+        // name in PlaylistsDataLoader and the companion has to show the same order as the app.
+        List<PlaylistSummary> summaries = [.. playlists.OrderBy(p => p.Name).Select(WebApiMapper.ToPlaylistSummary)];
 
         return JsonSerializer.Serialize(summaries, RokJsonContext.Default.ListPlaylistSummary);
     }
