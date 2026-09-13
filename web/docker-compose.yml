@@ -1,0 +1,28 @@
+# Example deployment of the Rok companion. Run it from this folder:
+#   docker compose up -d --build
+# then open http://<ip-de-la-machine>:8080
+#
+# Nothing here plays audio: the sound always comes out of the PC running Rok. The container
+# only serves the web remote and relays its calls to that PC.
+services:
+  companion:
+    build:
+      # The build needs src/Rok.WebApi.Contracts and Directory.Build.props, both outside web/.
+      context: ..
+      dockerfile: web/Dockerfile
+    image: rok-companion:latest
+    container_name: rok-companion
+    restart: unless-stopped
+    ports:
+      # Left side is the port on the host. Change it, not the right one.
+      - "8080:8080"
+    environment:
+      # Where Rok listens, seen from inside the container:
+      #   - same machine as Docker  -> http://host.docker.internal:5075
+      #   - another machine on the LAN -> http://192.168.1.50:5075
+      # Rok must have EnableWebApi + WebApiAllowLan set in its settings.json, otherwise it
+      # only listens on loopback and the container cannot reach it. No trailing slash.
+      ROK_API: http://host.docker.internal:5075
+    extra_hosts:
+      # Docker Desktop provides this name already; on Linux this line is what creates it.
+      - "host.docker.internal:host-gateway"

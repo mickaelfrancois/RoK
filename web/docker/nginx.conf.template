@@ -1,0 +1,62 @@
+# Rendered at container start by the nginx image: ${ROK_API} comes from the environment.
+# Everything else ($uri, $host, ...) is an nginx variable and is left alone by the filter.
+
+server {
+    listen 8080;
+    server_name _;
+
+    root /usr/share/nginx/html;
+    index index.html;
+
+    # The companion publishes without .br/.gz variants (CompressionEnabled=false in the csproj),
+    # so nginx compresses on the fly instead. .wasm and .dat are the heavy ones.
+    gzip on;
+    gzip_min_length 1024;
+    gzip_proxied any;
+    gzip_types text/plain text/css application/javascript application/json application/wasm
+               application/octet-stream image/svg+xml;
+
+    # Rok's HTTP API lives on the machine holding the music. Relaying it here keeps the browser
+    # on a single origin: no CORS preflight, and the app needs no ApiBaseAddress baked in.
+    location /api/ {
+        proxy_pass ${ROK_API};
+        proxy_http_version 1.1;
+
+        # Host is rewritten, and this is the line that makes the phone work. Unless WebApiAllowLan is
+        # on, Rok binds http://localhost:<port>/ and http.sys matches the prefix on the Host header,
+        # not on the caller's address: forwarding "192.168.1.x" earns a 400 before Rok sees anything.
+        # Saying "localhost" gets in while Rok's own port stays bound to loopback, so this container's
+        # port remains the only thing the network can reach. $proxy_port follows ROK_API.
+        proxy_set_header Host localhost:$proxy_port;
+
+        # The Origin header, by contrast, is forwarded untouched. Rok refuses state-changing requests
+        # whose origin is neither loopback nor a private address (WebApiOriginGuard), which is what
+        # stops any random web page from driving the player. Reach this container by its LAN IP and
+        # the check passes; reach it by hostname, or through a reverse proxy that terminates a domain
+        # name, and the POST routes answer 403 while the GET ones keep working.
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    }
+
+    # Album covers are served from the legacy route space, next to the /api/ one.
+    location /current/ {
+        proxy_pass ${ROK_API};
+        proxy_http_version 1.1;
+        proxy_set_header Host localhost:$proxy_port;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    }
+
+    # Framework assets carry a fingerprint in their name, so a stale copy can never be served.
+    location /_framework/ {
+        add_header Cache-Control "public, max-age=31536000, immutable";
+    }
+
+    # index.html is the one file whose name never changes: it must never be cached, or a new
+    # deployment keeps loading the previous fingerprints.
+    location = /index.html {
+        add_header Cache-Control "no-cache";
+    }
+
+    location / {
+        try_files $uri $uri/ /index.html;
+    }
+}
