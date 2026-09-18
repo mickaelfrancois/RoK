@@ -1,5 +1,18 @@
 ﻿# ChangeLog
 
+## [1.18.3] Store – 18 septembre 2026
+
+### Ajouté
+
+- Rok Companion : télécommande web pour piloter le lecteur depuis un navigateur du réseau local (#380)
+- Animation de la note lors d'un clic depuis la barre de lecture (#375)
+
+### Corrigé
+
+- Correction d'un plantage au premier démarrage, pendant l'affichage progressif des albums importés (#381)
+
+--
+
 ## [1.18.1] Store – 11 septembre 2026
 
 ### Corrigé
