@@ -14,10 +14,16 @@
         <SolidColorBrush x:Key="RatingControlPointerOverPlaceholderForeground" Color="Gold"/>
     </UserControl.Resources>
 
-    <RatingControl x:Name="InnerRating"
+    <Grid RenderTransformOrigin="0,0.5">
+        <Grid.RenderTransform>
+            <CompositeTransform x:Name="AnimationTransform"/>
+        </Grid.RenderTransform>
+
+        <RatingControl x:Name="InnerRating"
                        Opacity="{x:Bind Opacity, Mode=OneWay}"
                        MaxRating="{x:Bind MaxRating, Mode=OneWay}"
                        IsClearEnabled="{x:Bind IsClearEnabled, Mode=OneWay}"
                        InitialSetValue="{x:Bind InitialValue, Mode=OneWay}"
                        Value="{x:Bind Value, Mode=TwoWay}"/>
+    </Grid>
 </UserControl>
