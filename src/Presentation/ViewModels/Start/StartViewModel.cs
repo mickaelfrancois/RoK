@@ -3,6 +3,7 @@ using CommunityToolkit.Mvvm.Input;
 using Microsoft.UI.Dispatching;
 using Rok.Application.Features.Tracks.Requests;
 using Rok.Application.Interfaces.Pictures;
+using Rok.Commons;
 using Rok.Import.Services;
 using Windows.Storage;
 using Windows.Storage.AccessCache;
@@ -12,6 +13,7 @@ namespace Rok.ViewModels.Start;
 public sealed partial class StartViewModel : ObservableObject, IDisposable
 {
     private const int KDisplayIntervalMs = 300;
+    private const int KDisplayBatchSize = 4;
 
     // Must stay <= ImportMessageThrottler.MaxMessagesBeforeThrottle.
     // If unlock > throttle, AlbumImportedMessage stops arriving before the threshold is reached
@@ -32,6 +34,8 @@ public sealed partial class StartViewModel : ObservableObject, IDisposable
     private readonly DispatcherQueue _dispatcherQueue = DispatcherQueue.GetForCurrentThread();
     private readonly Queue<AlbumImportedModel> _pendingAlbums = new();
     private readonly DispatcherQueueTimer _displayTimer;
+    private readonly AlbumStreamPacer _displayPacer = new(KDisplayBatchSize, KMinAlbumsToUnlockApp);
+    private bool _albumStreamStarted;
     private readonly string _albumsImportedMessage;
     private readonly string _importBackgroundTitle;
     private readonly string _importBackgroundMessage;
@@ -79,13 +83,25 @@ public sealed partial class StartViewModel : ObservableObject, IDisposable
         _displayTimer = _dispatcherQueue.CreateTimer();
         _displayTimer.Interval = TimeSpan.FromMilliseconds(KDisplayIntervalMs);
         _displayTimer.Tick += OnDisplayTimerTick;
-        _displayTimer.Start();
 
         _subscriptions.Add(_messenger.Subscribe<LibraryRefreshMessage>(OnLibraryRefreshMessage));
         _subscriptions.Add(_messenger.Subscribe<AlbumImportedMessage>(AlbumImported));
     }
 
     private void OnLibraryRefreshMessage(LibraryRefreshMessage message) => _ = LibraryRefreshChangeAsync(message);
+
+    /// <summary>
+    /// Starts revealing the imported albums. Idempotent and safe to call more than
+    /// once — the caller does not need to track whether the fade-in already fired.
+    /// </summary>
+    public void StartAlbumStream()
+    {
+        if (_albumStreamStarted || _disposed)
+            return;
+
+        _albumStreamStarted = true;
+        _displayTimer.Start();
+    }
 
     private void UnregisterEvents()
     {
@@ -97,15 +113,18 @@ public sealed partial class StartViewModel : ObservableObject, IDisposable
 
     private void OnDisplayTimerTick(DispatcherQueueTimer sender, object args)
     {
-        if (_pendingAlbums.Count == 0)
+        IReadOnlyList<AlbumImportedModel> batch = _displayPacer.DrainBatch(_pendingAlbums);
+
+        if (batch.Count == 0)
             return;
 
-        AlbumImportedModel album = _pendingAlbums.Dequeue();
-        AlbumsImported.Insert(0, album);
-        ImportProgressText = $"{AlbumsImported.Count} {_albumsImportedMessage}";
-        ImportProgress = Math.Min(AlbumsImported.Count * 100.0 / KMinAlbumsToUnlockApp, 100);
+        foreach (AlbumImportedModel album in batch)
+            AlbumsImported.Insert(0, album);
 
-        if (AlbumsImported.Count >= KMinAlbumsToUnlockApp)
+        ImportProgressText = $"{AlbumsImported.Count} {_albumsImportedMessage}";
+        ImportProgress = AlbumStreamPacer.ProgressPercent(AlbumsImported.Count, KMinAlbumsToUnlockApp);
+
+        if (_displayPacer.ShouldUnlock(AlbumsImported.Count))
         {
             _messenger.Send(new ShowNotificationMessage
             {

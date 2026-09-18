@@ -11,7 +11,7 @@
       mc:Ignorable="d">
 
     <Page.Resources>
-        <Storyboard x:Name="FadeInStoryboard">
+        <Storyboard x:Name="FadeInStoryboard" Completed="FadeInStoryboard_Completed">
             <DoubleAnimation Storyboard.TargetName="mainContent"
                              Storyboard.TargetProperty="Opacity"
                              From="0" To="1"
@@ -105,64 +105,62 @@
             </StackPanel>
 
             <!-- Album discovery wall -->
-            <ScrollViewer Grid.Row="1"
-                          VerticalScrollBarVisibility="Hidden"
-                          HorizontalScrollBarVisibility="Disabled">
-                <GridView x:Name="listAlbums"
-                          ItemsSource="{x:Bind ViewModel.AlbumsImported}"
-                          Padding="32,0,32,40"
-                          SelectionMode="None"
-                          IsItemClickEnabled="False">
-                    <GridView.ItemsPanel>
-                        <ItemsPanelTemplate>
-                            <ItemsWrapGrid Orientation="Horizontal" />
-                        </ItemsPanelTemplate>
-                    </GridView.ItemsPanel>
-                    <GridView.ItemTemplate>
-                        <DataTemplate x:DataType="start:AlbumImportedModel">
-                            <Grid Width="220" Height="220" Margin="6" CornerRadius="12">
-                                <Grid.Shadow>
-                                    <ThemeShadow />
-                                </Grid.Shadow>
-                                <Grid CornerRadius="12">
-                                    <common:PictureControl Cover="{x:Bind Picture}"
-                                                           VerticalAlignment="Center"
-                                                           HorizontalAlignment="Center"
-                                                           PlayButtonVisibility="Collapsed" />
-                                    <Grid VerticalAlignment="Bottom" CornerRadius="0,0,12,12">
-                                        <Grid.Background>
-                                            <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
-                                                <GradientStop Color="Transparent" Offset="0" />
-                                                <GradientStop Color="#E6000000" Offset="1" />
-                                            </LinearGradientBrush>
-                                        </Grid.Background>
-                                        <StackPanel Padding="10,20,10,10" Spacing="2">
-                                            <TextBlock Text="{x:Bind Name}"
-                                                       FontSize="13"
-                                                       FontWeight="SemiBold"
-                                                       Foreground="White"
-                                                       TextTrimming="CharacterEllipsis"
-                                                       MaxLines="1" />
-                                            <TextBlock Text="{x:Bind ArtistName}"
-                                                       FontSize="11"
-                                                       Foreground="White"
-                                                       Opacity="0.7"
-                                                       TextTrimming="CharacterEllipsis"
-                                                       MaxLines="1" />
-                                        </StackPanel>
-                                    </Grid>
+            <GridView x:Name="listAlbums"
+                      Grid.Row="1"
+                      ItemsSource="{x:Bind ViewModel.AlbumsImported}"
+                      Padding="32,0,32,40"
+                      SelectionMode="None"
+                      IsItemClickEnabled="False"
+                      ScrollViewer.VerticalScrollBarVisibility="Hidden"
+                      ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                <GridView.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <ItemsWrapGrid Orientation="Horizontal" />
+                    </ItemsPanelTemplate>
+                </GridView.ItemsPanel>
+                <GridView.ItemTemplate>
+                    <DataTemplate x:DataType="start:AlbumImportedModel">
+                        <Grid Width="220" Height="220" Margin="6" CornerRadius="12">
+                            <Grid.Shadow>
+                                <ThemeShadow />
+                            </Grid.Shadow>
+                            <Grid CornerRadius="12">
+                                <common:PictureControl Cover="{x:Bind Picture}"
+                                                       VerticalAlignment="Center"
+                                                       HorizontalAlignment="Center"
+                                                       PlayButtonVisibility="Collapsed" />
+                                <Grid VerticalAlignment="Bottom" CornerRadius="0,0,12,12">
+                                    <Grid.Background>
+                                        <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                                            <GradientStop Color="Transparent" Offset="0" />
+                                            <GradientStop Color="#E6000000" Offset="1" />
+                                        </LinearGradientBrush>
+                                    </Grid.Background>
+                                    <StackPanel Padding="10,20,10,10" Spacing="2">
+                                        <TextBlock Text="{x:Bind Name}"
+                                                   FontSize="13"
+                                                   FontWeight="SemiBold"
+                                                   Foreground="White"
+                                                   TextTrimming="CharacterEllipsis"
+                                                   MaxLines="1" />
+                                        <TextBlock Text="{x:Bind ArtistName}"
+                                                   FontSize="11"
+                                                   Foreground="White"
+                                                   Opacity="0.7"
+                                                   TextTrimming="CharacterEllipsis"
+                                                   MaxLines="1" />
+                                    </StackPanel>
                                 </Grid>
                             </Grid>
-                        </DataTemplate>
-                    </GridView.ItemTemplate>
-                    <GridView.ItemContainerTransitions>
-                        <TransitionCollection>
-                            <AddDeleteThemeTransition />
-                            <EntranceThemeTransition IsStaggeringEnabled="True" />
-                        </TransitionCollection>
-                    </GridView.ItemContainerTransitions>
-                </GridView>
-            </ScrollViewer>
+                        </Grid>
+                    </DataTemplate>
+                </GridView.ItemTemplate>
+                <GridView.ItemContainerTransitions>
+                    <TransitionCollection>
+                        <EntranceThemeTransition IsStaggeringEnabled="True" />
+                    </TransitionCollection>
+                </GridView.ItemContainerTransitions>
+            </GridView>
 
             <!-- Error state — centered floating card -->
             <Grid Grid.Row="0" Grid.RowSpan="2"
