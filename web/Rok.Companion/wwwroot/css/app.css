@@ -1,0 +1,530 @@
+:root {
+    color-scheme: dark;
+
+    /* Mirrors Rok's own tokens: Blue400 accent, Blue300 hover, Blue800 pressed, Gray950 player surface,
+       and the neutral dark the app paints behind its window. Stars are blue in Rok, never gold. */
+    --bg: #17191a;
+    --surface: #1f1f1f;
+    --surface-2: #26292b;
+    --line: #343839;
+    --text: #ffffff;
+    --muted: #9ba1a6;
+    --accent: #257ef9;
+    --accent-hover: #5b9efa;
+    --accent-pressed: #123d7a;
+    --accent-soft: rgba(37, 126, 249, .16);
+    --star: #257ef9;
+    --star-hover: #92befc;
+    --radius: 16px;
+    --shadow: 0 18px 40px rgba(0, 0, 0, .5);
+}
+
+* {
+    box-sizing: border-box;
+}
+
+html,
+body {
+    margin: 0;
+    min-height: 100%;
+}
+
+body {
+    background:
+        radial-gradient(1100px 620px at 50% -14%, rgba(13, 42, 84, .8) 0%, transparent 62%),
+        var(--bg);
+    color: var(--text);
+    font: 15px/1.5 "Segoe UI Variable Text", "Segoe UI", system-ui, -apple-system, sans-serif;
+    -webkit-font-smoothing: antialiased;
+}
+
+.topbar {
+    align-items: center;
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    padding: 18px 16px 2px;
+}
+
+.topbar .mark {
+    height: 30px;
+    width: 30px;
+}
+
+.wordmark {
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: .16em;
+    text-transform: uppercase;
+}
+
+.wordmark-accent {
+    color: var(--accent);
+}
+
+.app-shell {
+    display: block;
+    padding: 12px 16px 40px;
+    padding-bottom: calc(40px + env(safe-area-inset-bottom, 0px));
+}
+
+.remote {
+    display: grid;
+    gap: 18px;
+    margin: 0 auto;
+    max-width: 620px;
+}
+
+.banner-detail {
+    display: block;
+    font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+    font-size: 12px;
+    margin-top: 6px;
+    opacity: .8;
+    overflow-wrap: anywhere;
+}
+
+.banner {
+    background: rgba(213, 16, 7, .14);
+    border: 1px solid rgba(213, 16, 7, .45);
+    border-radius: 12px;
+    color: #ffc9c6;
+    font-size: 14px;
+    padding: 12px 14px;
+}
+
+/* Now playing ---------------------------------------------------------- */
+
+.now {
+    align-items: center;
+    background: linear-gradient(160deg, var(--surface-2), var(--surface));
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    display: grid;
+    gap: 18px;
+    grid-template-columns: 116px 1fr;
+    padding: 18px;
+}
+
+.cover {
+    aspect-ratio: 1;
+    background: #0f1116;
+    border-radius: 12px;
+    overflow: hidden;
+    width: 116px;
+}
+
+.cover img {
+    display: block;
+    height: 100%;
+    object-fit: cover;
+    width: 100%;
+}
+
+.cover-empty {
+    align-items: center;
+    color: #343a49;
+    display: flex;
+    font-size: 46px;
+    height: 100%;
+    justify-content: center;
+}
+
+.meta {
+    min-width: 0;
+}
+
+.meta h1 {
+    font-size: 20px;
+    font-weight: 650;
+    letter-spacing: -.01em;
+    margin: 0 0 4px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.meta .artist {
+    color: var(--text);
+    margin: 0;
+    opacity: .85;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.meta .album {
+    color: var(--muted);
+    font-size: 13px;
+    margin: 2px 0 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.stars {
+    display: flex;
+    gap: 2px;
+    margin-top: 10px;
+}
+
+.star {
+    background: none;
+    border: 0;
+    color: #3a4052;
+    cursor: pointer;
+    font-size: 20px;
+    line-height: 1;
+    padding: 2px;
+    transition: color .15s ease, transform .15s ease;
+}
+
+.star:hover {
+    color: var(--star-hover);
+    transform: scale(1.15);
+}
+
+.star.on {
+    color: var(--star);
+}
+
+/* Progress and volume -------------------------------------------------- */
+
+.progress,
+.volume {
+    align-items: center;
+    display: grid;
+    gap: 12px;
+    grid-template-columns: auto 1fr auto;
+}
+
+.time {
+    color: var(--muted);
+    font-size: 12px;
+    font-variant-numeric: tabular-nums;
+    min-width: 38px;
+    text-align: center;
+}
+
+input[type="range"] {
+    -webkit-appearance: none;
+    appearance: none;
+    background: transparent;
+    cursor: pointer;
+    width: 100%;
+}
+
+input[type="range"]::-webkit-slider-runnable-track {
+    background: var(--line);
+    border-radius: 999px;
+    height: 6px;
+}
+
+input[type="range"]::-moz-range-track {
+    background: var(--line);
+    border-radius: 999px;
+    height: 6px;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    background: var(--accent);
+    border: 0;
+    border-radius: 50%;
+    box-shadow: 0 0 0 4px var(--accent-soft);
+    height: 16px;
+    margin-top: -5px;
+    width: 16px;
+}
+
+input[type="range"]::-moz-range-thumb {
+    background: var(--accent);
+    border: 0;
+    border-radius: 50%;
+    box-shadow: 0 0 0 4px var(--accent-soft);
+    height: 16px;
+    width: 16px;
+}
+
+input[type="range"]:disabled {
+    cursor: default;
+    opacity: .4;
+}
+
+/* Transport ------------------------------------------------------------ */
+
+.transport {
+    align-items: center;
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+}
+
+.transport button,
+.volume button {
+    align-items: center;
+    border-radius: 50%;
+    cursor: pointer;
+    display: inline-flex;
+    justify-content: center;
+    transition: background .15s ease, color .15s ease, transform .1s ease;
+}
+
+.transport button:active,
+.volume button:active {
+    transform: scale(.94);
+}
+
+.ghost {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    color: var(--text);
+    font-size: 18px;
+    height: 46px;
+    width: 46px;
+}
+
+.ghost:hover:not(:disabled) {
+    background: var(--surface-2);
+}
+
+.ghost:disabled {
+    color: #414759;
+    cursor: default;
+    opacity: .5;
+}
+
+.ghost.active {
+    background: var(--accent-soft);
+    border-color: var(--accent);
+    color: var(--accent);
+}
+
+.primary {
+    background: var(--accent);
+    border: 0;
+    box-shadow: 0 10px 24px rgba(37, 126, 249, .34);
+    color: #fff;
+    font-size: 24px;
+    height: 62px;
+    width: 62px;
+}
+
+.primary:hover {
+    background: var(--accent-hover);
+}
+
+.primary:active {
+    background: var(--accent-pressed);
+}
+
+/* Surprise ------------------------------------------------------------- */
+
+.surprise {
+    display: grid;
+    gap: 8px;
+    grid-template-columns: 1fr 1fr;
+}
+
+.pill {
+    background: linear-gradient(140deg, var(--surface-2), var(--surface));
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    color: var(--text);
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 600;
+    padding: 12px;
+    transition: border-color .15s ease, color .15s ease, transform .1s ease;
+}
+
+.pill:hover:not(:disabled) {
+    border-color: var(--accent);
+    color: var(--accent);
+}
+
+.pill:active:not(:disabled) {
+    transform: scale(.97);
+}
+
+.pill:disabled {
+    cursor: default;
+    opacity: .5;
+}
+
+.pick {
+    color: var(--muted);
+    font-size: 13px;
+    margin: -8px 0 0;
+    text-align: center;
+}
+
+.pick strong {
+    color: var(--text);
+    font-weight: 600;
+}
+
+/* Tabs and lists ------------------------------------------------------- */
+
+.tabs {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    display: grid;
+    gap: 4px;
+    grid-template-columns: 1fr 1fr;
+    padding: 4px;
+}
+
+.tabs button {
+    background: none;
+    border: 0;
+    border-radius: 9px;
+    color: var(--muted);
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 600;
+    padding: 10px;
+    transition: background .15s ease, color .15s ease;
+}
+
+.tabs button.on {
+    background: var(--surface-2);
+    color: var(--accent);
+}
+
+.panel {
+    display: grid;
+    gap: 6px;
+}
+
+.row {
+    align-items: center;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    color: inherit;
+    cursor: pointer;
+    display: flex;
+    gap: 12px;
+    padding: 12px 14px;
+    text-align: left;
+    transition: background .15s ease, border-color .15s ease;
+    width: 100%;
+}
+
+.row:hover {
+    background: var(--surface-2);
+}
+
+.row.current {
+    background: var(--accent-soft);
+    border-color: rgba(37, 126, 249, .45);
+}
+
+.row-main {
+    display: grid;
+    min-width: 0;
+}
+
+.row-title {
+    font-weight: 600;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.row-sub {
+    color: var(--muted);
+    font-size: 12.5px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.row-action {
+    color: var(--muted);
+    font-size: 13px;
+    font-variant-numeric: tabular-nums;
+    margin-left: auto;
+}
+
+.hint {
+    color: var(--muted);
+    padding: 18px 4px;
+    text-align: center;
+}
+
+/* Touch pointers -------------------------------------------------------- */
+
+/* A finger needs a target a mouse does not: the rating stars and the slider handles are the two controls
+   small enough to miss on a phone, so they grow only where the pointer is coarse. */
+@media (pointer: coarse) {
+    .star {
+        font-size: 24px;
+        padding: 10px;
+    }
+
+    input[type="range"]::-webkit-slider-runnable-track {
+        height: 8px;
+    }
+
+    input[type="range"]::-moz-range-track {
+        height: 8px;
+    }
+
+    input[type="range"]::-webkit-slider-thumb {
+        height: 22px;
+        margin-top: -7px;
+        width: 22px;
+    }
+
+    input[type="range"]::-moz-range-thumb {
+        height: 22px;
+        width: 22px;
+    }
+}
+
+/* Narrow screens ------------------------------------------------------- */
+
+@media (max-width: 460px) {
+    .now {
+        gap: 14px;
+        grid-template-columns: 92px 1fr;
+        padding: 14px;
+    }
+
+    .cover {
+        width: 92px;
+    }
+
+    .meta h1 {
+        font-size: 18px;
+    }
+
+    .primary {
+        height: 56px;
+        width: 56px;
+    }
+}
+
+#blazor-error-ui {
+    background: #1d202a;
+    border-top: 1px solid var(--line);
+    bottom: 0;
+    box-shadow: 0 -6px 20px rgba(0, 0, 0, .4);
+    color: var(--text);
+    display: none;
+    left: 0;
+    padding: 12px 16px;
+    position: fixed;
+    width: 100%;
+    z-index: 20;
+}
+
+#blazor-error-ui .dismiss {
+    cursor: pointer;
+    float: right;
+}

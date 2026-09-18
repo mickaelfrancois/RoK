@@ -18,6 +18,18 @@ public class AppOptions : IAppOptions
 
     public bool EnableWebApi { get; set; } = true;
 
+    /// <summary>
+    /// When <c>true</c>, the web API listens on every network interface instead of loopback only,
+    /// which makes it reachable from other machines on the local network. Off by default: turning it
+    /// on exposes playback control and the library listing to anyone on the same network.
+    /// </summary>
+    public bool WebApiAllowLan { get; set; }
+
+    /// <summary>
+    /// Absolute path of the folder holding the published web companion. Empty disables static file serving.
+    /// </summary>
+    public string WebAppRoot { get; set; } = string.Empty;
+
     public List<string> LibraryTokens { get; set; } = [];
 
     public bool CrossFade { get; set; } = true;
@@ -113,6 +125,8 @@ public class AppOptions : IAppOptions
         PauseOnCall = options.PauseOnCall;
         WebApiPort = options.WebApiPort;
         EnableWebApi = options.EnableWebApi;
+        WebApiAllowLan = options.WebApiAllowLan;
+        WebAppRoot = options.WebAppRoot;
 
         ArtistsGroupBy = options.ArtistsGroupBy;
         ArtistsFilterBy = options.ArtistsFilterBy;

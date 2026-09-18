@@ -16,6 +16,10 @@ public interface IAppOptions
 
     bool EnableWebApi { get; set; }
 
+    bool WebApiAllowLan { get; set; }
+
+    string WebAppRoot { get; set; }
+
     List<string> LibraryTokens { get; set; }
 
     bool CrossFade { get; set; }

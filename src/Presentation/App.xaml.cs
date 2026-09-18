@@ -5,6 +5,7 @@ using Rok.Application.Options;
 using Rok.Application.Player;
 using Rok.Import;
 using Rok.Infrastructure;
+using Rok.Services.PlayerCommand.Api;
 using Rok.Services.PlayerCommand.Terminal;
 using Rok.ViewModels.Player.Services;
 using Serilog;
@@ -188,6 +189,15 @@ public partial class App : Microsoft.UI.Xaml.Application
         services.AddLogic();
 
         services.AddSingleton<Action<Action>>(_ => action => MainWindow.DispatcherQueue.TryEnqueue(() => action()));
+
+        // Registered after AddLogic so that it lands last in IEnumerable<IWebApiRouteHandler>: this handler
+        // answers a very broad set of paths and would shadow the API routes if it came first.
+        services.AddSingleton<IWebApiRouteHandler>(provider => new WebAppRouteHandler(
+            Path.Combine(ApplicationData.Current.LocalFolder.Path, "webapp"),
+            provider.GetRequiredService<IAppOptions>(),
+            provider.GetRequiredService<IFileSystem>(),
+            provider.GetRequiredService<ILogger<WebAppRouteHandler>>()));
+
         services.AddSingleton<PlayerWebApiService>();
 
         return services.BuildServiceProvider();

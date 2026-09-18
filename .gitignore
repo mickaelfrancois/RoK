@@ -370,6 +370,9 @@ FodyWeavers.xsd
 *.key
 secrets.json
 appsettings.*.json
+
+# The companion only stores the development API address there, never a secret.
+!web/Rok.Companion/wwwroot/appsettings.Development.json
 .env
 */Properties/PublishProfiles/*
 /Presentation/appsettings.json

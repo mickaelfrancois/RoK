@@ -1,0 +1,10 @@
+# The build context is the repository root, so everything is excluded first and only what the
+# companion needs is allowed back in. Keeps the context at a few hundred kilobytes.
+*
+!Directory.Build.props
+!src/Rok.WebApi.Contracts/
+!web/Rok.Companion/
+!web/docker/
+
+**/bin/
+**/obj/

@@ -67,3 +67,12 @@
 #*.PDF   diff=astextplain
 #*.rtf   diff=astextplain
 #*.RTF   diff=astextplain
+
+###############################################################################
+# Container files must keep LF. Checked out with CRLF, a backslash continuation
+# in the Dockerfile ends in a carriage return and the build breaks.
+###############################################################################
+web/Dockerfile              text eol=lf
+web/Dockerfile.dockerignore text eol=lf
+web/docker-compose.yml      text eol=lf
+web/docker/*.template       text eol=lf
