@@ -1,3 +1,4 @@
+using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml.Controls;
 using Rok.ViewModels.Start;
 using Windows.Storage;
@@ -9,6 +10,10 @@ namespace Rok.Pages;
 
 public sealed partial class WelcomePage : Page
 {
+    private static readonly TimeSpan FallbackStreamStartDelay = TimeSpan.FromMilliseconds(1500);
+
+    private readonly DispatcherQueueTimer _fallbackStreamStartTimer;
+
     public StartViewModel ViewModel { get; set; }
 
     public WelcomePage()
@@ -16,6 +21,11 @@ public sealed partial class WelcomePage : Page
         InitializeComponent();
 
         ViewModel = App.ServiceProvider.GetRequiredService<StartViewModel>();
+
+        _fallbackStreamStartTimer = DispatcherQueue.CreateTimer();
+        _fallbackStreamStartTimer.Interval = FallbackStreamStartDelay;
+        _fallbackStreamStartTimer.IsRepeating = false;
+        _fallbackStreamStartTimer.Tick += (_, _) => ViewModel.StartAlbumStream();
     }
 
 
@@ -38,6 +48,13 @@ public sealed partial class WelcomePage : Page
     private void Grid_Loaded(object sender, RoutedEventArgs e)
     {
         FadeInStoryboard.Begin();
+        _fallbackStreamStartTimer.Start();
         ViewModel.StartInitialScan();
+    }
+
+    private void FadeInStoryboard_Completed(object sender, object e)
+    {
+        _fallbackStreamStartTimer.Stop();
+        ViewModel.StartAlbumStream();
     }
 }
