@@ -105,7 +105,7 @@ public sealed class PlayerCommandService(IPlayerService playerService, IMediator
     /// </summary>
     public async Task<SurprisePick?> SurpriseArtistAsync()
     {
-        IEnumerable<ArtistDto> artists = await mediator.Send(new GetAllArtistsRequest());
+        IEnumerable<ArtistDto> artists = await mediator.Send(new GetAllArtistsRequest { ExcludeArtistsWithoutAlbum = true });
 
         foreach (ArtistDto artist in SamplingHelper.SamplePartialFisherYates(artists, SurpriseDraws))
         {
