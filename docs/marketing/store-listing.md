@@ -1,7 +1,8 @@
 # Store listing & acquisition kit
 
 Source of truth for the Microsoft Store listing (Partner Center → Store listings) and for
-third-party directory submissions. Paste field by field; limits are the Partner Center ones.
+third-party directory submissions. The Store fields are applied through Partner Center's
+listing CSV export/import (en-us, fr-fr, es-es, uk-ua columns); limits are the Partner Center ones.
 
 Baseline (2026-09-28, telemetry + Store API):
 - ~25 installs / week, 11.5 % come back on day 2, 44 % end with an empty library.
@@ -78,7 +79,9 @@ Supported formats: MP3 and FLAC.
 ### Search terms (7 max, ≤ 30 chars each, 21 words total)
 
 `local music player` · `FLAC player` · `MP3 player` · `music library` ·
-`MusicBee alternative` · `Groove Music` · `offline music`
+`offline music` · `smart playlists` · `internet radio`
+
+No competitor names in search terms (Store policy risk); keep them for AlternativeTo.
 
 ### Screenshots
 
@@ -135,8 +138,8 @@ Formats pris en charge : MP3 et FLAC.
 
 ### Termes de recherche
 
-`lecteur musique local` · `lecteur FLAC` · `lecteur MP3` · `bibliothèque musicale` ·
-`alternative MusicBee` · `Groove Musique` · `musique hors ligne`
+`lecteur de musique` · `lecteur FLAC` · `lecteur MP3` · `bibliothèque musicale` ·
+`musique hors ligne` · `playlists intelligentes` · `radio internet`
 
 ---
 
@@ -183,8 +186,8 @@ Formatos compatibles: MP3 y FLAC.
 
 ### Términos de búsqueda
 
-`reproductor música local` · `reproductor FLAC` · `reproductor MP3` · `biblioteca musical` ·
-`alternativa MusicBee` · `Groove Música` · `música sin conexión`
+`reproductor de música` · `reproductor FLAC` · `reproductor MP3` · `biblioteca musical` ·
+`música sin conexión` · `listas inteligentes` · `radio por internet`
 
 ---
 
