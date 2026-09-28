@@ -41,6 +41,7 @@ public sealed partial class StartViewModel : ObservableObject, IDisposable
     private readonly string _importBackgroundMessage;
     private readonly string _errorAccessDenied;
     private readonly string _errorNoAudioFiles;
+    private readonly string _errorFolderPicker;
 
     public RangeObservableCollection<AlbumImportedModel> AlbumsImported { get; } = new();
 
@@ -79,6 +80,7 @@ public sealed partial class StartViewModel : ObservableObject, IDisposable
         _importBackgroundMessage = resourceService.GetString("notification_import_background_message");
         _errorAccessDenied = resourceService.GetString("startViewErrorAccessDenied");
         _errorNoAudioFiles = resourceService.GetString("startViewErrorNoAudio");
+        _errorFolderPicker = resourceService.GetString("startViewErrorFolderPicker");
 
         _displayTimer = _dispatcherQueue.CreateTimer();
         _displayTimer.Interval = TimeSpan.FromMilliseconds(KDisplayIntervalMs);
@@ -215,6 +217,17 @@ public sealed partial class StartViewModel : ObservableObject, IDisposable
         }
 
         _importService.Start(0);
+    }
+
+    /// <summary>
+    /// Shows the folder picker error banner and reports the failure to telemetry.
+    /// Must be called on the UI thread.
+    /// </summary>
+    /// <param name="hResult">HRESULT of the exception raised by the folder picker.</param>
+    public void ReportFolderPickerFailure(int hResult)
+    {
+        ErrorBannerMessage = _errorFolderPicker;
+        _ = _telemetryClient.CaptureEventAsync("Onboarding", "FolderPickerFailed", new Dictionary<string, object> { ["hResult"] = $"0x{hResult:X8}" });
     }
 
     [RelayCommand]

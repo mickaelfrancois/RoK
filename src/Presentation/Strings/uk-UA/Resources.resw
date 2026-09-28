@@ -788,6 +788,9 @@
   <data name="startViewErrorNoAudio" xml:space="preserve">
     <value>Ця папка не містить сумісних аудіофайлів (MP3, FLAC).</value>
   </data>
+  <data name="startViewErrorFolderPicker" xml:space="preserve">
+    <value>Не вдалося відкрити вікно вибору папки. Спробуйте ще раз.</value>
+  </data>
   <data name="startViewExplanation.Text" xml:space="preserve">
     <value>Rok відтворює музику, збережену локально на вашому ПК. У вашій папці не знайдено аудіофайлів.</value>
   </data>

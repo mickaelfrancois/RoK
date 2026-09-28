@@ -730,6 +730,9 @@
   <data name="startViewErrorNoAudio" xml:space="preserve">
     <value>Esta carpeta no contiene archivos de audio compatibles (MP3, FLAC).</value>
   </data>
+  <data name="startViewErrorFolderPicker" xml:space="preserve">
+    <value>No se pudo abrir el selector de carpetas. Inténtalo de nuevo.</value>
+  </data>
   <data name="startViewExplanation.Text" xml:space="preserve">
     <value>Rok reproduce música almacenada localmente en tu PC. No se encontraron archivos de audio en tu carpeta.</value>
   </data>

@@ -1,3 +1,4 @@
+using System.Runtime.InteropServices;
 using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml.Controls;
 using Rok.ViewModels.Start;
@@ -13,6 +14,8 @@ public sealed partial class WelcomePage : Page
     private static readonly TimeSpan FallbackStreamStartDelay = TimeSpan.FromMilliseconds(1500);
 
     private readonly DispatcherQueueTimer _fallbackStreamStartTimer;
+
+    private bool _isPickerOpen;
 
     public StartViewModel ViewModel { get; set; }
 
@@ -31,18 +34,40 @@ public sealed partial class WelcomePage : Page
 
     private async void Button_Click(object sender, RoutedEventArgs e)
     {
-        FolderPicker folderPicker = new()
+        if (_isPickerOpen)
+            return;
+
+        _isPickerOpen = true;
+
+        try
         {
-            ViewMode = PickerViewMode.List,
-            SuggestedStartLocation = PickerLocationId.MusicLibrary
-        };
+            FolderPicker folderPicker = new()
+            {
+                ViewMode = PickerViewMode.List,
+                SuggestedStartLocation = PickerLocationId.MusicLibrary
+            };
 
-        InitializeWithWindow.Initialize(folderPicker, Rok.App.MainWindowHandle);
+            InitializeWithWindow.Initialize(folderPicker, Rok.App.MainWindowHandle);
 
-        StorageFolder? folder = await folderPicker.PickSingleFolderAsync();
+            StorageFolder? folder;
 
-        if (folder is not null)
-            ViewModel.AddLibraryFolderCommand.Execute(folder);
+            try
+            {
+                folder = await folderPicker.PickSingleFolderAsync();
+            }
+            catch (COMException ex)
+            {
+                ViewModel.ReportFolderPickerFailure(ex.HResult);
+                return;
+            }
+
+            if (folder is not null)
+                ViewModel.AddLibraryFolderCommand.Execute(folder);
+        }
+        finally
+        {
+            _isPickerOpen = false;
+        }
     }
 
     private void Grid_Loaded(object sender, RoutedEventArgs e)

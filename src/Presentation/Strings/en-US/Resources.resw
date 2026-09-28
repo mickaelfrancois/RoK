@@ -847,6 +847,9 @@
   <data name="startViewErrorNoAudio" xml:space="preserve">
     <value>This folder contains no compatible audio files (MP3, FLAC).</value>
   </data>
+  <data name="startViewErrorFolderPicker" xml:space="preserve">
+    <value>Couldn't open the folder picker. Please try again.</value>
+  </data>
   <data name="startViewExplanation.Text" xml:space="preserve">
     <value>Rok plays music stored locally on your PC. No audio files were found in your folder.</value>
   </data>
