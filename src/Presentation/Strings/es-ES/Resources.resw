@@ -2011,4 +2011,22 @@
   <data name="genrePageNotFound.Message" xml:space="preserve">
     <value>Este género ya no está en tu biblioteca</value>
   </data>
+  <data name="startViewErrorUnsupportedFormat" xml:space="preserve">
+    <value>Se encontraron {0} archivos {1} — Rok solo reproduce MP3 y FLAC.</value>
+  </data>
+  <data name="startViewErrorUnsupportedFormatSingle" xml:space="preserve">
+    <value>Se encontró {0} archivo {1} — Rok solo reproduce MP3 y FLAC.</value>
+  </data>
+  <data name="startViewRadioFallback.Text" xml:space="preserve">
+    <value>Escuchar la radio mientras tanto</value>
+  </data>
+  <data name="radiosSuggestionsLocalTitle" xml:space="preserve">
+    <value>Emisoras populares cerca de ti</value>
+  </data>
+  <data name="radiosSuggestionsWorldTitle" xml:space="preserve">
+    <value>Emisoras populares en el mundo</value>
+  </data>
+  <data name="radiosSuggestionAdd.Text" xml:space="preserve">
+    <value>Añadir</value>
+  </data>
 </root>

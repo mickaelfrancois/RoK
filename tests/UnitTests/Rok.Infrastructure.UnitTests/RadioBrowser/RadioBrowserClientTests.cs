@@ -165,4 +165,86 @@ public class RadioBrowserClientTests
 
         Assert.Contains("limit=10", captured[0].RequestUri!.AbsoluteUri);
     }
+
+    [Fact(DisplayName = "get_top_by_country_should_call_bycountrycodeexact_endpoint_sorted_by_votes")]
+    public async Task GetTopByCountry_ShouldCallByCountryCodeExactEndpoint_SortedByVotes()
+    {
+        // Arrange
+        var (client, captured) = CreateClient("[]");
+
+        // Act
+        _ = await client.GetTopByCountryAsync("FR", 24, CancellationToken.None);
+
+        // Assert
+        Assert.Single(captured);
+        string url = captured[0].RequestUri!.AbsoluteUri;
+        Assert.Contains("/json/stations/bycountrycodeexact/FR?", url);
+        Assert.Contains("limit=24", url);
+        Assert.Contains("hidebroken=true", url);
+        Assert.Contains("order=votes", url);
+        Assert.Contains("reverse=true", url);
+    }
+
+    [Fact(DisplayName = "get_top_by_country_should_uppercase_country_code")]
+    public async Task GetTopByCountry_ShouldUppercaseCountryCode()
+    {
+        // Arrange
+        var (client, captured) = CreateClient("[]");
+
+        // Act
+        _ = await client.GetTopByCountryAsync("fr", 24, CancellationToken.None);
+
+        // Assert
+        Assert.Contains("/bycountrycodeexact/FR?", captured[0].RequestUri!.AbsoluteUri);
+    }
+
+    [Fact(DisplayName = "get_top_worldwide_should_call_stations_endpoint_sorted_by_votes")]
+    public async Task GetTopWorldwide_ShouldCallStationsEndpoint_SortedByVotes()
+    {
+        // Arrange
+        var (client, captured) = CreateClient("[]");
+
+        // Act
+        _ = await client.GetTopWorldwideAsync(24, CancellationToken.None);
+
+        // Assert
+        string url = captured[0].RequestUri!.AbsoluteUri;
+        Assert.Contains("/json/stations?", url);
+        Assert.Contains("limit=24", url);
+        Assert.Contains("hidebroken=true", url);
+        Assert.Contains("order=votes", url);
+        Assert.Contains("reverse=true", url);
+    }
+
+    [Fact(DisplayName = "get_top_by_country_should_map_and_skip_invalid_stations")]
+    public async Task GetTopByCountry_ShouldMapAndSkipInvalidStations()
+    {
+        // Arrange
+        string json = """
+            [
+                { "name": "France Inter", "url": "https://stream.example/orig", "url_resolved": "https://stream.example/inter.mp3" },
+                { "name": "", "url": "https://stream.example/noname", "url_resolved": "https://stream.example/noname" }
+            ]
+            """;
+        var (client, _) = CreateClient(json);
+
+        // Act
+        IReadOnlyList<RadioSearchResultDto> results = await client.GetTopByCountryAsync("FR", 24, CancellationToken.None);
+
+        // Assert
+        Assert.Single(results);
+        Assert.Equal("France Inter", results[0].Name);
+        Assert.Equal("https://stream.example/inter.mp3", results[0].StreamUrl);
+    }
+
+    [Fact(DisplayName = "get_top_worldwide_should_throw_http_request_exception_on_500")]
+    public Task GetTopWorldwide_ShouldThrowHttpRequestException_On500()
+    {
+        // Arrange
+        var (client, _) = CreateClient("internal error", HttpStatusCode.InternalServerError);
+
+        // Act & Assert
+        return Assert.ThrowsAsync<HttpRequestException>(() =>
+            client.GetTopWorldwideAsync(24, CancellationToken.None));
+    }
 }

@@ -242,6 +242,8 @@ public static class DependencyInjection
         services.AddSingleton<IRadioPictureService, RadioPictureService>();
         services.AddSingleton<RadioPictureService>(sp => (RadioPictureService)sp.GetRequiredService<IRadioPictureService>());
         services.AddTransient<SearchRadioStationsViewModel>();
+        services.AddSingleton<IRegionProvider, WindowsRegionProvider>();
+        services.AddTransient<RadioSuggestionsService>();
 
         // Insights ViewModel and services
         services.AddSingleton<InsightsViewModel>();

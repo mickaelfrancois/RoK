@@ -6,6 +6,7 @@
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
       xmlns:common="using:Rok.Commons"
       xmlns:vm="using:Rok.ViewModels.Radio"
+      xmlns:dto="using:Rok.Application.Dto"
       mc:Ignorable="d"
       x:Name="radiosView">
 
@@ -91,6 +92,44 @@
                 </Grid>
             </Grid>
         </DataTemplate>
+
+        <DataTemplate x:Key="RadioSuggestionTemplate" x:DataType="dto:RadioSearchResultDto">
+            <Grid Style="{StaticResource MainGridCoverStyle}">
+                <Border CornerRadius="{StaticResource CornerRadiusMediumValue}" Background="{ThemeResource BrandPrimaryBrush}">
+                    <FontIcon Glyph="&#xE8D6;"
+                              FontSize="56" Foreground="White" Opacity="0.35"
+                              HorizontalAlignment="Center" VerticalAlignment="Center" />
+                </Border>
+
+                <Button Click="OnSuggestionAddClick"
+                        Tag="{x:Bind}"
+                        HorizontalAlignment="Right" VerticalAlignment="Top"
+                        Margin="{StaticResource CoverBadgeMargin}"
+                        Padding="8,4">
+                    <StackPanel Orientation="Horizontal" Spacing="4">
+                        <SymbolIcon Symbol="Add" />
+                        <TextBlock x:Uid="radiosSuggestionAdd" />
+                    </StackPanel>
+                </Button>
+
+                <Grid Style="{StaticResource GridCoverBottomStyle}">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="{StaticResource GridBottomFirstRowHeight}" />
+                        <RowDefinition Height="{StaticResource GridBottomSecondRowHeight}" />
+                    </Grid.RowDefinitions>
+
+                    <HyperlinkButton Content="{x:Bind Name}"
+                                     Click="OnSuggestionPlayClick"
+                                     Tag="{x:Bind}"
+                                     Style="{StaticResource GridCoverButtonStyle}" />
+
+                    <TextBlock Grid.Row="1"
+                               Text="{x:Bind common:RadioDisplay.FormatTechnical(Codec, Bitrate)}"
+                               Style="{StaticResource GridCoverBottomSecondLineStyle}"
+                               Margin="{StaticResource CoverSubtitleMargin}" />
+                </Grid>
+            </Grid>
+        </DataTemplate>
     </Page.Resources>
 
     <Grid>
@@ -136,9 +175,32 @@
                                      ScrollViewer.VerticalScrollMode="Enabled"
                                      ScrollViewer.VerticalScrollBarVisibility="Auto" />
 
+            <Grid Visibility="{x:Bind ViewModel.HasSuggestions, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+
+                <TextBlock Text="{x:Bind ViewModel.SuggestionsTitle, Mode=OneWay}"
+                           Style="{StaticResource SubtitleTextBlockStyle}"
+                           Margin="0,0,0,12" />
+
+                <common:GridViewExtended Grid.Row="1"
+                                         ItemsSource="{x:Bind ViewModel.Suggestions}"
+                                         ItemTemplate="{StaticResource RadioSuggestionTemplate}"
+                                         ItemsPanel="{StaticResource GridPanelTemplate}"
+                                         SelectionMode="None"
+                                         IsItemClickEnabled="False"
+                                         ScrollViewer.VerticalScrollMode="Enabled"
+                                         ScrollViewer.VerticalScrollBarVisibility="Auto" />
+            </Grid>
+
+            <ProgressRing IsActive="{x:Bind ViewModel.IsLoadingSuggestions, Mode=OneWay}"
+                          HorizontalAlignment="Center" VerticalAlignment="Center" />
+
             <common:EmptyStateControl x:Uid="radiosNoData"
                                       Glyph="&#xE8D6;"
-                                      Visibility="{x:Bind ViewModel.HasNoData, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" />
+                                      Visibility="{x:Bind ViewModel.ShowEmptyMessage, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" />
         </Grid>
     </Grid>
 </Page>
