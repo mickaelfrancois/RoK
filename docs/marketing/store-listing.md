@@ -47,7 +47,7 @@ WHY ROK
 • Free, no ads, no account.
 
 LISTEN
-• Gapless-feeling crossfade, sleep timer, queue editing by song, album, artist or genre.
+• Smooth crossfade, sleep timer, queue editing by song, album, artist or genre.
 • Synced lyrics, including lyrics embedded in your files.
 • Internet radio: search thousands of stations or play any stream URL.
 • Automatically pauses during Teams and other calls.
@@ -55,7 +55,7 @@ LISTEN
 ORGANISE
 • Smart playlists that update themselves (genre, year, play count, rating…).
 • Import and export playlists.
-• Edit tags, artists and albums; missing covers and metadata retrieved automatically.
+• Edit album and artist details in Rok without ever touching your files; missing covers and metadata retrieved automatically.
 
 REDISCOVER
 • Listening stats per album and artist, album anniversaries, "Surprise me" picks.
@@ -132,7 +132,7 @@ POURQUOI ROK
 ORGANISER
 • Playlists intelligentes qui se mettent à jour seules (genre, année, écoutes, note…).
 • Import et export de playlists.
-• Édition des tags, artistes et albums ; pochettes et métadonnées récupérées automatiquement.
+• Modifiez les fiches albums et artistes dans Rok, sans jamais toucher à vos fichiers ; pochettes et métadonnées manquantes récupérées automatiquement.
 
 REDÉCOUVRIR
 • Statistiques d'écoute par album et artiste, anniversaires d'albums, « Surprends-moi ».
@@ -180,7 +180,7 @@ ESCUCHAR
 ORGANIZAR
 • Listas inteligentes que se actualizan solas (género, año, reproducciones, valoración…).
 • Importar y exportar listas.
-• Edición de etiquetas, artistas y álbumes; carátulas y metadatos automáticos.
+• Edita los datos de álbumes y artistas en Rok sin modificar nunca tus archivos; carátulas y metadatos automáticos.
 
 REDESCUBRIR
 • Estadísticas de escucha por álbum y artista, aniversarios de álbumes, «Sorpréndeme».
@@ -232,7 +232,8 @@ buttons: replace with `cid=rok-site`.
 - **Tags**: `local-music`, `flac`, `mp3`, `music-library`, `smart-playlists`, `lyrics`,
   `internet-radio`, `windows-11`, `fluent-design`, `ad-free`
 - **Features to tick**: Ad-free, Lightweight, Dark mode, Lyrics, Smart playlists,
-  Internet radio, Gapless / Crossfade, Discord integration, Metadata editor.
+  Internet radio, Crossfade, Discord integration.
+- **Do not tick**: Tag editor, Gapless playback — Rok never writes to your files and crossfades instead of gapless.
 - **Screenshots**: same order as the Store.
 
 After approval: ask the first retained users (or friends) to "like" it and add Rok as an
