@@ -30,7 +30,8 @@ dotnet test /p:Platform=x64 --filter "FullyQualifiedName~PlayerServiceTests"
 dotnet test /p:Platform=x64 --filter "DisplayName~when_track_ends"
 
 # Format (also runs automatically on staged .cs files via husky pre-commit)
-dotnet format /p:Platform=x64
+# No platform flag: dotnet format rejects /p: and -p:, prints its help and exits 0
+dotnet format Rok.slnx
 ```
 
 Husky-driven git hooks live in `.husky/` (`task-runner.json`):
