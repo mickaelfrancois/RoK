@@ -76,3 +76,6 @@ web/Dockerfile              text eol=lf
 web/Dockerfile.dockerignore text eol=lf
 web/docker-compose.yml      text eol=lf
 web/docker/*.template       text eol=lf
+
+# Partner Center listing CSV: CRLF between rows, LF inside fields; keep bytes as exported
+docs/marketing/*.csv -text
