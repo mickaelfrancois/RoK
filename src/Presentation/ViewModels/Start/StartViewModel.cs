@@ -144,6 +144,7 @@ public sealed partial class StartViewModel : ObservableObject, IDisposable
             });
             UnregisterEvents();
             _navigationService.NavigateToAlbums();
+            _navigationService.RemoveLastEntry();
         }
     }
 
@@ -192,6 +193,7 @@ public sealed partial class StartViewModel : ObservableObject, IDisposable
                 {
                     UnregisterEvents();
                     _navigationService.NavigateToAlbums();
+                    _navigationService.RemoveLastEntry();
                 }
             });
         }
