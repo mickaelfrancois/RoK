@@ -24,6 +24,7 @@ public static class DependencyInjection
         services.AddSingleton<IPlaylistService, PlaylistService>();
         services.AddSingleton<IPlayerService, PlayerService>();
         services.AddSingleton<IReviewPromptEligibilityService, ReviewPromptEligibilityService>();
+        services.AddSingleton<IReviewPromptService, ReviewPromptService>();
         services.AddSingleton<IEqualizerPresetResolver, EqualizerPresetResolver>();
 
         services.AddSingleton<IPlayerSleepModeService, PlayerSleepModeService>();

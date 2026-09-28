@@ -53,7 +53,7 @@ public partial class App : Microsoft.UI.Xaml.Application
             NavigationService navigationService = ServiceProvider.GetRequiredService<NavigationService>();
             ResourceLoader resourceLoader = ServiceProvider.GetRequiredService<ResourceLoader>();
             ITelemetryClient telemetryClient = ServiceProvider.GetRequiredService<ITelemetryClient>();
-            IReviewPromptEligibilityService reviewPromptEligibilityService = ServiceProvider.GetRequiredService<IReviewPromptEligibilityService>();
+            IReviewPromptService reviewPromptService = ServiceProvider.GetRequiredService<IReviewPromptService>();
 
             if (options.SessionsCount == 1)
                 _ = telemetryClient.CaptureEventAsync("Event", "FirstStart");
@@ -61,7 +61,7 @@ public partial class App : Microsoft.UI.Xaml.Application
             string iconPath = Path.Combine(AppContext.BaseDirectory, "Assets/Square44x44Logo.ico");
 
             IMessenger messenger = ServiceProvider.GetRequiredService<IMessenger>();
-            MainWindow = new MainWindow(navigationService, telemetryClient, resourceLoader, appDbContext, options, reviewPromptEligibilityService, messenger);
+            MainWindow = new MainWindow(navigationService, telemetryClient, resourceLoader, appDbContext, options, reviewPromptService, messenger);
             MainWindow.AppWindow.SetIcon(iconPath);
             MainWindow.Title = "RoK";
 #if DEBUG

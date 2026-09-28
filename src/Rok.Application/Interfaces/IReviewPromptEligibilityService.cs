@@ -2,5 +2,8 @@ namespace Rok.Application.Interfaces;
 
 public interface IReviewPromptEligibilityService
 {
-    bool ShouldShowReviewPrompt(int tracksListened, int maxTracksBeforePrompt, int minSessionsBeforePrompt, int minDaysBeforePrompt);
+    /// <summary>
+    /// Returns <c>true</c> when the user may be asked to rate the app now.
+    /// </summary>
+    bool ShouldShowReviewPrompt();
 }

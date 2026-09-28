@@ -1567,18 +1567,6 @@
   <data name="reviewSentimentGateNo" xml:space="preserve">
     <value>Realmente, no</value>
   </data>
-  <data name="reviewPositiveTitle" xml:space="preserve">
-    <value>Gracias !</value>
-  </data>
-  <data name="reviewPositiveContent" xml:space="preserve">
-    <value>Una breve reseña en Microsoft Store ayuda a Corea del Sur a llegar a más personas que todavía se preocupan por poseer su música.</value>
-  </data>
-  <data name="reviewPositiveLeave" xml:space="preserve">
-    <value>Dejar un comentario</value>
-  </data>
-  <data name="reviewPositiveLater" xml:space="preserve">
-    <value>Quizás más tarde</value>
-  </data>
   <data name="reviewNegativeTitle" xml:space="preserve">
     <value>Gracias por su honestidad</value>
   </data>

@@ -13,12 +13,8 @@ using Windows.System;
 
 namespace Rok;
 
-public sealed partial class MainWindow : Window
+public sealed partial class MainWindow : Window, IReviewPromptView
 {
-    private const int KMaxTrackListenedBeforeReviewPrompt = 10;
-    private const int KMinSessionBeforeReviewPrompt = 3;
-    private const int KMinDaysBeforeReviewPrompt = 45;
-
     private readonly NavigationService _navigationService;
     private readonly ITelemetryClient _telemetryClient;
     private readonly ResourceLoader _resourceLoader;
@@ -35,9 +31,7 @@ public sealed partial class MainWindow : Window
 
     private readonly IAppOptions _appOptions;
 
-    private readonly IReviewPromptEligibilityService _reviewPromptEligibilityService;
-
-    private int _tracksListenedCount = 0;
+    private readonly IReviewPromptService _reviewPromptService;
 
     private bool _isOnboardingActive = false;
 
@@ -67,14 +61,14 @@ public sealed partial class MainWindow : Window
 
 
 
-    public MainWindow(NavigationService navigationService, ITelemetryClient telemetryClient, ResourceLoader resourceLoader, IAppDbContext dbContext, IAppOptions appOptions, IReviewPromptEligibilityService reviewPromptEligibilityService, IMessenger messenger)
+    public MainWindow(NavigationService navigationService, ITelemetryClient telemetryClient, ResourceLoader resourceLoader, IAppDbContext dbContext, IAppOptions appOptions, IReviewPromptService reviewPromptService, IMessenger messenger)
     {
         _navigationService = Guard.NotNull(navigationService);
         _telemetryClient = Guard.NotNull(telemetryClient);
         _resourceLoader = Guard.NotNull(resourceLoader);
         _dbContext = Guard.NotNull(dbContext);
         _appOptions = Guard.NotNull(appOptions);
-        _reviewPromptEligibilityService = Guard.NotNull(reviewPromptEligibilityService);
+        _reviewPromptService = Guard.NotNull(reviewPromptService);
         _messenger = Guard.NotNull(messenger);
 
         this.InitializeComponent();
@@ -250,11 +244,7 @@ public sealed partial class MainWindow : Window
             await fullscreen.TrackChangedAsync(message.NewTrack, message.PreviousTrack);
 
             if (message.NewTrack != null)
-            {
-                _tracksListenedCount++;
-                if (_tracksListenedCount == KMaxTrackListenedBeforeReviewPrompt)
-                    await TryShowReviewPromptAsync();
-            }
+                await _reviewPromptService.OnTrackStartedAsync(this);
         });
     }
 
@@ -415,61 +405,24 @@ public sealed partial class MainWindow : Window
     }
 
 
-    private async Task TryShowReviewPromptAsync()
-    {
-        if (_reviewPromptEligibilityService.ShouldShowReviewPrompt(
-            _tracksListenedCount,
-            KMaxTrackListenedBeforeReviewPrompt,
-            KMinSessionBeforeReviewPrompt,
-            KMinDaysBeforeReviewPrompt))
-        {
-            await ShowReviewPromptAsync();
-        }
-    }
-
-    private async Task ShowReviewPromptAsync()
-    {
-        _appOptions.ReviewLastPromptDate = DateTimeOffset.UtcNow;
-
-        bool? result = await ReviewPrompt.ShowAsync(
-            "\uE734",
+    public Task<bool?> AskSentimentAsync() =>
+        ReviewPrompt.ShowAsync(
+            "",
             _resourceLoader.GetString("reviewSentimentGateTitle"),
             _resourceLoader.GetString("reviewSentimentGateContent"),
             _resourceLoader.GetString("reviewSentimentGateYes"),
             _resourceLoader.GetString("reviewSentimentGateNo"));
 
-        if (result == null)
-            return;
+    public Task<bool?> AskFeedbackAsync() =>
+        ReviewPrompt.ShowAsync(
+            "",
+            _resourceLoader.GetString("reviewNegativeTitle"),
+            _resourceLoader.GetString("reviewNegativeContent"),
+            _resourceLoader.GetString("reviewNegativeSend"),
+            _resourceLoader.GetString("reviewNegativeClose"));
 
-        if (result == true)
-        {
-            _appOptions.HasRated = true;
-
-            bool? reviewResult = await ReviewPrompt.ShowAsync(
-                "\uE735",
-                _resourceLoader.GetString("reviewPositiveTitle"),
-                _resourceLoader.GetString("reviewPositiveContent"),
-                _resourceLoader.GetString("reviewPositiveLeave"),
-                _resourceLoader.GetString("reviewPositiveLater"));
-
-            if (reviewResult == true)
-            {
-                await Launcher.LaunchUriAsync(new Uri($"ms-windows-store://review/?ProductId=9NX19R28Q92S"));
-            }
-        }
-        else
-        {
-            bool? feedbackResult = await ReviewPrompt.ShowAsync(
-                "\uE939",
-                _resourceLoader.GetString("reviewNegativeTitle"),
-                _resourceLoader.GetString("reviewNegativeContent"),
-                _resourceLoader.GetString("reviewNegativeSend"),
-                _resourceLoader.GetString("reviewNegativeClose"));
-
-            if (feedbackResult == true)
-                await Launcher.LaunchUriAsync(new Uri("https://github.com/mickaelfrancois/RoK/issues/new"));
-        }
-    }
+    public Task OpenFeedbackPageAsync() =>
+        Launcher.LaunchUriAsync(new Uri("https://github.com/mickaelfrancois/RoK/issues/new")).AsTask();
 
 
     private void AttachGlobalShortcuts()
