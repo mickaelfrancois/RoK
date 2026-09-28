@@ -12,7 +12,7 @@
     <File Path="README.fr.md" />
     <File Path="README.md" />
 	<File Path="CHANGELOG.MD" />
-    <File Path="LICENSE.txt" />    
+    <File Path="LICENSE" />    
   </Folder>
   <Folder Name="/tests/" />
   <Folder Name="/tests/PerfTests/" />

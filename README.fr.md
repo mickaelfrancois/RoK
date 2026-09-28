@@ -131,3 +131,11 @@ src/
 Mickaël François - [@mickaelfrancois](https://github.com/mickaelfrancois)
 
 ⭐ Si vous aimez ce projet, n'hésitez pas à lui donner une étoile sur GitHub !
+
+## Licence
+
+Copyright (C) 2026 Mickaël FRANCOIS
+
+Rok est un logiciel libre : vous pouvez le redistribuer et/ou le modifier selon les termes de la Licence publique générale GNU publiée par la Free Software Foundation, en version 3 ou (à votre choix) toute version ultérieure.
+
+Rok est distribué dans l'espoir qu'il sera utile, mais SANS AUCUNE GARANTIE, sans même la garantie implicite de QUALITÉ MARCHANDE ou d'ADÉQUATION À UN USAGE PARTICULIER. Voir la [Licence publique générale GNU](LICENSE) pour plus de détails.

@@ -36,7 +36,7 @@ LISTEN
 ORGANIZE
 • Smart playlists that update themselves (genre, year, play count, rating…).
 • Import and export playlists.
-• Edit tags, artists and albums; missing covers and metadata retrieved automatically.
+• Edit album and artist details in Rok without ever touching your files; missing covers and metadata retrieved automatically.
 
 REDISCOVER
 • Listening stats per album and artist, album anniversaries, "Surprise me" picks.
@@ -84,7 +84,7 @@ POURQUOI ROK
 ORGANISER
 • Playlists intelligentes qui se mettent à jour seules (genre, année, nombre d’écoutes, note…).
 • Import et export de playlists.
-• Édition des tags, artistes et albums ; pochettes et métadonnées manquantes récupérées automatiquement.
+• Modifiez les fiches albums et artistes dans Rok, sans jamais toucher à vos fichiers ; pochettes et métadonnées manquantes récupérées automatiquement.
 
 REDÉCOUVRIR
 • Statistiques d’écoute par album et artiste, anniversaires d’albums, « Surprends-moi ».
@@ -132,7 +132,7 @@ ESCUCHAR
 ORGANIZAR
 • Listas inteligentes que se actualizan solas (género, año, reproducciones, valoración…).
 • Importar y exportar listas de reproducción.
-• Edición de etiquetas, artistas y álbumes; carátulas y metadatos que faltan, recuperados automáticamente.
+• Edita los datos de álbumes y artistas en Rok sin modificar nunca tus archivos; carátulas y metadatos que faltan, recuperados automáticamente.
 
 REDESCUBRIR
 • Estadísticas de escucha por álbum y artista, aniversarios de álbumes, «Sorpréndeme».
@@ -180,7 +180,7 @@ T["uk-ua"] = {
 ВПОРЯДКОВУЙТЕ
 • Розумні плейлисти, що оновлюються самі (жанр, рік, кількість прослуховувань, оцінка…).
 • Імпорт і експорт плейлистів.
-• Редагування тегів, виконавців і альбомів; відсутні обкладинки та метадані завантажуються автоматично.
+• Редагуйте дані альбомів і виконавців у Rok, не змінюючи ваші файли; відсутні обкладинки та метадані завантажуються автоматично.
 
 ВІДКРИВАЙТЕ ЗАНОВО
 • Статистика прослуховувань за альбомами й виконавцями, річниці альбомів, «Здивуй мене».
