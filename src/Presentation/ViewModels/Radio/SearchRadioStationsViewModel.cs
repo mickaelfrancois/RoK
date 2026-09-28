@@ -113,17 +113,7 @@ public sealed partial class SearchRadioStationsViewModel : ObservableObject
     [RelayCommand]
     private async Task AddToFavoritesAsync(RadioSearchResultDto r)
     {
-        Result<long> result = await _mediator.Send(new AddRadioStationRequest
-        {
-            Name = r.Name,
-            StreamUrl = r.StreamUrl,
-            HomepageUrl = r.HomepageUrl,
-            StationUuid = r.StationUuid,
-            FaviconUrl = r.FaviconUrl,
-            CountryCode = r.CountryCode,
-            Codec = r.Codec,
-            Bitrate = r.Bitrate,
-        });
+        Result<long> result = await _mediator.Send(r.ToAddRequest());
 
         if (result.IsSuccess)
         {

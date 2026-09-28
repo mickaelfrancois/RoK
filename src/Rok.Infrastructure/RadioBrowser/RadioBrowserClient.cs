@@ -12,7 +12,7 @@ internal sealed class RadioBrowserClient(HttpClient http, ILogger<RadioBrowserCl
 {
     private static readonly JsonSerializerOptions JsonOpts = new(JsonSerializerDefaults.Web);
 
-    public async Task<IReadOnlyList<RadioSearchResultDto>> SearchByNameAsync(
+    public Task<IReadOnlyList<RadioSearchResultDto>> SearchByNameAsync(
         string query, int limit, CancellationToken ct)
     {
         string encoded = Uri.EscapeDataString(query);
@@ -20,6 +20,31 @@ internal sealed class RadioBrowserClient(HttpClient http, ILogger<RadioBrowserCl
 
         logger.LogDebug("Radio-Browser search: query='{Query}' limit={Limit}", query, limit);
 
+        return FetchStationsAsync(path, ct);
+    }
+
+    public Task<IReadOnlyList<RadioSearchResultDto>> GetTopByCountryAsync(
+        string countryCode, int limit, CancellationToken ct)
+    {
+        string encoded = Uri.EscapeDataString(countryCode.ToUpperInvariant());
+        string path = $"json/stations/bycountrycodeexact/{encoded}?limit={limit}&hidebroken=true&order=votes&reverse=true";
+
+        logger.LogDebug("Radio-Browser top by country: country='{Country}' limit={Limit}", countryCode, limit);
+
+        return FetchStationsAsync(path, ct);
+    }
+
+    public Task<IReadOnlyList<RadioSearchResultDto>> GetTopWorldwideAsync(int limit, CancellationToken ct)
+    {
+        string path = $"json/stations?limit={limit}&hidebroken=true&order=votes&reverse=true";
+
+        logger.LogDebug("Radio-Browser top worldwide: limit={Limit}", limit);
+
+        return FetchStationsAsync(path, ct);
+    }
+
+    private async Task<IReadOnlyList<RadioSearchResultDto>> FetchStationsAsync(string path, CancellationToken ct)
+    {
         using HttpResponseMessage response = await http.GetAsync(path, ct);
         response.EnsureSuccessStatusCode();
 

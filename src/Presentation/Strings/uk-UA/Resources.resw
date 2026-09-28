@@ -2069,4 +2069,22 @@
   <data name="genrePageNotFound.Message" xml:space="preserve">
     <value>Цього жанру більше немає у вашій бібліотеці</value>
   </data>
+  <data name="startViewErrorUnsupportedFormat" xml:space="preserve">
+    <value>Знайдено файлів {1}: {0} — Rok відтворює лише MP3 і FLAC.</value>
+  </data>
+  <data name="startViewErrorUnsupportedFormatSingle" xml:space="preserve">
+    <value>Знайдено файлів {1}: {0} — Rok відтворює лише MP3 і FLAC.</value>
+  </data>
+  <data name="startViewRadioFallback.Text" xml:space="preserve">
+    <value>Слухати радіо тим часом</value>
+  </data>
+  <data name="radiosSuggestionsLocalTitle" xml:space="preserve">
+    <value>Популярні станції поруч із вами</value>
+  </data>
+  <data name="radiosSuggestionsWorldTitle" xml:space="preserve">
+    <value>Популярні станції у світі</value>
+  </data>
+  <data name="radiosSuggestionAdd.Text" xml:space="preserve">
+    <value>Додати</value>
+  </data>
 </root>

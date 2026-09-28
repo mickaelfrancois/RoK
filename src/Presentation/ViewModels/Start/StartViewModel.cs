@@ -5,6 +5,7 @@ using Rok.Application.Features.Tracks.Requests;
 using Rok.Application.Interfaces.Pictures;
 using Rok.Commons;
 using Rok.Import.Services;
+using Rok.Pages;
 using Windows.Storage;
 using Windows.Storage.AccessCache;
 
@@ -28,6 +29,7 @@ public sealed partial class StartViewModel : ObservableObject, IDisposable
     private readonly IAppOptions _appOptions;
     private readonly ISettingsFile _settingsFile;
     private readonly ITelemetryClient _telemetryClient;
+    private readonly IFolderResolver _folderResolver;
     private readonly List<IDisposable> _subscriptions = new();
     private bool _disposed;
 
@@ -42,6 +44,9 @@ public sealed partial class StartViewModel : ObservableObject, IDisposable
     private readonly string _errorAccessDenied;
     private readonly string _errorNoAudioFiles;
     private readonly string _errorFolderPicker;
+    private readonly string _errorUnsupportedFormat;
+    private readonly string _errorUnsupportedFormatSingle;
+    private string _lastErrorReason = "Unknown";
 
     public RangeObservableCollection<AlbumImportedModel> AlbumsImported { get; } = new();
 
@@ -60,7 +65,7 @@ public sealed partial class StartViewModel : ObservableObject, IDisposable
     [ObservableProperty]
     public partial string? ErrorBannerMessage { get; set; }
 
-    public StartViewModel(IAlbumPicture albumPicture, ISettingsFile settingsFile, NavigationService navigationService, IResourceService resourceService, IMediator mediator, IMessenger messenger, IImport importService, IAppOptions appOptions, ITelemetryClient telemetryClient)
+    public StartViewModel(IAlbumPicture albumPicture, ISettingsFile settingsFile, NavigationService navigationService, IResourceService resourceService, IMediator mediator, IMessenger messenger, IImport importService, IAppOptions appOptions, ITelemetryClient telemetryClient, IFolderResolver folderResolver)
     {
         Debug.Assert(
             ImportMessageThrottler.MaxMessagesBeforeThrottle >= KMinAlbumsToUnlockApp,
@@ -74,6 +79,7 @@ public sealed partial class StartViewModel : ObservableObject, IDisposable
         _importService = importService;
         _appOptions = appOptions;
         _telemetryClient = telemetryClient;
+        _folderResolver = folderResolver;
 
         _albumsImportedMessage = resourceService.GetString("AlbumsImported");
         _importBackgroundTitle = resourceService.GetString("notification_import_background_title");
@@ -81,6 +87,8 @@ public sealed partial class StartViewModel : ObservableObject, IDisposable
         _errorAccessDenied = resourceService.GetString("startViewErrorAccessDenied");
         _errorNoAudioFiles = resourceService.GetString("startViewErrorNoAudio");
         _errorFolderPicker = resourceService.GetString("startViewErrorFolderPicker");
+        _errorUnsupportedFormat = resourceService.GetString("startViewErrorUnsupportedFormat");
+        _errorUnsupportedFormatSingle = resourceService.GetString("startViewErrorUnsupportedFormatSingle");
 
         _displayTimer = _dispatcherQueue.CreateTimer();
         _displayTimer.Interval = TimeSpan.FromMilliseconds(KDisplayIntervalMs);
@@ -162,6 +170,10 @@ public sealed partial class StartViewModel : ObservableObject, IDisposable
         {
             int trackCount = await _mediator.Send(new GetTracksCountRequest());
 
+            IReadOnlyDictionary<string, int> unsupportedCounts = trackCount == 0 && _appOptions.LibraryTokens.Count > 0
+                ? await ScanLibraryFoldersAsync()
+                : new Dictionary<string, int>();
+
             _dispatcherQueue.TryEnqueue(() =>
             {
                 LibraryRefreshRunning = false;
@@ -171,8 +183,9 @@ public sealed partial class StartViewModel : ObservableObject, IDisposable
                     ErrorOccurred = true;
                     if (_appOptions.LibraryTokens.Count > 0)
                     {
-                        ErrorBannerMessage = _errorNoAudioFiles;
-                        _ = _telemetryClient.CaptureEventAsync("Onboarding", "NoAudioFiles");
+                        _lastErrorReason = "NoAudioFiles";
+                        ErrorBannerMessage = BuildNoAudioBanner(unsupportedCounts);
+                        _ = _telemetryClient.CaptureEventAsync("Onboarding", "NoAudioFiles", OnboardingTelemetry.BuildUnsupportedFormatProperties(unsupportedCounts));
                     }
                 }
                 else
@@ -183,6 +196,34 @@ public sealed partial class StartViewModel : ObservableObject, IDisposable
             });
         }
     }
+
+    private async Task<IReadOnlyDictionary<string, int>> ScanLibraryFoldersAsync()
+    {
+        try
+        {
+            List<IReadOnlyDictionary<string, int>> folderCounts = [];
+
+            foreach (string token in _appOptions.LibraryTokens.ToList())
+            {
+                foreach (string path in await _folderResolver.GetPathFromTokenAsync(token))
+                {
+                    FolderScanResult scan = await FolderValidator.ScanAsync(path);
+
+                    if (scan.Status != FolderValidationResult.AccessDenied)
+                        folderCounts.Add(scan.UnsupportedCounts);
+                }
+            }
+
+            return UnsupportedAudioSummary.Merge(folderCounts);
+        }
+        catch (Exception)
+        {
+            return new Dictionary<string, int>();
+        }
+    }
+
+    private string BuildNoAudioBanner(IReadOnlyDictionary<string, int> unsupportedCounts) =>
+        UnsupportedAudioSummary.BuildBannerMessage(_errorUnsupportedFormat, _errorUnsupportedFormatSingle, _errorNoAudioFiles, unsupportedCounts);
 
     private void AlbumImported(AlbumImportedMessage message)
     {
@@ -212,6 +253,7 @@ public sealed partial class StartViewModel : ObservableObject, IDisposable
         {
             LibraryRefreshRunning = false;
             ErrorOccurred = true;
+            _lastErrorReason = "NoFolderConfigured";
             _ = _telemetryClient.CaptureEventAsync("Onboarding", "NoFolderConfigured");
             return;
         }
@@ -233,19 +275,27 @@ public sealed partial class StartViewModel : ObservableObject, IDisposable
     [RelayCommand]
     private async Task AddLibraryFolderAsync(StorageFolder folder)
     {
-        FolderValidationResult validationResult = await FolderValidator.ValidateAsync(folder.Path);
+        FolderScanResult scan = await FolderValidator.ScanAsync(folder.Path);
 
-        if (validationResult == FolderValidationResult.AccessDenied)
+        if (scan.Status == FolderValidationResult.AccessDenied)
         {
-            _dispatcherQueue.TryEnqueue(() => ErrorBannerMessage = _errorAccessDenied);
+            _dispatcherQueue.TryEnqueue(() =>
+            {
+                _lastErrorReason = "FolderAccessDenied";
+                ErrorBannerMessage = _errorAccessDenied;
+            });
             _ = _telemetryClient.CaptureEventAsync("Onboarding", "FolderAccessDenied");
             return;
         }
 
-        if (validationResult == FolderValidationResult.NoAudioFiles)
+        if (scan.Status == FolderValidationResult.NoAudioFiles)
         {
-            _dispatcherQueue.TryEnqueue(() => ErrorBannerMessage = _errorNoAudioFiles);
-            _ = _telemetryClient.CaptureEventAsync("Onboarding", "FolderNoAudioFiles");
+            _dispatcherQueue.TryEnqueue(() =>
+            {
+                _lastErrorReason = "FolderNoAudioFiles";
+                ErrorBannerMessage = BuildNoAudioBanner(scan.UnsupportedCounts);
+            });
+            _ = _telemetryClient.CaptureEventAsync("Onboarding", "FolderNoAudioFiles", OnboardingTelemetry.BuildUnsupportedFormatProperties(scan.UnsupportedCounts));
             return;
         }
 
@@ -264,5 +314,18 @@ public sealed partial class StartViewModel : ObservableObject, IDisposable
         });
 
         _importService.Start(0);
+    }
+
+    /// <summary>
+    /// Leaves onboarding for the radio page so the user can listen right away.
+    /// Must be called on the UI thread.
+    /// </summary>
+    [RelayCommand]
+    private void ListenToRadio()
+    {
+        UnregisterEvents();
+        _ = _telemetryClient.CaptureEventAsync("Onboarding", "RadioFallback", OnboardingTelemetry.BuildRadioFallbackProperties(_lastErrorReason));
+        _navigationService.NavigateTo(typeof(RadiosPage));
+        _navigationService.RemoveLastEntry();
     }
 }

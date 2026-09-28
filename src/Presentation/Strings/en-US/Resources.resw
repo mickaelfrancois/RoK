@@ -2179,4 +2179,22 @@
   <data name="genrePageNotFound.Message" xml:space="preserve">
     <value>This genre is no longer in your library</value>
   </data>
+  <data name="startViewErrorUnsupportedFormat" xml:space="preserve">
+    <value>{0} {1} files found — Rok only plays MP3 and FLAC.</value>
+  </data>
+  <data name="startViewErrorUnsupportedFormatSingle" xml:space="preserve">
+    <value>{0} {1} file found — Rok only plays MP3 and FLAC.</value>
+  </data>
+  <data name="startViewRadioFallback.Text" xml:space="preserve">
+    <value>Listen to the radio meanwhile</value>
+  </data>
+  <data name="radiosSuggestionsLocalTitle" xml:space="preserve">
+    <value>Popular stations near you</value>
+  </data>
+  <data name="radiosSuggestionsWorldTitle" xml:space="preserve">
+    <value>Popular stations worldwide</value>
+  </data>
+  <data name="radiosSuggestionAdd.Text" xml:space="preserve">
+    <value>Add</value>
+  </data>
 </root>

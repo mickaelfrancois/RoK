@@ -224,6 +224,15 @@
                             </StackPanel>
                         </Button>
 
+                        <!-- Secondary action: listen to the radio while no library is available -->
+                        <Button Command="{x:Bind ViewModel.ListenToRadioCommand}"
+                                HorizontalAlignment="Stretch">
+                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                <FontIcon Glyph="&#xE8D6;" FontSize="14" />
+                                <TextBlock x:Uid="startViewRadioFallback" />
+                            </StackPanel>
+                        </Button>
+
                         <!-- Contextual error banner — visible only when ErrorBannerMessage is set -->
                         <Border Background="{ThemeResource SystemFillColorCriticalBackgroundBrush}"
                                 BorderBrush="{ThemeResource SystemFillColorCriticalBrush}"

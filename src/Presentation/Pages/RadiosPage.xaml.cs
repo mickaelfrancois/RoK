@@ -77,6 +77,18 @@ public sealed partial class RadiosPage : Page
             _ = ViewModel.PlayCommand.ExecuteAsync(tile);
     }
 
+    private void OnSuggestionPlayClick(object sender, RoutedEventArgs e)
+    {
+        if (sender is FrameworkElement { Tag: RadioSearchResultDto station })
+            _ = ViewModel.PlaySuggestionCommand.ExecuteAsync(station);
+    }
+
+    private void OnSuggestionAddClick(object sender, RoutedEventArgs e)
+    {
+        if (sender is FrameworkElement { Tag: RadioSearchResultDto station })
+            _ = ViewModel.AddSuggestionCommand.ExecuteAsync(station);
+    }
+
     private async void OnEditMenuClick(object sender, RoutedEventArgs e)
     {
         if (sender is not MenuFlyoutItem { Tag: RadioTileViewModel tile })
