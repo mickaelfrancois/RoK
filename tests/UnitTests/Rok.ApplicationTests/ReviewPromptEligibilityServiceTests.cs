@@ -1,138 +1,158 @@
+using Microsoft.Extensions.Time.Testing;
 using Moq;
-using Rok.Application.Interfaces;
+using Rok.Application.Options;
 using Rok.Application.Services;
 
 namespace Rok.ApplicationTests;
 
 public class ReviewPromptEligibilityServiceTests
 {
-    private readonly Mock<IAppOptions> mockAppOptions;
-    private readonly Mock<ICrashStore> mockCrashStore;
-    private readonly ReviewPromptEligibilityService service;
-
-    public ReviewPromptEligibilityServiceTests()
+    private readonly FakeTimeProvider _time = new(new DateTimeOffset(2026, 9, 28, 12, 0, 0, TimeSpan.Zero));
+    private readonly Mock<ICrashStore> _crashStore = new();
+    private readonly AppOptions _options = new()
     {
-        mockAppOptions = new Mock<IAppOptions>();
-        mockCrashStore = new Mock<ICrashStore>();
-        service = new ReviewPromptEligibilityService(mockAppOptions.Object, mockCrashStore.Object);
-    }
+        SessionsCount = ReviewPromptEligibilityService.MinSessions,
+        TotalTracksListened = ReviewPromptEligibilityService.MinTotalTracks,
+        HasRated = false,
+        ReviewLastPromptDate = null
+    };
 
-    [Fact]
-    public void ShouldShowReviewPrompt_ReturnsFalse_WhenUserHasAlreadyRated()
+    private ReviewPromptEligibilityService CreateService() => new(_options, _crashStore.Object, _time);
+
+    [Fact(DisplayName = "eligible_when_three_sessions_and_twenty_tracks")]
+    public void Eligible_WhenThreeSessionsAndTwentyTracks()
     {
-        mockAppOptions.SetupGet(o => o.HasRated).Returns(true);
-        mockAppOptions.SetupGet(o => o.SessionsCount).Returns(10);
-        mockAppOptions.SetupGet(o => o.ReviewLastPromptDate).Returns((DateTimeOffset?)null);
-        mockCrashStore.Setup(c => c.GetCrashCount()).Returns(0);
+        // Arrange
+        _options.SessionsCount = 3;
+        _options.TotalTracksListened = 20;
 
-        bool result = service.ShouldShowReviewPrompt(10, 10, 3, 45);
+        // Act
+        bool result = CreateService().ShouldShowReviewPrompt();
 
-        Assert.False(result);
-    }
-
-    [Fact]
-    public void ShouldShowReviewPrompt_ReturnsFalse_WhenRecentCrashExists()
-    {
-        mockAppOptions.SetupGet(o => o.HasRated).Returns(false);
-        mockAppOptions.SetupGet(o => o.SessionsCount).Returns(10);
-        mockAppOptions.SetupGet(o => o.ReviewLastPromptDate).Returns((DateTimeOffset?)null);
-        mockCrashStore.Setup(c => c.GetCrashCount()).Returns(1);
-        mockCrashStore.Setup(c => c.HasLastCrashExpired(45)).Returns(false);
-
-        bool result = service.ShouldShowReviewPrompt(10, 10, 3, 45);
-
-        Assert.False(result);
-    }
-
-    [Fact]
-    public void ShouldShowReviewPrompt_ReturnsTrue_WhenCrashHasExpired()
-    {
-        mockAppOptions.SetupGet(o => o.HasRated).Returns(false);
-        mockAppOptions.SetupGet(o => o.SessionsCount).Returns(10);
-        mockAppOptions.SetupGet(o => o.ReviewLastPromptDate).Returns((DateTimeOffset?)null);
-        mockCrashStore.Setup(c => c.GetCrashCount()).Returns(1);
-        mockCrashStore.Setup(c => c.HasLastCrashExpired(45)).Returns(true);
-
-        bool result = service.ShouldShowReviewPrompt(10, 10, 3, 45);
-
+        // Assert
         Assert.True(result);
     }
 
-    [Fact]
-    public void ShouldShowReviewPrompt_ReturnsFalse_WhenNotEnoughSessions()
+    [Fact(DisplayName = "not_eligible_with_two_sessions")]
+    public void NotEligible_WithTwoSessions()
     {
-        mockAppOptions.SetupGet(o => o.HasRated).Returns(false);
-        mockAppOptions.SetupGet(o => o.SessionsCount).Returns(2);
-        mockAppOptions.SetupGet(o => o.ReviewLastPromptDate).Returns((DateTimeOffset?)null);
-        mockCrashStore.Setup(c => c.GetCrashCount()).Returns(0);
+        // Arrange
+        _options.SessionsCount = 2;
+        _options.TotalTracksListened = 50;
 
-        bool result = service.ShouldShowReviewPrompt(10, 10, 3, 45);
+        // Act
+        bool result = CreateService().ShouldShowReviewPrompt();
 
+        // Assert
         Assert.False(result);
     }
 
-    [Fact]
-    public void ShouldShowReviewPrompt_ReturnsFalse_WhenLastPromptWasTooRecent()
+    [Fact(DisplayName = "not_eligible_with_nineteen_tracks")]
+    public void NotEligible_WithNineteenTracks()
     {
-        mockAppOptions.SetupGet(o => o.HasRated).Returns(false);
-        mockAppOptions.SetupGet(o => o.SessionsCount).Returns(10);
-        mockAppOptions.SetupGet(o => o.ReviewLastPromptDate).Returns(DateTimeOffset.UtcNow.AddDays(-30));
-        mockCrashStore.Setup(c => c.GetCrashCount()).Returns(0);
+        // Arrange
+        _options.SessionsCount = 10;
+        _options.TotalTracksListened = 19;
 
-        bool result = service.ShouldShowReviewPrompt(10, 10, 3, 45);
+        // Act
+        bool result = CreateService().ShouldShowReviewPrompt();
 
+        // Assert
         Assert.False(result);
     }
 
-    [Fact]
-    public void ShouldShowReviewPrompt_ReturnsTrue_WhenLastPromptWasLongAgo()
+    [Fact(DisplayName = "not_eligible_when_already_rated")]
+    public void NotEligible_WhenAlreadyRated()
     {
-        mockAppOptions.SetupGet(o => o.HasRated).Returns(false);
-        mockAppOptions.SetupGet(o => o.SessionsCount).Returns(10);
-        mockAppOptions.SetupGet(o => o.ReviewLastPromptDate).Returns(DateTimeOffset.UtcNow.AddDays(-50));
-        mockCrashStore.Setup(c => c.GetCrashCount()).Returns(0);
+        // Arrange
+        _options.HasRated = true;
 
-        bool result = service.ShouldShowReviewPrompt(10, 10, 3, 45);
+        // Act
+        bool result = CreateService().ShouldShowReviewPrompt();
 
+        // Assert
+        Assert.False(result);
+    }
+
+    [Fact(DisplayName = "not_eligible_within_seven_days_after_crash")]
+    public void NotEligible_WithinSevenDaysAfterCrash()
+    {
+        // Arrange
+        _crashStore.Setup(c => c.GetCrashCount()).Returns(1);
+        _crashStore.Setup(c => c.HasLastCrashExpired(7)).Returns(false);
+
+        // Act
+        bool result = CreateService().ShouldShowReviewPrompt();
+
+        // Assert
+        Assert.False(result);
+    }
+
+    [Fact(DisplayName = "eligible_when_last_crash_is_older_than_seven_days")]
+    public void Eligible_WhenLastCrashIsOlderThanSevenDays()
+    {
+        // Arrange
+        _crashStore.Setup(c => c.GetCrashCount()).Returns(1);
+        _crashStore.Setup(c => c.HasLastCrashExpired(7)).Returns(true);
+
+        // Act
+        bool result = CreateService().ShouldShowReviewPrompt();
+
+        // Assert
+        Assert.True(result);
+        _crashStore.Verify(c => c.HasLastCrashExpired(7), Times.Once);
+    }
+
+    [Fact(DisplayName = "eligible_when_no_crash_recorded")]
+    public void Eligible_WhenNoCrashRecorded()
+    {
+        // Arrange
+        _crashStore.Setup(c => c.GetCrashCount()).Returns(0);
+
+        // Act
+        bool result = CreateService().ShouldShowReviewPrompt();
+
+        // Assert
+        Assert.True(result);
+        _crashStore.Verify(c => c.HasLastCrashExpired(It.IsAny<int>()), Times.Never);
+    }
+
+    [Fact(DisplayName = "not_eligible_when_last_prompt_is_29_days_old")]
+    public void NotEligible_WhenLastPromptIs29DaysOld()
+    {
+        // Arrange
+        _options.ReviewLastPromptDate = _time.GetUtcNow().AddDays(-29);
+
+        // Act
+        bool result = CreateService().ShouldShowReviewPrompt();
+
+        // Assert
+        Assert.False(result);
+    }
+
+    [Fact(DisplayName = "eligible_when_last_prompt_is_30_days_old")]
+    public void Eligible_WhenLastPromptIs30DaysOld()
+    {
+        // Arrange
+        _options.ReviewLastPromptDate = _time.GetUtcNow().AddDays(-30);
+
+        // Act
+        bool result = CreateService().ShouldShowReviewPrompt();
+
+        // Assert
         Assert.True(result);
     }
 
-    [Fact]
-    public void ShouldShowReviewPrompt_ReturnsFalse_WhenNotEnoughTracksListened()
+    [Fact(DisplayName = "eligible_when_never_prompted")]
+    public void Eligible_WhenNeverPrompted()
     {
-        mockAppOptions.SetupGet(o => o.HasRated).Returns(false);
-        mockAppOptions.SetupGet(o => o.SessionsCount).Returns(10);
-        mockAppOptions.SetupGet(o => o.ReviewLastPromptDate).Returns((DateTimeOffset?)null);
-        mockCrashStore.Setup(c => c.GetCrashCount()).Returns(0);
+        // Arrange
+        _options.ReviewLastPromptDate = null;
 
-        bool result = service.ShouldShowReviewPrompt(5, 10, 3, 45);
+        // Act
+        bool result = CreateService().ShouldShowReviewPrompt();
 
-        Assert.False(result);
-    }
-
-    [Fact]
-    public void ShouldShowReviewPrompt_ReturnsTrue_WhenAllConditionsAreMet()
-    {
-        mockAppOptions.SetupGet(o => o.HasRated).Returns(false);
-        mockAppOptions.SetupGet(o => o.SessionsCount).Returns(10);
-        mockAppOptions.SetupGet(o => o.ReviewLastPromptDate).Returns((DateTimeOffset?)null);
-        mockCrashStore.Setup(c => c.GetCrashCount()).Returns(0);
-
-        bool result = service.ShouldShowReviewPrompt(10, 10, 3, 45);
-
-        Assert.True(result);
-    }
-
-    [Fact]
-    public void ShouldShowReviewPrompt_ReturnsTrue_WhenNoCrashesExist()
-    {
-        mockAppOptions.SetupGet(o => o.HasRated).Returns(false);
-        mockAppOptions.SetupGet(o => o.SessionsCount).Returns(5);
-        mockAppOptions.SetupGet(o => o.ReviewLastPromptDate).Returns((DateTimeOffset?)null);
-        mockCrashStore.Setup(c => c.GetCrashCount()).Returns(0);
-
-        bool result = service.ShouldShowReviewPrompt(15, 10, 3, 45);
-
+        // Assert
         Assert.True(result);
     }
 }

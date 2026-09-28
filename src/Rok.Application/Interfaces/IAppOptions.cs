@@ -70,6 +70,8 @@ public interface IAppOptions
 
     int SessionsCount { get; set; }
 
+    int TotalTracksListened { get; set; }
+
     bool HasRated { get; set; }
 
     DateTimeOffset? ReviewLastPromptDate { get; set; }

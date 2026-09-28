@@ -61,6 +61,7 @@ public static class DependencyInjection
         services.AddSingleton<IFolderResolver, FolderResolver>();
         services.AddSingleton<IBackdropLoader, BackdropLoader>();
         services.AddSingleton<ICrashStore, CrashStore>();
+        services.AddSingleton<IStoreReviewService, StoreReviewService>();
 
         services.AddSingleton<IPlayerCommandService, PlayerCommandService>();
         services.AddSingleton<IPlayerCommandHandler, PlayerCommandHandler>();

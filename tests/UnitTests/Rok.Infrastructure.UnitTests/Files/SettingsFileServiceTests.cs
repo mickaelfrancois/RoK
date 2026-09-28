@@ -161,6 +161,32 @@ public class SettingsFileServiceTests
         Assert.Contains("\"LibraryTokens\"", capturedJson);
     }
 
+    [Fact(DisplayName = "total_tracks_listened_survives_save_load_and_copy")]
+    public async Task TotalTracksListened_SurvivesSaveLoadAndCopy()
+    {
+        // Arrange
+        AppOptions options = new() { TotalTracksListened = 37 };
+        string? capturedJson = null;
+
+        Mock<IFileSystem> fs = CreateFileSystemMock();
+        fs.Setup(f => f.WriteAllTextAsync(SettingsFilePath, It.IsAny<string>(), It.IsAny<CancellationToken>()))
+            .Callback<string, string, CancellationToken>((_, json, _) => capturedJson = json)
+            .Returns(Task.CompletedTask);
+        fs.Setup(f => f.FileExists(SettingsFilePath)).Returns(true);
+        fs.Setup(f => f.ReadAllTextAsync(SettingsFilePath, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(() => capturedJson!);
+        SettingsFileService sut = new(ApplicationPath, CreateFolderResolverMock().Object, fs.Object);
+
+        // Act
+        await sut.SaveAsync(options);
+        IAppOptions? loaded = await sut.LoadAsync<AppOptions>();
+        AppOptions restored = new();
+        restored.CopyFrom(loaded!);
+
+        // Assert
+        Assert.Equal(37, restored.TotalTracksListened);
+    }
+
     [Fact]
     public Task SaveAsync_WithNullOptions_ThrowsArgumentNullException()
     {

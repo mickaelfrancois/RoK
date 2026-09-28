@@ -80,6 +80,8 @@ public class AppOptions : IAppOptions
 
     public int SessionsCount { get; set; } = 0;
 
+    public int TotalTracksListened { get; set; } = 0;
+
     public bool HasRated { get; set; } = false;
 
     public DateTimeOffset? ReviewLastPromptDate { get; set; } = null;
@@ -138,6 +140,7 @@ public class AppOptions : IAppOptions
         TracksFilterBy = options.TracksFilterBy;
 
         SessionsCount = options.SessionsCount;
+        TotalTracksListened = options.TotalTracksListened;
         HasRated = options.HasRated;
         ReviewLastPromptDate = options.ReviewLastPromptDate;
     }

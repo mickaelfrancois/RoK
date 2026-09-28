@@ -1625,18 +1625,6 @@
   <data name="reviewSentimentGateNo" xml:space="preserve">
     <value>Не дуже. </value>
   </data>
-  <data name="reviewPositiveTitle" xml:space="preserve">
-    <value>Дякую!</value>
-  </data>
-  <data name="reviewPositiveContent" xml:space="preserve">
-    <value>Короткий огляд у Microsoft Store допомагає охопити більше людей, які все ще дбають про володіння своєю музикою.</value>
-  </data>
-  <data name="reviewPositiveLeave" xml:space="preserve">
-    <value>Залишити відгук</value>
-  </data>
-  <data name="reviewPositiveLater" xml:space="preserve">
-    <value>Можливо пізніше</value>
-  </data>
   <data name="reviewNegativeTitle" xml:space="preserve">
     <value>Дякуємо за чесність</value>
   </data>
