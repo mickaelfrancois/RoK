@@ -4,6 +4,11 @@ Source of truth for the Microsoft Store listing (Partner Center → Store listin
 third-party directory submissions. The Store fields are applied through Partner Center's
 listing CSV export/import (en-us, fr-fr, es-es, uk-ua columns); limits are the Partner Center ones.
 
+- `store-listing.csv` — ready-to-import listing (Partner Center → Store listings → Import).
+- `generate_store_listing.py` — rebuilds it from a fresh export:
+  `python docs/marketing/generate_store_listing.py <export.csv>`. Edit the texts in the
+  script, not in the CSV; it aborts if it cannot round-trip the export byte for byte.
+
 Baseline (2026-09-28, telemetry + Store API):
 - ~25 installs / week, 11.5 % come back on day 2, 44 % end with an empty library.
 - 0 ratings on the Store.
