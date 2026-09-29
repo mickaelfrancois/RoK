@@ -10,6 +10,8 @@ namespace Rok.Infrastructure.Social;
 
 public sealed class DiscordRichPresenceService : IDisposable, IDiscordRichPresenceService
 {
+    private const string StoreUrl = "https://apps.microsoft.com/store/detail/9NX19R28Q92S?cid=discord-rpc";
+
     private readonly DiscordRpcClient? _client;
     private readonly ILogger<DiscordRichPresenceService> _logger;
     private readonly object _lock = new();
@@ -101,7 +103,7 @@ public sealed class DiscordRichPresenceService : IDisposable, IDiscordRichPresen
                     Type = ActivityType.Listening,
                     Buttons =
                     [
-                        new Button { Label = "Download Rok", Url = "https://apps.microsoft.com/store/detail/9NX19R28Q92S?cid=DevShareMCLPCS" }
+                        new Button { Label = "Download Rok", Url = StoreUrl }
                     ]
                 };
 
@@ -133,7 +135,7 @@ public sealed class DiscordRichPresenceService : IDisposable, IDiscordRichPresen
                     Type = ActivityType.Listening,
                     Buttons =
                     [
-                        new Button { Label = "Download Rok", Url = "https://apps.microsoft.com/store/detail/9NX19R28Q92S?cid=DevShareMCLPCS" }
+                        new Button { Label = "Download Rok", Url = StoreUrl }
                     ]
                 };
 
@@ -165,7 +167,7 @@ public sealed class DiscordRichPresenceService : IDisposable, IDiscordRichPresen
                     Type = ActivityType.Listening,
                     Buttons =
                     [
-                        new Button { Label = "Download Rok", Url = "https://apps.microsoft.com/store/detail/9NX19R28Q92S?cid=DevShareMCLPCS" }
+                        new Button { Label = "Download Rok", Url = StoreUrl }
                     ]
                 };
 
