@@ -844,7 +844,7 @@
     <value>Accès refusé à ce dossier. Essayez un autre dossier ou vérifiez les permissions.</value>
   </data>
   <data name="startViewErrorNoAudio" xml:space="preserve">
-    <value>Ce dossier ne contient aucun fichier audio compatible (MP3, FLAC).</value>
+    <value>Ce dossier ne contient aucun fichier audio compatible (MP3, FLAC, M4A, WAV, WMA, AIFF).</value>
   </data>
   <data name="startViewErrorFolderPicker" xml:space="preserve">
     <value>Impossible d'ouvrir le sélecteur de dossier. Réessayez.</value>
@@ -853,7 +853,7 @@
     <value>Rok joue votre musique stockée localement sur ce PC. Aucun fichier audio n'a été trouvé dans votre dossier.</value>
   </data>
   <data name="startViewFormats.Text" xml:space="preserve">
-    <value>MP3 · FLAC</value>
+    <value>MP3 · FLAC · M4A · WAV · WMA · AIFF</value>
   </data>
   <data name="startViewTagline.Text" xml:space="preserve">
     <value>Lecteur de musique locale</value>
@@ -2167,10 +2167,10 @@
     <value>Ce genre n'est plus dans votre bibliothèque</value>
   </data>
   <data name="startViewErrorUnsupportedFormat" xml:space="preserve">
-    <value>{0} fichiers {1} trouvés — Rok lit uniquement MP3 et FLAC.</value>
+    <value>{0} fichiers {1} trouvés — Rok lit MP3, FLAC, M4A, WAV, WMA et AIFF.</value>
   </data>
   <data name="startViewErrorUnsupportedFormatSingle" xml:space="preserve">
-    <value>{0} fichier {1} trouvé — Rok lit uniquement MP3 et FLAC.</value>
+    <value>{0} fichier {1} trouvé — Rok lit MP3, FLAC, M4A, WAV, WMA et AIFF.</value>
   </data>
   <data name="startViewRadioFallback.Text" xml:space="preserve">
     <value>Écouter la radio en attendant</value>

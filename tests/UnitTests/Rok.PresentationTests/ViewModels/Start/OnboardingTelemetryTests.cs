@@ -12,18 +12,18 @@ public sealed class OnboardingTelemetryTests : IDisposable
     public void BuildUnsupportedFormatProperties_ExposesFixedExtensionKeysAndTotal()
     {
         // Arrange
-        Dictionary<string, int> counts = new() { [".m4a"] = 312, [".wma"] = 4 };
+        Dictionary<string, int> counts = new() { [".ogg"] = 312, [".opus"] = 4 };
 
         // Act
         Dictionary<string, object> properties = OnboardingTelemetry.BuildUnsupportedFormatProperties(counts);
 
         // Assert
-        string[] expectedKeys = ["aac", "aiff", "ape", "m4a", "ogg", "opus", "wav", "wma", "wv", OnboardingTelemetry.UnsupportedTotalKey];
+        string[] expectedKeys = ["ape", "ogg", "opus", "wv", OnboardingTelemetry.UnsupportedTotalKey];
         Assert.Equal(expectedKeys.Order(), properties.Keys.Order());
         Assert.All(properties.Values, value => Assert.IsType<int>(value));
-        Assert.Equal(312, properties["m4a"]);
-        Assert.Equal(4, properties["wma"]);
-        Assert.Equal(0, properties["ogg"]);
+        Assert.Equal(312, properties["ogg"]);
+        Assert.Equal(4, properties["opus"]);
+        Assert.Equal(0, properties["ape"]);
         Assert.Equal(316, properties[OnboardingTelemetry.UnsupportedTotalKey]);
     }
 
@@ -31,7 +31,7 @@ public sealed class OnboardingTelemetryTests : IDisposable
     public async Task BuildUnsupportedFormatProperties_DoesNotContainAnyPathOrFileName()
     {
         // Arrange
-        await File.WriteAllTextAsync(Path.Combine(_tempDir.FullName, "secret-name.m4a"), string.Empty);
+        await File.WriteAllTextAsync(Path.Combine(_tempDir.FullName, "secret-name.ogg"), string.Empty);
         FolderScanResult scan = await FolderValidator.ScanAsync(_tempDir.FullName);
 
         // Act
@@ -45,7 +45,7 @@ public sealed class OnboardingTelemetryTests : IDisposable
             Assert.DoesNotContain("\\", text, StringComparison.Ordinal);
             Assert.DoesNotContain(_tempDir.FullName, text, StringComparison.OrdinalIgnoreCase);
         });
-        Assert.Equal(1, properties["m4a"]);
+        Assert.Equal(1, properties["ogg"]);
     }
 
     [Fact(DisplayName = "radio_fallback_properties_should_carry_reason_only")]

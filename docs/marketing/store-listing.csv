@@ -1,7 +1,7 @@
 ﻿Field,ID,Type (Type),default,fr-fr,en-us,es-es,uk-ua
 Description,2,Text,,"Rok est un lecteur pour ceux qui possèdent leur musique.
 
-Indiquez votre dossier Musique : Rok construit une belle bibliothèque à partir de vos fichiers MP3 et FLAC — albums, artistes, genres et pochettes, enrichis automatiquement. Il reste rapide avec 100 000 titres et plus.
+Indiquez votre dossier Musique : Rok construit une belle bibliothèque à partir de vos fichiers MP3, FLAC, ALAC/M4A, WAV et WMA — albums, artistes, genres et pochettes, enrichis automatiquement. Il reste rapide avec 100 000 titres et plus.
 
 POURQUOI ROK
 • Pensé pour les fichiers locaux : votre collection, sur votre disque, sans abonnement de streaming.
@@ -24,9 +24,9 @@ REDÉCOUVRIR
 • API locale : pilotez la lecture depuis vos scripts et outils d’automatisation.
 • Discord Rich Presence : montrez à vos amis ce que vous écoutez.
 
-Formats pris en charge : MP3 et FLAC.","Rok is a music player for people who own their music.
+Formats pris en charge : MP3, FLAC, M4A (AAC et ALAC), WAV, WMA et AIFF.","Rok is a music player for people who own their music.
 
-Point Rok at your Music folder and it builds a beautiful library from your MP3 and FLAC files: albums, artists, genres and covers, enriched automatically. It stays fast with collections of 100,000 tracks and more.
+Point Rok at your Music folder and it builds a beautiful library from your MP3, FLAC, ALAC/M4A, WAV and WMA files: albums, artists, genres and covers, enriched automatically. It stays fast with collections of 100,000 tracks and more.
 
 WHY ROK
 • Made for local files: your collection, on your disk, no streaming subscription needed.
@@ -49,9 +49,9 @@ REDISCOVER
 • Local API: control playback from your own scripts and automation tools.
 • Discord Rich Presence: show friends what you are listening to.
 
-Supported formats: MP3 and FLAC.","Rok es un reproductor para quienes tienen su propia música.
+Supported formats: MP3, FLAC, M4A (AAC and ALAC), WAV, WMA and AIFF.","Rok es un reproductor para quienes tienen su propia música.
 
-Elige tu carpeta de Música y Rok crea una biblioteca a partir de tus archivos MP3 y FLAC: álbumes, artistas, géneros y carátulas, enriquecidos automáticamente. Sigue siendo rápido con 100 000 canciones o más.
+Elige tu carpeta de Música y Rok crea una biblioteca a partir de tus archivos MP3, FLAC, ALAC/M4A, WAV y WMA: álbumes, artistas, géneros y carátulas, enriquecidos automáticamente. Sigue siendo rápido con 100 000 canciones o más.
 
 POR QUÉ ROK
 • Hecho para archivos locales: tu colección, en tu disco, sin suscripción de streaming.
@@ -74,9 +74,9 @@ REDESCUBRIR
 • API local: controla la reproducción desde tus scripts y herramientas de automatización.
 • Discord Rich Presence: muestra a tus amigos lo que escuchas.
 
-Formatos compatibles: MP3 y FLAC.","Rok — музичний плеєр для тих, хто має власну музику.
+Formatos compatibles: MP3, FLAC, M4A (AAC y ALAC), WAV, WMA y AIFF.","Rok — музичний плеєр для тих, хто має власну музику.
 
-Вкажіть папку «Музика», і Rok створить гарну бібліотеку з ваших файлів MP3 і FLAC: альбоми, виконавці, жанри та обкладинки, автоматично доповнені. Він залишається швидким навіть із колекціями від 100 000 треків.
+Вкажіть папку «Музика», і Rok створить гарну бібліотеку з ваших файлів MP3, FLAC, ALAC/M4A, WAV і WMA: альбоми, виконавці, жанри та обкладинки, автоматично доповнені. Він залишається швидким навіть із колекціями від 100 000 треків.
 
 ЧОМУ ROK
 • Створений для локальних файлів: ваша колекція на вашому диску, без підписки на стрімінг.
@@ -99,7 +99,7 @@ Formatos compatibles: MP3 y FLAC.","Rok — музичний плеєр для �
 • Локальний API: керуйте відтворенням із власних скриптів і засобів автоматизації.
 • Discord Rich Presence: покажіть друзям, що ви слухаєте.
 
-Підтримувані формати: MP3 і FLAC."
+Підтримувані формати: MP3, FLAC, M4A (AAC і ALAC), WAV, WMA і AIFF."
 ReleaseNotes,3,Text,,"- Affichage du nombre d’éléments dans les pages Albums, Artistes et Titres pour une meilleure visibilité de votre bibliothèque.
 - Ajout d’un message dédié lorsque aucune donnée n’est trouvée dans les listes.
 - Nouvelles statistiques indiquant le nombre d’albums, d’artistes et de titres actuellement affichés.","- Monthly insights into your listening habits
@@ -116,7 +116,7 @@ Title,4,Text,,Rok musicplayer,Rok musicplayer,Rok musicplayer,Rok musicplayer
 ShortTitle,5,Text,,,,,
 SortTitle,6,Text,,,,,
 VoiceTitle,7,Text,,,,,
-ShortDescription,8,Text,,"Un lecteur rapide et moderne pour votre collection de musique locale sous Windows 11. Lit vos fichiers MP3 et FLAC, organise automatiquement les grandes bibliothèques, et ajoute playlists intelligentes, paroles, radios internet et statistiques d’écoute. Gratuit, sans compte, sans pub.","A fast, modern player for your local music collection on Windows 11. Plays your MP3 and FLAC files, organizes big libraries automatically, and adds smart playlists, lyrics, internet radio and listening stats. Free, no account, no ads.","Un reproductor rápido y moderno para tu colección de música local en Windows 11. Reproduce tus archivos MP3 y FLAC, organiza bibliotecas grandes automáticamente y añade listas inteligentes, letras, radio por internet y estadísticas de escucha. Gratis, sin cuenta y sin anuncios.","Швидкий сучасний плеєр для вашої локальної музичної колекції у Windows 11. Відтворює файли MP3 і FLAC, автоматично впорядковує великі бібліотеки та додає розумні плейлисти, тексти пісень, інтернет-радіо й статистику прослуховувань. Безкоштовно, без облікового запису, без реклами."
+ShortDescription,8,Text,,"Un lecteur rapide et moderne pour votre collection de musique locale sous Windows 11. Lit vos fichiers MP3, FLAC, ALAC/M4A, WAV et WMA, organise automatiquement les grandes bibliothèques, et ajoute playlists intelligentes, paroles, radios internet et statistiques d’écoute. Gratuit, sans compte, sans pub.","A fast, modern player for your local music collection on Windows 11. Plays your MP3, FLAC, ALAC/M4A, WAV and WMA files, organizes big libraries automatically, and adds smart playlists, lyrics, internet radio and listening stats. Free, no account, no ads.","Un reproductor rápido y moderno para tu colección de música local en Windows 11. Reproduce tus archivos MP3, FLAC, ALAC/M4A, WAV y WMA, organiza bibliotecas grandes automáticamente y añade listas inteligentes, letras, radio por internet y estadísticas de escucha. Gratis, sin cuenta y sin anuncios.","Швидкий сучасний плеєр для вашої локальної музичної колекції у Windows 11. Відтворює файли MP3, FLAC, ALAC/M4A, WAV і WMA, автоматично впорядковує великі бібліотеки та додає розумні плейлисти, тексти пісень, інтернет-радіо й статистику прослуховувань. Безкоштовно, без облікового запису, без реклами."
 DevStudio,9,Text,,Mickaël FRANCOIS,Mickaël FRANCOIS,Mickaël FRANCOIS,Mickaël FRANCOIS
 CopyrightTrademarkInformation,12,Text,,Rok app 2026,Rok app 2026,Rok app 2026,Rok app 2026
 AdditionalLicenseTerms,13,Text,,,,,
@@ -414,7 +414,7 @@ XboxFeaturedPromo1080x1080,610,Relative path (or URL to file in Partner Center),
 OptionalPromo358x358,611,Relative path (or URL to file in Partner Center),,,,,
 OptionalPromo1000x800,612,Relative path (or URL to file in Partner Center),,,,,
 OptionalPromo414x180,613,Relative path (or URL to file in Partner Center),,,,,
-Feature1,700,Text,,"Lit votre collection locale MP3 et FLAC, sans abonnement de streaming","Plays your local MP3 and FLAC collection, no streaming subscription needed","Reproduce tu colección local MP3 y FLAC, sin suscripción de streaming",Відтворює вашу локальну колекцію MP3 і FLAC без підписки на стрімінг
+Feature1,700,Text,,"Lit votre collection locale MP3, FLAC et ALAC, sans abonnement de streaming","Plays your local MP3, FLAC and ALAC collection, no streaming subscription needed","Reproduce tu colección local MP3, FLAC y ALAC, sin suscripción de streaming","Відтворює вашу локальну колекцію MP3, FLAC і ALAC без підписки на стрімінг"
 Feature2,701,Text,,Reste rapide avec de très grandes bibliothèques (100 000 titres et plus),"Stays fast with huge libraries (100,000+ tracks)",Sigue siendo rápido con bibliotecas enormes (más de 100 000 canciones),Залишається швидким із величезними бібліотеками (понад 100 000 треків)
 Feature3,702,Text,,Pochettes et métadonnées récupérées automatiquement,Album covers and metadata retrieved automatically,Carátulas y metadatos recuperados automáticamente,Обкладинки та метадані завантажуються автоматично
 Feature4,703,Text,,Playlists intelligentes qui se mettent à jour seules,Smart playlists that update themselves,Listas inteligentes que se actualizan solas,"Розумні плейлисти, що оновлюються самі"
@@ -460,7 +460,7 @@ SearchTerm1,900,Text,,lecteur de musique,local music player,reproductor de músi
 SearchTerm2,901,Text,,lecteur FLAC,FLAC player,reproductor FLAC,FLAC плеєр
 SearchTerm3,902,Text,,lecteur MP3,MP3 player,reproductor MP3,MP3 плеєр
 SearchTerm4,903,Text,,bibliothèque musicale,music library,biblioteca musical,музична бібліотека
-SearchTerm5,904,Text,,musique hors ligne,offline music,música sin conexión,local music player
+SearchTerm5,904,Text,,lecteur ALAC,ALAC player,reproductor ALAC,ALAC плеєр
 SearchTerm6,905,Text,,playlists intelligentes,smart playlists,listas inteligentes,розумні плейлисти
 SearchTerm7,906,Text,,radio internet,internet radio,radio por internet,інтернет-радіо
 TrailerToPlayAtTopOfListing,999,Relative path (or URL to file in Partner Center),,,,,

@@ -786,7 +786,7 @@
     <value>Доступ до цієї папки заборонено. Спробуйте іншу папку або перевірте права доступу.</value>
   </data>
   <data name="startViewErrorNoAudio" xml:space="preserve">
-    <value>Ця папка не містить сумісних аудіофайлів (MP3, FLAC).</value>
+    <value>Ця папка не містить сумісних аудіофайлів (MP3, FLAC, M4A, WAV, WMA, AIFF).</value>
   </data>
   <data name="startViewErrorFolderPicker" xml:space="preserve">
     <value>Не вдалося відкрити вікно вибору папки. Спробуйте ще раз.</value>
@@ -795,7 +795,7 @@
     <value>Rok відтворює музику, збережену локально на вашому ПК. У вашій папці не знайдено аудіофайлів.</value>
   </data>
   <data name="startViewFormats.Text" xml:space="preserve">
-    <value>MP3 · FLAC</value>
+    <value>MP3 · FLAC · M4A · WAV · WMA · AIFF</value>
   </data>
   <data name="startViewTagline.Text" xml:space="preserve">
     <value>Локальний музичний плеєр</value>
@@ -2058,10 +2058,10 @@
     <value>Цього жанру більше немає у вашій бібліотеці</value>
   </data>
   <data name="startViewErrorUnsupportedFormat" xml:space="preserve">
-    <value>Знайдено файлів {1}: {0} — Rok відтворює лише MP3 і FLAC.</value>
+    <value>Знайдено файлів {1}: {0} — Rok відтворює MP3, FLAC, M4A, WAV, WMA і AIFF.</value>
   </data>
   <data name="startViewErrorUnsupportedFormatSingle" xml:space="preserve">
-    <value>Знайдено файлів {1}: {0} — Rok відтворює лише MP3 і FLAC.</value>
+    <value>Знайдено файлів {1}: {0} — Rok відтворює MP3, FLAC, M4A, WAV, WMA і AIFF.</value>
   </data>
   <data name="startViewRadioFallback.Text" xml:space="preserve">
     <value>Слухати радіо тим часом</value>

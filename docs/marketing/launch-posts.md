@@ -1,5 +1,7 @@
 # Launch posts (step 3)
 
+> **Publish after the release that ships GH#400** (M4A/ALAC, WAV, WMA and AIFF support): the texts below already list these formats.
+
 Ready-to-post texts for the promotion wave that follows release 1.18.4 (onboarding, radio
 suggestions, rating prompt). Every link carries its `cid` (see `store-listing.md` §4) so
 Partner Center shows installs per channel.
@@ -35,7 +37,7 @@ before someone else does; no superlatives; never ask for upvotes (Reddit and HN 
 
 **Title**
 
-> I built a free, open-source Windows 11 player for big local MP3/FLAC libraries — it never rewrites your tags
+> I built a free, open-source Windows 11 player for big local FLAC/ALAC/MP3 libraries — it never rewrites your tags
 
 **Body**
 
@@ -62,7 +64,7 @@ before someone else does; no superlatives; never ask for upvotes (Reddit and HN 
 >
 > What it does **not** do (yet), so you don't waste your time:
 >
-> - Formats: MP3 and FLAC only. No ALAC/M4A, Opus, WMA or DSD for now — Rok tells you how
+> - Formats: MP3, FLAC, ALAC/M4A, WAV, WMA and AIFF. No Opus/OGG or DSD for now — Rok tells you how
 >   many unsupported files it found so I can see what to add first.
 > - No gapless playback (crossfade instead), no tag editor, no ReplayGain yet.
 > - Windows 11 24H2 or later only, from the Microsoft Store.
@@ -92,7 +94,7 @@ before someone else does; no superlatives; never ask for upvotes (Reddit and HN 
 
 **Title** (≤ 80 chars)
 
-> Show HN: Rok – a native Windows 11 music player for local MP3/FLAC libraries
+> Show HN: Rok – a native Windows 11 music player for local FLAC/ALAC/MP3 libraries
 
 **URL**: `https://github.com/mickaelfrancois/RoK` (HN prefers the code over a store page).
 
@@ -120,7 +122,7 @@ before someone else does; no superlatives; never ask for upvotes (Reddit and HN 
 > - Call detection: it pauses when Teams/Zoom/Discord open an audio session, found by walking
 >   the process tree (new Teams plays call audio from a WebView2 child process).
 >
-> Limits: MP3 and FLAC only for now, Windows 11 24H2+, no gapless.
+> Limits: no Opus/OGG or DSD for now, Windows 11 24H2+, no gapless.
 >
 > Store link if you just want to try it:
 > https://apps.microsoft.com/detail/9NX19R28Q92S?cid=hn
@@ -136,9 +138,9 @@ different angle (e.g. "What I learned shipping a WinUI 3 app to the Store").
 ## 3. Product Hunt
 
 - **Name**: Rok
-- **Tagline** (≤ 60 chars): `A native Windows 11 player for your MP3 & FLAC library`
+- **Tagline** (≤ 60 chars): `A native Windows 11 player for your FLAC & ALAC library`
 - **Description** (≤ 260 chars):
-  > Rok turns your local MP3 and FLAC folders into a beautiful, fast library: covers, smart
+  > Rok turns your local FLAC, ALAC and MP3 folders into a beautiful, fast library: covers, smart
   > playlists, synced lyrics, listening stats, internet radio and a local API. Free, open
   > source, no account, and it never modifies your audio files.
 - **Topics**: Music, Windows, Open Source
@@ -169,7 +171,7 @@ without asking for upvotes.
 
 ## 4. r/software / r/Windows11
 
-Short version of §1: title `Rok – free, open-source music player for local MP3/FLAC files (Windows 11)`,
+Short version of §1: title `Rok – free, open-source music player for local FLAC/ALAC/MP3 files (Windows 11)`,
 keep the "what it does / does not do" lists, drop the hoarder-specific questions, swap the cid.
 r/Windows11 only allows it in the weekly self-promotion thread: check the pinned post.
 
