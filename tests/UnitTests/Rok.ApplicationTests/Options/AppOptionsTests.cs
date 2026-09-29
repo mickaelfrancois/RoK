@@ -1,4 +1,5 @@
 using Rok.Application.Options;
+using Rok.Application.Player;
 
 namespace Rok.ApplicationTests.Options;
 
@@ -16,6 +17,32 @@ public class AppOptionsTests
 
         // Assert
         Assert.Equal(42, target.TotalTracksListened);
+    }
+
+    [Fact(DisplayName = "copy_from_preserves_replay_gain_options")]
+    public void CopyFrom_PreservesReplayGainOptions()
+    {
+        // Arrange
+        AppOptions source = new() { ReplayGainMode = EReplayGainMode.Track, ReplayGainPreampDb = 3.5 };
+        AppOptions target = new();
+
+        // Act
+        target.CopyFrom(source);
+
+        // Assert
+        Assert.Equal(EReplayGainMode.Track, target.ReplayGainMode);
+        Assert.Equal(3.5, target.ReplayGainPreampDb);
+    }
+
+    [Fact(DisplayName = "replay_gain_defaults_to_auto_without_preamp")]
+    public void ReplayGain_DefaultsToAutoWithoutPreamp()
+    {
+        // Act
+        AppOptions options = new();
+
+        // Assert
+        Assert.Equal(EReplayGainMode.Auto, options.ReplayGainMode);
+        Assert.Equal(0, options.ReplayGainPreampDb);
     }
 
     [Fact(DisplayName = "copy_from_preserves_review_fields")]

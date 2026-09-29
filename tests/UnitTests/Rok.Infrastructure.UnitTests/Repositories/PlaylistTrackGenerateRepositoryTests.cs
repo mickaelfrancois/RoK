@@ -54,6 +54,23 @@ public class PlaylistTrackGenerateRepositoryTests
         Assert.All(result, t => Assert.False(string.IsNullOrEmpty(t.ArtistName)));
     }
 
+    [Fact(DisplayName = "generate_should_project_album_replay_gain")]
+    public async Task Generate_ShouldProjectAlbumReplayGain()
+    {
+        // Arrange
+        using SqliteDatabaseFixture fixture = new();
+        PlaylistTrackGenerateRepository repo = CreateRepository(fixture);
+        await fixture.Connection.ExecuteAsync("UPDATE Albums SET replayGainAlbumGain = -4.5, replayGainAlbumPeak = 1.05");
+
+        // Act
+        List<TrackEntity> result = await repo.GenerateAsync(BuildQuery(10));
+
+        // Assert
+        Assert.NotEmpty(result);
+        Assert.All(result, t => Assert.Equal(-4.5, t.ReplayGainAlbumGain));
+        Assert.All(result, t => Assert.Equal(1.05, t.ReplayGainAlbumPeak));
+    }
+
     [Fact(DisplayName = "Generate should filter tracks by a numeric comparison on albums")]
     public async Task Generate_ShouldFilterTracks_ByNumericComparisonOnAlbums()
     {

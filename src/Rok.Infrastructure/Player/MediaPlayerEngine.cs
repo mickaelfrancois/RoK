@@ -113,7 +113,7 @@ public class WinUIMediaPlayer : IPlayerEngine, IDisposable
         _player.Volume = (float)clampVolume;
     }
 
-    public bool SetTrack(TrackDto track)
+    public bool SetTrack(TrackDto track, float replayGain)
     {
         try
         {
@@ -145,10 +145,10 @@ public class WinUIMediaPlayer : IPlayerEngine, IDisposable
     }
 
     /// <inheritdoc />
-    public Task CrossfadeToAsync(TrackDto nextTrack, double durationSeconds, double masterVolume, CancellationToken ct)
+    public Task CrossfadeToAsync(TrackDto nextTrack, float replayGain, double durationSeconds, double masterVolume, CancellationToken ct)
     {
         // WinUI MediaPlayer does not support simultaneous dual-track playback; fall back to instant switch.
-        SetTrack(nextTrack);
+        SetTrack(nextTrack, replayGain);
         SetVolume(masterVolume);
         Play();
         return Task.CompletedTask;
@@ -162,10 +162,15 @@ public class WinUIMediaPlayer : IPlayerEngine, IDisposable
     }
 
     /// <inheritdoc />
-    public bool QueueNextTrack(TrackDto nextTrack) => false;
+    public bool QueueNextTrack(TrackDto nextTrack, float replayGain) => false;
 
     /// <inheritdoc />
     public void ClearNextTrack()
+    {
+    }
+
+    /// <inheritdoc />
+    public void UpdateReplayGain(long trackId, float replayGain)
     {
     }
 

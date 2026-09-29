@@ -18,7 +18,7 @@ public class PlayerServiceSmtcTests
         Mock<ICallDetectionService> callMock = new();
         Mock<IAppOptions> optionsMock = new();
         optionsMock.SetupGet(o => o.CrossFade).Returns(false);
-        engine.Setup(o => o.SetTrack(It.IsAny<TrackDto>())).Returns(true);
+        engine.Setup(o => o.SetTrack(It.IsAny<TrackDto>(), It.IsAny<float>())).Returns(true);
         FakeTimeProvider time = new();
 
         const string albumDir = @"C:\Music\Album";
@@ -63,7 +63,7 @@ public class PlayerServiceSmtcTests
         Mock<ICallDetectionService> callMock = new();
         Mock<IAppOptions> optionsMock = new();
         optionsMock.SetupGet(o => o.CrossFade).Returns(false);
-        engine.Setup(o => o.SetTrack(It.IsAny<TrackDto>())).Returns(true);
+        engine.Setup(o => o.SetTrack(It.IsAny<TrackDto>(), It.IsAny<float>())).Returns(true);
         FakeTimeProvider time = new();
 
         const string albumDir = @"C:\Music\Album";
@@ -140,7 +140,7 @@ public class PlayerServiceSmtcTests
         // Arrange
         Mock<ISystemMediaTransportControlsService> smtc = new();
         Mock<IPlayerEngine> engine = new();
-        engine.Setup(o => o.SetTrack(It.IsAny<TrackDto>())).Returns(true);
+        engine.Setup(o => o.SetTrack(It.IsAny<TrackDto>(), It.IsAny<float>())).Returns(true);
         engine.SetupGet(e => e.Position).Returns(10d);
         engine.SetupGet(e => e.Length).Returns(180d);
         Mock<ICallDetectionService> callMock = new();
@@ -179,7 +179,7 @@ public class PlayerServiceSmtcTests
         // Arrange
         Mock<ISystemMediaTransportControlsService> smtc = new();
         Mock<IPlayerEngine> engine = new();
-        engine.Setup(o => o.SetTrack(It.IsAny<TrackDto>())).Returns(true);
+        engine.Setup(o => o.SetTrack(It.IsAny<TrackDto>(), It.IsAny<float>())).Returns(true);
         engine.SetupGet(e => e.Position).Returns(10d);
         engine.SetupGet(e => e.Length).Returns(180d);
         Mock<ICallDetectionService> callMock = new();

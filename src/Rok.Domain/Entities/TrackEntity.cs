@@ -72,6 +72,12 @@ public class TrackEntity : BaseEntity
     public bool IsAlbumLive { get; set; }
 
     [Write(false)]
+    public double? ReplayGainAlbumGain { get; set; }
+
+    [Write(false)]
+    public double? ReplayGainAlbumPeak { get; set; }
+
+    [Write(false)]
     public string GenreName { get; set; } = string.Empty;
 
     [Write(false)]

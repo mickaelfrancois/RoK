@@ -2,6 +2,7 @@
 using Moq;
 using Rok.Application.Interfaces;
 using Rok.Application.Options;
+using Rok.Application.Player;
 using Rok.Infrastructure.Files;
 using Rok.Shared.Enums;
 
@@ -185,6 +186,33 @@ public class SettingsFileServiceTests
 
         // Assert
         Assert.Equal(37, restored.TotalTracksListened);
+    }
+
+    [Fact(DisplayName = "replay_gain_options_survive_save_load_and_copy")]
+    public async Task ReplayGainOptions_SurviveSaveLoadAndCopy()
+    {
+        // Arrange
+        AppOptions options = new() { ReplayGainMode = EReplayGainMode.Album, ReplayGainPreampDb = -2.5 };
+        string? capturedJson = null;
+
+        Mock<IFileSystem> fs = CreateFileSystemMock();
+        fs.Setup(f => f.WriteAllTextAsync(SettingsFilePath, It.IsAny<string>(), It.IsAny<CancellationToken>()))
+            .Callback<string, string, CancellationToken>((_, json, _) => capturedJson = json)
+            .Returns(Task.CompletedTask);
+        fs.Setup(f => f.FileExists(SettingsFilePath)).Returns(true);
+        fs.Setup(f => f.ReadAllTextAsync(SettingsFilePath, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(() => capturedJson!);
+        SettingsFileService sut = new(ApplicationPath, CreateFolderResolverMock().Object, fs.Object);
+
+        // Act
+        await sut.SaveAsync(options);
+        IAppOptions? loaded = await sut.LoadAsync<AppOptions>();
+        AppOptions restored = new();
+        restored.CopyFrom(loaded!);
+
+        // Assert
+        Assert.Equal(EReplayGainMode.Album, restored.ReplayGainMode);
+        Assert.Equal(-2.5, restored.ReplayGainPreampDb);
     }
 
     [Fact]

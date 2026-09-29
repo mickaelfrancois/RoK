@@ -1021,6 +1021,27 @@
   <data name="OptionsCrossFadeDescription.Text" xml:space="preserve">
     <value>Albums played in order always flow without gaps.</value>
   </data>
+  <data name="OptionsReplayGainModeLabel.Text" xml:space="preserve">
+    <value>Volume normalization (ReplayGain)</value>
+  </data>
+  <data name="OptionsReplayGainModeOffItem.Content" xml:space="preserve">
+    <value>Off</value>
+  </data>
+  <data name="OptionsReplayGainModeTrackItem.Content" xml:space="preserve">
+    <value>Track</value>
+  </data>
+  <data name="OptionsReplayGainModeAlbumItem.Content" xml:space="preserve">
+    <value>Album</value>
+  </data>
+  <data name="OptionsReplayGainModeAutoItem.Content" xml:space="preserve">
+    <value>Auto (album when played in order)</value>
+  </data>
+  <data name="OptionsReplayGainPreampSlider.Header" xml:space="preserve">
+    <value>Preamp (dB)</value>
+  </data>
+  <data name="OptionsReplayGainDescription.Text" xml:space="preserve">
+    <value>Uses the ReplayGain tags of your files to play every track at a similar loudness. Tracks without tags play unchanged.</value>
+  </data>
   <data name="shuffleButton.Label" xml:space="preserve">
     <value>Shuffle</value>
   </data>

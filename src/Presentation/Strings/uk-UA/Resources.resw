@@ -962,6 +962,27 @@
   <data name="OptionsCrossFadeDescription.Text" xml:space="preserve">
     <value>Альбоми, прослухані по порядку, завжди звучать без пауз.</value>
   </data>
+  <data name="OptionsReplayGainModeLabel.Text" xml:space="preserve">
+    <value>Нормалізація гучності (ReplayGain)</value>
+  </data>
+  <data name="OptionsReplayGainModeOffItem.Content" xml:space="preserve">
+    <value>Вимкнено</value>
+  </data>
+  <data name="OptionsReplayGainModeTrackItem.Content" xml:space="preserve">
+    <value>Трек</value>
+  </data>
+  <data name="OptionsReplayGainModeAlbumItem.Content" xml:space="preserve">
+    <value>Альбом</value>
+  </data>
+  <data name="OptionsReplayGainModeAutoItem.Content" xml:space="preserve">
+    <value>Авто (альбом, якщо слухати по порядку)</value>
+  </data>
+  <data name="OptionsReplayGainPreampSlider.Header" xml:space="preserve">
+    <value>Попереднє підсилення (дБ)</value>
+  </data>
+  <data name="OptionsReplayGainDescription.Text" xml:space="preserve">
+    <value>Використовує теги ReplayGain ваших файлів, щоб кожен трек звучав з подібною гучністю. Треки без тегів відтворюються без змін.</value>
+  </data>
   <data name="shuffleButton.Label" xml:space="preserve">
     <value>Перемішати</value>
   </data>

@@ -904,6 +904,27 @@
   <data name="OptionsCrossFadeDescription.Text" xml:space="preserve">
     <value>Los álbumes escuchados en orden siempre se encadenan sin pausas.</value>
   </data>
+  <data name="OptionsReplayGainModeLabel.Text" xml:space="preserve">
+    <value>Normalización del volumen (ReplayGain)</value>
+  </data>
+  <data name="OptionsReplayGainModeOffItem.Content" xml:space="preserve">
+    <value>Desactivada</value>
+  </data>
+  <data name="OptionsReplayGainModeTrackItem.Content" xml:space="preserve">
+    <value>Pista</value>
+  </data>
+  <data name="OptionsReplayGainModeAlbumItem.Content" xml:space="preserve">
+    <value>Álbum</value>
+  </data>
+  <data name="OptionsReplayGainModeAutoItem.Content" xml:space="preserve">
+    <value>Auto (álbum si se escucha en orden)</value>
+  </data>
+  <data name="OptionsReplayGainPreampSlider.Header" xml:space="preserve">
+    <value>Preamplificador (dB)</value>
+  </data>
+  <data name="OptionsReplayGainDescription.Text" xml:space="preserve">
+    <value>Usa las etiquetas ReplayGain de tus archivos para reproducir cada pista con un volumen percibido similar. Las pistas sin etiquetas se reproducen sin cambios.</value>
+  </data>
   <data name="shuffleButton.Label" xml:space="preserve">
     <value>Barajar</value>
   </data>

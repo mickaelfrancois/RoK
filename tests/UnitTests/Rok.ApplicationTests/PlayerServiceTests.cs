@@ -26,7 +26,7 @@ public class PlayerServiceTests
         mockAlbumPicture = new Mock<IAlbumPicture>();
         fakeTimeProvider = new FakeTimeProvider();
 
-        mockPlayerEngine.Setup(o => o.SetTrack(It.IsAny<TrackDto>())).Returns(true);
+        mockPlayerEngine.Setup(o => o.SetTrack(It.IsAny<TrackDto>(), It.IsAny<float>())).Returns(true);
         mockAppOptions.SetupGet(o => o.CrossFade).Returns(false);
 
         playerService = new PlayerService(mockCallDetectionService.Object, mockPlayerEngine.Object, mockAppOptions.Object, null, null, mockAlbumPicture.Object, fakeTimeProvider, new Messenger(), mockLogger.Object);

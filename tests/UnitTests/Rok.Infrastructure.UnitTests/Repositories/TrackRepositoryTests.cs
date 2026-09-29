@@ -883,4 +883,91 @@ public class TrackRepositoryTests
         Assert.True(foundDifference,
             "Two successive calls to GetByAlbumIdAsync returned identical orderings across 3 attempts. ORDER BY RANDOM() may be missing.");
     }
+
+    [Fact(DisplayName = "get_by_album_id_projects_track_and_album_replay_gain")]
+    public async Task GetByAlbumIdAsync_ProjectsTrackAndAlbumReplayGain()
+    {
+        // Arrange
+        using SqliteDatabaseFixture fixture = CreateFixture();
+        TrackRepository repo = CreateRepository(fixture);
+        DateTime now = DateTime.UtcNow;
+        const long albumId = 8410;
+
+        await fixture.Connection.ExecuteAsync(@"
+            INSERT INTO Albums(id, name, isLive, isCompilation, isBestof, trackCount, duration, isFavorite, listenCount, creatDate, artistId, genreId, replayGainAlbumGain, replayGainAlbumPeak)
+            VALUES (@albumId, 'ReplayGain Album', 0, 0, 0, 1, 180, 0, 0, @now, 1, 1, -6.5, 1.12)",
+            new { albumId, now });
+
+        await fixture.Connection.ExecuteAsync(@"
+            INSERT INTO Tracks(id, title, duration, size, bitrate, musicFile, fileDate, isLive, score, listenCount, skipCount, creatDate, albumId, artistId, trackNumber, replayGainTrackGain, replayGainTrackPeak)
+            VALUES (8411, 'ReplayGain Track', 180, 1000, 128, '/test8411', @now, 0, 0, 0, 0, @now, @albumId, 1, 1, -7.25, 0.98)",
+            new { albumId, now });
+
+        // Act
+        TrackEntity track = Assert.Single(await repo.GetByAlbumIdAsync(albumId));
+
+        // Assert
+        Assert.Equal(-7.25, track.ReplayGainTrackGain);
+        Assert.Equal(0.98, track.ReplayGainTrackPeak);
+        Assert.Equal(-6.5, track.ReplayGainAlbumGain);
+        Assert.Equal(1.12, track.ReplayGainAlbumPeak);
+    }
+
+    [Fact(DisplayName = "get_by_album_id_leaves_album_replay_gain_null_when_album_has_none")]
+    public async Task GetByAlbumIdAsync_LeavesAlbumReplayGainNull_WhenAlbumHasNone()
+    {
+        // Arrange
+        using SqliteDatabaseFixture fixture = CreateFixture();
+        TrackRepository repo = CreateRepository(fixture);
+        DateTime now = DateTime.UtcNow;
+        const long albumId = 8420;
+
+        await fixture.Connection.ExecuteAsync(@"
+            INSERT INTO Albums(id, name, isLive, isCompilation, isBestof, trackCount, duration, isFavorite, listenCount, creatDate, artistId, genreId)
+            VALUES (@albumId, 'Plain Album', 0, 0, 0, 1, 180, 0, 0, @now, 1, 1)",
+            new { albumId, now });
+
+        await fixture.Connection.ExecuteAsync(@"
+            INSERT INTO Tracks(id, title, duration, size, bitrate, musicFile, fileDate, isLive, score, listenCount, skipCount, creatDate, albumId, artistId, trackNumber)
+            VALUES (8421, 'Plain Track', 180, 1000, 128, '/test8421', @now, 0, 0, 0, 0, @now, @albumId, 1, 1)",
+            new { albumId, now });
+
+        // Act
+        TrackEntity track = Assert.Single(await repo.GetByAlbumIdAsync(albumId));
+
+        // Assert
+        Assert.Null(track.ReplayGainAlbumGain);
+        Assert.Null(track.ReplayGainAlbumPeak);
+        Assert.Null(track.ReplayGainTrackGain);
+    }
+
+    [Fact(DisplayName = "update_of_a_track_loaded_with_album_replay_gain_succeeds")]
+    public async Task UpdateAsync_OfTrackLoadedWithAlbumReplayGain_Succeeds()
+    {
+        // Arrange
+        using SqliteDatabaseFixture fixture = CreateFixture();
+        TrackRepository repo = CreateRepository(fixture);
+        DateTime now = DateTime.UtcNow;
+        const long albumId = 8430;
+
+        await fixture.Connection.ExecuteAsync(@"
+            INSERT INTO Albums(id, name, isLive, isCompilation, isBestof, trackCount, duration, isFavorite, listenCount, creatDate, artistId, genreId, replayGainAlbumGain, replayGainAlbumPeak)
+            VALUES (@albumId, 'Updatable Album', 0, 0, 0, 1, 180, 0, 0, @now, 1, 1, -3.0, 0.9)",
+            new { albumId, now });
+
+        await fixture.Connection.ExecuteAsync(@"
+            INSERT INTO Tracks(id, title, duration, size, bitrate, musicFile, fileDate, isLive, score, listenCount, skipCount, creatDate, albumId, artistId, trackNumber)
+            VALUES (8431, 'Updatable Track', 180, 1000, 128, '/test8431', @now, 0, 0, 0, 0, @now, @albumId, 1, 1)",
+            new { albumId, now });
+
+        TrackEntity track = Assert.Single(await repo.GetByAlbumIdAsync(albumId));
+        track.Title = "Renamed Track";
+
+        // Act
+        bool updated = await repo.UpdateAsync(track);
+
+        // Assert
+        Assert.True(updated);
+        Assert.Equal("Renamed Track", Assert.Single(await repo.GetByAlbumIdAsync(albumId)).Title);
+    }
 }

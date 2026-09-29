@@ -313,6 +313,7 @@ public class PlaylistTrackGenerateRepository(IDbConnection db, [FromKeyedService
         string query = """
                 SELECT tracks.*,
                      albums.name AS albumName, albums.isFavorite AS isAlbumFavorite, albums.isCompilation AS isAlbumCompilation, albums.isLive AS isAlbumLive,
+                     albums.replayGainAlbumGain AS replayGainAlbumGain, albums.replayGainAlbumPeak AS replayGainAlbumPeak,
                      artists.name AS artistName, artists.isFavorite AS isArtistFavorite, 
                      genres.name AS genreName, genres.isFavorite AS isGenreFavorite, 
                      countries.code AS countryCode, countries.english AS countryName

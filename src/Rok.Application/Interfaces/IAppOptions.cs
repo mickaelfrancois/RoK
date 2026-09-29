@@ -1,4 +1,5 @@
-﻿using Rok.Shared.Enums;
+﻿using Rok.Application.Player;
+using Rok.Shared.Enums;
 
 namespace Rok.Application.Interfaces;
 
@@ -23,6 +24,10 @@ public interface IAppOptions
     List<string> LibraryTokens { get; set; }
 
     bool CrossFade { get; set; }
+
+    EReplayGainMode ReplayGainMode { get; set; }
+
+    double ReplayGainPreampDb { get; set; }
 
     bool IsGridView { get; set; }
 

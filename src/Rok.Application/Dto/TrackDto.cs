@@ -56,6 +56,14 @@ public class TrackDto
 
     public bool IsAlbumLive { get; set; }
 
+    public double? ReplayGainTrackGain { get; set; }
+
+    public double? ReplayGainTrackPeak { get; set; }
+
+    public double? ReplayGainAlbumGain { get; set; }
+
+    public double? ReplayGainAlbumPeak { get; set; }
+
     public string GenreName { get; set; } = string.Empty;
 
     public bool IsGenreFavorite { get; set; }

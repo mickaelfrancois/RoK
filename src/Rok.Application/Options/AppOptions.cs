@@ -1,5 +1,6 @@
 ﻿using CleanArch.DevKit.Guards;
 using Rok.Application.Interfaces;
+using Rok.Application.Player;
 using Rok.Shared.Enums;
 
 namespace Rok.Application.Options;
@@ -33,6 +34,10 @@ public class AppOptions : IAppOptions
     public List<string> LibraryTokens { get; set; } = [];
 
     public bool CrossFade { get; set; } = true;
+
+    public EReplayGainMode ReplayGainMode { get; set; } = EReplayGainMode.Auto;
+
+    public double ReplayGainPreampDb { get; set; } = 0;
 
     public bool IsGridView { get; set; } = true;
 
@@ -125,6 +130,8 @@ public class AppOptions : IAppOptions
         TelemetryEnabled = options.TelemetryEnabled;
         NovaApiEnabled = options.NovaApiEnabled;
         PauseOnCall = options.PauseOnCall;
+        ReplayGainMode = options.ReplayGainMode;
+        ReplayGainPreampDb = options.ReplayGainPreampDb;
         WebApiPort = options.WebApiPort;
         EnableWebApi = options.EnableWebApi;
         WebApiAllowLan = options.WebApiAllowLan;

@@ -182,6 +182,8 @@ public sealed class PlayerService : IPlayerService, IDisposable
 
     private readonly IMessenger _messenger;
 
+    private readonly IDisposable _replayGainSubscription;
+
     public PlayerService(ICallDetectionService callDetectionService, IPlayerEngine player, IAppOptions appOptions, IDiscordRichPresenceService? discordService, ISystemMediaTransportControlsService? smtcService, IAlbumPicture albumPicture, TimeProvider timeProvider, IMessenger messenger, ILogger<PlayerService> logger)
     {
         _callDetectionService = Guard.NotNull(callDetectionService, nameof(callDetectionService));
@@ -199,6 +201,8 @@ public sealed class PlayerService : IPlayerService, IDisposable
         _discordService?.Initialize();
 
         InitEvents();
+
+        _replayGainSubscription = _messenger.Subscribe<ReplayGainOptionsChanged>(_ => ApplyReplayGainOptions());
 
 #if DEBUG
         _volume = 5;
@@ -323,7 +327,7 @@ public sealed class PlayerService : IPlayerService, IDisposable
 
         if (PlaybackTransitionPolicy.Decide(_isCrossfadeEnabled, _isMuted, CurrentTrack, nextTrack) == EPlaybackTransition.Gapless)
         {
-            QueueGaplessTransition(nextTrack);
+            QueueGaplessTransition(nextIndex, nextTrack);
             return;
         }
 
@@ -331,7 +335,7 @@ public sealed class PlayerService : IPlayerService, IDisposable
         _ = CrossfadeToNextTrackAsync();
     }
 
-    private void QueueGaplessTransition(TrackDto nextTrack)
+    private void QueueGaplessTransition(int nextIndex, TrackDto nextTrack)
     {
         lock (_transitionLock)
         {
@@ -339,7 +343,7 @@ public sealed class PlayerService : IPlayerService, IDisposable
             _invalidatedGapless = null;
         }
 
-        if (_player.QueueNextTrack(nextTrack))
+        if (_player.QueueNextTrack(nextTrack, ResolveReplayGain(nextIndex)))
             return;
 
         _logger.LogDebug("Gapless refused for {Track}, the next track will be reloaded at the end", nextTrack.Title);
@@ -752,7 +756,7 @@ public sealed class PlayerService : IPlayerService, IDisposable
         ResetPendingTransition();
         _player.Stop();
 
-        bool res = _player.SetTrack(track);
+        bool res = _player.SetTrack(track, ResolveReplayGain(_currentIndex));
 
         if (res)
         {
@@ -884,7 +888,7 @@ public sealed class PlayerService : IPlayerService, IDisposable
 
         long durationPlayed = (long)_player.Position;
 
-        await _player.CrossfadeToAsync(nextTrack, crossfadeDurationSeconds, _volume, cancellationToken);
+        await _player.CrossfadeToAsync(nextTrack, ResolveReplayGain(nextIndex), crossfadeDurationSeconds, _volume, cancellationToken);
 
         cancellationToken.ThrowIfCancellationRequested();
 
@@ -940,10 +944,33 @@ public sealed class PlayerService : IPlayerService, IDisposable
 
     public void Dispose()
     {
+        _replayGainSubscription.Dispose();
         _smtcTimelineTimer?.Dispose();
         _smtcTimelineTimer = null;
         _crossfadeCts?.Dispose();
         _crossfadeCts = null;
+    }
+
+    private float ResolveReplayGain(int index)
+    {
+        if (index < 0 || index >= Playlist.Count)
+            return 1f;
+
+        TrackDto? previous = index > 0 ? Playlist[index - 1] : null;
+        TrackDto? next = index + 1 < Playlist.Count ? Playlist[index + 1] : null;
+
+        return ReplayGainCalculator.Resolve(_appOptions.ReplayGainMode, _appOptions.ReplayGainPreampDb, previous, Playlist[index], next);
+    }
+
+    private void ApplyReplayGainOptions()
+    {
+        if (_mode == EPlaybackMode.Radio || CurrentTrack == null)
+            return;
+
+        _player.UpdateReplayGain(CurrentTrack.Id, ResolveReplayGain(_currentIndex));
+
+        if (TryGetNextIndex(out int nextIndex))
+            _player.UpdateReplayGain(Playlist[nextIndex].Id, ResolveReplayGain(nextIndex));
     }
 
     private void OnSmtcTimelineTick()

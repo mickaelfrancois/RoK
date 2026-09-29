@@ -25,6 +25,7 @@ public class NAudioMediaPlayer : IPlayerEngine, IDisposable
     private IWavePlayer? _outputDevice;
     private PlaybackPipeline? _pipeline;
     private PendingNext? _pendingNext;
+    private PlaybackPipeline? _crossfadeIncoming;
     private int _generation;
     private float _volume = 1f;
     private readonly float[] _bandGains = new float[PlaybackPipeline.BandFrequencies.Length];
@@ -220,7 +221,7 @@ public class NAudioMediaPlayer : IPlayerEngine, IDisposable
             _pipeline.Volume.Volume = _volume;
     }
 
-    public bool SetTrack(TrackDto track)
+    public bool SetTrack(TrackDto track, float replayGain)
     {
         AudioFileReader? reader = null;
 
@@ -229,7 +230,7 @@ public class NAudioMediaPlayer : IPlayerEngine, IDisposable
             Stop();
 
             reader = new AudioFileReader(track.MusicFile);
-            PlaybackPipeline pipeline = PlaybackPipeline.Create(reader, _bandGains, _volume);
+            PlaybackPipeline pipeline = PlaybackPipeline.Create(reader, replayGain, track.Id, _bandGains, _volume);
 
             Length = reader.TotalTime.TotalSeconds > 0
                 ? reader.TotalTime.TotalSeconds
@@ -312,16 +313,16 @@ public class NAudioMediaPlayer : IPlayerEngine, IDisposable
     }
 
     /// <inheritdoc />
-    public bool QueueNextTrack(TrackDto nextTrack)
+    public bool QueueNextTrack(TrackDto nextTrack, float replayGain)
     {
         if (_isLive || _pipeline is null)
             return false;
 
-        AudioFileReader reader;
+        ReplayGainSampleProvider source;
 
         try
         {
-            reader = new AudioFileReader(nextTrack.MusicFile);
+            source = new ReplayGainSampleProvider(new AudioFileReader(nextTrack.MusicFile), replayGain);
         }
         catch (Exception ex)
         {
@@ -334,9 +335,9 @@ public class NAudioMediaPlayer : IPlayerEngine, IDisposable
 
         lock (_stateLock)
         {
-            if (_pipeline is not null && _pipeline.Chain.TryQueueNext(reader, out replaced))
+            if (_pipeline is not null && _pipeline.Chain.TryQueueNext(source, out replaced))
             {
-                _pendingNext = new PendingNext(reader, nextTrack);
+                _pendingNext = new PendingNext(source, nextTrack);
                 queued = true;
             }
         }
@@ -346,10 +347,26 @@ public class NAudioMediaPlayer : IPlayerEngine, IDisposable
         if (!queued)
         {
             _logger.LogInformation("Gapless: {File} has a different format, falling back to a regular transition", nextTrack.MusicFile);
-            reader.Dispose();
+            source.Dispose();
         }
 
         return queued;
+    }
+
+    /// <inheritdoc />
+    public void UpdateReplayGain(long trackId, float replayGain)
+    {
+        lock (_stateLock)
+        {
+            if (_pipeline is not null && _pipeline.TrackId == trackId)
+                _pipeline.Source.Gain = replayGain;
+
+            if (_pendingNext is not null && _pendingNext.Track.Id == trackId)
+                _pendingNext.Source.Gain = replayGain;
+
+            if (_crossfadeIncoming is not null && _crossfadeIncoming.TrackId == trackId)
+                _crossfadeIncoming.Source.Gain = replayGain;
+        }
     }
 
     /// <inheritdoc />
@@ -368,7 +385,7 @@ public class NAudioMediaPlayer : IPlayerEngine, IDisposable
     }
 
     /// <inheritdoc />
-    public async Task CrossfadeToAsync(TrackDto nextTrack, double durationSeconds, double masterVolume, CancellationToken ct)
+    public async Task CrossfadeToAsync(TrackDto nextTrack, float replayGain, double durationSeconds, double masterVolume, CancellationToken ct)
     {
         if (_isLive) return;
 
@@ -379,12 +396,17 @@ public class NAudioMediaPlayer : IPlayerEngine, IDisposable
 
         try
         {
-            nextPipeline = PlaybackPipeline.Create(new AudioFileReader(nextTrack.MusicFile), _bandGains, 0f);
+            nextPipeline = PlaybackPipeline.Create(new AudioFileReader(nextTrack.MusicFile), replayGain, nextTrack.Id, _bandGains, 0f);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Crossfade: failed to open next track {File}", nextTrack.MusicFile);
             return;
+        }
+
+        lock (_stateLock)
+        {
+            _crossfadeIncoming = nextPipeline;
         }
 
         WaveOut nextDevice = new();
@@ -421,17 +443,26 @@ public class NAudioMediaPlayer : IPlayerEngine, IDisposable
         }
         catch (OperationCanceledException)
         {
-            nextDevice.Stop();
-            nextDevice.Dispose();
-            nextPipeline.Dispose();
+            AbandonCrossfade(nextPipeline, nextDevice);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Crossfade: unexpected error");
-            nextDevice.Stop();
-            nextDevice.Dispose();
-            nextPipeline.Dispose();
+            AbandonCrossfade(nextPipeline, nextDevice);
         }
+    }
+
+    private void AbandonCrossfade(PlaybackPipeline nextPipeline, WaveOut nextDevice)
+    {
+        lock (_stateLock)
+        {
+            if (ReferenceEquals(_crossfadeIncoming, nextPipeline))
+                _crossfadeIncoming = null;
+        }
+
+        nextDevice.Stop();
+        nextDevice.Dispose();
+        nextPipeline.Dispose();
     }
 
     private void PromoteCrossfade(PlaybackPipeline nextPipeline, WaveOut nextDevice, double masterVolume)
@@ -453,6 +484,7 @@ public class NAudioMediaPlayer : IPlayerEngine, IDisposable
             _outputDevice = nextDevice;
             _pipeline = nextPipeline;
             _pendingNext = null;
+            _crossfadeIncoming = null;
             _generation++;
             _length = nextPipeline.Reader.TotalTime.TotalSeconds > 0 ? nextPipeline.Reader.TotalTime.TotalSeconds : 1;
             _aboutToEndRaised = false;
@@ -504,14 +536,16 @@ public class NAudioMediaPlayer : IPlayerEngine, IDisposable
         {
             PlaybackPipeline? pipeline = _pipeline;
 
-            if (pipeline is null || !ReferenceEquals(pipeline.Chain, sender) || e.Current is not AudioFileReader next)
+            if (pipeline is null || !ReferenceEquals(pipeline.Chain, sender) || e.Current is not ReplayGainSampleProvider { Source: AudioFileReader next } source)
                 return;
 
+            pending = ReferenceEquals(_pendingNext?.Source, source) ? _pendingNext : null;
             previous = pipeline.Reader;
             pipeline.Reader = next;
+            pipeline.Source = source;
+            pipeline.TrackId = pending?.Track.Id ?? 0;
             _length = next.TotalTime.TotalSeconds > 0 ? next.TotalTime.TotalSeconds : 1;
             _aboutToEndRaised = false;
-            pending = ReferenceEquals(_pendingNext?.Reader, next) ? _pendingNext : null;
             _pendingNext = null;
             generation = _generation;
         }
@@ -628,5 +662,5 @@ public class NAudioMediaPlayer : IPlayerEngine, IDisposable
         GC.SuppressFinalize(this);
     }
 
-    private sealed record PendingNext(AudioFileReader Reader, TrackDto Track);
+    private sealed record PendingNext(ReplayGainSampleProvider Source, TrackDto Track);
 }
