@@ -394,8 +394,5 @@
 	<ItemGroup>
 	  <PRIResource Remove="Commons\Extensions\**" />
 	</ItemGroup>
-	<ItemGroup>
-	  <PackageReference Update="Roslynator.Analyzers" Version="5.0.0" />
-	</ItemGroup>
 	
 </Project>

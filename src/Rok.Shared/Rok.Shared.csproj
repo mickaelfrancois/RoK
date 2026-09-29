@@ -11,9 +11,5 @@
     <PackageReference Include="CleanArch.DevKit.Guards" Version="1.1.1" />
   </ItemGroup>
 
-  <ItemGroup>
-    <PackageReference Update="Roslynator.Analyzers" Version="5.0.0" />
-  </ItemGroup>
-
 
 </Project>
