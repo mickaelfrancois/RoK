@@ -71,6 +71,12 @@ public sealed class PlayerService : IPlayerService, IDisposable
 
     private CancellationTokenSource? _crossfadeCts;
 
+    private readonly Lock _transitionLock = new();
+
+    private TrackDto? _pendingGapless;
+
+    private TrackDto? _invalidatedGapless;
+
     public bool IsLoopingEnabled { get; set; }
 
     public double Position
@@ -84,6 +90,8 @@ public sealed class PlayerService : IPlayerService, IDisposable
             _ = Task.Run(() =>
             {
                 double seek = Math.Max(0, value);
+
+                InvalidatePendingTransition();
 
                 if (PlaybackState == EPlaybackState.Paused || PlaybackState == EPlaybackState.Ended)
                     Play();
@@ -205,6 +213,7 @@ public sealed class PlayerService : IPlayerService, IDisposable
         _player.OnMediaChanged += OnMediaChanged;
         _player.OnMediaEnded += OnMediaEnded;
         _player.OnMediaStateChanged += OnMediaStateChanged;
+        _player.OnGaplessTransition += OnGaplessTransition;
         _player.OnMetadataChanged += (_, title) =>
         {
             _currentStreamTitle = title;
@@ -302,13 +311,115 @@ public sealed class PlayerService : IPlayerService, IDisposable
     {
         _logger.LogDebug("Event Media about to end fired.");
 
-        if (CurrentTrack != null)
-            _messenger.Send(new MediaAboutToEndEvent(CurrentTrack));
+        if (CurrentTrack == null)
+            return;
 
-        if (_isCrossfadeEnabled)
+        _messenger.Send(new MediaAboutToEndEvent(CurrentTrack));
+
+        if (!TryGetNextIndex(out int nextIndex))
+            return;
+
+        TrackDto nextTrack = Playlist[nextIndex];
+
+        if (PlaybackTransitionPolicy.Decide(_isCrossfadeEnabled, _isMuted, CurrentTrack, nextTrack) == EPlaybackTransition.Gapless)
         {
-            _isCrossfadeRunning = true;
-            _ = CrossfadeToNextTrackAsync();
+            QueueGaplessTransition(nextTrack);
+            return;
+        }
+
+        _isCrossfadeRunning = true;
+        _ = CrossfadeToNextTrackAsync();
+    }
+
+    private void QueueGaplessTransition(TrackDto nextTrack)
+    {
+        lock (_transitionLock)
+        {
+            _pendingGapless = nextTrack;
+            _invalidatedGapless = null;
+        }
+
+        if (_player.QueueNextTrack(nextTrack))
+            return;
+
+        _logger.LogDebug("Gapless refused for {Track}, the next track will be reloaded at the end", nextTrack.Title);
+
+        lock (_transitionLock)
+        {
+            _pendingGapless = null;
+        }
+    }
+
+    private void OnGaplessTransition(object? sender, GaplessTransitionEventArgs e)
+    {
+        _ = HandleGaplessTransitionAsync(e);
+    }
+
+    private async Task HandleGaplessTransitionAsync(GaplessTransitionEventArgs e)
+    {
+        try
+        {
+            TrackDto? pending;
+            TrackDto? invalidated;
+
+            lock (_transitionLock)
+            {
+                pending = _pendingGapless;
+                invalidated = _invalidatedGapless;
+                _pendingGapless = null;
+                _invalidatedGapless = null;
+            }
+
+            if (pending?.Id == e.Track.Id && TryGetNextIndex(out int nextIndex) && Playlist[nextIndex].Id == e.Track.Id)
+            {
+                if (CurrentTrack != null)
+                    _messenger.Send(new MediaEvent(EPlaybackState.Stopped, CurrentTrack));
+
+                await AdvanceToWithoutLoadAsync(nextIndex, e.Track, (long)e.PreviousTrackPosition);
+                return;
+            }
+
+            if (pending?.Id == e.Track.Id || invalidated?.Id == e.Track.Id)
+            {
+                _logger.LogInformation("Gapless switch to {Track} no longer matches the queue, reloading the next track", e.Track.Title);
+                Next();
+                return;
+            }
+
+            _logger.LogDebug("Ignoring stale gapless switch to {Track}", e.Track.Title);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error during gapless transition.");
+        }
+    }
+
+    private TrackDto? PeekNext() => TryGetNextIndex(out int nextIndex) ? Playlist[nextIndex] : null;
+
+    private void InvalidatePendingTransition()
+    {
+        CancelCrossfade();
+        _player.ClearNextTrack();
+
+        lock (_transitionLock)
+        {
+            _invalidatedGapless = _pendingGapless ?? _invalidatedGapless;
+            _pendingGapless = null;
+        }
+    }
+
+    private void InvalidateIfImminentChanged(TrackDto? imminentBefore)
+    {
+        if (PeekNext()?.Id != imminentBefore?.Id)
+            InvalidatePendingTransition();
+    }
+
+    private void ResetPendingTransition()
+    {
+        lock (_transitionLock)
+        {
+            _pendingGapless = null;
+            _invalidatedGapless = null;
         }
     }
 
@@ -397,7 +508,7 @@ public sealed class PlayerService : IPlayerService, IDisposable
             return 0;
 
         if (imminentRemoved)
-            CancelCrossfade();
+            InvalidatePendingTransition();
 
         _messenger.Send(new PlaylistChanged(Playlist));
 
@@ -415,11 +526,14 @@ public sealed class PlayerService : IPlayerService, IDisposable
         Guard.NotNull(tracks);
 
         bool hasTracks = Playlist.Count > 0;
+        TrackDto? imminentBefore = PeekNext();
 
         tracks.ForEach(c => Playlist.Add(c));
 
         if (!hasTracks)
             Start();
+        else
+            InvalidateIfImminentChanged(imminentBefore);
 
         _messenger.Send(new PlaylistChanged(Playlist));
     }
@@ -437,7 +551,11 @@ public sealed class PlayerService : IPlayerService, IDisposable
         index ??= _currentIndex + 1;
         index = Math.Clamp(index.Value, 0, Playlist.Count);
 
+        TrackDto? imminentBefore = PeekNext();
+
         Playlist.InsertRange(index.Value, itemsToInsert);
+
+        InvalidateIfImminentChanged(imminentBefore);
 
         _messenger.Send(new PlaylistChanged(Playlist));
     }
@@ -504,6 +622,7 @@ public sealed class PlayerService : IPlayerService, IDisposable
         StopSmtcTimelineTimer();
 
         _crossfadeCts?.Cancel();
+        ResetPendingTransition();
         _player.Stop();
 
         _mode = EPlaybackMode.None;
@@ -578,7 +697,11 @@ public sealed class PlayerService : IPlayerService, IDisposable
 
     public void ShuffleTracks()
     {
+        TrackDto? imminentBefore = PeekNext();
+
         TracksRandomizer.ArtistBalancedTrackRandomize(Playlist, _currentIndex);
+
+        InvalidateIfImminentChanged(imminentBefore);
 
         _messenger.Send(new PlaylistChanged(Playlist));
     }
@@ -626,6 +749,7 @@ public sealed class PlayerService : IPlayerService, IDisposable
     private void LoadFile(TrackDto track)
     {
         long durationPlayed = (long)_player.Position;
+        ResetPendingTransition();
         _player.Stop();
 
         bool res = _player.SetTrack(track);
@@ -698,19 +822,6 @@ public sealed class PlayerService : IPlayerService, IDisposable
             double trackLength = _player.Length;
             double currentPosition = _player.Position;
 
-            if (_isMuted || CurrentTrack == null || (CurrentTrack.IsAlbumLive && nextTrack.IsAlbumLive))
-            {
-                _logger.LogDebug("No crossfade between two live albums");
-
-                double timeToWait = Math.Max(0, trackLength - currentPosition);
-
-                if (timeToWait > 0)
-                    await Task.Delay(TimeSpan.FromSeconds(timeToWait), cancellationToken);
-
-                Next();
-                return;
-            }
-
             await RunCrossfadeAsync(nextIndex, nextTrack, trackLength, currentPosition, cancellationToken);
         }
         catch (OperationCanceledException)
@@ -771,22 +882,28 @@ public sealed class PlayerService : IPlayerService, IDisposable
 
         _logger.LogDebug("Starting simultaneous crossfade to {Track} over {Duration}s", nextTrack.Title, crossfadeDurationSeconds);
 
-        TrackDto? previousTrack = CurrentTrack;
         long durationPlayed = (long)_player.Position;
 
         await _player.CrossfadeToAsync(nextTrack, crossfadeDurationSeconds, _volume, cancellationToken);
 
         cancellationToken.ThrowIfCancellationRequested();
 
-        _currentIndex = nextIndex;
-        CurrentTrack = nextTrack;
+        await AdvanceToWithoutLoadAsync(nextIndex, nextTrack, durationPlayed);
+    }
 
-        if (previousTrack == null || previousTrack.Id != nextTrack.Id)
-            _messenger.Send(new MediaChangedMessage(nextTrack, previousTrack, durationPlayed));
+    private async Task AdvanceToWithoutLoadAsync(int index, TrackDto track, long durationPlayed)
+    {
+        TrackDto? previousTrack = CurrentTrack;
+
+        _currentIndex = index;
+        CurrentTrack = track;
+
+        if (previousTrack == null || previousTrack.Id != track.Id)
+            _messenger.Send(new MediaChangedMessage(track, previousTrack, durationPlayed));
 
         PlaybackState = EPlaybackState.Playing;
-        UpdateDiscordPresence(nextTrack, isPlaying: true);
-        await (_smtcService?.UpdateTrackInfoAsync(nextTrack, ResolveCoverPath(nextTrack)) ?? Task.CompletedTask);
+        UpdateDiscordPresence(track, isPlaying: true);
+        await (_smtcService?.UpdateTrackInfoAsync(track, ResolveCoverPath(track)) ?? Task.CompletedTask);
         _smtcService?.UpdatePlaybackState(PlaybackStatus.Playing);
     }
 

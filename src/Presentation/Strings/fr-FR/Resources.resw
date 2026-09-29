@@ -1015,7 +1015,10 @@
     <value>Autoriser l'envoi d'informations de télémétrie sur l'usage de l'application afin de permettre son amélioration</value>
   </data>
   <data name="OptionsCrossFadeSwitch.Header" xml:space="preserve">
-    <value>Activer le fondu enchainé entre deux chansons</value>
+    <value>Activer le fondu enchaîné entre deux chansons</value>
+  </data>
+  <data name="OptionsCrossFadeDescription.Text" xml:space="preserve">
+    <value>Les albums écoutés dans l'ordre s'enchaînent toujours sans blanc.</value>
   </data>
   <data name="shuffleButton.Label" xml:space="preserve">
     <value>Mélanger</value>

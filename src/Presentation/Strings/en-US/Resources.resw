@@ -1018,6 +1018,9 @@
   <data name="OptionsCrossFadeSwitch.Header" xml:space="preserve">
     <value>Enable crossfade between two songs</value>
   </data>
+  <data name="OptionsCrossFadeDescription.Text" xml:space="preserve">
+    <value>Albums played in order always flow without gaps.</value>
+  </data>
   <data name="shuffleButton.Label" xml:space="preserve">
     <value>Shuffle</value>
   </data>

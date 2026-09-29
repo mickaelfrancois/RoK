@@ -959,6 +959,9 @@
   <data name="OptionsCrossFadeSwitch.Header" xml:space="preserve">
     <value>Увімкнути кросфейд між двома піснями</value>
   </data>
+  <data name="OptionsCrossFadeDescription.Text" xml:space="preserve">
+    <value>Альбоми, прослухані по порядку, завжди звучать без пауз.</value>
+  </data>
   <data name="shuffleButton.Label" xml:space="preserve">
     <value>Перемішати</value>
   </data>

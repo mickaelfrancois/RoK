@@ -41,9 +41,15 @@
                                       IsOn="{x:Bind Options.HideArtistsWithoutAlbum, Mode=TwoWay}"
                                       x:Name="HideArtistsSwitch"
                                       VerticalAlignment="Center" />
-                        <ToggleSwitch x:Uid="OptionsCrossFadeSwitch"
-                                      x:Name="OptionsCrossFadeSwitch"
-                                      IsOn="{x:Bind Options.CrossFade, Mode=TwoWay}" />
+                        <StackPanel Spacing="2">
+                            <ToggleSwitch x:Uid="OptionsCrossFadeSwitch"
+                                          x:Name="OptionsCrossFadeSwitch"
+                                          IsOn="{x:Bind Options.CrossFade, Mode=TwoWay}" />
+                            <TextBlock x:Uid="OptionsCrossFadeDescription"
+                                       Style="{ThemeResource CaptionTextBlockStyle}"
+                                       Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                       TextWrapping="WrapWholeWords" />
+                        </StackPanel>
                         <ToggleSwitch x:Uid="optionsRefreshAtStartupSwitch"
                                       x:Name="optionsRefreshAtStartupSwitch"
                                       IsOn="{x:Bind Options.RefreshLibraryAtStartup, Mode=TwoWay}" />

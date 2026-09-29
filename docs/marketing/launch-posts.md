@@ -57,7 +57,7 @@ before someone else does; no superlatives; never ask for upvotes (Reddit and HN 
 > - Smart playlists (genre, year, play count, rating, last played…), M3U import/export.
 > - Synced lyrics, including lyrics embedded in the tags, or a `.lrc` next to the file.
 > - Per-album and per-artist listening stats, album anniversaries.
-> - Crossfade, 10-band EQ, sleep timer, auto-pause during Teams/Zoom/Discord calls.
+> - Gapless playback and crossfade, 10-band EQ, sleep timer, auto-pause during Teams/Zoom/Discord calls.
 > - An optional local HTTP API: drive playback, read the current track and queue, start
 >   playlists or rate tracks from your own scripts, a Stream Deck or Home Assistant.
 > - Free, no account, no ads. GPL-3.0.
@@ -66,7 +66,7 @@ before someone else does; no superlatives; never ask for upvotes (Reddit and HN 
 >
 > - Formats: MP3, FLAC, ALAC/M4A, WAV, WMA and AIFF. No Opus/OGG or DSD for now — Rok tells you how
 >   many unsupported files it found so I can see what to add first.
-> - No gapless playback (crossfade instead), no tag editor, no ReplayGain yet.
+> - No tag editor, no ReplayGain yet.
 > - Windows 11 24H2 or later only, from the Microsoft Store.
 >
 > Store: https://apps.microsoft.com/detail/9NX19R28Q92S?cid=reddit-musichoarder
@@ -86,7 +86,8 @@ before someone else does; no superlatives; never ask for upvotes (Reddit and HN 
 - *Does it write into my music folders?* — Only sidecars it fetched or extracted (`cover.jpg`,
   `artist.jpg`, `.lrc`/`.txt`), only when missing, and never the audio files. Turn off data
   retrieval in Options and it writes nothing.
-- *Gapless?* — Not yet. Tell me your use case (live albums, classical) — it helps me prioritise.
+- *Gapless?* — Yes. Consecutive tracks of an album always play without gaps (live albums,
+  classical), even with crossfade on; crossfade only kicks in when the album changes.
 
 ---
 
@@ -122,7 +123,7 @@ before someone else does; no superlatives; never ask for upvotes (Reddit and HN 
 > - Call detection: it pauses when Teams/Zoom/Discord open an audio session, found by walking
 >   the process tree (new Teams plays call audio from a WebView2 child process).
 >
-> Limits: no Opus/OGG or DSD for now, Windows 11 24H2+, no gapless.
+> Limits: no Opus/OGG or DSD for now, Windows 11 24H2+.
 >
 > Store link if you just want to try it:
 > https://apps.microsoft.com/detail/9NX19R28Q92S?cid=hn

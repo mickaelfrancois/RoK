@@ -901,6 +901,9 @@
   <data name="OptionsCrossFadeSwitch.Header" xml:space="preserve">
     <value>Habilitar el fundido cruzado entre dos canciones</value>
   </data>
+  <data name="OptionsCrossFadeDescription.Text" xml:space="preserve">
+    <value>Los álbumes escuchados en orden siempre se encadenan sin pausas.</value>
+  </data>
   <data name="shuffleButton.Label" xml:space="preserve">
     <value>Barajar</value>
   </data>

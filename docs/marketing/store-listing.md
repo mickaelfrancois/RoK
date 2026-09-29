@@ -232,8 +232,8 @@ buttons: replace with `cid=rok-site`.
 - **Tags**: `local-music`, `flac`, `alac`, `mp3`, `music-library`, `smart-playlists`, `lyrics`,
   `internet-radio`, `windows-11`, `fluent-design`, `ad-free`
 - **Features to tick**: Ad-free, Lightweight, Dark mode, Lyrics, Smart playlists,
-  Internet radio, Crossfade, Discord integration.
-- **Do not tick**: Tag editor, Gapless playback — Rok never writes to your files and crossfades instead of gapless.
+  Internet radio, Crossfade, Gapless playback, Discord integration.
+- **Do not tick**: Tag editor — Rok never writes to your files.
 - **Screenshots**: same order as the Store.
 
 After approval: ask the first retained users (or friends) to "like" it and add Rok as an
