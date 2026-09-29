@@ -224,7 +224,7 @@ buttons: replace with `cid=rok-site`.
 - **Name**: Rok
 - **URL**: https://rok.fpc-france.com
 - **Platforms**: Windows
-- **License**: Free (proprietary) — switch to Open Source if the repo is public
+- **License**: Free, Open Source (GPL-3.0) — the repo is public
 - **Category**: Music & Audio → Music Player
 - **Tagline**: Modern Windows 11 player for your local MP3 & FLAC collection
 - **Description**: reuse the English short description above.
