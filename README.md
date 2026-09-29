@@ -18,7 +18,7 @@ Rok is a Windows desktop application for managing and playing your local music c
 
 ## ✨ Features
 
-- 🎵 **Audio Playback** — NAudio-powered engine with queue management, crossfade, and a sleep timer
+- 🎵 **Audio Playback** — NAudio-powered engine with queue management, gapless playback, crossfade, ReplayGain, and a sleep timer
 - 📚 **Library Management** — Browse by albums, artists, genres, and playlists
 - 🧠 **Smart Playlists** — Dynamic playlists built from rules
 - 🔍 **Search** — Quick search across your entire collection

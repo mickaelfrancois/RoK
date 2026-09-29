@@ -4,16 +4,18 @@ using NAudio.Wave.SampleProviders;
 namespace Rok.Infrastructure.Player;
 
 /// <summary>
-/// Rendering chain shared by consecutive tracks: gapless chain, equalizer then volume.
+/// Rendering chain shared by consecutive tracks: per-track ReplayGain, gapless chain, equalizer then volume.
 /// <see cref="Output"/> plugs into any <see cref="IWavePlayer"/>.
 /// </summary>
 internal sealed class PlaybackPipeline : IDisposable
 {
     internal static readonly float[] BandFrequencies = [32f, 64f, 125f, 250f, 500f, 1000f, 2000f, 4000f, 8000f, 16000f];
 
-    private PlaybackPipeline(AudioFileReader reader, GaplessChainSampleProvider chain, Equalizer equalizer, VolumeSampleProvider volume)
+    private PlaybackPipeline(AudioFileReader reader, ReplayGainSampleProvider source, long trackId, GaplessChainSampleProvider chain, Equalizer equalizer, VolumeSampleProvider volume)
     {
         Reader = reader;
+        Source = source;
+        TrackId = trackId;
         Chain = chain;
         Equalizer = equalizer;
         Volume = volume;
@@ -21,6 +23,12 @@ internal sealed class PlaybackPipeline : IDisposable
 
     /// <summary>Reader of the track currently rendered; replaced on each gapless switch.</summary>
     public AudioFileReader Reader { get; set; }
+
+    /// <summary>ReplayGain wrapper around <see cref="Reader"/>; replaced on each gapless switch.</summary>
+    public ReplayGainSampleProvider Source { get; set; }
+
+    /// <summary>Identifier of the track currently rendered; replaced on each gapless switch.</summary>
+    public long TrackId { get; set; }
 
     public GaplessChainSampleProvider Chain { get; }
 
@@ -30,14 +38,15 @@ internal sealed class PlaybackPipeline : IDisposable
 
     public ISampleProvider Output => Volume;
 
-    /// <summary>Builds a pipeline around <paramref name="reader"/> with the given band gains and volume.</summary>
-    public static PlaybackPipeline Create(AudioFileReader reader, IReadOnlyList<float> bandGains, float volume)
+    /// <summary>Builds a pipeline around <paramref name="reader"/> with its ReplayGain, the band gains and the volume.</summary>
+    public static PlaybackPipeline Create(AudioFileReader reader, float replayGain, long trackId, IReadOnlyList<float> bandGains, float volume)
     {
-        GaplessChainSampleProvider chain = new(reader);
+        ReplayGainSampleProvider source = new(reader, replayGain);
+        GaplessChainSampleProvider chain = new(source);
         Equalizer equalizer = new(chain, CreateBands(reader.WaveFormat.Channels, bandGains));
         VolumeSampleProvider volumeProvider = new(equalizer) { Volume = volume };
 
-        return new PlaybackPipeline(reader, chain, equalizer, volumeProvider);
+        return new PlaybackPipeline(reader, source, trackId, chain, equalizer, volumeProvider);
     }
 
     /// <summary>Creates one band per <see cref="BandFrequencies"/> entry, set to the matching gain of <paramref name="bandGains"/>.</summary>
@@ -60,9 +69,9 @@ internal sealed class PlaybackPipeline : IDisposable
     {
         (Chain.ClearNext() as IDisposable)?.Dispose();
 
-        if (!ReferenceEquals(Chain.Current, Reader))
+        if (!ReferenceEquals(Chain.Current, Source))
             (Chain.Current as IDisposable)?.Dispose();
 
-        Reader.Dispose();
+        Source.Dispose();
     }
 }

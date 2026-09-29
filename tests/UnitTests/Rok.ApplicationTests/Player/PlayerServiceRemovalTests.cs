@@ -18,7 +18,7 @@ public class PlayerServiceRemovalTests
 
     public PlayerServiceRemovalTests()
     {
-        _engine.Setup(o => o.SetTrack(It.IsAny<TrackDto>())).Returns(true);
+        _engine.Setup(o => o.SetTrack(It.IsAny<TrackDto>(), It.IsAny<float>())).Returns(true);
         _appOptions.SetupGet(o => o.CrossFade).Returns(false);
     }
 
@@ -306,8 +306,8 @@ public class PlayerServiceRemovalTests
         CancellationToken capturedToken = default;
 
         _engine
-            .Setup(o => o.CrossfadeToAsync(It.IsAny<TrackDto>(), It.IsAny<double>(), It.IsAny<double>(), It.IsAny<CancellationToken>()))
-            .Returns<TrackDto, double, double, CancellationToken>((_, _, _, token) =>
+            .Setup(o => o.CrossfadeToAsync(It.IsAny<TrackDto>(), It.IsAny<float>(), It.IsAny<double>(), It.IsAny<double>(), It.IsAny<CancellationToken>()))
+            .Returns<TrackDto, float, double, double, CancellationToken>((_, _, _, _, token) =>
             {
                 capturedToken = token;
                 crossfadeEntered.SetResult();

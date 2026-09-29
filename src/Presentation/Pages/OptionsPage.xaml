@@ -50,6 +50,29 @@
                                        Foreground="{ThemeResource TextFillColorSecondaryBrush}"
                                        TextWrapping="WrapWholeWords" />
                         </StackPanel>
+                        <StackPanel Spacing="8">
+                            <TextBlock x:Uid="OptionsReplayGainModeLabel" />
+                            <ComboBox Width="220" SelectedValuePath="Tag" SelectedValue="{x:Bind ReplayGainModeString, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+                                <ComboBoxItem x:Uid="OptionsReplayGainModeOffItem" Tag="Off" />
+                                <ComboBoxItem x:Uid="OptionsReplayGainModeTrackItem" Tag="Track" />
+                                <ComboBoxItem x:Uid="OptionsReplayGainModeAlbumItem" Tag="Album" />
+                                <ComboBoxItem x:Uid="OptionsReplayGainModeAutoItem" Tag="Auto" />
+                            </ComboBox>
+                            <Slider x:Uid="OptionsReplayGainPreampSlider"
+                                    Width="220"
+                                    HorizontalAlignment="Left"
+                                    Minimum="{x:Bind ReplayGainPreampMin}"
+                                    Maximum="{x:Bind ReplayGainPreampMax}"
+                                    StepFrequency="{x:Bind ReplayGainPreampStep}"
+                                    SnapsTo="StepValues"
+                                    TickFrequency="1"
+                                    TickPlacement="Outside"
+                                    Value="{x:Bind ReplayGainPreampDb, Mode=TwoWay}" />
+                            <TextBlock x:Uid="OptionsReplayGainDescription"
+                                       Style="{ThemeResource CaptionTextBlockStyle}"
+                                       Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                       TextWrapping="WrapWholeWords" />
+                        </StackPanel>
                         <ToggleSwitch x:Uid="optionsRefreshAtStartupSwitch"
                                       x:Name="optionsRefreshAtStartupSwitch"
                                       IsOn="{x:Bind Options.RefreshLibraryAtStartup, Mode=TwoWay}" />

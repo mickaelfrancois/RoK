@@ -18,9 +18,9 @@ public class PlayerServiceGaplessTests
 
     public PlayerServiceGaplessTests()
     {
-        _engine.Setup(o => o.SetTrack(It.IsAny<TrackDto>())).Returns(true);
-        _engine.Setup(o => o.QueueNextTrack(It.IsAny<TrackDto>())).Returns(true);
-        _engine.Setup(o => o.CrossfadeToAsync(It.IsAny<TrackDto>(), It.IsAny<double>(), It.IsAny<double>(), It.IsAny<CancellationToken>())).Returns(Task.CompletedTask);
+        _engine.Setup(o => o.SetTrack(It.IsAny<TrackDto>(), It.IsAny<float>())).Returns(true);
+        _engine.Setup(o => o.QueueNextTrack(It.IsAny<TrackDto>(), It.IsAny<float>())).Returns(true);
+        _engine.Setup(o => o.CrossfadeToAsync(It.IsAny<TrackDto>(), It.IsAny<float>(), It.IsAny<double>(), It.IsAny<double>(), It.IsAny<CancellationToken>())).Returns(Task.CompletedTask);
         _engine.SetupGet(o => o.Position).Returns(90);
         _engine.SetupGet(o => o.Length).Returns(100);
         _engine.SetupGet(o => o.CrossfadeDelay).Returns(5);
@@ -43,7 +43,7 @@ public class PlayerServiceGaplessTests
         _engine.Raise(m => m.OnGaplessTransition += null, _engine.Object, new GaplessTransitionEventArgs(track, previousPosition));
 
     private void VerifyNoCrossfade() =>
-        _engine.Verify(o => o.CrossfadeToAsync(It.IsAny<TrackDto>(), It.IsAny<double>(), It.IsAny<double>(), It.IsAny<CancellationToken>()), Times.Never);
+        _engine.Verify(o => o.CrossfadeToAsync(It.IsAny<TrackDto>(), It.IsAny<float>(), It.IsAny<double>(), It.IsAny<double>(), It.IsAny<CancellationToken>()), Times.Never);
 
     [Fact(DisplayName = "when_crossfade_is_disabled_about_to_end_queues_the_next_track")]
     public void WhenCrossfadeIsDisabled_AboutToEnd_QueuesNextTrack()
@@ -56,7 +56,7 @@ public class PlayerServiceGaplessTests
         RaiseMediaAboutToEnd();
 
         // Assert
-        _engine.Verify(o => o.QueueNextTrack(It.Is<TrackDto>(t => t.Id == 2)), Times.Once);
+        _engine.Verify(o => o.QueueNextTrack(It.Is<TrackDto>(t => t.Id == 2), It.IsAny<float>()), Times.Once);
         VerifyNoCrossfade();
     }
 
@@ -71,7 +71,7 @@ public class PlayerServiceGaplessTests
         RaiseMediaAboutToEnd();
 
         // Assert
-        _engine.Verify(o => o.QueueNextTrack(It.Is<TrackDto>(t => t.Id == 2)), Times.Once);
+        _engine.Verify(o => o.QueueNextTrack(It.Is<TrackDto>(t => t.Id == 2), It.IsAny<float>()), Times.Once);
         VerifyNoCrossfade();
     }
 
@@ -87,8 +87,8 @@ public class PlayerServiceGaplessTests
         RaiseMediaAboutToEnd();
 
         // Assert
-        _engine.Verify(o => o.CrossfadeToAsync(It.Is<TrackDto>(t => t.Id == 2), It.IsAny<double>(), It.IsAny<double>(), It.IsAny<CancellationToken>()), Times.Once);
-        _engine.Verify(o => o.QueueNextTrack(It.IsAny<TrackDto>()), Times.Never);
+        _engine.Verify(o => o.CrossfadeToAsync(It.Is<TrackDto>(t => t.Id == 2), It.IsAny<float>(), It.IsAny<double>(), It.IsAny<double>(), It.IsAny<CancellationToken>()), Times.Once);
+        _engine.Verify(o => o.QueueNextTrack(It.IsAny<TrackDto>(), It.IsAny<float>()), Times.Never);
     }
 
     [Fact(DisplayName = "when_muted_with_crossfade_about_to_end_queues_the_next_track")]
@@ -103,7 +103,7 @@ public class PlayerServiceGaplessTests
         RaiseMediaAboutToEnd();
 
         // Assert
-        _engine.Verify(o => o.QueueNextTrack(It.Is<TrackDto>(t => t.Id == 2)), Times.Once);
+        _engine.Verify(o => o.QueueNextTrack(It.Is<TrackDto>(t => t.Id == 2), It.IsAny<float>()), Times.Once);
         VerifyNoCrossfade();
     }
 
@@ -111,7 +111,7 @@ public class PlayerServiceGaplessTests
     public void WhenQueueIsRefused_TrackEndsAndNextReloads()
     {
         // Arrange
-        _engine.Setup(o => o.QueueNextTrack(It.IsAny<TrackDto>())).Returns(false);
+        _engine.Setup(o => o.QueueNextTrack(It.IsAny<TrackDto>(), It.IsAny<float>())).Returns(false);
         PlayerService sut = BuildService(crossfade: false);
         sut.LoadPlaylist([BuildTrack(1), BuildTrack(2)]);
         RaiseMediaAboutToEnd();
@@ -120,7 +120,7 @@ public class PlayerServiceGaplessTests
         RaiseMediaEnded();
 
         // Assert
-        _engine.Verify(o => o.SetTrack(It.Is<TrackDto>(t => t.Id == 2)), Times.Once);
+        _engine.Verify(o => o.SetTrack(It.Is<TrackDto>(t => t.Id == 2), It.IsAny<float>()), Times.Once);
         Assert.Equal(2, sut.CurrentTrack?.Id);
     }
 
@@ -139,7 +139,7 @@ public class PlayerServiceGaplessTests
         // Assert
         Assert.Equal(2, sut.CurrentTrack?.Id);
         Assert.Equal(EPlaybackState.Playing, sut.PlaybackState);
-        _engine.Verify(o => o.SetTrack(It.Is<TrackDto>(t => t.Id == 2)), Times.Never);
+        _engine.Verify(o => o.SetTrack(It.Is<TrackDto>(t => t.Id == 2), It.IsAny<float>()), Times.Never);
     }
 
     [Fact(DisplayName = "when_gapless_transition_occurs_media_changed_carries_previous_duration")]
@@ -299,7 +299,7 @@ public class PlayerServiceGaplessTests
         RaiseGaplessTransition(second);
 
         // Assert
-        _engine.Verify(o => o.SetTrack(It.Is<TrackDto>(t => t.Id == 3)), Times.Once);
+        _engine.Verify(o => o.SetTrack(It.Is<TrackDto>(t => t.Id == 3), It.IsAny<float>()), Times.Once);
         Assert.Equal(3, sut.CurrentTrack?.Id);
     }
 
@@ -315,7 +315,7 @@ public class PlayerServiceGaplessTests
         RaiseMediaEnded();
 
         // Assert
-        _engine.Verify(o => o.QueueNextTrack(It.IsAny<TrackDto>()), Times.Never);
+        _engine.Verify(o => o.QueueNextTrack(It.IsAny<TrackDto>(), It.IsAny<float>()), Times.Never);
         VerifyNoCrossfade();
         Assert.Equal(EPlaybackState.Stopped, sut.PlaybackState);
     }
@@ -335,7 +335,7 @@ public class PlayerServiceGaplessTests
         RaiseGaplessTransition(first);
 
         // Assert
-        _engine.Verify(o => o.QueueNextTrack(first), Times.Once);
+        _engine.Verify(o => o.QueueNextTrack(first, It.IsAny<float>()), Times.Once);
         Assert.Equal(1, sut.CurrentTrack?.Id);
         Assert.Equal(2, sut.GetQueue()[0].Id);
     }
@@ -355,6 +355,6 @@ public class PlayerServiceGaplessTests
 
         // Assert
         Assert.Equal(2, sut.CurrentTrack?.Id);
-        _engine.Verify(o => o.SetTrack(It.Is<TrackDto>(t => t.Id == 3)), Times.Never);
+        _engine.Verify(o => o.SetTrack(It.Is<TrackDto>(t => t.Id == 3), It.IsAny<float>()), Times.Never);
     }
 }

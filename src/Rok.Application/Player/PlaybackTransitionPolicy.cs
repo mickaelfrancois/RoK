@@ -15,7 +15,7 @@ internal static class PlaybackTransitionPolicy
         return EPlaybackTransition.Crossfade;
     }
 
-    private static bool IsConsecutiveSameAlbum(TrackDto current, TrackDto next)
+    internal static bool IsConsecutiveSameAlbum(TrackDto current, TrackDto next)
     {
         if (current.AlbumId is null || current.AlbumId != next.AlbumId)
             return false;

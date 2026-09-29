@@ -1,4 +1,5 @@
 using Microsoft.UI.Xaml.Controls;
+using Rok.Application.Player;
 using Rok.ViewModels.Statistics;
 using Windows.ApplicationModel;
 using Windows.Storage;
@@ -27,6 +28,41 @@ public sealed partial class OptionsPage : Page
         }
     }
 
+    public string ReplayGainModeString
+    {
+        get => Options.ReplayGainMode.ToString();
+        set
+        {
+            if (!Enum.TryParse(value, out EReplayGainMode mode) || mode == Options.ReplayGainMode)
+                return;
+
+            Options.ReplayGainMode = mode;
+            _messenger.Send(new ReplayGainOptionsChanged());
+        }
+    }
+
+    public double ReplayGainPreampDb
+    {
+        get => Options.ReplayGainPreampDb;
+        set
+        {
+            double preamp = Math.Clamp(value, ReplayGainCalculator.MinPreampDb, ReplayGainCalculator.MaxPreampDb);
+
+            if (preamp.Equals(Options.ReplayGainPreampDb))
+                return;
+
+            Options.ReplayGainPreampDb = preamp;
+            _messenger.Send(new ReplayGainOptionsChanged());
+        }
+    }
+
+    public double ReplayGainPreampMin => ReplayGainCalculator.MinPreampDb;
+
+    public double ReplayGainPreampMax => ReplayGainCalculator.MaxPreampDb;
+
+    public double ReplayGainPreampStep => ReplayGainCalculator.PreampStepDb;
+
+    private readonly IMessenger _messenger;
     private readonly IFolderResolver _folderResolver;
     private readonly ResourceLoader _resourceLoader;
     private readonly ILogger<OptionsPage> _logger;
@@ -48,6 +84,7 @@ public sealed partial class OptionsPage : Page
         InitializeComponent();
 
         Options = App.ServiceProvider.GetRequiredService<IAppOptions>();
+        _messenger = App.ServiceProvider.GetRequiredService<IMessenger>();
         _folderResolver = App.ServiceProvider.GetRequiredService<IFolderResolver>();
         _resourceLoader = App.ServiceProvider.GetRequiredService<ResourceLoader>();
         _logger = App.ServiceProvider.GetRequiredService<ILogger<OptionsPage>>();

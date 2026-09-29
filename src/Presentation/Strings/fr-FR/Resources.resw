@@ -1020,6 +1020,27 @@
   <data name="OptionsCrossFadeDescription.Text" xml:space="preserve">
     <value>Les albums écoutés dans l'ordre s'enchaînent toujours sans blanc.</value>
   </data>
+  <data name="OptionsReplayGainModeLabel.Text" xml:space="preserve">
+    <value>Normalisation du volume (ReplayGain)</value>
+  </data>
+  <data name="OptionsReplayGainModeOffItem.Content" xml:space="preserve">
+    <value>Désactivée</value>
+  </data>
+  <data name="OptionsReplayGainModeTrackItem.Content" xml:space="preserve">
+    <value>Piste</value>
+  </data>
+  <data name="OptionsReplayGainModeAlbumItem.Content" xml:space="preserve">
+    <value>Album</value>
+  </data>
+  <data name="OptionsReplayGainModeAutoItem.Content" xml:space="preserve">
+    <value>Auto (album si écouté dans l'ordre)</value>
+  </data>
+  <data name="OptionsReplayGainPreampSlider.Header" xml:space="preserve">
+    <value>Préampli (dB)</value>
+  </data>
+  <data name="OptionsReplayGainDescription.Text" xml:space="preserve">
+    <value>Utilise les tags ReplayGain de vos fichiers pour jouer chaque morceau à un volume perçu proche. Les pistes sans tag sont lues sans modification.</value>
+  </data>
   <data name="shuffleButton.Label" xml:space="preserve">
     <value>Mélanger</value>
   </data>
