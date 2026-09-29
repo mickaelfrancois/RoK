@@ -52,11 +52,11 @@ public class PlayerServiceCrossfadeTests
         _engine.Verify(o => o.CrossfadeToAsync(It.Is<TrackDto>(t => t.Id == 2), 5, It.IsAny<double>(), It.IsAny<CancellationToken>()), Times.Once);
     }
 
-    [Fact(DisplayName = "OnMediaAboutToEnd should fall back to Next when both current and next tracks are live albums")]
-    public void OnMediaAboutToEnd_ShouldFallBackToNext_WhenBothTracksAreLiveAlbums()
+    [Fact(DisplayName = "OnMediaAboutToEnd should crossfade between two live tracks that are not consecutive in the same album")]
+    public void OnMediaAboutToEnd_ShouldCrossfade_WhenLiveTracksAreNotConsecutive()
     {
         // Arrange
-        SetEnginePosition(position: 100, length: 100);
+        SetEnginePosition(position: 95, length: 100);
         SetCrossfadeDelay(5);
         PlayerService sut = BuildService();
         sut.LoadPlaylist(new List<TrackDto> { BuildTrack(1, isLive: true), BuildTrack(2, isLive: true) });
@@ -66,15 +66,35 @@ public class PlayerServiceCrossfadeTests
         RaiseMediaAboutToEnd();
 
         // Assert
-        _engine.Verify(o => o.CrossfadeToAsync(It.IsAny<TrackDto>(), It.IsAny<double>(), It.IsAny<double>(), It.IsAny<CancellationToken>()), Times.Never);
-        _engine.Verify(o => o.SetTrack(It.Is<TrackDto>(t => t.Id == 2)), Times.Once);
+        _engine.Verify(o => o.CrossfadeToAsync(It.Is<TrackDto>(t => t.Id == 2), It.IsAny<double>(), It.IsAny<double>(), It.IsAny<CancellationToken>()), Times.Once);
+        _engine.Verify(o => o.QueueNextTrack(It.IsAny<TrackDto>()), Times.Never);
     }
 
-    [Fact(DisplayName = "OnMediaAboutToEnd should fall back to Next when player is muted")]
-    public void OnMediaAboutToEnd_ShouldFallBackToNext_WhenMuted()
+    [Fact(DisplayName = "OnMediaAboutToEnd should queue the next track gaplessly between consecutive tracks of a live album")]
+    public void OnMediaAboutToEnd_ShouldQueueNextTrack_WhenLiveTracksAreConsecutive()
     {
         // Arrange
-        SetEnginePosition(position: 100, length: 100);
+        SetEnginePosition(position: 95, length: 100);
+        SetCrossfadeDelay(5);
+        PlayerService sut = BuildService();
+        TrackDto first = new() { Id = 1, Title = "t1", IsAlbumLive = true, AlbumId = 10, TrackNumber = 3 };
+        TrackDto second = new() { Id = 2, Title = "t2", IsAlbumLive = true, AlbumId = 10, TrackNumber = 4 };
+        sut.LoadPlaylist(new List<TrackDto> { first, second });
+        _engine.Invocations.Clear();
+
+        // Act
+        RaiseMediaAboutToEnd();
+
+        // Assert
+        _engine.Verify(o => o.QueueNextTrack(It.Is<TrackDto>(t => t.Id == 2)), Times.Once);
+        _engine.Verify(o => o.CrossfadeToAsync(It.IsAny<TrackDto>(), It.IsAny<double>(), It.IsAny<double>(), It.IsAny<CancellationToken>()), Times.Never);
+    }
+
+    [Fact(DisplayName = "OnMediaAboutToEnd should queue the next track gaplessly when player is muted")]
+    public void OnMediaAboutToEnd_ShouldQueueNextTrack_WhenMuted()
+    {
+        // Arrange
+        SetEnginePosition(position: 95, length: 100);
         SetCrossfadeDelay(5);
         PlayerService sut = BuildService();
         sut.LoadPlaylist(new List<TrackDto> { BuildTrack(1), BuildTrack(2) });
@@ -85,8 +105,9 @@ public class PlayerServiceCrossfadeTests
         RaiseMediaAboutToEnd();
 
         // Assert
+        _engine.Verify(o => o.QueueNextTrack(It.Is<TrackDto>(t => t.Id == 2)), Times.Once);
         _engine.Verify(o => o.CrossfadeToAsync(It.IsAny<TrackDto>(), It.IsAny<double>(), It.IsAny<double>(), It.IsAny<CancellationToken>()), Times.Never);
-        _engine.Verify(o => o.SetTrack(It.Is<TrackDto>(t => t.Id == 2)), Times.Once);
+        _engine.Verify(o => o.SetTrack(It.IsAny<TrackDto>()), Times.Never);
     }
 
     [Fact(DisplayName = "OnMediaAboutToEnd should do nothing when playlist is at last track without looping")]

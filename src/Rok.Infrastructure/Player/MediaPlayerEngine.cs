@@ -154,6 +154,21 @@ public class WinUIMediaPlayer : IPlayerEngine, IDisposable
         return Task.CompletedTask;
     }
 
+    /// <inheritdoc />
+    public event EventHandler<GaplessTransitionEventArgs>? OnGaplessTransition
+    {
+        add { }
+        remove { }
+    }
+
+    /// <inheritdoc />
+    public bool QueueNextTrack(TrackDto nextTrack) => false;
+
+    /// <inheritdoc />
+    public void ClearNextTrack()
+    {
+    }
+
     private void Player_MediaOpened(MediaPlayer sender, object args)
     {
         TimeSpan duration = sender.PlaybackSession?.NaturalDuration ?? TimeSpan.Zero;

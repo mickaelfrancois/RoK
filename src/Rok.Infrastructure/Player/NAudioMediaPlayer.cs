@@ -16,14 +16,19 @@ public class NAudioMediaPlayer : IPlayerEngine, IDisposable
     public event EventHandler? OnMediaStateChanged;
     public event EventHandler? OnMediaAboutToEnd;
     public event EventHandler<string>? OnMetadataChanged;
+    public event EventHandler<GaplessTransitionEventArgs>? OnGaplessTransition;
 
     public bool IsLive => _isLive;
 
     public bool IsBuffering => _streaming?.IsBuffering ?? false;
 
     private IWavePlayer? _outputDevice;
-    private AudioFileReader? _audioFileReader;
-    private Equalizer? _equalizer;
+    private PlaybackPipeline? _pipeline;
+    private PendingNext? _pendingNext;
+    private int _generation;
+    private float _volume = 1f;
+    private readonly float[] _bandGains = new float[PlaybackPipeline.BandFrequencies.Length];
+    private readonly Lock _stateLock = new();
     private readonly System.Timers.Timer _positionTimer;
     private readonly ILogger<NAudioMediaPlayer> _logger;
     private readonly IHttpClientFactory _httpClientFactory;
@@ -40,7 +45,7 @@ public class NAudioMediaPlayer : IPlayerEngine, IDisposable
     private bool _aboutToEndRaised;
     private bool disposedValue;
 
-    public double Position => _audioFileReader?.CurrentTime.TotalSeconds ?? 0;
+    public double Position => _pipeline?.Reader.CurrentTime.TotalSeconds ?? 0;
 
     public double Length
     {
@@ -116,10 +121,12 @@ public class NAudioMediaPlayer : IPlayerEngine, IDisposable
 
     private void ReinitializeOutputDevice()
     {
-        if (_equalizer is null || _audioFileReader is null)
+        PlaybackPipeline? pipeline = _pipeline;
+
+        if (pipeline is null)
             return;
 
-        double currentPosition = _audioFileReader.CurrentTime.TotalSeconds;
+        double currentPosition = pipeline.Reader.CurrentTime.TotalSeconds;
 
         if (_outputDevice is not null)
         {
@@ -130,9 +137,9 @@ public class NAudioMediaPlayer : IPlayerEngine, IDisposable
 
         _outputDevice = new WaveOut();
         _outputDevice.PlaybackStopped += OutputDevice_PlaybackStopped;
-        _outputDevice.Init(_equalizer);
+        _outputDevice.Init(pipeline.Output);
 
-        _audioFileReader.CurrentTime = TimeSpan.FromSeconds(currentPosition);
+        pipeline.Reader.CurrentTime = TimeSpan.FromSeconds(currentPosition);
 
         _logger.LogInformation("Audio device reinitialized, position restored to {Position}s", currentPosition);
     }
@@ -153,21 +160,27 @@ public class NAudioMediaPlayer : IPlayerEngine, IDisposable
 
         _positionTimer.Stop();
 
-        if (_outputDevice is not null)
+        IWavePlayer? device;
+        PlaybackPipeline? pipeline;
+
+        lock (_stateLock)
         {
-            _outputDevice.PlaybackStopped -= OutputDevice_PlaybackStopped;
-            _outputDevice.Stop();
-            _outputDevice.Dispose();
+            device = _outputDevice;
+            pipeline = _pipeline;
             _outputDevice = null;
+            _pipeline = null;
+            _pendingNext = null;
+            _generation++;
         }
 
-        if (_audioFileReader is not null)
+        if (device is not null)
         {
-            _audioFileReader.Dispose();
-            _audioFileReader = null;
+            device.PlaybackStopped -= OutputDevice_PlaybackStopped;
+            device.Stop();
+            device.Dispose();
         }
 
-        _equalizer = null;
+        ReleasePipeline(pipeline);
 
         Length = 0;
         _aboutToEndRaised = false;
@@ -179,13 +192,15 @@ public class NAudioMediaPlayer : IPlayerEngine, IDisposable
     {
         if (_isLive) return;
 
-        if (_audioFileReader is null)
+        PlaybackPipeline? pipeline = _pipeline;
+
+        if (pipeline is null)
             return;
 
         if (position < 0)
             position = 0;
 
-        _audioFileReader.CurrentTime = TimeSpan.FromSeconds(position);
+        pipeline.Reader.CurrentTime = TimeSpan.FromSeconds(position);
 
         if (Position < Math.Max(0, Length - _aboutToEndDelay))
             _aboutToEndRaised = false;
@@ -199,43 +214,38 @@ public class NAudioMediaPlayer : IPlayerEngine, IDisposable
             return;
         }
 
-        if (_audioFileReader is not null)
-        {
-            float clampVolume = (float)Math.Clamp(volume / 100.0, 0.0, 1.0);
-            _audioFileReader.Volume = clampVolume;
-        }
+        _volume = ToLinearVolume(volume);
+
+        if (_pipeline is not null)
+            _pipeline.Volume.Volume = _volume;
     }
 
     public bool SetTrack(TrackDto track)
     {
+        AudioFileReader? reader = null;
+
         try
         {
             Stop();
 
-            _audioFileReader = new AudioFileReader(track.MusicFile);
-            Length = _audioFileReader.TotalTime.TotalSeconds > 0
-                ? _audioFileReader.TotalTime.TotalSeconds
+            reader = new AudioFileReader(track.MusicFile);
+            PlaybackPipeline pipeline = PlaybackPipeline.Create(reader, _bandGains, _volume);
+
+            Length = reader.TotalTime.TotalSeconds > 0
+                ? reader.TotalTime.TotalSeconds
                 : 1;
 
-            EqualizerBand[] bands = new[]
+            WaveOut device = new();
+            device.PlaybackStopped += OutputDevice_PlaybackStopped;
+            device.Init(pipeline.Output);
+
+            pipeline.Chain.SourceSwitched += Chain_SourceSwitched;
+
+            lock (_stateLock)
             {
-                new EqualizerBand(32f, 1f, _audioFileReader.WaveFormat.Channels),
-                new EqualizerBand(64f, 1f, _audioFileReader.WaveFormat.Channels),
-                new EqualizerBand(125f, 1f, _audioFileReader.WaveFormat.Channels),
-                new EqualizerBand(250f, 1f, _audioFileReader.WaveFormat.Channels),
-                new EqualizerBand(500f, 1f, _audioFileReader.WaveFormat.Channels),
-                new EqualizerBand(1000f, 1f, _audioFileReader.WaveFormat.Channels),
-                new EqualizerBand(2000f, 1f, _audioFileReader.WaveFormat.Channels),
-                new EqualizerBand(4000f, 1f, _audioFileReader.WaveFormat.Channels),
-                new EqualizerBand(8000f, 1f, _audioFileReader.WaveFormat.Channels),
-                new EqualizerBand(16000f, 1f, _audioFileReader.WaveFormat.Channels)
-            };
-
-            _equalizer = new Equalizer(_audioFileReader, bands);
-
-            _outputDevice = new WaveOut();
-            _outputDevice.PlaybackStopped += OutputDevice_PlaybackStopped;
-            _outputDevice.Init(_equalizer);
+                _pipeline = pipeline;
+                _outputDevice = device;
+            }
 
             _aboutToEndRaised = false;
 
@@ -246,11 +256,7 @@ public class NAudioMediaPlayer : IPlayerEngine, IDisposable
         }
         catch
         {
-            if (_audioFileReader is not null)
-            {
-                _audioFileReader.Dispose();
-                _audioFileReader = null;
-            }
+            reader?.Dispose();
 
             if (_outputDevice is not null)
             {
@@ -258,7 +264,7 @@ public class NAudioMediaPlayer : IPlayerEngine, IDisposable
                 _outputDevice = null;
             }
 
-            _equalizer = null;
+            _pipeline = null;
 
             return false;
         }
@@ -299,7 +305,66 @@ public class NAudioMediaPlayer : IPlayerEngine, IDisposable
 
     public void SetEqualizerBand(int bandIndex, float gain)
     {
-        _equalizer?.UpdateBand(bandIndex, gain);
+        if (bandIndex >= 0 && bandIndex < _bandGains.Length)
+            _bandGains[bandIndex] = gain;
+
+        _pipeline?.Equalizer.UpdateBand(bandIndex, gain);
+    }
+
+    /// <inheritdoc />
+    public bool QueueNextTrack(TrackDto nextTrack)
+    {
+        if (_isLive || _pipeline is null)
+            return false;
+
+        AudioFileReader reader;
+
+        try
+        {
+            reader = new AudioFileReader(nextTrack.MusicFile);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "Gapless: failed to open next track {File}", nextTrack.MusicFile);
+            return false;
+        }
+
+        bool queued = false;
+        ISampleProvider? replaced = null;
+
+        lock (_stateLock)
+        {
+            if (_pipeline is not null && _pipeline.Chain.TryQueueNext(reader, out replaced))
+            {
+                _pendingNext = new PendingNext(reader, nextTrack);
+                queued = true;
+            }
+        }
+
+        (replaced as IDisposable)?.Dispose();
+
+        if (!queued)
+        {
+            _logger.LogInformation("Gapless: {File} has a different format, falling back to a regular transition", nextTrack.MusicFile);
+            reader.Dispose();
+        }
+
+        return queued;
+    }
+
+    /// <inheritdoc />
+    public void ClearNextTrack()
+    {
+        ISampleProvider? removed;
+
+        lock (_stateLock)
+        {
+            removed = _pipeline?.Chain.ClearNext();
+            _pendingNext = null;
+            _aboutToEndRaised = false;
+        }
+
+        (removed as IDisposable)?.Dispose();
     }
 
     /// <inheritdoc />
@@ -310,10 +375,11 @@ public class NAudioMediaPlayer : IPlayerEngine, IDisposable
         if (durationSeconds <= 0)
             return;
 
-        AudioFileReader nextReader;
+        PlaybackPipeline nextPipeline;
+
         try
         {
-            nextReader = new AudioFileReader(nextTrack.MusicFile);
+            nextPipeline = PlaybackPipeline.Create(new AudioFileReader(nextTrack.MusicFile), _bandGains, 0f);
         }
         catch (Exception ex)
         {
@@ -321,29 +387,11 @@ public class NAudioMediaPlayer : IPlayerEngine, IDisposable
             return;
         }
 
-        // Build the full equalizer chain upfront so the next device plays continuously without restart
-        EqualizerBand[] nextBands = new[]
-        {
-            new EqualizerBand(32f, 1f, nextReader.WaveFormat.Channels),
-            new EqualizerBand(64f, 1f, nextReader.WaveFormat.Channels),
-            new EqualizerBand(125f, 1f, nextReader.WaveFormat.Channels),
-            new EqualizerBand(250f, 1f, nextReader.WaveFormat.Channels),
-            new EqualizerBand(500f, 1f, nextReader.WaveFormat.Channels),
-            new EqualizerBand(1000f, 1f, nextReader.WaveFormat.Channels),
-            new EqualizerBand(2000f, 1f, nextReader.WaveFormat.Channels),
-            new EqualizerBand(4000f, 1f, nextReader.WaveFormat.Channels),
-            new EqualizerBand(8000f, 1f, nextReader.WaveFormat.Channels),
-            new EqualizerBand(16000f, 1f, nextReader.WaveFormat.Channels)
-        };
-
-        Equalizer nextEqualizer = new(nextReader, nextBands);
-
         WaveOut nextDevice = new();
 
         try
         {
-            nextDevice.Init(nextEqualizer);
-            nextReader.Volume = 0f;
+            nextDevice.Init(nextPipeline.Output);
             nextDevice.Play();
 
             const int intervalMs = 50;
@@ -359,7 +407,7 @@ public class NAudioMediaPlayer : IPlayerEngine, IDisposable
                 SetVolume(fadeOutVolume);
 
                 double fadeInVolume = Math.Max(0, DbInterpolate(1.0 - progress, masterVolume));
-                nextReader.Volume = (float)Math.Clamp(fadeInVolume / 100.0, 0.0, 1.0);
+                nextPipeline.Volume.Volume = ToLinearVolume(fadeInVolume);
 
                 if (progress >= 1.0)
                     break;
@@ -367,50 +415,67 @@ public class NAudioMediaPlayer : IPlayerEngine, IDisposable
                 await Task.Delay(intervalMs, ct);
             }
 
-            // Promote nextDevice as the main player — no Stop/Init/Play, just wire events and swap state
-            _positionTimer.Stop();
-
-            if (_outputDevice is not null)
-            {
-                _outputDevice.PlaybackStopped -= OutputDevice_PlaybackStopped;
-                _outputDevice.Stop();
-                _outputDevice.Dispose();
-            }
-
-            _audioFileReader?.Dispose();
-
-            _audioFileReader = nextReader;
-            _equalizer = nextEqualizer;
-            _length = nextReader.TotalTime.TotalSeconds > 0 ? nextReader.TotalTime.TotalSeconds : 1;
-            nextReader.Volume = (float)Math.Clamp(masterVolume / 100.0, 0.0, 1.0);
-            _aboutToEndRaised = false;
-
-            _outputDevice = nextDevice;
-            _outputDevice.PlaybackStopped += OutputDevice_PlaybackStopped;
-
-            _positionTimer.Start();
+            PromoteCrossfade(nextPipeline, nextDevice, masterVolume);
 
             OnMediaChanged?.Invoke(this, EventArgs.Empty);
         }
         catch (OperationCanceledException)
         {
-            nextDevice?.Stop();
-            nextDevice?.Dispose();
-            nextReader.Dispose();
+            nextDevice.Stop();
+            nextDevice.Dispose();
+            nextPipeline.Dispose();
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Crossfade: unexpected error");
-            nextDevice?.Stop();
-            nextDevice?.Dispose();
-            nextReader.Dispose();
+            nextDevice.Stop();
+            nextDevice.Dispose();
+            nextPipeline.Dispose();
         }
+    }
+
+    private void PromoteCrossfade(PlaybackPipeline nextPipeline, WaveOut nextDevice, double masterVolume)
+    {
+        _positionTimer.Stop();
+
+        IWavePlayer? previousDevice;
+        PlaybackPipeline? previousPipeline;
+
+        _volume = ToLinearVolume(masterVolume);
+        nextPipeline.Volume.Volume = _volume;
+        nextPipeline.Chain.SourceSwitched += Chain_SourceSwitched;
+        nextDevice.PlaybackStopped += OutputDevice_PlaybackStopped;
+
+        lock (_stateLock)
+        {
+            previousDevice = _outputDevice;
+            previousPipeline = _pipeline;
+            _outputDevice = nextDevice;
+            _pipeline = nextPipeline;
+            _pendingNext = null;
+            _generation++;
+            _length = nextPipeline.Reader.TotalTime.TotalSeconds > 0 ? nextPipeline.Reader.TotalTime.TotalSeconds : 1;
+            _aboutToEndRaised = false;
+        }
+
+        if (previousDevice is not null)
+        {
+            previousDevice.PlaybackStopped -= OutputDevice_PlaybackStopped;
+            previousDevice.Stop();
+            previousDevice.Dispose();
+        }
+
+        ReleasePipeline(previousPipeline);
+
+        _positionTimer.Start();
     }
 
     public EqualizerBand[]? GetEqualizerBands()
     {
-        return _equalizer?.GetBands();
+        return _pipeline?.Equalizer.GetBands();
     }
+
+    private static float ToLinearVolume(double volumePercent) => (float)Math.Clamp(volumePercent / 100.0, 0.0, 1.0);
 
     private static double DbInterpolate(double t, double masterVolumePercent, double minDb = -80.0)
     {
@@ -418,6 +483,71 @@ public class NAudioMediaPlayer : IPlayerEngine, IDisposable
         double gain = Math.Pow(10.0, curDb / 20.0);
         double v = gain * masterVolumePercent;
         return double.IsNaN(v) || double.IsInfinity(v) ? 0.0 : Math.Clamp(v, 0.0, 100.0);
+    }
+
+    private void ReleasePipeline(PlaybackPipeline? pipeline)
+    {
+        if (pipeline is null)
+            return;
+
+        pipeline.Chain.SourceSwitched -= Chain_SourceSwitched;
+        pipeline.Dispose();
+    }
+
+    private void Chain_SourceSwitched(object? sender, SourceSwitchedEventArgs e)
+    {
+        AudioFileReader previous;
+        PendingNext? pending;
+        int generation;
+
+        lock (_stateLock)
+        {
+            PlaybackPipeline? pipeline = _pipeline;
+
+            if (pipeline is null || !ReferenceEquals(pipeline.Chain, sender) || e.Current is not AudioFileReader next)
+                return;
+
+            previous = pipeline.Reader;
+            pipeline.Reader = next;
+            _length = next.TotalTime.TotalSeconds > 0 ? next.TotalTime.TotalSeconds : 1;
+            _aboutToEndRaised = false;
+            pending = ReferenceEquals(_pendingNext?.Reader, next) ? _pendingNext : null;
+            _pendingNext = null;
+            generation = _generation;
+        }
+
+        ThreadPool.UnsafeQueueUserWorkItem(state => state.Player.CompleteGaplessSwitch(state.Previous, state.Pending, state.Generation), (Player: this, Previous: previous, Pending: pending, Generation: generation), preferLocal: false);
+    }
+
+    private void CompleteGaplessSwitch(AudioFileReader previous, PendingNext? pending, int generation)
+    {
+        try
+        {
+            double previousPosition = previous.CurrentTime.TotalSeconds;
+            previous.Dispose();
+
+            bool isCurrent;
+
+            lock (_stateLock)
+            {
+                isCurrent = generation == _generation;
+            }
+
+            if (!isCurrent)
+                return;
+
+            if (pending is null)
+            {
+                _logger.LogWarning("Gapless: the output switched to a track that was not tracked as pending");
+                return;
+            }
+
+            OnGaplessTransition?.Invoke(this, new GaplessTransitionEventArgs(pending.Track, previousPosition));
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Gapless: failed to complete the track switch");
+        }
     }
 
     private void OutputDevice_PlaybackStopped(object? sender, StoppedEventArgs e)
@@ -432,17 +562,29 @@ public class NAudioMediaPlayer : IPlayerEngine, IDisposable
 
     private void PositionTimer_Elapsed(object? s, ElapsedEventArgs e)
     {
-        if (_audioFileReader is null || _outputDevice is null || _outputDevice.PlaybackState != PlaybackState.Playing)
+        PlaybackPipeline? pipeline = _pipeline;
+
+        if (pipeline is null || _outputDevice is null || _outputDevice.PlaybackState != PlaybackState.Playing)
             return;
 
-        double pos = _audioFileReader.CurrentTime.TotalSeconds;
+        double pos;
+
+        try
+        {
+            pos = pipeline.Reader.CurrentTime.TotalSeconds;
+        }
+        catch (ObjectDisposedException)
+        {
+            return;
+        }
+
         double len = Length;
 
         if (len <= 0)
             return;
 
         bool isAboutToEnd = pos >= len - _aboutToEndDelay &&
-                    pos < len - _crossfadeDelay &&
+                    (pos < len - _crossfadeDelay || len <= _aboutToEndDelay) &&
                     !_aboutToEndRaised;
 
         if (isAboutToEnd)
@@ -472,10 +614,8 @@ public class NAudioMediaPlayer : IPlayerEngine, IDisposable
                     _outputDevice.Dispose();
                 }
 
-                if (_audioFileReader is not null)
-                {
-                    _audioFileReader.Dispose();
-                }
+                ReleasePipeline(_pipeline);
+                _pipeline = null;
             }
 
             disposedValue = true;
@@ -487,4 +627,6 @@ public class NAudioMediaPlayer : IPlayerEngine, IDisposable
         Dispose(disposing: true);
         GC.SuppressFinalize(this);
     }
+
+    private sealed record PendingNext(AudioFileReader Reader, TrackDto Track);
 }

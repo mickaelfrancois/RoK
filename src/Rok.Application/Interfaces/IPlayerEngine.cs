@@ -40,4 +40,14 @@ public interface IPlayerEngine
 
     /// <summary>Performs a simultaneous crossfade from the current track to <paramref name="nextTrack"/>.</summary>
     Task CrossfadeToAsync(TrackDto nextTrack, double durationSeconds, double masterVolume, CancellationToken ct);
+
+    /// <summary>Raised once the output has moved, without reopening, to the track queued by <see cref="QueueNextTrack"/>.</summary>
+    event EventHandler<GaplessTransitionEventArgs>? OnGaplessTransition;
+
+    /// <summary>Preloads <paramref name="nextTrack"/> so that it follows the current track without any gap.</summary>
+    /// <returns><c>false</c> when nothing is playing, a radio is playing, the file cannot be opened or its format differs.</returns>
+    bool QueueNextTrack(TrackDto nextTrack);
+
+    /// <summary>Drops the track queued by <see cref="QueueNextTrack"/>, if any, and rearms <see cref="OnMediaAboutToEnd"/>.</summary>
+    void ClearNextTrack();
 }
