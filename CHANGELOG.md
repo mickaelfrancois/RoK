@@ -1,5 +1,25 @@
 ﻿# ChangeLog
 
+## [1.18.4] Store – 29 septembre 2026
+
+### Ajouté
+
+- Premier démarrage : explication lorsque la bibliothèque reste vide à cause de formats non pris en charge, avec le détail des fichiers trouvés (#389)
+- Écoute de la radio proposée depuis l'écran d'accueil, et stations populaires de votre pays suggérées lorsque la page Radios est vide (#389)
+- Demande de note aux utilisateurs réguliers, avec la fenêtre de notation native du Microsoft Store (#394)
+
+### Modifié
+
+- Mise à jour de Windows App SDK 2.5.1, NAudio 3.1.0 et des paquets NuGet standard (#396)
+
+### Corrigé
+
+- Le bouton Retour ne ramène plus à l'écran d'accueil après l'import de la bibliothèque, ce qui relançait l'analyse (#391)
+- Correction d'un plantage à l'ouverture du sélecteur de dossier sur l'écran d'accueil (#385)
+- Rok Companion : « Surprends-moi » ne propose plus d'artistes présents uniquement sur des compilations (#383)
+
+--
+
 ## [1.18.3] Store – 18 septembre 2026
 
 ### Ajouté
