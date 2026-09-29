@@ -7,7 +7,7 @@
 
   <ItemGroup>
     <PackageReference Include="Dapper.Contrib" Version="2.0.78" />
-    <PackageReference Include="Microsoft.Data.Sqlite" Version="10.0.11" />
+    <PackageReference Include="Microsoft.Data.Sqlite" Version="10.0.12" />
     <!-- Transitive override: pulls the patched native SQLite (>= 3.50.2) to fix CVE-2025-6965 / GHSA-2m69-gcr7-jv3q.
          In 3.0.x the vulnerable SQLitePCLRaw.lib.e_sqlite3 is replaced by SourceGear.sqlite3. -->
     <PackageReference Include="SQLitePCLRaw.bundle_e_sqlite3" Version="3.0.5" />
@@ -16,10 +16,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Rok.Shared\Rok.Shared.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Update="Roslynator.Analyzers" Version="5.0.0" />
   </ItemGroup>
 
 </Project>
