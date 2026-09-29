@@ -60,20 +60,60 @@ public sealed class FolderValidatorTests : IDisposable
         Assert.Equal(FolderValidationResult.Valid, result);
     }
 
-    [Fact(DisplayName = "scan_should_count_unsupported_extensions_when_folder_has_only_m4a")]
-    public async Task ScanAsync_CountsUnsupportedExtensions_WhenFolderHasOnlyM4a()
+    [Theory(DisplayName = "when_folder_has_a_media_foundation_format_returns_valid")]
+    [InlineData("track.m4a")]
+    [InlineData("track.wav")]
+    [InlineData("track.wma")]
+    [InlineData("track.aac")]
+    [InlineData("track.aiff")]
+    [InlineData("track.aif")]
+    public async Task ValidateAsync_ReturnsValid_WhenFolderContainsMediaFoundationFormat(string fileName)
+    {
+        // Arrange
+        await File.WriteAllTextAsync(Path.Combine(_tempDir.FullName, fileName), string.Empty);
+
+        // Act
+        FolderValidationResult result = await FolderValidator.ValidateAsync(_tempDir.FullName);
+
+        // Assert
+        Assert.Equal(FolderValidationResult.Valid, result);
+    }
+
+    [Fact(DisplayName = "scan_should_count_unsupported_extensions_when_folder_has_only_ogg")]
+    public async Task ScanAsync_CountsUnsupportedExtensions_WhenFolderHasOnlyOgg()
     {
         // Arrange
         for (int i = 0; i < 3; i++)
-            await File.WriteAllTextAsync(Path.Combine(_tempDir.FullName, $"track{i}.m4a"), string.Empty);
+            await File.WriteAllTextAsync(Path.Combine(_tempDir.FullName, $"track{i}.ogg"), string.Empty);
 
         // Act
         FolderScanResult result = await FolderValidator.ScanAsync(_tempDir.FullName);
 
         // Assert
         Assert.Equal(FolderValidationResult.NoAudioFiles, result.Status);
-        Assert.Equal(3, result.UnsupportedCounts[".m4a"]);
+        Assert.Equal(3, result.UnsupportedCounts[".ogg"]);
         Assert.Single(result.UnsupportedCounts);
+    }
+
+    [Fact(DisplayName = "scan_should_count_ape_and_wavpack_until_a_supported_file_appears")]
+    public async Task ScanAsync_CountsApeAndWavPack_UntilSupportedFileAppears()
+    {
+        // Arrange
+        await File.WriteAllTextAsync(Path.Combine(_tempDir.FullName, "track.ape"), string.Empty);
+        await File.WriteAllTextAsync(Path.Combine(_tempDir.FullName, "track.wv"), string.Empty);
+
+        // Act
+        FolderScanResult withoutSupported = await FolderValidator.ScanAsync(_tempDir.FullName);
+        await File.WriteAllTextAsync(Path.Combine(_tempDir.FullName, "track.m4a"), string.Empty);
+        FolderScanResult withSupported = await FolderValidator.ScanAsync(_tempDir.FullName);
+
+        // Assert
+        Assert.Equal(FolderValidationResult.NoAudioFiles, withoutSupported.Status);
+        Assert.Equal(1, withoutSupported.UnsupportedCounts[".ape"]);
+        Assert.Equal(1, withoutSupported.UnsupportedCounts[".wv"]);
+        Assert.Equal(2, withoutSupported.UnsupportedCounts.Count);
+        Assert.Equal(FolderValidationResult.Valid, withSupported.Status);
+        Assert.Empty(withSupported.UnsupportedCounts);
     }
 
     [Fact(DisplayName = "scan_should_count_extensions_case_insensitively_across_subdirectories")]
@@ -82,7 +122,7 @@ public sealed class FolderValidatorTests : IDisposable
         // Arrange
         string sub = Path.Combine(_tempDir.FullName, "Artist", "Album");
         Directory.CreateDirectory(sub);
-        await File.WriteAllTextAsync(Path.Combine(_tempDir.FullName, "track.M4A"), string.Empty);
+        await File.WriteAllTextAsync(Path.Combine(_tempDir.FullName, "track.OPUS"), string.Empty);
         await File.WriteAllTextAsync(Path.Combine(sub, "track.ogg"), string.Empty);
         await File.WriteAllTextAsync(Path.Combine(sub, "cover.jpg"), string.Empty);
 
@@ -91,7 +131,7 @@ public sealed class FolderValidatorTests : IDisposable
 
         // Assert
         Assert.Equal(FolderValidationResult.NoAudioFiles, result.Status);
-        Assert.Equal(1, result.UnsupportedCounts[".m4a"]);
+        Assert.Equal(1, result.UnsupportedCounts[".opus"]);
         Assert.Equal(1, result.UnsupportedCounts[".ogg"]);
         Assert.Equal(2, result.UnsupportedCounts.Count);
     }
@@ -100,7 +140,7 @@ public sealed class FolderValidatorTests : IDisposable
     public async Task ScanAsync_ReturnsValidWithEmptyCounts_WhenMp3Present()
     {
         // Arrange
-        await File.WriteAllTextAsync(Path.Combine(_tempDir.FullName, "track.m4a"), string.Empty);
+        await File.WriteAllTextAsync(Path.Combine(_tempDir.FullName, "track.ogg"), string.Empty);
         await File.WriteAllTextAsync(Path.Combine(_tempDir.FullName, "track.mp3"), string.Empty);
 
         // Act

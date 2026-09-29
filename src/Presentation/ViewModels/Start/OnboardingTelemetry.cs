@@ -1,3 +1,5 @@
+using Rok.Shared;
+
 namespace Rok.ViewModels.Start;
 
 public static class OnboardingTelemetry
@@ -11,7 +13,7 @@ public static class OnboardingTelemetry
         Dictionary<string, object> properties = [];
         int total = 0;
 
-        foreach (string extension in FolderValidator.UnsupportedAudioExtensions.Order(StringComparer.Ordinal))
+        foreach (string extension in AudioFormats.KnownUnsupported.Order(StringComparer.Ordinal))
         {
             string key = extension.ToLowerInvariant();
             int count = counts.GetValueOrDefault(key);

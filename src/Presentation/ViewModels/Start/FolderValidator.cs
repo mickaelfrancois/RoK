@@ -1,4 +1,5 @@
 using System.IO;
+using Rok.Shared;
 
 namespace Rok.ViewModels.Start;
 
@@ -13,25 +14,6 @@ public sealed record FolderScanResult(FolderValidationResult Status, IReadOnlyDi
 
 public static class FolderValidator
 {
-    private static readonly HashSet<string> ValidExtensions = new(StringComparer.OrdinalIgnoreCase)
-    {
-        ".mp3",
-        ".flac"
-    };
-
-    public static IReadOnlySet<string> UnsupportedAudioExtensions { get; } = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
-    {
-        ".m4a",
-        ".aac",
-        ".wma",
-        ".ogg",
-        ".opus",
-        ".wav",
-        ".aiff",
-        ".ape",
-        ".wv"
-    };
-
     private static readonly IReadOnlyDictionary<string, int> NoCounts = new Dictionary<string, int>();
 
     public static async Task<FolderValidationResult> ValidateAsync(string folderPath)
@@ -58,10 +40,10 @@ public static class FolderValidator
                 {
                     string extension = Path.GetExtension(file);
 
-                    if (ValidExtensions.Contains(extension))
+                    if (AudioFormats.Supported.Contains(extension))
                         return new FolderScanResult(FolderValidationResult.Valid, NoCounts);
 
-                    if (UnsupportedAudioExtensions.Contains(extension))
+                    if (AudioFormats.KnownUnsupported.Contains(extension))
                     {
                         string key = extension.ToLowerInvariant();
                         unsupportedCounts[key] = unsupportedCounts.GetValueOrDefault(key) + 1;

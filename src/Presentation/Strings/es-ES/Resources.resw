@@ -728,7 +728,7 @@
     <value>Acceso denegado a esta carpeta. Intenta con otra carpeta o verifica los permisos.</value>
   </data>
   <data name="startViewErrorNoAudio" xml:space="preserve">
-    <value>Esta carpeta no contiene archivos de audio compatibles (MP3, FLAC).</value>
+    <value>Esta carpeta no contiene archivos de audio compatibles (MP3, FLAC, M4A, WAV, WMA, AIFF).</value>
   </data>
   <data name="startViewErrorFolderPicker" xml:space="preserve">
     <value>No se pudo abrir el selector de carpetas. Inténtalo de nuevo.</value>
@@ -737,7 +737,7 @@
     <value>Rok reproduce música almacenada localmente en tu PC. No se encontraron archivos de audio en tu carpeta.</value>
   </data>
   <data name="startViewFormats.Text" xml:space="preserve">
-    <value>MP3 · FLAC</value>
+    <value>MP3 · FLAC · M4A · WAV · WMA · AIFF</value>
   </data>
   <data name="startViewTagline.Text" xml:space="preserve">
     <value>Reproductor de música local</value>
@@ -2000,10 +2000,10 @@
     <value>Este género ya no está en tu biblioteca</value>
   </data>
   <data name="startViewErrorUnsupportedFormat" xml:space="preserve">
-    <value>Se encontraron {0} archivos {1} — Rok solo reproduce MP3 y FLAC.</value>
+    <value>Se encontraron {0} archivos {1} — Rok reproduce MP3, FLAC, M4A, WAV, WMA y AIFF.</value>
   </data>
   <data name="startViewErrorUnsupportedFormatSingle" xml:space="preserve">
-    <value>Se encontró {0} archivo {1} — Rok solo reproduce MP3 y FLAC.</value>
+    <value>Se encontró {0} archivo {1} — Rok reproduce MP3, FLAC, M4A, WAV, WMA y AIFF.</value>
   </data>
   <data name="startViewRadioFallback.Text" xml:space="preserve">
     <value>Escuchar la radio mientras tanto</value>

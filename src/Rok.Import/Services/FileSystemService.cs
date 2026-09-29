@@ -6,12 +6,6 @@ namespace Rok.Import.Services;
 
 public class FileSystemService(ILogger<FileSystemService> logger)
 {
-    private static readonly HashSet<string> ValidExtensions = new(StringComparer.OrdinalIgnoreCase)
-    {
-        ".mp3",
-        ".flac"
-    };
-
     private const int MinParallelDegree = 1;
     private const int MaxParallelDegree = 8;
 
@@ -81,7 +75,7 @@ public class FileSystemService(ILogger<FileSystemService> logger)
 
     private static bool IsValidMusicFile(string filePath)
     {
-        if (!ValidExtensions.Contains(Path.GetExtension(filePath)))
+        if (!AudioFormats.IsSupported(filePath))
             return false;
 
         if (FileHelpers.IsOnline(filePath))

@@ -17,10 +17,10 @@ DST = sys.argv[2] if len(sys.argv) > 2 else os.path.join(os.path.dirname(os.path
 T = {}
 
 T["en-us"] = {
-    "ShortDescription": "A fast, modern player for your local music collection on Windows 11. Plays your MP3 and FLAC files, organizes big libraries automatically, and adds smart playlists, lyrics, internet radio and listening stats. Free, no account, no ads.",
+    "ShortDescription": "A fast, modern player for your local music collection on Windows 11. Plays your MP3, FLAC, ALAC/M4A, WAV and WMA files, organizes big libraries automatically, and adds smart playlists, lyrics, internet radio and listening stats. Free, no account, no ads.",
     "Description": """Rok is a music player for people who own their music.
 
-Point Rok at your Music folder and it builds a beautiful library from your MP3 and FLAC files: albums, artists, genres and covers, enriched automatically. It stays fast with collections of 100,000 tracks and more.
+Point Rok at your Music folder and it builds a beautiful library from your MP3, FLAC, ALAC/M4A, WAV and WMA files: albums, artists, genres and covers, enriched automatically. It stays fast with collections of 100,000 tracks and more.
 
 WHY ROK
 • Made for local files: your collection, on your disk, no streaming subscription needed.
@@ -43,9 +43,9 @@ REDISCOVER
 • Local API: control playback from your own scripts and automation tools.
 • Discord Rich Presence: show friends what you are listening to.
 
-Supported formats: MP3 and FLAC.""",
+Supported formats: MP3, FLAC, M4A (AAC and ALAC), WAV, WMA and AIFF.""",
     "Features": [
-        "Plays your local MP3 and FLAC collection, no streaming subscription needed",
+        "Plays your local MP3, FLAC and ALAC collection, no streaming subscription needed",
         "Stays fast with huge libraries (100,000+ tracks)",
         "Album covers and metadata retrieved automatically",
         "Smart playlists that update themselves",
@@ -61,14 +61,14 @@ Supported formats: MP3 and FLAC.""",
         "Native Windows 11 design, light and dark themes",
         "Free, no ads, no account",
     ],
-    "SearchTerms": ["local music player", "FLAC player", "MP3 player", "music library", "offline music", "smart playlists", "internet radio"],
+    "SearchTerms": ["local music player", "FLAC player", "MP3 player", "music library", "ALAC player", "smart playlists", "internet radio"],
 }
 
 T["fr-fr"] = {
-    "ShortDescription": "Un lecteur rapide et moderne pour votre collection de musique locale sous Windows 11. Lit vos fichiers MP3 et FLAC, organise automatiquement les grandes bibliothèques, et ajoute playlists intelligentes, paroles, radios internet et statistiques d’écoute. Gratuit, sans compte, sans pub.",
+    "ShortDescription": "Un lecteur rapide et moderne pour votre collection de musique locale sous Windows 11. Lit vos fichiers MP3, FLAC, ALAC/M4A, WAV et WMA, organise automatiquement les grandes bibliothèques, et ajoute playlists intelligentes, paroles, radios internet et statistiques d’écoute. Gratuit, sans compte, sans pub.",
     "Description": """Rok est un lecteur pour ceux qui possèdent leur musique.
 
-Indiquez votre dossier Musique : Rok construit une belle bibliothèque à partir de vos fichiers MP3 et FLAC — albums, artistes, genres et pochettes, enrichis automatiquement. Il reste rapide avec 100 000 titres et plus.
+Indiquez votre dossier Musique : Rok construit une belle bibliothèque à partir de vos fichiers MP3, FLAC, ALAC/M4A, WAV et WMA — albums, artistes, genres et pochettes, enrichis automatiquement. Il reste rapide avec 100 000 titres et plus.
 
 POURQUOI ROK
 • Pensé pour les fichiers locaux : votre collection, sur votre disque, sans abonnement de streaming.
@@ -91,9 +91,9 @@ REDÉCOUVRIR
 • API locale : pilotez la lecture depuis vos scripts et outils d’automatisation.
 • Discord Rich Presence : montrez à vos amis ce que vous écoutez.
 
-Formats pris en charge : MP3 et FLAC.""",
+Formats pris en charge : MP3, FLAC, M4A (AAC et ALAC), WAV, WMA et AIFF.""",
     "Features": [
-        "Lit votre collection locale MP3 et FLAC, sans abonnement de streaming",
+        "Lit votre collection locale MP3, FLAC et ALAC, sans abonnement de streaming",
         "Reste rapide avec de très grandes bibliothèques (100 000 titres et plus)",
         "Pochettes et métadonnées récupérées automatiquement",
         "Playlists intelligentes qui se mettent à jour seules",
@@ -109,14 +109,14 @@ Formats pris en charge : MP3 et FLAC.""",
         "Design Windows 11 natif, thèmes clair et sombre",
         "Gratuit, sans pub, sans compte",
     ],
-    "SearchTerms": ["lecteur de musique", "lecteur FLAC", "lecteur MP3", "bibliothèque musicale", "musique hors ligne", "playlists intelligentes", "radio internet"],
+    "SearchTerms": ["lecteur de musique", "lecteur FLAC", "lecteur MP3", "bibliothèque musicale", "lecteur ALAC", "playlists intelligentes", "radio internet"],
 }
 
 T["es-es"] = {
-    "ShortDescription": "Un reproductor rápido y moderno para tu colección de música local en Windows 11. Reproduce tus archivos MP3 y FLAC, organiza bibliotecas grandes automáticamente y añade listas inteligentes, letras, radio por internet y estadísticas de escucha. Gratis, sin cuenta y sin anuncios.",
+    "ShortDescription": "Un reproductor rápido y moderno para tu colección de música local en Windows 11. Reproduce tus archivos MP3, FLAC, ALAC/M4A, WAV y WMA, organiza bibliotecas grandes automáticamente y añade listas inteligentes, letras, radio por internet y estadísticas de escucha. Gratis, sin cuenta y sin anuncios.",
     "Description": """Rok es un reproductor para quienes tienen su propia música.
 
-Elige tu carpeta de Música y Rok crea una biblioteca a partir de tus archivos MP3 y FLAC: álbumes, artistas, géneros y carátulas, enriquecidos automáticamente. Sigue siendo rápido con 100 000 canciones o más.
+Elige tu carpeta de Música y Rok crea una biblioteca a partir de tus archivos MP3, FLAC, ALAC/M4A, WAV y WMA: álbumes, artistas, géneros y carátulas, enriquecidos automáticamente. Sigue siendo rápido con 100 000 canciones o más.
 
 POR QUÉ ROK
 • Hecho para archivos locales: tu colección, en tu disco, sin suscripción de streaming.
@@ -139,9 +139,9 @@ REDESCUBRIR
 • API local: controla la reproducción desde tus scripts y herramientas de automatización.
 • Discord Rich Presence: muestra a tus amigos lo que escuchas.
 
-Formatos compatibles: MP3 y FLAC.""",
+Formatos compatibles: MP3, FLAC, M4A (AAC y ALAC), WAV, WMA y AIFF.""",
     "Features": [
-        "Reproduce tu colección local MP3 y FLAC, sin suscripción de streaming",
+        "Reproduce tu colección local MP3, FLAC y ALAC, sin suscripción de streaming",
         "Sigue siendo rápido con bibliotecas enormes (más de 100 000 canciones)",
         "Carátulas y metadatos recuperados automáticamente",
         "Listas inteligentes que se actualizan solas",
@@ -157,14 +157,14 @@ Formatos compatibles: MP3 y FLAC.""",
         "Diseño nativo de Windows 11, temas claro y oscuro",
         "Gratis, sin anuncios, sin cuenta",
     ],
-    "SearchTerms": ["reproductor de música", "reproductor FLAC", "reproductor MP3", "biblioteca musical", "música sin conexión", "listas inteligentes", "radio por internet"],
+    "SearchTerms": ["reproductor de música", "reproductor FLAC", "reproductor MP3", "biblioteca musical", "reproductor ALAC", "listas inteligentes", "radio por internet"],
 }
 
 T["uk-ua"] = {
-    "ShortDescription": "Швидкий сучасний плеєр для вашої локальної музичної колекції у Windows 11. Відтворює файли MP3 і FLAC, автоматично впорядковує великі бібліотеки та додає розумні плейлисти, тексти пісень, інтернет-радіо й статистику прослуховувань. Безкоштовно, без облікового запису, без реклами.",
+    "ShortDescription": "Швидкий сучасний плеєр для вашої локальної музичної колекції у Windows 11. Відтворює файли MP3, FLAC, ALAC/M4A, WAV і WMA, автоматично впорядковує великі бібліотеки та додає розумні плейлисти, тексти пісень, інтернет-радіо й статистику прослуховувань. Безкоштовно, без облікового запису, без реклами.",
     "Description": """Rok — музичний плеєр для тих, хто має власну музику.
 
-Вкажіть папку «Музика», і Rok створить гарну бібліотеку з ваших файлів MP3 і FLAC: альбоми, виконавці, жанри та обкладинки, автоматично доповнені. Він залишається швидким навіть із колекціями від 100 000 треків.
+Вкажіть папку «Музика», і Rok створить гарну бібліотеку з ваших файлів MP3, FLAC, ALAC/M4A, WAV і WMA: альбоми, виконавці, жанри та обкладинки, автоматично доповнені. Він залишається швидким навіть із колекціями від 100 000 треків.
 
 ЧОМУ ROK
 • Створений для локальних файлів: ваша колекція на вашому диску, без підписки на стрімінг.
@@ -187,9 +187,9 @@ T["uk-ua"] = {
 • Локальний API: керуйте відтворенням із власних скриптів і засобів автоматизації.
 • Discord Rich Presence: покажіть друзям, що ви слухаєте.
 
-Підтримувані формати: MP3 і FLAC.""",
+Підтримувані формати: MP3, FLAC, M4A (AAC і ALAC), WAV, WMA і AIFF.""",
     "Features": [
-        "Відтворює вашу локальну колекцію MP3 і FLAC без підписки на стрімінг",
+        "Відтворює вашу локальну колекцію MP3, FLAC і ALAC без підписки на стрімінг",
         "Залишається швидким із величезними бібліотеками (понад 100 000 треків)",
         "Обкладинки та метадані завантажуються автоматично",
         "Розумні плейлисти, що оновлюються самі",
@@ -205,7 +205,7 @@ T["uk-ua"] = {
         "Нативний дизайн Windows 11, світла й темна теми",
         "Безкоштовно, без реклами, без облікового запису",
     ],
-    "SearchTerms": ["музичний плеєр", "FLAC плеєр", "MP3 плеєр", "музична бібліотека", "local music player", "розумні плейлисти", "інтернет-радіо"],
+    "SearchTerms": ["музичний плеєр", "FLAC плеєр", "MP3 плеєр", "музична бібліотека", "ALAC плеєр", "розумні плейлисти", "інтернет-радіо"],
 }
 
 EN_RELEASE_FIX = ("- Información mensual sobre tus hábitos de escucha", "- Monthly insights into your listening habits")
