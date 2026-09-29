@@ -134,7 +134,7 @@
 		  <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
 		<PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.28000.2705" />
-		<PackageReference Include="Microsoft.WindowsAppSDK" Version="2.4.0" />
+		<PackageReference Include="Microsoft.WindowsAppSDK" Version="2.5.1" />
 		<PackageReference Include="CleanArch.DevKit.Guards" Version="1.1.1" />
 		<PackageReference Include="MiF.RelayCommand" Version="1.0.0" />
 	</ItemGroup>
