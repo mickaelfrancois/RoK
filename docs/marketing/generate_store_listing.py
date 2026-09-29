@@ -40,7 +40,7 @@ ORGANIZE
 
 REDISCOVER
 • Listening stats per album and artist, album anniversaries, "Surprise me" picks.
-• Rok companion: control playback from your phone's browser on the same network.
+• Local API: control playback from your own scripts and automation tools.
 • Discord Rich Presence: show friends what you are listening to.
 
 Supported formats: MP3 and FLAC.""",
@@ -53,7 +53,7 @@ Supported formats: MP3 and FLAC.""",
         "Internet radio with thousands of stations",
         "Smooth crossfade and sleep timer",
         "Listening stats and album anniversaries",
-        "Web companion: control playback from your phone",
+        "Local API: control playback from scripts and automation tools",
         "Automatic pause during Teams calls",
         "Discord Rich Presence",
         "Media keys and Windows media controls",
@@ -88,7 +88,7 @@ ORGANISER
 
 REDÉCOUVRIR
 • Statistiques d’écoute par album et artiste, anniversaires d’albums, « Surprends-moi ».
-• Rok companion : pilotez la lecture depuis le navigateur de votre téléphone, sur le même réseau.
+• API locale : pilotez la lecture depuis vos scripts et outils d’automatisation.
 • Discord Rich Presence : montrez à vos amis ce que vous écoutez.
 
 Formats pris en charge : MP3 et FLAC.""",
@@ -101,7 +101,7 @@ Formats pris en charge : MP3 et FLAC.""",
         "Radios internet : des milliers de stations",
         "Fondu enchaîné et minuterie de sommeil",
         "Statistiques d’écoute et anniversaires d’albums",
-        "Companion web : pilotez la lecture depuis votre téléphone",
+        "API locale : pilotez la lecture depuis vos scripts",
         "Pause automatique pendant les appels Teams",
         "Discord Rich Presence",
         "Touches multimédia et contrôles multimédia de Windows",
@@ -136,7 +136,7 @@ ORGANIZAR
 
 REDESCUBRIR
 • Estadísticas de escucha por álbum y artista, aniversarios de álbumes, «Sorpréndeme».
-• Rok companion: controla la reproducción desde el navegador de tu móvil, en la misma red.
+• API local: controla la reproducción desde tus scripts y herramientas de automatización.
 • Discord Rich Presence: muestra a tus amigos lo que escuchas.
 
 Formatos compatibles: MP3 y FLAC.""",
@@ -149,7 +149,7 @@ Formatos compatibles: MP3 y FLAC.""",
         "Radio por internet con miles de emisoras",
         "Fundido cruzado y temporizador de apagado",
         "Estadísticas de escucha y aniversarios de álbumes",
-        "Companion web: controla la reproducción desde tu móvil",
+        "API local: controla la reproducción desde tus scripts",
         "Pausa automática durante las llamadas de Teams",
         "Discord Rich Presence",
         "Teclas multimedia y controles multimedia de Windows",
@@ -184,7 +184,7 @@ T["uk-ua"] = {
 
 ВІДКРИВАЙТЕ ЗАНОВО
 • Статистика прослуховувань за альбомами й виконавцями, річниці альбомів, «Здивуй мене».
-• Rok companion: керуйте відтворенням із браузера телефона в тій самій мережі.
+• Локальний API: керуйте відтворенням із власних скриптів і засобів автоматизації.
 • Discord Rich Presence: покажіть друзям, що ви слухаєте.
 
 Підтримувані формати: MP3 і FLAC.""",
@@ -197,7 +197,7 @@ T["uk-ua"] = {
         "Інтернет-радіо з тисячами станцій",
         "Плавний перехід між треками й таймер сну",
         "Статистика прослуховувань і річниці альбомів",
-        "Вебкомпаньйон: керуйте відтворенням із телефона",
+        "Локальний API: керуйте відтворенням зі скриптів",
         "Автоматична пауза під час дзвінків у Teams",
         "Discord Rich Presence",
         "Мультимедійні клавіші та системні елементи керування Windows",
