@@ -56,7 +56,8 @@ before someone else does; no superlatives; never ask for upvotes (Reddit and HN 
 > - Synced lyrics, including lyrics embedded in the tags, or a `.lrc` next to the file.
 > - Per-album and per-artist listening stats, album anniversaries.
 > - Crossfade, 10-band EQ, sleep timer, auto-pause during Teams/Zoom/Discord calls.
-> - A web remote: control playback from your phone's browser on your LAN.
+> - An optional local HTTP API: drive playback, read the current track and queue, start
+>   playlists or rate tracks from your own scripts, a Stream Deck or Home Assistant.
 > - Free, no account, no ads. GPL-3.0.
 >
 > What it does **not** do (yet), so you don't waste your time:
@@ -114,7 +115,8 @@ before someone else does; no superlatives; never ask for upvotes (Reddit and HN 
 >   ScrollViewer silently loses virtualisation, for example).
 > - It never writes tags: user edits are stored in the database and overlaid on file metadata.
 >   The only files it creates are missing sidecars (covers, `.lrc` lyrics).
-> - A small HTTP API plus a Blazor WebAssembly companion lets you drive playback from a phone.
+> - An optional local HTTP API (off by default, LAN access opt-in) exposes playback, status,
+>   queue, playlists and ratings, so Rok can be scripted or wired into home automation.
 > - Call detection: it pauses when Teams/Zoom/Discord open an audio session, found by walking
 >   the process tree (new Teams plays call audio from a WebView2 child process).
 >
@@ -137,12 +139,12 @@ different angle (e.g. "What I learned shipping a WinUI 3 app to the Store").
 - **Tagline** (≤ 60 chars): `A native Windows 11 player for your MP3 & FLAC library`
 - **Description** (≤ 260 chars):
   > Rok turns your local MP3 and FLAC folders into a beautiful, fast library: covers, smart
-  > playlists, synced lyrics, listening stats, internet radio and a phone remote. Free, open
+  > playlists, synced lyrics, listening stats, internet radio and a local API. Free, open
   > source, no account, and it never modifies your audio files.
 - **Topics**: Music, Windows, Open Source
 - **Link**: `https://apps.microsoft.com/detail/9NX19R28Q92S?cid=producthunt`
-- **Gallery**: GIF first, then albums grid, now playing + lyrics, album stats, companion on a
-  phone (1270×760).
+- **Gallery**: GIF first, then albums grid, now playing + lyrics, album stats, smart playlists
+  (1270×760).
 - **Pricing**: Free.
 
 **Maker comment**

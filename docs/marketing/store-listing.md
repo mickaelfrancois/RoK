@@ -59,7 +59,7 @@ ORGANISE
 
 REDISCOVER
 • Listening stats per album and artist, album anniversaries, "Surprise me" picks.
-• Rok companion: control playback from your phone's browser on the same network.
+• Local API: control playback from your own scripts and automation tools.
 • Discord Rich Presence: show what you are listening to.
 
 Supported formats: MP3 and FLAC.
@@ -74,7 +74,7 @@ Supported formats: MP3 and FLAC.
 6. Internet radio with thousands of stations
 7. Crossfade and sleep timer
 8. Listening stats and album anniversaries
-9. Web companion: remote control from your phone
+9. Local API: control playback from scripts and automation tools
 10. Auto-pause during Teams calls
 11. Discord Rich Presence
 12. Media keys and Windows media controls
@@ -96,7 +96,7 @@ Order matters (first 3 show in search results):
 3. Album page with stats panel.
 4. Smart playlist editor.
 5. Radios.
-6. Companion on a phone.
+6. Options page with the local API settings.
 
 Add a one-line caption on each: "Your MP3 & FLAC library, beautifully organised", etc.
 
@@ -136,7 +136,7 @@ ORGANISER
 
 REDÉCOUVRIR
 • Statistiques d'écoute par album et artiste, anniversaires d'albums, « Surprends-moi ».
-• Rok companion : pilotez la lecture depuis le navigateur de votre téléphone.
+• API locale : pilotez la lecture depuis vos scripts et outils d’automatisation.
 • Discord Rich Presence.
 
 Formats pris en charge : MP3 et FLAC.
@@ -184,7 +184,7 @@ ORGANIZAR
 
 REDESCUBRIR
 • Estadísticas de escucha por álbum y artista, aniversarios de álbumes, «Sorpréndeme».
-• Rok companion: controla la reproducción desde el navegador de tu móvil.
+• API local: controla la reproducción desde tus scripts y herramientas de automatización.
 • Discord Rich Presence.
 
 Formatos compatibles: MP3 y FLAC.
