@@ -124,12 +124,18 @@ public class AppOptions : IAppOptions
         CachePath = options.CachePath;
 
         Theme = options.Theme;
+        AlbumRecentThresholdDays = options.AlbumRecentThresholdDays;
+        ArtistRecentThresholdDays = options.ArtistRecentThresholdDays;
         Language = options.Language;
         RefreshLibraryAtStartup = options.RefreshLibraryAtStartup;
         HideArtistsWithoutAlbum = options.HideArtistsWithoutAlbum;
+        ImportTrackWithArtistGenre = options.ImportTrackWithArtistGenre;
         TelemetryEnabled = options.TelemetryEnabled;
         NovaApiEnabled = options.NovaApiEnabled;
+        DiscordRichPresenceEnabled = options.DiscordRichPresenceEnabled;
         PauseOnCall = options.PauseOnCall;
+        CrossFade = options.CrossFade;
+        IsGridView = options.IsGridView;
         ReplayGainMode = options.ReplayGainMode;
         ReplayGainPreampDb = options.ReplayGainPreampDb;
         WebApiPort = options.WebApiPort;
@@ -139,12 +145,18 @@ public class AppOptions : IAppOptions
 
         ArtistsGroupBy = options.ArtistsGroupBy;
         ArtistsFilterBy = options.ArtistsFilterBy;
+        ArtistsFilterByTags = options.ArtistsFilterByTags;
+        ArtistsFilterByGenresId = options.ArtistsFilterByGenresId;
 
         AlbumsGroupBy = options.AlbumsGroupBy;
         AlbumsFilterBy = options.AlbumsFilterBy;
+        AlbumsFilterByTags = options.AlbumsFilterByTags;
+        AlbumsFilterByGenresId = options.AlbumsFilterByGenresId;
 
         TracksGroupBy = options.TracksGroupBy;
         TracksFilterBy = options.TracksFilterBy;
+        TracksFilterByTags = options.TracksFilterByTags;
+        TracksFilterByGenresId = options.TracksFilterByGenresId;
 
         SessionsCount = options.SessionsCount;
         TotalTracksListened = options.TotalTracksListened;

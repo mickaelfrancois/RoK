@@ -215,6 +215,65 @@ public class SettingsFileServiceTests
         Assert.Equal(-2.5, restored.ReplayGainPreampDb);
     }
 
+    [Fact(DisplayName = "restored_options_survive_save_load_and_copy")]
+    public async Task RestoredOptions_SurviveSaveLoadAndCopy()
+    {
+        // Arrange
+        AppOptions options = new()
+        {
+            CrossFade = false,
+            IsGridView = false,
+            AlbumsFilterByGenresId = [12, 34],
+            ArtistsFilterByTags = ["live"]
+        };
+        string? capturedJson = null;
+
+        Mock<IFileSystem> fs = CreateFileSystemMock();
+        fs.Setup(f => f.WriteAllTextAsync(SettingsFilePath, It.IsAny<string>(), It.IsAny<CancellationToken>()))
+            .Callback<string, string, CancellationToken>((_, json, _) => capturedJson = json)
+            .Returns(Task.CompletedTask);
+        fs.Setup(f => f.FileExists(SettingsFilePath)).Returns(true);
+        fs.Setup(f => f.ReadAllTextAsync(SettingsFilePath, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(() => capturedJson!);
+        SettingsFileService sut = new(ApplicationPath, CreateFolderResolverMock().Object, fs.Object);
+
+        // Act
+        await sut.SaveAsync(options);
+        IAppOptions? loaded = await sut.LoadAsync<AppOptions>();
+        AppOptions restored = new();
+        restored.CopyFrom(loaded!);
+
+        // Assert
+        Assert.False(restored.CrossFade);
+        Assert.False(restored.IsGridView);
+        Assert.Equal([12L, 34L], restored.AlbumsFilterByGenresId);
+        Assert.Equal(["live"], restored.ArtistsFilterByTags);
+    }
+
+    [Fact(DisplayName = "legacy_settings_without_new_keys_keep_defaults")]
+    public async Task LegacySettings_WithoutNewKeys_KeepDefaults()
+    {
+        // Arrange
+        const string legacyJson = """{ "Theme": 1, "PauseOnCall": false }""";
+
+        Mock<IFileSystem> fs = CreateFileSystemMock();
+        fs.Setup(f => f.FileExists(SettingsFilePath)).Returns(true);
+        fs.Setup(f => f.ReadAllTextAsync(SettingsFilePath, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(legacyJson);
+        SettingsFileService sut = new(ApplicationPath, CreateFolderResolverMock().Object, fs.Object);
+
+        // Act
+        IAppOptions? loaded = await sut.LoadAsync<AppOptions>();
+        AppOptions restored = new();
+        restored.CopyFrom(loaded!);
+
+        // Assert
+        Assert.False(restored.PauseOnCall);
+        Assert.True(restored.CrossFade);
+        Assert.NotNull(restored.AlbumsFilterByGenresId);
+        Assert.Empty(restored.AlbumsFilterByGenresId);
+    }
+
     [Fact]
     public Task SaveAsync_WithNullOptions_ThrowsArgumentNullException()
     {
