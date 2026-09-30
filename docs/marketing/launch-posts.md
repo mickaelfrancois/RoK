@@ -57,7 +57,7 @@ before someone else does; no superlatives; never ask for upvotes (Reddit and HN 
 > - Smart playlists (genre, year, play count, rating, last played…), M3U import/export.
 > - Synced lyrics, including lyrics embedded in the tags, or a `.lrc` next to the file.
 > - Per-album and per-artist listening stats, album anniversaries.
-> - Gapless playback and crossfade, ReplayGain (track/album/auto), 10-band EQ, sleep timer, auto-pause during Teams/Zoom/Discord calls.
+> - Gapless playback and crossfade, ReplayGain (track/album/auto), output device choice with bit-perfect WASAPI exclusive mode, 10-band EQ, sleep timer, auto-pause during Teams/Zoom/Discord calls.
 > - An optional local HTTP API: drive playback, read the current track and queue, start
 >   playlists or rate tracks from your own scripts, a Stream Deck or Home Assistant.
 > - Free, no account, no ads. GPL-3.0.

@@ -2,7 +2,9 @@ using System.Diagnostics;
 using Microsoft.Extensions.Logging;
 using NAudio.Wave;
 using NAudio.Wave.Compression;
+using NAudio.Wave.SampleProviders;
 using Rok.Application.Dto;
+using Rok.Infrastructure.Player.Output;
 
 namespace Rok.Infrastructure.Player.Streaming;
 
@@ -12,13 +14,20 @@ internal sealed class StreamingPlayback : IDisposable
     public event EventHandler? PlaybackEnded;
     public event EventHandler<bool>? BufferingChanged;
 
+    /// <summary>Raised on the thread pool once a failed output has been released.</summary>
+    public event EventHandler<AudioOutputHandle>? OutputLost;
+
     private readonly HttpClient _httpClient;
     private readonly ILogger _logger;
+    private readonly Func<ISampleProvider, AudioOutputHandle> _openOutput;
+    private readonly Lock _outputLock = new();
 
     private IcyStreamHandler? _icy;
     private IWaveProvider? _decoded;
     private BufferedWaveProvider? _buffer;
-    private WaveOut? _output;
+    private AudioOutputHandle? _output;
+    private VolumeSampleProvider? _volumeProvider;
+    private float _volume = 1f;
     private CancellationTokenSource? _cts;
     private Task? _pumpTask;
     private AcmMp3FrameDecompressor? _mp3Decompressor;
@@ -31,10 +40,14 @@ internal sealed class StreamingPlayback : IDisposable
 
     public bool IsBuffering { get; private set; }
 
-    public StreamingPlayback(HttpClient httpClient, ILogger logger)
+    /// <summary>Output currently open, if any.</summary>
+    public AudioOutputHandle? Output => _output;
+
+    public StreamingPlayback(HttpClient httpClient, ILogger logger, Func<ISampleProvider, AudioOutputHandle> openOutput)
     {
         _httpClient = httpClient;
         _logger = logger;
+        _openOutput = openOutput;
     }
 
     public async Task StartAsync(RadioStationDto station, CancellationToken cancellationToken)
@@ -74,8 +87,7 @@ internal sealed class StreamingPlayback : IDisposable
                         DiscardOnBufferOverflow = true
                     };
 
-                    _output = new WaveOut();
-                    _output.Init(_buffer);
+                    OpenOutput();
 
                     SetBuffering(true);
                     _pumpTask = Task.Run(() => PumpAsync(_cts.Token), _cts.Token);
@@ -106,8 +118,7 @@ internal sealed class StreamingPlayback : IDisposable
                     int firstDecoded = _mp3Decompressor.DecompressFrame(firstFrame, firstDecodeBuffer, 0);
                     _buffer.AddSamples(firstDecodeBuffer, 0, firstDecoded);
 
-                    _output = new WaveOut();
-                    _output.Init(_buffer);
+                    OpenOutput();
 
                     SetBuffering(true);
                     _pumpTask = Task.Run(() => PumpMp3Async(mp3Source, _cts.Token), _cts.Token);
@@ -126,8 +137,7 @@ internal sealed class StreamingPlayback : IDisposable
                     DiscardOnBufferOverflow = true
                 };
 
-                _output = new WaveOut();
-                _output.Init(_buffer);
+                OpenOutput();
 
                 SetBuffering(true);
                 _pumpTask = Task.Run(() => PumpAsync(_cts.Token), _cts.Token);
@@ -156,19 +166,99 @@ internal sealed class StreamingPlayback : IDisposable
         DisposeResources();
     }
 
-    public void Pause() => _output?.Pause();
+    public void Pause() => _output?.Player.Pause();
 
-    public void Resume() => _output?.Play();
+    /// <summary>Resumes playback, reopening the output first when it was released.</summary>
+    public void Resume()
+    {
+        lock (_outputLock)
+        {
+            if (_output is null && _buffer is not null)
+                OpenOutput();
+
+            _output?.Player.Play();
+        }
+    }
 
     public void SetVolume(double percent)
     {
-        if (_output is null) return;
-        _output.Volume = (float)Math.Clamp(percent / 100.0, 0.0, 1.0);
+        _volume = (float)Math.Clamp(percent / 100.0, 0.0, 1.0);
+
+        if (_volumeProvider is not null)
+            _volumeProvider.Volume = _volume;
+    }
+
+    /// <summary>Replaces the output on the current target while keeping the buffered stream: no reconnection.</summary>
+    public void ReopenOutput(bool play)
+    {
+        lock (_outputLock)
+        {
+            if (_buffer is null)
+                return;
+
+            ReleaseOutput();
+
+            if (!play)
+                return;
+
+            OpenOutput();
+            _output?.Player.Play();
+        }
+    }
+
+    private void OpenOutput()
+    {
+        BufferedWaveProvider buffer = _buffer ?? throw new InvalidOperationException("The stream buffer is not ready.");
+        VolumeSampleProvider volumeProvider = new(buffer.ToSampleProvider()) { Volume = _volume };
+        AudioOutputHandle output = _openOutput(volumeProvider);
+
+        output.Player.PlaybackStopped += Output_PlaybackStopped;
+        _volumeProvider = volumeProvider;
+        _output = output;
+    }
+
+    private void ReleaseOutput()
+    {
+        AudioOutputHandle? output = _output;
+        _output = null;
+
+        if (output is null)
+            return;
+
+        output.Player.PlaybackStopped -= Output_PlaybackStopped;
+        output.Dispose();
+    }
+
+    private void Output_PlaybackStopped(object? sender, StoppedEventArgs e)
+    {
+        if (e.Exception is null || sender is not IWavePlayer player)
+            return;
+
+        _logger.LogWarning(e.Exception, "Radio output lost");
+
+        ThreadPool.UnsafeQueueUserWorkItem(state => state.Playback.HandleOutputLost(state.Player), (Playback: this, Player: player), preferLocal: false);
+    }
+
+    private void HandleOutputLost(IWavePlayer player)
+    {
+        AudioOutputHandle? lost;
+
+        lock (_outputLock)
+        {
+            lost = _output;
+
+            if (lost is null || !ReferenceEquals(lost.Player, player))
+                return;
+
+            ReleaseOutput();
+        }
+
+        OutputLost?.Invoke(this, lost);
     }
 
     private async Task PumpMp3Async(Stream mp3Source, CancellationToken ct)
     {
-        if (_buffer is null || _output is null || _mp3Decompressor is null)
+        if (_buffer is null || _mp3Decompressor is null)
             return;
 
         byte[] decodeBuffer = new byte[16384];
@@ -186,7 +276,7 @@ internal sealed class StreamingPlayback : IDisposable
         }
 
         SetBuffering(false);
-        _output.Play();
+        _output?.Player.Play();
 
         while (!ct.IsCancellationRequested)
         {
@@ -224,7 +314,7 @@ internal sealed class StreamingPlayback : IDisposable
 
     private async Task PumpAsync(CancellationToken ct)
     {
-        if (_decoded is null || _buffer is null || _output is null)
+        if (_decoded is null || _buffer is null)
             return;
 
         byte[] readBuffer = new byte[8192];
@@ -241,7 +331,7 @@ internal sealed class StreamingPlayback : IDisposable
         }
 
         SetBuffering(false);
-        _output.Play();
+        _output?.Player.Play();
 
         while (!ct.IsCancellationRequested)
         {
@@ -279,7 +369,7 @@ internal sealed class StreamingPlayback : IDisposable
             double bufferedSec = _buffer.BufferedBytes / bytesPerSecond;
 
             // During underflow we surface IsBuffering=true to the UI but leave _output
-            // playing. WaveOut will naturally output silence while the buffer is
+            // playing. The output will naturally output silence while the buffer is
             // drained and resume as soon as new samples arrive; pausing/resuming the
             // output device would add clock drift and pop artifacts.
             if (!IsBuffering && bufferedSec < BufferingTriggerSeconds)
@@ -298,8 +388,12 @@ internal sealed class StreamingPlayback : IDisposable
 
     private void DisposeResources()
     {
-        try { _output?.Stop(); } catch { }
-        _output?.Dispose(); _output = null;
+        lock (_outputLock)
+        {
+            ReleaseOutput();
+        }
+
+        _volumeProvider = null;
         (_decoded as IDisposable)?.Dispose(); _decoded = null;
         _mp3Decompressor?.Dispose(); _mp3Decompressor = null;
         _buffer = null;

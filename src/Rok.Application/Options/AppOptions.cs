@@ -1,6 +1,7 @@
 ﻿using CleanArch.DevKit.Guards;
 using Rok.Application.Interfaces;
 using Rok.Application.Player;
+using Rok.Application.Player.Output;
 using Rok.Shared.Enums;
 
 namespace Rok.Application.Options;
@@ -38,6 +39,10 @@ public class AppOptions : IAppOptions
     public EReplayGainMode ReplayGainMode { get; set; } = EReplayGainMode.Auto;
 
     public double ReplayGainPreampDb { get; set; } = 0;
+
+    public string OutputDeviceId { get; set; } = string.Empty;
+
+    public EAudioOutputMode OutputMode { get; set; } = EAudioOutputMode.Shared;
 
     public bool IsGridView { get; set; } = true;
 
@@ -138,6 +143,8 @@ public class AppOptions : IAppOptions
         IsGridView = options.IsGridView;
         ReplayGainMode = options.ReplayGainMode;
         ReplayGainPreampDb = options.ReplayGainPreampDb;
+        OutputDeviceId = options.OutputDeviceId;
+        OutputMode = options.OutputMode;
         WebApiPort = options.WebApiPort;
         EnableWebApi = options.EnableWebApi;
         WebApiAllowLan = options.WebApiAllowLan;

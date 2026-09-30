@@ -12,6 +12,7 @@ using Rok.Application.Features.Tracks.Services;
 using Rok.Application.Interfaces;
 using Rok.Application.Options;
 using Rok.Application.Player;
+using Rok.Application.Player.Output;
 using Rok.Application.Services;
 
 namespace Rok.Application;
@@ -23,6 +24,7 @@ public static class DependencyInjection
         services.AddSingleton<IAppOptions, AppOptions>();
         services.AddSingleton<IPlaylistService, PlaylistService>();
         services.AddSingleton<IPlayerService, PlayerService>();
+        services.AddSingleton<AudioOutputCoordinator>();
         services.AddSingleton<IReviewPromptEligibilityService, ReviewPromptEligibilityService>();
         services.AddSingleton<IReviewPromptService, ReviewPromptService>();
         services.AddSingleton<IEqualizerPresetResolver, EqualizerPresetResolver>();

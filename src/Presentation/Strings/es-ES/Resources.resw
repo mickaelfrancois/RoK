@@ -2041,4 +2041,52 @@
   <data name="radiosSuggestionAdd.Text" xml:space="preserve">
     <value>Añadir</value>
   </data>
+  <data name="OptionsOutputDeviceLabel.Text" xml:space="preserve">
+    <value>Salida de audio</value>
+  </data>
+  <data name="OptionsOutputDeviceDefault" xml:space="preserve">
+    <value>Dispositivo predeterminado de Windows</value>
+  </data>
+  <data name="OptionsOutputDeviceDisconnected" xml:space="preserve">
+    <value>Dispositivo desconectado</value>
+  </data>
+  <data name="OptionsOutputModeLabel.Text" xml:space="preserve">
+    <value>Modo de salida</value>
+  </data>
+  <data name="OptionsOutputModeSharedItem.Content" xml:space="preserve">
+    <value>Compartido (mezclador de Windows)</value>
+  </data>
+  <data name="OptionsOutputModeExclusiveItem.Content" xml:space="preserve">
+    <value>Exclusivo (WASAPI)</value>
+  </data>
+  <data name="OptionsOutputModeDescription.Text" xml:space="preserve">
+    <value>En modo exclusivo, Rok toma el dispositivo en solitario y envía cada archivo a su frecuencia original, sin remuestreo. La reproducción es bit-perfect cuando el ecualizador está plano, el ReplayGain es neutro y el volumen está al 100 %. Las demás aplicaciones no tienen sonido mientras Rok conserva el dispositivo, incluso en pausa, y el crossfade se sustituye por transiciones sin pausas.</value>
+  </data>
+  <data name="OutputStatusIdle" xml:space="preserve">
+    <value>Estado: no se reproduce nada</value>
+  </data>
+  <data name="OutputStatusShared" xml:space="preserve">
+    <value>Estado: reproducción compartida a través del mezclador de Windows</value>
+  </data>
+  <data name="OutputStatusExclusiveBitPerfect" xml:space="preserve">
+    <value>Estado: exclusivo, bit-perfect</value>
+  </data>
+  <data name="OutputStatusExclusiveProcessed" xml:space="preserve">
+    <value>Estado: exclusivo, con procesamiento activo (ecualizador, ReplayGain o volumen)</value>
+  </data>
+  <data name="OutputStatusSharedFallback" xml:space="preserve">
+    <value>Estado: reproducción compartida, se rechazó el modo exclusivo</value>
+  </data>
+  <data name="PlayerOutputFallbackFormatRefused" xml:space="preserve">
+    <value>Reproducción en modo compartido en lugar de exclusivo: el sonido pasa por el mezclador de Windows, que puede remuestrearlo. Causa: el dispositivo rechaza el formato de este archivo. Rok volverá a intentar el modo exclusivo en la siguiente pista.</value>
+  </data>
+  <data name="PlayerOutputFallbackDeviceBusy" xml:space="preserve">
+    <value>Reproducción en modo compartido en lugar de exclusivo: el sonido pasa por el mezclador de Windows, que puede remuestrearlo. Causa: otra aplicación usa el dispositivo en modo exclusivo. Rok volverá a intentar el modo exclusivo en la siguiente pista.</value>
+  </data>
+  <data name="PlayerOutputFallbackExclusiveDisabled" xml:space="preserve">
+    <value>Reproducción en modo compartido en lugar de exclusivo: el sonido pasa por el mezclador de Windows, que puede remuestrearlo. Causa: Windows no permite el modo exclusivo en este dispositivo. Marque «Permitir que las aplicaciones tomen el control exclusivo de este dispositivo» en las propiedades avanzadas del dispositivo (Configuración de sonido). Rok volverá a intentar el modo exclusivo en la siguiente pista.</value>
+  </data>
+  <data name="PlayerOutputFallbackOther" xml:space="preserve">
+    <value>Reproducción en modo compartido en lugar de exclusivo: el sonido pasa por el mezclador de Windows, que puede remuestrearlo. Causa: no se pudo abrir la salida exclusiva. Rok volverá a intentar el modo exclusivo en la siguiente pista.</value>
+  </data>
 </root>

@@ -42,6 +42,40 @@ public class EqualizerTests
         Assert.NotEqual(StubSampleProvider.SampleValue, buffer[0]);
     }
 
+    [Fact(DisplayName = "flat_equalizer_passes_samples_unchanged")]
+    public void Read_PassesSamplesUnchanged_WhenAllBandsAreFlat()
+    {
+        // Arrange
+        Random random = new(42);
+        float[] input = [.. Enumerable.Range(0, 4096).Select(_ => (float)((random.NextDouble() * 2) - 1))];
+        Equalizer equalizer = new(new ArraySampleProvider(input), PlaybackPipeline.CreateBands(1, []));
+        float[] buffer = new float[input.Length];
+
+        // Act
+        int samplesRead = equalizer.Read(buffer);
+
+        // Assert
+        Assert.True(equalizer.IsFlat);
+        Assert.Equal(input.Length, samplesRead);
+        Assert.Equal(input, buffer);
+    }
+
+    [Fact(DisplayName = "equalizer_is_no_longer_flat_once_a_band_has_a_gain")]
+    public void IsFlat_BecomesFalse_WhenABandHasAGain()
+    {
+        // Arrange
+        Equalizer equalizer = new(new ArraySampleProvider([0f]), PlaybackPipeline.CreateBands(1, []));
+
+        // Act
+        equalizer.UpdateBand(3, 2f);
+        bool afterGain = equalizer.IsFlat;
+        equalizer.UpdateBand(3, 0f);
+
+        // Assert
+        Assert.False(afterGain);
+        Assert.True(equalizer.IsFlat);
+    }
+
     [Fact(DisplayName = "read_returns_zero_when_the_source_is_exhausted")]
     public void Read_ReturnsZero_WhenSourceIsExhausted()
     {
@@ -56,6 +90,19 @@ public class EqualizerTests
 
         // Assert
         Assert.Equal(0, samplesRead);
+    }
+
+    private sealed class ArraySampleProvider(float[] samples) : ISampleProvider
+    {
+        public WaveFormat WaveFormat { get; } = WaveFormat.CreateIeeeFloatWaveFormat(44100, 1);
+
+        public int Read(Span<float> buffer)
+        {
+            int count = Math.Min(buffer.Length, samples.Length);
+            samples.AsSpan(0, count).CopyTo(buffer);
+
+            return count;
+        }
     }
 
     private sealed class StubSampleProvider(int channels, int samplesToReturn) : ISampleProvider
