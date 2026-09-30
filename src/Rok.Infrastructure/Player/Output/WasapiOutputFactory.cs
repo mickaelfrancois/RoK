@@ -1,4 +1,3 @@
-using System.Runtime.InteropServices;
 using Microsoft.Extensions.Logging;
 using NAudio.CoreAudioApi;
 using NAudio.Wave;
@@ -9,10 +8,9 @@ namespace Rok.Infrastructure.Player.Output;
 
 /// <summary>Opens WASAPI outputs, shared or exclusive, on the device resolved by <see cref="AudioDevicePolicy"/>.</summary>
 /// <remarks>
-/// Built on <see cref="WasapiOut"/>, which NAudio 3.1 marks obsolete in favour of <c>WasapiPlayer</c>: WasapiOut is the
-/// implementation validated for gapless and exclusive playback, and moving to WasapiPlayer is tracked separately.
+/// Each <see cref="WasapiPlayer"/> is built without a <see cref="SynchronizationContext"/>, so that
+/// <see cref="WasapiPlayer.PlaybackStopped"/> is raised on the player's own render thread whatever the calling thread.
 /// </remarks>
-#pragma warning disable CS0618
 public sealed class WasapiOutputFactory(IAudioDeviceService deviceService, ILogger<WasapiOutputFactory> logger) : IAudioOutputFactory
 {
     internal const int LatencyMilliseconds = 200;
@@ -42,11 +40,16 @@ public sealed class WasapiOutputFactory(IAudioDeviceService deviceService, ILogg
     private static AudioOutputHandle OpenShared(string deviceId, bool isOnPreferred, ISampleProvider source, EExclusiveFallbackReason? fallbackReason)
     {
         MMDevice device = GetDevice(deviceId);
-        WasapiOut? output = null;
+        WasapiPlayer? output = null;
 
         try
         {
-            output = new WasapiOut(device, AudioClientShareMode.Shared, useEventSync: true, LatencyMilliseconds);
+            output = SynchronizationContextScope.RunDetached(() => new WasapiPlayerBuilder()
+                .WithDevice(device)
+                .WithSharedMode()
+                .WithEventSync()
+                .WithLatency(LatencyMilliseconds)
+                .Build());
             output.Init(new SampleToWaveProvider(source));
 
             return new AudioOutputHandle(output, deviceId, isOnPreferred, EAudioOutputMode.Shared, fallbackReason, null, device);
@@ -72,11 +75,11 @@ public sealed class WasapiOutputFactory(IAudioDeviceService deviceService, ILogg
                 if (handle is not null)
                     return handle;
             }
-            catch (COMException ex) when (!WasapiErrorClassifier.IsDeviceInvalidated(ex.HResult))
+            catch (Exception ex) when (WasapiErrorClassifier.ClassifyExclusiveFailure(ex) is EExclusiveFallbackReason classified)
             {
-                reason = WasapiErrorClassifier.Classify(ex.HResult);
+                reason = classified;
 
-                logger.LogInformation(ex, "Exclusive output refused for {Format} (0x{HResult:X8})", candidate, ex.HResult);
+                logger.LogInformation(ex, "Exclusive output refused for {Format}: {ExceptionType} (0x{HResult:X8})", candidate, ex.GetType().Name, ex.HResult);
 
                 if (reason != EExclusiveFallbackReason.FormatRefused)
                     return null;
@@ -92,11 +95,16 @@ public sealed class WasapiOutputFactory(IAudioDeviceService deviceService, ILogg
             return null;
 
         MMDevice device = GetDevice(deviceId);
-        WasapiOut? output = null;
+        WasapiPlayer? output = null;
 
         try
         {
-            output = new WasapiOut(device, AudioClientShareMode.Exclusive, useEventSync: false, LatencyMilliseconds);
+            output = SynchronizationContextScope.RunDetached(() => new WasapiPlayerBuilder()
+                .WithDevice(device)
+                .WithExclusiveMode()
+                .WithPollingSync()
+                .WithLatency(LatencyMilliseconds)
+                .Build());
             output.Init(new FloatToPcmWaveProvider(source, format));
 
             if (!ExclusiveFormatLadder.AreEquivalent(output.OutputWaveFormat, format))
@@ -120,8 +128,8 @@ public sealed class WasapiOutputFactory(IAudioDeviceService deviceService, ILogg
     }
 
     /// <summary>
-    /// Checked before <see cref="WasapiOut.Init"/>, which would otherwise insert a resampler without saying so when the
-    /// format is refused. Uses its own device instance so the client released here is never the one of the output.
+    /// Checked before <see cref="WasapiPlayer.Init"/>, which would otherwise adapt the bit depth itself (not bit-exact)
+    /// when the format is refused. Uses its own device instance so the client released here is never the one of the output.
     /// </summary>
     private static bool IsSupported(string deviceId, WaveFormat format)
     {
@@ -138,4 +146,3 @@ public sealed class WasapiOutputFactory(IAudioDeviceService deviceService, ILogg
         return enumerator.GetDevice(deviceId);
     }
 }
-#pragma warning restore CS0618

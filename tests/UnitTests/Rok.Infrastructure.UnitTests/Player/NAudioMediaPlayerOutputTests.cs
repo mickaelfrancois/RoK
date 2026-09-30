@@ -99,6 +99,32 @@ public sealed class NAudioMediaPlayerOutputTests : IDisposable
         Assert.Equal(1, _sut.Position, precision: 1);
     }
 
+    [Theory(DisplayName = "late_playback_stopped_from_a_replaced_output_is_ignored")]
+    [InlineData(false)]
+    [InlineData(true)]
+    public void LatePlaybackStopped_FromReplacedOutput_IsIgnored(bool withException)
+    {
+        // Arrange
+        bool mediaEnded = false;
+        bool outputLost = false;
+        _sut.OnMediaEnded += (_, _) => mediaEnded = true;
+        _sut.OnOutputLost += (_, _) => outputLost = true;
+        _sut.SetTrack(Track(1, _first), 1f);
+        _sut.Play();
+        FakeWavePlayer previous = _factory.LastPlayer;
+        _sut.SetOutputTarget(new AudioOutputTarget("dac", EAudioOutputMode.Shared));
+        FakeWavePlayer current = _factory.LastPlayer;
+
+        // Act
+        _sut.HandleOutputStopped(previous, withException ? new COMException("gone", unchecked((int)0x88890004)) : null);
+
+        // Assert
+        Assert.False(mediaEnded);
+        Assert.False(outputLost);
+        Assert.False(current.IsDisposed);
+        Assert.True(_sut.OutputState.IsOpen);
+    }
+
     [Fact(DisplayName = "set_output_target_while_paused_reopens_lazily_on_play")]
     public void SetOutputTarget_WhilePaused_ReopensLazilyOnPlay()
     {
