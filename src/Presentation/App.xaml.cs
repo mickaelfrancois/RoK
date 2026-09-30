@@ -3,6 +3,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Windows.AppLifecycle;
 using Rok.Application.Options;
 using Rok.Application.Player;
+using Rok.Application.Player.Output;
 using Rok.Import;
 using Rok.Infrastructure;
 using Rok.Services.PlayerCommand.Api;
@@ -89,6 +90,8 @@ public partial class App : Microsoft.UI.Xaml.Application
             ISystemMediaTransportControlsService smtc = ServiceProvider.GetRequiredService<ISystemMediaTransportControlsService>();
             smtc.SetPlayerService(ServiceProvider.GetRequiredService<IPlayerService>());
             smtc.Initialize();
+
+            ServiceProvider.GetRequiredService<AudioOutputCoordinator>().Start();
         }
         catch (Exception ex)
         {

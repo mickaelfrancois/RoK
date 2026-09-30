@@ -2209,4 +2209,52 @@
   <data name="radiosSuggestionAdd.Text" xml:space="preserve">
     <value>Add</value>
   </data>
+  <data name="OptionsOutputDeviceLabel.Text" xml:space="preserve">
+    <value>Audio output</value>
+  </data>
+  <data name="OptionsOutputDeviceDefault" xml:space="preserve">
+    <value>Windows default device</value>
+  </data>
+  <data name="OptionsOutputDeviceDisconnected" xml:space="preserve">
+    <value>Disconnected device</value>
+  </data>
+  <data name="OptionsOutputModeLabel.Text" xml:space="preserve">
+    <value>Output mode</value>
+  </data>
+  <data name="OptionsOutputModeSharedItem.Content" xml:space="preserve">
+    <value>Shared (Windows mixer)</value>
+  </data>
+  <data name="OptionsOutputModeExclusiveItem.Content" xml:space="preserve">
+    <value>Exclusive (WASAPI)</value>
+  </data>
+  <data name="OptionsOutputModeDescription.Text" xml:space="preserve">
+    <value>In exclusive mode, Rok takes the device alone and sends each file at its original sample rate, without resampling. Playback is bit-perfect when the equalizer is flat, ReplayGain is neutral and the volume is at 100%. Other applications have no sound while Rok holds the device, even when paused, and crossfade is replaced by gapless transitions.</value>
+  </data>
+  <data name="OutputStatusIdle" xml:space="preserve">
+    <value>Status: nothing is playing</value>
+  </data>
+  <data name="OutputStatusShared" xml:space="preserve">
+    <value>Status: shared playback through the Windows mixer</value>
+  </data>
+  <data name="OutputStatusExclusiveBitPerfect" xml:space="preserve">
+    <value>Status: exclusive, bit-perfect</value>
+  </data>
+  <data name="OutputStatusExclusiveProcessed" xml:space="preserve">
+    <value>Status: exclusive, with active processing (equalizer, ReplayGain or volume)</value>
+  </data>
+  <data name="OutputStatusSharedFallback" xml:space="preserve">
+    <value>Status: shared playback, exclusive mode was refused</value>
+  </data>
+  <data name="PlayerOutputFallbackFormatRefused" xml:space="preserve">
+    <value>Playing in shared mode instead of exclusive: the sound goes through the Windows mixer, which may resample it. Cause: the device refuses the format of this file. Rok will try exclusive mode again on the next track.</value>
+  </data>
+  <data name="PlayerOutputFallbackDeviceBusy" xml:space="preserve">
+    <value>Playing in shared mode instead of exclusive: the sound goes through the Windows mixer, which may resample it. Cause: another application is using the device in exclusive mode. Rok will try exclusive mode again on the next track.</value>
+  </data>
+  <data name="PlayerOutputFallbackExclusiveDisabled" xml:space="preserve">
+    <value>Playing in shared mode instead of exclusive: the sound goes through the Windows mixer, which may resample it. Cause: Windows does not allow exclusive mode on this device. Check "Allow applications to take exclusive control of this device" in the advanced properties of the device (Sound settings). Rok will try exclusive mode again on the next track.</value>
+  </data>
+  <data name="PlayerOutputFallbackOther" xml:space="preserve">
+    <value>Playing in shared mode instead of exclusive: the sound goes through the Windows mixer, which may resample it. Cause: the exclusive output could not be opened. Rok will try exclusive mode again on the next track.</value>
+  </data>
 </root>

@@ -2,6 +2,7 @@ using System.Collections;
 using System.Reflection;
 using Rok.Application.Options;
 using Rok.Application.Player;
+using Rok.Application.Player.Output;
 
 namespace Rok.ApplicationTests.Options;
 
@@ -45,6 +46,17 @@ public class AppOptionsTests
         // Assert
         Assert.Equal(EReplayGainMode.Auto, options.ReplayGainMode);
         Assert.Equal(0, options.ReplayGainPreampDb);
+    }
+
+    [Fact(DisplayName = "output_defaults_to_windows_default_in_shared_mode")]
+    public void Output_DefaultsToWindowsDefaultInSharedMode()
+    {
+        // Act
+        AppOptions options = new();
+
+        // Assert
+        Assert.Equal(string.Empty, options.OutputDeviceId);
+        Assert.Equal(EAudioOutputMode.Shared, options.OutputMode);
     }
 
     [Fact(DisplayName = "copy_from_preserves_review_fields")]

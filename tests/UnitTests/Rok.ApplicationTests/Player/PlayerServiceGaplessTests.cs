@@ -3,6 +3,7 @@ using Moq;
 using Rok.Application.Interfaces.Pictures;
 using Rok.Application.Messages;
 using Rok.Application.Player;
+using Rok.Application.Player.Output;
 
 namespace Rok.ApplicationTests.Player;
 
@@ -66,6 +67,22 @@ public class PlayerServiceGaplessTests
         // Arrange
         PlayerService sut = BuildService(crossfade: true);
         sut.LoadPlaylist([BuildTrack(1, albumId: 7, trackNumber: 1), BuildTrack(2, albumId: 7, trackNumber: 2)]);
+
+        // Act
+        RaiseMediaAboutToEnd();
+
+        // Assert
+        _engine.Verify(o => o.QueueNextTrack(It.Is<TrackDto>(t => t.Id == 2), It.IsAny<float>()), Times.Once);
+        VerifyNoCrossfade();
+    }
+
+    [Fact(DisplayName = "exclusive_mode_queues_gapless_instead_of_crossfade")]
+    public void WhenExclusiveMode_AboutToEnd_QueuesGaplessInsteadOfCrossfade()
+    {
+        // Arrange
+        PlayerService sut = BuildService(crossfade: true);
+        _appOptions.SetupGet(o => o.OutputMode).Returns(EAudioOutputMode.Exclusive);
+        sut.LoadPlaylist([BuildTrack(1, albumId: 7, trackNumber: 1), BuildTrack(2, albumId: 8, trackNumber: 1)]);
 
         // Act
         RaiseMediaAboutToEnd();

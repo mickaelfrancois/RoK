@@ -1,4 +1,5 @@
 ﻿using Rok.Application.Player;
+using Rok.Application.Player.Output;
 using Rok.Shared.Enums;
 
 namespace Rok.Application.Interfaces;
@@ -28,6 +29,11 @@ public interface IAppOptions
     EReplayGainMode ReplayGainMode { get; set; }
 
     double ReplayGainPreampDb { get; set; }
+
+    /// <summary>Identifier of the chosen output device; empty to follow the Windows default device.</summary>
+    string OutputDeviceId { get; set; }
+
+    EAudioOutputMode OutputMode { get; set; }
 
     bool IsGridView { get; set; }
 

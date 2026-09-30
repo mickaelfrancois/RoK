@@ -1,10 +1,33 @@
 using Rok.Application.Player;
+using Rok.Application.Player.Output;
 
 namespace Rok.ApplicationTests.Player;
 
 public class PlaybackTransitionPolicyTests
 {
     private static TrackDto BuildTrack(long? albumId, int? trackNumber, bool isLive = false) => new() { Id = trackNumber ?? 0, AlbumId = albumId, TrackNumber = trackNumber, IsAlbumLive = isLive };
+
+    [Fact(DisplayName = "crossfade_is_not_allowed_in_exclusive_mode")]
+    public void IsCrossfadeAllowed_ReturnsFalse_InExclusiveMode()
+    {
+        // Act
+        bool allowed = PlaybackTransitionPolicy.IsCrossfadeAllowed(crossfadeEnabled: true, EAudioOutputMode.Exclusive);
+
+        // Assert
+        Assert.False(allowed);
+    }
+
+    [Theory(DisplayName = "crossfade_is_allowed_in_shared_mode_when_enabled")]
+    [InlineData(true, true)]
+    [InlineData(false, false)]
+    public void IsCrossfadeAllowed_FollowsOption_InSharedMode(bool crossfadeEnabled, bool expected)
+    {
+        // Act
+        bool allowed = PlaybackTransitionPolicy.IsCrossfadeAllowed(crossfadeEnabled, EAudioOutputMode.Shared);
+
+        // Assert
+        Assert.Equal(expected, allowed);
+    }
 
     [Theory(DisplayName = "decide_returns_gapless_when_crossfade_is_disabled")]
     [InlineData(1L, 1, 1L, 2)]

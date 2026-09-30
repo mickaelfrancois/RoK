@@ -9,6 +9,7 @@ using Rok.Application.Interfaces.Pictures;
 using Rok.Application.Interfaces.Repositories;
 using Rok.Application.Options;
 using Rok.Application.Player;
+using Rok.Application.Player.Output;
 using Rok.Application.Tag;
 using Rok.Infrastructure.Files;
 using Rok.Infrastructure.FileSystem;
@@ -18,6 +19,7 @@ using Rok.Infrastructure.Lyrics;
 using Rok.Infrastructure.Migration;
 using Rok.Infrastructure.MusicData;
 using Rok.Infrastructure.Player;
+using Rok.Infrastructure.Player.Output;
 using Rok.Infrastructure.Playlists;
 using Rok.Infrastructure.Playlists.Formats;
 using Rok.Infrastructure.RadioBrowser;
@@ -59,6 +61,9 @@ public static class DependencyInjection
         services.AddSingleton<ISystemMediaTransportControlsService, SystemMediaTransportControlsService>();
         services.AddSingleton(TimeProvider.System);
 
+        services.AddSingleton<IAudioDeviceService, WasapiDeviceService>();
+        services.AddSingleton<IAudioOutputFactory, WasapiOutputFactory>();
+        services.AddSingleton<IAudioFormatProbe, TagLibAudioFormatProbe>();
         services.AddSingleton<IPlayerEngine, NAudioMediaPlayer>();
         services.AddSingleton<ILyricsService, LyricsService>();
         services.AddSingleton<ILyricsParser, LyricsParser>();

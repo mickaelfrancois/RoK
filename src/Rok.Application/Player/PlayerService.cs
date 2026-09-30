@@ -325,7 +325,9 @@ public sealed class PlayerService : IPlayerService, IDisposable
 
         TrackDto nextTrack = Playlist[nextIndex];
 
-        if (PlaybackTransitionPolicy.Decide(_isCrossfadeEnabled, _isMuted, CurrentTrack, nextTrack) == EPlaybackTransition.Gapless)
+        bool crossfadeAllowed = PlaybackTransitionPolicy.IsCrossfadeAllowed(_isCrossfadeEnabled, _appOptions.OutputMode);
+
+        if (PlaybackTransitionPolicy.Decide(crossfadeAllowed, _isMuted, CurrentTrack, nextTrack) == EPlaybackTransition.Gapless)
         {
             QueueGaplessTransition(nextIndex, nextTrack);
             return;

@@ -1,10 +1,11 @@
 using System.Diagnostics;
 using System.Timers;
 using Microsoft.Extensions.Logging;
-using NAudio;
 using NAudio.Wave;
 using Rok.Application.Dto;
 using Rok.Application.Interfaces;
+using Rok.Application.Player.Output;
+using Rok.Infrastructure.Player.Output;
 using Rok.Infrastructure.Player.Streaming;
 
 namespace Rok.Infrastructure.Player;
@@ -17,12 +18,16 @@ public class NAudioMediaPlayer : IPlayerEngine, IDisposable
     public event EventHandler? OnMediaAboutToEnd;
     public event EventHandler<string>? OnMetadataChanged;
     public event EventHandler<GaplessTransitionEventArgs>? OnGaplessTransition;
+    public event EventHandler<OutputLostEventArgs>? OnOutputLost;
+    public event EventHandler<AudioOutputState>? OnOutputStateChanged;
+
+    private const int UnknownDepth = -1;
 
     public bool IsLive => _isLive;
 
     public bool IsBuffering => _streaming?.IsBuffering ?? false;
 
-    private IWavePlayer? _outputDevice;
+    private AudioOutputHandle? _output;
     private PlaybackPipeline? _pipeline;
     private PendingNext? _pendingNext;
     private PlaybackPipeline? _crossfadeIncoming;
@@ -30,9 +35,19 @@ public class NAudioMediaPlayer : IPlayerEngine, IDisposable
     private float _volume = 1f;
     private readonly float[] _bandGains = new float[PlaybackPipeline.BandFrequencies.Length];
     private readonly Lock _stateLock = new();
+    private readonly Lock _outputLock = new();
     private readonly System.Timers.Timer _positionTimer;
     private readonly ILogger<NAudioMediaPlayer> _logger;
     private readonly IHttpClientFactory _httpClientFactory;
+    private readonly IAudioOutputFactory _outputFactory;
+    private readonly IAudioFormatProbe _formatProbe;
+
+    private AudioOutputTarget _target = AudioOutputTarget.Default;
+    private volatile bool _isPlaying;
+    private string? _currentFile;
+    private int _nativeBits = UnknownDepth;
+    private bool _outputChangePending;
+    private bool _lastNeutral = true;
 
     private StreamingPlayback? _streaming;
     private bool _isLive;
@@ -60,10 +75,29 @@ public class NAudioMediaPlayer : IPlayerEngine, IDisposable
         set => _length = value;
     }
 
-    public NAudioMediaPlayer(ILogger<NAudioMediaPlayer> logger, IHttpClientFactory httpClientFactory)
+    /// <inheritdoc />
+    public AudioOutputState OutputState
+    {
+        get
+        {
+            AudioOutputHandle? output = _isLive ? _streaming?.Output : _output;
+            bool isNeutral = IsProcessingNeutral;
+
+            if (output is null)
+                return AudioOutputState.Closed with { IsProcessingNeutral = isNeutral };
+
+            return new AudioOutputState(true, output.DeviceId, output.IsOnPreferred, output.ActualMode, output.FallbackReason, isNeutral);
+        }
+    }
+
+    private bool IsProcessingNeutral => _volume == 1f && (_pipeline?.Source.Gain ?? 1f) == 1f && Array.TrueForAll(_bandGains, gain => gain == 0f);
+
+    public NAudioMediaPlayer(ILogger<NAudioMediaPlayer> logger, IHttpClientFactory httpClientFactory, IAudioOutputFactory outputFactory, IAudioFormatProbe formatProbe)
     {
         _logger = logger;
         _httpClientFactory = httpClientFactory;
+        _outputFactory = outputFactory;
+        _formatProbe = formatProbe;
 
         _positionTimer = new System.Timers.Timer(250)
         {
@@ -76,6 +110,8 @@ public class NAudioMediaPlayer : IPlayerEngine, IDisposable
 
     public void Pause()
     {
+        _isPlaying = false;
+
         if (_isLive)
         {
             _streaming?.Pause();
@@ -83,70 +119,62 @@ public class NAudioMediaPlayer : IPlayerEngine, IDisposable
             return;
         }
 
-        if (_outputDevice is not null && _outputDevice.PlaybackState == PlaybackState.Playing)
-        {
-            _outputDevice.Pause();
-            _positionTimer.Stop();
-            OnMediaStateChanged?.Invoke(this, EventArgs.Empty);
-        }
+        AudioOutputHandle? output = _output;
+
+        if (output is not null && output.Player.PlaybackState == PlaybackState.Playing)
+            output.Player.Pause();
+
+        _positionTimer.Stop();
+        OnMediaStateChanged?.Invoke(this, EventArgs.Empty);
     }
 
+    /// <inheritdoc />
+    /// <remarks>Opens the output first when it was released; throws when no output device is available.</remarks>
     public void Play()
     {
+        _isPlaying = true;
+
         if (_isLive)
         {
-            _streaming?.Resume();
+            RunOrResetPlaying(() => _streaming?.Resume());
             OnMediaStateChanged?.Invoke(this, EventArgs.Empty);
             return;
         }
 
-        if (_outputDevice is not null && _outputDevice.PlaybackState != PlaybackState.Playing)
+        if (_pipeline is null)
+            return;
+
+        RunOrResetPlaying(() =>
         {
-            try
-            {
-                _outputDevice.Play();
-            }
-            catch (MmException ex)
-            {
-                _logger.LogWarning(ex, "Audio device lost (NoDriver), attempting to reinitialize");
-                ReinitializeOutputDevice();
-                _outputDevice?.Play();
-            }
+            AudioOutputHandle output = EnsureOutput();
 
-            if (!_positionTimer.Enabled)
-                _positionTimer.Start();
+            if (output.Player.PlaybackState != PlaybackState.Playing)
+                output.Player.Play();
+        });
 
-            OnMediaStateChanged?.Invoke(this, EventArgs.Empty);
-        }
+        if (!_positionTimer.Enabled)
+            _positionTimer.Start();
+
+        OnMediaStateChanged?.Invoke(this, EventArgs.Empty);
     }
 
-    private void ReinitializeOutputDevice()
+    private void RunOrResetPlaying(Action action)
     {
-        PlaybackPipeline? pipeline = _pipeline;
-
-        if (pipeline is null)
-            return;
-
-        double currentPosition = pipeline.Reader.CurrentTime.TotalSeconds;
-
-        if (_outputDevice is not null)
+        try
         {
-            _outputDevice.PlaybackStopped -= OutputDevice_PlaybackStopped;
-            _outputDevice.Dispose();
-            _outputDevice = null;
+            action();
         }
-
-        _outputDevice = new WaveOut();
-        _outputDevice.PlaybackStopped += OutputDevice_PlaybackStopped;
-        _outputDevice.Init(pipeline.Output);
-
-        pipeline.Reader.CurrentTime = TimeSpan.FromSeconds(currentPosition);
-
-        _logger.LogInformation("Audio device reinitialized, position restored to {Position}s", currentPosition);
+        catch
+        {
+            _isPlaying = false;
+            throw;
+        }
     }
 
     public void Stop()
     {
+        _isPlaying = false;
+
         if (_isLive)
         {
             _streaming?.Stop();
@@ -156,29 +184,28 @@ public class NAudioMediaPlayer : IPlayerEngine, IDisposable
             _length = 0;
             _aboutToEndRaised = false;
             OnMediaStateChanged?.Invoke(this, EventArgs.Empty);
+            RaiseOutputStateChanged();
             return;
         }
 
         _positionTimer.Stop();
 
-        IWavePlayer? device;
+        AudioOutputHandle? output;
         PlaybackPipeline? pipeline;
 
-        lock (_stateLock)
+        lock (_outputLock)
         {
-            device = _outputDevice;
-            pipeline = _pipeline;
-            _outputDevice = null;
-            _pipeline = null;
-            _pendingNext = null;
-            _generation++;
-        }
+            lock (_stateLock)
+            {
+                output = _output;
+                pipeline = _pipeline;
+                _output = null;
+                _pipeline = null;
+                _pendingNext = null;
+                _generation++;
+            }
 
-        if (device is not null)
-        {
-            device.PlaybackStopped -= OutputDevice_PlaybackStopped;
-            device.Stop();
-            device.Dispose();
+            ReleaseOutput(output);
         }
 
         ReleasePipeline(pipeline);
@@ -187,6 +214,9 @@ public class NAudioMediaPlayer : IPlayerEngine, IDisposable
         _aboutToEndRaised = false;
 
         OnMediaStateChanged?.Invoke(this, EventArgs.Empty);
+
+        if (output is not null)
+            RaiseOutputStateChanged();
     }
 
     public void SetPosition(double position)
@@ -219,6 +249,8 @@ public class NAudioMediaPlayer : IPlayerEngine, IDisposable
 
         if (_pipeline is not null)
             _pipeline.Volume.Volume = _volume;
+
+        NotifyIfNeutralityChanged();
     }
 
     public bool SetTrack(TrackDto track, float replayGain)
@@ -236,38 +268,49 @@ public class NAudioMediaPlayer : IPlayerEngine, IDisposable
                 ? reader.TotalTime.TotalSeconds
                 : 1;
 
-            WaveOut device = new();
-            device.PlaybackStopped += OutputDevice_PlaybackStopped;
-            device.Init(pipeline.Output);
-
             pipeline.Chain.SourceSwitched += Chain_SourceSwitched;
 
             lock (_stateLock)
             {
                 _pipeline = pipeline;
-                _outputDevice = device;
+                _currentFile = track.MusicFile;
+                _nativeBits = UnknownDepth;
             }
-
-            _aboutToEndRaised = false;
-
-            OnMediaChanged?.Invoke(this, EventArgs.Empty);
-            OnMediaStateChanged?.Invoke(this, EventArgs.Empty);
-
-            return true;
         }
-        catch
+        catch (Exception ex)
         {
+            _logger.LogWarning(ex, "Failed to open {File}", track.MusicFile);
             reader?.Dispose();
 
-            if (_outputDevice is not null)
+            lock (_stateLock)
             {
-                _outputDevice.Dispose();
-                _outputDevice = null;
+                _pipeline = null;
             }
 
-            _pipeline = null;
-
             return false;
+        }
+
+        TryOpenOutput();
+
+        _aboutToEndRaised = false;
+
+        OnMediaChanged?.Invoke(this, EventArgs.Empty);
+        OnMediaStateChanged?.Invoke(this, EventArgs.Empty);
+        NotifyIfNeutralityChanged();
+
+        return true;
+    }
+
+    /// <summary>Opens the output right after loading a track; a failure is retried, and reported, by <see cref="Play"/>.</summary>
+    private void TryOpenOutput()
+    {
+        try
+        {
+            EnsureOutput();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "Unable to open the audio output, it will be retried on play");
         }
     }
 
@@ -275,12 +318,14 @@ public class NAudioMediaPlayer : IPlayerEngine, IDisposable
     {
         Stop();
 
-        _streaming = new StreamingPlayback(_httpClientFactory.CreateClient("RadioStream"), _logger);
+        _streaming = new StreamingPlayback(_httpClientFactory.CreateClient("RadioStream"), _logger, OpenRadioOutput);
         _streaming.MetadataChanged += (_, title) => OnMetadataChanged?.Invoke(this, title);
         _streaming.PlaybackEnded += (_, _) => OnMediaEnded?.Invoke(this, EventArgs.Empty);
         _streaming.BufferingChanged += (_, _) => OnMediaStateChanged?.Invoke(this, EventArgs.Empty);
+        _streaming.OutputLost += Streaming_OutputLost;
 
         _isLive = true;
+        _isPlaying = true;
         _length = 0;
 
         _ = Task.Run(async () =>
@@ -290,6 +335,7 @@ public class NAudioMediaPlayer : IPlayerEngine, IDisposable
                 await _streaming.StartAsync(station, CancellationToken.None);
                 OnMediaChanged?.Invoke(this, EventArgs.Empty);
                 OnMediaStateChanged?.Invoke(this, EventArgs.Empty);
+                RaiseOutputStateChanged();
             }
             catch (Exception ex)
             {
@@ -304,25 +350,53 @@ public class NAudioMediaPlayer : IPlayerEngine, IDisposable
         return true;
     }
 
+    /// <summary>The radio always plays shared, on the device chosen for the music.</summary>
+    private AudioOutputHandle OpenRadioOutput(ISampleProvider source) =>
+        _outputFactory.Open(_target with { Mode = EAudioOutputMode.Shared }, source, 0);
+
+    private void Streaming_OutputLost(object? sender, AudioOutputHandle lost)
+    {
+        if (!ReferenceEquals(sender, _streaming))
+            return;
+
+        OnOutputLost?.Invoke(this, new OutputLostEventArgs(_isPlaying, lost.IsOnPreferred));
+        RaiseOutputStateChanged();
+    }
+
     public void SetEqualizerBand(int bandIndex, float gain)
     {
         if (bandIndex >= 0 && bandIndex < _bandGains.Length)
             _bandGains[bandIndex] = gain;
 
         _pipeline?.Equalizer.UpdateBand(bandIndex, gain);
+
+        NotifyIfNeutralityChanged();
     }
 
     /// <inheritdoc />
+    /// <remarks>
+    /// When exclusive is requested, the next track is refused while the output runs a shared fallback (so the next
+    /// track retries exclusive) and when its format cannot follow on the negotiated one.
+    /// </remarks>
     public bool QueueNextTrack(TrackDto nextTrack, float replayGain)
     {
         if (_isLive || _pipeline is null)
             return false;
 
-        ReplayGainSampleProvider source;
+        bool exclusiveRequested = _target.Mode == EAudioOutputMode.Exclusive;
+        AudioOutputHandle? output = _output;
+
+        if (exclusiveRequested && (output is null || output.FallbackReason is not null))
+        {
+            _logger.LogInformation("Gapless: the exclusive output is not open, {File} will reopen it", nextTrack.MusicFile);
+            return false;
+        }
+
+        AudioFileReader reader;
 
         try
         {
-            source = new ReplayGainSampleProvider(new AudioFileReader(nextTrack.MusicFile), replayGain);
+            reader = new AudioFileReader(nextTrack.MusicFile);
         }
         catch (Exception ex)
         {
@@ -330,6 +404,21 @@ public class NAudioMediaPlayer : IPlayerEngine, IDisposable
             return false;
         }
 
+        int nextBits = UnknownDepth;
+
+        if (exclusiveRequested && output?.ExclusiveFormat is WaveFormat negotiated)
+        {
+            nextBits = _formatProbe.GetBitsPerSample(nextTrack.MusicFile);
+
+            if (!ExclusiveFormatLadder.CanChain(negotiated, reader.WaveFormat.SampleRate, reader.WaveFormat.Channels, nextBits))
+            {
+                _logger.LogInformation("Gapless: {File} does not fit the exclusive format {Format}, the output will reopen", nextTrack.MusicFile, negotiated);
+                reader.Dispose();
+                return false;
+            }
+        }
+
+        ReplayGainSampleProvider source = new(reader, replayGain);
         bool queued = false;
         ISampleProvider? replaced = null;
 
@@ -337,7 +426,7 @@ public class NAudioMediaPlayer : IPlayerEngine, IDisposable
         {
             if (_pipeline is not null && _pipeline.Chain.TryQueueNext(source, out replaced))
             {
-                _pendingNext = new PendingNext(source, nextTrack);
+                _pendingNext = new PendingNext(source, nextTrack, nextBits);
                 queued = true;
             }
         }
@@ -367,6 +456,8 @@ public class NAudioMediaPlayer : IPlayerEngine, IDisposable
             if (_crossfadeIncoming is not null && _crossfadeIncoming.TrackId == trackId)
                 _crossfadeIncoming.Source.Gain = replayGain;
         }
+
+        NotifyIfNeutralityChanged();
     }
 
     /// <inheritdoc />
@@ -382,6 +473,142 @@ public class NAudioMediaPlayer : IPlayerEngine, IDisposable
         }
 
         (removed as IDisposable)?.Dispose();
+    }
+
+    /// <inheritdoc />
+    public void SetOutputTarget(AudioOutputTarget target)
+    {
+        _target = target;
+        ReopenOutput();
+    }
+
+    /// <inheritdoc />
+    public void ReopenOutput()
+    {
+        if (_isLive)
+        {
+            try
+            {
+                _streaming?.ReopenOutput(_isPlaying);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Unable to reopen the radio output");
+            }
+
+            RaiseOutputStateChanged();
+            return;
+        }
+
+        lock (_stateLock)
+        {
+            if (_crossfadeIncoming is not null)
+            {
+                _outputChangePending = true;
+                return;
+            }
+        }
+
+        ApplyOutputChange();
+    }
+
+    /// <summary>
+    /// Releases the output and, while playing, opens a new one on the current target at the same position. The pipeline
+    /// is kept, so a pending gapless track stays valid and <see cref="_generation"/> does not change.
+    /// </summary>
+    private void ApplyOutputChange()
+    {
+        lock (_outputLock)
+        {
+            AudioOutputHandle? previous;
+            PlaybackPipeline? pipeline;
+
+            lock (_stateLock)
+            {
+                previous = _output;
+                pipeline = _pipeline;
+                _output = null;
+                _outputChangePending = false;
+            }
+
+            ReleaseOutput(previous);
+
+            if (pipeline is not null && _isPlaying)
+            {
+                try
+                {
+                    AudioOutputHandle output = OpenOutput(pipeline);
+
+                    lock (_stateLock)
+                    {
+                        _output = output;
+                    }
+
+                    output.Player.Play();
+
+                    if (!_positionTimer.Enabled)
+                        _positionTimer.Start();
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Unable to reopen the audio output");
+                }
+            }
+        }
+
+        RaiseOutputStateChanged();
+    }
+
+    private AudioOutputHandle EnsureOutput()
+    {
+        AudioOutputHandle output;
+
+        lock (_outputLock)
+        {
+            PlaybackPipeline pipeline;
+
+            lock (_stateLock)
+            {
+                if (_output is not null)
+                    return _output;
+
+                pipeline = _pipeline ?? throw new InvalidOperationException("No track is loaded.");
+            }
+
+            output = OpenOutput(pipeline);
+
+            lock (_stateLock)
+            {
+                _output = output;
+            }
+        }
+
+        RaiseOutputStateChanged();
+
+        return output;
+    }
+
+    /// <summary>Opens an output for <paramref name="pipeline"/>; call it under <see cref="_outputLock"/>.</summary>
+    private AudioOutputHandle OpenOutput(PlaybackPipeline pipeline)
+    {
+        AudioOutputTarget target = _target;
+
+        if (target.Mode == EAudioOutputMode.Exclusive && _nativeBits == UnknownDepth && _currentFile is not null)
+            _nativeBits = _formatProbe.GetBitsPerSample(_currentFile);
+
+        AudioOutputHandle output = _outputFactory.Open(target, pipeline.Output, Math.Max(0, _nativeBits));
+        output.Player.PlaybackStopped += Output_PlaybackStopped;
+
+        return output;
+    }
+
+    private void ReleaseOutput(AudioOutputHandle? output)
+    {
+        if (output is null)
+            return;
+
+        output.Player.PlaybackStopped -= Output_PlaybackStopped;
+        output.Dispose();
     }
 
     /// <inheritdoc />
@@ -409,12 +636,12 @@ public class NAudioMediaPlayer : IPlayerEngine, IDisposable
             _crossfadeIncoming = nextPipeline;
         }
 
-        WaveOut nextDevice = new();
+        AudioOutputHandle? nextOutput = null;
 
         try
         {
-            nextDevice.Init(nextPipeline.Output);
-            nextDevice.Play();
+            nextOutput = _outputFactory.Open(_target with { Mode = EAudioOutputMode.Shared }, nextPipeline.Output, 0);
+            nextOutput.Player.Play();
 
             const int intervalMs = 50;
             var sw = Stopwatch.StartNew();
@@ -437,22 +664,24 @@ public class NAudioMediaPlayer : IPlayerEngine, IDisposable
                 await Task.Delay(intervalMs, ct);
             }
 
-            PromoteCrossfade(nextPipeline, nextDevice, masterVolume);
+            PromoteCrossfade(nextPipeline, nextOutput, nextTrack.MusicFile, masterVolume);
 
             OnMediaChanged?.Invoke(this, EventArgs.Empty);
         }
         catch (OperationCanceledException)
         {
-            AbandonCrossfade(nextPipeline, nextDevice);
+            AbandonCrossfade(nextPipeline, nextOutput);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Crossfade: unexpected error");
-            AbandonCrossfade(nextPipeline, nextDevice);
+            AbandonCrossfade(nextPipeline, nextOutput);
         }
+
+        ApplyPendingOutputChange();
     }
 
-    private void AbandonCrossfade(PlaybackPipeline nextPipeline, WaveOut nextDevice)
+    private void AbandonCrossfade(PlaybackPipeline nextPipeline, AudioOutputHandle? nextOutput)
     {
         lock (_stateLock)
         {
@@ -460,46 +689,60 @@ public class NAudioMediaPlayer : IPlayerEngine, IDisposable
                 _crossfadeIncoming = null;
         }
 
-        nextDevice.Stop();
-        nextDevice.Dispose();
+        nextOutput?.Dispose();
         nextPipeline.Dispose();
     }
 
-    private void PromoteCrossfade(PlaybackPipeline nextPipeline, WaveOut nextDevice, double masterVolume)
+    private void PromoteCrossfade(PlaybackPipeline nextPipeline, AudioOutputHandle nextOutput, string nextFile, double masterVolume)
     {
         _positionTimer.Stop();
 
-        IWavePlayer? previousDevice;
+        AudioOutputHandle? previousOutput;
         PlaybackPipeline? previousPipeline;
 
         _volume = ToLinearVolume(masterVolume);
         nextPipeline.Volume.Volume = _volume;
         nextPipeline.Chain.SourceSwitched += Chain_SourceSwitched;
-        nextDevice.PlaybackStopped += OutputDevice_PlaybackStopped;
+        nextOutput.Player.PlaybackStopped += Output_PlaybackStopped;
 
-        lock (_stateLock)
+        lock (_outputLock)
         {
-            previousDevice = _outputDevice;
-            previousPipeline = _pipeline;
-            _outputDevice = nextDevice;
-            _pipeline = nextPipeline;
-            _pendingNext = null;
-            _crossfadeIncoming = null;
-            _generation++;
-            _length = nextPipeline.Reader.TotalTime.TotalSeconds > 0 ? nextPipeline.Reader.TotalTime.TotalSeconds : 1;
-            _aboutToEndRaised = false;
-        }
+            lock (_stateLock)
+            {
+                previousOutput = _output;
+                previousPipeline = _pipeline;
+                _output = nextOutput;
+                _pipeline = nextPipeline;
+                _currentFile = nextFile;
+                _nativeBits = UnknownDepth;
+                _pendingNext = null;
+                _crossfadeIncoming = null;
+                _generation++;
+                _length = nextPipeline.Reader.TotalTime.TotalSeconds > 0 ? nextPipeline.Reader.TotalTime.TotalSeconds : 1;
+                _aboutToEndRaised = false;
+            }
 
-        if (previousDevice is not null)
-        {
-            previousDevice.PlaybackStopped -= OutputDevice_PlaybackStopped;
-            previousDevice.Stop();
-            previousDevice.Dispose();
+            ReleaseOutput(previousOutput);
         }
 
         ReleasePipeline(previousPipeline);
 
         _positionTimer.Start();
+
+        RaiseOutputStateChanged();
+    }
+
+    private void ApplyPendingOutputChange()
+    {
+        bool pending;
+
+        lock (_stateLock)
+        {
+            pending = _outputChangePending && _crossfadeIncoming is null;
+        }
+
+        if (pending)
+            ApplyOutputChange();
     }
 
     public EqualizerBand[]? GetEqualizerBands()
@@ -544,6 +787,8 @@ public class NAudioMediaPlayer : IPlayerEngine, IDisposable
             pipeline.Reader = next;
             pipeline.Source = source;
             pipeline.TrackId = pending?.Track.Id ?? 0;
+            _currentFile = pending?.Track.MusicFile;
+            _nativeBits = pending?.NativeBits ?? UnknownDepth;
             _length = next.TotalTime.TotalSeconds > 0 ? next.TotalTime.TotalSeconds : 1;
             _aboutToEndRaised = false;
             _pendingNext = null;
@@ -570,6 +815,8 @@ public class NAudioMediaPlayer : IPlayerEngine, IDisposable
             if (!isCurrent)
                 return;
 
+            NotifyIfNeutralityChanged();
+
             if (pending is null)
             {
                 _logger.LogWarning("Gapless: the output switched to a track that was not tracked as pending");
@@ -584,21 +831,94 @@ public class NAudioMediaPlayer : IPlayerEngine, IDisposable
         }
     }
 
-    private void OutputDevice_PlaybackStopped(object? sender, StoppedEventArgs e)
+    /// <summary>
+    /// Raised on the output's own playback thread: hand off at once, since stopping that output from here would wait for
+    /// the thread to end (a deadlock).
+    /// </summary>
+    private void Output_PlaybackStopped(object? sender, StoppedEventArgs e)
     {
+        if (sender is not IWavePlayer player)
+            return;
+
+        ThreadPool.UnsafeQueueUserWorkItem(state => state.Engine.HandleOutputStopped(state.Player, state.Exception), (Engine: this, Player: player, e.Exception), preferLocal: false);
+    }
+
+    /// <summary>A stop without error ends the track; a stop with an error means the device was lost.</summary>
+    internal void HandleOutputStopped(IWavePlayer player, Exception? exception)
+    {
+        AudioOutputHandle? output;
+
+        lock (_stateLock)
+        {
+            output = _output;
+        }
+
+        if (output is null || !ReferenceEquals(output.Player, player))
+            return;
+
         _positionTimer.Stop();
 
-        if (e.Exception is not null)
-            _logger.LogWarning(e.Exception, "Playback stopped unexpectedly at position {Position}s.", Position);
+        if (exception is null)
+        {
+            OnMediaEnded?.Invoke(this, EventArgs.Empty);
+            return;
+        }
 
-        OnMediaEnded?.Invoke(this, EventArgs.Empty);
+        _logger.LogWarning(exception, "Audio output lost at position {Position}s", Position);
+
+        bool detached = false;
+
+        lock (_outputLock)
+        {
+            lock (_stateLock)
+            {
+                if (ReferenceEquals(_output, output))
+                {
+                    _output = null;
+                    detached = true;
+                }
+            }
+
+            if (detached)
+                ReleaseOutput(output);
+        }
+
+        if (!detached)
+            return;
+
+        OnOutputLost?.Invoke(this, new OutputLostEventArgs(_isPlaying, output.IsOnPreferred));
+        RaiseOutputStateChanged();
+    }
+
+    private void NotifyIfNeutralityChanged()
+    {
+        bool isNeutral = IsProcessingNeutral;
+
+        if (isNeutral == _lastNeutral)
+            return;
+
+        _lastNeutral = isNeutral;
+        RaiseOutputStateChanged();
+    }
+
+    private void RaiseOutputStateChanged()
+    {
+        try
+        {
+            OnOutputStateChanged?.Invoke(this, OutputState);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to publish the audio output state");
+        }
     }
 
     private void PositionTimer_Elapsed(object? s, ElapsedEventArgs e)
     {
         PlaybackPipeline? pipeline = _pipeline;
+        AudioOutputHandle? output = _output;
 
-        if (pipeline is null || _outputDevice is null || _outputDevice.PlaybackState != PlaybackState.Playing)
+        if (pipeline is null || output is null || output.Player.PlaybackState != PlaybackState.Playing)
             return;
 
         double pos;
@@ -642,11 +962,8 @@ public class NAudioMediaPlayer : IPlayerEngine, IDisposable
                 _positionTimer.Elapsed -= PositionTimer_Elapsed;
                 _positionTimer.Dispose();
 
-                if (_outputDevice is not null)
-                {
-                    _outputDevice.PlaybackStopped -= OutputDevice_PlaybackStopped;
-                    _outputDevice.Dispose();
-                }
+                ReleaseOutput(_output);
+                _output = null;
 
                 ReleasePipeline(_pipeline);
                 _pipeline = null;
@@ -662,5 +979,5 @@ public class NAudioMediaPlayer : IPlayerEngine, IDisposable
         GC.SuppressFinalize(this);
     }
 
-    private sealed record PendingNext(ReplayGainSampleProvider Source, TrackDto Track);
+    private sealed record PendingNext(ReplayGainSampleProvider Source, TrackDto Track, int NativeBits);
 }

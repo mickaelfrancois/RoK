@@ -3,6 +3,7 @@ using Moq;
 using Rok.Application.Interfaces;
 using Rok.Application.Options;
 using Rok.Application.Player;
+using Rok.Application.Player.Output;
 using Rok.Infrastructure.Files;
 using Rok.Shared.Enums;
 
@@ -272,6 +273,36 @@ public class SettingsFileServiceTests
         Assert.True(restored.CrossFade);
         Assert.NotNull(restored.AlbumsFilterByGenresId);
         Assert.Empty(restored.AlbumsFilterByGenresId);
+        Assert.Equal(string.Empty, restored.OutputDeviceId);
+        Assert.Equal(EAudioOutputMode.Shared, restored.OutputMode);
+    }
+
+    [Fact(DisplayName = "output_options_survive_save_load_and_copy")]
+    public async Task OutputOptions_SurviveSaveLoadAndCopy()
+    {
+        // Arrange
+        const string deviceId = "{0.0.0.00000000}.{8f1c3a52-1111-4d2e-9a77-0123456789ab}";
+        AppOptions options = new() { OutputDeviceId = deviceId, OutputMode = EAudioOutputMode.Exclusive };
+        string? capturedJson = null;
+
+        Mock<IFileSystem> fs = CreateFileSystemMock();
+        fs.Setup(f => f.WriteAllTextAsync(SettingsFilePath, It.IsAny<string>(), It.IsAny<CancellationToken>()))
+            .Callback<string, string, CancellationToken>((_, json, _) => capturedJson = json)
+            .Returns(Task.CompletedTask);
+        fs.Setup(f => f.FileExists(SettingsFilePath)).Returns(true);
+        fs.Setup(f => f.ReadAllTextAsync(SettingsFilePath, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(() => capturedJson!);
+        SettingsFileService sut = new(ApplicationPath, CreateFolderResolverMock().Object, fs.Object);
+
+        // Act
+        await sut.SaveAsync(options);
+        IAppOptions? loaded = await sut.LoadAsync<AppOptions>();
+        AppOptions restored = new();
+        restored.CopyFrom(loaded!);
+
+        // Assert
+        Assert.Equal(deviceId, restored.OutputDeviceId);
+        Assert.Equal(EAudioOutputMode.Exclusive, restored.OutputMode);
     }
 
     [Fact]

@@ -73,6 +73,25 @@
                                        Foreground="{ThemeResource TextFillColorSecondaryBrush}"
                                        TextWrapping="WrapWholeWords" />
                         </StackPanel>
+                        <StackPanel Spacing="8">
+                            <TextBlock x:Uid="OptionsOutputDeviceLabel" />
+                            <ComboBox x:Name="OutputDeviceComboBox"
+                                      MinWidth="220"
+                                      MaxWidth="420"
+                                      SelectionChanged="OutputDeviceComboBox_SelectionChanged" />
+                            <TextBlock x:Uid="OptionsOutputModeLabel" />
+                            <ComboBox Width="220" SelectedValuePath="Tag" SelectedValue="{x:Bind OutputModeString, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+                                <ComboBoxItem x:Uid="OptionsOutputModeSharedItem" Tag="Shared" />
+                                <ComboBoxItem x:Uid="OptionsOutputModeExclusiveItem" Tag="Exclusive" />
+                            </ComboBox>
+                            <TextBlock x:Uid="OptionsOutputModeDescription"
+                                       Style="{ThemeResource CaptionTextBlockStyle}"
+                                       Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                       TextWrapping="WrapWholeWords" />
+                            <TextBlock x:Name="OutputStatusText"
+                                       Style="{ThemeResource CaptionTextBlockStyle}"
+                                       TextWrapping="WrapWholeWords" />
+                        </StackPanel>
                         <ToggleSwitch x:Uid="optionsRefreshAtStartupSwitch"
                                       x:Name="optionsRefreshAtStartupSwitch"
                                       IsOn="{x:Bind Options.RefreshLibraryAtStartup, Mode=TwoWay}" />

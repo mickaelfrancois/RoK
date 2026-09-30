@@ -1,3 +1,5 @@
+using Rok.Application.Player.Output;
+
 namespace Rok.Application.Interfaces;
 
 public interface IPlayerEngine
@@ -57,4 +59,22 @@ public interface IPlayerEngine
     /// <paramref name="trackId"/>. Unknown identifiers are ignored.
     /// </summary>
     void UpdateReplayGain(long trackId, float replayGain);
+
+    /// <summary>Actual state of the output currently used by the music or the radio.</summary>
+    AudioOutputState OutputState { get; }
+
+    /// <summary>Raised off the UI thread when the device of the open output disappears or fails.</summary>
+    event EventHandler<OutputLostEventArgs>? OnOutputLost;
+
+    /// <summary>Raised off the render thread each time <see cref="OutputState"/> changes.</summary>
+    event EventHandler<AudioOutputState>? OnOutputStateChanged;
+
+    /// <summary>
+    /// Sets the requested device and mode. While playing, the output reopens at once at the current position;
+    /// otherwise it is released and reopens on the next <see cref="Play"/>.
+    /// </summary>
+    void SetOutputTarget(AudioOutputTarget target);
+
+    /// <summary>Resolves the device again for the current target, with the same rules as <see cref="SetOutputTarget"/>.</summary>
+    void ReopenOutput();
 }

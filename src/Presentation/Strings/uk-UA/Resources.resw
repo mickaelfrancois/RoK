@@ -2099,4 +2099,52 @@
   <data name="radiosSuggestionAdd.Text" xml:space="preserve">
     <value>Додати</value>
   </data>
+  <data name="OptionsOutputDeviceLabel.Text" xml:space="preserve">
+    <value>Аудіовихід</value>
+  </data>
+  <data name="OptionsOutputDeviceDefault" xml:space="preserve">
+    <value>Пристрій Windows за замовчуванням</value>
+  </data>
+  <data name="OptionsOutputDeviceDisconnected" xml:space="preserve">
+    <value>Пристрій відключено</value>
+  </data>
+  <data name="OptionsOutputModeLabel.Text" xml:space="preserve">
+    <value>Режим виводу</value>
+  </data>
+  <data name="OptionsOutputModeSharedItem.Content" xml:space="preserve">
+    <value>Спільний (мікшер Windows)</value>
+  </data>
+  <data name="OptionsOutputModeExclusiveItem.Content" xml:space="preserve">
+    <value>Монопольний (WASAPI)</value>
+  </data>
+  <data name="OptionsOutputModeDescription.Text" xml:space="preserve">
+    <value>У монопольному режимі Rok одноосібно займає пристрій і передає кожен файл з його оригінальною частотою, без передискретизації. Відтворення є bit-perfect, коли еквалайзер вимкнено, ReplayGain нейтральний, а гучність становить 100 %. Інші програми не мають звуку, доки Rok утримує пристрій, навіть на паузі, а кросфейд замінюється переходами без пауз.</value>
+  </data>
+  <data name="OutputStatusIdle" xml:space="preserve">
+    <value>Стан: нічого не відтворюється</value>
+  </data>
+  <data name="OutputStatusShared" xml:space="preserve">
+    <value>Стан: спільне відтворення через мікшер Windows</value>
+  </data>
+  <data name="OutputStatusExclusiveBitPerfect" xml:space="preserve">
+    <value>Стан: монопольний, bit-perfect</value>
+  </data>
+  <data name="OutputStatusExclusiveProcessed" xml:space="preserve">
+    <value>Стан: монопольний, з активною обробкою (еквалайзер, ReplayGain або гучність)</value>
+  </data>
+  <data name="OutputStatusSharedFallback" xml:space="preserve">
+    <value>Стан: спільне відтворення, монопольний режим відхилено</value>
+  </data>
+  <data name="PlayerOutputFallbackFormatRefused" xml:space="preserve">
+    <value>Відтворення у спільному режимі замість монопольного: звук проходить через мікшер Windows, який може його передискретизувати. Причина: пристрій не приймає формат цього файлу. Rok знову спробує монопольний режим на наступному треку.</value>
+  </data>
+  <data name="PlayerOutputFallbackDeviceBusy" xml:space="preserve">
+    <value>Відтворення у спільному режимі замість монопольного: звук проходить через мікшер Windows, який може його передискретизувати. Причина: інша програма використовує пристрій у монопольному режимі. Rok знову спробує монопольний режим на наступному треку.</value>
+  </data>
+  <data name="PlayerOutputFallbackExclusiveDisabled" xml:space="preserve">
+    <value>Відтворення у спільному режимі замість монопольного: звук проходить через мікшер Windows, який може його передискретизувати. Причина: Windows забороняє монопольний режим на цьому пристрої. Увімкніть «Дозволити програмам отримувати монопольний контроль над цим пристроєм» у додаткових властивостях пристрою (Параметри звуку). Rok знову спробує монопольний режим на наступному треку.</value>
+  </data>
+  <data name="PlayerOutputFallbackOther" xml:space="preserve">
+    <value>Відтворення у спільному режимі замість монопольного: звук проходить через мікшер Windows, який може його передискретизувати. Причина: не вдалося відкрити монопольний вихід. Rok знову спробує монопольний режим на наступному треку.</value>
+  </data>
 </root>

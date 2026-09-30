@@ -1,5 +1,6 @@
 using Microsoft.UI.Xaml.Controls;
 using Rok.Application.Player;
+using Rok.Application.Player.Output;
 using Rok.ViewModels.Statistics;
 using Windows.ApplicationModel;
 using Windows.Storage;
@@ -56,6 +57,19 @@ public sealed partial class OptionsPage : Page
         }
     }
 
+    public string OutputModeString
+    {
+        get => Options.OutputMode.ToString();
+        set
+        {
+            if (!Enum.TryParse(value, out EAudioOutputMode mode) || mode == Options.OutputMode)
+                return;
+
+            Options.OutputMode = mode;
+            _messenger.Send(new AudioOutputOptionsChanged());
+        }
+    }
+
     public double ReplayGainPreampMin => ReplayGainCalculator.MinPreampDb;
 
     public double ReplayGainPreampMax => ReplayGainCalculator.MaxPreampDb;
@@ -66,6 +80,10 @@ public sealed partial class OptionsPage : Page
     private readonly IFolderResolver _folderResolver;
     private readonly ResourceLoader _resourceLoader;
     private readonly ILogger<OptionsPage> _logger;
+    private readonly IAudioDeviceService _audioDeviceService;
+    private readonly IPlayerEngine _playerEngine;
+    private IDisposable? _outputStateSubscription;
+    private bool _isLoadingDevices;
 
     private StatisticsViewModel StatisticsViewModel { get; }
 
@@ -88,6 +106,8 @@ public sealed partial class OptionsPage : Page
         _folderResolver = App.ServiceProvider.GetRequiredService<IFolderResolver>();
         _resourceLoader = App.ServiceProvider.GetRequiredService<ResourceLoader>();
         _logger = App.ServiceProvider.GetRequiredService<ILogger<OptionsPage>>();
+        _audioDeviceService = App.ServiceProvider.GetRequiredService<IAudioDeviceService>();
+        _playerEngine = App.ServiceProvider.GetRequiredService<IPlayerEngine>();
 
         StatisticsViewModel = App.ServiceProvider.GetRequiredService<StatisticsViewModel>();
     }
@@ -95,6 +115,11 @@ public sealed partial class OptionsPage : Page
     protected override async void OnNavigatedTo(Microsoft.UI.Xaml.Navigation.NavigationEventArgs e)
     {
         base.OnNavigatedTo(e);
+
+        LoadOutputDevices();
+        _outputStateSubscription = _messenger.Subscribe<AudioOutputStateChanged>(message =>
+            DispatcherQueue.TryEnqueue(() => ShowOutputStatus(message.State, message.IsLive)));
+        ShowOutputStatus(_playerEngine.OutputState, _playerEngine.IsLive);
 
         try
         {
@@ -117,6 +142,58 @@ public sealed partial class OptionsPage : Page
             _logger.LogError(ex, "Navigation to OptionsPage failed");
         }
     }
+
+    protected override void OnNavigatedFrom(Microsoft.UI.Xaml.Navigation.NavigationEventArgs e)
+    {
+        _outputStateSubscription?.Dispose();
+        _outputStateSubscription = null;
+
+        base.OnNavigatedFrom(e);
+    }
+
+    /// <summary>
+    /// The Windows default device first, then the active devices. A chosen device that is unplugged stays listed as
+    /// disconnected, so opening the options never replaces the saved choice.
+    /// </summary>
+    private void LoadOutputDevices()
+    {
+        List<OutputDeviceItem> items = [new(string.Empty, _resourceLoader.GetString("OptionsOutputDeviceDefault"))];
+
+        try
+        {
+            items.AddRange(_audioDeviceService.GetSnapshot().Active.Select(device => new OutputDeviceItem(device.Id, device.Name)));
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Unable to list the audio output devices");
+        }
+
+        string savedId = Options.OutputDeviceId ?? string.Empty;
+
+        if (!items.Exists(item => item.Id == savedId))
+            items.Add(new OutputDeviceItem(savedId, _resourceLoader.GetString("OptionsOutputDeviceDisconnected")));
+
+        List<ComboBoxItem> entries = [.. items.Select(item => new ComboBoxItem { Content = item.Name, Tag = item.Id })];
+
+        _isLoadingDevices = true;
+        OutputDeviceComboBox.ItemsSource = entries;
+        OutputDeviceComboBox.SelectedItem = entries.Find(entry => (string)entry.Tag == savedId);
+        _isLoadingDevices = false;
+    }
+
+    private void OutputDeviceComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        if (_isLoadingDevices || OutputDeviceComboBox.SelectedItem is not ComboBoxItem { Tag: string deviceId } || deviceId == Options.OutputDeviceId)
+            return;
+
+        Options.OutputDeviceId = deviceId;
+        _messenger.Send(new AudioOutputOptionsChanged());
+    }
+
+    private void ShowOutputStatus(AudioOutputState state, bool isLive) =>
+        OutputStatusText.Text = _resourceLoader.GetString(AudioOutputTextKeys.Status(AudioOutputStatusResolver.Resolve(state, isLive)));
+
+    private sealed record OutputDeviceItem(string Id, string Name);
 
     private void GitHubPageButton_Click(object sender, RoutedEventArgs e)
     {

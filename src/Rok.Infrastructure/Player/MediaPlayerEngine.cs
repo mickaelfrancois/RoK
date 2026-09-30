@@ -1,6 +1,7 @@
 ﻿using System.Timers;
 using Rok.Application.Dto;
 using Rok.Application.Interfaces;
+using Rok.Application.Player.Output;
 using Windows.Media.Core;
 using Windows.Media.Playback;
 
@@ -171,6 +172,33 @@ public class WinUIMediaPlayer : IPlayerEngine, IDisposable
 
     /// <inheritdoc />
     public void UpdateReplayGain(long trackId, float replayGain)
+    {
+    }
+
+    /// <inheritdoc />
+    public AudioOutputState OutputState => AudioOutputState.Closed;
+
+    /// <inheritdoc />
+    public event EventHandler<OutputLostEventArgs>? OnOutputLost
+    {
+        add { }
+        remove { }
+    }
+
+    /// <inheritdoc />
+    public event EventHandler<AudioOutputState>? OnOutputStateChanged
+    {
+        add { }
+        remove { }
+    }
+
+    /// <inheritdoc />
+    public void SetOutputTarget(AudioOutputTarget target)
+    {
+    }
+
+    /// <inheritdoc />
+    public void ReopenOutput()
     {
     }
 

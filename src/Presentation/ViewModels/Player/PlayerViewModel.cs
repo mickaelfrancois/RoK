@@ -5,6 +5,7 @@ using Rok.Application.Dto.Lyrics;
 using Rok.Application.Features.Tracks.Requests;
 using Rok.Application.Messages;
 using Rok.Application.Player;
+using Rok.Application.Player.Output;
 using Rok.Services;
 using Rok.ViewModels.Album;
 using Rok.ViewModels.Artist;
@@ -70,6 +71,13 @@ public partial class PlayerViewModel : ObservableObject, IDisposable
 
     [ObservableProperty]
     public partial bool IsBuffering { get; set; }
+
+    /// <summary>Exclusive output was requested but the current track plays shared.</summary>
+    [ObservableProperty]
+    public partial bool IsOutputFallback { get; set; }
+
+    [ObservableProperty]
+    public partial string? OutputFallbackToolTip { get; set; }
 
     public bool IsMusicMode => Mode == EPlaybackMode.Music;
     public bool IsRadioMode => Mode == EPlaybackMode.Radio;
@@ -232,6 +240,7 @@ public partial class PlayerViewModel : ObservableObject, IDisposable
         _subscriptions.Add(_messenger.Subscribe<RadioStationChanged>(OnRadioStationChanged));
         _subscriptions.Add(_messenger.Subscribe<RadioMetadataChanged>(OnRadioMetadataChanged));
         _subscriptions.Add(_messenger.Subscribe<BufferingChanged>(OnBufferingChanged));
+        _subscriptions.Add(_messenger.Subscribe<AudioOutputStateChanged>(OnAudioOutputStateChanged));
         _subscriptions.Add(_messenger.Subscribe<CompactModeMessage>(_ => OnCompactModeToggled()));
     }
 
@@ -287,6 +296,17 @@ public partial class PlayerViewModel : ObservableObject, IDisposable
         _stateManager.ExecuteOnUIThread(() =>
         {
             IsBuffering = message.IsBuffering;
+        });
+    }
+
+    private void OnAudioOutputStateChanged(AudioOutputStateChanged message)
+    {
+        EExclusiveFallbackReason? reason = message.State.IsOpen && !message.IsLive ? message.State.FallbackReason : null;
+
+        _stateManager.ExecuteOnUIThread(() =>
+        {
+            IsOutputFallback = reason is not null;
+            OutputFallbackToolTip = reason is null ? null : _resourceLoader.GetString(AudioOutputTextKeys.FallbackToolTip(reason.Value));
         });
     }
 
