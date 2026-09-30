@@ -1,3 +1,4 @@
+using System.Runtime.InteropServices;
 using Rok.Application.Player.Output;
 
 namespace Rok.Infrastructure.Player.Output;
@@ -20,4 +21,17 @@ internal static class WasapiErrorClassifier
 
     /// <summary>The device disappeared: a lost output, not a reason to fall back to the shared mode.</summary>
     public static bool IsDeviceInvalidated(int hresult) => hresult == DeviceInvalidated;
+
+    /// <summary>
+    /// Reason to fall back to the shared mode after an exclusive open failed, or <c>null</c> when the exception must
+    /// propagate: a vanished device is a lost output, and an unexpected exception is not a device refusal.
+    /// <see cref="NotSupportedException"/> is what <c>WasapiPlayer</c> raises when the device refuses the sample rate.
+    /// </summary>
+    public static EExclusiveFallbackReason? ClassifyExclusiveFailure(Exception exception) => exception switch
+    {
+        COMException com when IsDeviceInvalidated(com.HResult) => null,
+        COMException com => Classify(com.HResult),
+        NotSupportedException => EExclusiveFallbackReason.FormatRefused,
+        _ => null
+    };
 }
