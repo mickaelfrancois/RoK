@@ -4,6 +4,7 @@ using Microsoft.Extensions.Logging;
 using NAudio.Wave;
 using Rok.Application.Dto;
 using Rok.Application.Interfaces;
+using Rok.Application.Player.Mix;
 using Rok.Application.Player.Output;
 using Rok.Infrastructure.Player.Output;
 using Rok.Infrastructure.Player.Streaming;
@@ -632,7 +633,7 @@ public class NAudioMediaPlayer : IPlayerEngine, IDisposable
     /// so the fade is sample-accurate and the master volume can still change while it runs.
     /// </remarks>
     public Task CrossfadeToAsync(TrackDto nextTrack, float replayGain, double durationSeconds, CancellationToken ct) =>
-        CrossfadeToAsync(nextTrack, replayGain, durationSeconds, 0, ct);
+        CrossfadeToAsync(nextTrack, replayGain, durationSeconds, new MixTransition(0, BassSwap: false), ct);
 
     /// <inheritdoc />
     public void SetTransitionCue(long trackId, double positionSeconds) => _cueGate.Arm(trackId, positionSeconds);
@@ -641,7 +642,7 @@ public class NAudioMediaPlayer : IPlayerEngine, IDisposable
     public void ClearTransitionCue() => _cueGate.Clear();
 
     /// <inheritdoc />
-    public async Task CrossfadeToAsync(TrackDto nextTrack, float replayGain, double durationSeconds, double incomingStartSeconds, CancellationToken ct)
+    public async Task CrossfadeToAsync(TrackDto nextTrack, float replayGain, double durationSeconds, MixTransition transition, CancellationToken ct)
     {
         if (_isLive) return;
 
@@ -662,6 +663,7 @@ public class NAudioMediaPlayer : IPlayerEngine, IDisposable
 
         double nextLength = nextPipeline.Reader.TotalTime.TotalSeconds;
 
+        double incomingStartSeconds = transition.IncomingStartSeconds;
         double incomingStart = incomingStartSeconds > 0 && incomingStartSeconds < nextLength ? incomingStartSeconds : 0;
 
         if (incomingStart > 0)
@@ -682,6 +684,11 @@ public class NAudioMediaPlayer : IPlayerEngine, IDisposable
             durationSeconds = Math.Min(durationSeconds, (nextLength - incomingStart) / 2);
 
         TimeSpan duration = TimeSpan.FromSeconds(durationSeconds);
+        bool bassSwap = transition.BassSwap && BassSwapCurve.Applies(durationSeconds);
+
+        if (bassSwap)
+            nextPipeline.BassSwap.Start(EBassSwapRole.Incoming, duration);
+
         nextPipeline.Fade.Start(EFadeDirection.In, duration);
 
         PlaybackPipeline? outgoing;
@@ -698,7 +705,11 @@ public class NAudioMediaPlayer : IPlayerEngine, IDisposable
         {
             nextOutput = _outputFactory.Open(_target with { Mode = EAudioOutputMode.Shared }, nextPipeline.Output, 0);
             nextOutput.Player.Play();
-            outgoing?.Fade.Start(EFadeDirection.Out, RemainingRamp(outgoing, duration));
+            TimeSpan outgoingRamp = outgoing is null ? duration : RemainingRamp(outgoing, duration);
+            outgoing?.Fade.Start(EFadeDirection.Out, outgoingRamp);
+
+            if (bassSwap)
+                outgoing?.BassSwap.Start(EBassSwapRole.Outgoing, duration);
 
             await WaitForFadeAsync(nextPipeline.Fade, duration, ct);
 
@@ -709,12 +720,14 @@ public class NAudioMediaPlayer : IPlayerEngine, IDisposable
         catch (OperationCanceledException)
         {
             outgoing?.Fade.Reset();
+            outgoing?.BassSwap.Reset();
             AbandonCrossfade(nextPipeline, nextOutput);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Crossfade: unexpected error");
             outgoing?.Fade.Reset();
+            outgoing?.BassSwap.Reset();
             AbandonCrossfade(nextPipeline, nextOutput);
         }
 
@@ -765,6 +778,7 @@ public class NAudioMediaPlayer : IPlayerEngine, IDisposable
         PlaybackPipeline? previousPipeline;
 
         nextPipeline.Fade.Reset();
+        nextPipeline.BassSwap.Reset();
         nextPipeline.Chain.SourceSwitched += Chain_SourceSwitched;
         nextOutput.Player.PlaybackStopped += Output_PlaybackStopped;
 

@@ -54,6 +54,20 @@ public class PlaybackPipelineTests
         Assert.Equal(data, rendered);
     }
 
+    [Fact(DisplayName = "created_pipeline_exposes_an_inactive_bass_swap")]
+    public void Create_ExposesInactiveBassSwap()
+    {
+        // Arrange
+        using TestWaveFile file = TestWaveFile.Create(44100, 16, 2, new byte[4096]);
+
+        // Act
+        using PlaybackPipeline pipeline = PlaybackPipeline.Create(new AudioFileReader(file.Path), 1f, 1, [], 1f);
+
+        // Assert
+        Assert.NotNull(pipeline.BassSwap);
+        Assert.False(pipeline.BassSwap.IsActive);
+    }
+
     [Fact(DisplayName = "create_bands_leaves_bands_flat_when_no_gain_is_given")]
     public void CreateBands_LeavesBandsFlat_WhenNoGainIsGiven()
     {

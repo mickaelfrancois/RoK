@@ -1,3 +1,4 @@
+using Rok.Application.Player.Mix;
 using Rok.Application.Player.Output;
 
 namespace Rok.Application.Interfaces;
@@ -47,11 +48,12 @@ public interface IPlayerEngine
 
     /// <summary>
     /// Same as <see cref="CrossfadeToAsync(TrackDto, float, double, CancellationToken)"/>, but the incoming track starts
-    /// playing at <paramref name="incomingStartSeconds"/> instead of its beginning. A value that is not strictly between
-    /// zero and the incoming length is ignored, and <paramref name="durationSeconds"/> is capped to half of what is left
-    /// of the incoming track.
+    /// playing at <see cref="MixTransition.IncomingStartSeconds"/> instead of its beginning. A value that is not strictly
+    /// between zero and the incoming length is ignored, and <paramref name="durationSeconds"/> is capped to half of what
+    /// is left of the incoming track. <see cref="MixTransition.BassSwap"/> asks the engine to swap the bass of the two
+    /// tracks at the middle of the mix.
     /// </summary>
-    Task CrossfadeToAsync(TrackDto nextTrack, float replayGain, double durationSeconds, double incomingStartSeconds, CancellationToken ct);
+    Task CrossfadeToAsync(TrackDto nextTrack, float replayGain, double durationSeconds, MixTransition transition, CancellationToken ct);
 
     /// <summary>
     /// Raised off the UI thread, once per arming, when the playback position of the track given to

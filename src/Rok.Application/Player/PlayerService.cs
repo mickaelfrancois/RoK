@@ -1140,7 +1140,7 @@ public sealed class PlayerService : IPlayerService, IDisposable
 
         long durationPlayed = (long)_player.Position;
 
-        await _player.CrossfadeToAsync(nextTrack, ResolveReplayGain(nextIndex), duration, incomingStart, cancellationToken);
+        await _player.CrossfadeToAsync(nextTrack, ResolveReplayGain(nextIndex), duration, new MixTransition(incomingStart, BassSwap: true), cancellationToken);
 
         cancellationToken.ThrowIfCancellationRequested();
 

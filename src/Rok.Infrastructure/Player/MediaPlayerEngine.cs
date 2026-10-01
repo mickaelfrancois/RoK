@@ -1,6 +1,7 @@
 ﻿using System.Timers;
 using Rok.Application.Dto;
 using Rok.Application.Interfaces;
+using Rok.Application.Player.Mix;
 using Rok.Application.Player.Output;
 using Windows.Media.Core;
 using Windows.Media.Playback;
@@ -144,16 +145,16 @@ public class WinUIMediaPlayer : IPlayerEngine, IDisposable
 
     /// <inheritdoc />
     public Task CrossfadeToAsync(TrackDto nextTrack, float replayGain, double durationSeconds, CancellationToken ct) =>
-        CrossfadeToAsync(nextTrack, replayGain, durationSeconds, 0, ct);
+        CrossfadeToAsync(nextTrack, replayGain, durationSeconds, new MixTransition(0, BassSwap: false), ct);
 
     /// <inheritdoc />
-    public Task CrossfadeToAsync(TrackDto nextTrack, float replayGain, double durationSeconds, double incomingStartSeconds, CancellationToken ct)
+    public Task CrossfadeToAsync(TrackDto nextTrack, float replayGain, double durationSeconds, MixTransition transition, CancellationToken ct)
     {
         // WinUI MediaPlayer does not support simultaneous dual-track playback; fall back to instant switch.
         SetTrack(nextTrack, replayGain);
 
-        if (incomingStartSeconds > 0)
-            SetPosition(incomingStartSeconds);
+        if (transition.IncomingStartSeconds > 0)
+            SetPosition(transition.IncomingStartSeconds);
 
         Play();
         return Task.CompletedTask;
