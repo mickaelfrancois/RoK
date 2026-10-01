@@ -2210,7 +2210,7 @@
     <value>Add</value>
   </data>
   <data name="OptionsOutputDeviceLabel.Text" xml:space="preserve">
-    <value>Audio output</value>
+    <value>Device</value>
   </data>
   <data name="OptionsOutputDeviceDefault" xml:space="preserve">
     <value>Windows default device</value>
@@ -2256,5 +2256,20 @@
   </data>
   <data name="PlayerOutputFallbackOther" xml:space="preserve">
     <value>Playing in shared mode instead of exclusive: the sound goes through the Windows mixer, which may resample it. Cause: the exclusive output could not be opened. Rok will try exclusive mode again on the next track.</value>
+  </data>
+  <data name="OptionsSectionAppearance.Text" xml:space="preserve">
+    <value>Appearance</value>
+  </data>
+  <data name="OptionsSectionPlayback.Text" xml:space="preserve">
+    <value>Playback</value>
+  </data>
+  <data name="OptionsSectionAudioOutput.Text" xml:space="preserve">
+    <value>Audio output</value>
+  </data>
+  <data name="OptionsSectionLibrary.Text" xml:space="preserve">
+    <value>Library</value>
+  </data>
+  <data name="OptionsSectionOnline.Text" xml:space="preserve">
+    <value>Online services and privacy</value>
   </data>
 </root>

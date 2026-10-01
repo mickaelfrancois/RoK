@@ -2209,7 +2209,7 @@
     <value>Ajouter</value>
   </data>
   <data name="OptionsOutputDeviceLabel.Text" xml:space="preserve">
-    <value>Sortie audio</value>
+    <value>Périphérique</value>
   </data>
   <data name="OptionsOutputDeviceDefault" xml:space="preserve">
     <value>Périphérique par défaut de Windows</value>
@@ -2255,5 +2255,20 @@
   </data>
   <data name="PlayerOutputFallbackOther" xml:space="preserve">
     <value>Lecture en partagé au lieu de l'exclusif : le son passe par le mixeur Windows, qui peut le rééchantillonner. Cause : la sortie exclusive n'a pas pu s'ouvrir. Rok retentera l'exclusif à la piste suivante.</value>
+  </data>
+  <data name="OptionsSectionAppearance.Text" xml:space="preserve">
+    <value>Apparence</value>
+  </data>
+  <data name="OptionsSectionPlayback.Text" xml:space="preserve">
+    <value>Lecture</value>
+  </data>
+  <data name="OptionsSectionAudioOutput.Text" xml:space="preserve">
+    <value>Sortie audio</value>
+  </data>
+  <data name="OptionsSectionLibrary.Text" xml:space="preserve">
+    <value>Bibliothèque</value>
+  </data>
+  <data name="OptionsSectionOnline.Text" xml:space="preserve">
+    <value>Services en ligne et confidentialité</value>
   </data>
 </root>
