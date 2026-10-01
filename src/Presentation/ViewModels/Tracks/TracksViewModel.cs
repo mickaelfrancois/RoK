@@ -66,14 +66,29 @@ public partial class TracksViewModel : ObservableObject, IDisposable
         _playbackService = playbackService;
         _logger = logger;
 
-        _libraryMonitor.LibraryChanged += OnLibraryChanged;
+        _libraryMonitor.LibraryRefreshed += OnLibraryRefreshed;
     }
 
 
-    private void OnLibraryChanged(object? sender, EventArgs e)
+    private void OnLibraryRefreshed(object? sender, EventArgs e)
     {
         _libraryUpdated = true;
-        _dispatcherQueue.TryEnqueue(() => FilterAndSort());
+        _dispatcherQueue.TryEnqueue(async () => await ReloadAfterScanAsync());
+    }
+
+    private async Task ReloadAfterScanAsync()
+    {
+        if (ViewModels.Count == 0)
+            return;
+
+        try
+        {
+            await LoadDataAsync(forceReload: true);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to reload tracks after the library scan.");
+        }
     }
 
 
@@ -243,7 +258,7 @@ public partial class TracksViewModel : ObservableObject, IDisposable
         {
             if (disposing)
             {
-                _libraryMonitor.LibraryChanged -= OnLibraryChanged;
+                _libraryMonitor.LibraryRefreshed -= OnLibraryRefreshed;
                 _libraryMonitor.Dispose();
                 _trackProvider.Clear();
             }

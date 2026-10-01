@@ -82,6 +82,7 @@ public partial class ArtistsViewModel : ObservableObject, IDisposable
 
         IsGridView = _stateManager.GetGridView();
         _libraryMonitor.LibraryChanged += OnLibraryChanged;
+        _libraryMonitor.LibraryRefreshed += OnLibraryRefreshed;
     }
 
 
@@ -89,6 +90,27 @@ public partial class ArtistsViewModel : ObservableObject, IDisposable
     {
         _libraryUpdated = true;
         _dispatcherQueue.TryEnqueue(() => FilterAndSort());
+    }
+
+    private void OnLibraryRefreshed(object? sender, EventArgs e)
+    {
+        _libraryUpdated = true;
+        _dispatcherQueue.TryEnqueue(async () => await ReloadAfterScanAsync());
+    }
+
+    private async Task ReloadAfterScanAsync()
+    {
+        if (ViewModels.Count == 0)
+            return;
+
+        try
+        {
+            await LoadDataAsync(forceReload: true);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to reload artists after the library scan.");
+        }
     }
 
 
@@ -311,6 +333,7 @@ public partial class ArtistsViewModel : ObservableObject, IDisposable
             if (disposing)
             {
                 _libraryMonitor.LibraryChanged -= OnLibraryChanged;
+                _libraryMonitor.LibraryRefreshed -= OnLibraryRefreshed;
                 _libraryMonitor.Dispose();
                 _artistProvider.Clear();
             }
