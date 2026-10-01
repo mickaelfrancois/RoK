@@ -113,6 +113,10 @@ public partial class ArtistsViewModel : ObservableObject, IDisposable
 
         await _artistProvider.LoadAsync(_appOptions.HideArtistsWithoutAlbum);
 
+        _stateManager.PruneGenreFilters(Genres.Select(g => g.Id));
+        _stateManager.PruneTagFilters(Tags);
+        SetFilterLabel();
+
         FilterAndSort();
     }
 
@@ -132,7 +136,7 @@ public partial class ArtistsViewModel : ObservableObject, IDisposable
         else if (_stateManager.SelectedGenreFilters.Count > 0)
         {
             long lastGenreId = _stateManager.SelectedGenreFilters[^1];
-            FilterByText = Genres.FirstOrDefault(c => c.Id == lastGenreId)?.Name ?? "";
+            FilterByText = Genres.FirstOrDefault(c => c.Id == lastGenreId)?.Name ?? _artistProvider.GetFilterLabel("");
         }
         else
         {

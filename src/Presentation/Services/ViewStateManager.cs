@@ -44,6 +44,30 @@ public abstract class ViewStateManager(IAppOptions appOptions)
         SelectedTagFilters = GetStoredTagFilters();
     }
 
+    /// <summary>
+    /// Removes in place the selected genre ids that are not in <paramref name="knownGenreIds"/>. The list is shared
+    /// with the stored options, so they are cleaned as well.
+    /// </summary>
+    /// <returns><c>true</c> when at least one id was removed.</returns>
+    public bool PruneGenreFilters(IEnumerable<long> knownGenreIds)
+    {
+        HashSet<long> known = [.. knownGenreIds];
+
+        return SelectedGenreFilters.RemoveAll(id => !known.Contains(id)) > 0;
+    }
+
+    /// <summary>
+    /// Removes in place the selected tags that are not in <paramref name="knownTags"/> (ordinal comparison). The list
+    /// is shared with the stored options, so they are cleaned as well.
+    /// </summary>
+    /// <returns><c>true</c> when at least one tag was removed.</returns>
+    public bool PruneTagFilters(IEnumerable<string> knownTags)
+    {
+        HashSet<string> known = new(knownTags, StringComparer.Ordinal);
+
+        return SelectedTagFilters.RemoveAll(tag => !known.Contains(tag)) > 0;
+    }
+
     public void Save()
     {
         SaveGroupBy(GroupBy);
