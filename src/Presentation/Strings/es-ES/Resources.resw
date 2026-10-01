@@ -2104,4 +2104,7 @@
   <data name="OptionsSectionOnline.Text" xml:space="preserve">
     <value>Servicios en línea y privacidad</value>
   </data>
+  <data name="OptionsCrossfadeDurationSlider.Header" xml:space="preserve">
+    <value>Duración del fundido (s)</value>
+  </data>
 </root>

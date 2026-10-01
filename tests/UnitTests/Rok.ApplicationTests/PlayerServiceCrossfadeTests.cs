@@ -18,7 +18,7 @@ public class PlayerServiceCrossfadeTests
     public PlayerServiceCrossfadeTests()
     {
         _engine.Setup(o => o.SetTrack(It.IsAny<TrackDto>(), It.IsAny<float>())).Returns(true);
-        _engine.Setup(o => o.CrossfadeToAsync(It.IsAny<TrackDto>(), It.IsAny<float>(), It.IsAny<double>(), It.IsAny<double>(), It.IsAny<CancellationToken>())).Returns(Task.CompletedTask);
+        _engine.Setup(o => o.CrossfadeToAsync(It.IsAny<TrackDto>(), It.IsAny<float>(), It.IsAny<double>(), It.IsAny<CancellationToken>())).Returns(Task.CompletedTask);
         _appOptions.SetupGet(o => o.CrossFade).Returns(true);
     }
 
@@ -32,7 +32,7 @@ public class PlayerServiceCrossfadeTests
         _engine.SetupGet(o => o.Length).Returns(length);
     }
 
-    private void SetCrossfadeDelay(int seconds) => _engine.SetupGet(o => o.CrossfadeDelay).Returns(seconds);
+    private void SetCrossfadeDelay(int seconds) => _appOptions.SetupGet(o => o.CrossfadeDurationSeconds).Returns(seconds);
 
     private void RaiseMediaAboutToEnd() => _engine.Raise(m => m.OnMediaAboutToEnd += null, this, EventArgs.Empty);
 
@@ -49,7 +49,7 @@ public class PlayerServiceCrossfadeTests
         RaiseMediaAboutToEnd();
 
         // Assert
-        _engine.Verify(o => o.CrossfadeToAsync(It.Is<TrackDto>(t => t.Id == 2), It.IsAny<float>(), 5, It.IsAny<double>(), It.IsAny<CancellationToken>()), Times.Once);
+        _engine.Verify(o => o.CrossfadeToAsync(It.Is<TrackDto>(t => t.Id == 2), It.IsAny<float>(), 5, It.IsAny<CancellationToken>()), Times.Once);
     }
 
     [Fact(DisplayName = "OnMediaAboutToEnd should crossfade between two live tracks that are not consecutive in the same album")]
@@ -66,7 +66,7 @@ public class PlayerServiceCrossfadeTests
         RaiseMediaAboutToEnd();
 
         // Assert
-        _engine.Verify(o => o.CrossfadeToAsync(It.Is<TrackDto>(t => t.Id == 2), It.IsAny<float>(), It.IsAny<double>(), It.IsAny<double>(), It.IsAny<CancellationToken>()), Times.Once);
+        _engine.Verify(o => o.CrossfadeToAsync(It.Is<TrackDto>(t => t.Id == 2), It.IsAny<float>(), It.IsAny<double>(), It.IsAny<CancellationToken>()), Times.Once);
         _engine.Verify(o => o.QueueNextTrack(It.IsAny<TrackDto>(), It.IsAny<float>()), Times.Never);
     }
 
@@ -87,7 +87,7 @@ public class PlayerServiceCrossfadeTests
 
         // Assert
         _engine.Verify(o => o.QueueNextTrack(It.Is<TrackDto>(t => t.Id == 2), It.IsAny<float>()), Times.Once);
-        _engine.Verify(o => o.CrossfadeToAsync(It.IsAny<TrackDto>(), It.IsAny<float>(), It.IsAny<double>(), It.IsAny<double>(), It.IsAny<CancellationToken>()), Times.Never);
+        _engine.Verify(o => o.CrossfadeToAsync(It.IsAny<TrackDto>(), It.IsAny<float>(), It.IsAny<double>(), It.IsAny<CancellationToken>()), Times.Never);
     }
 
     [Fact(DisplayName = "OnMediaAboutToEnd should queue the next track gaplessly when player is muted")]
@@ -106,7 +106,7 @@ public class PlayerServiceCrossfadeTests
 
         // Assert
         _engine.Verify(o => o.QueueNextTrack(It.Is<TrackDto>(t => t.Id == 2), It.IsAny<float>()), Times.Once);
-        _engine.Verify(o => o.CrossfadeToAsync(It.IsAny<TrackDto>(), It.IsAny<float>(), It.IsAny<double>(), It.IsAny<double>(), It.IsAny<CancellationToken>()), Times.Never);
+        _engine.Verify(o => o.CrossfadeToAsync(It.IsAny<TrackDto>(), It.IsAny<float>(), It.IsAny<double>(), It.IsAny<CancellationToken>()), Times.Never);
         _engine.Verify(o => o.SetTrack(It.IsAny<TrackDto>(), It.IsAny<float>()), Times.Never);
     }
 
@@ -124,7 +124,7 @@ public class PlayerServiceCrossfadeTests
         RaiseMediaAboutToEnd();
 
         // Assert
-        _engine.Verify(o => o.CrossfadeToAsync(It.IsAny<TrackDto>(), It.IsAny<float>(), It.IsAny<double>(), It.IsAny<double>(), It.IsAny<CancellationToken>()), Times.Never);
+        _engine.Verify(o => o.CrossfadeToAsync(It.IsAny<TrackDto>(), It.IsAny<float>(), It.IsAny<double>(), It.IsAny<CancellationToken>()), Times.Never);
         _engine.Verify(o => o.SetTrack(It.IsAny<TrackDto>(), It.IsAny<float>()), Times.Never);
     }
 
@@ -144,7 +144,25 @@ public class PlayerServiceCrossfadeTests
         RaiseMediaAboutToEnd();
 
         // Assert
-        _engine.Verify(o => o.CrossfadeToAsync(It.Is<TrackDto>(t => t.Id == 1), It.IsAny<float>(), It.IsAny<double>(), It.IsAny<double>(), It.IsAny<CancellationToken>()), Times.Once);
+        _engine.Verify(o => o.CrossfadeToAsync(It.Is<TrackDto>(t => t.Id == 1), It.IsAny<float>(), It.IsAny<double>(), It.IsAny<CancellationToken>()), Times.Once);
+    }
+
+    [Theory(DisplayName = "crossfade_uses_the_duration_chosen_in_the_options")]
+    [InlineData(8, 8)]
+    [InlineData(30, 12)]
+    public void OnMediaAboutToEnd_UsesOptionDuration(int storedSeconds, double expectedSeconds)
+    {
+        // Arrange
+        SetEnginePosition(position: 100 - expectedSeconds, length: 100);
+        SetCrossfadeDelay(storedSeconds);
+        PlayerService sut = BuildService();
+        sut.LoadPlaylist(new List<TrackDto> { BuildTrack(1), BuildTrack(2) });
+
+        // Act
+        RaiseMediaAboutToEnd();
+
+        // Assert
+        _engine.Verify(o => o.CrossfadeToAsync(It.Is<TrackDto>(t => t.Id == 2), It.IsAny<float>(), expectedSeconds, It.IsAny<CancellationToken>()), Times.Once);
     }
 
     [Fact(DisplayName = "OnMediaAboutToEnd should fall back to Next when crossfade duration is zero")]
@@ -161,7 +179,7 @@ public class PlayerServiceCrossfadeTests
         RaiseMediaAboutToEnd();
 
         // Assert
-        _engine.Verify(o => o.CrossfadeToAsync(It.IsAny<TrackDto>(), It.IsAny<float>(), It.IsAny<double>(), It.IsAny<double>(), It.IsAny<CancellationToken>()), Times.Never);
+        _engine.Verify(o => o.CrossfadeToAsync(It.IsAny<TrackDto>(), It.IsAny<float>(), It.IsAny<double>(), It.IsAny<CancellationToken>()), Times.Never);
         _engine.Verify(o => o.SetTrack(It.Is<TrackDto>(t => t.Id == 2), It.IsAny<float>()), Times.Once);
     }
 
@@ -172,8 +190,8 @@ public class PlayerServiceCrossfadeTests
         SetEnginePosition(position: 95, length: 100);
         SetCrossfadeDelay(5);
         TaskCompletionSource<bool> crossfadeCompleted = new();
-        _engine.Setup(o => o.CrossfadeToAsync(It.IsAny<TrackDto>(), It.IsAny<float>(), It.IsAny<double>(), It.IsAny<double>(), It.IsAny<CancellationToken>()))
-               .Returns<TrackDto, float, double, double, CancellationToken>((t, g, d, v, ct) => { crossfadeCompleted.SetResult(true); return Task.CompletedTask; });
+        _engine.Setup(o => o.CrossfadeToAsync(It.IsAny<TrackDto>(), It.IsAny<float>(), It.IsAny<double>(), It.IsAny<CancellationToken>()))
+               .Returns<TrackDto, float, double, CancellationToken>((t, g, d, ct) => { crossfadeCompleted.SetResult(true); return Task.CompletedTask; });
         PlayerService sut = BuildService();
         sut.LoadPlaylist(new List<TrackDto> { BuildTrack(1), BuildTrack(2) });
 
@@ -184,5 +202,58 @@ public class PlayerServiceCrossfadeTests
 
         // Assert
         Assert.Equal(2, sut.CurrentTrack?.Id);
+    }
+
+    private TaskCompletionSource<CancellationToken> KeepCrossfadeInFlight()
+    {
+        TaskCompletionSource<CancellationToken> entered = new();
+        _engine.Setup(o => o.CrossfadeToAsync(It.IsAny<TrackDto>(), It.IsAny<float>(), It.IsAny<double>(), It.IsAny<CancellationToken>()))
+               .Returns<TrackDto, float, double, CancellationToken>((_, _, _, token) =>
+               {
+                   entered.TrySetResult(token);
+                   return Task.Delay(Timeout.Infinite, token);
+               });
+
+        return entered;
+    }
+
+    [Fact(DisplayName = "pausing_during_a_crossfade_cancels_it")]
+    public async Task Pause_CancelsRunningCrossfade()
+    {
+        // Arrange
+        SetEnginePosition(position: 95, length: 100);
+        SetCrossfadeDelay(5);
+        TaskCompletionSource<CancellationToken> entered = KeepCrossfadeInFlight();
+        PlayerService sut = BuildService();
+        sut.LoadPlaylist(new List<TrackDto> { BuildTrack(1), BuildTrack(2) });
+        RaiseMediaAboutToEnd();
+        CancellationToken token = await entered.Task.WaitAsync(TimeSpan.FromSeconds(2));
+
+        // Act
+        sut.Pause();
+
+        // Assert
+        Assert.True(token.IsCancellationRequested);
+    }
+
+    [Fact(DisplayName = "end_of_the_outgoing_track_during_a_crossfade_is_ignored_even_if_crossfade_was_switched_off")]
+    public async Task MediaEnded_DuringCrossfade_IsIgnored()
+    {
+        // Arrange
+        SetEnginePosition(position: 95, length: 100);
+        SetCrossfadeDelay(5);
+        TaskCompletionSource<CancellationToken> entered = KeepCrossfadeInFlight();
+        PlayerService sut = BuildService();
+        sut.LoadPlaylist(new List<TrackDto> { BuildTrack(1), BuildTrack(2) });
+        RaiseMediaAboutToEnd();
+        await entered.Task.WaitAsync(TimeSpan.FromSeconds(2));
+        _appOptions.SetupGet(o => o.CrossFade).Returns(false);
+        _engine.Invocations.Clear();
+
+        // Act
+        _engine.Raise(m => m.OnMediaEnded += null, this, EventArgs.Empty);
+
+        // Assert
+        _engine.Verify(o => o.SetTrack(It.IsAny<TrackDto>(), It.IsAny<float>()), Times.Never);
     }
 }

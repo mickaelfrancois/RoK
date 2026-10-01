@@ -25,10 +25,7 @@ public class WinUIMediaPlayer : IPlayerEngine, IDisposable
 
     private readonly System.Timers.Timer _positionTimer;
 
-    private readonly int _crossfadeDelay = 5;
-    private readonly int _aboutToEndDelay = 15;
-
-    public int CrossfadeDelay => _crossfadeDelay;
+    private readonly int _aboutToEndDelay = 20;
 
     private double _length;
     private bool _aboutToEndRaised;
@@ -146,11 +143,10 @@ public class WinUIMediaPlayer : IPlayerEngine, IDisposable
     }
 
     /// <inheritdoc />
-    public Task CrossfadeToAsync(TrackDto nextTrack, float replayGain, double durationSeconds, double masterVolume, CancellationToken ct)
+    public Task CrossfadeToAsync(TrackDto nextTrack, float replayGain, double durationSeconds, CancellationToken ct)
     {
         // WinUI MediaPlayer does not support simultaneous dual-track playback; fall back to instant switch.
         SetTrack(nextTrack, replayGain);
-        SetVolume(masterVolume);
         Play();
         return Task.CompletedTask;
     }
@@ -251,9 +247,7 @@ public class WinUIMediaPlayer : IPlayerEngine, IDisposable
         if (len <= 0)
             return;
 
-        bool isAboutToEnd = pos >= len - _aboutToEndDelay &&
-                    pos < len - _crossfadeDelay &&
-                    !_aboutToEndRaised;
+        bool isAboutToEnd = pos >= len - _aboutToEndDelay && !_aboutToEndRaised;
 
         if (isAboutToEnd)
         {

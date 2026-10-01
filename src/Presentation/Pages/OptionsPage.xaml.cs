@@ -70,6 +70,16 @@ public sealed partial class OptionsPage : Page
         }
     }
 
+    public double CrossfadeDurationSeconds
+    {
+        get => CrossfadeDuration.Clamp(Options.CrossfadeDurationSeconds);
+        set => Options.CrossfadeDurationSeconds = CrossfadeDuration.Clamp((int)Math.Round(value));
+    }
+
+    public double CrossfadeDurationMin => CrossfadeDuration.MinSeconds;
+
+    public double CrossfadeDurationMax => CrossfadeDuration.MaxSeconds;
+
     public double ReplayGainPreampMin => ReplayGainCalculator.MinPreampDb;
 
     public double ReplayGainPreampMax => ReplayGainCalculator.MaxPreampDb;

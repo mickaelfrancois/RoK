@@ -4,14 +4,14 @@ using NAudio.Wave.SampleProviders;
 namespace Rok.Infrastructure.Player;
 
 /// <summary>
-/// Rendering chain shared by consecutive tracks: per-track ReplayGain, gapless chain, equalizer then volume.
+/// Rendering chain shared by consecutive tracks: per-track ReplayGain, gapless chain, equalizer, volume then crossfade ramp.
 /// <see cref="Output"/> plugs into any <see cref="IWavePlayer"/>.
 /// </summary>
 internal sealed class PlaybackPipeline : IDisposable
 {
     internal static readonly float[] BandFrequencies = [32f, 64f, 125f, 250f, 500f, 1000f, 2000f, 4000f, 8000f, 16000f];
 
-    private PlaybackPipeline(AudioFileReader reader, ReplayGainSampleProvider source, long trackId, GaplessChainSampleProvider chain, Equalizer equalizer, VolumeSampleProvider volume)
+    private PlaybackPipeline(AudioFileReader reader, ReplayGainSampleProvider source, long trackId, GaplessChainSampleProvider chain, Equalizer equalizer, VolumeSampleProvider volume, FadeSampleProvider fade)
     {
         Reader = reader;
         Source = source;
@@ -19,6 +19,7 @@ internal sealed class PlaybackPipeline : IDisposable
         Chain = chain;
         Equalizer = equalizer;
         Volume = volume;
+        Fade = fade;
     }
 
     /// <summary>Reader of the track currently rendered; replaced on each gapless switch.</summary>
@@ -36,7 +37,10 @@ internal sealed class PlaybackPipeline : IDisposable
 
     public VolumeSampleProvider Volume { get; }
 
-    public ISampleProvider Output => Volume;
+    /// <summary>Crossfade ramp, a pass-through outside a crossfade.</summary>
+    public FadeSampleProvider Fade { get; }
+
+    public ISampleProvider Output => Fade;
 
     /// <summary>Builds a pipeline around <paramref name="reader"/> with its ReplayGain, the band gains and the volume.</summary>
     public static PlaybackPipeline Create(AudioFileReader reader, float replayGain, long trackId, IReadOnlyList<float> bandGains, float volume)
@@ -46,7 +50,7 @@ internal sealed class PlaybackPipeline : IDisposable
         Equalizer equalizer = new(chain, CreateBands(reader.WaveFormat.Channels, bandGains));
         VolumeSampleProvider volumeProvider = new(equalizer) { Volume = volume };
 
-        return new PlaybackPipeline(reader, source, trackId, chain, equalizer, volumeProvider);
+        return new PlaybackPipeline(reader, source, trackId, chain, equalizer, volumeProvider, new FadeSampleProvider(volumeProvider));
     }
 
     /// <summary>Creates one band per <see cref="BandFrequencies"/> entry, set to the matching gain of <paramref name="bandGains"/>.</summary>

@@ -2271,4 +2271,7 @@
   <data name="OptionsSectionOnline.Text" xml:space="preserve">
     <value>Services en ligne et confidentialité</value>
   </data>
+  <data name="OptionsCrossfadeDurationSlider.Header" xml:space="preserve">
+    <value>Durée du fondu (s)</value>
+  </data>
 </root>

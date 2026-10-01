@@ -2272,4 +2272,7 @@
   <data name="OptionsSectionOnline.Text" xml:space="preserve">
     <value>Online services and privacy</value>
   </data>
+  <data name="OptionsCrossfadeDurationSlider.Header" xml:space="preserve">
+    <value>Crossfade duration (s)</value>
+  </data>
 </root>

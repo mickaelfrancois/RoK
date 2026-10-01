@@ -52,10 +52,9 @@ public class NAudioMediaPlayer : IPlayerEngine, IDisposable
     private StreamingPlayback? _streaming;
     private bool _isLive;
 
-    private readonly int _crossfadeDelay = 5;
-    private readonly int _aboutToEndDelay = 15;
-
-    public int CrossfadeDelay => _crossfadeDelay;
+    private const int FadePollIntervalMs = 50;
+    private static readonly TimeSpan FadeCompletionGrace = TimeSpan.FromSeconds(1);
+    private readonly int _aboutToEndDelay = 20;
 
     private double _length;
     private bool _aboutToEndRaised;
@@ -247,8 +246,18 @@ public class NAudioMediaPlayer : IPlayerEngine, IDisposable
 
         _volume = ToLinearVolume(volume);
 
+        PlaybackPipeline? incoming;
+
+        lock (_stateLock)
+        {
+            incoming = _crossfadeIncoming;
+        }
+
         if (_pipeline is not null)
             _pipeline.Volume.Volume = _volume;
+
+        if (incoming is not null)
+            incoming.Volume.Volume = _volume;
 
         NotifyIfNeutralityChanged();
     }
@@ -612,7 +621,11 @@ public class NAudioMediaPlayer : IPlayerEngine, IDisposable
     }
 
     /// <inheritdoc />
-    public async Task CrossfadeToAsync(TrackDto nextTrack, float replayGain, double durationSeconds, double masterVolume, CancellationToken ct)
+    /// <remarks>
+    /// Both tracks play on their own shared output; each pipeline ramps its own samples (<see cref="FadeSampleProvider"/>),
+    /// so the fade is sample-accurate and the master volume can still change while it runs.
+    /// </remarks>
+    public async Task CrossfadeToAsync(TrackDto nextTrack, float replayGain, double durationSeconds, CancellationToken ct)
     {
         if (_isLive) return;
 
@@ -623,7 +636,7 @@ public class NAudioMediaPlayer : IPlayerEngine, IDisposable
 
         try
         {
-            nextPipeline = PlaybackPipeline.Create(new AudioFileReader(nextTrack.MusicFile), replayGain, nextTrack.Id, _bandGains, 0f);
+            nextPipeline = PlaybackPipeline.Create(new AudioFileReader(nextTrack.MusicFile), replayGain, nextTrack.Id, _bandGains, _volume);
         }
         catch (Exception ex)
         {
@@ -631,9 +644,20 @@ public class NAudioMediaPlayer : IPlayerEngine, IDisposable
             return;
         }
 
+        double nextLength = nextPipeline.Reader.TotalTime.TotalSeconds;
+
+        if (nextLength > 0)
+            durationSeconds = Math.Min(durationSeconds, nextLength / 2);
+
+        TimeSpan duration = TimeSpan.FromSeconds(durationSeconds);
+        nextPipeline.Fade.Start(EFadeDirection.In, duration);
+
+        PlaybackPipeline? outgoing;
+
         lock (_stateLock)
         {
             _crossfadeIncoming = nextPipeline;
+            outgoing = _pipeline;
         }
 
         AudioOutputHandle? nextOutput = null;
@@ -642,43 +666,50 @@ public class NAudioMediaPlayer : IPlayerEngine, IDisposable
         {
             nextOutput = _outputFactory.Open(_target with { Mode = EAudioOutputMode.Shared }, nextPipeline.Output, 0);
             nextOutput.Player.Play();
+            outgoing?.Fade.Start(EFadeDirection.Out, RemainingRamp(outgoing, duration));
 
-            const int intervalMs = 50;
-            var sw = Stopwatch.StartNew();
+            await WaitForFadeAsync(nextPipeline.Fade, duration, ct);
 
-            while (true)
-            {
-                ct.ThrowIfCancellationRequested();
-
-                double progress = Math.Clamp(sw.Elapsed.TotalSeconds / durationSeconds, 0.0, 1.0);
-
-                double fadeOutVolume = Math.Max(0, DbInterpolate(progress, masterVolume));
-                SetVolume(fadeOutVolume);
-
-                double fadeInVolume = Math.Max(0, DbInterpolate(1.0 - progress, masterVolume));
-                nextPipeline.Volume.Volume = ToLinearVolume(fadeInVolume);
-
-                if (progress >= 1.0)
-                    break;
-
-                await Task.Delay(intervalMs, ct);
-            }
-
-            PromoteCrossfade(nextPipeline, nextOutput, nextTrack.MusicFile, masterVolume);
+            PromoteCrossfade(nextPipeline, nextOutput, nextTrack.MusicFile);
 
             OnMediaChanged?.Invoke(this, EventArgs.Empty);
         }
         catch (OperationCanceledException)
         {
+            outgoing?.Fade.Reset();
             AbandonCrossfade(nextPipeline, nextOutput);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Crossfade: unexpected error");
+            outgoing?.Fade.Reset();
             AbandonCrossfade(nextPipeline, nextOutput);
         }
 
         ApplyPendingOutputChange();
+    }
+
+    /// <summary>
+    /// Outgoing ramp shortened to what is left of the outgoing track, so that it reaches silence before the file ends
+    /// even when the incoming output took time to open.
+    /// </summary>
+    private static TimeSpan RemainingRamp(PlaybackPipeline outgoing, TimeSpan duration)
+    {
+        TimeSpan remaining = outgoing.Reader.TotalTime - outgoing.Reader.CurrentTime;
+
+        return remaining > TimeSpan.Zero && remaining < duration ? remaining : duration;
+    }
+
+    /// <summary>Waits until the incoming ramp has been rendered, or its duration plus a grace period when output stalls.</summary>
+    private static async Task WaitForFadeAsync(FadeSampleProvider fade, TimeSpan duration, CancellationToken ct)
+    {
+        Stopwatch elapsed = Stopwatch.StartNew();
+        TimeSpan deadline = duration + FadeCompletionGrace;
+
+        while (!fade.IsComplete && elapsed.Elapsed < deadline)
+            await Task.Delay(FadePollIntervalMs, ct);
+
+        ct.ThrowIfCancellationRequested();
     }
 
     private void AbandonCrossfade(PlaybackPipeline nextPipeline, AudioOutputHandle? nextOutput)
@@ -693,15 +724,14 @@ public class NAudioMediaPlayer : IPlayerEngine, IDisposable
         nextPipeline.Dispose();
     }
 
-    private void PromoteCrossfade(PlaybackPipeline nextPipeline, AudioOutputHandle nextOutput, string nextFile, double masterVolume)
+    private void PromoteCrossfade(PlaybackPipeline nextPipeline, AudioOutputHandle nextOutput, string nextFile)
     {
         _positionTimer.Stop();
 
         AudioOutputHandle? previousOutput;
         PlaybackPipeline? previousPipeline;
 
-        _volume = ToLinearVolume(masterVolume);
-        nextPipeline.Volume.Volume = _volume;
+        nextPipeline.Fade.Reset();
         nextPipeline.Chain.SourceSwitched += Chain_SourceSwitched;
         nextOutput.Player.PlaybackStopped += Output_PlaybackStopped;
 
@@ -751,14 +781,6 @@ public class NAudioMediaPlayer : IPlayerEngine, IDisposable
     }
 
     private static float ToLinearVolume(double volumePercent) => (float)Math.Clamp(volumePercent / 100.0, 0.0, 1.0);
-
-    private static double DbInterpolate(double t, double masterVolumePercent, double minDb = -80.0)
-    {
-        double curDb = 0.0 * (1.0 - t) + minDb * t;
-        double gain = Math.Pow(10.0, curDb / 20.0);
-        double v = gain * masterVolumePercent;
-        return double.IsNaN(v) || double.IsInfinity(v) ? 0.0 : Math.Clamp(v, 0.0, 100.0);
-    }
 
     private void ReleasePipeline(PlaybackPipeline? pipeline)
     {
@@ -937,9 +959,7 @@ public class NAudioMediaPlayer : IPlayerEngine, IDisposable
         if (len <= 0)
             return;
 
-        bool isAboutToEnd = pos >= len - _aboutToEndDelay &&
-                    (pos < len - _crossfadeDelay || len <= _aboutToEndDelay) &&
-                    !_aboutToEndRaised;
+        bool isAboutToEnd = pos >= len - _aboutToEndDelay && !_aboutToEndRaised;
 
         if (isAboutToEnd)
         {

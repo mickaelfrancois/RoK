@@ -2162,4 +2162,7 @@
   <data name="OptionsSectionOnline.Text" xml:space="preserve">
     <value>Онлайн-сервіси та конфіденційність</value>
   </data>
+  <data name="OptionsCrossfadeDurationSlider.Header" xml:space="preserve">
+    <value>Тривалість переходу (с)</value>
+  </data>
 </root>

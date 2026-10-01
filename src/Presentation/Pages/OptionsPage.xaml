@@ -58,6 +58,18 @@
                                                Style="{ThemeResource CaptionTextBlockStyle}"
                                                Foreground="{ThemeResource TextFillColorSecondaryBrush}"
                                                TextWrapping="WrapWholeWords" />
+                                    <Slider x:Uid="OptionsCrossfadeDurationSlider"
+                                            Width="220"
+                                            Margin="0,8,0,0"
+                                            HorizontalAlignment="Left"
+                                            Minimum="{x:Bind CrossfadeDurationMin}"
+                                            Maximum="{x:Bind CrossfadeDurationMax}"
+                                            StepFrequency="1"
+                                            SnapsTo="StepValues"
+                                            TickFrequency="1"
+                                            TickPlacement="Outside"
+                                            IsEnabled="{x:Bind OptionsCrossFadeSwitch.IsOn, Mode=OneWay}"
+                                            Value="{x:Bind CrossfadeDurationSeconds, Mode=TwoWay}" />
                                 </StackPanel>
                                 <StackPanel Spacing="8">
                                     <TextBlock x:Uid="OptionsReplayGainModeLabel" />
