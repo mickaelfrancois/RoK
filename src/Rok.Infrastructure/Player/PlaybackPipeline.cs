@@ -4,20 +4,21 @@ using NAudio.Wave.SampleProviders;
 namespace Rok.Infrastructure.Player;
 
 /// <summary>
-/// Rendering chain shared by consecutive tracks: per-track ReplayGain, gapless chain, equalizer, volume then crossfade ramp.
+/// Rendering chain shared by consecutive tracks: per-track ReplayGain, gapless chain, equalizer, bass swap, volume then crossfade ramp.
 /// <see cref="Output"/> plugs into any <see cref="IWavePlayer"/>.
 /// </summary>
 internal sealed class PlaybackPipeline : IDisposable
 {
     internal static readonly float[] BandFrequencies = [32f, 64f, 125f, 250f, 500f, 1000f, 2000f, 4000f, 8000f, 16000f];
 
-    private PlaybackPipeline(AudioFileReader reader, ReplayGainSampleProvider source, long trackId, GaplessChainSampleProvider chain, Equalizer equalizer, VolumeSampleProvider volume, FadeSampleProvider fade)
+    private PlaybackPipeline(AudioFileReader reader, ReplayGainSampleProvider source, long trackId, GaplessChainSampleProvider chain, Equalizer equalizer, BassSwapSampleProvider bassSwap, VolumeSampleProvider volume, FadeSampleProvider fade)
     {
         Reader = reader;
         Source = source;
         TrackId = trackId;
         Chain = chain;
         Equalizer = equalizer;
+        BassSwap = bassSwap;
         Volume = volume;
         Fade = fade;
     }
@@ -35,6 +36,9 @@ internal sealed class PlaybackPipeline : IDisposable
 
     public Equalizer Equalizer { get; }
 
+    /// <summary>Low-shelf cut of the Mix bass swap, a pass-through outside a bass swap.</summary>
+    public BassSwapSampleProvider BassSwap { get; }
+
     public VolumeSampleProvider Volume { get; }
 
     /// <summary>Crossfade ramp, a pass-through outside a crossfade.</summary>
@@ -48,9 +52,10 @@ internal sealed class PlaybackPipeline : IDisposable
         ReplayGainSampleProvider source = new(reader, replayGain);
         GaplessChainSampleProvider chain = new(source);
         Equalizer equalizer = new(chain, CreateBands(reader.WaveFormat.Channels, bandGains));
-        VolumeSampleProvider volumeProvider = new(equalizer) { Volume = volume };
+        BassSwapSampleProvider bassSwap = new(equalizer);
+        VolumeSampleProvider volumeProvider = new(bassSwap) { Volume = volume };
 
-        return new PlaybackPipeline(reader, source, trackId, chain, equalizer, volumeProvider, new FadeSampleProvider(volumeProvider));
+        return new PlaybackPipeline(reader, source, trackId, chain, equalizer, bassSwap, volumeProvider, new FadeSampleProvider(volumeProvider));
     }
 
     /// <summary>Creates one band per <see cref="BandFrequencies"/> entry, set to the matching gain of <paramref name="bandGains"/>.</summary>

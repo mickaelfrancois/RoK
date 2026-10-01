@@ -30,7 +30,7 @@ public class PlayerServiceMixTests
         _engine.Setup(o => o.SetTrack(It.IsAny<TrackDto>(), It.IsAny<float>())).Returns(true);
         _engine.Setup(o => o.QueueNextTrack(It.IsAny<TrackDto>(), It.IsAny<float>())).Returns(true);
         _engine.Setup(o => o.CrossfadeToAsync(It.IsAny<TrackDto>(), It.IsAny<float>(), It.IsAny<double>(), It.IsAny<CancellationToken>())).Returns(Task.CompletedTask);
-        _engine.Setup(o => o.CrossfadeToAsync(It.IsAny<TrackDto>(), It.IsAny<float>(), It.IsAny<double>(), It.IsAny<double>(), It.IsAny<CancellationToken>())).Returns(Task.CompletedTask);
+        _engine.Setup(o => o.CrossfadeToAsync(It.IsAny<TrackDto>(), It.IsAny<float>(), It.IsAny<double>(), It.IsAny<MixTransition>(), It.IsAny<CancellationToken>())).Returns(Task.CompletedTask);
         _engine.SetupGet(o => o.Position).Returns(150);
         _engine.SetupGet(o => o.Length).Returns(TrackLength);
         _appOptions.SetupGet(o => o.CrossFade).Returns(true);
@@ -61,7 +61,7 @@ public class PlayerServiceMixTests
 
     private void RaiseMediaAboutToEnd() => _engine.Raise(m => m.OnMediaAboutToEnd += null, _engine.Object, EventArgs.Empty);
 
-    private void VerifyMixCrossfade(Times times) => _engine.Verify(o => o.CrossfadeToAsync(It.IsAny<TrackDto>(), It.IsAny<float>(), It.IsAny<double>(), It.IsAny<double>(), It.IsAny<CancellationToken>()), times);
+    private void VerifyMixCrossfade(Times times) => _engine.Verify(o => o.CrossfadeToAsync(It.IsAny<TrackDto>(), It.IsAny<float>(), It.IsAny<double>(), It.IsAny<MixTransition>(), It.IsAny<CancellationToken>()), times);
 
     private void VerifyClassicCrossfade(Times times) => _engine.Verify(o => o.CrossfadeToAsync(It.IsAny<TrackDto>(), It.IsAny<float>(), It.IsAny<double>(), It.IsAny<CancellationToken>()), times);
 
@@ -138,7 +138,7 @@ public class PlayerServiceMixTests
         RaiseCue();
 
         // Assert
-        _engine.Verify(o => o.CrossfadeToAsync(It.Is<TrackDto>(t => t.Id == 2), It.IsAny<float>(), SliderSeconds, IncomingStart, It.IsAny<CancellationToken>()), Times.Once);
+        _engine.Verify(o => o.CrossfadeToAsync(It.Is<TrackDto>(t => t.Id == 2), It.IsAny<float>(), SliderSeconds, It.Is<MixTransition>(x => x.IncomingStartSeconds == IncomingStart && x.BassSwap), It.IsAny<CancellationToken>()), Times.Once);
         VerifyClassicCrossfade(Times.Never());
         Assert.Equal(2, sut.CurrentTrack?.Id);
     }
@@ -162,7 +162,7 @@ public class PlayerServiceMixTests
     {
         // Arrange
         TaskCompletionSource running = new();
-        _engine.Setup(o => o.CrossfadeToAsync(It.IsAny<TrackDto>(), It.IsAny<float>(), It.IsAny<double>(), It.IsAny<double>(), It.IsAny<CancellationToken>())).Returns(running.Task);
+        _engine.Setup(o => o.CrossfadeToAsync(It.IsAny<TrackDto>(), It.IsAny<float>(), It.IsAny<double>(), It.IsAny<MixTransition>(), It.IsAny<CancellationToken>())).Returns(running.Task);
         _engine.SetupGet(o => o.Position).Returns(MusicEnd - SliderSeconds);
         BuildLoadedService(BuildTrack(1), BuildTrack(2));
         RaiseCue();
@@ -315,8 +315,8 @@ public class PlayerServiceMixTests
         // Arrange
         CancellationToken captured = default;
         TaskCompletionSource running = new();
-        _engine.Setup(o => o.CrossfadeToAsync(It.IsAny<TrackDto>(), It.IsAny<float>(), It.IsAny<double>(), It.IsAny<double>(), It.IsAny<CancellationToken>()))
-            .Callback<TrackDto, float, double, double, CancellationToken>((_, _, _, _, token) => captured = token)
+        _engine.Setup(o => o.CrossfadeToAsync(It.IsAny<TrackDto>(), It.IsAny<float>(), It.IsAny<double>(), It.IsAny<MixTransition>(), It.IsAny<CancellationToken>()))
+            .Callback<TrackDto, float, double, MixTransition, CancellationToken>((_, _, _, _, token) => captured = token)
             .Returns(running.Task);
         _engine.SetupGet(o => o.Position).Returns(MusicEnd - SliderSeconds);
         PlayerService sut = BuildLoadedService(BuildTrack(1), BuildTrack(2));
