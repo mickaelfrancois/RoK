@@ -27,8 +27,7 @@ public class AlbumProvider(AlbumsDataLoader dataLoader, AlbumsFilter filterServi
         foreach (string filter in filters)
             filtered = filterService.Filter(filter, filtered);
 
-        foreach (long genreId in genreFilters)
-            filtered = filterService.FilterByGenreId(genreId, filtered);
+        filtered = filterService.FilterByGenreIds(genreFilters, filtered);
 
         if (tagFilters.Count > 0)
             filtered = filterService.FilterByTags(tagFilters, filtered);

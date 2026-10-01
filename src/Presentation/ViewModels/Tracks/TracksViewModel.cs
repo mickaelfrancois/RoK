@@ -94,6 +94,9 @@ public partial class TracksViewModel : ObservableObject, IDisposable
 
         await _trackProvider.LoadAsync();
 
+        _stateManager.PruneGenreFilters(Genres.Select(g => g.Id));
+        SetFilterLabel();
+
         using (new PerfLogger(_logger).Parameters("Tracks: FilterAndSort"))
         {
             FilterAndSort();
@@ -116,7 +119,7 @@ public partial class TracksViewModel : ObservableObject, IDisposable
         else if (_stateManager.SelectedGenreFilters.Count > 0)
         {
             long lastGenreId = _stateManager.SelectedGenreFilters[^1];
-            FilterByText = Genres.FirstOrDefault(c => c.Id == lastGenreId)?.Name ?? "";
+            FilterByText = Genres.FirstOrDefault(c => c.Id == lastGenreId)?.Name ?? _trackProvider.GetFilterLabel("");
         }
         else
         {

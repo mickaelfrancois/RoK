@@ -25,8 +25,7 @@ public class TrackProvider(TracksDataLoader dataLoader, TracksFilter filterServi
         foreach (string filter in filters)
             filtered = filterService.Filter(filter, filtered);
 
-        foreach (long genreId in genreFilters)
-            filtered = filterService.FilterByGenreId(genreId, filtered);
+        filtered = filterService.FilterByGenreIds(genreFilters, filtered);
 
         List<TrackViewModel> filteredList = filtered.Cast<TrackViewModel>().ToList();
         List<TracksGroupCategoryViewModel> groups = groupService

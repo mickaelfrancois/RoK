@@ -14,8 +14,8 @@ public class FilterServiceTests
         _filterService = new TestFilterService(mockResourceLoader.Object);
     }
 
-    [Fact]
-    public void FilterByGenreId_ShouldFilterCorrectly()
+    [Fact(DisplayName = "filter_by_genre_ids_keeps_single_genre_behaviour")]
+    public void FilterByGenreIds_SingleGenre()
     {
         // Arrange
         List<TestAlbum> albums = new()
@@ -26,11 +26,83 @@ public class FilterServiceTests
         };
 
         // Act
-        IEnumerable<TestAlbum> result = _filterService.FilterByGenreId(1, albums);
+        IEnumerable<TestAlbum> result = _filterService.FilterByGenreIds([1], albums);
 
         // Assert
         Assert.Equal(2, result.Count());
         Assert.All(result, album => Assert.Equal(1, album.GenreId));
+    }
+
+    [Fact(DisplayName = "filter_by_genre_ids_returns_items_of_any_selected_genre")]
+    public void FilterByGenreIds_AnySelectedGenre()
+    {
+        // Arrange
+        List<TestAlbum> albums = new()
+        {
+            new() { GenreId = 1 },
+            new() { GenreId = 2 },
+            new() { GenreId = 3 }
+        };
+
+        // Act
+        List<TestAlbum> result = _filterService.FilterByGenreIds([1, 2], albums).ToList();
+
+        // Assert
+        Assert.Equal([1L, 2L], result.Select(album => album.GenreId!.Value));
+    }
+
+    [Fact(DisplayName = "filter_by_genre_ids_returns_all_items_when_list_is_empty")]
+    public void FilterByGenreIds_EmptyList()
+    {
+        // Arrange
+        List<TestAlbum> albums = new()
+        {
+            new() { GenreId = 1 },
+            new() { GenreId = null }
+        };
+
+        // Act
+        IEnumerable<TestAlbum> result = _filterService.FilterByGenreIds([], albums);
+
+        // Assert
+        Assert.Equal(2, result.Count());
+    }
+
+    [Theory(DisplayName = "filter_by_genre_ids_ignores_zero_ids")]
+    [InlineData(new long[] { 0 }, 3)]
+    [InlineData(new long[] { 0, 1 }, 1)]
+    public void FilterByGenreIds_IgnoresZero(long[] genreIds, int expectedCount)
+    {
+        // Arrange
+        List<TestAlbum> albums = new()
+        {
+            new() { GenreId = 1 },
+            new() { GenreId = 2 },
+            new() { GenreId = null }
+        };
+
+        // Act
+        IEnumerable<TestAlbum> result = _filterService.FilterByGenreIds(genreIds, albums);
+
+        // Assert
+        Assert.Equal(expectedCount, result.Count());
+    }
+
+    [Fact(DisplayName = "filter_by_genre_ids_excludes_items_without_genre")]
+    public void FilterByGenreIds_ExcludesItemsWithoutGenre()
+    {
+        // Arrange
+        List<TestAlbum> albums = new()
+        {
+            new() { GenreId = 1 },
+            new() { GenreId = null }
+        };
+
+        // Act
+        IEnumerable<TestAlbum> result = _filterService.FilterByGenreIds([1], albums);
+
+        // Assert
+        Assert.Single(result);
     }
 
     [Fact]

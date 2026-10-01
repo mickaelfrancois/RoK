@@ -72,4 +72,32 @@ public class TracksStateManagerTests
         Assert.Equal(new long[] { 7 }, options.Object.TracksFilterByGenresId.ToArray());
         Assert.Equal(new[] { "tag" }, options.Object.TracksFilterByTags.ToArray());
     }
+
+    private static (Mock<IAppOptions> Options, TracksStateManager Sut) CreateTracks(List<long> genres, List<string> tags)
+    {
+        Mock<IAppOptions> options = new();
+        options.SetupProperty(o => o.TracksGroupBy, string.Empty);
+        options.SetupProperty(o => o.TracksFilterBy, new List<string>());
+        options.SetupProperty(o => o.TracksFilterByGenresId, genres);
+        options.SetupProperty(o => o.TracksFilterByTags, tags);
+        TracksStateManager sut = new(options.Object);
+        sut.Load();
+
+        return (options, sut);
+    }
+
+    [Fact(DisplayName = "prune_genre_filters_removes_unknown_genre_ids")]
+    public void PruneGenreFilters_RemovesUnknownIds()
+    {
+        // Arrange
+        (Mock<IAppOptions> options, TracksStateManager sut) = CreateTracks([1, 99], []);
+
+        // Act
+        bool removed = sut.PruneGenreFilters([1, 2]);
+
+        // Assert
+        Assert.True(removed);
+        Assert.Equal(new long[] { 1 }, sut.SelectedGenreFilters.ToArray());
+        Assert.Equal(new long[] { 1 }, options.Object.TracksFilterByGenresId.ToArray());
+    }
 }

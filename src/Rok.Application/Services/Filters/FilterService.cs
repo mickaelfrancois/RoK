@@ -22,12 +22,18 @@ public abstract class FilterService<T>(IResourceService resourceLoader) where T 
         return items;
     }
 
-    public IEnumerable<T> FilterByGenreId(long genreId, IEnumerable<T> items)
+    /// <summary>
+    /// Keeps the items whose genre is any of <paramref name="genreIds"/>. Ids equal to zero are ignored; when no
+    /// selected id remains, every item is returned.
+    /// </summary>
+    public IEnumerable<T> FilterByGenreIds(IReadOnlyCollection<long> genreIds, IEnumerable<T> items)
     {
-        if (genreId == 0)
+        HashSet<long> selected = [.. genreIds.Where(id => id != 0)];
+
+        if (selected.Count == 0)
             return items;
 
-        return items.Where(item => item.GenreId == genreId);
+        return items.Where(item => item.GenreId.HasValue && selected.Contains(item.GenreId.Value));
     }
 
     public IEnumerable<T> FilterByTags(List<string> tags, IEnumerable<T> items)

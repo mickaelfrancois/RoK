@@ -72,4 +72,47 @@ public class ArtistsStateManagerTests
         Assert.Equal(new long[] { 7 }, options.Object.ArtistsFilterByGenresId.ToArray());
         Assert.Equal(new[] { "tag" }, options.Object.ArtistsFilterByTags.ToArray());
     }
+
+    private static (Mock<IAppOptions> Options, ArtistsStateManager Sut) CreateArtists(List<long> genres, List<string> tags)
+    {
+        Mock<IAppOptions> options = new();
+        options.SetupProperty(o => o.ArtistsGroupBy, string.Empty);
+        options.SetupProperty(o => o.ArtistsFilterBy, new List<string>());
+        options.SetupProperty(o => o.ArtistsFilterByGenresId, genres);
+        options.SetupProperty(o => o.ArtistsFilterByTags, tags);
+        ArtistsStateManager sut = new(options.Object);
+        sut.Load();
+
+        return (options, sut);
+    }
+
+    [Fact(DisplayName = "prune_genre_filters_removes_unknown_genre_ids")]
+    public void PruneGenreFilters_RemovesUnknownIds()
+    {
+        // Arrange
+        (Mock<IAppOptions> options, ArtistsStateManager sut) = CreateArtists([1, 99], []);
+
+        // Act
+        bool removed = sut.PruneGenreFilters([1, 2]);
+
+        // Assert
+        Assert.True(removed);
+        Assert.Equal(new long[] { 1 }, sut.SelectedGenreFilters.ToArray());
+        Assert.Equal(new long[] { 1 }, options.Object.ArtistsFilterByGenresId.ToArray());
+    }
+
+    [Fact(DisplayName = "prune_tag_filters_removes_unknown_tags")]
+    public void PruneTagFilters_RemovesUnknownTags()
+    {
+        // Arrange
+        (Mock<IAppOptions> options, ArtistsStateManager sut) = CreateArtists([], ["rock", "gone"]);
+
+        // Act
+        bool removed = sut.PruneTagFilters(["rock"]);
+
+        // Assert
+        Assert.True(removed);
+        Assert.Equal(new[] { "rock" }, sut.SelectedTagFilters.ToArray());
+        Assert.Equal(new[] { "rock" }, options.Object.ArtistsFilterByTags.ToArray());
+    }
 }
