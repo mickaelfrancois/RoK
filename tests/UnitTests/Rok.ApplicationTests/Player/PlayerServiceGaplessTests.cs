@@ -3,6 +3,7 @@ using Moq;
 using Rok.Application.Interfaces.Pictures;
 using Rok.Application.Messages;
 using Rok.Application.Player;
+using Rok.Application.Player.Mix;
 using Rok.Application.Player.Output;
 
 namespace Rok.ApplicationTests.Player;
@@ -31,7 +32,7 @@ public class PlayerServiceGaplessTests
     {
         _appOptions.SetupGet(o => o.CrossFade).Returns(crossfade);
 
-        return new(_callDetection.Object, _engine.Object, _appOptions.Object, _discord.Object, _smtc.Object, _albumPicture.Object, TimeProvider.System, _messenger, NullLogger<PlayerService>.Instance);
+        return new(_callDetection.Object, _engine.Object, _appOptions.Object, _discord.Object, _smtc.Object, _albumPicture.Object, TimeProvider.System, _messenger, Mock.Of<IMixCueProvider>(), NullLogger<PlayerService>.Instance);
     }
 
     private static TrackDto BuildTrack(long id, long? albumId = null, int? trackNumber = null) => new() { Id = id, Title = $"t{id}", ArtistName = "artist", AlbumName = "album", AlbumId = albumId, TrackNumber = trackNumber };

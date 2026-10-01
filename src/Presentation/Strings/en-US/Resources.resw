@@ -1021,6 +1021,12 @@
   <data name="OptionsCrossFadeDescription.Text" xml:space="preserve">
     <value>Albums played in order always flow without gaps.</value>
   </data>
+  <data name="OptionsMixModeSwitch.Header" xml:space="preserve">
+    <value>Mix mode</value>
+  </data>
+  <data name="OptionsMixModeDescription.Text" xml:space="preserve">
+    <value>Fits the fade to the real end of the track and the start of the next one. The chosen duration becomes a maximum.</value>
+  </data>
   <data name="OptionsReplayGainModeLabel.Text" xml:space="preserve">
     <value>Volume normalization (ReplayGain)</value>
   </data>

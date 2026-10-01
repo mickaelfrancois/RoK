@@ -4,6 +4,7 @@ using Rok.Application.Dto;
 using Rok.Application.Interfaces;
 using Rok.Application.Interfaces.Pictures;
 using Rok.Application.Player;
+using Rok.Application.Player.Mix;
 
 namespace Rok.ApplicationTests.Player;
 
@@ -27,6 +28,7 @@ public class PlayerServiceRadioModeTests
             albumPicture: albumPicture.Object,
             timeProvider: TimeProvider.System,
             messenger: new Messenger(),
+            mixCues: Mock.Of<IMixCueProvider>(),
             logger: NullLogger<PlayerService>.Instance);
 
         return (service, engine);

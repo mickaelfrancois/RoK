@@ -38,6 +38,8 @@ public class AppOptions : IAppOptions
 
     public int CrossfadeDurationSeconds { get; set; } = CrossfadeDuration.DefaultSeconds;
 
+    public bool MixMode { get; set; }
+
     public EReplayGainMode ReplayGainMode { get; set; } = EReplayGainMode.Auto;
 
     public double ReplayGainPreampDb { get; set; } = 0;
@@ -143,6 +145,7 @@ public class AppOptions : IAppOptions
         PauseOnCall = options.PauseOnCall;
         CrossFade = options.CrossFade;
         CrossfadeDurationSeconds = options.CrossfadeDurationSeconds;
+        MixMode = options.MixMode;
         IsGridView = options.IsGridView;
         ReplayGainMode = options.ReplayGainMode;
         ReplayGainPreampDb = options.ReplayGainPreampDb;

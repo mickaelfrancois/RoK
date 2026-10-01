@@ -3,6 +3,7 @@ using Microsoft.Extensions.Logging;
 using Rok.Application.Interfaces;
 using Rok.Application.Interfaces.Pictures;
 using Rok.Application.Messages;
+using Rok.Application.Player.Mix;
 using Rok.Application.Randomizer;
 using Rok.Services.Player;
 
@@ -76,7 +77,30 @@ public sealed class PlayerService : IPlayerService, IDisposable
 
     private TrackDto? _invalidatedGapless;
 
-    public bool IsLoopingEnabled { get; set; }
+    private bool _isLoopingEnabled;
+
+    private MixPlan? _mixPlan;
+
+    private CancellationTokenSource? _mixCts;
+
+    private long _mixGeneration;
+
+    private long _crossfadeGeneration;
+
+    public bool IsLoopingEnabled
+    {
+        get => _isLoopingEnabled;
+        set
+        {
+            if (_isLoopingEnabled == value)
+                return;
+
+            _isLoopingEnabled = value;
+
+            if (CurrentTrack != null)
+                RequestMixPreparation();
+        }
+    }
 
     public double Position
     {
@@ -181,9 +205,11 @@ public sealed class PlayerService : IPlayerService, IDisposable
 
     private readonly IMessenger _messenger;
 
+    private readonly IMixCueProvider _mixCues;
+
     private readonly IDisposable _replayGainSubscription;
 
-    public PlayerService(ICallDetectionService callDetectionService, IPlayerEngine player, IAppOptions appOptions, IDiscordRichPresenceService? discordService, ISystemMediaTransportControlsService? smtcService, IAlbumPicture albumPicture, TimeProvider timeProvider, IMessenger messenger, ILogger<PlayerService> logger)
+    public PlayerService(ICallDetectionService callDetectionService, IPlayerEngine player, IAppOptions appOptions, IDiscordRichPresenceService? discordService, ISystemMediaTransportControlsService? smtcService, IAlbumPicture albumPicture, TimeProvider timeProvider, IMessenger messenger, IMixCueProvider mixCues, ILogger<PlayerService> logger)
     {
         _callDetectionService = Guard.NotNull(callDetectionService, nameof(callDetectionService));
         _player = Guard.NotNull(player, nameof(player));
@@ -193,6 +219,7 @@ public sealed class PlayerService : IPlayerService, IDisposable
         _albumPicture = Guard.NotNull(albumPicture, nameof(albumPicture));
         _timeProvider = Guard.NotNull(timeProvider, nameof(timeProvider));
         _messenger = Guard.NotNull(messenger, nameof(messenger));
+        _mixCues = Guard.NotNull(mixCues, nameof(mixCues));
         _logger = Guard.NotNull(logger, nameof(logger));
 
 
@@ -216,6 +243,7 @@ public sealed class PlayerService : IPlayerService, IDisposable
         _player.OnMediaEnded += OnMediaEnded;
         _player.OnMediaStateChanged += OnMediaStateChanged;
         _player.OnGaplessTransition += OnGaplessTransition;
+        _player.OnTransitionCue += OnTransitionCue;
         _player.OnMetadataChanged += (_, title) =>
         {
             _currentStreamTitle = title;
@@ -331,8 +359,185 @@ public sealed class PlayerService : IPlayerService, IDisposable
             return;
         }
 
-        _isCrossfadeRunning = true;
-        _ = CrossfadeToNextTrackAsync();
+        if (_isCrossfadeRunning)
+            return;
+
+        if (IsMixActive())
+        {
+            MixPlan? plan;
+
+            lock (_transitionLock)
+            {
+                plan = _mixPlan;
+            }
+
+            if (plan != null && plan.OutgoingTrackId == CurrentTrack.Id && plan.IncomingTrackId == nextTrack.Id && plan.StartSeconds > _player.Position)
+                return;
+
+            _logger.LogInformation("Mix: no usable plan for {Track}, classic crossfade", CurrentTrack.Title);
+        }
+
+        if (!TryBeginCrossfade())
+            return;
+
+        _ = CrossfadeToNextTrackAsync(null);
+    }
+
+    private bool TryBeginCrossfade()
+    {
+        lock (_transitionLock)
+        {
+            if (_isCrossfadeRunning)
+                return false;
+
+            _isCrossfadeRunning = true;
+
+            return true;
+        }
+    }
+
+    private bool IsMixActive() => _appOptions.MixMode && PlaybackTransitionPolicy.IsCrossfadeAllowed(_appOptions.CrossFade, _appOptions.OutputMode);
+
+    private void OnTransitionCue(object? sender, EventArgs e)
+    {
+        try
+        {
+            TrackDto? current = CurrentTrack;
+
+            if (current == null || _mode != EPlaybackMode.Music || !IsMixActive() || _isMuted)
+                return;
+
+            TrackDto? next = PeekNext();
+
+            if (next == null || PlaybackTransitionPolicy.Decide(true, _isMuted, current, next) != EPlaybackTransition.Crossfade)
+                return;
+
+            MixPlan? plan;
+
+            lock (_transitionLock)
+            {
+                plan = _mixPlan;
+            }
+
+            if (plan == null || plan.OutgoingTrackId != current.Id || plan.IncomingTrackId != next.Id)
+            {
+                _logger.LogDebug("Ignoring stale transition cue for {Track}", current.Title);
+                return;
+            }
+
+            if (!TryBeginCrossfade())
+                return;
+
+            _ = CrossfadeToNextTrackAsync(plan);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error while handling the transition cue.");
+        }
+    }
+
+    private void CancelMixPreparation(out bool hadState)
+    {
+        CancellationTokenSource? cts;
+
+        lock (_transitionLock)
+        {
+            cts = _mixCts;
+            hadState = cts != null || _mixPlan != null;
+            _mixCts = null;
+            _mixPlan = null;
+            _mixGeneration++;
+        }
+
+        if (cts == null)
+            return;
+
+        try
+        {
+            cts.Cancel();
+        }
+        catch (ObjectDisposedException)
+        {
+            // Already disposed.
+        }
+
+        cts.Dispose();
+    }
+
+    private void RequestMixPreparation()
+    {
+        CancelMixPreparation(out bool hadState);
+
+        if (!IsMixActive())
+        {
+            if (hadState)
+                _player.ClearTransitionCue();
+
+            return;
+        }
+
+        _player.ClearTransitionCue();
+
+        TrackDto? current = CurrentTrack;
+
+        if (current == null || _mode != EPlaybackMode.Music)
+            return;
+
+        TrackDto? next = PeekNext();
+
+        if (next == null || PlaybackTransitionPolicy.Decide(true, _isMuted, current, next) != EPlaybackTransition.Crossfade)
+            return;
+
+        CancellationTokenSource cts = new();
+        long generation;
+
+        lock (_transitionLock)
+        {
+            _mixCts = cts;
+            generation = _mixGeneration;
+        }
+
+        _ = ArmMixAsync(current, next, generation, cts.Token);
+    }
+
+    private async Task ArmMixAsync(TrackDto current, TrackDto next, long generation, CancellationToken ct)
+    {
+        try
+        {
+            OutroCues? outro = await _mixCues.GetOutroAsync(current, ct).ConfigureAwait(false);
+            IntroCues? intro = await _mixCues.GetIntroAsync(next, ct).ConfigureAwait(false);
+
+            if (ct.IsCancellationRequested)
+                return;
+
+            double trackLength = _player.Length > 0 ? _player.Length : current.Duration;
+            MixPlan? plan = outro == null || intro == null
+                ? null
+                : MixTransitionPlanner.Plan(current, outro, next, intro, trackLength, _appOptions.CrossfadeDurationSeconds);
+
+            if (plan == null)
+            {
+                _logger.LogInformation("Mix: no cues for {Track}, classic crossfade", current.Title);
+                return;
+            }
+
+            lock (_transitionLock)
+            {
+                if (ct.IsCancellationRequested || generation != _mixGeneration || CurrentTrack?.Id != current.Id || PeekNext()?.Id != next.Id)
+                    return;
+
+                _mixPlan = plan;
+                _player.SetTransitionCue(current.Id, plan.StartSeconds);
+            }
+        }
+        catch (OperationCanceledException)
+        {
+            // Preparation cancelled.
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "Mix: preparation failed for {Track}, classic crossfade", current.Title);
+        }
     }
 
     private void QueueGaplessTransition(int nextIndex, TrackDto nextTrack)
@@ -414,8 +619,11 @@ public sealed class PlayerService : IPlayerService, IDisposable
 
     private void InvalidateIfImminentChanged(TrackDto? imminentBefore)
     {
-        if (PeekNext()?.Id != imminentBefore?.Id)
-            InvalidatePendingTransition();
+        if (PeekNext()?.Id == imminentBefore?.Id)
+            return;
+
+        InvalidatePendingTransition();
+        RequestMixPreparation();
     }
 
     private void ResetPendingTransition()
@@ -512,7 +720,10 @@ public sealed class PlayerService : IPlayerService, IDisposable
             return 0;
 
         if (imminentRemoved)
+        {
             InvalidatePendingTransition();
+            RequestMixPreparation();
+        }
 
         _messenger.Send(new PlaylistChanged(Playlist));
 
@@ -521,8 +732,13 @@ public sealed class PlayerService : IPlayerService, IDisposable
 
     private void CancelCrossfade()
     {
+        lock (_transitionLock)
+        {
+            _crossfadeGeneration++;
+            _isCrossfadeRunning = false;
+        }
+
         _crossfadeCts?.Cancel();
-        _isCrossfadeRunning = false;
     }
 
     public void AddTracksToPlaylist(List<TrackDto> tracks)
@@ -627,6 +843,7 @@ public sealed class PlayerService : IPlayerService, IDisposable
         StopSmtcTimelineTimer();
 
         _crossfadeCts?.Cancel();
+        CancelMixPreparation(out _);
         ResetPendingTransition();
         _player.Stop();
 
@@ -742,6 +959,7 @@ public sealed class PlayerService : IPlayerService, IDisposable
     {
         if (_mode == EPlaybackMode.Radio)
         {
+            CancelMixPreparation(out _);
             _player.Stop();
             _currentStation = null;
             _currentStreamTitle = null;
@@ -768,6 +986,7 @@ public sealed class PlayerService : IPlayerService, IDisposable
                 _messenger.Send(new MediaChangedMessage(_currentTrack, previousTrack, durationPlayed));
 
             UpdateDiscordPresence(track, isPlaying: false);
+            RequestMixPreparation();
         }
     }
 
@@ -799,8 +1018,15 @@ public sealed class PlayerService : IPlayerService, IDisposable
         }
     }
 
-    private async Task CrossfadeToNextTrackAsync()
+    private async Task CrossfadeToNextTrackAsync(MixPlan? mixPlan)
     {
+        long generation;
+
+        lock (_transitionLock)
+        {
+            generation = _crossfadeGeneration;
+        }
+
         try
         {
             if (_crossfadeCts != null)
@@ -827,7 +1053,10 @@ public sealed class PlayerService : IPlayerService, IDisposable
             double trackLength = _player.Length;
             double currentPosition = _player.Position;
 
-            await RunCrossfadeAsync(nextIndex, nextTrack, trackLength, currentPosition, cancellationToken);
+            if (mixPlan != null)
+                await RunMixCrossfadeAsync(mixPlan, nextIndex, nextTrack, cancellationToken);
+            else
+                await RunCrossfadeAsync(nextIndex, nextTrack, trackLength, currentPosition, cancellationToken);
         }
         catch (OperationCanceledException)
         {
@@ -839,7 +1068,11 @@ public sealed class PlayerService : IPlayerService, IDisposable
         }
         finally
         {
-            _isCrossfadeRunning = false;
+            lock (_transitionLock)
+            {
+                if (generation == _crossfadeGeneration)
+                    _isCrossfadeRunning = false;
+            }
 
             if (_crossfadeCts != null && _crossfadeCts.IsCancellationRequested)
             {
@@ -896,6 +1129,24 @@ public sealed class PlayerService : IPlayerService, IDisposable
         await AdvanceToWithoutLoadAsync(nextIndex, nextTrack, durationPlayed);
     }
 
+    private async Task RunMixCrossfadeAsync(MixPlan plan, int nextIndex, TrackDto nextTrack, CancellationToken cancellationToken)
+    {
+        if (plan.IncomingTrackId != nextTrack.Id)
+            return;
+
+        (double duration, double incomingStart) = MixTransitionPlanner.ResolveAt(plan, _player.Position);
+
+        _logger.LogDebug("Starting mix to {Track} over {Duration}s from {Start}s", nextTrack.Title, duration, incomingStart);
+
+        long durationPlayed = (long)_player.Position;
+
+        await _player.CrossfadeToAsync(nextTrack, ResolveReplayGain(nextIndex), duration, incomingStart, cancellationToken);
+
+        cancellationToken.ThrowIfCancellationRequested();
+
+        await AdvanceToWithoutLoadAsync(nextIndex, nextTrack, durationPlayed);
+    }
+
     private async Task AdvanceToWithoutLoadAsync(int index, TrackDto track, long durationPlayed)
     {
         TrackDto? previousTrack = CurrentTrack;
@@ -905,6 +1156,8 @@ public sealed class PlayerService : IPlayerService, IDisposable
 
         if (previousTrack == null || previousTrack.Id != track.Id)
             _messenger.Send(new MediaChangedMessage(track, previousTrack, durationPlayed));
+
+        RequestMixPreparation();
 
         PlaybackState = EPlaybackState.Playing;
         UpdateDiscordPresence(track, isPlaying: true);
@@ -946,6 +1199,8 @@ public sealed class PlayerService : IPlayerService, IDisposable
     public void Dispose()
     {
         _replayGainSubscription.Dispose();
+        _player.OnTransitionCue -= OnTransitionCue;
+        CancelMixPreparation(out _);
         _smtcTimelineTimer?.Dispose();
         _smtcTimelineTimer = null;
         _crossfadeCts?.Dispose();

@@ -5,6 +5,7 @@ using Rok.Application.Interfaces;
 using Rok.Application.Interfaces.Pictures;
 using Rok.Application.Messages;
 using Rok.Application.Player;
+using Rok.Application.Player.Mix;
 
 namespace Rok.ApplicationTests.Player;
 
@@ -31,6 +32,7 @@ public class PlayerServiceRemovalTests
         albumPicture: _albumPicture.Object,
         timeProvider: TimeProvider.System,
         messenger: _messenger,
+        mixCues: Mock.Of<IMixCueProvider>(),
         logger: NullLogger<PlayerService>.Instance);
 
     private static TrackDto BuildTrack(long id, long? albumId = null, long? artistId = null, long? genreId = null)

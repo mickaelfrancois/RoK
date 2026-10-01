@@ -277,6 +277,53 @@ public class SettingsFileServiceTests
         Assert.Equal(EAudioOutputMode.Shared, restored.OutputMode);
     }
 
+    [Fact(DisplayName = "mix_mode_survives_a_save_and_reload")]
+    public async Task MixMode_SurvivesASaveAndReload()
+    {
+        // Arrange
+        AppOptions options = new() { MixMode = true };
+        string? capturedJson = null;
+
+        Mock<IFileSystem> fs = CreateFileSystemMock();
+        fs.Setup(f => f.WriteAllTextAsync(SettingsFilePath, It.IsAny<string>(), It.IsAny<CancellationToken>()))
+            .Callback<string, string, CancellationToken>((_, json, _) => capturedJson = json)
+            .Returns(Task.CompletedTask);
+        fs.Setup(f => f.FileExists(SettingsFilePath)).Returns(true);
+        fs.Setup(f => f.ReadAllTextAsync(SettingsFilePath, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(() => capturedJson!);
+        SettingsFileService sut = new(ApplicationPath, CreateFolderResolverMock().Object, fs.Object);
+
+        // Act
+        await sut.SaveAsync(options);
+        IAppOptions? loaded = await sut.LoadAsync<AppOptions>();
+        AppOptions restored = new();
+        restored.CopyFrom(loaded!);
+
+        // Assert
+        Assert.True(restored.MixMode);
+    }
+
+    [Fact(DisplayName = "settings_without_mix_mode_load_it_as_disabled")]
+    public async Task SettingsWithoutMixMode_LoadItAsDisabled()
+    {
+        // Arrange
+        const string legacyJson = """{ "CrossFade": true }""";
+
+        Mock<IFileSystem> fs = CreateFileSystemMock();
+        fs.Setup(f => f.FileExists(SettingsFilePath)).Returns(true);
+        fs.Setup(f => f.ReadAllTextAsync(SettingsFilePath, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(legacyJson);
+        SettingsFileService sut = new(ApplicationPath, CreateFolderResolverMock().Object, fs.Object);
+
+        // Act
+        IAppOptions? loaded = await sut.LoadAsync<AppOptions>();
+        AppOptions restored = new();
+        restored.CopyFrom(loaded!);
+
+        // Assert
+        Assert.False(restored.MixMode);
+    }
+
     [Fact(DisplayName = "output_options_survive_save_load_and_copy")]
     public async Task OutputOptions_SurviveSaveLoadAndCopy()
     {

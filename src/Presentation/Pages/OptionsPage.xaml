@@ -70,6 +70,13 @@
                                             TickPlacement="Outside"
                                             IsEnabled="{x:Bind OptionsCrossFadeSwitch.IsOn, Mode=OneWay}"
                                             Value="{x:Bind CrossfadeDurationSeconds, Mode=TwoWay}" />
+                                    <ToggleSwitch x:Uid="OptionsMixModeSwitch"
+                                                  IsOn="{x:Bind Options.MixMode, Mode=TwoWay}"
+                                                  IsEnabled="{x:Bind OptionsCrossFadeSwitch.IsOn, Mode=OneWay}" />
+                                    <TextBlock x:Uid="OptionsMixModeDescription"
+                                               Style="{ThemeResource CaptionTextBlockStyle}"
+                                               Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                               TextWrapping="WrapWholeWords" />
                                 </StackPanel>
                                 <StackPanel Spacing="8">
                                     <TextBlock x:Uid="OptionsReplayGainModeLabel" />

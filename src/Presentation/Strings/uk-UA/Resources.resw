@@ -962,6 +962,12 @@
   <data name="OptionsCrossFadeDescription.Text" xml:space="preserve">
     <value>Альбоми, прослухані по порядку, завжди звучать без пауз.</value>
   </data>
+  <data name="OptionsMixModeSwitch.Header" xml:space="preserve">
+    <value>Режим Мікс</value>
+  </data>
+  <data name="OptionsMixModeDescription.Text" xml:space="preserve">
+    <value>Підлаштовує перехід під справжній кінець треку та початок наступного. Обрана тривалість стає максимальною.</value>
+  </data>
   <data name="OptionsReplayGainModeLabel.Text" xml:space="preserve">
     <value>Нормалізація гучності (ReplayGain)</value>
   </data>

@@ -76,6 +76,30 @@ public class AppOptionsTests
         Assert.Equal(lastPrompt, target.ReviewLastPromptDate);
     }
 
+    [Fact(DisplayName = "mix_mode_is_disabled_by_default")]
+    public void MixMode_IsDisabledByDefault()
+    {
+        // Act
+        AppOptions options = new();
+
+        // Assert
+        Assert.False(options.MixMode);
+    }
+
+    [Fact(DisplayName = "copy_from_preserves_mix_mode")]
+    public void CopyFrom_PreservesMixMode()
+    {
+        // Arrange
+        AppOptions source = new() { MixMode = true };
+        AppOptions target = new();
+
+        // Act
+        target.CopyFrom(source);
+
+        // Assert
+        Assert.True(target.MixMode);
+    }
+
     [Fact(DisplayName = "copy_from_copies_every_interface_property")]
     public void CopyFrom_CopiesEveryInterfaceProperty()
     {

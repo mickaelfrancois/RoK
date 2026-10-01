@@ -3,6 +3,7 @@ using Microsoft.Extensions.Time.Testing;
 using Moq;
 using Rok.Application.Interfaces.Pictures;
 using Rok.Application.Player;
+using Rok.Application.Player.Mix;
 
 namespace Rok.ApplicationTests.Player;
 
@@ -44,6 +45,7 @@ public class PlayerServiceSmtcTests
             albumPicture: picture.Object,
             timeProvider: time,
             messenger: new Messenger(),
+            mixCues: Mock.Of<IMixCueProvider>(),
             logger: NullLogger<PlayerService>.Instance);
 
         // Act
@@ -87,6 +89,7 @@ public class PlayerServiceSmtcTests
             albumPicture: picture.Object,
             timeProvider: time,
             messenger: new Messenger(),
+            mixCues: Mock.Of<IMixCueProvider>(),
             logger: NullLogger<PlayerService>.Instance);
 
         // Act
@@ -120,7 +123,7 @@ public class PlayerServiceSmtcTests
         PlayerService sut = new(
             callMock.Object, engine.Object, optionsMock.Object,
             discordService: null, smtcService: smtc.Object, albumPicture: picture.Object,
-            timeProvider: time, messenger: new Messenger(), logger: NullLogger<PlayerService>.Instance);
+            timeProvider: time, messenger: new Messenger(), mixCues: Mock.Of<IMixCueProvider>(), logger: NullLogger<PlayerService>.Instance);
 
         sut.LoadPlaylist(new List<TrackDto> { onlyTrack });
         sut.IsLoopingEnabled = false;
@@ -161,7 +164,7 @@ public class PlayerServiceSmtcTests
         PlayerService sut = new(
             callMock.Object, engine.Object, optionsMock.Object,
             discordService: null, smtcService: smtc.Object, albumPicture: picture.Object,
-            timeProvider: time, messenger: new Messenger(), logger: NullLogger<PlayerService>.Instance);
+            timeProvider: time, messenger: new Messenger(), mixCues: Mock.Of<IMixCueProvider>(), logger: NullLogger<PlayerService>.Instance);
 
         sut.LoadPlaylist(new List<TrackDto> { track });
         smtc.Invocations.Clear();
@@ -205,7 +208,7 @@ public class PlayerServiceSmtcTests
         PlayerService sut = new(
             callMock.Object, engine.Object, optionsMock.Object,
             discordService: null, smtcService: smtc.Object, albumPicture: picture.Object,
-            timeProvider: time, messenger: new Messenger(), logger: NullLogger<PlayerService>.Instance);
+            timeProvider: time, messenger: new Messenger(), mixCues: Mock.Of<IMixCueProvider>(), logger: NullLogger<PlayerService>.Instance);
 
         sut.LoadPlaylist(new List<TrackDto> { track });
         smtc.Invocations.Clear();
