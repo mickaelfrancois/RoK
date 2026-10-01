@@ -904,6 +904,12 @@
   <data name="OptionsCrossFadeDescription.Text" xml:space="preserve">
     <value>Los álbumes escuchados en orden siempre se encadenan sin pausas.</value>
   </data>
+  <data name="OptionsMixModeSwitch.Header" xml:space="preserve">
+    <value>Modo Mix</value>
+  </data>
+  <data name="OptionsMixModeDescription.Text" xml:space="preserve">
+    <value>Ajusta el fundido al final real de la pista y al inicio de la siguiente. La duración elegida pasa a ser un máximo.</value>
+  </data>
   <data name="OptionsReplayGainModeLabel.Text" xml:space="preserve">
     <value>Normalización del volumen (ReplayGain)</value>
   </data>

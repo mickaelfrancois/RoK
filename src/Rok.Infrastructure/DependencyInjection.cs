@@ -19,6 +19,7 @@ using Rok.Infrastructure.Lyrics;
 using Rok.Infrastructure.Migration;
 using Rok.Infrastructure.MusicData;
 using Rok.Infrastructure.Player;
+using Rok.Infrastructure.Player.Mix;
 using Rok.Infrastructure.Player.Output;
 using Rok.Infrastructure.Playlists;
 using Rok.Infrastructure.Playlists.Formats;
@@ -65,6 +66,7 @@ public static class DependencyInjection
         services.AddSingleton<IAudioOutputFactory, WasapiOutputFactory>();
         services.AddSingleton<IAudioFormatProbe, TagLibAudioFormatProbe>();
         services.AddSingleton<IPlayerEngine, NAudioMediaPlayer>();
+        services.AddSingleton<IAudioEnvelopeReader, NAudioEnvelopeReader>();
         services.AddSingleton<ILyricsService, LyricsService>();
         services.AddSingleton<ILyricsParser, LyricsParser>();
 

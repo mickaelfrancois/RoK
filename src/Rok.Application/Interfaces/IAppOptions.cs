@@ -29,6 +29,9 @@ public interface IAppOptions
     /// <summary>Crossfade duration in seconds, within <see cref="Player.CrossfadeDuration"/> bounds.</summary>
     int CrossfadeDurationSeconds { get; set; }
 
+    /// <summary>Smart mix: the crossfade follows the real end of the track and the real start of the next one; <see cref="CrossfadeDurationSeconds"/> becomes a maximum.</summary>
+    bool MixMode { get; set; }
+
     EReplayGainMode ReplayGainMode { get; set; }
 
     double ReplayGainPreampDb { get; set; }

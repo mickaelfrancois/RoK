@@ -45,6 +45,29 @@ public interface IPlayerEngine
     /// </summary>
     Task CrossfadeToAsync(TrackDto nextTrack, float replayGain, double durationSeconds, CancellationToken ct);
 
+    /// <summary>
+    /// Same as <see cref="CrossfadeToAsync(TrackDto, float, double, CancellationToken)"/>, but the incoming track starts
+    /// playing at <paramref name="incomingStartSeconds"/> instead of its beginning. A value that is not strictly between
+    /// zero and the incoming length is ignored, and <paramref name="durationSeconds"/> is capped to half of what is left
+    /// of the incoming track.
+    /// </summary>
+    Task CrossfadeToAsync(TrackDto nextTrack, float replayGain, double durationSeconds, double incomingStartSeconds, CancellationToken ct);
+
+    /// <summary>
+    /// Raised off the UI thread, once per arming, when the playback position of the track given to
+    /// <see cref="SetTransitionCue"/> reaches the cue. Never raised under an engine lock.
+    /// </summary>
+    event EventHandler? OnTransitionCue;
+
+    /// <summary>
+    /// Arms <see cref="OnTransitionCue"/> for <paramref name="trackId"/> at <paramref name="positionSeconds"/>. A cue for a
+    /// track that is not the current one is ignored. It is rearmed by a seek or a resume, and cleared by any track change.
+    /// </summary>
+    void SetTransitionCue(long trackId, double positionSeconds);
+
+    /// <summary>Drops the cue set by <see cref="SetTransitionCue"/>, if any.</summary>
+    void ClearTransitionCue();
+
     /// <summary>Raised once the output has moved, without reopening, to the track queued by <see cref="QueueNextTrack"/>.</summary>
     event EventHandler<GaplessTransitionEventArgs>? OnGaplessTransition;
 

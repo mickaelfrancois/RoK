@@ -1,0 +1,6 @@
+namespace Rok.Application.Player.Mix;
+
+/// <summary>Cues found at the end of a track.</summary>
+/// <param name="MusicEndSeconds">Position where the music ends (the track length when there is no trailing silence).</param>
+/// <param name="FadeOutSeconds">Duration of a natural fade-out ending the track, or 0 when the ending is abrupt.</param>
+public sealed record OutroCues(double MusicEndSeconds, double FadeOutSeconds);

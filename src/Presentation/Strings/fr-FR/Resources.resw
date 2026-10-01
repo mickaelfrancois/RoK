@@ -1020,6 +1020,12 @@
   <data name="OptionsCrossFadeDescription.Text" xml:space="preserve">
     <value>Les albums écoutés dans l'ordre s'enchaînent toujours sans blanc.</value>
   </data>
+  <data name="OptionsMixModeSwitch.Header" xml:space="preserve">
+    <value>Mode Mix</value>
+  </data>
+  <data name="OptionsMixModeDescription.Text" xml:space="preserve">
+    <value>Cale le fondu sur la fin réelle du titre et le début du suivant. La durée choisie devient un maximum.</value>
+  </data>
   <data name="OptionsReplayGainModeLabel.Text" xml:space="preserve">
     <value>Normalisation du volume (ReplayGain)</value>
   </data>

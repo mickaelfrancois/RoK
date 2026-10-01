@@ -16,6 +16,7 @@ public class NAudioMediaPlayer : IPlayerEngine, IDisposable
     public event EventHandler? OnMediaEnded;
     public event EventHandler? OnMediaStateChanged;
     public event EventHandler? OnMediaAboutToEnd;
+    public event EventHandler? OnTransitionCue;
     public event EventHandler<string>? OnMetadataChanged;
     public event EventHandler<GaplessTransitionEventArgs>? OnGaplessTransition;
     public event EventHandler<OutputLostEventArgs>? OnOutputLost;
@@ -36,6 +37,7 @@ public class NAudioMediaPlayer : IPlayerEngine, IDisposable
     private readonly float[] _bandGains = new float[PlaybackPipeline.BandFrequencies.Length];
     private readonly Lock _stateLock = new();
     private readonly Lock _outputLock = new();
+    private readonly TransitionCueGate _cueGate = new();
     private readonly System.Timers.Timer _positionTimer;
     private readonly ILogger<NAudioMediaPlayer> _logger;
     private readonly IHttpClientFactory _httpClientFactory;
@@ -143,6 +145,8 @@ public class NAudioMediaPlayer : IPlayerEngine, IDisposable
         if (_pipeline is null)
             return;
 
+        _cueGate.Rearm();
+
         RunOrResetPlaying(() =>
         {
             AudioOutputHandle output = EnsureOutput();
@@ -173,6 +177,7 @@ public class NAudioMediaPlayer : IPlayerEngine, IDisposable
     public void Stop()
     {
         _isPlaying = false;
+        _cueGate.Clear();
 
         if (_isLive)
         {
@@ -231,6 +236,7 @@ public class NAudioMediaPlayer : IPlayerEngine, IDisposable
             position = 0;
 
         pipeline.Reader.CurrentTime = TimeSpan.FromSeconds(position);
+        _cueGate.Rearm();
 
         if (Position < Math.Max(0, Length - _aboutToEndDelay))
             _aboutToEndRaised = false;
@@ -625,7 +631,17 @@ public class NAudioMediaPlayer : IPlayerEngine, IDisposable
     /// Both tracks play on their own shared output; each pipeline ramps its own samples (<see cref="FadeSampleProvider"/>),
     /// so the fade is sample-accurate and the master volume can still change while it runs.
     /// </remarks>
-    public async Task CrossfadeToAsync(TrackDto nextTrack, float replayGain, double durationSeconds, CancellationToken ct)
+    public Task CrossfadeToAsync(TrackDto nextTrack, float replayGain, double durationSeconds, CancellationToken ct) =>
+        CrossfadeToAsync(nextTrack, replayGain, durationSeconds, 0, ct);
+
+    /// <inheritdoc />
+    public void SetTransitionCue(long trackId, double positionSeconds) => _cueGate.Arm(trackId, positionSeconds);
+
+    /// <inheritdoc />
+    public void ClearTransitionCue() => _cueGate.Clear();
+
+    /// <inheritdoc />
+    public async Task CrossfadeToAsync(TrackDto nextTrack, float replayGain, double durationSeconds, double incomingStartSeconds, CancellationToken ct)
     {
         if (_isLive) return;
 
@@ -646,8 +662,24 @@ public class NAudioMediaPlayer : IPlayerEngine, IDisposable
 
         double nextLength = nextPipeline.Reader.TotalTime.TotalSeconds;
 
+        double incomingStart = incomingStartSeconds > 0 && incomingStartSeconds < nextLength ? incomingStartSeconds : 0;
+
+        if (incomingStart > 0)
+        {
+            try
+            {
+                nextPipeline.Reader.CurrentTime = TimeSpan.FromSeconds(incomingStart);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Crossfade: failed to seek next track {File}", nextTrack.MusicFile);
+                nextPipeline.Dispose();
+                return;
+            }
+        }
+
         if (nextLength > 0)
-            durationSeconds = Math.Min(durationSeconds, nextLength / 2);
+            durationSeconds = Math.Min(durationSeconds, (nextLength - incomingStart) / 2);
 
         TimeSpan duration = TimeSpan.FromSeconds(durationSeconds);
         nextPipeline.Fade.Start(EFadeDirection.In, duration);
@@ -727,6 +759,7 @@ public class NAudioMediaPlayer : IPlayerEngine, IDisposable
     private void PromoteCrossfade(PlaybackPipeline nextPipeline, AudioOutputHandle nextOutput, string nextFile)
     {
         _positionTimer.Stop();
+        _cueGate.Clear();
 
         AudioOutputHandle? previousOutput;
         PlaybackPipeline? previousPipeline;
@@ -793,6 +826,8 @@ public class NAudioMediaPlayer : IPlayerEngine, IDisposable
 
     private void Chain_SourceSwitched(object? sender, SourceSwitchedEventArgs e)
     {
+        _cueGate.Clear();
+
         AudioFileReader previous;
         PendingNext? pending;
         int generation;
@@ -952,6 +987,18 @@ public class NAudioMediaPlayer : IPlayerEngine, IDisposable
         catch (ObjectDisposedException)
         {
             return;
+        }
+
+        if (_cueGate.ShouldRaise(pipeline.TrackId, pos))
+        {
+            try
+            {
+                OnTransitionCue?.Invoke(this, EventArgs.Empty);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "A transition cue handler failed");
+            }
         }
 
         double len = Length;

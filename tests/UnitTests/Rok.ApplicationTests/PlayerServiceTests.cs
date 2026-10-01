@@ -4,6 +4,7 @@ using Moq;
 using Rok.Application.Interfaces.Pictures;
 using Rok.Application.Messages;
 using Rok.Application.Player;
+using Rok.Application.Player.Mix;
 
 namespace Rok.ApplicationTests;
 
@@ -29,7 +30,7 @@ public class PlayerServiceTests
         mockPlayerEngine.Setup(o => o.SetTrack(It.IsAny<TrackDto>(), It.IsAny<float>())).Returns(true);
         mockAppOptions.SetupGet(o => o.CrossFade).Returns(false);
 
-        playerService = new PlayerService(mockCallDetectionService.Object, mockPlayerEngine.Object, mockAppOptions.Object, null, null, mockAlbumPicture.Object, fakeTimeProvider, new Messenger(), mockLogger.Object);
+        playerService = new PlayerService(mockCallDetectionService.Object, mockPlayerEngine.Object, mockAppOptions.Object, null, null, mockAlbumPicture.Object, fakeTimeProvider, new Messenger(), Mock.Of<IMixCueProvider>(), mockLogger.Object);
     }
 
     [Fact]

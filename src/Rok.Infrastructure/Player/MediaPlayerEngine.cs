@@ -143,12 +143,37 @@ public class WinUIMediaPlayer : IPlayerEngine, IDisposable
     }
 
     /// <inheritdoc />
-    public Task CrossfadeToAsync(TrackDto nextTrack, float replayGain, double durationSeconds, CancellationToken ct)
+    public Task CrossfadeToAsync(TrackDto nextTrack, float replayGain, double durationSeconds, CancellationToken ct) =>
+        CrossfadeToAsync(nextTrack, replayGain, durationSeconds, 0, ct);
+
+    /// <inheritdoc />
+    public Task CrossfadeToAsync(TrackDto nextTrack, float replayGain, double durationSeconds, double incomingStartSeconds, CancellationToken ct)
     {
         // WinUI MediaPlayer does not support simultaneous dual-track playback; fall back to instant switch.
         SetTrack(nextTrack, replayGain);
+
+        if (incomingStartSeconds > 0)
+            SetPosition(incomingStartSeconds);
+
         Play();
         return Task.CompletedTask;
+    }
+
+    /// <inheritdoc />
+    public event EventHandler? OnTransitionCue
+    {
+        add { }
+        remove { }
+    }
+
+    /// <inheritdoc />
+    public void SetTransitionCue(long trackId, double positionSeconds)
+    {
+    }
+
+    /// <inheritdoc />
+    public void ClearTransitionCue()
+    {
     }
 
     /// <inheritdoc />
