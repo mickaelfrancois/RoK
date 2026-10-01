@@ -31,7 +31,7 @@ public sealed class WasapiOutputFactory(IAudioDeviceService deviceService, ILogg
                 return exclusive;
 
             fallbackReason = reason;
-            logger.LogWarning("Exclusive output refused ({Reason}), playing through the shared mixer", reason);
+            logger.LogWarning("Exclusive output refused ({Reason}) for a {SampleRate} Hz source, playing through the shared mixer", reason, source.WaveFormat.SampleRate);
         }
 
         return OpenShared(deviceId, isOnPreferred, source, fallbackReason);
@@ -92,7 +92,10 @@ public sealed class WasapiOutputFactory(IAudioDeviceService deviceService, ILogg
     private AudioOutputHandle? TryOpenExclusiveFormat(string deviceId, bool isOnPreferred, ISampleProvider source, WaveFormatExtensible format)
     {
         if (!IsSupported(deviceId, format))
+        {
+            logger.LogInformation("Exclusive format {Format} is not supported by the device", format);
             return null;
+        }
 
         MMDevice device = GetDevice(deviceId);
         WasapiPlayer? output = null;

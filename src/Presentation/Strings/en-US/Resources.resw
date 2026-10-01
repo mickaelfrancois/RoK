@@ -2246,7 +2246,7 @@
     <value>Status: shared playback, exclusive mode was refused</value>
   </data>
   <data name="PlayerOutputFallbackFormatRefused" xml:space="preserve">
-    <value>Playing in shared mode instead of exclusive: the sound goes through the Windows mixer, which may resample it. Cause: the device refuses the format of this file. Rok will try exclusive mode again on the next track.</value>
+    <value>Playing in shared mode instead of exclusive: the sound goes through the Windows mixer, which may resample it. Cause: the device does not accept the sample rate of this file in exclusive mode. Many devices, including Bluetooth headsets and HDMI displays, only accept 48 kHz. For bit-perfect playback, choose a device that accepts the original sample rate, such as a USB DAC or a digital output.</value>
   </data>
   <data name="PlayerOutputFallbackDeviceBusy" xml:space="preserve">
     <value>Playing in shared mode instead of exclusive: the sound goes through the Windows mixer, which may resample it. Cause: another application is using the device in exclusive mode. Rok will try exclusive mode again on the next track.</value>

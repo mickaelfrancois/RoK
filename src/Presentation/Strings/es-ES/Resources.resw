@@ -2078,7 +2078,7 @@
     <value>Estado: reproducción compartida, se rechazó el modo exclusivo</value>
   </data>
   <data name="PlayerOutputFallbackFormatRefused" xml:space="preserve">
-    <value>Reproducción en modo compartido en lugar de exclusivo: el sonido pasa por el mezclador de Windows, que puede remuestrearlo. Causa: el dispositivo rechaza el formato de este archivo. Rok volverá a intentar el modo exclusivo en la siguiente pista.</value>
+    <value>Reproducción en modo compartido en lugar de exclusivo: el sonido pasa por el mezclador de Windows, que puede remuestrearlo. Causa: el dispositivo no acepta la frecuencia de este archivo en modo exclusivo. Muchos dispositivos, como los auriculares Bluetooth y las pantallas HDMI, solo aceptan 48 kHz. Para una reproducción bit-perfect, elija un dispositivo que acepte la frecuencia original, como un DAC USB o una salida digital.</value>
   </data>
   <data name="PlayerOutputFallbackDeviceBusy" xml:space="preserve">
     <value>Reproducción en modo compartido en lugar de exclusivo: el sonido pasa por el mezclador de Windows, que puede remuestrearlo. Causa: otra aplicación usa el dispositivo en modo exclusivo. Rok volverá a intentar el modo exclusivo en la siguiente pista.</value>
