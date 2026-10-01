@@ -67,7 +67,6 @@ public sealed class PlayerService : IPlayerService, IDisposable
         }
     }
 
-    private readonly bool _isCrossfadeEnabled;
 
     private CancellationTokenSource? _crossfadeCts;
 
@@ -196,7 +195,6 @@ public sealed class PlayerService : IPlayerService, IDisposable
         _messenger = Guard.NotNull(messenger, nameof(messenger));
         _logger = Guard.NotNull(logger, nameof(logger));
 
-        _isCrossfadeEnabled = appOptions.CrossFade;
 
         _discordService?.Initialize();
 
@@ -297,7 +295,7 @@ public sealed class PlayerService : IPlayerService, IDisposable
     {
         _logger.LogDebug("Event Media ended fired.");
 
-        if (_isCrossfadeEnabled && _isCrossfadeRunning)
+        if (_isCrossfadeRunning)
             return;
 
         if (CurrentTrack != null)
@@ -325,7 +323,7 @@ public sealed class PlayerService : IPlayerService, IDisposable
 
         TrackDto nextTrack = Playlist[nextIndex];
 
-        bool crossfadeAllowed = PlaybackTransitionPolicy.IsCrossfadeAllowed(_isCrossfadeEnabled, _appOptions.OutputMode);
+        bool crossfadeAllowed = PlaybackTransitionPolicy.IsCrossfadeAllowed(_appOptions.CrossFade, _appOptions.OutputMode);
 
         if (PlaybackTransitionPolicy.Decide(crossfadeAllowed, _isMuted, CurrentTrack, nextTrack) == EPlaybackTransition.Gapless)
         {
@@ -591,6 +589,7 @@ public sealed class PlayerService : IPlayerService, IDisposable
         _pauseReason = reason;
         _pauseTimestampUtc = _timeProvider.GetUtcNow().UtcDateTime;
 
+        CancelCrossfade();
         _player.Pause();
 
         _discordService?.ClearPresence();
@@ -867,7 +866,7 @@ public sealed class PlayerService : IPlayerService, IDisposable
     private async Task RunCrossfadeAsync(int nextIndex, TrackDto nextTrack, double trackLength, double positionAtDecisionTime, CancellationToken cancellationToken)
     {
         double remainingTime = Math.Max(0, trackLength - positionAtDecisionTime);
-        double crossfadeDurationSeconds = Math.Min(_player.CrossfadeDelay, remainingTime);
+        double crossfadeDurationSeconds = Math.Min(Math.Min(CrossfadeDuration.Clamp(_appOptions.CrossfadeDurationSeconds), remainingTime), trackLength / 2);
 
         if (crossfadeDurationSeconds <= 0)
         {
@@ -890,7 +889,7 @@ public sealed class PlayerService : IPlayerService, IDisposable
 
         long durationPlayed = (long)_player.Position;
 
-        await _player.CrossfadeToAsync(nextTrack, ResolveReplayGain(nextIndex), crossfadeDurationSeconds, _volume, cancellationToken);
+        await _player.CrossfadeToAsync(nextTrack, ResolveReplayGain(nextIndex), crossfadeDurationSeconds, cancellationToken);
 
         cancellationToken.ThrowIfCancellationRequested();
 

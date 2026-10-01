@@ -18,8 +18,6 @@ public interface IPlayerEngine
 
     double Length { get; set; }
 
-    int CrossfadeDelay { get; }
-
     bool IsLive { get; }
 
     bool IsBuffering { get; }
@@ -41,8 +39,11 @@ public interface IPlayerEngine
 
     void SetEqualizerBand(int bandIndex, float gain);
 
-    /// <summary>Performs a simultaneous crossfade from the current track to <paramref name="nextTrack"/>.</summary>
-    Task CrossfadeToAsync(TrackDto nextTrack, float replayGain, double durationSeconds, double masterVolume, CancellationToken ct);
+    /// <summary>
+    /// Performs a simultaneous crossfade from the current track to <paramref name="nextTrack"/> over
+    /// <paramref name="durationSeconds"/>, at the current volume.
+    /// </summary>
+    Task CrossfadeToAsync(TrackDto nextTrack, float replayGain, double durationSeconds, CancellationToken ct);
 
     /// <summary>Raised once the output has moved, without reopening, to the track queued by <see cref="QueueNextTrack"/>.</summary>
     event EventHandler<GaplessTransitionEventArgs>? OnGaplessTransition;

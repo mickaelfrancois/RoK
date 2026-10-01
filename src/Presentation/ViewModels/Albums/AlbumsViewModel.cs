@@ -79,12 +79,34 @@ public partial class AlbumsViewModel : ObservableObject, IDisposable
 
         IsGridView = _stateManager.GetGridView();
         _libraryMonitor.LibraryChanged += OnLibraryChanged;
+        _libraryMonitor.LibraryRefreshed += OnLibraryRefreshed;
     }
 
     private void OnLibraryChanged(object? sender, EventArgs e)
     {
         _libraryUpdated = true;
         _dispatcherQueue.TryEnqueue(() => FilterAndSort());
+    }
+
+    private void OnLibraryRefreshed(object? sender, EventArgs e)
+    {
+        _libraryUpdated = true;
+        _dispatcherQueue.TryEnqueue(async () => await ReloadAfterScanAsync());
+    }
+
+    private async Task ReloadAfterScanAsync()
+    {
+        if (ViewModels.Count == 0)
+            return;
+
+        try
+        {
+            await LoadDataAsync(forceReload: true);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to reload albums after the library scan.");
+        }
     }
 
     public async Task LoadDataAsync(bool forceReload)
@@ -306,6 +328,7 @@ public partial class AlbumsViewModel : ObservableObject, IDisposable
             if (disposing)
             {
                 _libraryMonitor.LibraryChanged -= OnLibraryChanged;
+                _libraryMonitor.LibraryRefreshed -= OnLibraryRefreshed;
                 _libraryMonitor.Dispose();
                 _albumProvider.Clear();
             }

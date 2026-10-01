@@ -21,10 +21,10 @@ public class PlayerServiceGaplessTests
     {
         _engine.Setup(o => o.SetTrack(It.IsAny<TrackDto>(), It.IsAny<float>())).Returns(true);
         _engine.Setup(o => o.QueueNextTrack(It.IsAny<TrackDto>(), It.IsAny<float>())).Returns(true);
-        _engine.Setup(o => o.CrossfadeToAsync(It.IsAny<TrackDto>(), It.IsAny<float>(), It.IsAny<double>(), It.IsAny<double>(), It.IsAny<CancellationToken>())).Returns(Task.CompletedTask);
+        _engine.Setup(o => o.CrossfadeToAsync(It.IsAny<TrackDto>(), It.IsAny<float>(), It.IsAny<double>(), It.IsAny<CancellationToken>())).Returns(Task.CompletedTask);
         _engine.SetupGet(o => o.Position).Returns(90);
         _engine.SetupGet(o => o.Length).Returns(100);
-        _engine.SetupGet(o => o.CrossfadeDelay).Returns(5);
+        _appOptions.SetupGet(o => o.CrossfadeDurationSeconds).Returns(5);
     }
 
     private PlayerService BuildService(bool crossfade = false)
@@ -44,7 +44,7 @@ public class PlayerServiceGaplessTests
         _engine.Raise(m => m.OnGaplessTransition += null, _engine.Object, new GaplessTransitionEventArgs(track, previousPosition));
 
     private void VerifyNoCrossfade() =>
-        _engine.Verify(o => o.CrossfadeToAsync(It.IsAny<TrackDto>(), It.IsAny<float>(), It.IsAny<double>(), It.IsAny<double>(), It.IsAny<CancellationToken>()), Times.Never);
+        _engine.Verify(o => o.CrossfadeToAsync(It.IsAny<TrackDto>(), It.IsAny<float>(), It.IsAny<double>(), It.IsAny<CancellationToken>()), Times.Never);
 
     [Fact(DisplayName = "when_crossfade_is_disabled_about_to_end_queues_the_next_track")]
     public void WhenCrossfadeIsDisabled_AboutToEnd_QueuesNextTrack()
@@ -104,7 +104,7 @@ public class PlayerServiceGaplessTests
         RaiseMediaAboutToEnd();
 
         // Assert
-        _engine.Verify(o => o.CrossfadeToAsync(It.Is<TrackDto>(t => t.Id == 2), It.IsAny<float>(), It.IsAny<double>(), It.IsAny<double>(), It.IsAny<CancellationToken>()), Times.Once);
+        _engine.Verify(o => o.CrossfadeToAsync(It.Is<TrackDto>(t => t.Id == 2), It.IsAny<float>(), It.IsAny<double>(), It.IsAny<CancellationToken>()), Times.Once);
         _engine.Verify(o => o.QueueNextTrack(It.IsAny<TrackDto>(), It.IsAny<float>()), Times.Never);
     }
 

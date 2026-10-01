@@ -20,10 +20,10 @@ public class PlayerServiceReplayGainTests
     {
         _engine.Setup(o => o.SetTrack(It.IsAny<TrackDto>(), It.IsAny<float>())).Returns(true);
         _engine.Setup(o => o.QueueNextTrack(It.IsAny<TrackDto>(), It.IsAny<float>())).Returns(true);
-        _engine.Setup(o => o.CrossfadeToAsync(It.IsAny<TrackDto>(), It.IsAny<float>(), It.IsAny<double>(), It.IsAny<double>(), It.IsAny<CancellationToken>())).Returns(Task.CompletedTask);
+        _engine.Setup(o => o.CrossfadeToAsync(It.IsAny<TrackDto>(), It.IsAny<float>(), It.IsAny<double>(), It.IsAny<CancellationToken>())).Returns(Task.CompletedTask);
         _engine.SetupGet(o => o.Position).Returns(95);
         _engine.SetupGet(o => o.Length).Returns(100);
-        _engine.SetupGet(o => o.CrossfadeDelay).Returns(5);
+        _appOptions.SetupGet(o => o.CrossfadeDurationSeconds).Returns(5);
         _appOptions.SetupProperty(o => o.ReplayGainMode, EReplayGainMode.Track);
         _appOptions.SetupProperty(o => o.ReplayGainPreampDb, 0);
     }
@@ -108,7 +108,7 @@ public class PlayerServiceReplayGainTests
         RaiseMediaAboutToEnd();
 
         // Assert
-        _engine.Verify(o => o.CrossfadeToAsync(It.Is<TrackDto>(t => t.Id == 2), It.Is<float>(g => Math.Abs(g - Linear(-2)) < Tolerance), It.IsAny<double>(), It.IsAny<double>(), It.IsAny<CancellationToken>()), Times.Once);
+        _engine.Verify(o => o.CrossfadeToAsync(It.Is<TrackDto>(t => t.Id == 2), It.Is<float>(g => Math.Abs(g - Linear(-2)) < Tolerance), It.IsAny<double>(), It.IsAny<CancellationToken>()), Times.Once);
     }
 
     [Fact(DisplayName = "options_change_updates_the_gain_of_the_current_and_next_tracks")]

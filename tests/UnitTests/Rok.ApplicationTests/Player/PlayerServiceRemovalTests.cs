@@ -300,14 +300,14 @@ public class PlayerServiceRemovalTests
         _appOptions.SetupGet(o => o.CrossFade).Returns(true);
         _engine.SetupGet(o => o.Position).Returns(95);
         _engine.SetupGet(o => o.Length).Returns(100);
-        _engine.SetupGet(o => o.CrossfadeDelay).Returns(5);
+        _appOptions.SetupGet(o => o.CrossfadeDurationSeconds).Returns(5);
 
         TaskCompletionSource crossfadeEntered = new();
         CancellationToken capturedToken = default;
 
         _engine
-            .Setup(o => o.CrossfadeToAsync(It.IsAny<TrackDto>(), It.IsAny<float>(), It.IsAny<double>(), It.IsAny<double>(), It.IsAny<CancellationToken>()))
-            .Returns<TrackDto, float, double, double, CancellationToken>((_, _, _, _, token) =>
+            .Setup(o => o.CrossfadeToAsync(It.IsAny<TrackDto>(), It.IsAny<float>(), It.IsAny<double>(), It.IsAny<CancellationToken>()))
+            .Returns<TrackDto, float, double, CancellationToken>((_, _, _, token) =>
             {
                 capturedToken = token;
                 crossfadeEntered.SetResult();

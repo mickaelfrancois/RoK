@@ -11,7 +11,7 @@ public partial class TrackLibraryMonitor : ITrackLibraryMonitor
     private readonly List<IDisposable> _subscriptions = new();
     private bool _disposed;
 
-    public event EventHandler? LibraryChanged;
+    public event EventHandler? LibraryRefreshed;
 
     public TrackLibraryMonitor(IMessenger messenger, LibraryRefreshMessageHandler libraryRefreshHandler, TrackImportedMessageHandler trackImportedHandler)
     {
@@ -21,11 +21,10 @@ public partial class TrackLibraryMonitor : ITrackLibraryMonitor
         _subscriptions.Add(messenger.Subscribe<LibraryRefreshMessage>(_libraryRefreshHandler.Handle));
         _subscriptions.Add(messenger.Subscribe<AlbumImportedMessage>(_trackImportedHandler.Handle));
 
-        _libraryRefreshHandler.LibraryChanged += OnLibraryChanged;
-        _trackImportedHandler.TrackImported += OnLibraryChanged;
+        _libraryRefreshHandler.LibraryChanged += OnLibraryRefreshed;
     }
 
-    private void OnLibraryChanged(object? sender, EventArgs e) => LibraryChanged?.Invoke(this, EventArgs.Empty);
+    private void OnLibraryRefreshed(object? sender, EventArgs e) => LibraryRefreshed?.Invoke(this, EventArgs.Empty);
 
     public void ResetUpdateFlags()
     {
@@ -44,8 +43,7 @@ public partial class TrackLibraryMonitor : ITrackLibraryMonitor
                 subscription.Dispose();
             _subscriptions.Clear();
 
-            _libraryRefreshHandler.LibraryChanged -= OnLibraryChanged;
-            _trackImportedHandler.TrackImported -= OnLibraryChanged;
+            _libraryRefreshHandler.LibraryChanged -= OnLibraryRefreshed;
         }
 
         _disposed = true;

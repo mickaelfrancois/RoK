@@ -13,99 +13,152 @@
     <Grid>
         <Pivot>
             <PivotItem x:Uid="OptionTabOptions">
-                <Border Background="{ThemeResource CardBackgroundFillColorDefault}" Padding="4" CornerRadius="12" Margin="8">
-                    <StackPanel Spacing="10" Margin="6,12,0,0">
-                        <StackPanel Orientation="Vertical" Spacing="12" VerticalAlignment="Center">
-                            <TextBlock x:Uid="optionsThemeLabel" VerticalAlignment="Center" />
-                            <ComboBox Width="220" SelectedValuePath="Tag" SelectedValue="{x:Bind ThemeString, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
-                                <ComboBoxItem x:Uid="optionsThemeSystemItem" Tag="System" />
-                                <ComboBoxItem x:Uid="optionsThemeLightItem" Tag="Light" />
-                                <ComboBoxItem x:Uid="optionsThemeDarkItem" Tag="Dark" />
-                            </ComboBox>
+                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <StackPanel Spacing="12" Margin="8,8,16,16">
+                        <Border Background="{ThemeResource CardBackgroundFillColorSecondaryBrush}"
+                                BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                                BorderThickness="1"
+                                CornerRadius="8"
+                                Padding="16,12">
+                            <StackPanel Spacing="12">
+                                <TextBlock x:Uid="OptionsSectionAppearance" Style="{ThemeResource SubtitleTextBlockStyle}" />
+                                <TextBlock x:Uid="optionsThemeLabel" VerticalAlignment="Center" />
+                                <ComboBox Width="220" SelectedValuePath="Tag" SelectedValue="{x:Bind ThemeString, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+                                    <ComboBoxItem x:Uid="optionsThemeSystemItem" Tag="System" />
+                                    <ComboBoxItem x:Uid="optionsThemeLightItem" Tag="Light" />
+                                    <ComboBoxItem x:Uid="optionsThemeDarkItem" Tag="Dark" />
+                                </ComboBox>
 
-                            <!-- Language Selection -->
-                            <TextBlock x:Uid="optionsLanguageLabel" VerticalAlignment="Center" />
-                            <ComboBox Width="220" ItemsSource="{x:Bind AvailableLanguages}" SelectedValue="{x:Bind SelectedLanguage, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
-                                <ComboBox.ItemTemplate>
-                                    <DataTemplate>
-                                        <StackPanel Orientation="Horizontal">
-                                            <TextBlock Text="{Binding}" />
-                                            <TextBlock x:Uid="optionsLanguageAutoTranslation" Visibility="{Binding Converter={StaticResource LanguageAutoTranslationConverter}}" />
-                                        </StackPanel>
-                                    </DataTemplate>
-                                </ComboBox.ItemTemplate>
-                            </ComboBox>
-                        </StackPanel>
-
-                        <ToggleSwitch x:Uid="OptionsHideArtistsSwitch"
-                                      IsOn="{x:Bind Options.HideArtistsWithoutAlbum, Mode=TwoWay}"
-                                      x:Name="HideArtistsSwitch"
-                                      VerticalAlignment="Center" />
-                        <StackPanel Spacing="2">
-                            <ToggleSwitch x:Uid="OptionsCrossFadeSwitch"
-                                          x:Name="OptionsCrossFadeSwitch"
-                                          IsOn="{x:Bind Options.CrossFade, Mode=TwoWay}" />
-                            <TextBlock x:Uid="OptionsCrossFadeDescription"
-                                       Style="{ThemeResource CaptionTextBlockStyle}"
-                                       Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                                       TextWrapping="WrapWholeWords" />
-                        </StackPanel>
-                        <StackPanel Spacing="8">
-                            <TextBlock x:Uid="OptionsReplayGainModeLabel" />
-                            <ComboBox Width="220" SelectedValuePath="Tag" SelectedValue="{x:Bind ReplayGainModeString, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
-                                <ComboBoxItem x:Uid="OptionsReplayGainModeOffItem" Tag="Off" />
-                                <ComboBoxItem x:Uid="OptionsReplayGainModeTrackItem" Tag="Track" />
-                                <ComboBoxItem x:Uid="OptionsReplayGainModeAlbumItem" Tag="Album" />
-                                <ComboBoxItem x:Uid="OptionsReplayGainModeAutoItem" Tag="Auto" />
-                            </ComboBox>
-                            <Slider x:Uid="OptionsReplayGainPreampSlider"
-                                    Width="220"
-                                    HorizontalAlignment="Left"
-                                    Minimum="{x:Bind ReplayGainPreampMin}"
-                                    Maximum="{x:Bind ReplayGainPreampMax}"
-                                    StepFrequency="{x:Bind ReplayGainPreampStep}"
-                                    SnapsTo="StepValues"
-                                    TickFrequency="1"
-                                    TickPlacement="Outside"
-                                    Value="{x:Bind ReplayGainPreampDb, Mode=TwoWay}" />
-                            <TextBlock x:Uid="OptionsReplayGainDescription"
-                                       Style="{ThemeResource CaptionTextBlockStyle}"
-                                       Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                                       TextWrapping="WrapWholeWords" />
-                        </StackPanel>
-                        <StackPanel Spacing="8">
-                            <TextBlock x:Uid="OptionsOutputDeviceLabel" />
-                            <ComboBox x:Name="OutputDeviceComboBox"
-                                      MinWidth="220"
-                                      MaxWidth="420"
-                                      SelectionChanged="OutputDeviceComboBox_SelectionChanged" />
-                            <TextBlock x:Uid="OptionsOutputModeLabel" />
-                            <ComboBox Width="220" SelectedValuePath="Tag" SelectedValue="{x:Bind OutputModeString, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
-                                <ComboBoxItem x:Uid="OptionsOutputModeSharedItem" Tag="Shared" />
-                                <ComboBoxItem x:Uid="OptionsOutputModeExclusiveItem" Tag="Exclusive" />
-                            </ComboBox>
-                            <TextBlock x:Uid="OptionsOutputModeDescription"
-                                       Style="{ThemeResource CaptionTextBlockStyle}"
-                                       Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                                       TextWrapping="WrapWholeWords" />
-                            <TextBlock x:Name="OutputStatusText"
-                                       Style="{ThemeResource CaptionTextBlockStyle}"
-                                       TextWrapping="WrapWholeWords" />
-                        </StackPanel>
-                        <ToggleSwitch x:Uid="optionsRefreshAtStartupSwitch"
-                                      x:Name="optionsRefreshAtStartupSwitch"
-                                      IsOn="{x:Bind Options.RefreshLibraryAtStartup, Mode=TwoWay}" />
-                        <ToggleSwitch x:Uid="OptionsImportWithArtistGenreSwitch"
-                                      IsOn="{x:Bind Options.ImportTrackWithArtistGenre, Mode=TwoWay}" />
-                        <ToggleSwitch x:Uid="OptionsPauseOnCall"
-                                      IsOn="{x:Bind Options.PauseOnCall, Mode=TwoWay}" />
-                        <ToggleSwitch x:Uid="OptionsNovaApiEnabledSwitch"
-                                      IsOn="{x:Bind Options.NovaApiEnabled, Mode=TwoWay}" />
-                        <ToggleSwitch x:Uid="OptionsTelemetryEnabledSwitch"
-                                      IsOn="{x:Bind Options.TelemetryEnabled, Mode=TwoWay}" />
-
+                                <!-- Language Selection -->
+                                <TextBlock x:Uid="optionsLanguageLabel" VerticalAlignment="Center" />
+                                <ComboBox Width="220" ItemsSource="{x:Bind AvailableLanguages}" SelectedValue="{x:Bind SelectedLanguage, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+                                    <ComboBox.ItemTemplate>
+                                        <DataTemplate>
+                                            <StackPanel Orientation="Horizontal">
+                                                <TextBlock Text="{Binding}" />
+                                                <TextBlock x:Uid="optionsLanguageAutoTranslation" Visibility="{Binding Converter={StaticResource LanguageAutoTranslationConverter}}" />
+                                            </StackPanel>
+                                        </DataTemplate>
+                                    </ComboBox.ItemTemplate>
+                                </ComboBox>
+                            </StackPanel>
+                        </Border>
+                        <Border Background="{ThemeResource CardBackgroundFillColorSecondaryBrush}"
+                                BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                                BorderThickness="1"
+                                CornerRadius="8"
+                                Padding="16,12">
+                            <StackPanel Spacing="12">
+                                <TextBlock x:Uid="OptionsSectionPlayback" Style="{ThemeResource SubtitleTextBlockStyle}" />
+                                <StackPanel Spacing="2">
+                                    <ToggleSwitch x:Uid="OptionsCrossFadeSwitch"
+                                                  x:Name="OptionsCrossFadeSwitch"
+                                                  IsOn="{x:Bind Options.CrossFade, Mode=TwoWay}" />
+                                    <TextBlock x:Uid="OptionsCrossFadeDescription"
+                                               Style="{ThemeResource CaptionTextBlockStyle}"
+                                               Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                               TextWrapping="WrapWholeWords" />
+                                    <Slider x:Uid="OptionsCrossfadeDurationSlider"
+                                            Width="220"
+                                            Margin="0,8,0,0"
+                                            HorizontalAlignment="Left"
+                                            Minimum="{x:Bind CrossfadeDurationMin}"
+                                            Maximum="{x:Bind CrossfadeDurationMax}"
+                                            StepFrequency="1"
+                                            SnapsTo="StepValues"
+                                            TickFrequency="1"
+                                            TickPlacement="Outside"
+                                            IsEnabled="{x:Bind OptionsCrossFadeSwitch.IsOn, Mode=OneWay}"
+                                            Value="{x:Bind CrossfadeDurationSeconds, Mode=TwoWay}" />
+                                </StackPanel>
+                                <StackPanel Spacing="8">
+                                    <TextBlock x:Uid="OptionsReplayGainModeLabel" />
+                                    <ComboBox Width="220" SelectedValuePath="Tag" SelectedValue="{x:Bind ReplayGainModeString, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+                                        <ComboBoxItem x:Uid="OptionsReplayGainModeOffItem" Tag="Off" />
+                                        <ComboBoxItem x:Uid="OptionsReplayGainModeTrackItem" Tag="Track" />
+                                        <ComboBoxItem x:Uid="OptionsReplayGainModeAlbumItem" Tag="Album" />
+                                        <ComboBoxItem x:Uid="OptionsReplayGainModeAutoItem" Tag="Auto" />
+                                    </ComboBox>
+                                    <Slider x:Uid="OptionsReplayGainPreampSlider"
+                                            Width="220"
+                                            HorizontalAlignment="Left"
+                                            Minimum="{x:Bind ReplayGainPreampMin}"
+                                            Maximum="{x:Bind ReplayGainPreampMax}"
+                                            StepFrequency="{x:Bind ReplayGainPreampStep}"
+                                            SnapsTo="StepValues"
+                                            TickFrequency="1"
+                                            TickPlacement="Outside"
+                                            Value="{x:Bind ReplayGainPreampDb, Mode=TwoWay}" />
+                                    <TextBlock x:Uid="OptionsReplayGainDescription"
+                                               Style="{ThemeResource CaptionTextBlockStyle}"
+                                               Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                               TextWrapping="WrapWholeWords" />
+                                </StackPanel>
+                                <ToggleSwitch x:Uid="OptionsPauseOnCall"
+                                              IsOn="{x:Bind Options.PauseOnCall, Mode=TwoWay}" />
+                            </StackPanel>
+                        </Border>
+                        <Border Background="{ThemeResource CardBackgroundFillColorSecondaryBrush}"
+                                BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                                BorderThickness="1"
+                                CornerRadius="8"
+                                Padding="16,12">
+                            <StackPanel Spacing="12">
+                                <TextBlock x:Uid="OptionsSectionAudioOutput" Style="{ThemeResource SubtitleTextBlockStyle}" />
+                                <StackPanel Spacing="8">
+                                    <TextBlock x:Uid="OptionsOutputDeviceLabel" />
+                                    <ComboBox x:Name="OutputDeviceComboBox"
+                                              MinWidth="220"
+                                              MaxWidth="420"
+                                              SelectionChanged="OutputDeviceComboBox_SelectionChanged" />
+                                    <TextBlock x:Uid="OptionsOutputModeLabel" />
+                                    <ComboBox Width="220" SelectedValuePath="Tag" SelectedValue="{x:Bind OutputModeString, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+                                        <ComboBoxItem x:Uid="OptionsOutputModeSharedItem" Tag="Shared" />
+                                        <ComboBoxItem x:Uid="OptionsOutputModeExclusiveItem" Tag="Exclusive" />
+                                    </ComboBox>
+                                    <TextBlock x:Uid="OptionsOutputModeDescription"
+                                               Style="{ThemeResource CaptionTextBlockStyle}"
+                                               Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                               TextWrapping="WrapWholeWords" />
+                                    <TextBlock x:Name="OutputStatusText"
+                                               Style="{ThemeResource CaptionTextBlockStyle}"
+                                               TextWrapping="WrapWholeWords" />
+                                </StackPanel>
+                            </StackPanel>
+                        </Border>
+                        <Border Background="{ThemeResource CardBackgroundFillColorSecondaryBrush}"
+                                BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                                BorderThickness="1"
+                                CornerRadius="8"
+                                Padding="16,12">
+                            <StackPanel Spacing="12">
+                                <TextBlock x:Uid="OptionsSectionLibrary" Style="{ThemeResource SubtitleTextBlockStyle}" />
+                                <ToggleSwitch x:Uid="optionsRefreshAtStartupSwitch"
+                                              x:Name="optionsRefreshAtStartupSwitch"
+                                              IsOn="{x:Bind Options.RefreshLibraryAtStartup, Mode=TwoWay}" />
+                                <ToggleSwitch x:Uid="OptionsHideArtistsSwitch"
+                                              IsOn="{x:Bind Options.HideArtistsWithoutAlbum, Mode=TwoWay}"
+                                              x:Name="HideArtistsSwitch"
+                                              VerticalAlignment="Center" />
+                                <ToggleSwitch x:Uid="OptionsImportWithArtistGenreSwitch"
+                                              IsOn="{x:Bind Options.ImportTrackWithArtistGenre, Mode=TwoWay}" />
+                            </StackPanel>
+                        </Border>
+                        <Border Background="{ThemeResource CardBackgroundFillColorSecondaryBrush}"
+                                BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                                BorderThickness="1"
+                                CornerRadius="8"
+                                Padding="16,12">
+                            <StackPanel Spacing="12">
+                                <TextBlock x:Uid="OptionsSectionOnline" Style="{ThemeResource SubtitleTextBlockStyle}" />
+                                <ToggleSwitch x:Uid="OptionsNovaApiEnabledSwitch"
+                                              IsOn="{x:Bind Options.NovaApiEnabled, Mode=TwoWay}" />
+                                <ToggleSwitch x:Uid="OptionsTelemetryEnabledSwitch"
+                                              IsOn="{x:Bind Options.TelemetryEnabled, Mode=TwoWay}" />
+                            </StackPanel>
+                        </Border>
                     </StackPanel>
-                </Border>
+                </ScrollViewer>
             </PivotItem>
 
             <PivotItem x:Uid="OptionTabShortcuts">

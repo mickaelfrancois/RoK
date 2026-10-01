@@ -26,6 +26,9 @@ public interface IAppOptions
 
     bool CrossFade { get; set; }
 
+    /// <summary>Crossfade duration in seconds, within <see cref="Player.CrossfadeDuration"/> bounds.</summary>
+    int CrossfadeDurationSeconds { get; set; }
+
     EReplayGainMode ReplayGainMode { get; set; }
 
     double ReplayGainPreampDb { get; set; }

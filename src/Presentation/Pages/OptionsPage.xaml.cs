@@ -70,6 +70,16 @@ public sealed partial class OptionsPage : Page
         }
     }
 
+    public double CrossfadeDurationSeconds
+    {
+        get => CrossfadeDuration.Clamp(Options.CrossfadeDurationSeconds);
+        set => Options.CrossfadeDurationSeconds = CrossfadeDuration.Clamp((int)Math.Round(value));
+    }
+
+    public double CrossfadeDurationMin => CrossfadeDuration.MinSeconds;
+
+    public double CrossfadeDurationMax => CrossfadeDuration.MaxSeconds;
+
     public double ReplayGainPreampMin => ReplayGainCalculator.MinPreampDb;
 
     public double ReplayGainPreampMax => ReplayGainCalculator.MaxPreampDb;
@@ -190,8 +200,16 @@ public sealed partial class OptionsPage : Page
         _messenger.Send(new AudioOutputOptionsChanged());
     }
 
-    private void ShowOutputStatus(AudioOutputState state, bool isLive) =>
-        OutputStatusText.Text = _resourceLoader.GetString(AudioOutputTextKeys.Status(AudioOutputStatusResolver.Resolve(state, isLive)));
+    private void ShowOutputStatus(AudioOutputState state, bool isLive)
+    {
+        EAudioOutputStatus status = AudioOutputStatusResolver.Resolve(state, isLive);
+        string text = _resourceLoader.GetString(AudioOutputTextKeys.Status(status));
+
+        if (status == EAudioOutputStatus.SharedFallback && state.FallbackReason is EExclusiveFallbackReason reason)
+            text += Environment.NewLine + _resourceLoader.GetString(AudioOutputTextKeys.FallbackToolTip(reason));
+
+        OutputStatusText.Text = text;
+    }
 
     private sealed record OutputDeviceItem(string Id, string Name);
 

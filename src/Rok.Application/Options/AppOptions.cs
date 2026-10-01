@@ -36,6 +36,8 @@ public class AppOptions : IAppOptions
 
     public bool CrossFade { get; set; } = true;
 
+    public int CrossfadeDurationSeconds { get; set; } = CrossfadeDuration.DefaultSeconds;
+
     public EReplayGainMode ReplayGainMode { get; set; } = EReplayGainMode.Auto;
 
     public double ReplayGainPreampDb { get; set; } = 0;
@@ -140,6 +142,7 @@ public class AppOptions : IAppOptions
         DiscordRichPresenceEnabled = options.DiscordRichPresenceEnabled;
         PauseOnCall = options.PauseOnCall;
         CrossFade = options.CrossFade;
+        CrossfadeDurationSeconds = options.CrossfadeDurationSeconds;
         IsGridView = options.IsGridView;
         ReplayGainMode = options.ReplayGainMode;
         ReplayGainPreampDb = options.ReplayGainPreampDb;

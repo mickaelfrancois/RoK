@@ -2042,7 +2042,7 @@
     <value>Añadir</value>
   </data>
   <data name="OptionsOutputDeviceLabel.Text" xml:space="preserve">
-    <value>Salida de audio</value>
+    <value>Dispositivo</value>
   </data>
   <data name="OptionsOutputDeviceDefault" xml:space="preserve">
     <value>Dispositivo predeterminado de Windows</value>
@@ -2078,7 +2078,7 @@
     <value>Estado: reproducción compartida, se rechazó el modo exclusivo</value>
   </data>
   <data name="PlayerOutputFallbackFormatRefused" xml:space="preserve">
-    <value>Reproducción en modo compartido en lugar de exclusivo: el sonido pasa por el mezclador de Windows, que puede remuestrearlo. Causa: el dispositivo rechaza el formato de este archivo. Rok volverá a intentar el modo exclusivo en la siguiente pista.</value>
+    <value>Reproducción en modo compartido en lugar de exclusivo: el sonido pasa por el mezclador de Windows, que puede remuestrearlo. Causa: el dispositivo no acepta la frecuencia de este archivo en modo exclusivo. Muchos dispositivos, como los auriculares Bluetooth y las pantallas HDMI, solo aceptan 48 kHz. Para una reproducción bit-perfect, elija un dispositivo que acepte la frecuencia original, como un DAC USB o una salida digital.</value>
   </data>
   <data name="PlayerOutputFallbackDeviceBusy" xml:space="preserve">
     <value>Reproducción en modo compartido en lugar de exclusivo: el sonido pasa por el mezclador de Windows, que puede remuestrearlo. Causa: otra aplicación usa el dispositivo en modo exclusivo. Rok volverá a intentar el modo exclusivo en la siguiente pista.</value>
@@ -2088,5 +2088,23 @@
   </data>
   <data name="PlayerOutputFallbackOther" xml:space="preserve">
     <value>Reproducción en modo compartido en lugar de exclusivo: el sonido pasa por el mezclador de Windows, que puede remuestrearlo. Causa: no se pudo abrir la salida exclusiva. Rok volverá a intentar el modo exclusivo en la siguiente pista.</value>
+  </data>
+  <data name="OptionsSectionAppearance.Text" xml:space="preserve">
+    <value>Apariencia</value>
+  </data>
+  <data name="OptionsSectionPlayback.Text" xml:space="preserve">
+    <value>Reproducción</value>
+  </data>
+  <data name="OptionsSectionAudioOutput.Text" xml:space="preserve">
+    <value>Salida de audio</value>
+  </data>
+  <data name="OptionsSectionLibrary.Text" xml:space="preserve">
+    <value>Biblioteca</value>
+  </data>
+  <data name="OptionsSectionOnline.Text" xml:space="preserve">
+    <value>Servicios en línea y privacidad</value>
+  </data>
+  <data name="OptionsCrossfadeDurationSlider.Header" xml:space="preserve">
+    <value>Duración del fundido (s)</value>
   </data>
 </root>

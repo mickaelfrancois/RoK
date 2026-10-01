@@ -2100,7 +2100,7 @@
     <value>Додати</value>
   </data>
   <data name="OptionsOutputDeviceLabel.Text" xml:space="preserve">
-    <value>Аудіовихід</value>
+    <value>Пристрій</value>
   </data>
   <data name="OptionsOutputDeviceDefault" xml:space="preserve">
     <value>Пристрій Windows за замовчуванням</value>
@@ -2136,7 +2136,7 @@
     <value>Стан: спільне відтворення, монопольний режим відхилено</value>
   </data>
   <data name="PlayerOutputFallbackFormatRefused" xml:space="preserve">
-    <value>Відтворення у спільному режимі замість монопольного: звук проходить через мікшер Windows, який може його передискретизувати. Причина: пристрій не приймає формат цього файлу. Rok знову спробує монопольний режим на наступному треку.</value>
+    <value>Відтворення в спільному режимі замість ексклюзивного: звук проходить через мікшер Windows, який може змінити частоту дискретизації. Причина: пристрій не приймає частоту цього файлу в ексклюзивному режимі. Багато пристроїв, зокрема Bluetooth-гарнітури та HDMI-дисплеї, приймають лише 48 кГц. Для відтворення bit-perfect виберіть пристрій, який приймає вихідну частоту, наприклад USB-ЦАП або цифровий вихід.</value>
   </data>
   <data name="PlayerOutputFallbackDeviceBusy" xml:space="preserve">
     <value>Відтворення у спільному режимі замість монопольного: звук проходить через мікшер Windows, який може його передискретизувати. Причина: інша програма використовує пристрій у монопольному режимі. Rok знову спробує монопольний режим на наступному треку.</value>
@@ -2146,5 +2146,23 @@
   </data>
   <data name="PlayerOutputFallbackOther" xml:space="preserve">
     <value>Відтворення у спільному режимі замість монопольного: звук проходить через мікшер Windows, який може його передискретизувати. Причина: не вдалося відкрити монопольний вихід. Rok знову спробує монопольний режим на наступному треку.</value>
+  </data>
+  <data name="OptionsSectionAppearance.Text" xml:space="preserve">
+    <value>Вигляд</value>
+  </data>
+  <data name="OptionsSectionPlayback.Text" xml:space="preserve">
+    <value>Відтворення</value>
+  </data>
+  <data name="OptionsSectionAudioOutput.Text" xml:space="preserve">
+    <value>Аудіовихід</value>
+  </data>
+  <data name="OptionsSectionLibrary.Text" xml:space="preserve">
+    <value>Бібліотека</value>
+  </data>
+  <data name="OptionsSectionOnline.Text" xml:space="preserve">
+    <value>Онлайн-сервіси та конфіденційність</value>
+  </data>
+  <data name="OptionsCrossfadeDurationSlider.Header" xml:space="preserve">
+    <value>Тривалість переходу (с)</value>
   </data>
 </root>

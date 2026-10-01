@@ -2209,7 +2209,7 @@
     <value>Ajouter</value>
   </data>
   <data name="OptionsOutputDeviceLabel.Text" xml:space="preserve">
-    <value>Sortie audio</value>
+    <value>Périphérique</value>
   </data>
   <data name="OptionsOutputDeviceDefault" xml:space="preserve">
     <value>Périphérique par défaut de Windows</value>
@@ -2245,7 +2245,7 @@
     <value>État : lecture en partagé, le mode exclusif a été refusé</value>
   </data>
   <data name="PlayerOutputFallbackFormatRefused" xml:space="preserve">
-    <value>Lecture en partagé au lieu de l'exclusif : le son passe par le mixeur Windows, qui peut le rééchantillonner. Cause : le périphérique refuse le format de ce fichier. Rok retentera l'exclusif à la piste suivante.</value>
+    <value>Lecture en partagé au lieu de l'exclusif : le son passe par le mixeur Windows, qui peut le rééchantillonner. Cause : le périphérique n'accepte pas la fréquence de ce fichier en mode exclusif. Beaucoup de périphériques, dont les casques Bluetooth et les écrans HDMI, n'acceptent que 48 kHz. Pour une lecture bit-perfect, choisissez un périphérique qui accepte la fréquence d'origine, comme un DAC USB ou une sortie numérique.</value>
   </data>
   <data name="PlayerOutputFallbackDeviceBusy" xml:space="preserve">
     <value>Lecture en partagé au lieu de l'exclusif : le son passe par le mixeur Windows, qui peut le rééchantillonner. Cause : une autre application utilise le périphérique en mode exclusif. Rok retentera l'exclusif à la piste suivante.</value>
@@ -2255,5 +2255,23 @@
   </data>
   <data name="PlayerOutputFallbackOther" xml:space="preserve">
     <value>Lecture en partagé au lieu de l'exclusif : le son passe par le mixeur Windows, qui peut le rééchantillonner. Cause : la sortie exclusive n'a pas pu s'ouvrir. Rok retentera l'exclusif à la piste suivante.</value>
+  </data>
+  <data name="OptionsSectionAppearance.Text" xml:space="preserve">
+    <value>Apparence</value>
+  </data>
+  <data name="OptionsSectionPlayback.Text" xml:space="preserve">
+    <value>Lecture</value>
+  </data>
+  <data name="OptionsSectionAudioOutput.Text" xml:space="preserve">
+    <value>Sortie audio</value>
+  </data>
+  <data name="OptionsSectionLibrary.Text" xml:space="preserve">
+    <value>Bibliothèque</value>
+  </data>
+  <data name="OptionsSectionOnline.Text" xml:space="preserve">
+    <value>Services en ligne et confidentialité</value>
+  </data>
+  <data name="OptionsCrossfadeDurationSlider.Header" xml:space="preserve">
+    <value>Durée du fondu (s)</value>
   </data>
 </root>
