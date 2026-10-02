@@ -58,6 +58,7 @@ Rok is a Windows desktop application for managing and playing your local music c
 - **C# 13** — Latest language features (`LangVersion=preview`)
 - **WinUI 3 / Windows App SDK 2.2** — Native Windows UI framework and platform APIs
 - **NAudio** — Audio playback engine
+- **SoundTouch.Net** — Tempo stretching for Mix mode (LGPL-2.1)
 - **SQLite** + **Dapper** — Local database and high-performance micro-ORM
 - **TagLibSharp** — Audio metadata reading/writing
 - **CleanArch.DevKit.Mediator** — Source-generated mediator (CQRS, validation, Result pattern, messaging)

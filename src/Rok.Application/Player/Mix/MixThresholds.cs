@@ -123,4 +123,19 @@ public static class MixThresholds
 
     /// <summary>Fraction of the best autocorrelation peak a faster tempo must reach to be preferred.</summary>
     public const double OctavePeakRatio = 0.9;
+
+    /// <summary>Largest relative tempo change applied to the incoming track to match the outgoing one (8 %).</summary>
+    public const double MaxTempoStretch = 0.08;
+
+    /// <summary>Relative tempo change under which the incoming track is left untouched (ratio brought back to 1).</summary>
+    public const double MinTempoStretch = 0.001;
+
+    /// <summary>Length, in outgoing bars, of a mix that time-stretches the incoming track.</summary>
+    public const int StretchMixBars = 8;
+
+    /// <summary>Length, in outgoing bars, of a stretched mix when <see cref="StretchMixBars"/> does not fit.</summary>
+    public const int StretchMixFallbackBars = 4;
+
+    /// <summary>Number of incoming bars over which the stretched tempo returns to the original one.</summary>
+    public const int TempoReturnBars = 8;
 }

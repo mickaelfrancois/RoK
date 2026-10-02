@@ -1,4 +1,5 @@
-﻿using CleanArch.DevKit.Guards;
+﻿using System.Globalization;
+using CleanArch.DevKit.Guards;
 using Microsoft.Extensions.Logging;
 using Rok.Application.Interfaces;
 using Rok.Application.Interfaces.Pictures;
@@ -529,7 +530,7 @@ public sealed class PlayerService : IPlayerService, IDisposable
             }
 
             _logger.LogInformation(
-                "Mix: {Track} -> {Next}, beat-aligned {Aligned}, BPM {OutgoingBpm}/{IncomingBpm}, start shift {Shift}s, bass swap at {SwapAt}s, mix point {MixPoint}, score {MixPointScore}",
+                "Mix: {Track} -> {Next}, beat-aligned {Aligned}, BPM {OutgoingBpm}/{IncomingBpm}, start shift {Shift}s, bass swap at {SwapAt}s, mix point {MixPoint}, score {MixPointScore}, stretch {Stretch}, bars {Bars}",
                 current.Title,
                 next.Title,
                 plan.Alignment != null,
@@ -538,7 +539,9 @@ public sealed class PlayerService : IPlayerService, IDisposable
                 plan.Alignment?.StartShiftSeconds ?? 0,
                 plan.BassSwapAtSeconds,
                 plan.MixPointScore != null,
-                outro?.MixPoint?.Score);
+                outro?.MixPoint?.Score,
+                plan.Stretch?.Ratio.ToString("0.000", CultureInfo.InvariantCulture) ?? "none",
+                plan.Stretch?.Bars ?? 0);
 
             lock (_transitionLock)
             {
@@ -1156,11 +1159,25 @@ public sealed class PlayerService : IPlayerService, IDisposable
         double position = _player.Position;
         (double duration, double incomingStart, double bassSwapAt) = MixTransitionPlanner.ResolveAt(plan, position);
 
-        _logger.LogDebug("Starting mix to {Track} over {Duration}s from {Start}s, bass swap at {BassSwapAt}s", nextTrack.Title, duration, incomingStart, bassSwapAt);
+        _logger.LogDebug(
+            "Starting mix to {Track} over {Duration}s from {Start}s, bass swap at {BassSwapAt}s, stretch {Stretch}, bars {Bars}",
+            nextTrack.Title,
+            duration,
+            incomingStart,
+            bassSwapAt,
+            plan.Stretch?.Ratio.ToString("0.000", CultureInfo.InvariantCulture) ?? "none",
+            plan.Stretch?.Bars ?? 0);
+
+        MixTransition transition = new(
+            incomingStart,
+            BassSwap: true,
+            BassSwapAtSeconds: bassSwapAt,
+            Stretch: plan.Stretch,
+            ReferencePositionSeconds: plan.Alignment != null ? position : null);
 
         long durationPlayed = (long)position;
 
-        await _player.CrossfadeToAsync(nextTrack, ResolveReplayGain(nextIndex), duration, new MixTransition(incomingStart, BassSwap: true, BassSwapAtSeconds: bassSwapAt), cancellationToken);
+        await _player.CrossfadeToAsync(nextTrack, ResolveReplayGain(nextIndex), duration, transition, cancellationToken);
 
         cancellationToken.ThrowIfCancellationRequested();
 

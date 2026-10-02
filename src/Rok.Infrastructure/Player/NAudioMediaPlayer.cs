@@ -63,6 +63,8 @@ public class NAudioMediaPlayer : IPlayerEngine, IDisposable
     private bool _aboutToEndRaised;
     private bool disposedValue;
 
+    internal TimeStretchSampleProvider? CurrentTimeStretch => _pipeline?.TimeStretch;
+
     public double Position => _pipeline?.Reader.CurrentTime.TotalSeconds ?? 0;
 
     public double Length
@@ -125,6 +127,8 @@ public class NAudioMediaPlayer : IPlayerEngine, IDisposable
 
         if (output is not null && output.Player.PlaybackState == PlaybackState.Playing)
             output.Player.Pause();
+
+        _pipeline?.TimeStretch.ReturnToOriginalTempo();
 
         _positionTimer.Stop();
         OnMediaStateChanged?.Invoke(this, EventArgs.Empty);
@@ -236,6 +240,7 @@ public class NAudioMediaPlayer : IPlayerEngine, IDisposable
         if (position < 0)
             position = 0;
 
+        pipeline.TimeStretch.Reset();
         pipeline.Reader.CurrentTime = TimeSpan.FromSeconds(position);
         _cueGate.Rearm();
 
@@ -683,14 +688,8 @@ public class NAudioMediaPlayer : IPlayerEngine, IDisposable
         if (nextLength > 0)
             durationSeconds = Math.Min(durationSeconds, (nextLength - incomingStart) / 2);
 
-        TimeSpan duration = TimeSpan.FromSeconds(durationSeconds);
-        bool bassSwap = transition.BassSwap && BassSwapCurve.Applies(durationSeconds);
-        TimeSpan swapAt = TimeSpan.FromSeconds(BassSwapCurve.ResolveSwapAt(transition.BassSwapAtSeconds, durationSeconds));
-
-        if (bassSwap)
-            nextPipeline.BassSwap.Start(EBassSwapRole.Incoming, duration, swapAt);
-
-        nextPipeline.Fade.Start(EFadeDirection.In, duration);
+        double plannedSwapAt = BassSwapCurve.ResolveSwapAt(transition.BassSwapAtSeconds, durationSeconds);
+        double plannedDuration = durationSeconds;
 
         PlaybackPipeline? outgoing;
 
@@ -701,10 +700,56 @@ public class NAudioMediaPlayer : IPlayerEngine, IDisposable
         }
 
         AudioOutputHandle? nextOutput = null;
+        TimeSpan duration = TimeSpan.FromSeconds(plannedDuration);
+        TimeSpan swapAt = TimeSpan.FromSeconds(plannedSwapAt);
+        bool bassSwap = false;
 
         try
         {
+            Stopwatch opening = Stopwatch.StartNew();
             nextOutput = _outputFactory.Open(_target with { Mode = EAudioOutputMode.Shared }, nextPipeline.Output, 0);
+
+            double ratio = transition.Stretch?.Ratio ?? 1;
+            bool stretch = transition.Stretch is not null
+                && Math.Abs(ratio - 1) >= MixThresholds.MinTempoStretch
+                && TimeStretchSampleProvider.Supports(nextPipeline.Reader.WaveFormat);
+
+            double tempoRatio = stretch ? ratio : 1;
+            double outgoingPosition = outgoing?.Reader.CurrentTime.TotalSeconds ?? transition.ReferencePositionSeconds ?? 0;
+
+            var compensation = MixStartCompensation.Compute(transition.ReferencePositionSeconds, outgoingPosition, tempoRatio, plannedDuration, plannedSwapAt);
+
+            if (stretch)
+            {
+                try
+                {
+                    nextPipeline.TimeStretch.Start(tempoRatio, TimeSpan.FromSeconds(compensation.DurationSeconds), TimeSpan.FromSeconds(transition.Stretch!.ReturnSeconds));
+                    outgoingPosition = outgoing?.Reader.CurrentTime.TotalSeconds ?? outgoingPosition;
+                    compensation = MixStartCompensation.Compute(transition.ReferencePositionSeconds, outgoingPosition, tempoRatio, plannedDuration, plannedSwapAt);
+                }
+                catch (Exception ex) when (ex is not OperationCanceledException)
+                {
+                    _logger.LogWarning(ex, "Mix: tempo stretch unavailable, crossfading without it");
+                    nextPipeline.TimeStretch.Reset();
+                    tempoRatio = 1;
+                    outgoingPosition = outgoing?.Reader.CurrentTime.TotalSeconds ?? outgoingPosition;
+                    compensation = MixStartCompensation.Compute(transition.ReferencePositionSeconds, outgoingPosition, tempoRatio, plannedDuration, plannedSwapAt);
+                }
+            }
+
+            nextPipeline.TimeStretch.SkipSource(TimeSpan.FromSeconds(compensation.SkipSeconds));
+
+            duration = TimeSpan.FromSeconds(compensation.DurationSeconds);
+            swapAt = TimeSpan.FromSeconds(compensation.BassSwapAtSeconds);
+            bassSwap = transition.BassSwap && BassSwapCurve.Applies(compensation.DurationSeconds);
+
+            if (bassSwap)
+                nextPipeline.BassSwap.Start(EBassSwapRole.Incoming, duration, swapAt);
+
+            nextPipeline.Fade.Start(EFadeDirection.In, duration);
+
+            _logger.LogInformation("Mix: incoming output opened in {OpenMs} ms, start compensated by {SkipMs} ms", opening.ElapsedMilliseconds, (long)(compensation.SkipSeconds * 1000));
+
             nextOutput.Player.Play();
             TimeSpan outgoingRamp = outgoing is null ? duration : RemainingRamp(outgoing, duration);
             outgoing?.Fade.Start(EFadeDirection.Out, outgoingRamp);
@@ -778,6 +823,7 @@ public class NAudioMediaPlayer : IPlayerEngine, IDisposable
         AudioOutputHandle? previousOutput;
         PlaybackPipeline? previousPipeline;
 
+        // TimeStretch is deliberately not reset: its tempo ramp keeps running on the promoted pipeline.
         nextPipeline.Fade.Reset();
         nextPipeline.BassSwap.Reset();
         nextPipeline.Chain.SourceSwitched += Chain_SourceSwitched;

@@ -10,4 +10,16 @@ namespace Rok.Application.Player.Mix;
 /// Offset in seconds from the start of the mix at which the bass swap happens; null means the middle of the mix.
 /// A value that is not strictly inside the mix is ignored.
 /// </param>
-public sealed record MixTransition(double IncomingStartSeconds, bool BassSwap, double? BassSwapAtSeconds = null);
+/// <param name="Stretch">
+/// Time-stretch of the incoming track planned with the mix; null leaves the incoming track at its original tempo.
+/// </param>
+/// <param name="ReferencePositionSeconds">
+/// Position of the outgoing track the plan was computed for. The engine compares it with the position reached once the
+/// incoming output is open and compensates the delay; null disables the compensation.
+/// </param>
+public sealed record MixTransition(
+    double IncomingStartSeconds,
+    bool BassSwap,
+    double? BassSwapAtSeconds = null,
+    MixTempoStretch? Stretch = null,
+    double? ReferencePositionSeconds = null);
