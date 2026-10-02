@@ -420,4 +420,202 @@ public class MixTransitionPlannerTests
         Assert.Equal(plan.DurationSeconds / 2, plan.BassSwapAtSeconds);
         Assert.Null(plan.Alignment);
     }
+
+    private const double OutDownbeat = 170;
+    private const double MixPointSeconds = 186;
+    private const double Bar120 = 2;
+
+    private static BeatGrid GridWithDownbeat(double bpm, double first, double downbeat) => new(bpm, first, 0.9, BpmSource.Detected, downbeat);
+
+    private static MixPlan? PlanWithPoint(
+        MixPoint? point,
+        BeatGrid? outBeats,
+        BeatGrid? inBeats,
+        int slider = 6,
+        double musicEnd = 200,
+        double length = 210,
+        double introStart = 1.2)
+    {
+        return MixTransitionPlanner.Plan(Current, new OutroCues(musicEnd, 0, outBeats, point), Next, new IntroCues(introStart, inBeats), length, slider);
+    }
+
+    private static BeatGrid BarOut => GridWithDownbeat(120, OutDownbeat, OutDownbeat);
+
+    private static BeatGrid BarIn => GridWithDownbeat(120, 0.31, 0.81);
+
+    private static bool OnBar(double time, double downbeat, double barPeriod)
+    {
+        var ratio = (time - downbeat) / barPeriod;
+
+        return Math.Abs(ratio - Math.Round(ratio)) < 1e-6;
+    }
+
+    [Theory(DisplayName = "plan_below_the_threshold_is_identical_to_the_437_plan")]
+    [InlineData(0.0, true)]
+    [InlineData(0.44, true)]
+    [InlineData(0.0, false)]
+    public void Plan_MixPointBelowTheThreshold_IsIdenticalToThe437Plan(double score, bool withPoint)
+    {
+        // Arrange
+        var expected = PlanWithPoint(null, BarOut, BarIn);
+        MixPoint? point = withPoint ? new MixPoint(MixPointSeconds, score) : null;
+
+        // Act
+        var plan = PlanWithPoint(point, BarOut, BarIn);
+
+        // Assert
+        Assert.True(score < MixThresholds.MinMixPointScore);
+        Assert.Equal(expected, plan);
+        Assert.Null(plan!.MixPointScore);
+    }
+
+    [Theory(DisplayName = "mix_point_plan_stays_in_the_last_30_seconds_and_never_exceeds_the_slider")]
+    [InlineData(1, 170)]
+    [InlineData(1, 186)]
+    [InlineData(1, 198)]
+    [InlineData(6, 170)]
+    [InlineData(6, 186)]
+    [InlineData(6, 198)]
+    [InlineData(12, 170)]
+    [InlineData(12, 186)]
+    [InlineData(12, 198)]
+    public void Plan_MixPoint_StaysInTheWindowAndNeverExceedsTheSlider(int slider, double pointSeconds)
+    {
+        // Arrange
+        var fallback = PlanWithPoint(null, BarOut, BarIn, slider);
+
+        // Act
+        var plan = PlanWithPoint(new MixPoint(pointSeconds, 0.9), BarOut, BarIn, slider);
+
+        // Assert
+        Assert.NotNull(plan);
+        Assert.True(plan.StartSeconds >= 210 - 30);
+        Assert.True(plan.DurationSeconds <= CrossfadeDuration.Clamp(slider));
+        Assert.True(plan.StartSeconds + plan.DurationSeconds <= 200 + 1e-9);
+
+        if (pointSeconds < 180)
+        {
+            Assert.Equal(fallback, plan);
+        }
+        else
+        {
+            Assert.Equal(pointSeconds, plan.StartSeconds);
+            Assert.Equal(0.9, plan.MixPointScore);
+        }
+    }
+
+    [Fact(DisplayName = "mix_point_plan_starts_the_incoming_track_on_its_first_downbeat")]
+    public void Plan_MixPoint_StartsTheIncomingOnItsFirstDownbeat()
+    {
+        // Arrange & Act
+        var plan = PlanWithPoint(new MixPoint(MixPointSeconds, 0.9), BarOut, BarIn);
+
+        // Assert
+        Assert.NotNull(plan);
+        Assert.NotNull(plan.Alignment);
+        Assert.True(plan.Alignment.BarAligned);
+        Assert.Equal(2.81, plan.IncomingStartSeconds, 2);
+        Assert.True(plan.IncomingStartSeconds >= 1.2);
+    }
+
+    [Fact(DisplayName = "mix_point_bass_swap_falls_on_an_outgoing_bar")]
+    public void Plan_MixPoint_SwapsTheBassOnAnOutgoingBar()
+    {
+        // Arrange & Act
+        var plan = PlanWithPoint(new MixPoint(MixPointSeconds, 0.9), BarOut, BarIn);
+
+        // Assert
+        Assert.NotNull(plan);
+        Assert.True(OnBar(plan.StartSeconds + plan.BassSwapAtSeconds, OutDownbeat, Bar120));
+        Assert.InRange(plan.BassSwapAtSeconds, BassSwapCurve.RampSeconds / 2, plan.DurationSeconds - (BassSwapCurve.RampSeconds / 2));
+    }
+
+    [Fact(DisplayName = "mix_point_plan_without_incoming_downbeat_is_beat_aligned")]
+    public void Plan_MixPointWithoutIncomingDownbeat_IsBeatAligned()
+    {
+        // Arrange & Act
+        var plan = PlanWithPoint(new MixPoint(MixPointSeconds, 0.9), BarOut, Grid(120, 0.31));
+
+        // Assert
+        Assert.NotNull(plan);
+        Assert.NotNull(plan.Alignment);
+        Assert.False(plan.Alignment.BarAligned);
+        Assert.True(OnBeat(plan.IncomingStartSeconds, 0.31, 120));
+        Assert.True(plan.IncomingStartSeconds >= 1.2);
+        Assert.True(OnBeat(plan.StartSeconds + plan.BassSwapAtSeconds, OutDownbeat, 120));
+    }
+
+    [Fact(DisplayName = "mix_point_with_incompatible_tempos_is_used_unaligned")]
+    public void Plan_MixPointWithIncompatibleTempos_IsUsedUnaligned()
+    {
+        // Arrange & Act
+        var plan = PlanWithPoint(new MixPoint(MixPointSeconds, 0.9), BarOut, GridWithDownbeat(128, 0.2, 0.2));
+
+        // Assert
+        Assert.NotNull(plan);
+        Assert.Equal(MixPointSeconds, plan.StartSeconds);
+        Assert.Null(plan.Alignment);
+        Assert.Equal(1.2, plan.IncomingStartSeconds);
+        Assert.Equal(plan.DurationSeconds / 2, plan.BassSwapAtSeconds);
+        Assert.Equal(0.9, plan.MixPointScore);
+    }
+
+    [Fact(DisplayName = "plan_with_octave_tempos_is_bar_aligned_on_the_outgoing_bar")]
+    public void Plan_MixPointWithOctaveTempos_IsBarAlignedOnTheOutgoingBar()
+    {
+        // Arrange
+        var outBeats = GridWithDownbeat(87, 170.3, 170.3);
+        var outBar = outBeats.BarPeriodSeconds;
+        var point = new MixPoint(170.3 + (5 * outBar), 0.9);
+
+        // Act
+        var plan = PlanWithPoint(point, outBeats, GridWithDownbeat(174, 0.2, 0.2));
+
+        // Assert
+        Assert.NotNull(plan);
+        Assert.NotNull(plan.Alignment);
+        Assert.True(plan.Alignment.BarAligned);
+        Assert.True(OnBar(plan.StartSeconds + plan.BassSwapAtSeconds, 170.3, outBar));
+    }
+
+    [Fact(DisplayName = "resolve_at_keeps_the_bar_phase_when_late")]
+    public void ResolveAt_BarAlignedLate_KeepsTheBarPhase()
+    {
+        // Arrange
+        var plan = PlanWithPoint(new MixPoint(MixPointSeconds, 0.9), BarOut, BarIn)!;
+        var lateness = 1.3 * Bar120;
+        var position = plan.StartSeconds + lateness;
+
+        // Act
+        var (duration, incomingStart, bassSwapAt) = MixTransitionPlanner.ResolveAt(plan, position);
+
+        // Assert
+        Assert.Equal(plan.IncomingStartSeconds + (lateness % Bar120), incomingStart, 6);
+        Assert.True(OnBar(position + bassSwapAt, OutDownbeat, Bar120));
+        Assert.InRange(bassSwapAt, BassSwapCurve.RampSeconds / 2, duration - (BassSwapCurve.RampSeconds / 2));
+    }
+
+    [Theory(DisplayName = "planned_bass_swap_is_kept_by_the_engine_rule")]
+    [InlineData("bar")]
+    [InlineData("beat")]
+    [InlineData("none")]
+    [InlineData("octave")]
+    public void Plan_BassSwap_IsKeptByTheEngineRule(string mode)
+    {
+        // Arrange
+        var inBeats = mode switch
+        {
+            "bar" => BarIn,
+            "beat" => Grid(120, 0.31),
+            "octave" => GridWithDownbeat(240, 0.2, 0.2),
+            _ => GridWithDownbeat(128, 0.2, 0.2)
+        };
+
+        // Act
+        var plan = PlanWithPoint(new MixPoint(MixPointSeconds, 0.9), BarOut, inBeats)!;
+
+        // Assert
+        Assert.True(BassSwapCurve.Applies(plan.DurationSeconds));
+        Assert.Equal(plan.BassSwapAtSeconds, BassSwapCurve.ResolveSwapAt(plan.BassSwapAtSeconds, plan.DurationSeconds));
+    }
 }

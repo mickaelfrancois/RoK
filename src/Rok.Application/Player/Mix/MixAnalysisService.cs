@@ -30,31 +30,39 @@ public sealed class MixAnalysisService : IMixCueProvider, IDisposable
     private static readonly EdgeSpec<OutroCues> OutroSpec = new(
         EAudioEdge.Tail,
         MixCueDetector.DetectOutro,
-        (row, beats) => row.MusicEndSeconds is { } end && row.FadeOutSeconds is { } fade ? new OutroCues(end, fade, beats) : null,
+        (row, beats) => row.MusicEndSeconds is { } end && row.FadeOutSeconds is { } fade ? new OutroCues(end, fade, beats, StoredMixPoint(row)) : null,
         (cues, beats) => cues with { Beats = beats },
-        (row, cues, firstBeat, analysed) =>
+        (cues, signal, curve, grid) => cues with { MixPoint = MixPointDetector.Detect(signal.Envelope, curve, signal.StartSeconds, grid, cues.MusicEndSeconds) },
+        (row, cues, grid, analysed) =>
         {
             row.MusicEndSeconds = cues.MusicEndSeconds;
             row.FadeOutSeconds = cues.FadeOutSeconds;
-            row.OutroBeatPhase = firstBeat;
+            row.OutroBeatPhase = grid?.FirstBeatSeconds;
+            row.OutroDownbeatSeconds = grid?.FirstDownbeatSeconds;
+            row.OutroMixPointSeconds = cues.MixPoint?.Seconds;
+            row.OutroMixPointScore = cues.MixPoint?.Score;
             row.OutroTempoAnalysed = analysed;
         },
         row => row.OutroTempoAnalysed,
-        row => row.OutroBeatPhase);
+        row => row.OutroBeatPhase,
+        row => row.OutroDownbeatSeconds);
 
     private static readonly EdgeSpec<IntroCues> IntroSpec = new(
         EAudioEdge.Head,
         MixCueDetector.DetectIntro,
         (row, beats) => row.MusicStartSeconds is { } start ? new IntroCues(start, beats) : null,
         (cues, beats) => cues with { Beats = beats },
-        (row, cues, firstBeat, analysed) =>
+        (cues, _, _, _) => cues,
+        (row, cues, grid, analysed) =>
         {
             row.MusicStartSeconds = cues.MusicStartSeconds;
-            row.IntroBeatPhase = firstBeat;
+            row.IntroBeatPhase = grid?.FirstBeatSeconds;
+            row.IntroDownbeatSeconds = grid?.FirstDownbeatSeconds;
             row.IntroTempoAnalysed = analysed;
         },
         row => row.IntroTempoAnalysed,
-        row => row.IntroBeatPhase);
+        row => row.IntroBeatPhase,
+        row => row.IntroDownbeatSeconds);
 
     /// <summary>Initializes a new instance of the <see cref="MixAnalysisService"/> class.</summary>
     /// <param name="reader">Decoder of track edges.</param>
@@ -97,7 +105,7 @@ public sealed class MixAnalysisService : IMixCueProvider, IDisposable
 
             if (stored is not null && IsServable(stored, spec, onBattery))
             {
-                var fromRow = spec.FromRow(stored, spec.IsTempoAnalysed(stored) ? BuildGrid(stored, spec.Phase(stored)) : null);
+                var fromRow = spec.FromRow(stored, spec.IsTempoAnalysed(stored) ? BuildGrid(stored, spec.Phase(stored), spec.Downbeat(stored)) : null);
 
                 if (fromRow is not null)
                 {
@@ -124,10 +132,18 @@ public sealed class MixAnalysisService : IMixCueProvider, IDisposable
             }
 
             var tempo = withTempo ? DetectTempo(track, stored, signal) : null;
-            var result = tempo?.Grid is { } grid ? spec.WithBeats(cues, grid) : cues;
+            var result = cues;
+
+            if (tempo?.Grid is { } grid)
+            {
+                result = spec.WithBeats(cues, grid);
+
+                if (tempo.Curve is { } curve)
+                    result = spec.Enrich(result, signal, curve, grid);
+            }
 
             if (track.Id > 0)
-                await PersistAsync(track, spec, cues, tempo, onBattery, ct).ConfigureAwait(false);
+                await PersistAsync(track, spec, result, tempo, onBattery, ct).ConfigureAwait(false);
 
             Store(key, result, tempoSkipped: onBattery && track.Id > 0);
 
@@ -191,19 +207,23 @@ public sealed class MixAnalysisService : IMixCueProvider, IDisposable
         where TCues : class =>
         spec.IsTempoAnalysed(row) || onBattery;
 
-    private static BeatGrid? BuildGrid(TrackAnalysisEntity row, double? phase) =>
+    private static BeatGrid? BuildGrid(TrackAnalysisEntity row, double? phase, double? downbeat) =>
         row.Bpm is { } bpm && phase is { } first
-            ? new BeatGrid(bpm, first, row.BpmConfidence ?? 1, row.BpmSource ?? BpmSource.Detected)
+            ? new BeatGrid(bpm, first, row.BpmConfidence ?? 1, row.BpmSource ?? BpmSource.Detected, downbeat)
             : null;
+
+    private static MixPoint? StoredMixPoint(TrackAnalysisEntity row) =>
+        row.OutroMixPointSeconds is { } seconds && row.OutroMixPointScore is { } score ? new MixPoint(seconds, score) : null;
 
     private static TempoOutcome? DetectTempo(TrackDto track, TrackAnalysisEntity? stored, AudioEdgeSignal signal)
     {
         var known = ChooseKnownBpm(track, stored);
 
         if (signal.MonoSamples is not { Length: > 0 } mono)
-            return known is { } only ? new TempoOutcome(only.Bpm, only.Confidence, only.Source, null) : null;
+            return known is { } only ? new TempoOutcome(only.Bpm, only.Confidence, only.Source, null, null) : null;
 
-        var detection = BeatGridDetector.Detect(mono, signal.MonoSampleRate, signal.StartSeconds, known?.Bpm);
+        var curve = BeatGridDetector.IsLongEnough(mono.Length, signal.MonoSampleRate) ? OnsetCurve.Compute(mono, signal.MonoSampleRate) : null;
+        var detection = curve is null ? TempoDetection.None : BeatGridDetector.Detect(curve, signal.StartSeconds, known?.Bpm);
 
         var bpm = known?.Bpm ?? detection.Bpm;
 
@@ -214,7 +234,10 @@ public sealed class MixAnalysisService : IMixCueProvider, IDisposable
         var source = known?.Source ?? BpmSource.Detected;
         var grid = detection.FirstBeatSeconds is { } first ? new BeatGrid(value, first, confidence, source) : null;
 
-        return new TempoOutcome(value, confidence, source, grid);
+        if (grid is not null && curve is not null)
+            grid = grid with { FirstDownbeatSeconds = DownbeatEstimator.Estimate(curve, signal.StartSeconds, value, grid.FirstBeatSeconds) };
+
+        return new TempoOutcome(value, confidence, source, grid, curve);
     }
 
     private static KnownBpm? ChooseKnownBpm(TrackDto track, TrackAnalysisEntity? stored)
@@ -245,7 +268,7 @@ public sealed class MixAnalysisService : IMixCueProvider, IDisposable
                 FileSize = track.Size,
             };
 
-            spec.Apply(row, cues, tempo?.Grid?.FirstBeatSeconds, !onBattery);
+            spec.Apply(row, cues, tempo?.Grid, !onBattery);
 
             if (tempo is not null && (row.Bpm is null || (tempo.Source == BpmSource.Tag && row.BpmSource != BpmSource.Tag)))
             {
@@ -320,15 +343,17 @@ public sealed class MixAnalysisService : IMixCueProvider, IDisposable
 
     private sealed record KnownBpm(double Bpm, double Confidence, BpmSource Source);
 
-    private sealed record TempoOutcome(double Bpm, double Confidence, BpmSource Source, BeatGrid? Grid);
+    private sealed record TempoOutcome(double Bpm, double Confidence, BpmSource Source, BeatGrid? Grid, OnsetCurve? Curve);
 
     private sealed record EdgeSpec<TCues>(
         EAudioEdge Edge,
         Func<RmsEnvelope, TCues?> Detect,
         Func<TrackAnalysisEntity, BeatGrid?, TCues?> FromRow,
         Func<TCues, BeatGrid?, TCues> WithBeats,
-        Action<TrackAnalysisEntity, TCues, double?, bool> Apply,
+        Func<TCues, AudioEdgeSignal, OnsetCurve, BeatGrid, TCues> Enrich,
+        Action<TrackAnalysisEntity, TCues, BeatGrid?, bool> Apply,
         Func<TrackAnalysisEntity, bool> IsTempoAnalysed,
-        Func<TrackAnalysisEntity, double?> Phase)
+        Func<TrackAnalysisEntity, double?> Phase,
+        Func<TrackAnalysisEntity, double?> Downbeat)
         where TCues : class;
 }

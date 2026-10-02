@@ -4,6 +4,7 @@ using Microsoft.Extensions.Logging.Abstractions;
 using Rok.Application.Interfaces;
 using Rok.Application.Player.Mix;
 using Rok.Application.Player.Mix.Tempo;
+using Rok.Domain.Enums;
 using Rok.Infrastructure.Player.Mix;
 
 namespace Rok.MetadataTool;
@@ -68,6 +69,8 @@ internal static class BpmCheckCommand
             List<SweepWindow> windows = [];
             BpmCheckReport report = await MeasureAsync(tracks, sweep ? windows : null, cts.Token);
             PrintReport(report);
+
+            PrintMixPoints(MixPointStats.Aggregate(report.MixPoints, MixThresholds.MinMixPointScore));
 
             if (sweep)
                 PrintSweep(BpmSweep.Aggregate(windows, BpmSweep.DefaultThresholds, Tolerance));
@@ -164,9 +167,15 @@ internal static class BpmCheckCommand
                     continue;
                 }
 
-                TempoDetection detection = BeatGridDetector.Detect(signal.MonoSamples, signal.MonoSampleRate, signal.StartSeconds, knownBpm: null);
+                OnsetCurve? curve = BeatGridDetector.IsLongEnough(signal.MonoSamples.Length, signal.MonoSampleRate)
+                    ? OnsetCurve.Compute(signal.MonoSamples, signal.MonoSampleRate)
+                    : null;
+                TempoDetection detection = curve is null ? TempoDetection.None : BeatGridDetector.Detect(curve, signal.StartSeconds, knownBpm: null);
                 report.Add(edge, track, detection);
-                sweepWindows?.Add(MeasureRaw(signal.MonoSamples, signal.MonoSampleRate, edge == EAudioEdge.Head, track.Bpm));
+                sweepWindows?.Add(MeasureRaw(curve, edge == EAudioEdge.Head, track.Bpm));
+
+                if (edge == EAudioEdge.Tail)
+                    report.MixPoints.Add(MeasureMixPoint(signal, curve, track));
             }
 
             stopwatch.Stop();
@@ -183,12 +192,34 @@ internal static class BpmCheckCommand
         return report;
     }
 
-    private static SweepWindow MeasureRaw(float[] mono, int sampleRate, bool intro, double tag)
+    private static MixPointSample MeasureMixPoint(AudioEdgeSignal signal, OnsetCurve? curve, TaggedTrack track)
     {
-        if (sampleRate <= 0 || mono.Length < MixThresholds.MinTempoSeconds * sampleRate)
+        if (curve is null)
+            return new MixPointSample(null);
+
+        // Same as the app: the tag takes precedence, so only the beat phase is detected.
+        TempoDetection tagged = BeatGridDetector.Detect(curve, signal.StartSeconds, track.Bpm);
+
+        if (tagged.FirstBeatSeconds is not { } firstBeat)
+            return new MixPointSample(null);
+
+        double? downbeat = DownbeatEstimator.Estimate(curve, signal.StartSeconds, track.Bpm, firstBeat);
+        BeatGrid grid = new(track.Bpm, firstBeat, 1, BpmSource.Tag, downbeat);
+        OutroCues? outro = MixCueDetector.DetectOutro(signal.Envelope);
+
+        if (outro is null)
+            return new MixPointSample(null);
+
+        MixPoint? point = MixPointDetector.Detect(signal.Envelope, curve, signal.StartSeconds, grid, outro.MusicEndSeconds);
+
+        return new MixPointSample(point?.Score);
+    }
+
+    private static SweepWindow MeasureRaw(OnsetCurve? curve, bool intro, double tag)
+    {
+        if (curve is null)
             return new SweepWindow(intro, 0, null, tag);
 
-        OnsetCurve curve = OnsetCurve.Compute(mono, sampleRate);
         TempoEstimate? estimate = TempoEstimator.Estimate(curve);
 
         if (estimate is null)
@@ -207,6 +238,26 @@ internal static class BpmCheckCommand
             Console.WriteLine($"{row.Threshold,-10:F3}{Format(row.Intro),-18}{Format(row.Outro),-18}{Format(row.All),-18}");
     }
 
+    private static void PrintMixPoints(MixPointSummary summary)
+    {
+        double Rate(int count) => summary.Total == 0 ? 0 : (double)count / summary.Total;
+
+        Console.WriteLine();
+        Console.WriteLine($"Mix point (outro, tag tempo like the app, retained at score >= {MixThresholds.MinMixPointScore:F2}):");
+        Console.WriteLine($"  Outros analysed     : {summary.Total}");
+        Console.WriteLine($"  With a candidate    : {summary.WithCandidate} ({Rate(summary.WithCandidate):P1})");
+        Console.WriteLine($"  Retained            : {summary.Retained} ({Rate(summary.Retained):P1})");
+        Console.WriteLine("  Score distribution (candidates, buckets of 0.1):");
+
+        foreach ((double from, int count) in summary.Histogram)
+            Console.WriteLine($"    [{from:F1}, {from + 0.1:F1}{(from >= 1.4 ? "+" : ")")} {count,5}  {new string('#', Math.Min(count, 60))}");
+
+        Console.WriteLine("  Threshold sweep (share of outros retained):");
+
+        foreach ((double threshold, double retainedRate) in summary.Sweep)
+            Console.WriteLine($"    {threshold,5:F2}  {retainedRate:P1}");
+    }
+
     private static string Format(SweepStats stats) => $"{stats.NotRejectedRate:P1} / {stats.CorrectRate:P1}";
 
     private static void PrintUsage()
@@ -222,6 +273,9 @@ internal static class BpmCheckCommand
         Console.WriteLine("  --limit N          Only measure the first N tracks.");
         Console.WriteLine("  --sweep            Also print, for confidence thresholds 0.05 to 0.30 (step 0.025), the share");
         Console.WriteLine("                     of windows not rejected and the accuracy among them (one decode per track).");
+        Console.WriteLine();
+        Console.WriteLine("  Also reports, on the outro, the share of tracks with a retained mix point and the distribution");
+        Console.WriteLine("  of the mix point scores (histogram and threshold sweep), using the tag tempo like the app.");
         Console.WriteLine();
         Console.WriteLine("Tracks whose tag is outside [40, 250] BPM are excluded from the measure.");
     }
@@ -283,6 +337,8 @@ internal static class BpmCheckCommand
         public TimeSpan TrackTime { get; set; }
 
         public List<Deviation> Deviations { get; } = [];
+
+        public List<MixPointSample> MixPoints { get; } = [];
 
         public WindowStats Intro => new(_introTotal, _introRejected, _introCorrect);
 

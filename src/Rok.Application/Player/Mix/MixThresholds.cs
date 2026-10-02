@@ -36,6 +36,9 @@ public static class MixThresholds
     /// <summary>Time the incoming track starts before its first audible window.</summary>
     public const double IntroPreRollSeconds = 0.1;
 
+    /// <summary>Number of beats in a bar (the analysis assumes 4/4).</summary>
+    public const int BeatsPerBar = 4;
+
     /// <summary>Shortest duration of a mix recomputed late.</summary>
     public const double MinMixSeconds = 1;
 
@@ -83,6 +86,40 @@ public static class MixThresholds
 
     /// <summary>Relative tempo tolerance under which two tracks are beat-aligned (octave errors included).</summary>
     public const double BeatAlignTempoTolerance = 0.03;
+
+    /// <summary>Number of bars compared on each side of a boundary when measuring its novelty.</summary>
+    public const int MixPointContextBars = 2;
+
+    /// <summary>Energy change, in dB, at which the novelty of a boundary reaches about 63 %.</summary>
+    public const double MixPointNoveltyScaleDb = 6;
+
+    /// <summary>Drop below the quietest neighbour bar, in dB, at which the dip of a boundary reaches about 63 %.</summary>
+    public const double MixPointDipScaleDb = 6;
+
+    /// <summary>Weight of the novelty in the score of a boundary.</summary>
+    public const double MixPointNoveltyWeight = 0.6;
+
+    /// <summary>Weight of the dip in the score of a boundary.</summary>
+    public const double MixPointDipWeight = 0.4;
+
+    /// <summary>Novelty from which the strongest boundary anchors the phrase grid.</summary>
+    public const double MixPointStrongRupture = 0.5;
+
+    /// <summary>Score bonus of a boundary an odd number of 8-bar phrases after the anchor.</summary>
+    public const double MixPointPhrase8Bonus = 0.25;
+
+    /// <summary>Score bonus of a boundary an even number of 8-bar phrases after the anchor.</summary>
+    public const double MixPointPhrase16Bonus = 0.5;
+
+    /// <summary>Room that must remain between a boundary and the end of the music, to stay clear of a natural fade.</summary>
+    public const double MixPointMinRoomSeconds = 4;
+
+    /// <summary>
+    /// Score from which a mix point is used. Tuned with bpm-check on 485 outros: 46% are retained, and it stays clear of
+    /// the peak of artefacts around 0.4. Applied by the planner; changing it does not require incrementing
+    /// <see cref="TrackAnalysisVersion.Current"/> because the best candidate is stored whatever its score.
+    /// </summary>
+    public const double MinMixPointScore = 0.45;
 
     /// <summary>Fraction of the best autocorrelation peak a faster tempo must reach to be preferred.</summary>
     public const double OctavePeakRatio = 0.9;

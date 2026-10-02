@@ -61,6 +61,33 @@ public class OnsetCurveTests
         }
     }
 
+    [Fact(DisplayName = "value_at_interpolates_and_is_zero_out_of_range")]
+    public void ValueAt_InterpolatesAndIsZeroOutOfRange()
+    {
+        // Arrange
+        var curve = new OnsetCurve([0f, 2f, 4f, 0f], 0.1, 0.5);
+
+        // Act & Assert
+        Assert.Equal(2.0, curve.ValueAt(0.6), 1e-9);
+        Assert.Equal(3.0, curve.ValueAt(0.65), 1e-9);
+        Assert.Equal(0.0, curve.ValueAt(0.49));
+        Assert.Equal(0.0, curve.ValueAt(0.81));
+        Assert.Equal(0.0, new OnsetCurve([], 0.1, 0.5).ValueAt(0.5));
+    }
+
+    [Fact(DisplayName = "mean_between_averages_the_frames_inside_the_range")]
+    public void MeanBetween_AveragesFramesInRange()
+    {
+        // Arrange
+        var curve = new OnsetCurve([1f, 2f, 3f, 4f], 0.1, 0.5);
+
+        // Act & Assert
+        Assert.Equal(2.5, curve.MeanBetween(0.55, 0.75), 1e-9);
+        Assert.Equal(2.5, curve.MeanBetween(0, 10), 1e-9);
+        Assert.Equal(0.0, curve.MeanBetween(5, 6));
+        Assert.Equal(0.0, curve.MeanBetween(0.6, 0.6));
+    }
+
     [Fact(DisplayName = "onset_curve_is_never_negative")]
     public void Compute_IsNeverNegative()
     {

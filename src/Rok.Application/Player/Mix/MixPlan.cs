@@ -9,6 +9,7 @@ namespace Rok.Application.Player.Mix;
 /// <param name="IncomingStartSeconds">Position in the incoming track where it starts playing.</param>
 /// <param name="BassSwapAtSeconds">Offset in seconds from the start of the mix at which the bass swap happens.</param>
 /// <param name="Alignment">How the plan was aligned on the beats, or null when it was not.</param>
+/// <param name="MixPointScore">Score of the mix point the plan starts on, or null when it does not start on one.</param>
 public sealed record MixPlan(
     long OutgoingTrackId,
     long IncomingTrackId,
@@ -17,4 +18,5 @@ public sealed record MixPlan(
     double MusicEndSeconds,
     double IncomingStartSeconds,
     double BassSwapAtSeconds,
-    MixBeatAlignment? Alignment = null);
+    MixBeatAlignment? Alignment = null,
+    double? MixPointScore = null);

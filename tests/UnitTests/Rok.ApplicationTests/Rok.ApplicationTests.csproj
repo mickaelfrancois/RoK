@@ -33,6 +33,7 @@
 
 	<ItemGroup>
 		<Compile Include="..\..\..\tools\Rok.MetadataTool\BpmSweep.cs" Link="Tools\BpmSweep.cs" />
+		<Compile Include="..\..\..\tools\Rok.MetadataTool\MixPointStats.cs" Link="Tools\MixPointStats.cs" />
 	</ItemGroup>
 
 	<ItemGroup>
