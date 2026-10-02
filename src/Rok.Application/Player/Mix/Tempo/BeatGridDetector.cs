@@ -1,0 +1,41 @@
+namespace Rok.Application.Player.Mix.Tempo;
+
+/// <summary>Detects the tempo and the position of the first beat in a window of a track.</summary>
+public static class BeatGridDetector
+{
+    /// <summary>Detects the tempo and beat position of a mono window.</summary>
+    /// <param name="mono">Mono samples of the window.</param>
+    /// <param name="sampleRate">Sample rate of <paramref name="mono"/>, in Hz.</param>
+    /// <param name="startSeconds">Absolute position in the track of the first sample.</param>
+    /// <param name="knownBpm">Tempo already known (tag or earlier analysis); when set, only the phase is computed.</param>
+    /// <returns>The detection; <see cref="TempoDetection.None"/> when the signal is too short or not rhythmic enough.</returns>
+    public static TempoDetection Detect(ReadOnlySpan<float> mono, int sampleRate, double startSeconds, double? knownBpm)
+    {
+        if (sampleRate <= 0 || mono.Length < MixThresholds.MinTempoSeconds * sampleRate)
+            return TempoDetection.None;
+
+        var curve = OnsetCurve.Compute(mono, sampleRate);
+
+        if (knownBpm is { } known and > 0)
+            return DetectPhase(curve, known, 1, startSeconds);
+
+        var estimate = TempoEstimator.Estimate(curve);
+
+        if (estimate is null || estimate.Confidence < MixThresholds.MinBeatConfidence)
+            return TempoDetection.None;
+
+        var bpm = BeatPhaseEstimator.RefineTempo(curve, estimate.Bpm);
+
+        return DetectPhase(curve, bpm, estimate.Confidence, startSeconds);
+    }
+
+    private static TempoDetection DetectPhase(OnsetCurve curve, double bpm, double bpmConfidence, double startSeconds)
+    {
+        var phase = BeatPhaseEstimator.Estimate(curve, bpm);
+
+        if (phase is null || phase.Confidence < MixThresholds.MinBeatConfidence)
+            return new TempoDetection(bpm, bpmConfidence, null, phase?.Confidence ?? 0);
+
+        return new TempoDetection(bpm, bpmConfidence, startSeconds + phase.OffsetSeconds, phase.Confidence);
+    }
+}

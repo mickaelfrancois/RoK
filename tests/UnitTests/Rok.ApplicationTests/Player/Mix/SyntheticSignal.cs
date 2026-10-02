@@ -43,6 +43,38 @@ internal static class SyntheticSignal
         return samples;
     }
 
+    public static float[] Clicks(double bpm, double seconds, int sampleRate, double firstClickSeconds = 0)
+    {
+        var samples = new float[(int)(seconds * sampleRate)];
+        var random = new Random(7);
+        var burstLength = (int)(0.012 * sampleRate);
+        var period = 60.0 / bpm;
+
+        for (var time = firstClickSeconds; time < seconds; time += period)
+        {
+            var start = (int)Math.Round(time * sampleRate);
+
+            for (var i = 0; i < burstLength && start + i < samples.Length; i++)
+            {
+                var decay = Math.Exp(-5.0 * i / burstLength);
+                samples[start + i] = (float)(0.8 * decay * ((random.NextDouble() * 2) - 1));
+            }
+        }
+
+        return samples;
+    }
+
+    public static float[] WhiteNoise(double seconds, int sampleRate, double amplitude = 0.3)
+    {
+        var random = new Random(11);
+        var samples = new float[(int)(seconds * sampleRate)];
+
+        for (var i = 0; i < samples.Length; i++)
+            samples[i] = (float)(amplitude * ((random.NextDouble() * 2) - 1));
+
+        return samples;
+    }
+
     public static float[] Concat(params float[][] parts) => parts.SelectMany(p => p).ToArray();
 
     public static RmsEnvelope Envelope(float[] mono, double startSeconds = 0, double? trackLengthSeconds = null)
