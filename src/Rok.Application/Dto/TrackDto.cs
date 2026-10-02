@@ -34,6 +34,8 @@ public class TrackDto
 
     public DateTime FileDate { get; set; }
 
+    public int? Bpm { get; set; }
+
     public bool IsLive { get; set; }
 
     public int Score { get; set; }

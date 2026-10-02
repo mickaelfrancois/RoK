@@ -23,6 +23,7 @@ using Rok.Infrastructure.Player.Mix;
 using Rok.Infrastructure.Player.Output;
 using Rok.Infrastructure.Playlists;
 using Rok.Infrastructure.Playlists.Formats;
+using Rok.Infrastructure.Power;
 using Rok.Infrastructure.RadioBrowser;
 using Rok.Infrastructure.Repositories;
 using Rok.Infrastructure.Social;
@@ -49,6 +50,9 @@ public static class DependencyInjection
         });
 
         services.AddKeyedSingleton<IDbConnection>("BackgroundConnection", new SqliteConnection(connectionString));
+
+        services.AddSingleton<ITrackAnalysisRepository>(_ => new TrackAnalysisRepository(() => new SqliteConnection(connectionString.Replace("Cache=Shared", "Cache=Private", StringComparison.Ordinal) + "Default Timeout=5;")));
+        services.AddSingleton<IPowerStateProvider, WindowsPowerStateProvider>();
 
         services.AddSingleton<IFileSystem, DefaultFileSystem>();
         services.AddSingleton<ISettingsFile>(c => new SettingsFileService(applicationLocalPath, c.GetRequiredService<IFolderResolver>(), c.GetRequiredService<IFileSystem>()));
@@ -89,6 +93,7 @@ public static class DependencyInjection
         services.AddSingleton<IMigration, Migration15>();
         services.AddSingleton<IMigration, Migration16>();
         services.AddSingleton<IMigration, Migration17>();
+        services.AddSingleton<IMigration, Migration18>();
 
         services.AddScoped<IArtistRepository, ArtistRepository>();
         services.AddScoped<IAlbumRepository, AlbumRepository>();

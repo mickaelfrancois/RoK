@@ -36,10 +36,11 @@ public sealed class NAudioEnvelopeReaderTests : IDisposable
         using var file = TestWaveFile.Create(SampleRate, 16, 2, StereoSine(35, 5));
 
         // Act
-        var envelope = await _reader.ReadAsync(file.Path, EAudioEdge.Tail, TimeSpan.FromSeconds(30), CancellationToken.None);
+        var signal = await _reader.ReadAsync(file.Path, EAudioEdge.Tail, TimeSpan.FromSeconds(30), false, CancellationToken.None);
 
         // Assert
-        Assert.NotNull(envelope);
+        Assert.NotNull(signal);
+        var envelope = signal.Envelope;
         Assert.Equal(10, envelope.StartSeconds, 0.1);
         Assert.Equal(40, envelope.TrackLengthSeconds, 0.1);
         Assert.InRange(envelope.LevelsDb.Length, 598, 600);
@@ -54,10 +55,11 @@ public sealed class NAudioEnvelopeReaderTests : IDisposable
         using var file = TestWaveFile.Create(SampleRate, 16, 2, StereoSine(40, 0));
 
         // Act
-        var envelope = await _reader.ReadAsync(file.Path, EAudioEdge.Head, TimeSpan.FromSeconds(30), CancellationToken.None);
+        var signal = await _reader.ReadAsync(file.Path, EAudioEdge.Head, TimeSpan.FromSeconds(30), false, CancellationToken.None);
 
         // Assert
-        Assert.NotNull(envelope);
+        Assert.NotNull(signal);
+        var envelope = signal.Envelope;
         Assert.Equal(0, envelope.StartSeconds);
         Assert.InRange(envelope.LevelsDb.Length, 598, 600);
     }
@@ -70,10 +72,11 @@ public sealed class NAudioEnvelopeReaderTests : IDisposable
         using var playback = new AudioFileReader(file.Path);
 
         // Act
-        var envelope = await _reader.ReadAsync(file.Path, EAudioEdge.Head, TimeSpan.FromSeconds(30), CancellationToken.None);
+        var signal = await _reader.ReadAsync(file.Path, EAudioEdge.Head, TimeSpan.FromSeconds(30), false, CancellationToken.None);
 
         // Assert
-        Assert.NotNull(envelope);
+        Assert.NotNull(signal);
+        var envelope = signal.Envelope;
         Assert.InRange(envelope.LevelsDb.Length, 98, 100);
     }
 
@@ -84,10 +87,59 @@ public sealed class NAudioEnvelopeReaderTests : IDisposable
         var path = Path.Combine(Path.GetTempPath(), $"rok-missing-{Guid.NewGuid():N}.wav");
 
         // Act
-        var envelope = await _reader.ReadAsync(path, EAudioEdge.Tail, TimeSpan.FromSeconds(30), CancellationToken.None);
+        var signal = await _reader.ReadAsync(path, EAudioEdge.Tail, TimeSpan.FromSeconds(30), false, CancellationToken.None);
 
         // Assert
-        Assert.Null(envelope);
+        Assert.Null(signal);
+    }
+
+    [Fact(DisplayName = "mono_samples_are_built_at_the_decimated_rate_when_requested")]
+    public async Task MonoSamplesAreBuiltWhenRequested()
+    {
+        // Arrange
+        using var file = TestWaveFile.Create(SampleRate, 16, 2, StereoSine(35, 5));
+
+        // Act
+        var signal = await _reader.ReadAsync(file.Path, EAudioEdge.Tail, TimeSpan.FromSeconds(30), true, CancellationToken.None);
+
+        // Assert
+        Assert.NotNull(signal);
+        Assert.NotNull(signal.MonoSamples);
+        Assert.Equal(11025, signal.MonoSampleRate);
+        Assert.InRange(signal.MonoSamples.Length, (30 * 11025) - 4, 30 * 11025);
+        Assert.Equal(10, signal.StartSeconds, 0.1);
+    }
+
+    [Fact(DisplayName = "mono_samples_are_absent_when_not_requested")]
+    public async Task MonoSamplesAreAbsentWhenNotRequested()
+    {
+        // Arrange
+        using var file = TestWaveFile.Create(SampleRate, 16, 2, StereoSine(40, 0));
+
+        // Act
+        var signal = await _reader.ReadAsync(file.Path, EAudioEdge.Head, TimeSpan.FromSeconds(30), false, CancellationToken.None);
+
+        // Assert
+        Assert.NotNull(signal);
+        Assert.Null(signal.MonoSamples);
+        Assert.Equal(0, signal.MonoSampleRate);
+    }
+
+    [Fact(DisplayName = "envelope_is_identical_with_or_without_mono_samples")]
+    public async Task EnvelopeIsTheSameWithOrWithoutMonoSamples()
+    {
+        // Arrange
+        using var file = TestWaveFile.Create(SampleRate, 16, 2, StereoSine(35, 5));
+
+        // Act
+        var without = await _reader.ReadAsync(file.Path, EAudioEdge.Tail, TimeSpan.FromSeconds(30), false, CancellationToken.None);
+        var with = await _reader.ReadAsync(file.Path, EAudioEdge.Tail, TimeSpan.FromSeconds(30), true, CancellationToken.None);
+
+        // Assert
+        Assert.NotNull(without);
+        Assert.NotNull(with);
+        Assert.Equal(without.Envelope.LevelsDb, with.Envelope.LevelsDb);
+        Assert.Equal(without.Envelope.StartSeconds, with.Envelope.StartSeconds);
     }
 
     [Fact(DisplayName = "dispose_is_safe_when_no_file_was_ever_read")]

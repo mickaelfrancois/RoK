@@ -32,6 +32,10 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<Compile Include="..\..\..\tools\Rok.MetadataTool\BpmSweep.cs" Link="Tools\BpmSweep.cs" />
+	</ItemGroup>
+
+	<ItemGroup>
 		<Using Include="Xunit" />
 	</ItemGroup>
 

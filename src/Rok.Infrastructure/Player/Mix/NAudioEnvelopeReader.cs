@@ -3,10 +3,11 @@ using Microsoft.Extensions.Logging;
 using NAudio.Wave;
 using Rok.Application.Interfaces;
 using Rok.Application.Player.Mix;
+using Rok.Application.Player.Mix.Tempo;
 
 namespace Rok.Infrastructure.Player.Mix;
 
-/// <summary>Measures the loudness envelope of a track edge by decoding it with NAudio on a low-priority thread.</summary>
+/// <summary>Measures the loudness envelope of a track edge, and optionally builds its mono signal, with a single NAudio decode on a low-priority thread.</summary>
 public sealed class NAudioEnvelopeReader : IAudioEnvelopeReader, IDisposable
 {
     private const int BlockSize = 4096;
@@ -25,11 +26,11 @@ public sealed class NAudioEnvelopeReader : IAudioEnvelopeReader, IDisposable
     }
 
     /// <inheritdoc />
-    public async Task<RmsEnvelope?> ReadAsync(string path, EAudioEdge edge, TimeSpan span, CancellationToken ct)
+    public async Task<AudioEdgeSignal?> ReadAsync(string path, EAudioEdge edge, TimeSpan span, bool includeMonoSamples, CancellationToken ct)
     {
         try
         {
-            return await GetWorker().RunAsync(token => Read(path, edge, span, token), ct).ConfigureAwait(false);
+            return await GetWorker().RunAsync(token => Read(path, edge, span, includeMonoSamples, token), ct).ConfigureAwait(false);
         }
         catch (OperationCanceledException)
         {
@@ -68,7 +69,7 @@ public sealed class NAudioEnvelopeReader : IAudioEnvelopeReader, IDisposable
         }
     }
 
-    private RmsEnvelope? Read(string path, EAudioEdge edge, TimeSpan span, CancellationToken ct)
+    private AudioEdgeSignal? Read(string path, EAudioEdge edge, TimeSpan span, bool includeMonoSamples, CancellationToken ct)
     {
         var stopwatch = Stopwatch.StartNew();
 
@@ -86,6 +87,7 @@ public sealed class NAudioEnvelopeReader : IAudioEnvelopeReader, IDisposable
             var startSeconds = reader.CurrentTime.TotalSeconds;
             var channels = reader.WaveFormat.Channels;
             var accumulator = new RmsEnvelopeAccumulator(reader.WaveFormat.SampleRate);
+            var decimator = includeMonoSamples ? new MonoDecimator(reader.WaveFormat.SampleRate) : null;
             var framesToRead = (long)(span.TotalSeconds * reader.WaveFormat.SampleRate);
             var blockFrames = BlockSize / channels;
             var buffer = new float[blockFrames * channels];
@@ -102,10 +104,13 @@ public sealed class NAudioEnvelopeReader : IAudioEnvelopeReader, IDisposable
                     break;
 
                 accumulator.Add(buffer.AsSpan(0, read), channels);
+                decimator?.Add(buffer.AsSpan(0, read), channels);
                 framesRead += read / channels;
             }
 
-            return accumulator.Build(startSeconds, total.TotalSeconds);
+            var envelope = accumulator.Build(startSeconds, total.TotalSeconds);
+
+            return new AudioEdgeSignal(envelope, decimator?.Build(), decimator?.OutputSampleRate ?? 0, startSeconds);
         }
         catch (OperationCanceledException)
         {

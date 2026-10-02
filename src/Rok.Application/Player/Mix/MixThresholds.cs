@@ -41,4 +41,46 @@ public static class MixThresholds
 
     /// <summary>Level reported for a window of pure digital silence.</summary>
     public const double SilentLevelDb = -120;
+
+    /// <summary>Sample rate the mono signal given to the tempo detector is brought close to.</summary>
+    public const int TargetMonoRate = 11025;
+
+    /// <summary>Size of an onset analysis frame, in samples (a power of two).</summary>
+    public const int OnsetFrameSize = 256;
+
+    /// <summary>Distance between two onset analysis frames, in samples.</summary>
+    public const int OnsetHop = 64;
+
+    /// <summary>Length of the sliding mean removed from the onset curve.</summary>
+    public const double OnsetMeanSeconds = 0.5;
+
+    /// <summary>Lowest tempo a detected BPM is folded into.</summary>
+    public const double MinBpm = 70;
+
+    /// <summary>Highest tempo a detected BPM is folded into.</summary>
+    public const double MaxBpm = 180;
+
+    /// <summary>Lowest tempo the autocorrelation looks for.</summary>
+    public const double SearchMinBpm = 40;
+
+    /// <summary>Highest tempo the autocorrelation looks for.</summary>
+    public const double SearchMaxBpm = 250;
+
+    /// <summary>
+    /// Confidence under which no tempo and no beat grid is reported. Tuned with <c>bpm-check --sweep</c> on 485 tagged
+    /// tracks: 0.15 keeps about 70 % of the windows with about 85 % of correct tempos.
+    /// </summary>
+    public const double MinBeatConfidence = 0.15;
+
+    /// <summary>Shortest signal the tempo detector accepts.</summary>
+    public const double MinTempoSeconds = 8;
+
+    /// <summary>Lowest BPM tag taken into account.</summary>
+    public const int MinTagBpm = 40;
+
+    /// <summary>Highest BPM tag taken into account.</summary>
+    public const int MaxTagBpm = 250;
+
+    /// <summary>Fraction of the best autocorrelation peak a faster tempo must reach to be preferred.</summary>
+    public const double OctavePeakRatio = 0.9;
 }

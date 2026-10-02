@@ -94,7 +94,7 @@ ViewModels use `CommunityToolkit.Mvvm` (`ObservableObject`, source-gen commands)
 
 ### Persistence
 
-- SQLite via Dapper. Repositories live in `Rok.Infrastructure/Repositories/`; new tables/columns are added through a new `MigrationN` class implementing `IMigration` and registered in `Rok.Infrastructure/DependencyInjection.cs` (discovered by `MigrationService` via `IEnumerable<IMigration>`). The current head is `Migration12`.
+- SQLite via Dapper. Repositories live in `Rok.Infrastructure/Repositories/`; new tables/columns are added through a new `MigrationN` class implementing `IMigration` and registered in `Rok.Infrastructure/DependencyInjection.cs` (discovered by `MigrationService` via `IEnumerable<IMigration>`). The current head is `Migration18`. The `trackAnalysis` table (Mix tempo/beat grid cache) is written through `TrackAnalysisRepository`, which opens its own short-lived connection per call instead of using the shared singleton connections, so it is safe from the analysis thread.
 - `DateOnlyTypeHandler` is registered globally for Dapper.
 - Domain entities use `[Table("…")]` attributes (see `Rok.Domain/Attributes/`).
 - A real test database (populated with the developer's library) is available locally at

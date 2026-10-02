@@ -4,11 +4,14 @@ using Microsoft.Extensions.DependencyInjection;
 using Rok.Application.Interfaces;
 using Rok.Application.Interfaces.Repositories;
 using Rok.Application.Tag;
+using Rok.Import.Services;
 using Rok.Infrastructure.FileSystem;
 using Rok.Infrastructure.Lyrics;
 using Rok.Infrastructure.Repositories;
 using Rok.Infrastructure.Tag;
-using Rok.Import.Services;
+
+if (args.Length > 0 && args[0] == "bpm-check")
+    return await Rok.MetadataTool.BpmCheckCommand.RunAsync(args[1..]);
 
 if (args.Length < 1 || args.Contains("--help") || args.Contains("-h"))
 {
@@ -138,6 +141,7 @@ static void BackupDatabase(string databasePath, string backupPath)
 static void PrintUsage()
 {
     Console.WriteLine("Usage: Rok.MetadataTool <database.sqlite> [--apply]");
+    Console.WriteLine("       Rok.MetadataTool bpm-check <database.sqlite> [--limit N] [--sweep]");
     Console.WriteLine();
     Console.WriteLine("  Re-reads the audio tag of every track in the database and refreshes the");
     Console.WriteLine("  extended metadata columns (disc, bpm, composers, audio specs, replaygain),");
@@ -150,6 +154,9 @@ static void PrintUsage()
     Console.WriteLine("Arguments:");
     Console.WriteLine("  <database.sqlite>  Path to an up-to-date Rok SQLite database.");
     Console.WriteLine("  --apply            Persist the changes (a timestamped .bak backup is taken first).");
+    Console.WriteLine();
+    Console.WriteLine("  bpm-check          Read-only measurement of the tempo detector against the BPM tags");
+    Console.WriteLine("                     (run 'bpm-check --help' for details).");
 }
 
 static void PrintReport(LibraryMetadataRefreshReport report)

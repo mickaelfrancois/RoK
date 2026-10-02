@@ -41,4 +41,27 @@ public class TrackDtoMappingTests
         Assert.Null(dto.ReplayGainAlbumGain);
         Assert.Null(dto.ReplayGainAlbumPeak);
     }
+
+    [Fact(DisplayName = "map_copies_the_bpm_tag")]
+    public void Map_CopiesBpm()
+    {
+        // Arrange
+        TrackEntity entity = new() { Id = 3, Title = "t3", Bpm = 128 };
+
+        // Act
+        TrackDto dto = TrackDtoMapping.Map(entity);
+
+        // Assert
+        Assert.Equal(128, dto.Bpm);
+    }
+
+    [Fact(DisplayName = "map_keeps_bpm_null_when_the_entity_has_none")]
+    public void Map_KeepsBpmNull_WhenEntityHasNone()
+    {
+        // Act
+        TrackDto dto = TrackDtoMapping.Map(new TrackEntity { Id = 4, Title = "t4" });
+
+        // Assert
+        Assert.Null(dto.Bpm);
+    }
 }
