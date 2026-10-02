@@ -362,7 +362,7 @@ public sealed class PlayerService : IPlayerService, IDisposable
         if (_isCrossfadeRunning)
             return;
 
-        if (IsMixActive())
+        if (IsMixActive() && PlaybackTransitionPolicy.IsMixAllowed(CurrentTrack, nextTrack))
         {
             MixPlan? plan;
 
@@ -409,7 +409,7 @@ public sealed class PlayerService : IPlayerService, IDisposable
 
             TrackDto? next = PeekNext();
 
-            if (next == null || PlaybackTransitionPolicy.Decide(true, _isMuted, current, next) != EPlaybackTransition.Crossfade)
+            if (next == null || PlaybackTransitionPolicy.Decide(true, _isMuted, current, next) != EPlaybackTransition.Crossfade || !PlaybackTransitionPolicy.IsMixAllowed(current, next))
                 return;
 
             MixPlan? plan;
@@ -487,6 +487,13 @@ public sealed class PlayerService : IPlayerService, IDisposable
 
         if (next == null || PlaybackTransitionPolicy.Decide(true, _isMuted, current, next) != EPlaybackTransition.Crossfade)
             return;
+
+        if (!PlaybackTransitionPolicy.IsMixAllowed(current, next))
+        {
+            _logger.LogInformation("Mix: skipped, live track ({Track} -> {Next})", current.Title, next.Title);
+
+            return;
+        }
 
         CancellationTokenSource cts = new();
         long generation;
