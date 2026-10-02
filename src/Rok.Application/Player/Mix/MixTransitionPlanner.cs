@@ -44,7 +44,67 @@ public static class MixTransitionPlanner
 
         var plan = new MixPlan(current.Id, next.Id, start, duration, outro.MusicEndSeconds, intro.MusicStartSeconds, duration / 2);
 
-        return TryAlignStart(plan, outro, intro, earliest) ?? plan;
+        return TryPlanFromMixPoint(plan, outro, intro, trackLength, maxDurationSeconds, earliest)
+            ?? TryAlignStart(plan, outro, intro, earliest)
+            ?? plan;
+    }
+
+    private static MixPlan? TryPlanFromMixPoint(
+        MixPlan basePlan,
+        OutroCues outro,
+        IntroCues intro,
+        double trackLength,
+        int maxDurationSeconds,
+        double earliest)
+    {
+        if (outro.MixPoint is not { } point || point.Score < MixThresholds.MinMixPointScore)
+        {
+            return null;
+        }
+
+        if (point.Seconds < earliest - Epsilon)
+        {
+            return null;
+        }
+
+        var duration = Math.Min(
+            Math.Min(CrossfadeDuration.Clamp(maxDurationSeconds), trackLength / 2),
+            outro.MusicEndSeconds - point.Seconds);
+
+        if (duration < MixThresholds.MinMixSeconds)
+        {
+            return null;
+        }
+
+        var plan = basePlan with
+        {
+            StartSeconds = point.Seconds,
+            DurationSeconds = duration,
+            IncomingStartSeconds = intro.MusicStartSeconds,
+            BassSwapAtSeconds = duration / 2,
+            MixPointScore = point.Score
+        };
+
+        if (outro.Beats is not { Bpm: > 0 } outBeats || intro.Beats is not { Bpm: > 0 } inBeats
+            || !TempoMatch.IsOctaveEquivalent(outBeats.Bpm, inBeats.Bpm, MixThresholds.BeatAlignTempoTolerance))
+        {
+            return plan;
+        }
+
+        var shift = basePlan.StartSeconds - point.Seconds;
+        var incomingDownbeat = inBeats.FirstDownbeatSeconds;
+        var barAligned = outBeats.FirstDownbeatSeconds != null && incomingDownbeat != null;
+        var alignment = new MixBeatAlignment(outBeats.Bpm, inBeats.Bpm, shift, barAligned);
+        var incomingStart = incomingDownbeat is { } downbeat && barAligned
+            ? FirstIncomingBeat(downbeat, inBeats.BarPeriodSeconds, intro.MusicStartSeconds)
+            : FirstIncomingBeat(inBeats.FirstBeatSeconds, 60 / inBeats.Bpm, intro.MusicStartSeconds);
+
+        return plan with
+        {
+            IncomingStartSeconds = incomingStart,
+            BassSwapAtSeconds = NearestGridPointToMiddle(0, alignment, duration),
+            Alignment = alignment
+        };
     }
 
     private static MixPlan? TryAlignStart(MixPlan plan, OutroCues outro, IntroCues intro, double earliest)
@@ -77,14 +137,14 @@ public static class MixTransitionPlanner
 
         var shift = Math.Max(0, plan.StartSeconds - aligned);
         var incomingStart = FirstIncomingBeat(inBeats.FirstBeatSeconds, incomingPeriod, intro.MusicStartSeconds);
-        var swapAt = NearestBeatToMiddle(0, outgoingPeriod, plan.DurationSeconds);
+        var alignment = new MixBeatAlignment(outBeats.Bpm, inBeats.Bpm, shift);
 
         return plan with
         {
             StartSeconds = aligned,
             IncomingStartSeconds = incomingStart,
-            BassSwapAtSeconds = swapAt,
-            Alignment = new MixBeatAlignment(outBeats.Bpm, inBeats.Bpm, shift)
+            BassSwapAtSeconds = NearestGridPointToMiddle(0, alignment, plan.DurationSeconds),
+            Alignment = alignment
         };
     }
 
@@ -95,7 +155,12 @@ public static class MixTransitionPlanner
         return firstBeatSeconds + (index * periodSeconds);
     }
 
-    private static double NearestBeatToMiddle(double anchorSeconds, double periodSeconds, double mixSeconds)
+    /// <summary>
+    /// Returns the bass swap offset: the bar (when bar-aligned) or the beat of the outgoing track nearest to the middle
+    /// of the mix, or the middle itself when none leaves room for the ramp. Shared by the planner and
+    /// <see cref="ResolveAt"/>.
+    /// </summary>
+    private static double NearestGridPointToMiddle(double anchorSeconds, MixBeatAlignment alignment, double mixSeconds)
     {
         var middle = mixSeconds / 2;
 
@@ -104,6 +169,7 @@ public static class MixTransitionPlanner
             return middle;
         }
 
+        var periodSeconds = alignment.AlignmentPeriodSeconds;
         var swapAt = anchorSeconds + (Math.Round((middle - anchorSeconds) / periodSeconds) * periodSeconds);
         var margin = BassSwapCurve.RampSeconds / 2;
 
@@ -113,7 +179,7 @@ public static class MixTransitionPlanner
     /// <summary>
     /// Returns the duration, the incoming start and the bass swap offset (from the start of the mix) to use when the
     /// cue is reached at <paramref name="position"/>. A beat-aligned plan reached late keeps the incoming track in
-    /// phase and the bass swap on a beat of the outgoing track.
+    /// phase and the bass swap on a beat (a bar when bar-aligned) of the outgoing track.
     /// </summary>
     public static (double Duration, double IncomingStart, double BassSwapAt) ResolveAt(MixPlan plan, double position)
     {
@@ -130,12 +196,12 @@ public static class MixTransitionPlanner
             return (duration, plan.IncomingStartSeconds, duration / 2);
         }
 
-        var period = alignment.OutgoingPeriodSeconds;
+        var period = alignment.AlignmentPeriodSeconds;
         var lateness = Math.Max(0, position - plan.StartSeconds);
         var incomingStart = plan.IncomingStartSeconds + (lateness % period);
         var anchor = PositiveModulo(plan.StartSeconds - position, period);
 
-        return (duration, incomingStart, NearestBeatToMiddle(anchor, period, duration));
+        return (duration, incomingStart, NearestGridPointToMiddle(anchor, alignment, duration));
     }
 
     private static double PositiveModulo(double value, double period)

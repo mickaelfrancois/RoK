@@ -53,9 +53,9 @@ public class MixAnalysisServiceTests
             .Callback((TrackAnalysisEntity e, CancellationToken _) => _written = e)
             .Returns(Task.CompletedTask);
 
-    private void SetupTailWithMono(float[]? mono)
+    private void SetupTailWithMono(float[]? mono, RmsEnvelope? tail = null)
     {
-        var envelope = Tail();
+        var envelope = tail ?? Tail();
         _reader.Setup(r => r.ReadAsync(It.IsAny<string>(), EAudioEdge.Tail, It.IsAny<TimeSpan>(), It.IsAny<bool>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync((string _, EAudioEdge _, TimeSpan _, bool include, CancellationToken _) =>
                 new AudioEdgeSignal(envelope, include ? mono : null, include && mono is not null ? MonoRate : 0, envelope.StartSeconds));
@@ -316,6 +316,139 @@ public class MixAnalysisServiceTests
         Assert.Null(_written.Bpm);
     }
 
+    [Fact(DisplayName = "track_analysis_version_is_2")]
+    public void TrackAnalysisVersion_Current_Is2()
+    {
+        // Assert
+        Assert.Equal(2, TrackAnalysisVersion.Current);
+    }
+
+    [Fact(DisplayName = "row_of_a_previous_version_is_decoded_again")]
+    public async Task GetOutroAsync_VersionOneRow_IsDecodedAgainAndRewrittenInVersionTwo()
+    {
+        // Arrange
+        SetupStored(Row(r =>
+        {
+            r.AlgorithmVersion = 1;
+            r.MusicEndSeconds = 195;
+            r.FadeOutSeconds = 0;
+            r.OutroTempoAnalysed = true;
+            r.OutroBeatPhase = 170.2;
+            r.Bpm = 120;
+            r.BpmSource = BpmSource.Detected;
+        }));
+        SetupTailWithMono(Mono120());
+        CaptureUpsert();
+
+        // Act
+        var cues = await _service.GetOutroAsync(Track(1), CancellationToken.None);
+
+        // Assert
+        Assert.NotNull(cues);
+        VerifyReads(Times.Once());
+        Assert.NotNull(_written);
+        Assert.Equal(2, _written.AlgorithmVersion);
+    }
+
+    [Fact(DisplayName = "outro_cues_carry_the_mix_point_and_downbeat")]
+    public async Task GetOutroAsync_WithTempo_CarriesTheDownbeatAndTheMixPoint()
+    {
+        // Arrange
+        var tail = SyntheticSignal.Envelope(SyntheticSignal.Concat(SyntheticSignal.Sine(14), SyntheticSignal.Sine(11, 0.1), SyntheticSignal.Silence(5)), 170, 200);
+        SetupStored(null);
+        SetupTailWithMono(Mono120(), tail);
+        CaptureUpsert();
+
+        // Act
+        var cues = await _service.GetOutroAsync(Track(1, bpm: 120), CancellationToken.None);
+
+        // Assert
+        Assert.NotNull(cues?.Beats);
+        Assert.NotNull(cues.Beats.FirstDownbeatSeconds);
+        Assert.InRange(cues.Beats.FirstDownbeatSeconds.Value, cues.Beats.FirstBeatSeconds, cues.Beats.FirstBeatSeconds + (3 * 0.5) + 1e-9);
+        Assert.NotNull(cues.MixPoint);
+        Assert.InRange(cues.MixPoint.Seconds, 182, 186);
+        Assert.True(cues.MixPoint.Score >= MixThresholds.MinMixPointScore);
+        Assert.NotNull(_written);
+        Assert.Equal(cues.Beats.FirstDownbeatSeconds, _written.OutroDownbeatSeconds);
+        Assert.Equal(cues.MixPoint.Seconds, _written.OutroMixPointSeconds);
+        Assert.Equal(cues.MixPoint.Score, _written.OutroMixPointScore);
+    }
+
+    [Fact(DisplayName = "intro_downbeat_is_computed_and_stored")]
+    public async Task GetIntroAsync_WithTempo_StoresTheDownbeat()
+    {
+        // Arrange
+        var head = Head();
+        _reader.Setup(r => r.ReadAsync(It.IsAny<string>(), EAudioEdge.Head, It.IsAny<TimeSpan>(), It.IsAny<bool>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new AudioEdgeSignal(head, Mono120(), MonoRate, head.StartSeconds));
+        SetupStored(null);
+        CaptureUpsert();
+
+        // Act
+        var cues = await _service.GetIntroAsync(Track(1, bpm: 120), CancellationToken.None);
+
+        // Assert
+        Assert.NotNull(cues?.Beats?.FirstDownbeatSeconds);
+        Assert.NotNull(_written);
+        Assert.Equal(cues.Beats.FirstDownbeatSeconds, _written.IntroDownbeatSeconds);
+        Assert.Equal(cues.Beats.FirstBeatSeconds, _written.IntroBeatPhase);
+    }
+
+    [Fact(DisplayName = "valid_stored_row_serves_mix_point_and_downbeats_without_decoding")]
+    public async Task GetCues_ValidRow_ServesTheMixPointAndDownbeatsWithoutDecoding()
+    {
+        // Arrange
+        SetupStored(Row(r =>
+        {
+            r.MusicStartSeconds = 0.5;
+            r.IntroTempoAnalysed = true;
+            r.IntroBeatPhase = 0.6;
+            r.IntroDownbeatSeconds = 1.1;
+            r.MusicEndSeconds = 195;
+            r.FadeOutSeconds = 0;
+            r.OutroTempoAnalysed = true;
+            r.OutroBeatPhase = 170.2;
+            r.OutroDownbeatSeconds = 171.2;
+            r.OutroMixPointSeconds = 183.2;
+            r.OutroMixPointScore = 0.58;
+            r.Bpm = 120;
+            r.BpmSource = BpmSource.Detected;
+        }));
+
+        // Act
+        var outro = await _service.GetOutroAsync(Track(1), CancellationToken.None);
+        var intro = await _service.GetIntroAsync(Track(1), CancellationToken.None);
+
+        // Assert
+        Assert.Equal(171.2, outro?.Beats?.FirstDownbeatSeconds);
+        Assert.Equal(new MixPoint(183.2, 0.58), outro?.MixPoint);
+        Assert.Equal(1.1, intro?.Beats?.FirstDownbeatSeconds);
+        VerifyReads(Times.Never());
+    }
+
+    [Fact(DisplayName = "stored_row_without_a_mix_point_gives_no_mix_point")]
+    public async Task GetOutroAsync_RowWithoutMixPoint_GivesNone()
+    {
+        // Arrange
+        SetupStored(Row(r =>
+        {
+            r.MusicEndSeconds = 195;
+            r.FadeOutSeconds = 0;
+            r.OutroTempoAnalysed = true;
+            r.OutroBeatPhase = 170.2;
+            r.Bpm = 120;
+            r.OutroMixPointSeconds = 183.2;
+        }));
+
+        // Act
+        var outro = await _service.GetOutroAsync(Track(1), CancellationToken.None);
+
+        // Assert
+        Assert.NotNull(outro);
+        Assert.Null(outro.MixPoint);
+    }
+
     [Fact(DisplayName = "tag_bpm_is_used_as_is_and_flagged_as_tag")]
     public async Task GetOutroAsync_TagBpm_UsesTagAndOnlyDetectsPhase()
     {
@@ -399,12 +532,15 @@ public class MixAnalysisServiceTests
         // Assert
         Assert.NotNull(cues);
         Assert.Null(cues.Beats);
+        Assert.Null(cues.MixPoint);
         Assert.Equal(195, cues.MusicEndSeconds, 0.1);
         _reader.Verify(r => r.ReadAsync(It.IsAny<string>(), EAudioEdge.Tail, It.IsAny<TimeSpan>(), false, It.IsAny<CancellationToken>()), Times.Once);
         Assert.NotNull(_written);
         Assert.False(_written.OutroTempoAnalysed);
         Assert.NotNull(_written.MusicEndSeconds);
         Assert.Null(_written.Bpm);
+        Assert.Null(_written.OutroMixPointSeconds);
+        Assert.Null(_written.OutroDownbeatSeconds);
     }
 
     [Fact(DisplayName = "on_battery_a_row_with_cues_but_no_tempo_is_served_without_decoding")]

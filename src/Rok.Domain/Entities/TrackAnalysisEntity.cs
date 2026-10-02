@@ -46,6 +46,18 @@ public class TrackAnalysisEntity
     /// <summary>Gets or sets the absolute position, in seconds, of the first beat of the outro window.</summary>
     public double? OutroBeatPhase { get; set; }
 
+    /// <summary>Gets or sets the absolute position, in seconds, of the first bar start of the intro window.</summary>
+    public double? IntroDownbeatSeconds { get; set; }
+
+    /// <summary>Gets or sets the absolute position, in seconds, of the first bar start of the outro window.</summary>
+    public double? OutroDownbeatSeconds { get; set; }
+
+    /// <summary>Gets or sets the absolute position, in seconds, of the best bar boundary to start a mix on, whatever its score.</summary>
+    public double? OutroMixPointSeconds { get; set; }
+
+    /// <summary>Gets or sets the score of the best mix point, between 0 and 1.5.</summary>
+    public double? OutroMixPointScore { get; set; }
+
     /// <summary>Gets or sets a value indicating whether tempo detection ran on the intro window.</summary>
     public bool IntroTempoAnalysed { get; set; }
 

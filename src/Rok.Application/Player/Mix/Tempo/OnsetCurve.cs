@@ -15,6 +15,49 @@ public sealed record OnsetCurve(float[] Values, double HopSeconds, double FirstF
     /// <param name="frame">Frame index.</param>
     public double TimeOf(int frame) => FirstFrameCenterSeconds + (frame * HopSeconds);
 
+    /// <summary>Onset strength at a time, linearly interpolated between the two surrounding frames.</summary>
+    /// <param name="relativeSeconds">Time relative to the first sample of the analysed signal.</param>
+    /// <returns>The interpolated strength, or 0 outside the curve.</returns>
+    public double ValueAt(double relativeSeconds)
+    {
+        if (Values.Length == 0)
+            return 0;
+
+        var position = (relativeSeconds - FirstFrameCenterSeconds) / HopSeconds;
+
+        if (position < 0 || position > Values.Length - 1)
+            return 0;
+
+        var index = (int)position;
+        var fraction = position - index;
+        var next = Math.Min(index + 1, Values.Length - 1);
+
+        return (Values[index] * (1 - fraction)) + (Values[next] * fraction);
+    }
+
+    /// <summary>Mean onset strength of the frames whose centre lies in a time range.</summary>
+    /// <param name="fromRelativeSeconds">Start of the range (inclusive), relative to the first sample.</param>
+    /// <param name="toRelativeSeconds">End of the range (exclusive), relative to the first sample.</param>
+    /// <returns>The mean, or 0 when no frame falls in the range.</returns>
+    public double MeanBetween(double fromRelativeSeconds, double toRelativeSeconds)
+    {
+        if (Values.Length == 0 || toRelativeSeconds <= fromRelativeSeconds)
+            return 0;
+
+        var first = Math.Max(0, (int)Math.Ceiling((fromRelativeSeconds - FirstFrameCenterSeconds) / HopSeconds));
+        var last = Math.Min(Values.Length - 1, (int)Math.Ceiling((toRelativeSeconds - FirstFrameCenterSeconds) / HopSeconds) - 1);
+
+        if (last < first)
+            return 0;
+
+        double sum = 0;
+
+        for (var i = first; i <= last; i++)
+            sum += Values[i];
+
+        return sum / (last - first + 1);
+    }
+
     /// <summary>Computes the onset curve of a mono signal.</summary>
     /// <param name="mono">Mono samples.</param>
     /// <param name="sampleRate">Sample rate of <paramref name="mono"/>, in Hz.</param>

@@ -26,7 +26,7 @@ public class Migration18Tests
             "introTempoAnalysed", "outroTempoAnalysed"
         ];
 
-        Assert.Equal(expected.Order(), columns.Order());
+        Assert.Subset(columns.ToHashSet(), expected.ToHashSet());
     }
 
     [Fact(DisplayName = "migration_18_targets_version_18")]

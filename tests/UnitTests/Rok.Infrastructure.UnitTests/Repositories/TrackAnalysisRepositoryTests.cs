@@ -32,7 +32,11 @@ public class TrackAnalysisRepositoryTests : IClassFixture<SqliteDatabaseFixture>
         IntroBeatPhase = 3.1,
         OutroBeatPhase = 171.7,
         IntroTempoAnalysed = true,
-        OutroTempoAnalysed = true
+        OutroTempoAnalysed = true,
+        IntroDownbeatSeconds = 3.6,
+        OutroDownbeatSeconds = 172.2,
+        OutroMixPointSeconds = 180.2,
+        OutroMixPointScore = 0.62
     };
 
     [Fact(DisplayName = "upsert_then_get_round_trips_every_column")]
@@ -61,6 +65,10 @@ public class TrackAnalysisRepositoryTests : IClassFixture<SqliteDatabaseFixture>
         Assert.Equal(entity.OutroBeatPhase, loaded.OutroBeatPhase);
         Assert.True(loaded.IntroTempoAnalysed);
         Assert.True(loaded.OutroTempoAnalysed);
+        Assert.Equal(entity.IntroDownbeatSeconds, loaded.IntroDownbeatSeconds);
+        Assert.Equal(entity.OutroDownbeatSeconds, loaded.OutroDownbeatSeconds);
+        Assert.Equal(entity.OutroMixPointSeconds, loaded.OutroMixPointSeconds);
+        Assert.Equal(entity.OutroMixPointScore, loaded.OutroMixPointScore);
     }
 
     [Fact(DisplayName = "upsert_then_get_round_trips_null_columns_and_false_flags")]
@@ -91,6 +99,33 @@ public class TrackAnalysisRepositoryTests : IClassFixture<SqliteDatabaseFixture>
         Assert.Null(loaded.OutroBeatPhase);
         Assert.False(loaded.IntroTempoAnalysed);
         Assert.False(loaded.OutroTempoAnalysed);
+        Assert.Null(loaded.IntroDownbeatSeconds);
+        Assert.Null(loaded.OutroDownbeatSeconds);
+        Assert.Null(loaded.OutroMixPointSeconds);
+        Assert.Null(loaded.OutroMixPointScore);
+    }
+
+    [Fact(DisplayName = "migration_19_round_trips_new_columns")]
+    public async Task UpsertThenGet_RoundTripsTheMigration19Columns_KeepingNulls()
+    {
+        // Arrange
+        using SqliteDatabaseFixture own = new();
+        var repository = new TrackAnalysisRepository(() => new SqliteConnection(own.ConnectionString));
+        var entity = Full(1);
+        entity.IntroDownbeatSeconds = null;
+        entity.OutroMixPointSeconds = 181.125;
+        entity.OutroMixPointScore = 0.0;
+
+        // Act
+        await repository.UpsertAsync(entity, CancellationToken.None);
+        var loaded = await repository.GetAsync(1, CancellationToken.None);
+
+        // Assert
+        Assert.NotNull(loaded);
+        Assert.Null(loaded.IntroDownbeatSeconds);
+        Assert.Equal(172.2, loaded.OutroDownbeatSeconds);
+        Assert.Equal(181.125, loaded.OutroMixPointSeconds);
+        Assert.Equal(0.0, loaded.OutroMixPointScore);
     }
 
     [Fact(DisplayName = "upsert_of_an_existing_row_replaces_its_values")]
@@ -102,6 +137,7 @@ public class TrackAnalysisRepositoryTests : IClassFixture<SqliteDatabaseFixture>
         updated.Bpm = 90;
         updated.BpmSource = BpmSource.Tag;
         updated.OutroTempoAnalysed = false;
+        updated.OutroMixPointScore = null;
 
         // Act
         await _repository.UpsertAsync(updated, CancellationToken.None);
@@ -115,6 +151,8 @@ public class TrackAnalysisRepositoryTests : IClassFixture<SqliteDatabaseFixture>
         Assert.Equal(90, loaded.Bpm);
         Assert.Equal(BpmSource.Tag, loaded.BpmSource);
         Assert.False(loaded.OutroTempoAnalysed);
+        Assert.Null(loaded.OutroMixPointScore);
+        Assert.Equal(172.2, loaded.OutroDownbeatSeconds);
     }
 
     [Fact(DisplayName = "get_returns_null_for_a_track_never_analysed")]

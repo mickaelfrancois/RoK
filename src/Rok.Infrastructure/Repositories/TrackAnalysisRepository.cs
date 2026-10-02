@@ -13,15 +13,18 @@ public sealed class TrackAnalysisRepository : ITrackAnalysisRepository
 
     private const string SelectSql = """
         SELECT trackId, algorithmVersion, fileModifiedUtc, fileSize, musicEndSeconds, fadeOutSeconds, musicStartSeconds,
-               bpm, bpmConfidence, bpmSource, introBeatPhase, outroBeatPhase, introTempoAnalysed, outroTempoAnalysed
+               bpm, bpmConfidence, bpmSource, introBeatPhase, outroBeatPhase, introTempoAnalysed, outroTempoAnalysed,
+               introDownbeatSeconds, outroDownbeatSeconds, outroMixPointSeconds, outroMixPointScore
         FROM trackAnalysis WHERE trackId = @trackId
         """;
 
     private const string UpsertSql = """
         INSERT INTO trackAnalysis (trackId, algorithmVersion, fileModifiedUtc, fileSize, musicEndSeconds, fadeOutSeconds, musicStartSeconds,
-                                   bpm, bpmConfidence, bpmSource, introBeatPhase, outroBeatPhase, introTempoAnalysed, outroTempoAnalysed)
+                                   bpm, bpmConfidence, bpmSource, introBeatPhase, outroBeatPhase, introTempoAnalysed, outroTempoAnalysed,
+                                   introDownbeatSeconds, outroDownbeatSeconds, outroMixPointSeconds, outroMixPointScore)
         VALUES (@trackId, @algorithmVersion, @fileModifiedUtc, @fileSize, @musicEndSeconds, @fadeOutSeconds, @musicStartSeconds,
-                @bpm, @bpmConfidence, @bpmSource, @introBeatPhase, @outroBeatPhase, @introTempoAnalysed, @outroTempoAnalysed)
+                @bpm, @bpmConfidence, @bpmSource, @introBeatPhase, @outroBeatPhase, @introTempoAnalysed, @outroTempoAnalysed,
+                @introDownbeatSeconds, @outroDownbeatSeconds, @outroMixPointSeconds, @outroMixPointScore)
         ON CONFLICT(trackId) DO UPDATE SET
             algorithmVersion = excluded.algorithmVersion,
             fileModifiedUtc = excluded.fileModifiedUtc,
@@ -35,7 +38,11 @@ public sealed class TrackAnalysisRepository : ITrackAnalysisRepository
             introBeatPhase = excluded.introBeatPhase,
             outroBeatPhase = excluded.outroBeatPhase,
             introTempoAnalysed = excluded.introTempoAnalysed,
-            outroTempoAnalysed = excluded.outroTempoAnalysed
+            outroTempoAnalysed = excluded.outroTempoAnalysed,
+            introDownbeatSeconds = excluded.introDownbeatSeconds,
+            outroDownbeatSeconds = excluded.outroDownbeatSeconds,
+            outroMixPointSeconds = excluded.outroMixPointSeconds,
+            outroMixPointScore = excluded.outroMixPointScore
         """;
 
     private readonly Func<IDbConnection> _connectionFactory;
@@ -79,7 +86,11 @@ public sealed class TrackAnalysisRepository : ITrackAnalysisRepository
             introBeatPhase = entity.IntroBeatPhase,
             outroBeatPhase = entity.OutroBeatPhase,
             introTempoAnalysed = entity.IntroTempoAnalysed,
-            outroTempoAnalysed = entity.OutroTempoAnalysed
+            outroTempoAnalysed = entity.OutroTempoAnalysed,
+            introDownbeatSeconds = entity.IntroDownbeatSeconds,
+            outroDownbeatSeconds = entity.OutroDownbeatSeconds,
+            outroMixPointSeconds = entity.OutroMixPointSeconds,
+            outroMixPointScore = entity.OutroMixPointScore
         };
 
         try

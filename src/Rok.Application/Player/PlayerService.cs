@@ -522,14 +522,16 @@ public sealed class PlayerService : IPlayerService, IDisposable
             }
 
             _logger.LogInformation(
-                "Mix: {Track} -> {Next}, beat-aligned {Aligned}, BPM {OutgoingBpm}/{IncomingBpm}, start shift {Shift}s, bass swap at {SwapAt}s",
+                "Mix: {Track} -> {Next}, beat-aligned {Aligned}, BPM {OutgoingBpm}/{IncomingBpm}, start shift {Shift}s, bass swap at {SwapAt}s, mix point {MixPoint}, score {MixPointScore}",
                 current.Title,
                 next.Title,
                 plan.Alignment != null,
                 outro?.Beats?.Bpm,
                 intro?.Beats?.Bpm,
                 plan.Alignment?.StartShiftSeconds ?? 0,
-                plan.BassSwapAtSeconds);
+                plan.BassSwapAtSeconds,
+                plan.MixPointScore != null,
+                outro?.MixPoint?.Score);
 
             lock (_transitionLock)
             {

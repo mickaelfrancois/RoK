@@ -110,6 +110,34 @@ public class BeatGridDetectorTests
         Assert.InRange(detection.FirstBeatSeconds.Value, 170 + 0.137 - 0.02, 170 + 0.137 + 0.02);
     }
 
+    [Fact(DisplayName = "detect_on_a_curve_matches_detect_on_mono")]
+    public void Detect_OnCurve_MatchesDetectOnMono()
+    {
+        // Arrange
+        var clicks = SyntheticSignal.Clicks(120, 30, Rate, 0.137);
+        var curve = OnsetCurve.Compute(clicks, Rate);
+
+        // Act
+        var fromMono = BeatGridDetector.Detect(clicks, Rate, 170, null);
+        var fromCurve = BeatGridDetector.Detect(curve, 170, null);
+
+        // Assert
+        Assert.Equal(fromMono, fromCurve);
+    }
+
+    [Theory(DisplayName = "is_long_enough_requires_the_minimum_duration_and_a_positive_rate")]
+    [InlineData(88200, 11025, true)]
+    [InlineData(88199, 11025, false)]
+    [InlineData(88200, 0, false)]
+    public void IsLongEnough_ChecksLengthAndRate(int count, int rate, bool expected)
+    {
+        // Act
+        var result = BeatGridDetector.IsLongEnough(count, rate);
+
+        // Assert
+        Assert.Equal(expected, result);
+    }
+
     [Fact(DisplayName = "detect_works_at_a_twelve_kilohertz_rate")]
     public void Detect_WorksAtTwelveKilohertz()
     {

@@ -15,14 +15,14 @@ public class DependencyInjectionTests
         return services;
     }
 
-    [Fact(DisplayName = "migration_18_is_registered")]
-    public void AddInfrastructure_RegistersMigration18()
+    [Fact(DisplayName = "migration_19_is_registered")]
+    public void AddInfrastructure_RegistersMigration19()
     {
         // Act
         var services = Register();
 
         // Assert
-        Assert.Contains(services, d => d.ServiceType == typeof(IMigration) && d.ImplementationType == typeof(Migration18));
+        Assert.Contains(services, d => d.ServiceType == typeof(IMigration) && d.ImplementationType == typeof(Migration19));
     }
 
     [Fact(DisplayName = "every_migration_target_version_is_unique")]
@@ -38,7 +38,7 @@ public class DependencyInjectionTests
             .ToList();
 
         Assert.Equal(versions.Count, versions.Distinct().Count());
-        Assert.Contains(18, versions);
+        Assert.Contains(19, versions);
     }
 
     [Fact(DisplayName = "track_analysis_repository_is_registered_as_singleton")]
