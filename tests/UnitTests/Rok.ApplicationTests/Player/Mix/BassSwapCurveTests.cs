@@ -127,4 +127,61 @@ public class BassSwapCurveTests
         Assert.InRange(incoming, 0, 1);
         Assert.InRange(outgoing, 0, 1);
     }
+
+    [Fact(DisplayName = "bass_swap_ramp_is_centred_on_the_requested_position")]
+    public void Cut_WithSwapPosition_CentresTheRamp()
+    {
+        // Act & Assert
+        Assert.Equal(1, BassSwapCurve.Cut(EBassSwapRole.Incoming, 2.7, Mix, 3), 6);
+        Assert.Equal(0.5, BassSwapCurve.Cut(EBassSwapRole.Incoming, 3, Mix, 3), 6);
+        Assert.Equal(0, BassSwapCurve.Cut(EBassSwapRole.Incoming, 3.3, Mix, 3), 6);
+        Assert.Equal(0, BassSwapCurve.Cut(EBassSwapRole.Outgoing, 2.7, Mix, 3), 6);
+        Assert.Equal(0.5, BassSwapCurve.Cut(EBassSwapRole.Outgoing, 3, Mix, 3), 6);
+        Assert.Equal(1, BassSwapCurve.Cut(EBassSwapRole.Outgoing, 3.3, Mix, 3), 6);
+    }
+
+    [Theory(DisplayName = "bass_swap_defaults_to_the_middle")]
+    [InlineData(EBassSwapRole.Incoming, 0)]
+    [InlineData(EBassSwapRole.Incoming, 4.9)]
+    [InlineData(EBassSwapRole.Incoming, 5.1)]
+    [InlineData(EBassSwapRole.Outgoing, 5.2)]
+    [InlineData(EBassSwapRole.Outgoing, 9)]
+    public void Cut_WithoutSwapPosition_MatchesTheMiddle(EBassSwapRole role, double elapsed)
+    {
+        // Act
+        double implicitMiddle = BassSwapCurve.Cut(role, elapsed, Mix);
+        double explicitMiddle = BassSwapCurve.Cut(role, elapsed, Mix, Mix / 2);
+
+        // Assert
+        Assert.Equal(explicitMiddle, implicitMiddle);
+    }
+
+    [Fact(DisplayName = "resolve_swap_at_keeps_a_valid_position")]
+    public void ResolveSwapAt_ValidPosition_IsKept()
+    {
+        // Act
+        double swapAt = BassSwapCurve.ResolveSwapAt(2.5, 6);
+
+        // Assert
+        Assert.Equal(2.5, swapAt);
+    }
+
+    [Theory(DisplayName = "resolve_swap_at_falls_back_to_the_middle")]
+    [InlineData(null)]
+    [InlineData(0.0)]
+    [InlineData(-1.0)]
+    [InlineData(0.1)]
+    [InlineData(5.9)]
+    [InlineData(6.0)]
+    [InlineData(7.0)]
+    [InlineData(double.NaN)]
+    [InlineData(double.PositiveInfinity)]
+    public void ResolveSwapAt_InvalidPosition_FallsBackToTheMiddle(double? requested)
+    {
+        // Act
+        double swapAt = BassSwapCurve.ResolveSwapAt(requested, 6);
+
+        // Assert
+        Assert.Equal(3, swapAt);
+    }
 }

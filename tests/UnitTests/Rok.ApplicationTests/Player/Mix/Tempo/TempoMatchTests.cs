@@ -1,3 +1,4 @@
+using Rok.Application.Player.Mix;
 using Rok.Application.Player.Mix.Tempo;
 
 namespace Rok.ApplicationTests.Player.Mix.Tempo;
@@ -26,6 +27,31 @@ public class TempoMatchTests
     {
         // Act
         var result = TempoMatch.IsOctaveEquivalent(a, b, 0.02);
+
+        // Assert
+        Assert.False(result);
+    }
+
+    [Theory(DisplayName = "octave_tempos_match_within_three_percent")]
+    [InlineData(87, 174)]
+    [InlineData(174, 87)]
+    [InlineData(120, 121)]
+    public void IsOctaveEquivalent_AtThreePercent_Matches(double a, double b)
+    {
+        // Act
+        var result = TempoMatch.IsOctaveEquivalent(a, b, MixThresholds.BeatAlignTempoTolerance);
+
+        // Assert
+        Assert.True(result);
+    }
+
+    [Theory(DisplayName = "distinct_tempos_do_not_match_within_three_percent")]
+    [InlineData(120, 128)]
+    [InlineData(128, 120)]
+    public void IsOctaveEquivalent_AtThreePercent_DoesNotMatch(double a, double b)
+    {
+        // Act
+        var result = TempoMatch.IsOctaveEquivalent(a, b, MixThresholds.BeatAlignTempoTolerance);
 
         // Assert
         Assert.False(result);

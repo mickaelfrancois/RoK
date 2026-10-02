@@ -685,9 +685,10 @@ public class NAudioMediaPlayer : IPlayerEngine, IDisposable
 
         TimeSpan duration = TimeSpan.FromSeconds(durationSeconds);
         bool bassSwap = transition.BassSwap && BassSwapCurve.Applies(durationSeconds);
+        TimeSpan swapAt = TimeSpan.FromSeconds(BassSwapCurve.ResolveSwapAt(transition.BassSwapAtSeconds, durationSeconds));
 
         if (bassSwap)
-            nextPipeline.BassSwap.Start(EBassSwapRole.Incoming, duration);
+            nextPipeline.BassSwap.Start(EBassSwapRole.Incoming, duration, swapAt);
 
         nextPipeline.Fade.Start(EFadeDirection.In, duration);
 
@@ -709,7 +710,7 @@ public class NAudioMediaPlayer : IPlayerEngine, IDisposable
             outgoing?.Fade.Start(EFadeDirection.Out, outgoingRamp);
 
             if (bassSwap)
-                outgoing?.BassSwap.Start(EBassSwapRole.Outgoing, duration);
+                outgoing?.BassSwap.Start(EBassSwapRole.Outgoing, duration, swapAt);
 
             await WaitForFadeAsync(nextPipeline.Fade, duration, ct);
 

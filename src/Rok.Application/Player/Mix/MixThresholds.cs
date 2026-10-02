@@ -81,6 +81,9 @@ public static class MixThresholds
     /// <summary>Highest BPM tag taken into account.</summary>
     public const int MaxTagBpm = 250;
 
+    /// <summary>Relative tempo tolerance under which two tracks are beat-aligned (octave errors included).</summary>
+    public const double BeatAlignTempoTolerance = 0.03;
+
     /// <summary>Fraction of the best autocorrelation peak a faster tempo must reach to be preferred.</summary>
     public const double OctavePeakRatio = 0.9;
 }
