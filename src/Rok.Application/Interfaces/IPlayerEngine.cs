@@ -52,6 +52,10 @@ public interface IPlayerEngine
     /// between zero and the incoming length is ignored, and <paramref name="durationSeconds"/> is capped to half of what
     /// is left of the incoming track. <see cref="MixTransition.BassSwap"/> asks the engine to swap the bass of the two
     /// tracks, at <see cref="MixTransition.BassSwapAtSeconds"/> from the start of the mix (the middle when null).
+    /// When <see cref="MixTransition.Stretch"/> is set, the incoming track is time-stretched at that ratio for the
+    /// mix, then its tempo returns linearly to the original one. When
+    /// <see cref="MixTransition.ReferencePositionSeconds"/> is set, the engine skips the incoming content matching the
+    /// time spent opening the output, and shortens the mix and the bass swap offset by the same delay.
     /// </summary>
     Task CrossfadeToAsync(TrackDto nextTrack, float replayGain, double durationSeconds, MixTransition transition, CancellationToken ct);
 

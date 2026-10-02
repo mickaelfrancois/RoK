@@ -57,6 +57,7 @@ Rok est une application de bureau Windows permettant de gérer et d'écouter vot
 - **C# 13** — Dernières fonctionnalités du langage (`LangVersion=preview`)
 - **WinUI 3 / Windows App SDK 2.2** — Framework d'interface natif Windows et APIs de la plateforme
 - **NAudio** — Moteur de lecture audio
+- **SoundTouch.Net** — Étirement du tempo du mode Mix (LGPL-2.1)
 - **SQLite** + **Dapper** — Base de données locale et micro-ORM haute performance
 - **TagLibSharp** — Lecture/écriture des métadonnées audio
 - **CleanArch.DevKit.Mediator** — Médiateur source-generé (CQRS, validation, pattern Result, messagerie)

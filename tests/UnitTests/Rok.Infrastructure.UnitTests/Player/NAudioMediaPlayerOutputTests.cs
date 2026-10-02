@@ -216,6 +216,120 @@ public sealed class NAudioMediaPlayerOutputTests : IDisposable
         Assert.Equal([false, true], states.Select(state => state.IsProcessingNeutral));
     }
 
+    [Fact(DisplayName = "pause_returns_the_current_track_to_its_original_tempo")]
+
+    public void Pause_ReturnsCurrentTrack_ToItsOriginalTempo()
+
+    {
+
+        // Arrange
+
+        using TestWaveFile noise = CreateNoise(10);
+
+        _sut.SetTrack(Track(1, noise), 1f);
+
+        _sut.Play();
+
+        _sut.CurrentTimeStretch!.Start(1.05, TimeSpan.FromSeconds(1), TimeSpan.FromSeconds(1));
+
+        float[] buffer = new float[2048];
+
+        _factory.LastSource.Read(buffer.AsSpan());
+
+
+
+        // Act
+
+        _sut.Pause();
+
+        int reads = 0;
+
+
+
+        while (_sut.CurrentTimeStretch.IsActive && reads++ < 200)
+
+            _factory.LastSource.Read(buffer.AsSpan());
+
+
+
+        // Assert
+
+        Assert.False(_sut.CurrentTimeStretch.IsActive);
+
+        Assert.True(reads < 200);
+
+    }
+
+
+
+    [Fact(DisplayName = "seek_resets_the_time_stretch_before_moving")]
+
+    public void SetPosition_ResetsTimeStretch_BeforeMoving()
+
+    {
+
+        // Arrange
+
+        using TestWaveFile noise = CreateNoise(10);
+
+        using AudioFileReader expectedReader = new(noise.Path);
+
+        _sut.SetTrack(Track(1, noise), 1f);
+
+        _sut.Play();
+
+        _sut.CurrentTimeStretch!.Start(1.05, TimeSpan.FromSeconds(5), TimeSpan.FromSeconds(1));
+
+        float[] buffer = new float[2048];
+
+        _factory.LastSource.Read(buffer.AsSpan());
+
+        expectedReader.CurrentTime = TimeSpan.FromSeconds(3);
+
+        float[] expected = new float[512];
+
+        float[] rendered = new float[512];
+
+        expectedReader.Read(expected.AsSpan());
+
+
+
+        // Act
+
+        _sut.SetPosition(3);
+
+        int read = _factory.LastSource.Read(rendered.AsSpan());
+
+
+
+        // Assert
+
+        Assert.False(_sut.CurrentTimeStretch.IsActive);
+
+        Assert.Equal(expected.Length, read);
+
+        Assert.Equal(expected, rendered);
+
+    }
+
+
+
+    private static TestWaveFile CreateNoise(double seconds)
+
+    {
+
+        byte[] data = new byte[(int)(44100 * seconds) * 4];
+
+        new Random(11).NextBytes(data);
+
+
+
+        return TestWaveFile.Create(44100, 16, 2, data);
+
+    }
+
+
+
     private sealed class FakeOutputFactory : IAudioOutputFactory
     {
         public List<(AudioOutputTarget Target, int NativeBits)> Opened { get; } = [];
@@ -226,10 +340,13 @@ public sealed class NAudioMediaPlayerOutputTests : IDisposable
 
         public FakeWavePlayer LastPlayer { get; private set; } = null!;
 
+        public ISampleProvider LastSource { get; private set; } = null!;
+
         public AudioOutputHandle Open(AudioOutputTarget target, ISampleProvider source, int nativeBitsPerSample)
         {
             Opened.Add((target, nativeBitsPerSample));
             LastPlayer = new FakeWavePlayer();
+            LastSource = source;
 
             bool exclusive = target.Mode == EAudioOutputMode.Exclusive && FallbackReason is null;
             string deviceId = target.FollowsWindowsDefault ? "speakers" : target.PreferredDeviceId;

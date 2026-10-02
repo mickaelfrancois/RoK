@@ -56,4 +56,63 @@ public class TempoMatchTests
         // Assert
         Assert.False(result);
     }
+
+    [Fact(DisplayName = "stretch_ratio_within_eight_percent_is_returned")]
+    public void StretchRatio_WithinMax_IsReturned()
+    {
+        // Act
+        var result = TempoMatch.StretchRatio(128, 128 / 1.07, MixThresholds.MaxTempoStretch);
+
+        // Assert
+        Assert.NotNull(result);
+        Assert.Equal(1.07, result.Value, 9);
+    }
+
+    [Theory(DisplayName = "stretch_ratio_beyond_eight_percent_is_null")]
+    [InlineData(1.09)]
+    [InlineData(0.91)]
+    public void StretchRatio_BeyondMax_IsNull(double ratio)
+    {
+        // Act
+        var result = TempoMatch.StretchRatio(128, 128 / ratio, MixThresholds.MaxTempoStretch);
+
+        // Assert
+        Assert.Null(result);
+    }
+
+    [Fact(DisplayName = "stretch_ratio_folds_octaves")]
+    public void StretchRatio_OctaveApart_FoldsToTheClosestFactor()
+    {
+        // Act
+        var result = TempoMatch.StretchRatio(87, 174 * 1.05, MixThresholds.MaxTempoStretch);
+
+        // Assert
+        Assert.NotNull(result);
+        Assert.Equal(1 / 1.05, result.Value, 9);
+    }
+
+    [Theory(DisplayName = "stretch_ratio_below_the_minimum_is_one")]
+    [InlineData(128, 128)]
+    [InlineData(128, 128.05)]
+    public void StretchRatio_BelowMinimum_IsOne(double outgoing, double incoming)
+    {
+        // Act
+        var result = TempoMatch.StretchRatio(outgoing, incoming, MixThresholds.MaxTempoStretch);
+
+        // Assert
+        Assert.Equal(1d, result);
+    }
+
+    [Theory(DisplayName = "invalid_bpm_gives_null")]
+    [InlineData(0, 120)]
+    [InlineData(120, 0)]
+    [InlineData(-1, 120)]
+    public void StretchRatio_NonPositiveTempo_IsNull(double outgoing, double incoming)
+    {
+        // Act
+        var result = TempoMatch.StretchRatio(outgoing, incoming, MixThresholds.MaxTempoStretch);
+
+        // Assert
+        Assert.Null(result);
+    }
 }

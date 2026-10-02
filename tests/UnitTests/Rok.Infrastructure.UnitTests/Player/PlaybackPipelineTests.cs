@@ -78,4 +78,42 @@ public class PlaybackPipelineTests
         Assert.Equal(10, bands.Length);
         Assert.All(bands, band => Assert.Equal(0f, band.Gain));
     }
+
+    [Fact(DisplayName = "created_pipeline_exposes_an_inactive_time_stretch")]
+    public void Create_ExposesInactiveTimeStretch()
+    {
+        // Arrange
+        using TestWaveFile file = TestWaveFile.Create(44100, 16, 2, new byte[4096]);
+
+        // Act
+        using PlaybackPipeline pipeline = PlaybackPipeline.Create(new AudioFileReader(file.Path), 1f, 1, [], 1f);
+
+        // Assert
+        Assert.NotNull(pipeline.TimeStretch);
+        Assert.False(pipeline.TimeStretch.IsActive);
+    }
+
+    [Fact(DisplayName = "time_stretch_sits_in_the_render_path_between_the_chain_and_the_equalizer")]
+    public void TimeStretch_SitsInRenderPath_BetweenChainAndEqualizer()
+    {
+        // Arrange
+        Random random = new(7);
+        byte[] data = new byte[44100 * 4];
+        random.NextBytes(data);
+        using TestWaveFile file = TestWaveFile.Create(44100, 16, 2, data);
+        using AudioFileReader expectedReader = new(file.Path);
+        using PlaybackPipeline pipeline = PlaybackPipeline.Create(new AudioFileReader(file.Path), 1f, 1, [], 1f);
+        const int skippedFrames = 4410;
+        float[] expected = new float[2 * skippedFrames + 64];
+        float[] rendered = new float[64];
+        expectedReader.Read(expected.AsSpan());
+        pipeline.TimeStretch.SkipSource(TimeSpan.FromSeconds(0.1));
+
+        // Act
+        int read = pipeline.Output.Read(rendered.AsSpan());
+
+        // Assert
+        Assert.Equal(rendered.Length, read);
+        Assert.Equal(expected.AsSpan(2 * skippedFrames).ToArray(), rendered);
+    }
 }

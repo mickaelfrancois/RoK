@@ -10,9 +10,14 @@ public class MixTransitionPlannerTests
     private static readonly TrackDto Current = new() { Id = 1 };
     private static readonly TrackDto Next = new() { Id = 2 };
 
-    private static MixPlan? Plan(double musicEnd, double fadeOut, double length, int slider, double introStart = 0, BeatGrid? outBeats = null, BeatGrid? inBeats = null)
+    // Too short to be stretched over 4 bars: keeps the plans of the non-stretched mix (#437, #444).
+    private const long ShortIncoming = 30;
+
+    private static TrackDto NextTrack(long duration) => new() { Id = 2, Duration = duration };
+
+    private static MixPlan? Plan(double musicEnd, double fadeOut, double length, int slider, double introStart = 0, BeatGrid? outBeats = null, BeatGrid? inBeats = null, long incomingDuration = 0)
     {
-        return MixTransitionPlanner.Plan(Current, new OutroCues(musicEnd, fadeOut, outBeats), Next, new IntroCues(introStart, inBeats), length, slider);
+        return MixTransitionPlanner.Plan(Current, new OutroCues(musicEnd, fadeOut, outBeats), NextTrack(incomingDuration), new IntroCues(introStart, inBeats), length, slider);
     }
 
     private static BeatGrid Grid(double bpm, double first) => new(bpm, first, 0.9, BpmSource.Detected);
@@ -256,7 +261,7 @@ public class MixTransitionPlannerTests
         var unaligned = Plan(musicEnd: 200, fadeOut: 0, length: 210, slider)!;
 
         // Act
-        var plan = Plan(musicEnd: 200, fadeOut: 0, length: 210, slider, outBeats: Grid(bpm, first), inBeats: Grid(bpm, 0.1))!;
+        var plan = Plan(musicEnd: 200, fadeOut: 0, length: 210, slider, outBeats: Grid(bpm, first), inBeats: Grid(bpm, 0.1), incomingDuration: ShortIncoming)!;
 
         // Assert
         Assert.NotNull(plan.Alignment);
@@ -306,7 +311,7 @@ public class MixTransitionPlannerTests
         var expected = Plan(musicEnd: 200, fadeOut: 0, length: 210, slider: 6);
 
         // Act
-        var plan = Plan(musicEnd: 200, fadeOut: 0, length: 210, slider: 6, outBeats: Grid(120, 170.3), inBeats: Grid(128, 0.2));
+        var plan = Plan(musicEnd: 200, fadeOut: 0, length: 210, slider: 6, outBeats: Grid(120, 170.3), inBeats: Grid(140, 0.2));
 
         // Assert
         Assert.Equal(expected, plan);
@@ -341,7 +346,7 @@ public class MixTransitionPlannerTests
     public void ResolveAt_AlignedOnTime_KeepsThePlan()
     {
         // Arrange
-        var plan = Plan(musicEnd: 200, fadeOut: 0, length: 210, slider: 6, introStart: 1.2, outBeats: Grid(128, 170.13), inBeats: Grid(128, 0.31))!;
+        var plan = Plan(musicEnd: 200, fadeOut: 0, length: 210, slider: 6, introStart: 1.2, outBeats: Grid(128, 170.13), inBeats: Grid(128, 0.31), incomingDuration: ShortIncoming)!;
 
         // Act
         var (duration, incomingStart, bassSwapAt) = MixTransitionPlanner.ResolveAt(plan, plan.StartSeconds);
@@ -356,7 +361,7 @@ public class MixTransitionPlannerTests
     public void ResolveAt_AlignedLate_ShiftsTheIncomingStartByThePhase()
     {
         // Arrange
-        var plan = Plan(musicEnd: 200, fadeOut: 0, length: 210, slider: 6, introStart: 1.2, outBeats: Grid(128, 170.13), inBeats: Grid(128, 0.31))!;
+        var plan = Plan(musicEnd: 200, fadeOut: 0, length: 210, slider: 6, introStart: 1.2, outBeats: Grid(128, 170.13), inBeats: Grid(128, 0.31), incomingDuration: ShortIncoming)!;
         var period = 60.0 / 128;
 
         // Act
@@ -370,7 +375,7 @@ public class MixTransitionPlannerTests
     public void ResolveAt_AlignedLate_KeepsTheBassSwapOnABeat()
     {
         // Arrange
-        var plan = Plan(musicEnd: 200, fadeOut: 0, length: 210, slider: 6, outBeats: Grid(128, 170.13), inBeats: Grid(128, 0.31))!;
+        var plan = Plan(musicEnd: 200, fadeOut: 0, length: 210, slider: 6, outBeats: Grid(128, 170.13), inBeats: Grid(128, 0.31), incomingDuration: ShortIncoming)!;
         var position = plan.StartSeconds + 1.3;
 
         // Act
@@ -399,7 +404,7 @@ public class MixTransitionPlannerTests
     public void ResolveAt_AlignedTooLate_FallsBackToTheMiddle()
     {
         // Arrange
-        var plan = Plan(musicEnd: 200, fadeOut: 0, length: 210, slider: 6, outBeats: Grid(128, 170.13), inBeats: Grid(128, 0.31))!;
+        var plan = Plan(musicEnd: 200, fadeOut: 0, length: 210, slider: 6, outBeats: Grid(128, 170.13), inBeats: Grid(128, 0.31), incomingDuration: ShortIncoming)!;
 
         // Act
         var (duration, _, bassSwapAt) = MixTransitionPlanner.ResolveAt(plan, 205);
@@ -434,9 +439,10 @@ public class MixTransitionPlannerTests
         int slider = 6,
         double musicEnd = 200,
         double length = 210,
-        double introStart = 1.2)
+        double introStart = 1.2,
+        long incomingDuration = ShortIncoming)
     {
-        return MixTransitionPlanner.Plan(Current, new OutroCues(musicEnd, 0, outBeats, point), Next, new IntroCues(introStart, inBeats), length, slider);
+        return MixTransitionPlanner.Plan(Current, new OutroCues(musicEnd, 0, outBeats, point), NextTrack(incomingDuration), new IntroCues(introStart, inBeats), length, slider);
     }
 
     private static BeatGrid BarOut => GridWithDownbeat(120, OutDownbeat, OutDownbeat);
@@ -549,7 +555,7 @@ public class MixTransitionPlannerTests
     public void Plan_MixPointWithIncompatibleTempos_IsUsedUnaligned()
     {
         // Arrange & Act
-        var plan = PlanWithPoint(new MixPoint(MixPointSeconds, 0.9), BarOut, GridWithDownbeat(128, 0.2, 0.2));
+        var plan = PlanWithPoint(new MixPoint(MixPointSeconds, 0.9), BarOut, GridWithDownbeat(140, 0.2, 0.2));
 
         // Assert
         Assert.NotNull(plan);
@@ -608,7 +614,7 @@ public class MixTransitionPlannerTests
             "bar" => BarIn,
             "beat" => Grid(120, 0.31),
             "octave" => GridWithDownbeat(240, 0.2, 0.2),
-            _ => GridWithDownbeat(128, 0.2, 0.2)
+            _ => GridWithDownbeat(140, 0.2, 0.2)
         };
 
         // Act
@@ -617,5 +623,184 @@ public class MixTransitionPlannerTests
         // Assert
         Assert.True(BassSwapCurve.Applies(plan.DurationSeconds));
         Assert.Equal(plan.BassSwapAtSeconds, BassSwapCurve.ResolveSwapAt(plan.BassSwapAtSeconds, plan.DurationSeconds));
+    }
+
+    private const double Bar128 = 1.875;
+
+    private static BeatGrid StretchOut => GridWithDownbeat(128, OutDownbeat, OutDownbeat);
+
+    private static BeatGrid StretchIn(double ratio) => GridWithDownbeat(128 / ratio, 0.31, 0.81);
+
+    private static MixPlan? PlanStretched(
+        BeatGrid? outBeats,
+        BeatGrid? inBeats,
+        MixPoint? point = null,
+        int slider = 6,
+        double musicEnd = 200,
+        double length = 210,
+        long incomingDuration = 0)
+    {
+        return PlanWithPoint(point, outBeats, inBeats, slider, musicEnd, length, introStart: 0, incomingDuration);
+    }
+
+    [Fact(DisplayName = "tempos_seven_percent_apart_are_stretched_over_eight_bars")]
+    public void Plan_TemposSevenPercentApart_AreStretchedOverEightBars()
+    {
+        // Arrange & Act
+        var plan = PlanStretched(StretchOut, StretchIn(1.07));
+
+        // Assert
+        Assert.NotNull(plan);
+        Assert.NotNull(plan.Stretch);
+        Assert.Equal(8, plan.Stretch.Bars);
+        Assert.Equal(1.07, plan.Stretch.Ratio, 9);
+        Assert.Equal(8 * Bar128, plan.DurationSeconds, 9);
+        Assert.True(OnBar(plan.StartSeconds, OutDownbeat, Bar128));
+        Assert.True(OnBar(plan.StartSeconds + plan.DurationSeconds, OutDownbeat, Bar128));
+        Assert.NotNull(plan.Alignment);
+        Assert.True(plan.Alignment.BarAligned);
+    }
+
+    [Fact(DisplayName = "tempos_nine_percent_apart_keep_the_current_plan")]
+    public void Plan_TemposNinePercentApart_KeepTheCurrentPlan()
+    {
+        // Arrange
+        var expected = PlanStretched(null, null);
+
+        // Act
+        var plan = PlanStretched(StretchOut, StretchIn(1.09));
+
+        // Assert
+        Assert.NotNull(plan);
+        Assert.Null(plan.Stretch);
+        Assert.Equal(expected, plan);
+    }
+
+    [Theory(DisplayName = "stretched_plan_falls_back_to_four_bars_then_to_the_current_plan")]
+    [InlineData(200, 0, 8)]
+    [InlineData(200, 100, 8)]
+    [InlineData(200, 50, 4)]
+    [InlineData(200, 30, 0)]
+    [InlineData(190, 0, 4)]
+    [InlineData(185, 0, 0)]
+    public void Plan_Stretched_FallsBackToFourBarsThenToTheCurrentPlan(double musicEnd, long incomingDuration, int expectedBars)
+    {
+        // Arrange & Act
+        var plan = PlanStretched(StretchOut, StretchIn(1), musicEnd: musicEnd, incomingDuration: incomingDuration);
+
+        // Assert
+        if (expectedBars == 0)
+        {
+            Assert.True(plan is null || plan.Stretch is null);
+
+            return;
+        }
+
+        Assert.NotNull(plan);
+        Assert.NotNull(plan.Stretch);
+        Assert.Equal(expectedBars, plan.Stretch.Bars);
+        Assert.Equal(expectedBars * Bar128, plan.DurationSeconds, 9);
+    }
+
+    [Fact(DisplayName = "stretched_plan_starts_on_the_mix_point_when_it_fits")]
+    public void Plan_Stretched_StartsOnTheMixPointWhenItFits()
+    {
+        // Arrange & Act
+        var plan = PlanStretched(StretchOut, StretchIn(1.05), new MixPoint(184, 0.9));
+
+        // Assert
+        Assert.NotNull(plan);
+        Assert.NotNull(plan.Stretch);
+        Assert.Equal(184, plan.StartSeconds);
+        Assert.Equal(0.9, plan.MixPointScore);
+        Assert.Equal(8, plan.Stretch.Bars);
+    }
+
+    [Fact(DisplayName = "mix_point_too_late_for_eight_bars_uses_the_bar_grid")]
+    public void Plan_Stretched_MixPointTooLateForEightBars_UsesTheBarGrid()
+    {
+        // Arrange & Act
+        var plan = PlanStretched(StretchOut, StretchIn(1.05), new MixPoint(190, 0.9));
+
+        // Assert
+        Assert.NotNull(plan);
+        Assert.NotNull(plan.Stretch);
+        Assert.Equal(8, plan.Stretch.Bars);
+        Assert.Equal(185, plan.StartSeconds, 9);
+        Assert.Null(plan.MixPointScore);
+    }
+
+    [Theory(DisplayName = "stretched_plan_stays_in_the_last_30_seconds_and_ignores_the_slider")]
+    [InlineData(1)]
+    [InlineData(6)]
+    [InlineData(12)]
+    public void Plan_Stretched_StaysInTheWindowAndIgnoresTheSlider(int slider)
+    {
+        // Arrange & Act
+        var plan = PlanStretched(StretchOut, StretchIn(1.05), slider: slider);
+
+        // Assert
+        Assert.NotNull(plan);
+        Assert.NotNull(plan.Stretch);
+        Assert.True(plan.StartSeconds >= 210 - 30);
+        Assert.Equal(8 * Bar128, plan.DurationSeconds, 9);
+    }
+
+    [Fact(DisplayName = "stretched_bass_swap_falls_on_the_middle_bar")]
+    public void Plan_Stretched_SwapsTheBassOnTheMiddleBar()
+    {
+        // Arrange & Act
+        var plan = PlanStretched(StretchOut, StretchIn(1.05));
+
+        // Assert
+        Assert.NotNull(plan);
+        Assert.Equal(4 * Bar128, plan.BassSwapAtSeconds, 9);
+    }
+
+    [Fact(DisplayName = "resolve_at_keeps_the_stretched_end_on_the_bar_when_late")]
+    public void ResolveAt_StretchedLate_KeepsTheEndOnTheBar()
+    {
+        // Arrange
+        var plan = PlanStretched(StretchOut, StretchIn(1.05), new MixPoint(184, 0.9))!;
+        var position = plan.StartSeconds + 3;
+
+        // Act
+        var (duration, _, _) = MixTransitionPlanner.ResolveAt(plan, position);
+
+        // Assert
+        Assert.True(plan.MusicEndSeconds > plan.StartSeconds + plan.DurationSeconds - 1e-9);
+        Assert.Equal(plan.StartSeconds + plan.DurationSeconds, position + duration, 9);
+    }
+
+    [Fact(DisplayName = "resolve_at_scales_the_incoming_shift_by_the_ratio")]
+    public void ResolveAt_StretchedLate_ScalesTheIncomingShiftByTheRatio()
+    {
+        // Arrange
+        var plan = PlanStretched(StretchOut, StretchIn(1.05))!;
+        var lateness = 4.0;
+
+        // Act
+        var (_, incomingStart, _) = MixTransitionPlanner.ResolveAt(plan, plan.StartSeconds + lateness);
+
+        // Assert
+        Assert.Equal(plan.IncomingStartSeconds + ((lateness % Bar128) * plan.Stretch!.Ratio), incomingStart, 9);
+    }
+
+    [Theory(DisplayName = "planned_stretch_is_kept_by_the_engine_rules")]
+    [InlineData(1.07)]
+    [InlineData(0.93)]
+    [InlineData(1.0)]
+    [InlineData(1.0799)]
+    public void Plan_Stretch_IsKeptByTheEngineRules(double ratio)
+    {
+        // Arrange & Act
+        var plan = PlanStretched(StretchOut, StretchIn(ratio))!;
+
+        // Assert
+        var stretch = plan.Stretch!;
+
+        Assert.Equal(stretch.Ratio, TempoStretchCurve.ClampRatio(stretch.Ratio));
+        Assert.Equal(stretch.Ratio, TempoStretchCurve.TempoAt(stretch.Ratio, plan.DurationSeconds, stretch.ReturnSeconds, plan.DurationSeconds - 1e-6));
+        Assert.Equal(1, TempoStretchCurve.TempoAt(stretch.Ratio, plan.DurationSeconds, stretch.ReturnSeconds, plan.DurationSeconds + stretch.ReturnSeconds));
     }
 }

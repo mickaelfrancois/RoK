@@ -44,9 +44,97 @@ public static class MixTransitionPlanner
 
         var plan = new MixPlan(current.Id, next.Id, start, duration, outro.MusicEndSeconds, intro.MusicStartSeconds, duration / 2);
 
-        return TryPlanFromMixPoint(plan, outro, intro, trackLength, maxDurationSeconds, earliest)
+        return TryPlanStretched(plan, outro, next, intro, trackLength, earliest)
+            ?? TryPlanFromMixPoint(plan, outro, intro, trackLength, maxDurationSeconds, earliest)
             ?? TryAlignStart(plan, outro, intro, earliest)
             ?? plan;
+    }
+
+    private static MixPlan? TryPlanStretched(
+        MixPlan basePlan,
+        OutroCues outro,
+        TrackDto next,
+        IntroCues intro,
+        double trackLength,
+        double earliest)
+    {
+        if (outro.Beats is not { Bpm: > 0 } outBeats || intro.Beats is not { Bpm: > 0 } inBeats)
+        {
+            return null;
+        }
+
+        if (TempoMatch.StretchRatio(outBeats.Bpm, inBeats.Bpm, MixThresholds.MaxTempoStretch) is not { } ratio)
+        {
+            return null;
+        }
+
+        var barAligned = outBeats.FirstDownbeatSeconds != null && inBeats.FirstDownbeatSeconds != null;
+        var outBar = MixThresholds.BeatsPerBar * 60 / outBeats.Bpm;
+        var anchor = outBeats.FirstDownbeatSeconds ?? outBeats.FirstBeatSeconds;
+        var incomingStart = inBeats.FirstDownbeatSeconds is { } downbeat && barAligned
+            ? FirstIncomingBeat(downbeat, inBeats.BarPeriodSeconds, intro.MusicStartSeconds)
+            : FirstIncomingBeat(inBeats.FirstBeatSeconds, 60 / inBeats.Bpm, intro.MusicStartSeconds);
+        var returnSeconds = TempoStretchCurve.ReturnSeconds(inBeats.Bpm);
+
+        foreach (var bars in new[] { MixThresholds.StretchMixBars, MixThresholds.StretchMixFallbackBars })
+        {
+            var duration = bars * outBar;
+
+            if (duration > trackLength / 2)
+            {
+                continue;
+            }
+
+            if (next.Duration > 0 && next.Duration < incomingStart + (2 * (duration + returnSeconds)))
+            {
+                continue;
+            }
+
+            var mixPoint = StartFromMixPoint(outro, duration, earliest);
+            var start = mixPoint?.Seconds ?? LatestBarStart(anchor, outBar, outro.MusicEndSeconds, duration, earliest);
+
+            if (start is not { } startSeconds)
+            {
+                continue;
+            }
+
+            var alignment = new MixBeatAlignment(outBeats.Bpm, inBeats.Bpm, basePlan.StartSeconds - startSeconds, barAligned);
+
+            return basePlan with
+            {
+                StartSeconds = startSeconds,
+                DurationSeconds = duration,
+                IncomingStartSeconds = incomingStart,
+                BassSwapAtSeconds = NearestGridPointToMiddle(0, alignment, duration),
+                Alignment = alignment,
+                MixPointScore = mixPoint?.Score,
+                Stretch = new MixTempoStretch(ratio, bars, returnSeconds)
+            };
+        }
+
+        return null;
+    }
+
+    private static MixPoint? StartFromMixPoint(OutroCues outro, double duration, double earliest)
+    {
+        if (outro.MixPoint is not { } point || point.Score < MixThresholds.MinMixPointScore)
+        {
+            return null;
+        }
+
+        if (point.Seconds < earliest - Epsilon || point.Seconds + duration > outro.MusicEndSeconds + Epsilon)
+        {
+            return null;
+        }
+
+        return point;
+    }
+
+    private static double? LatestBarStart(double anchor, double barSeconds, double musicEnd, double duration, double earliest)
+    {
+        var start = anchor + (Math.Floor(((musicEnd - duration - anchor) / barSeconds) + Epsilon) * barSeconds);
+
+        return start >= earliest - Epsilon ? start : null;
     }
 
     private static MixPlan? TryPlanFromMixPoint(
@@ -187,7 +275,8 @@ public static class MixTransitionPlanner
 
         if (position > plan.StartSeconds + LateToleranceSeconds)
         {
-            var remaining = plan.MusicEndSeconds - position;
+            var end = plan.Stretch is null ? plan.MusicEndSeconds : plan.StartSeconds + plan.DurationSeconds;
+            var remaining = end - position;
             duration = Math.Min(Math.Max(remaining, MixThresholds.MinMixSeconds), plan.DurationSeconds);
         }
 
@@ -198,7 +287,7 @@ public static class MixTransitionPlanner
 
         var period = alignment.AlignmentPeriodSeconds;
         var lateness = Math.Max(0, position - plan.StartSeconds);
-        var incomingStart = plan.IncomingStartSeconds + (lateness % period);
+        var incomingStart = plan.IncomingStartSeconds + ((lateness % period) * (plan.Stretch?.Ratio ?? 1));
         var anchor = PositiveModulo(plan.StartSeconds - position, period);
 
         return (duration, incomingStart, NearestGridPointToMiddle(anchor, alignment, duration));

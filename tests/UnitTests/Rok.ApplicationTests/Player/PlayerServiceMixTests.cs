@@ -281,6 +281,102 @@ public class PlayerServiceMixTests
         Assert.InRange(sent.IncomingStartSeconds, IncomingStart, IncomingStart + period);
     }
 
+    private (MixTransition? Sent, double ArmedStart) RunStretchedMix(double outgoingBpm, double incomingBpm)
+    {
+        double armedStart = 0;
+        MixTransition? sent = null;
+        SetupCues(
+            new OutroCues(MusicEnd, 0, new BeatGrid(outgoingBpm, 0.3, 0.9, BpmSource.Detected)),
+            new IntroCues(IncomingStart, new BeatGrid(incomingBpm, 0.31, 0.9, BpmSource.Detected)));
+        _engine.Setup(o => o.SetTransitionCue(It.IsAny<long>(), It.IsAny<double>())).Callback<long, double>((_, start) => armedStart = start);
+        _engine.SetupGet(o => o.Position).Returns(() => armedStart);
+        _engine.Setup(o => o.CrossfadeToAsync(It.IsAny<TrackDto>(), It.IsAny<float>(), It.IsAny<double>(), It.IsAny<MixTransition>(), It.IsAny<CancellationToken>()))
+            .Callback<TrackDto, float, double, MixTransition, CancellationToken>((_, _, _, transition, _) => sent = transition)
+            .Returns(Task.CompletedTask);
+        BuildLoadedService(BuildTrack(1), BuildTrack(2));
+
+        RaiseCue();
+
+        return (sent, armedStart);
+    }
+
+    [Fact(DisplayName = "stretched_mix_sends_the_planned_stretch_and_reference")]
+    public void Stretched_mix_sends_the_planned_stretch_and_reference()
+    {
+        // Arrange
+        const double outgoingBpm = 128;
+        double incomingBpm = outgoingBpm / 1.07;
+        double barSeconds = 4 * 60 / outgoingBpm;
+        MixPlan? plan = MixTransitionPlanner.Plan(
+            BuildTrack(1),
+            new OutroCues(MusicEnd, 0, new BeatGrid(outgoingBpm, 0.3, 0.9, BpmSource.Detected)),
+            BuildTrack(2),
+            new IntroCues(IncomingStart, new BeatGrid(incomingBpm, 0.31, 0.9, BpmSource.Detected)),
+            TrackLength,
+            SliderSeconds);
+
+        // Act
+        (MixTransition? sent, double armedStart) = RunStretchedMix(outgoingBpm, incomingBpm);
+
+        // Assert
+        Assert.NotNull(plan);
+        Assert.NotNull(plan.Stretch);
+        Assert.NotNull(sent);
+        Assert.Equal(plan.Stretch, sent.Stretch);
+        Assert.Equal(8, sent.Stretch!.Bars);
+        Assert.Equal(1.07, sent.Stretch.Ratio, 6);
+        Assert.Equal(armedStart, sent.ReferencePositionSeconds);
+        _engine.Verify(o => o.CrossfadeToAsync(It.IsAny<TrackDto>(), It.IsAny<float>(), It.Is<double>(d => Math.Abs(d - (8 * barSeconds)) < 1e-6), It.IsAny<MixTransition>(), It.IsAny<CancellationToken>()), Times.Once);
+    }
+
+    [Fact(DisplayName = "unaligned_mix_sends_no_stretch_nor_reference")]
+    public void Unaligned_mix_sends_no_stretch_nor_reference()
+    {
+        // Arrange
+        MixTransition? sent = null;
+        _engine.SetupGet(o => o.Position).Returns(MusicEnd - SliderSeconds);
+        _engine.Setup(o => o.CrossfadeToAsync(It.IsAny<TrackDto>(), It.IsAny<float>(), It.IsAny<double>(), It.IsAny<MixTransition>(), It.IsAny<CancellationToken>()))
+            .Callback<TrackDto, float, double, MixTransition, CancellationToken>((_, _, _, transition, _) => sent = transition)
+            .Returns(Task.CompletedTask);
+        BuildLoadedService(BuildTrack(1), BuildTrack(2));
+
+        // Act
+        RaiseCue();
+
+        // Assert
+        Assert.NotNull(sent);
+        Assert.Null(sent.Stretch);
+        Assert.Null(sent.ReferencePositionSeconds);
+    }
+
+    [Fact(DisplayName = "mix_log_reports_the_stretch_ratio_and_bars")]
+    public void Mix_log_reports_the_stretch_ratio_and_bars()
+    {
+        // Arrange
+        const double outgoingBpm = 128;
+        double incomingBpm = outgoingBpm / 1.07;
+        SetupCues(
+            new OutroCues(MusicEnd, 0, new BeatGrid(outgoingBpm, 0.3, 0.9, BpmSource.Detected)),
+            new IntroCues(IncomingStart, new BeatGrid(incomingBpm, 0.31, 0.9, BpmSource.Detected)));
+
+        // Act
+        BuildLoadedService(BuildTrack(1), BuildTrack(2));
+
+        // Assert
+        VerifyInformationLog("stretch 1.070, bars 8", Times.Once());
+    }
+
+    [Fact(DisplayName = "mix_log_reports_no_stretch_without_beat_grids")]
+    public void Mix_log_reports_no_stretch_without_beat_grids()
+    {
+        // Arrange
+        // Act
+        BuildLoadedService(BuildTrack(1), BuildTrack(2));
+
+        // Assert
+        VerifyInformationLog("stretch none, bars 0", Times.Once());
+    }
+
     [Fact(DisplayName = "about_to_end_waits_for_the_cue_when_a_plan_is_armed")]
     public void About_to_end_waits_for_the_cue_when_a_plan_is_armed()
     {
