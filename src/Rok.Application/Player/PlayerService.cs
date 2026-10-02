@@ -521,6 +521,16 @@ public sealed class PlayerService : IPlayerService, IDisposable
                 return;
             }
 
+            _logger.LogInformation(
+                "Mix: {Track} -> {Next}, beat-aligned {Aligned}, BPM {OutgoingBpm}/{IncomingBpm}, start shift {Shift}s, bass swap at {SwapAt}s",
+                current.Title,
+                next.Title,
+                plan.Alignment != null,
+                outro?.Beats?.Bpm,
+                intro?.Beats?.Bpm,
+                plan.Alignment?.StartShiftSeconds ?? 0,
+                plan.BassSwapAtSeconds);
+
             lock (_transitionLock)
             {
                 if (ct.IsCancellationRequested || generation != _mixGeneration || CurrentTrack?.Id != current.Id || PeekNext()?.Id != next.Id)
@@ -1134,13 +1144,14 @@ public sealed class PlayerService : IPlayerService, IDisposable
         if (plan.IncomingTrackId != nextTrack.Id)
             return;
 
-        (double duration, double incomingStart) = MixTransitionPlanner.ResolveAt(plan, _player.Position);
+        double position = _player.Position;
+        (double duration, double incomingStart, double bassSwapAt) = MixTransitionPlanner.ResolveAt(plan, position);
 
-        _logger.LogDebug("Starting mix to {Track} over {Duration}s from {Start}s", nextTrack.Title, duration, incomingStart);
+        _logger.LogDebug("Starting mix to {Track} over {Duration}s from {Start}s, bass swap at {BassSwapAt}s", nextTrack.Title, duration, incomingStart, bassSwapAt);
 
-        long durationPlayed = (long)_player.Position;
+        long durationPlayed = (long)position;
 
-        await _player.CrossfadeToAsync(nextTrack, ResolveReplayGain(nextIndex), duration, new MixTransition(incomingStart, BassSwap: true), cancellationToken);
+        await _player.CrossfadeToAsync(nextTrack, ResolveReplayGain(nextIndex), duration, new MixTransition(incomingStart, BassSwap: true, BassSwapAtSeconds: bassSwapAt), cancellationToken);
 
         cancellationToken.ThrowIfCancellationRequested();
 

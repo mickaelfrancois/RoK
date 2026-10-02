@@ -200,6 +200,60 @@ public class BassSwapSampleProviderTests
         Assert.Equal(expected, actual);
     }
 
+    [Fact(DisplayName = "outgoing_bass_is_cut_after_an_early_swap_position")]
+    public void Outgoing_CutsBass_AfterAnEarlySwapPosition()
+    {
+        // Arrange
+        BassSwapSampleProvider early = new(new SineSampleProvider(60));
+        BassSwapSampleProvider middle = new(new SineSampleProvider(60));
+        early.Start(EBassSwapRole.Outgoing, TimeSpan.FromSeconds(MixSeconds), TimeSpan.FromSeconds(1));
+        middle.Start(EBassSwapRole.Outgoing, TimeSpan.FromSeconds(MixSeconds), TimeSpan.FromSeconds(2));
+        Render(early, SampleRate * 3 / 2);
+        Render(middle, SampleRate * 3 / 2);
+
+        // Act
+        double earlyDb = AttenuationDb(Render(early, SampleRate / 2));
+        double middleDb = AttenuationDb(Render(middle, SampleRate / 2));
+
+        // Assert
+        Assert.True(earlyDb >= 20);
+        Assert.True(middleDb < 6);
+    }
+
+    [Fact(DisplayName = "incoming_bass_is_restored_after_an_early_swap_position")]
+    public void Incoming_RestoresBass_AfterAnEarlySwapPosition()
+    {
+        // Arrange
+        BassSwapSampleProvider sut = new(new SineSampleProvider(60));
+        sut.Start(EBassSwapRole.Incoming, TimeSpan.FromSeconds(MixSeconds), TimeSpan.FromSeconds(1));
+        Render(sut, SampleRate * 3 / 2);
+
+        // Act
+        float[] output = Render(sut, SampleRate / 2);
+
+        // Assert
+        Assert.True(Math.Abs(AttenuationDb(output)) < 1);
+    }
+
+    [Theory(DisplayName = "two_argument_start_matches_the_middle")]
+    [InlineData(EBassSwapRole.Incoming)]
+    [InlineData(EBassSwapRole.Outgoing)]
+    public void Start_WithTwoArguments_MatchesTheMiddle(EBassSwapRole role)
+    {
+        // Arrange
+        BassSwapSampleProvider twoArguments = new(new SineSampleProvider(60));
+        BassSwapSampleProvider threeArguments = new(new SineSampleProvider(60));
+        twoArguments.Start(role, TimeSpan.FromSeconds(MixSeconds));
+        threeArguments.Start(role, TimeSpan.FromSeconds(MixSeconds), TimeSpan.FromSeconds(MixSeconds / 2));
+
+        // Act
+        float[] expected = Render(threeArguments, SampleRate * 4);
+        float[] actual = Render(twoArguments, SampleRate * 4);
+
+        // Assert
+        Assert.Equal(expected, actual);
+    }
+
     private static float[] Render(ISampleProvider provider, int frames, int chunkSamples = 1000)
     {
         float[] buffer = new float[frames * Channels];

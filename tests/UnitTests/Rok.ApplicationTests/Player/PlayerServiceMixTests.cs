@@ -6,6 +6,7 @@ using Rok.Application.Interfaces.Pictures;
 using Rok.Application.Player;
 using Rok.Application.Player.Mix;
 using Rok.Application.Player.Output;
+using Rok.Domain.Enums;
 
 namespace Rok.ApplicationTests.Player;
 
@@ -141,6 +142,55 @@ public class PlayerServiceMixTests
         _engine.Verify(o => o.CrossfadeToAsync(It.Is<TrackDto>(t => t.Id == 2), It.IsAny<float>(), SliderSeconds, It.Is<MixTransition>(x => x.IncomingStartSeconds == IncomingStart && x.BassSwap), It.IsAny<CancellationToken>()), Times.Once);
         VerifyClassicCrossfade(Times.Never());
         Assert.Equal(2, sut.CurrentTrack?.Id);
+    }
+
+    [Fact(DisplayName = "cue_sends_the_middle_bass_swap_without_beat_grid")]
+    public void Cue_sends_the_middle_bass_swap_without_beat_grid()
+    {
+        // Arrange
+        _engine.SetupGet(o => o.Position).Returns(MusicEnd - SliderSeconds);
+        BuildLoadedService(BuildTrack(1), BuildTrack(2));
+
+        // Act
+        RaiseCue();
+
+        // Assert
+        _engine.Verify(o => o.CrossfadeToAsync(It.IsAny<TrackDto>(), It.IsAny<float>(), It.IsAny<double>(), It.Is<MixTransition>(x => x.BassSwap && x.BassSwapAtSeconds == SliderSeconds / 2.0), It.IsAny<CancellationToken>()), Times.Once);
+    }
+
+    [Fact(DisplayName = "cue_sends_the_beat_bass_swap_with_compatible_grids")]
+    public void Cue_sends_the_beat_bass_swap_with_compatible_grids()
+    {
+        // Arrange
+        const double bpm = 120;
+        const double outgoingFirst = 170.3;
+        const double incomingFirst = 0.31;
+        double armedStart = 0;
+        MixTransition? sent = null;
+        SetupCues(
+            new OutroCues(MusicEnd, 0, new BeatGrid(bpm, outgoingFirst, 0.9, BpmSource.Detected)),
+            new IntroCues(IncomingStart, new BeatGrid(bpm, incomingFirst, 0.9, BpmSource.Detected)));
+        _engine.Setup(o => o.SetTransitionCue(It.IsAny<long>(), It.IsAny<double>())).Callback<long, double>((_, start) => armedStart = start);
+        _engine.SetupGet(o => o.Position).Returns(() => armedStart);
+        _engine.Setup(o => o.CrossfadeToAsync(It.IsAny<TrackDto>(), It.IsAny<float>(), It.IsAny<double>(), It.IsAny<MixTransition>(), It.IsAny<CancellationToken>()))
+            .Callback<TrackDto, float, double, MixTransition, CancellationToken>((_, _, _, transition, _) => sent = transition)
+            .Returns(Task.CompletedTask);
+        BuildLoadedService(BuildTrack(1), BuildTrack(2));
+
+        // Act
+        RaiseCue();
+
+        // Assert
+        Assert.NotNull(sent);
+        Assert.NotNull(sent.BassSwapAtSeconds);
+
+        double period = 60 / bpm;
+        double swapBeats = (armedStart + sent.BassSwapAtSeconds.Value - outgoingFirst) / period;
+        double incomingBeats = (sent.IncomingStartSeconds - incomingFirst) / period;
+
+        Assert.True(Math.Abs(swapBeats - Math.Round(swapBeats)) < 0.01 / period);
+        Assert.True(Math.Abs(incomingBeats - Math.Round(incomingBeats)) < 0.01 / period);
+        Assert.InRange(sent.IncomingStartSeconds, IncomingStart, IncomingStart + period);
     }
 
     [Fact(DisplayName = "about_to_end_waits_for_the_cue_when_a_plan_is_armed")]

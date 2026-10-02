@@ -5,7 +5,7 @@ namespace Rok.Infrastructure.Player;
 
 /// <summary>
 /// Low-shelf filter of the Mix bass swap, applied on the rendering thread. The cut follows <see cref="BassSwapCurve"/>
-/// over the duration of the mix; the filter is an allocation-free RBJ biquad whose coefficients are refreshed every
+/// over the duration of the mix, with the switch at the requested position (the middle by default); the filter is an allocation-free RBJ biquad whose coefficients are refreshed every
 /// <see cref="BlockFrames"/> frames. Passes the signal through untouched until a bass swap starts and while the cut is zero.
 /// </summary>
 internal sealed class BassSwapSampleProvider : ISampleProvider
@@ -21,6 +21,7 @@ internal sealed class BassSwapSampleProvider : ISampleProvider
     private EBassSwapRole _role;
     private long _framesTotal;
     private long _framesDone;
+    private double _swapAtSeconds;
     private double _appliedCut = -1;
     private double _b0;
     private double _b1;
@@ -48,11 +49,18 @@ internal sealed class BassSwapSampleProvider : ISampleProvider
     }
 
     /// <summary>Starts the bass swap of a mix of <paramref name="mixDuration"/>, counted in rendered frames from the next read.</summary>
-    public void Start(EBassSwapRole role, TimeSpan mixDuration)
+    public void Start(EBassSwapRole role, TimeSpan mixDuration) => Start(role, mixDuration, mixDuration / 2);
+
+    /// <summary>
+    /// Starts the bass swap of a mix of <paramref name="mixDuration"/>, the switch ramp being centred
+    /// <paramref name="swapAt"/> after the start of the mix.
+    /// </summary>
+    public void Start(EBassSwapRole role, TimeSpan mixDuration, TimeSpan swapAt)
     {
         lock (_lock)
         {
             _role = role;
+            _swapAtSeconds = swapAt.TotalSeconds;
             _framesTotal = Math.Max(1, (long)(mixDuration.TotalSeconds * WaveFormat.SampleRate));
             _framesDone = 0;
             _active = true;
@@ -76,6 +84,7 @@ internal sealed class BassSwapSampleProvider : ISampleProvider
         EBassSwapRole role;
         long framesTotal;
         long framesDone;
+        double swapAtSeconds;
         bool clearState;
         int channels = WaveFormat.Channels;
         int frames = read / channels;
@@ -96,6 +105,7 @@ internal sealed class BassSwapSampleProvider : ISampleProvider
             role = _role;
             framesTotal = _framesTotal;
             framesDone = _framesDone;
+            swapAtSeconds = _swapAtSeconds;
             _framesDone = Math.Min(framesTotal, framesDone + frames);
         }
 
@@ -109,7 +119,7 @@ internal sealed class BassSwapSampleProvider : ISampleProvider
         {
             int count = Math.Min(BlockFrames, frames - start);
             double elapsed = (framesDone + start + (count / 2.0)) / sampleRate;
-            double cut = BassSwapCurve.Cut(role, elapsed, mixSeconds);
+            double cut = BassSwapCurve.Cut(role, elapsed, mixSeconds, swapAtSeconds);
 
             if (cut <= 0)
             {

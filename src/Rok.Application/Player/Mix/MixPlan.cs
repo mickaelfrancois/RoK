@@ -7,10 +7,14 @@ namespace Rok.Application.Player.Mix;
 /// <param name="DurationSeconds">Duration of the fade.</param>
 /// <param name="MusicEndSeconds">Position in the outgoing track where the music ends.</param>
 /// <param name="IncomingStartSeconds">Position in the incoming track where it starts playing.</param>
+/// <param name="BassSwapAtSeconds">Offset in seconds from the start of the mix at which the bass swap happens.</param>
+/// <param name="Alignment">How the plan was aligned on the beats, or null when it was not.</param>
 public sealed record MixPlan(
     long OutgoingTrackId,
     long IncomingTrackId,
     double StartSeconds,
     double DurationSeconds,
     double MusicEndSeconds,
-    double IncomingStartSeconds);
+    double IncomingStartSeconds,
+    double BassSwapAtSeconds,
+    MixBeatAlignment? Alignment = null);
