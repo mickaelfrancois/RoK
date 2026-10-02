@@ -637,7 +637,7 @@ public class NAudioMediaPlayer : IPlayerEngine, IDisposable
     /// Both tracks play on their own shared output; each pipeline ramps its own samples (<see cref="FadeSampleProvider"/>),
     /// so the fade is sample-accurate and the master volume can still change while it runs.
     /// </remarks>
-    public Task CrossfadeToAsync(TrackDto nextTrack, float replayGain, double durationSeconds, CancellationToken ct) =>
+    public Task<bool> CrossfadeToAsync(TrackDto nextTrack, float replayGain, double durationSeconds, CancellationToken ct) =>
         CrossfadeToAsync(nextTrack, replayGain, durationSeconds, new MixTransition(0, BassSwap: false), ct);
 
     /// <inheritdoc />
@@ -647,12 +647,12 @@ public class NAudioMediaPlayer : IPlayerEngine, IDisposable
     public void ClearTransitionCue() => _cueGate.Clear();
 
     /// <inheritdoc />
-    public async Task CrossfadeToAsync(TrackDto nextTrack, float replayGain, double durationSeconds, MixTransition transition, CancellationToken ct)
+    public async Task<bool> CrossfadeToAsync(TrackDto nextTrack, float replayGain, double durationSeconds, MixTransition transition, CancellationToken ct)
     {
-        if (_isLive) return;
+        if (_isLive) return false;
 
         if (durationSeconds <= 0)
-            return;
+            return false;
 
         PlaybackPipeline nextPipeline;
 
@@ -663,7 +663,7 @@ public class NAudioMediaPlayer : IPlayerEngine, IDisposable
         catch (Exception ex)
         {
             _logger.LogError(ex, "Crossfade: failed to open next track {File}", nextTrack.MusicFile);
-            return;
+            return false;
         }
 
         double nextLength = nextPipeline.Reader.TotalTime.TotalSeconds;
@@ -673,15 +673,11 @@ public class NAudioMediaPlayer : IPlayerEngine, IDisposable
 
         if (incomingStart > 0)
         {
-            try
+            if (!TrySeekIncoming(nextPipeline.Reader, incomingStart))
             {
-                nextPipeline.Reader.CurrentTime = TimeSpan.FromSeconds(incomingStart);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Crossfade: failed to seek next track {File}", nextTrack.MusicFile);
+                _logger.LogError("Crossfade: failed to seek next track {File}", nextTrack.MusicFile);
                 nextPipeline.Dispose();
-                return;
+                return false;
             }
         }
 
@@ -691,6 +687,7 @@ public class NAudioMediaPlayer : IPlayerEngine, IDisposable
         double plannedSwapAt = BassSwapCurve.ResolveSwapAt(transition.BassSwapAtSeconds, durationSeconds);
         double plannedDuration = durationSeconds;
 
+        bool promoted = false;
         PlaybackPipeline? outgoing;
 
         lock (_stateLock)
@@ -761,6 +758,8 @@ public class NAudioMediaPlayer : IPlayerEngine, IDisposable
 
             PromoteCrossfade(nextPipeline, nextOutput, nextTrack.MusicFile);
 
+            promoted = true;
+
             OnMediaChanged?.Invoke(this, EventArgs.Empty);
         }
         catch (OperationCanceledException)
@@ -778,6 +777,23 @@ public class NAudioMediaPlayer : IPlayerEngine, IDisposable
         }
 
         ApplyPendingOutputChange();
+
+        return promoted;
+    }
+
+    /// <summary>Seeks <paramref name="reader"/> to <paramref name="seconds"/>; <c>false</c> when the reader refuses.</summary>
+    internal static bool TrySeekIncoming(WaveStream reader, double seconds)
+    {
+        try
+        {
+            reader.CurrentTime = TimeSpan.FromSeconds(seconds);
+
+            return true;
+        }
+        catch (Exception)
+        {
+            return false;
+        }
     }
 
     /// <summary>

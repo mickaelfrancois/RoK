@@ -21,7 +21,7 @@ public class PlayerServiceReplayGainTests
     {
         _engine.Setup(o => o.SetTrack(It.IsAny<TrackDto>(), It.IsAny<float>())).Returns(true);
         _engine.Setup(o => o.QueueNextTrack(It.IsAny<TrackDto>(), It.IsAny<float>())).Returns(true);
-        _engine.Setup(o => o.CrossfadeToAsync(It.IsAny<TrackDto>(), It.IsAny<float>(), It.IsAny<double>(), It.IsAny<CancellationToken>())).Returns(Task.CompletedTask);
+        _engine.Setup(o => o.CrossfadeToAsync(It.IsAny<TrackDto>(), It.IsAny<float>(), It.IsAny<double>(), It.IsAny<CancellationToken>())).ReturnsAsync(true);
         _engine.SetupGet(o => o.Position).Returns(95);
         _engine.SetupGet(o => o.Length).Returns(100);
         _appOptions.SetupGet(o => o.CrossfadeDurationSeconds).Returns(5);
