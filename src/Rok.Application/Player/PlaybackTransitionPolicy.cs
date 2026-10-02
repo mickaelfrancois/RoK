@@ -21,6 +21,15 @@ internal static class PlaybackTransitionPolicy
         return EPlaybackTransition.Crossfade;
     }
 
+    /// <summary>
+    /// Mix is refused when either track is live: the room noise defeats the silence and fade-out detection
+    /// that the mix cues rely on.
+    /// </summary>
+    internal static bool IsMixAllowed(TrackDto current, TrackDto next) =>
+        !IsLiveTrack(current) && !IsLiveTrack(next);
+
+    private static bool IsLiveTrack(TrackDto track) => track.IsLive || track.IsAlbumLive;
+
     internal static bool IsConsecutiveSameAlbum(TrackDto current, TrackDto next)
     {
         if (current.AlbumId is null || current.AlbumId != next.AlbumId)

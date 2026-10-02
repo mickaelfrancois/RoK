@@ -1,4 +1,4 @@
-using Microsoft.Extensions.Logging.Abstractions;
+using Microsoft.Extensions.Logging;
 using Moq;
 using Rok.Application.Dto;
 using Rok.Application.Interfaces;
@@ -25,6 +25,7 @@ public class PlayerServiceMixTests
     private readonly Mock<ICallDetectionService> _callDetection = new();
     private readonly Mock<IAlbumPicture> _albumPicture = new();
     private readonly Mock<IMixCueProvider> _cues = new();
+    private readonly Mock<ILogger<PlayerService>> _logger = new();
 
     public PlayerServiceMixTests()
     {
@@ -46,9 +47,9 @@ public class PlayerServiceMixTests
         _cues.Setup(c => c.GetIntroAsync(It.IsAny<TrackDto>(), It.IsAny<CancellationToken>())).ReturnsAsync(intro);
     }
 
-    private PlayerService BuildService() => new(_callDetection.Object, _engine.Object, _appOptions.Object, null, null, _albumPicture.Object, TimeProvider.System, new Messenger(), _cues.Object, NullLogger<PlayerService>.Instance);
+    private PlayerService BuildService() => new(_callDetection.Object, _engine.Object, _appOptions.Object, null, null, _albumPicture.Object, TimeProvider.System, new Messenger(), _cues.Object, _logger.Object);
 
-    private static TrackDto BuildTrack(long id, long? albumId = null, int? trackNumber = null) => new() { Id = id, Title = $"t{id}", AlbumId = albumId, TrackNumber = trackNumber, Duration = (long)TrackLength };
+    private static TrackDto BuildTrack(long id, long? albumId = null, int? trackNumber = null, bool isLive = false, bool isAlbumLive = false) => new() { Id = id, Title = $"t{id}", AlbumId = albumId, TrackNumber = trackNumber, Duration = (long)TrackLength, IsLive = isLive, IsAlbumLive = isAlbumLive };
 
     private PlayerService BuildLoadedService(params TrackDto[] tracks)
     {
@@ -67,6 +68,15 @@ public class PlayerServiceMixTests
     private void VerifyClassicCrossfade(Times times) => _engine.Verify(o => o.CrossfadeToAsync(It.IsAny<TrackDto>(), It.IsAny<float>(), It.IsAny<double>(), It.IsAny<CancellationToken>()), times);
 
     private void VerifyCueSet(Times times) => _engine.Verify(o => o.SetTransitionCue(It.IsAny<long>(), It.IsAny<double>()), times);
+
+    private void VerifyInformationLog(string fragment, Times times) => _logger.Verify(
+        l => l.Log(
+            LogLevel.Information,
+            It.IsAny<EventId>(),
+            It.Is<It.IsAnyType>((state, _) => $"{state}".Contains(fragment)),
+            It.IsAny<Exception?>(),
+            It.IsAny<Func<It.IsAnyType, Exception?, string>>()),
+        times);
 
     [Fact(DisplayName = "mix_off_keeps_the_classic_crossfade")]
     public void Mix_off_keeps_the_classic_crossfade()
@@ -115,6 +125,84 @@ public class PlayerServiceMixTests
         VerifyCueSet(Times.Never());
         _engine.Verify(o => o.QueueNextTrack(It.Is<TrackDto>(t => t.Id == 2), It.IsAny<float>()), Times.Once);
         VerifyMixCrossfade(Times.Never());
+    }
+
+    [Fact(DisplayName = "live_track_is_never_prepared_for_mix")]
+    public void Live_track_is_never_prepared_for_mix()
+    {
+        // Arrange
+        // Act
+        BuildLoadedService(BuildTrack(1, isLive: true), BuildTrack(2));
+
+        // Assert
+        _cues.Verify(c => c.GetOutroAsync(It.IsAny<TrackDto>(), It.IsAny<CancellationToken>()), Times.Never);
+        _cues.Verify(c => c.GetIntroAsync(It.IsAny<TrackDto>(), It.IsAny<CancellationToken>()), Times.Never);
+        VerifyCueSet(Times.Never());
+    }
+
+    [Fact(DisplayName = "live_incoming_track_falls_back_to_the_classic_crossfade")]
+    public void Live_incoming_track_falls_back_to_the_classic_crossfade()
+    {
+        // Arrange
+        _engine.SetupGet(o => o.Position).Returns(195);
+        BuildLoadedService(BuildTrack(1), BuildTrack(2, isAlbumLive: true));
+
+        // Act
+        RaiseMediaAboutToEnd();
+
+        // Assert
+        _cues.Verify(c => c.GetOutroAsync(It.IsAny<TrackDto>(), It.IsAny<CancellationToken>()), Times.Never);
+        _cues.Verify(c => c.GetIntroAsync(It.IsAny<TrackDto>(), It.IsAny<CancellationToken>()), Times.Never);
+        VerifyClassicCrossfade(Times.Once());
+        VerifyMixCrossfade(Times.Never());
+    }
+
+    [Fact(DisplayName = "transition_cue_is_ignored_for_a_live_pair")]
+    public void Transition_cue_is_ignored_for_a_live_pair()
+    {
+        // Arrange
+        _engine.SetupGet(o => o.Position).Returns(MusicEnd - SliderSeconds);
+        PlayerService sut = BuildLoadedService(BuildTrack(1, isLive: true), BuildTrack(2));
+
+        // Act
+        RaiseCue();
+
+        // Assert
+        VerifyMixCrossfade(Times.Never());
+        Assert.Equal(1, sut.CurrentTrack?.Id);
+    }
+
+    [Fact(DisplayName = "consecutive_live_album_tracks_stay_gapless_in_mix_mode")]
+    public void Consecutive_live_album_tracks_stay_gapless_in_mix_mode()
+    {
+        // Arrange
+        BuildLoadedService(BuildTrack(1, albumId: 10, trackNumber: 1, isAlbumLive: true), BuildTrack(2, albumId: 10, trackNumber: 2, isAlbumLive: true));
+
+        // Act
+        RaiseMediaAboutToEnd();
+
+        // Assert
+        _engine.Verify(o => o.QueueNextTrack(It.Is<TrackDto>(t => t.Id == 2), It.IsAny<float>()), Times.Once);
+        VerifyClassicCrossfade(Times.Never());
+        VerifyMixCrossfade(Times.Never());
+        _cues.Verify(c => c.GetOutroAsync(It.IsAny<TrackDto>(), It.IsAny<CancellationToken>()), Times.Never);
+        _cues.Verify(c => c.GetIntroAsync(It.IsAny<TrackDto>(), It.IsAny<CancellationToken>()), Times.Never);
+    }
+
+    [Fact(DisplayName = "live_skip_is_logged_once_per_pair")]
+    public void Live_skip_is_logged_once_per_pair()
+    {
+        // Arrange
+        _engine.SetupGet(o => o.Position).Returns(195);
+        BuildLoadedService(BuildTrack(1, isLive: true), BuildTrack(2));
+
+        // Act
+        RaiseMediaAboutToEnd();
+
+        // Assert
+        VerifyInformationLog("Mix: skipped, live track", Times.Once());
+        VerifyInformationLog("Mix: no usable plan", Times.Never());
+        VerifyClassicCrossfade(Times.Once());
     }
 
     [Fact(DisplayName = "mix_arms_the_cue_at_the_planned_start")]

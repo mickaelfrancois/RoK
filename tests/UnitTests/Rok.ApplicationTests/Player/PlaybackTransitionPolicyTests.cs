@@ -5,7 +5,7 @@ namespace Rok.ApplicationTests.Player;
 
 public class PlaybackTransitionPolicyTests
 {
-    private static TrackDto BuildTrack(long? albumId, int? trackNumber, bool isLive = false) => new() { Id = trackNumber ?? 0, AlbumId = albumId, TrackNumber = trackNumber, IsAlbumLive = isLive };
+    private static TrackDto BuildTrack(long? albumId, int? trackNumber, bool isLive = false, bool isTrackLive = false) => new() { Id = trackNumber ?? 0, AlbumId = albumId, TrackNumber = trackNumber, IsAlbumLive = isLive, IsLive = isTrackLive };
 
     [Fact(DisplayName = "crossfade_is_not_allowed_in_exclusive_mode")]
     public void IsCrossfadeAllowed_ReturnsFalse_InExclusiveMode()
@@ -98,6 +98,34 @@ public class PlaybackTransitionPolicyTests
 
         // Assert
         Assert.Equal(EPlaybackTransition.Gapless, transition);
+    }
+
+    [Fact(DisplayName = "is_mix_allowed_when_no_track_is_live")]
+    public void IsMixAllowed_ReturnsTrue_WhenNoTrackIsLive()
+    {
+        // Act
+        bool allowed = PlaybackTransitionPolicy.IsMixAllowed(BuildTrack(5, 3), BuildTrack(6, 4));
+
+        // Assert
+        Assert.True(allowed);
+    }
+
+    [Theory(DisplayName = "is_mix_refused_when_a_track_is_live")]
+    [InlineData(true, false, false, false)]
+    [InlineData(false, true, false, false)]
+    [InlineData(false, false, true, false)]
+    [InlineData(false, false, false, true)]
+    public void IsMixAllowed_ReturnsFalse_WhenATrackIsLive(bool outgoingTrackLive, bool outgoingAlbumLive, bool incomingTrackLive, bool incomingAlbumLive)
+    {
+        // Arrange
+        TrackDto current = BuildTrack(5, 3, outgoingAlbumLive, outgoingTrackLive);
+        TrackDto next = BuildTrack(6, 4, incomingAlbumLive, incomingTrackLive);
+
+        // Act
+        bool allowed = PlaybackTransitionPolicy.IsMixAllowed(current, next);
+
+        // Assert
+        Assert.False(allowed);
     }
 
     [Fact(DisplayName = "decide_returns_crossfade_between_live_tracks_of_different_albums")]
