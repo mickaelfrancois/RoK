@@ -44,7 +44,8 @@ public interface IPlayerEngine
     /// Performs a simultaneous crossfade from the current track to <paramref name="nextTrack"/> over
     /// <paramref name="durationSeconds"/>, at the current volume.
     /// </summary>
-    Task CrossfadeToAsync(TrackDto nextTrack, float replayGain, double durationSeconds, CancellationToken ct);
+    /// <returns><c>true</c> when the incoming track is now the one playing; <c>false</c> when the outgoing track keeps playing (live stream, zero duration, open, seek or output failure, cancellation).</returns>
+    Task<bool> CrossfadeToAsync(TrackDto nextTrack, float replayGain, double durationSeconds, CancellationToken ct);
 
     /// <summary>
     /// Same as <see cref="CrossfadeToAsync(TrackDto, float, double, CancellationToken)"/>, but the incoming track starts
@@ -57,7 +58,8 @@ public interface IPlayerEngine
     /// <see cref="MixTransition.ReferencePositionSeconds"/> is set, the engine skips the incoming content matching the
     /// time spent opening the output, and shortens the mix and the bass swap offset by the same delay.
     /// </summary>
-    Task CrossfadeToAsync(TrackDto nextTrack, float replayGain, double durationSeconds, MixTransition transition, CancellationToken ct);
+    /// <returns>Same as <see cref="CrossfadeToAsync(TrackDto, float, double, CancellationToken)"/>.</returns>
+    Task<bool> CrossfadeToAsync(TrackDto nextTrack, float replayGain, double durationSeconds, MixTransition transition, CancellationToken ct);
 
     /// <summary>
     /// Raised off the UI thread, once per arming, when the playback position of the track given to

@@ -69,7 +69,7 @@ public sealed partial class RatingControlDarkControl : UserControl
         int previousScore = (int)e.OldValue;
         int newScore = (int)e.NewValue;
 
-        if ((int)innerRating.Value != newScore)
+        if (!IsSetByUser(innerRating.Value, previousScore, newScore))
         {
             control._logger.LogDebug("Rating row {RowName} received score {Score} from the binding", control.Name, newScore);
             return;
@@ -84,6 +84,19 @@ public sealed partial class RatingControlDarkControl : UserControl
             return;
 
         control.PlayGesture(plan);
+    }
+
+    /// <summary>
+    /// Tells whether a score change comes from the user: the inner control already carries the new score,
+    /// except for the 0 to -1 change, which is the binding replacing the property default with "unrated".
+    /// </summary>
+    /// <param name="innerValue">The value currently held by the inner rating control.</param>
+    /// <param name="previousScore">The score before the change.</param>
+    /// <param name="newScore">The score after the change.</param>
+    /// <returns><see langword="true"/> when the change was made by the user.</returns>
+    public static bool IsSetByUser(double innerValue, int previousScore, int newScore)
+    {
+        return (int)innerValue == newScore && !(previousScore == 0 && newScore == -1);
     }
 
     private void PlayGesture(ScoreAnimationPlan plan)

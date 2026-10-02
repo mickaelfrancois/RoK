@@ -309,11 +309,13 @@ public class PlayerServiceRemovalTests
 
         _engine
             .Setup(o => o.CrossfadeToAsync(It.IsAny<TrackDto>(), It.IsAny<float>(), It.IsAny<double>(), It.IsAny<CancellationToken>()))
-            .Returns<TrackDto, float, double, CancellationToken>((_, _, _, token) =>
+            .Returns<TrackDto, float, double, CancellationToken>(async (_, _, _, token) =>
             {
                 capturedToken = token;
                 crossfadeEntered.SetResult();
-                return Task.Delay(Timeout.Infinite, token); // keep the crossfade in flight until its token is cancelled
+                await Task.Delay(Timeout.Infinite, token); // keep the crossfade in flight until its token is cancelled
+
+                return true;
             });
 
         PlayerService sut = BuildService();
@@ -328,5 +330,76 @@ public class PlayerServiceRemovalTests
         // Assert
         Assert.Equal(1, removed);
         Assert.True(capturedToken.IsCancellationRequested);
+    }
+
+    [Fact(DisplayName = "when_next_is_called_on_the_last_track_with_looping_then_playback_wraps_to_the_first_track")]
+    public void Next_on_last_track_with_looping_wraps_to_first()
+    {
+        // Arrange
+        TrackDto t1 = BuildTrack(1);
+        TrackDto t2 = BuildTrack(2);
+        PlayerService sut = BuildService();
+        sut.LoadPlaylist(new List<TrackDto> { t1, t2 });
+        sut.IsLoopingEnabled = true;
+        sut.Next();
+
+        // Act
+        sut.Next();
+
+        // Assert
+        Assert.Equal(t1, sut.CurrentTrack);
+        Assert.Equal(new List<TrackDto> { t2 }, sut.GetQueue());
+    }
+
+    [Fact(DisplayName = "when_previous_is_called_on_the_first_track_with_looping_then_playback_wraps_to_the_last_track")]
+    public void Previous_on_first_track_with_looping_wraps_to_last()
+    {
+        // Arrange
+        TrackDto t1 = BuildTrack(1);
+        TrackDto t2 = BuildTrack(2);
+        PlayerService sut = BuildService();
+        sut.LoadPlaylist(new List<TrackDto> { t1, t2 });
+        sut.IsLoopingEnabled = true;
+
+        // Act
+        sut.Previous();
+
+        // Assert
+        Assert.Equal(t2, sut.CurrentTrack);
+        Assert.Empty(sut.GetQueue());
+    }
+
+    [Fact(DisplayName = "when_next_is_called_on_the_last_track_without_looping_then_playback_stops_and_track_is_kept")]
+    public void Next_on_last_track_without_looping_stops()
+    {
+        // Arrange
+        TrackDto t1 = BuildTrack(1);
+        PlayerService sut = BuildService();
+        sut.LoadPlaylist(new List<TrackDto> { t1 });
+
+        // Act
+        sut.Next();
+
+        // Assert
+        Assert.Equal(t1, sut.CurrentTrack);
+        Assert.Equal(EPlaybackState.Stopped, sut.PlaybackState);
+    }
+
+    [Fact(DisplayName = "when_tracks_are_inserted_after_the_current_one_then_they_become_the_upcoming_queue")]
+    public void Insert_tracks_places_them_after_the_current_track()
+    {
+        // Arrange
+        TrackDto t1 = BuildTrack(1);
+        TrackDto t2 = BuildTrack(2);
+        TrackDto t3 = BuildTrack(3);
+        PlayerService sut = BuildService();
+        sut.LoadPlaylist(new List<TrackDto> { t1, t2 });
+
+        // Act
+        sut.InsertTracksToPlaylist(new List<TrackDto> { t3 });
+
+        // Assert
+        Assert.Equal(new List<TrackDto> { t1, t3, t2 }, sut.Playlist);
+        Assert.Equal(new List<TrackDto> { t3, t2 }, sut.GetQueue());
     }
 }

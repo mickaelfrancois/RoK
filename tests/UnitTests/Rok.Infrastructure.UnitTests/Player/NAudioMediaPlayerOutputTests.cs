@@ -330,6 +330,99 @@ public sealed class NAudioMediaPlayerOutputTests : IDisposable
 
 
 
+    [Fact(DisplayName = "crossfade_returns_false_when_the_incoming_track_cannot_be_opened")]
+    public async Task Crossfade_IncomingTrackCannotBeOpened_ReturnsFalse()
+    {
+        // Arrange
+        _sut.SetTrack(Track(1, _first), 1f);
+        _sut.Play();
+        FakeWavePlayer current = _factory.LastPlayer;
+        TrackDto missing = new() { Id = 2, Title = "missing", MusicFile = Path.Combine(Path.GetTempPath(), $"{Guid.NewGuid()}.wav") };
+
+        // Act
+        bool result = await _sut.CrossfadeToAsync(missing, 1f, 1, CancellationToken.None);
+
+        // Assert
+        Assert.False(result);
+        Assert.Single(_factory.Opened);
+        Assert.False(current.IsDisposed);
+        Assert.Equal(PlaybackState.Playing, current.PlaybackState);
+    }
+
+    [Fact(DisplayName = "crossfade_returns_false_for_a_zero_duration")]
+    public async Task Crossfade_ZeroDuration_ReturnsFalse()
+    {
+        // Arrange
+        _sut.SetTrack(Track(1, _first), 1f);
+        _sut.Play();
+
+        // Act
+        bool result = await _sut.CrossfadeToAsync(Track(2, _second), 1f, 0, CancellationToken.None);
+
+        // Assert
+        Assert.False(result);
+        Assert.Single(_factory.Opened);
+    }
+
+    [Fact(DisplayName = "crossfade_returns_true_once_the_incoming_track_is_promoted")]
+    public async Task Crossfade_IncomingTrackPromoted_ReturnsTrue()
+    {
+        // Arrange
+        _sut.SetTrack(Track(1, _first), 1f);
+        _sut.Play();
+        FakeWavePlayer outgoing = _factory.LastPlayer;
+
+        // Act
+        bool result = await _sut.CrossfadeToAsync(Track(2, _second), 1f, 0.05, CancellationToken.None);
+
+        // Assert
+        Assert.True(result);
+        Assert.Equal(2, _factory.Opened.Count);
+        Assert.True(outgoing.IsDisposed);
+    }
+
+    [Fact(DisplayName = "try_seek_incoming_returns_false_when_the_reader_throws")]
+    public void TrySeekIncoming_ReaderThrows_ReturnsFalse()
+    {
+        // Arrange
+        using ThrowingSeekStream reader = new();
+
+        // Act
+        bool result = NAudioMediaPlayer.TrySeekIncoming(reader, 1);
+
+        // Assert
+        Assert.False(result);
+    }
+
+    [Fact(DisplayName = "try_seek_incoming_applies_the_position_on_a_valid_reader")]
+    public void TrySeekIncoming_ValidReader_ReturnsTrueAndSeeks()
+    {
+        // Arrange
+        using AudioFileReader reader = new(_first.Path);
+
+        // Act
+        bool result = NAudioMediaPlayer.TrySeekIncoming(reader, 1);
+
+        // Assert
+        Assert.True(result);
+        Assert.Equal(1, reader.CurrentTime.TotalSeconds, precision: 1);
+    }
+
+    private sealed class ThrowingSeekStream : WaveStream
+    {
+        public override WaveFormat WaveFormat { get; } = new(44100, 16, 2);
+
+        public override long Length => 0;
+
+        public override long Position
+        {
+            get => 0;
+            set => throw new IOException("seek refused");
+        }
+
+        public override int Read(byte[] buffer, int offset, int count) => 0;
+    }
+
     private sealed class FakeOutputFactory : IAudioOutputFactory
     {
         public List<(AudioOutputTarget Target, int NativeBits)> Opened { get; } = [];

@@ -31,8 +31,8 @@ public class PlayerServiceMixTests
     {
         _engine.Setup(o => o.SetTrack(It.IsAny<TrackDto>(), It.IsAny<float>())).Returns(true);
         _engine.Setup(o => o.QueueNextTrack(It.IsAny<TrackDto>(), It.IsAny<float>())).Returns(true);
-        _engine.Setup(o => o.CrossfadeToAsync(It.IsAny<TrackDto>(), It.IsAny<float>(), It.IsAny<double>(), It.IsAny<CancellationToken>())).Returns(Task.CompletedTask);
-        _engine.Setup(o => o.CrossfadeToAsync(It.IsAny<TrackDto>(), It.IsAny<float>(), It.IsAny<double>(), It.IsAny<MixTransition>(), It.IsAny<CancellationToken>())).Returns(Task.CompletedTask);
+        _engine.Setup(o => o.CrossfadeToAsync(It.IsAny<TrackDto>(), It.IsAny<float>(), It.IsAny<double>(), It.IsAny<CancellationToken>())).ReturnsAsync(true);
+        _engine.Setup(o => o.CrossfadeToAsync(It.IsAny<TrackDto>(), It.IsAny<float>(), It.IsAny<double>(), It.IsAny<MixTransition>(), It.IsAny<CancellationToken>())).ReturnsAsync(true);
         _engine.SetupGet(o => o.Position).Returns(150);
         _engine.SetupGet(o => o.Length).Returns(TrackLength);
         _appOptions.SetupGet(o => o.CrossFade).Returns(true);
@@ -262,7 +262,7 @@ public class PlayerServiceMixTests
         _engine.SetupGet(o => o.Position).Returns(() => armedStart);
         _engine.Setup(o => o.CrossfadeToAsync(It.IsAny<TrackDto>(), It.IsAny<float>(), It.IsAny<double>(), It.IsAny<MixTransition>(), It.IsAny<CancellationToken>()))
             .Callback<TrackDto, float, double, MixTransition, CancellationToken>((_, _, _, transition, _) => sent = transition)
-            .Returns(Task.CompletedTask);
+            .ReturnsAsync(true);
         BuildLoadedService(BuildTrack(1), BuildTrack(2));
 
         // Act
@@ -292,7 +292,7 @@ public class PlayerServiceMixTests
         _engine.SetupGet(o => o.Position).Returns(() => armedStart);
         _engine.Setup(o => o.CrossfadeToAsync(It.IsAny<TrackDto>(), It.IsAny<float>(), It.IsAny<double>(), It.IsAny<MixTransition>(), It.IsAny<CancellationToken>()))
             .Callback<TrackDto, float, double, MixTransition, CancellationToken>((_, _, _, transition, _) => sent = transition)
-            .Returns(Task.CompletedTask);
+            .ReturnsAsync(true);
         BuildLoadedService(BuildTrack(1), BuildTrack(2));
 
         RaiseCue();
@@ -337,7 +337,7 @@ public class PlayerServiceMixTests
         _engine.SetupGet(o => o.Position).Returns(MusicEnd - SliderSeconds);
         _engine.Setup(o => o.CrossfadeToAsync(It.IsAny<TrackDto>(), It.IsAny<float>(), It.IsAny<double>(), It.IsAny<MixTransition>(), It.IsAny<CancellationToken>()))
             .Callback<TrackDto, float, double, MixTransition, CancellationToken>((_, _, _, transition, _) => sent = transition)
-            .Returns(Task.CompletedTask);
+            .ReturnsAsync(true);
         BuildLoadedService(BuildTrack(1), BuildTrack(2));
 
         // Act
@@ -395,7 +395,7 @@ public class PlayerServiceMixTests
     public void About_to_end_is_ignored_while_a_mix_runs()
     {
         // Arrange
-        TaskCompletionSource running = new();
+        TaskCompletionSource<bool> running = new();
         _engine.Setup(o => o.CrossfadeToAsync(It.IsAny<TrackDto>(), It.IsAny<float>(), It.IsAny<double>(), It.IsAny<MixTransition>(), It.IsAny<CancellationToken>())).Returns(running.Task);
         _engine.SetupGet(o => o.Position).Returns(MusicEnd - SliderSeconds);
         BuildLoadedService(BuildTrack(1), BuildTrack(2));
@@ -409,7 +409,7 @@ public class PlayerServiceMixTests
         VerifyMixCrossfade(Times.Once());
         VerifyClassicCrossfade(Times.Never());
 
-        running.SetResult();
+        running.SetResult(true);
     }
 
     [Fact(DisplayName = "missing_cues_fall_back_to_the_classic_crossfade")]
@@ -548,7 +548,7 @@ public class PlayerServiceMixTests
     {
         // Arrange
         CancellationToken captured = default;
-        TaskCompletionSource running = new();
+        TaskCompletionSource<bool> running = new();
         _engine.Setup(o => o.CrossfadeToAsync(It.IsAny<TrackDto>(), It.IsAny<float>(), It.IsAny<double>(), It.IsAny<MixTransition>(), It.IsAny<CancellationToken>()))
             .Callback<TrackDto, float, double, MixTransition, CancellationToken>((_, _, _, _, token) => captured = token)
             .Returns(running.Task);
@@ -563,7 +563,7 @@ public class PlayerServiceMixTests
         Assert.True(captured.CanBeCanceled);
         Assert.True(captured.IsCancellationRequested);
 
-        running.SetResult();
+        running.SetResult(true);
     }
 
     [Fact(DisplayName = "stopping_the_player_drops_the_mix_plan")]
@@ -604,8 +604,8 @@ public class PlayerServiceMixTests
     public void Cancelled_crossfade_does_not_reset_the_running_flag_of_the_next_one()
     {
         // Arrange
-        TaskCompletionSource first = new();
-        TaskCompletionSource second = new();
+        TaskCompletionSource<bool> first = new();
+        TaskCompletionSource<bool> second = new();
         _appOptions.SetupGet(o => o.MixMode).Returns(false);
         _engine.SetupGet(o => o.Position).Returns(195);
         _engine.SetupSequence(o => o.CrossfadeToAsync(It.IsAny<TrackDto>(), It.IsAny<float>(), It.IsAny<double>(), It.IsAny<CancellationToken>()))
@@ -617,12 +617,31 @@ public class PlayerServiceMixTests
         RaiseMediaAboutToEnd();
 
         // Act
-        first.SetResult();
+        first.SetResult(true);
         RaiseMediaAboutToEnd();
 
         // Assert
         VerifyClassicCrossfade(Times.Exactly(2));
 
-        second.SetResult();
+        second.SetResult(true);
+    }
+
+    [Fact(DisplayName = "mix_failure_keeps_the_current_track_and_falls_back_at_the_end")]
+    public void Mix_failure_keeps_the_current_track_and_falls_back_at_the_end()
+    {
+        // Arrange
+        _engine.Setup(o => o.CrossfadeToAsync(It.IsAny<TrackDto>(), It.IsAny<float>(), It.IsAny<double>(), It.IsAny<MixTransition>(), It.IsAny<CancellationToken>())).ReturnsAsync(false);
+        _engine.SetupGet(o => o.Position).Returns(MusicEnd - SliderSeconds);
+        PlayerService sut = BuildLoadedService(BuildTrack(1), BuildTrack(2));
+        RaiseCue();
+        Assert.Equal(1, sut.CurrentTrack?.Id);
+        _engine.Invocations.Clear();
+
+        // Act
+        _engine.Raise(m => m.OnMediaEnded += null, _engine.Object, EventArgs.Empty);
+
+        // Assert
+        _engine.Verify(o => o.SetTrack(It.Is<TrackDto>(t => t.Id == 2), It.IsAny<float>()), Times.Once);
+        Assert.Equal(2, sut.CurrentTrack?.Id);
     }
 }
