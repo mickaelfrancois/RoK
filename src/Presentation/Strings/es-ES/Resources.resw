@@ -745,12 +745,6 @@
   <data name="noTitle" xml:space="preserve">
     <value>Sin título</value>
   </data>
-  <data name="ListeningViewTitle.Text" xml:space="preserve">
-    <value>Escuchando actualmente</value>
-  </data>
-  <data name="ListeningViewTitleCount.Text" xml:space="preserve">
-    <value>canciones, </value>
-  </data>
   <data name="PlayerFullScreenLyricsToolTips.Text" xml:space="preserve">
     <value>Mostrar letra</value>
   </data>
@@ -2112,5 +2106,77 @@
   </data>
   <data name="OptionsCrossfadeDurationSlider.Header" xml:space="preserve">
     <value>Duración del fundido (s)</value>
+  </data>
+  <data name="listeningSummaryTrack" xml:space="preserve">
+    <value>{0} canción</value>
+  </data>
+  <data name="listeningSummaryTracks" xml:space="preserve">
+    <value>{0} canciones</value>
+  </data>
+  <data name="listeningSummaryHoursMinutes" xml:space="preserve">
+    <value>{0} h {1} min</value>
+  </data>
+  <data name="listeningSummaryHours" xml:space="preserve">
+    <value>{0} h</value>
+  </data>
+  <data name="listeningSummaryMinutes" xml:space="preserve">
+    <value>{0} min</value>
+  </data>
+  <data name="listeningSummaryEndsAt" xml:space="preserve">
+    <value>Termina hacia las {0}</value>
+  </data>
+  <data name="listeningSleepIdle" xml:space="preserve">
+    <value>Temporizador</value>
+  </data>
+  <data name="listeningSleepRemaining" xml:space="preserve">
+    <value>Se detiene en {0} min</value>
+  </data>
+  <data name="listeningFavoriteAdd" xml:space="preserve">
+    <value>Añadir {0} a favoritos</value>
+  </data>
+  <data name="listeningFavoriteRemove" xml:space="preserve">
+    <value>Quitar {0} de favoritos</value>
+  </data>
+  <data name="listeningNowPlayingLabel.Text" xml:space="preserve">
+    <value>Reproduciendo ahora</value>
+  </data>
+  <data name="listeningShuffleButton.Text" xml:space="preserve">
+    <value>Barajar</value>
+  </data>
+  <data name="listeningArtistLinksButton.ToolTipService.ToolTip" xml:space="preserve">
+    <value>Enlaces del artista</value>
+  </data>
+  <data name="listeningArtistLinksButton.AutomationProperties.Name" xml:space="preserve">
+    <value>Enlaces del artista</value>
+  </data>
+  <data name="listeningEmptyState.Message" xml:space="preserve">
+    <value>Nada en reproducción</value>
+  </data>
+  <data name="listeningLinkWebSite.Text" xml:space="preserve">
+    <value>Sitio web oficial</value>
+  </data>
+  <data name="listeningLinkLastFm.Text" xml:space="preserve">
+    <value>Last.fm</value>
+  </data>
+  <data name="listeningLinkWikipedia.Text" xml:space="preserve">
+    <value>Wikipedia</value>
+  </data>
+  <data name="listeningLinkFacebook.Text" xml:space="preserve">
+    <value>Facebook</value>
+  </data>
+  <data name="listeningLinkInstagram.Text" xml:space="preserve">
+    <value>Instagram</value>
+  </data>
+  <data name="listeningLinkTwitter.Text" xml:space="preserve">
+    <value>X</value>
+  </data>
+  <data name="listeningLinkThreads.Text" xml:space="preserve">
+    <value>Threads</value>
+  </data>
+  <data name="listeningLinkTikTok.Text" xml:space="preserve">
+    <value>TikTok</value>
+  </data>
+  <data name="listeningLinkYoutube.Text" xml:space="preserve">
+    <value>YouTube</value>
   </data>
 </root>

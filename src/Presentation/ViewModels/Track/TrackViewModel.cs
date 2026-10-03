@@ -148,8 +148,6 @@ public partial class TrackViewModel : ObservableObject, IDisposable, IFilterable
 
     public bool LyricsExists => LyricsType != ELyricsType.None;
 
-    public BitmapImage Picture { get; set; } = null!;
-
     public bool Listened { get; set; }
 
     public bool IsArtistFavorite => Track.IsArtistFavorite;

@@ -803,12 +803,6 @@
   <data name="noTitle" xml:space="preserve">
     <value>Без назви</value>
   </data>
-  <data name="ListeningViewTitle.Text" xml:space="preserve">
-    <value>Наразі слухаю:</value>
-  </data>
-  <data name="ListeningViewTitleCount.Text" xml:space="preserve">
-    <value>Пісня</value>
-  </data>
   <data name="PlayerFullScreenLyricsToolTips.Text" xml:space="preserve">
     <value>Показати текст пісні</value>
   </data>
@@ -2170,5 +2164,77 @@
   </data>
   <data name="OptionsCrossfadeDurationSlider.Header" xml:space="preserve">
     <value>Тривалість переходу (с)</value>
+  </data>
+  <data name="listeningSummaryTrack" xml:space="preserve">
+    <value>{0} композиція</value>
+  </data>
+  <data name="listeningSummaryTracks" xml:space="preserve">
+    <value>{0} композицій</value>
+  </data>
+  <data name="listeningSummaryHoursMinutes" xml:space="preserve">
+    <value>{0} год {1} хв</value>
+  </data>
+  <data name="listeningSummaryHours" xml:space="preserve">
+    <value>{0} год</value>
+  </data>
+  <data name="listeningSummaryMinutes" xml:space="preserve">
+    <value>{0} хв</value>
+  </data>
+  <data name="listeningSummaryEndsAt" xml:space="preserve">
+    <value>Закінчиться близько {0}</value>
+  </data>
+  <data name="listeningSleepIdle" xml:space="preserve">
+    <value>Таймер сну</value>
+  </data>
+  <data name="listeningSleepRemaining" xml:space="preserve">
+    <value>Зупинка через {0} хв</value>
+  </data>
+  <data name="listeningFavoriteAdd" xml:space="preserve">
+    <value>Додати {0} до улюблених</value>
+  </data>
+  <data name="listeningFavoriteRemove" xml:space="preserve">
+    <value>Видалити {0} з улюблених</value>
+  </data>
+  <data name="listeningNowPlayingLabel.Text" xml:space="preserve">
+    <value>Зараз грає</value>
+  </data>
+  <data name="listeningShuffleButton.Text" xml:space="preserve">
+    <value>Перемішати</value>
+  </data>
+  <data name="listeningArtistLinksButton.ToolTipService.ToolTip" xml:space="preserve">
+    <value>Посилання виконавця</value>
+  </data>
+  <data name="listeningArtistLinksButton.AutomationProperties.Name" xml:space="preserve">
+    <value>Посилання виконавця</value>
+  </data>
+  <data name="listeningEmptyState.Message" xml:space="preserve">
+    <value>Нічого не грає</value>
+  </data>
+  <data name="listeningLinkWebSite.Text" xml:space="preserve">
+    <value>Офіційний сайт</value>
+  </data>
+  <data name="listeningLinkLastFm.Text" xml:space="preserve">
+    <value>Last.fm</value>
+  </data>
+  <data name="listeningLinkWikipedia.Text" xml:space="preserve">
+    <value>Wikipedia</value>
+  </data>
+  <data name="listeningLinkFacebook.Text" xml:space="preserve">
+    <value>Facebook</value>
+  </data>
+  <data name="listeningLinkInstagram.Text" xml:space="preserve">
+    <value>Instagram</value>
+  </data>
+  <data name="listeningLinkTwitter.Text" xml:space="preserve">
+    <value>X</value>
+  </data>
+  <data name="listeningLinkThreads.Text" xml:space="preserve">
+    <value>Threads</value>
+  </data>
+  <data name="listeningLinkTikTok.Text" xml:space="preserve">
+    <value>TikTok</value>
+  </data>
+  <data name="listeningLinkYoutube.Text" xml:space="preserve">
+    <value>YouTube</value>
   </data>
 </root>

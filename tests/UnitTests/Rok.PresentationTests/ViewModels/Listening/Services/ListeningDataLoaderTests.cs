@@ -2,7 +2,9 @@ using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using Rok.Application.Dto;
 using Rok.Application.Errors;
+using Rok.Application.Features.Albums.Requests;
 using Rok.Application.Features.Tracks.Requests;
+using Rok.ViewModels.Albums.Interfaces;
 using Rok.ViewModels.Artists.Interfaces;
 using Rok.ViewModels.Listening.Services;
 using Rok.ViewModels.Tracks.Interfaces;
@@ -13,10 +15,42 @@ public class ListeningDataLoaderTests
 {
     private readonly FakeMediator _mediator = new();
     private readonly Mock<IArtistViewModelFactory> _artistFactory = new();
+    private readonly Mock<IAlbumViewModelFactory> _albumFactory = new();
     private readonly Mock<ITrackViewModelFactory> _trackFactory = new();
 
     private ListeningDataLoader BuildService() =>
-        new(_mediator, _artistFactory.Object, _trackFactory.Object, NullLogger<ListeningDataLoader>.Instance);
+        new(_mediator, _artistFactory.Object, _albumFactory.Object, _trackFactory.Object, NullLogger<ListeningDataLoader>.Instance);
+
+    [Fact(DisplayName = "load_album_returns_null_when_request_fails")]
+    public async Task LoadAlbumAsync_ShouldReturnNull_WhenRequestFails()
+    {
+        // Arrange
+        _mediator.Setup<GetAlbumByIdRequest, Result<AlbumDto>>()
+                 .Returns(Result<AlbumDto>.Fail(new OperationError("album.load_failed", "Load failed")));
+        ListeningDataLoader sut = BuildService();
+
+        // Act
+        var result = await sut.LoadAlbumAsync(3);
+
+        // Assert
+        Assert.Null(result);
+        _albumFactory.Verify(f => f.Create(), Times.Never);
+    }
+
+    [Fact(DisplayName = "load_album_sends_request_with_album_id")]
+    public async Task LoadAlbumAsync_ShouldSendRequestWithAlbumId()
+    {
+        // Arrange
+        _mediator.Setup<GetAlbumByIdRequest, Result<AlbumDto>>()
+                 .Returns(Result<AlbumDto>.Fail(new OperationError("album.load_failed", "Load failed")));
+        ListeningDataLoader sut = BuildService();
+
+        // Act
+        await sut.LoadAlbumAsync(42);
+
+        // Assert
+        Assert.Equal(42, Assert.Single(_mediator.Sent<GetAlbumByIdRequest>()).Id);
+    }
 
     [Fact(DisplayName = "GetTracksByArtistAsync should return an empty list when the artist has no tracks")]
     public async Task GetTracksByArtistAsync_ShouldReturnEmpty_WhenNoTracks()

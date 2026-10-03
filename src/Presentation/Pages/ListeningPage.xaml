@@ -6,16 +6,27 @@
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
       xmlns:common="using:Rok.Commons"
+      xmlns:converters="using:Rok.Converters"
       xmlns:track="using:Rok.ViewModels.Track"
       Loaded="ListeningPage_Loaded"
+      SizeChanged="Page_SizeChanged"
       x:Name="PageRoot"
       mc:Ignorable="d">
 
+    <Page.Resources>
+        <converters:BoolToColorConverter x:Key="ListeningRowBackgroundConverter">
+            <converters:BoolToColorConverter.TrueBrush>
+                <SolidColorBrush Color="{ThemeResource SubtleFillColorSecondary}" />
+            </converters:BoolToColorConverter.TrueBrush>
+            <converters:BoolToColorConverter.FalseBrush>
+                <SolidColorBrush Color="Transparent" />
+            </converters:BoolToColorConverter.FalseBrush>
+        </converters:BoolToColorConverter>
+    </Page.Resources>
+
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="auto" x:Name="playlistRow" />
-            <RowDefinition MinHeight="{StaticResource SmallHeaderHeight}" MaxHeight="{StaticResource SmallHeaderHeight}" x:Name="headerRow" />
-            <RowDefinition Height="auto" x:Name="commandRow" />
+            <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
@@ -23,92 +34,155 @@
             <SolidColorBrush Color="{ThemeResource CardBackgroundFillColorDefault}" Opacity="{StaticResource HeaderBackgroundOpacity}" />
         </Grid.Background>
 
-        <Image x:Name="backdrop" Grid.RowSpan="4" Source="{x:Bind ViewModel.Artist.Backdrop,Mode=OneWay}" Opacity="{StaticResource HeaderBackdropOpacity}" Style="{StaticResource HeaderBackdropStyle}" Stretch="UniformToFill" IsHitTestVisible="False" />
-
-        <!-- Title -->
-        <StackPanel Orientation="Horizontal" Margin="4,6,0,6">
-            <SymbolIcon Symbol="MusicInfo" Margin="4,0,4,0" />
-            <TextBlock x:Uid="ListeningViewTitle" x:Name="title" Style="{StaticResource HeaderStyle}" />
-            <TextBlock Text="{x:Bind ViewModel.TrackCount}" Style="{StaticResource SubtitleTextBlockStyle}" FontSize="{StaticResource FontSizeXMedium}" Margin="6,0,4,4" VerticalAlignment="Bottom" />
-            <TextBlock x:Uid="ListeningViewTitleCount" Style="{StaticResource SubtitleTextBlockStyle}" FontSize="{StaticResource FontSizeXMedium}" Margin="0,0,4,4" VerticalAlignment="Bottom" />
-            <TextBlock Text="{x:Bind ViewModel.Duration, Converter={StaticResource LongToTimespanConverter}}" Style="{StaticResource SubtitleTextBlockStyle}" FontSize="{StaticResource FontSizeXMedium}" Margin="0,0,4,4" VerticalAlignment="Bottom" />
-        </StackPanel>
-
-        <Line Stretch="Fill" Stroke="{StaticResource AppBarSeparatorForegroundThemeBrush}" VerticalAlignment="Bottom" X2="100"></Line>
+        <VisualStateManager.VisualStateGroups>
+            <VisualStateGroup x:Name="HeaderLayoutStates">
+                <VisualState x:Name="WideHeader" />
+                <VisualState x:Name="NarrowHeader">
+                    <VisualState.Setters>
+                        <Setter Target="headerActions.(Grid.Row)" Value="1" />
+                        <Setter Target="headerActions.(Grid.Column)" Value="1" />
+                        <Setter Target="headerActions.HorizontalAlignment" Value="Left" />
+                        <Setter Target="headerActions.Margin" Value="0,12,0,0" />
+                        <Setter Target="coverPicture.Width" Value="72" />
+                        <Setter Target="coverPicture.Height" Value="72" />
+                    </VisualState.Setters>
+                </VisualState>
+            </VisualStateGroup>
+        </VisualStateManager.VisualStateGroups>
 
         <!-- Header -->
-        <Grid Grid.Row="1" Padding="2">
+        <Grid x:Name="headerGrid" Padding="28,20,24,20" ColumnSpacing="{StaticResource SpacingMedium}" Visibility="{x:Bind ViewModel.HeaderState.IsEmpty, Mode=OneWay, Converter={StaticResource BoolToInvertVisibilityConverter}}">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
-                <ColumnDefinition x:Name="pictureColumn" Width="100" />
-                <ColumnDefinition Width="*"></ColumnDefinition>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
 
-            <Grid Margin="6" Padding="0" CornerRadius="{StaticResource CornerRadiusMediumValue}">
-                <common:PictureControl x:Name="artistPicture" Height="100" Width="100" Cover="{x:Bind ViewModel.Artist.Picture, Mode=OneWay}" UseArtistFallback="True" Style="{StaticResource HeaderPictureStyle}" />
-                <common:AnimatedButton x:Uid="artistFavoriteButton"
-                                       HorizontalAlignment="Right"
-                                       VerticalAlignment="Top"
-                                       Icon="{StaticResource HeartPath}"
-                                       Color="{x:Bind ViewModel.Artist.IsFavorite, Converter={StaticResource FavoriteToColorConverter}, Mode=OneWay}"
-                                       Command="{x:Bind ViewModel.Artist.ArtistFavoriteCommand}"
-                                       CommandParameter="{x:Bind ViewModel.Artist.IsFavorite, Converter={StaticResource BoolToInvertBoolConverter}, Mode=OneWay}" />
+            <Image x:Name="backdrop" Grid.RowSpan="2" Grid.ColumnSpan="3" Margin="-28,-20,-24,-20" Source="{x:Bind ViewModel.Artist.Backdrop, Mode=OneWay}" Opacity="{StaticResource HeaderBackdropOpacity}" Style="{StaticResource HeaderBackdropStyle}" Stretch="UniformToFill" IsHitTestVisible="False" />
+            <Rectangle Grid.RowSpan="2" Grid.ColumnSpan="3" Margin="-28,-20,-24,-20" IsHitTestVisible="False">
+                <Rectangle.Fill>
+                    <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                        <GradientStop Color="Transparent" Offset="0" />
+                        <GradientStop Color="{ThemeResource CardBackgroundFillColorDefault}" Offset="1" />
+                    </LinearGradientBrush>
+                </Rectangle.Fill>
+            </Rectangle>
 
-                <Button x:Uid="selectPicture" Style="{StaticResource HeaderPictureSelectButtonStyle}" Command="{x:Bind ViewModel.Artist.SelectPictureCommand}" />
-            </Grid>
+            <!-- Cover -->
+            <common:PictureControl x:Name="coverPicture" Width="120" Height="120" VerticalAlignment="Top" CornerRadius="{StaticResource CornerRadiusMediumValue}" Cover="{x:Bind ViewModel.Album.Picture, Mode=OneWay}" Style="{StaticResource HeaderPictureStyle}" />
 
-            <RelativePanel Grid.Column="1" Margin="6,0,0,0">
+            <!-- Infos -->
+            <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="4">
+                <TextBlock x:Uid="listeningNowPlayingLabel" Style="{StaticResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                <TextBlock Text="{x:Bind ViewModel.HeaderTrack.Title, Mode=OneWay}" FontSize="{StaticResource FontSizeHeading}" FontWeight="SemiBold" TextTrimming="CharacterEllipsis" />
 
-                <HyperlinkButton x:Name="artistName" Content="{x:Bind ViewModel.CurrentTrack.ArtistName, Mode=OneWay}" Command="{x:Bind ViewModel.ArtistOpenCommand}" FontSize="{StaticResource FontSizeLarge}" FontWeight="Bold" Padding="0" Margin="0" Style="{StaticResource HeaderHyperlinkStyle}" />
+                <StackPanel Orientation="Horizontal" Spacing="4">
+                    <StackPanel Orientation="Horizontal" Visibility="{x:Bind ViewModel.HeaderState.HasArtist, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">
+                        <HyperlinkButton Command="{x:Bind ViewModel.ArtistOpenCommand}" Padding="0" Margin="0" Style="{StaticResource HeaderHyperlinkStyle}">
+                            <TextBlock Text="{x:Bind ViewModel.HeaderTrack.ArtistName, Mode=OneWay}" MaxWidth="320" FontSize="{StaticResource FontSizeMedium}" FontWeight="SemiBold" TextTrimming="CharacterEllipsis" />
+                        </HyperlinkButton>
+                        <common:AnimatedButton Visibility="{x:Bind ViewModel.HeaderState.ShowArtistFavorite, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}"
+                                               VerticalAlignment="Center"
+                                               Icon="{StaticResource HeartPath}"
+                                               Color="{x:Bind ViewModel.Artist.IsFavorite, Converter={StaticResource FavoriteToColorConverter}, Mode=OneWay}"
+                                               Command="{x:Bind ViewModel.ToggleArtistFavoriteCommand}"
+                                               ToolTipService.ToolTip="{x:Bind ViewModel.ArtistFavoriteLabel, Mode=OneWay}"
+                                               AutomationProperties.Name="{x:Bind ViewModel.ArtistFavoriteLabel, Mode=OneWay}" />
+                    </StackPanel>
 
-                <Button x:Name="buttonCountry" RelativePanel.RightOf="artistName" RelativePanel.AlignVerticalCenterWith="artistName" Margin="4,0,0,0" Style="{StaticResource ButtonTextBlockStyle}" Visibility="{x:Bind ViewModel.Artist.Artist.CountryCode, Mode=OneWay, Converter={StaticResource StringToVisibilityConverter}}" BorderBrush="Transparent" Background="Transparent" ToolTipService.ToolTip="{x:Bind ViewModel.Artist.Artist.CountryName, Mode=OneWay}">
-                    <Image Source="{x:Bind ViewModel.Artist.Artist.CountryCode, Mode=OneWay, Converter={StaticResource CountryCodeToImageSourceConverter}}" Height="10"></Image>
-                </Button>
+                    <TextBlock Text="·" VerticalAlignment="Center" Foreground="{ThemeResource TextFillColorSecondaryBrush}" Visibility="{x:Bind ViewModel.HeaderState.ShowArtistAlbumSeparator, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" />
 
-                <TextBlock x:Name="year" RelativePanel.RightOf="buttonCountry" RelativePanel.AlignVerticalCenterWith="buttonCountry" Text="{x:Bind ViewModel.Artist.ActiveYears}" Style="{StaticResource SubtitleTextBlockStyle}" FontSize="{StaticResource FontSizeSmall}" Margin="10,-1,0,0" VerticalAlignment="Center" />
-                <HyperlinkButton x:Name="genreName" Content="{x:Bind ViewModel.Artist.Artist.GenreName}" RelativePanel.Below="artistName" Command="{x:Bind ViewModel.Artist.GenreOpenCommand}" Style="{StaticResource HeaderHyperlinkStyle}" />
-                <CommandBar x:Name="panelNetwork" RelativePanel.Below="genreName" Style="{StaticResource HeaderCommandBarStyle}">
-                    <common:SocialNetworkAppBarButton x:Uid="artistViewWebSite" Style="{StaticResource HeaderBrandButtonStyle}" ToolTipService.ToolTip="{x:Bind ViewModel.Artist.Artist.OfficialSiteUrl, Mode=OneWay}" Command="{x:Bind ViewModel.Artist.OpenUrlCommand, Mode=OneWay}" Url="{x:Bind ViewModel.Artist.Artist.OfficialSiteUrl, Mode=OneWay}" IconFill="{StaticResource WebsiteBrush}" IconData="{StaticResource BrandIconWebsite}" />
-                    <common:SocialNetworkAppBarButton x:Uid="artistViewLastFm" Style="{StaticResource HeaderBrandButtonStyle}" ToolTipService.ToolTip="Last.FM" Command="{x:Bind ViewModel.Artist.OpenUrlCommand, Mode=OneWay}" Url="{x:Bind ViewModel.Artist.Artist.LastFmUrl, Mode=OneWay}" IconFill="{StaticResource LastFmBrush}" IconData="{StaticResource BrandIconLastFm}" />
-                    <common:SocialNetworkAppBarButton x:Uid="artistViewWikipedia" Style="{StaticResource HeaderBrandButtonStyle}" ToolTipService.ToolTip="Wikipedia" Command="{x:Bind ViewModel.Artist.OpenUrlCommand, Mode=OneWay}" Url="{x:Bind ViewModel.Artist.Artist.WikipediaUrl, Mode=OneWay}" IconFill="{StaticResource WikipediaBrush}" IconData="{StaticResource BrandIconWikipedia}" />
-                    <common:SocialNetworkAppBarButton x:Uid="artistViewFacebook" Style="{StaticResource HeaderBrandButtonStyle}" ToolTipService.ToolTip="Facebook" Command="{x:Bind ViewModel.Artist.OpenUrlCommand, Mode=OneWay}" Url="{x:Bind ViewModel.Artist.Artist.FacebookUrl, Mode=OneWay}" IconFill="{StaticResource FacebookBrush}" IconData="{StaticResource BrandIconFacebook}" />
-                    <common:SocialNetworkAppBarButton x:Uid="artistViewInstagram" Style="{StaticResource HeaderBrandButtonStyle}" ToolTipService.ToolTip="Instagram" Command="{x:Bind ViewModel.Artist.OpenUrlCommand, Mode=OneWay}" Url="{x:Bind ViewModel.Artist.Artist.InstagramUrl, Mode=OneWay}" IconFill="{StaticResource InstagramBrush}" IconData="{StaticResource BrandIconInstagram}" />
-                    <common:SocialNetworkAppBarButton x:Uid="artistViewTwitter" Style="{StaticResource HeaderBrandButtonStyle}" ToolTipService.ToolTip="X" Command="{x:Bind ViewModel.Artist.OpenUrlCommand, Mode=OneWay}" Url="{x:Bind ViewModel.Artist.Artist.TwitterUrl, Mode=OneWay}" IconFill="{StaticResource TwitterBrush}" IconData="{StaticResource BrandIconTwitter}" />
-                    <common:SocialNetworkAppBarButton x:Uid="artistViewThreads" Style="{StaticResource HeaderBrandButtonStyle}" ToolTipService.ToolTip="Threads" Command="{x:Bind ViewModel.Artist.OpenUrlCommand, Mode=OneWay}" Url="{x:Bind ViewModel.Artist.Artist.ThreadsUrl, Mode=OneWay}" IconFill="{StaticResource ThreadsBrush}" IconData="{StaticResource BrandIconThreads}" />
-                    <common:SocialNetworkAppBarButton x:Uid="artistViewTikTok" Style="{StaticResource HeaderBrandButtonStyle}" ToolTipService.ToolTip="Tiktok" Command="{x:Bind ViewModel.Artist.OpenUrlCommand, Mode=OneWay}" Url="{x:Bind ViewModel.Artist.Artist.TiktokUrl, Mode=OneWay}" IconFill="{StaticResource TiktokBrush}" IconData="{StaticResource BrandIconTikTok}" />
-                    <common:SocialNetworkAppBarButton x:Uid="artistViewYoutube" Style="{StaticResource HeaderBrandButtonStyle}" ToolTipService.ToolTip="Youtube" Command="{x:Bind ViewModel.Artist.OpenUrlCommand, Mode=OneWay}" Url="{x:Bind ViewModel.Artist.Artist.YoutubeUrl, Mode=OneWay}" IconFill="{StaticResource YoutubeBrush}" IconData="{StaticResource BrandIconYoutube}" />
-                </CommandBar>
-            </RelativePanel>
+                    <StackPanel Orientation="Horizontal" Visibility="{x:Bind ViewModel.HeaderState.HasAlbum, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">
+                        <HyperlinkButton Command="{x:Bind ViewModel.AlbumOpenCommand}" Padding="0" Margin="0" Style="{StaticResource HeaderHyperlinkStyle}">
+                            <TextBlock Text="{x:Bind ViewModel.HeaderTrack.AlbumName, Mode=OneWay}" MaxWidth="320" FontSize="{StaticResource FontSizeMedium}" TextTrimming="CharacterEllipsis" />
+                        </HyperlinkButton>
+                        <common:AnimatedButton Visibility="{x:Bind ViewModel.HeaderState.ShowAlbumFavorite, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}"
+                                               VerticalAlignment="Center"
+                                               Icon="{StaticResource HeartPath}"
+                                               Color="{x:Bind ViewModel.Album.IsFavorite, Converter={StaticResource FavoriteToColorConverter}, Mode=OneWay}"
+                                               Command="{x:Bind ViewModel.ToggleAlbumFavoriteCommand}"
+                                               ToolTipService.ToolTip="{x:Bind ViewModel.AlbumFavoriteLabel, Mode=OneWay}"
+                                               AutomationProperties.Name="{x:Bind ViewModel.AlbumFavoriteLabel, Mode=OneWay}" />
+                    </StackPanel>
+                </StackPanel>
+
+                <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingSmall}">
+                    <Image Height="12" VerticalAlignment="Center" Source="{x:Bind ViewModel.HeaderTrack.CountryCode, Mode=OneWay, Converter={StaticResource CountryCodeToImageSourceConverter}}" ToolTipService.ToolTip="{x:Bind ViewModel.HeaderTrack.CountryName, Mode=OneWay}" Visibility="{x:Bind ViewModel.HeaderState.HasCountry, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" />
+                    <TextBlock Text="{x:Bind ViewModel.AlbumYear, Mode=OneWay}" VerticalAlignment="Center" FontSize="{StaticResource FontSizeSmall}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" Visibility="{x:Bind ViewModel.HeaderState.HasYear, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" />
+                    <Button Command="{x:Bind ViewModel.GenreOpenCommand}" Padding="10,2" CornerRadius="{StaticResource CornerRadiusMediumValue}" Visibility="{x:Bind ViewModel.HeaderState.HasGenre, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">
+                        <StackPanel Orientation="Horizontal" Spacing="6">
+                            <TextBlock Text="{x:Bind ViewModel.HeaderTrack.GenreName, Mode=OneWay}" FontSize="{StaticResource FontSizeSmall}" />
+                            <FontIcon Glyph="&#xE76C;" FontSize="10" VerticalAlignment="Center" />
+                        </StackPanel>
+                    </Button>
+                </StackPanel>
+            </StackPanel>
+
+            <!-- Summary and actions -->
+            <StackPanel x:Name="headerActions" Grid.Column="2" VerticalAlignment="Center" HorizontalAlignment="Right" Spacing="{StaticResource SpacingSmall}">
+                <TextBlock Text="{x:Bind ViewModel.QueueSummaryText, Mode=OneWay}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" FontSize="{StaticResource FontSizeSmall}" TextWrapping="Wrap" />
+
+                <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingSmall}">
+                    <Button Style="{StaticResource AccentButtonStyle}" Command="{x:Bind ViewModel.ShufflePlaylistCommand}">
+                        <StackPanel Orientation="Horizontal" Spacing="6">
+                            <SymbolIcon Symbol="Shuffle" />
+                            <TextBlock x:Uid="listeningShuffleButton" VerticalAlignment="Center" />
+                        </StackPanel>
+                    </Button>
+
+                    <Button>
+                        <StackPanel Orientation="Horizontal" Spacing="6">
+                            <SymbolIcon Symbol="Clock" />
+                            <TextBlock Text="{x:Bind ViewModel.SleepButtonLabel, Mode=OneWay}" VerticalAlignment="Center" />
+                        </StackPanel>
+                        <Button.Flyout>
+                            <MenuFlyout Placement="Bottom" Opening="SleepFlyout_Opening">
+                                <MenuFlyoutItem IsEnabled="False" Text="{x:Bind ViewModel.SleepButtonLabel, Mode=OneWay}" Visibility="{x:Bind ViewModel.IsSleepModeActive, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" />
+                                <MenuFlyoutItem x:Uid="playerSleepOff" Command="{x:Bind ViewModel.StopSleepTimerCommand}" Visibility="{x:Bind ViewModel.IsSleepModeActive, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">
+                                    <MenuFlyoutItem.Icon>
+                                        <SymbolIcon Symbol="Cancel" />
+                                    </MenuFlyoutItem.Icon>
+                                </MenuFlyoutItem>
+                                <MenuFlyoutSeparator Visibility="{x:Bind ViewModel.IsSleepModeActive, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" />
+                                <MenuFlyoutItem x:Uid="playerSleep5" Command="{x:Bind ViewModel.SetSleepTimerCommand}" CommandParameter="{StaticResource SleepTimer5}" />
+                                <MenuFlyoutItem x:Uid="playerSleep10" Command="{x:Bind ViewModel.SetSleepTimerCommand}" CommandParameter="{StaticResource SleepTimer10}" />
+                                <MenuFlyoutItem x:Uid="playerSleep15" Command="{x:Bind ViewModel.SetSleepTimerCommand}" CommandParameter="{StaticResource SleepTimer15}" />
+                                <MenuFlyoutItem x:Uid="playerSleep30" Command="{x:Bind ViewModel.SetSleepTimerCommand}" CommandParameter="{StaticResource SleepTimer30}" />
+                                <MenuFlyoutItem x:Uid="playerSleep45" Command="{x:Bind ViewModel.SetSleepTimerCommand}" CommandParameter="{StaticResource SleepTimer45}" />
+                                <MenuFlyoutItem x:Uid="playerSleep60" Command="{x:Bind ViewModel.SetSleepTimerCommand}" CommandParameter="{StaticResource SleepTimer60}" />
+                            </MenuFlyout>
+                        </Button.Flyout>
+                    </Button>
+
+                    <Button x:Uid="listeningArtistLinksButton" Visibility="{x:Bind ViewModel.HeaderState.HasArtistLinks, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">
+                        <FontIcon Glyph="&#xE712;" />
+                        <Button.Flyout>
+                            <MenuFlyout Placement="Bottom">
+                                <MenuFlyoutItem x:Uid="listeningLinkWebSite" Command="{x:Bind ViewModel.Artist.OpenUrlCommand, Mode=OneWay}" CommandParameter="{x:Bind ViewModel.Artist.Artist.OfficialSiteUrl, Mode=OneWay}" Visibility="{x:Bind ViewModel.Artist.Artist.OfficialSiteUrl, Mode=OneWay, Converter={StaticResource StringToVisibilityConverter}}" />
+                                <MenuFlyoutItem x:Uid="listeningLinkLastFm" Command="{x:Bind ViewModel.Artist.OpenUrlCommand, Mode=OneWay}" CommandParameter="{x:Bind ViewModel.Artist.Artist.LastFmUrl, Mode=OneWay}" Visibility="{x:Bind ViewModel.Artist.Artist.LastFmUrl, Mode=OneWay, Converter={StaticResource StringToVisibilityConverter}}" />
+                                <MenuFlyoutItem x:Uid="listeningLinkWikipedia" Command="{x:Bind ViewModel.Artist.OpenUrlCommand, Mode=OneWay}" CommandParameter="{x:Bind ViewModel.Artist.Artist.WikipediaUrl, Mode=OneWay}" Visibility="{x:Bind ViewModel.Artist.Artist.WikipediaUrl, Mode=OneWay, Converter={StaticResource StringToVisibilityConverter}}" />
+                                <MenuFlyoutItem x:Uid="listeningLinkFacebook" Command="{x:Bind ViewModel.Artist.OpenUrlCommand, Mode=OneWay}" CommandParameter="{x:Bind ViewModel.Artist.Artist.FacebookUrl, Mode=OneWay}" Visibility="{x:Bind ViewModel.Artist.Artist.FacebookUrl, Mode=OneWay, Converter={StaticResource StringToVisibilityConverter}}" />
+                                <MenuFlyoutItem x:Uid="listeningLinkInstagram" Command="{x:Bind ViewModel.Artist.OpenUrlCommand, Mode=OneWay}" CommandParameter="{x:Bind ViewModel.Artist.Artist.InstagramUrl, Mode=OneWay}" Visibility="{x:Bind ViewModel.Artist.Artist.InstagramUrl, Mode=OneWay, Converter={StaticResource StringToVisibilityConverter}}" />
+                                <MenuFlyoutItem x:Uid="listeningLinkTwitter" Command="{x:Bind ViewModel.Artist.OpenUrlCommand, Mode=OneWay}" CommandParameter="{x:Bind ViewModel.Artist.Artist.TwitterUrl, Mode=OneWay}" Visibility="{x:Bind ViewModel.Artist.Artist.TwitterUrl, Mode=OneWay, Converter={StaticResource StringToVisibilityConverter}}" />
+                                <MenuFlyoutItem x:Uid="listeningLinkThreads" Command="{x:Bind ViewModel.Artist.OpenUrlCommand, Mode=OneWay}" CommandParameter="{x:Bind ViewModel.Artist.Artist.ThreadsUrl, Mode=OneWay}" Visibility="{x:Bind ViewModel.Artist.Artist.ThreadsUrl, Mode=OneWay, Converter={StaticResource StringToVisibilityConverter}}" />
+                                <MenuFlyoutItem x:Uid="listeningLinkTikTok" Command="{x:Bind ViewModel.Artist.OpenUrlCommand, Mode=OneWay}" CommandParameter="{x:Bind ViewModel.Artist.Artist.TiktokUrl, Mode=OneWay}" Visibility="{x:Bind ViewModel.Artist.Artist.TiktokUrl, Mode=OneWay, Converter={StaticResource StringToVisibilityConverter}}" />
+                                <MenuFlyoutItem x:Uid="listeningLinkYoutube" Command="{x:Bind ViewModel.Artist.OpenUrlCommand, Mode=OneWay}" CommandParameter="{x:Bind ViewModel.Artist.Artist.YoutubeUrl, Mode=OneWay}" Visibility="{x:Bind ViewModel.Artist.Artist.YoutubeUrl, Mode=OneWay, Converter={StaticResource StringToVisibilityConverter}}" />
+                            </MenuFlyout>
+                        </Button.Flyout>
+                    </Button>
+                </StackPanel>
+            </StackPanel>
         </Grid>
 
-        <!-- Commands -->
-        <RelativePanel Grid.Row="2" Margin="6,0,0,0">
-            <CommandBar RelativePanel.AlignBottomWithPanel="True" Style="{StaticResource HeaderCommandBarStyle}">
-                <AppBarButton x:Uid="shuffleButton" Style="{StaticResource AppBarButtonCompactStyle}" Icon="Shuffle" Command="{x:Bind ViewModel.ShufflePlaylistCommand}" />
-
-                <AppBarButton x:Uid="playerSleepModeAppBarButton" Style="{StaticResource AppBarButtonCompactStyle}" Icon="Clock">
-                    <AppBarButton.Flyout>
-                        <MenuFlyout Placement="Top" Opening="SleepFlyout_Opening">
-                            <MenuFlyoutItem IsEnabled="False" Text="{x:Bind ViewModel.RemainingSleepTime, Mode=OneWay, Converter={StaticResource SecondsToReadableConverter}}" Visibility="{x:Bind ViewModel.IsSleepModeActive, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" />
-                            <MenuFlyoutItem x:Uid="playerSleepOff" Command="{x:Bind ViewModel.StopSleepTimerCommand}" Visibility="{x:Bind ViewModel.IsSleepModeActive, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">
-                                <MenuFlyoutItem.Icon>
-                                    <SymbolIcon Symbol="Cancel" />
-                                </MenuFlyoutItem.Icon>
-                            </MenuFlyoutItem>
-                            <MenuFlyoutSeparator Visibility="{x:Bind ViewModel.IsSleepModeActive, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" />
-                            <MenuFlyoutItem x:Uid="playerSleep5" Command="{x:Bind ViewModel.SetSleepTimerCommand}" CommandParameter="{StaticResource SleepTimer5}" />
-                            <MenuFlyoutItem x:Uid="playerSleep10" Command="{x:Bind ViewModel.SetSleepTimerCommand}" CommandParameter="{StaticResource SleepTimer10}" />
-                            <MenuFlyoutItem x:Uid="playerSleep15" Command="{x:Bind ViewModel.SetSleepTimerCommand}" CommandParameter="{StaticResource SleepTimer15}" />
-                            <MenuFlyoutItem x:Uid="playerSleep30" Command="{x:Bind ViewModel.SetSleepTimerCommand}" CommandParameter="{StaticResource SleepTimer30}" />
-                            <MenuFlyoutItem x:Uid="playerSleep45" Command="{x:Bind ViewModel.SetSleepTimerCommand}" CommandParameter="{StaticResource SleepTimer45}" />
-                            <MenuFlyoutItem x:Uid="playerSleep60" Command="{x:Bind ViewModel.SetSleepTimerCommand}" CommandParameter="{StaticResource SleepTimer60}" />
-                        </MenuFlyout>
-                    </AppBarButton.Flyout>
-                </AppBarButton>
-            </CommandBar>
-        </RelativePanel>
+        <!-- Empty state -->
+        <common:EmptyStateControl x:Uid="listeningEmptyState" Glyph="&#xE8D6;" Grid.RowSpan="2" Visibility="{x:Bind ViewModel.HeaderState.IsEmpty, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" />
 
         <!-- Tracks -->
-        <Grid x:Name="tracks" CornerRadius="12,12,0,0" Padding="24" Background="{ThemeResource CardBackgroundFillColorDefault}" Margin="4,0,4,4" Grid.Row="3">
+        <Grid x:Name="tracks" CornerRadius="12,12,0,0" Padding="24" Background="{ThemeResource CardBackgroundFillColorDefault}" Margin="4,0,4,4" Grid.Row="1" Visibility="{x:Bind ViewModel.HeaderState.IsEmpty, Mode=OneWay, Converter={StaticResource BoolToInvertVisibilityConverter}}">
             <Grid.RowDefinitions>
                 <RowDefinition Height="{StaticResource GridHeaderTracksHeight}" />
                 <RowDefinition />
@@ -133,7 +207,7 @@
             <common:ListViewExtended x:Name="tracksList" ItemsSource="{x:Bind ViewModel.Tracks}" ContainerContentChanging="tracksList_ContainerContentChanging" Grid.Row="1" BorderThickness="0" ItemContainerStyle="{StaticResource TracksListViewItemStyle}" Margin="0" >
                 <ListView.ItemTemplate>
                     <DataTemplate x:DataType="track:TrackViewModel">
-                        <Grid HorizontalAlignment="Stretch" VerticalAlignment="Center" Background="Transparent" Margin="0,0,20,0">
+                        <Grid HorizontalAlignment="Stretch" VerticalAlignment="Center" Background="{x:Bind Listening, Mode=OneWay, Converter={StaticResource ListeningRowBackgroundConverter}}" Margin="0,0,20,0">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="{StaticResource GridHeaderTracksTitleColumnWidth}" />
                                 <ColumnDefinition Width="{StaticResource GridHeaderTracksArtistColumnWidth}" />
