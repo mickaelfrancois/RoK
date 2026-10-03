@@ -9,6 +9,10 @@ using Rok.Infrastructure.FileSystem;
 using Rok.Infrastructure.Lyrics;
 using Rok.Infrastructure.Repositories;
 using Rok.Infrastructure.Tag;
+using Rok.MetadataTool;
+
+if (args.Length > 0 && args[0] == "mix-scan")
+    return await Rok.MetadataTool.MixScanCommand.RunAsync(args[1..]);
 
 if (args.Length > 0 && args[0] == "bpm-check")
     return await Rok.MetadataTool.BpmCheckCommand.RunAsync(args[1..]);
@@ -42,14 +46,14 @@ Console.WriteLine();
 
 try
 {
-    if (!TableExists(connectionString, "Tracks"))
+    if (!ToolDatabase.TableExists(connectionString, "Tracks"))
     {
         Console.Error.WriteLine("This file does not look like a Rok database (no 'Tracks' table).");
         return 1;
     }
 
     // The tool does not migrate; it expects an up-to-date schema (open the database once in Rok first).
-    if (!ColumnExists(connectionString, "Tracks", "disc"))
+    if (!ToolDatabase.ColumnExists(connectionString, "Tracks", "disc"))
     {
         Console.Error.WriteLine("Database schema is out of date for this tool. Open the database once in Rok (which applies migrations), then retry.");
         return 1;
@@ -72,8 +76,7 @@ try
 
     if (apply)
     {
-        string backupPath = $"{databasePath}.{DateTime.Now:yyyyMMdd_HHmmss}.bak";
-        BackupDatabase(databasePath, backupPath);
+        string backupPath = ToolDatabase.CreateBackup(databasePath, DateTime.Now);
         Console.WriteLine($"Backup created: {backupPath}");
         Console.WriteLine();
     }
@@ -95,53 +98,11 @@ catch (SqliteException ex)
 
 return 0;
 
-static bool TableExists(string connectionString, string table)
-{
-    using SqliteConnection connection = new(connectionString);
-    connection.Open();
-
-    using SqliteCommand command = connection.CreateCommand();
-    command.CommandText = "SELECT count(*) FROM sqlite_master WHERE type = 'table' AND name = $name;";
-    command.Parameters.AddWithValue("$name", table);
-
-    return Convert.ToInt64(command.ExecuteScalar()) > 0;
-}
-
-static bool ColumnExists(string connectionString, string table, string column)
-{
-    using SqliteConnection connection = new(connectionString);
-    connection.Open();
-
-    using SqliteCommand command = connection.CreateCommand();
-    command.CommandText = "SELECT count(*) FROM pragma_table_info($table) WHERE name = $column;";
-    command.Parameters.AddWithValue("$table", table);
-    command.Parameters.AddWithValue("$column", column);
-
-    return Convert.ToInt64(command.ExecuteScalar()) > 0;
-}
-
-static void BackupDatabase(string databasePath, string backupPath)
-{
-    using SqliteConnection source = new(new SqliteConnectionStringBuilder
-    {
-        DataSource = databasePath,
-        Mode = SqliteOpenMode.ReadOnly,
-        Pooling = false
-    }.ToString());
-    source.Open();
-
-    using SqliteConnection destination = new(new SqliteConnectionStringBuilder { DataSource = backupPath }.ToString());
-    destination.Open();
-
-    // SQLite online-backup API copies a consistent image including pending WAL pages,
-    // unlike a plain File.Copy of the main database file.
-    source.BackupDatabase(destination);
-}
-
 static void PrintUsage()
 {
     Console.WriteLine("Usage: Rok.MetadataTool <database.sqlite> [--apply]");
     Console.WriteLine("       Rok.MetadataTool bpm-check <database.sqlite> [--limit N] [--sweep]");
+    Console.WriteLine("       Rok.MetadataTool mix-scan <database.sqlite> [--write] [--limit N] [--parallel N]");
     Console.WriteLine();
     Console.WriteLine("  Re-reads the audio tag of every track in the database and refreshes the");
     Console.WriteLine("  extended metadata columns (disc, bpm, composers, audio specs, replaygain),");
@@ -157,6 +118,8 @@ static void PrintUsage()
     Console.WriteLine();
     Console.WriteLine("  bpm-check          Read-only measurement of the tempo detector against the BPM tags");
     Console.WriteLine("                     (run 'bpm-check --help' for details).");
+    Console.WriteLine("  mix-scan           Pre-fills the Mix analysis cache (trackAnalysis); read-only unless --write");
+    Console.WriteLine("                     (run 'mix-scan --help' for details).");
 }
 
 static void PrintReport(LibraryMetadataRefreshReport report)

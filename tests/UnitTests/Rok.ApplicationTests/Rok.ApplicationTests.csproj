@@ -34,6 +34,11 @@
 	<ItemGroup>
 		<Compile Include="..\..\..\tools\Rok.MetadataTool\BpmSweep.cs" Link="Tools\BpmSweep.cs" />
 		<Compile Include="..\..\..\tools\Rok.MetadataTool\MixPointStats.cs" Link="Tools\MixPointStats.cs" />
+		<Compile Include="..\..\..\tools\Rok.MetadataTool\MixScanOptions.cs" Link="Tools\MixScanOptions.cs" />
+		<Compile Include="..\..\..\tools\Rok.MetadataTool\MixScanTracks.cs" Link="Tools\MixScanTracks.cs" />
+		<Compile Include="..\..\..\tools\Rok.MetadataTool\MixScanSupport.cs" Link="Tools\MixScanSupport.cs" />
+		<Compile Include="..\..\..\tools\Rok.MetadataTool\MixScanner.cs" Link="Tools\MixScanner.cs" />
+		<Compile Include="..\..\..\tools\Rok.MetadataTool\MixScanReport.cs" Link="Tools\MixScanReport.cs" />
 	</ItemGroup>
 
 	<ItemGroup>
