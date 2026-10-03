@@ -2307,7 +2307,10 @@
   <data name="listeningNowPlayingLabel.Text" xml:space="preserve">
     <value>En cours de lecture</value>
   </data>
-  <data name="listeningShuffleButton.Text" xml:space="preserve">
+  <data name="listeningQueueLabel.Text" xml:space="preserve">
+    <value>FILE D'ÉCOUTE</value>
+  </data>
+  <data name="listeningShuffleButton.Label" xml:space="preserve">
     <value>Mélanger</value>
   </data>
   <data name="listeningArtistLinksButton.ToolTipService.ToolTip" xml:space="preserve">

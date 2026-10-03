@@ -124,4 +124,46 @@ public class ListeningQueueSummaryFormatterTests
         // Assert
         Assert.EndsWith(" · " + expected, result);
     }
+
+    [Fact(DisplayName = "format_overview_renders_count_and_duration_without_end_time")]
+    public void FormatOverview_RendersCountAndDurationWithoutEndTime()
+    {
+        // Arrange
+        var summary = new ListeningQueueSummary(42, (2 * 3600) + (34 * 60), EndAt);
+
+        // Act
+        var result = ListeningQueueSummaryFormatter.FormatOverview(summary, Labels, French);
+
+        // Assert
+        Assert.Equal("42 titres · 2 h 34 min", result);
+    }
+
+    [Fact(DisplayName = "format_end_time_renders_only_the_end_time")]
+    public void FormatEndTime_RendersOnlyTheEndTime()
+    {
+        // Arrange
+        var summary = new ListeningQueueSummary(42, (2 * 3600) + (34 * 60), EndAt);
+
+        // Act
+        var result = ListeningQueueSummaryFormatter.FormatEndTime(summary, Labels, French);
+
+        // Assert
+        Assert.Equal("Fin vers 18:05", result);
+    }
+
+    [Fact(DisplayName = "format_end_time_is_empty_without_end_time_or_tracks")]
+    public void FormatEndTime_IsEmptyWithoutEndTimeOrTracks()
+    {
+        // Arrange
+        var noEnd = new ListeningQueueSummary(3, 600, null);
+        var noTracks = new ListeningQueueSummary(0, 0, EndAt);
+
+        // Act
+        var withoutEnd = ListeningQueueSummaryFormatter.FormatEndTime(noEnd, Labels, French);
+        var withoutTracks = ListeningQueueSummaryFormatter.FormatEndTime(noTracks, Labels, French);
+
+        // Assert
+        Assert.Equal(string.Empty, withoutEnd);
+        Assert.Equal(string.Empty, withoutTracks);
+    }
 }

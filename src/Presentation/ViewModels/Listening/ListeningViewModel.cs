@@ -34,7 +34,8 @@ public sealed partial class ListeningViewModel : ObservableObject, IDisposable
     public bool IsSleepModeActive => _playerSleepModeService.IsSleepTimerActive;
     public TrackDto? HeaderTrack { get; private set; }
     public ListeningHeaderState HeaderState { get; private set; } = ListeningHeaderState.From(null, null, null);
-    public string QueueSummaryText { get; private set; } = string.Empty;
+    public string QueueOverviewText { get; private set; } = string.Empty;
+    public string QueueEndText { get; private set; } = string.Empty;
     public string SleepButtonLabel { get; private set; } = string.Empty;
     public string ArtistFavoriteLabel { get; private set; } = string.Empty;
     public string AlbumFavoriteLabel { get; private set; } = string.Empty;
@@ -169,8 +170,10 @@ public sealed partial class ListeningViewModel : ObservableObject, IDisposable
             _resourceLoader.GetString("listeningSummaryMinutes"),
             _resourceLoader.GetString("listeningSummaryEndsAt"));
 
-        QueueSummaryText = ListeningQueueSummaryFormatter.Format(summary, labels, CultureInfo.CurrentCulture);
-        OnPropertyChanged(nameof(QueueSummaryText));
+        QueueOverviewText = ListeningQueueSummaryFormatter.FormatOverview(summary, labels, CultureInfo.CurrentCulture);
+        QueueEndText = ListeningQueueSummaryFormatter.FormatEndTime(summary, labels, CultureInfo.CurrentCulture);
+        OnPropertyChanged(nameof(QueueOverviewText));
+        OnPropertyChanged(nameof(QueueEndText));
     }
 
     private void UpdateSleepButtonLabel()

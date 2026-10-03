@@ -43,12 +43,15 @@
                         <Setter Target="headerActions.(Grid.Column)" Value="1" />
                         <Setter Target="headerActions.HorizontalAlignment" Value="Left" />
                         <Setter Target="headerActions.Margin" Value="0,12,0,0" />
+                        <Setter Target="queueSummary.HorizontalAlignment" Value="Left" />
                         <Setter Target="coverPicture.Width" Value="72" />
                         <Setter Target="coverPicture.Height" Value="72" />
                     </VisualState.Setters>
                 </VisualState>
             </VisualStateGroup>
         </VisualStateManager.VisualStateGroups>
+
+        <Image x:Name="backdrop" Grid.RowSpan="2" Source="{x:Bind ViewModel.Artist.Backdrop, Mode=OneWay}" Style="{StaticResource HeaderBackdropStyle}" IsHitTestVisible="False" />
 
         <!-- Header -->
         <Grid x:Name="headerGrid" Padding="28,20,24,20" ColumnSpacing="{StaticResource SpacingMedium}" Visibility="{x:Bind ViewModel.HeaderState.IsEmpty, Mode=OneWay, Converter={StaticResource BoolToInvertVisibilityConverter}}">
@@ -61,19 +64,6 @@
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
-
-            <Grid.Background>
-                <ImageBrush ImageSource="{x:Bind ViewModel.Artist.Backdrop, Mode=OneWay}" Opacity="{StaticResource HeaderBackdropOpacity}" Stretch="UniformToFill" AlignmentY="Center" />
-            </Grid.Background>
-
-            <Rectangle Grid.RowSpan="2" Grid.ColumnSpan="3" Margin="-28,-20,-24,-20" IsHitTestVisible="False">
-                <Rectangle.Fill>
-                    <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
-                        <GradientStop Color="Transparent" Offset="0" />
-                        <GradientStop Color="{ThemeResource CardBackgroundFillColorDefault}" Offset="1" />
-                    </LinearGradientBrush>
-                </Rectangle.Fill>
-            </Rectangle>
 
             <!-- Cover -->
             <common:PictureControl x:Name="coverPicture" Width="120" Height="120" VerticalAlignment="Top" CornerRadius="{StaticResource CornerRadiusMediumValue}" Cover="{x:Bind ViewModel.Album.Picture, Mode=OneWay}" Style="{StaticResource HeaderPictureStyle}" />
@@ -127,15 +117,14 @@
 
             <!-- Summary and actions -->
             <StackPanel x:Name="headerActions" Grid.Column="2" VerticalAlignment="Center" HorizontalAlignment="Right" Spacing="{StaticResource SpacingSmall}">
-                <TextBlock Text="{x:Bind ViewModel.QueueSummaryText, Mode=OneWay}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" FontSize="{StaticResource FontSizeSmall}" TextWrapping="Wrap" />
+                <StackPanel x:Name="queueSummary" HorizontalAlignment="Right" Spacing="2" Margin="0,0,0,4">
+                    <TextBlock x:Uid="listeningQueueLabel" HorizontalAlignment="Right" Style="{StaticResource CaptionTextBlockStyle}" FontWeight="SemiBold" CharacterSpacing="80" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                    <TextBlock Text="{x:Bind ViewModel.QueueOverviewText, Mode=OneWay}" HorizontalAlignment="Right" FontSize="{StaticResource FontSizeXMedium}" />
+                    <TextBlock Text="{x:Bind ViewModel.QueueEndText, Mode=OneWay}" HorizontalAlignment="Right" Style="{StaticResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" Visibility="{x:Bind ViewModel.QueueEndText, Mode=OneWay, Converter={StaticResource StringToVisibilityConverter}}" />
+                </StackPanel>
 
                 <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingSmall}">
-                    <Button Style="{StaticResource AccentButtonStyle}" Command="{x:Bind ViewModel.ShufflePlaylistCommand}">
-                        <StackPanel Orientation="Horizontal" Spacing="6">
-                            <SymbolIcon Symbol="Shuffle" />
-                            <TextBlock x:Uid="listeningShuffleButton" VerticalAlignment="Center" />
-                        </StackPanel>
-                    </Button>
+                    <AppBarButton x:Uid="listeningShuffleButton" Style="{StaticResource ListenAppBarButtonStyle}" Icon="Shuffle" Command="{x:Bind ViewModel.ShufflePlaylistCommand}" />
 
                     <Button>
                         <StackPanel Orientation="Horizontal" Spacing="6">

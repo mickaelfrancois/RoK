@@ -8,6 +8,20 @@ public static class ListeningQueueSummaryFormatter
 
     public static string Format(ListeningQueueSummary summary, ListeningSummaryLabels labels, CultureInfo culture)
     {
+        string overview = FormatOverview(summary, labels, culture);
+
+        if (overview.Length == 0)
+        {
+            return string.Empty;
+        }
+
+        string endTime = FormatEndTime(summary, labels, culture);
+
+        return endTime.Length == 0 ? overview : overview + Separator + endTime;
+    }
+
+    public static string FormatOverview(ListeningQueueSummary summary, ListeningSummaryLabels labels, CultureInfo culture)
+    {
         ArgumentNullException.ThrowIfNull(summary);
         ArgumentNullException.ThrowIfNull(labels);
         ArgumentNullException.ThrowIfNull(culture);
@@ -17,22 +31,25 @@ public static class ListeningQueueSummaryFormatter
             return string.Empty;
         }
 
-        var segments = new List<string>(3)
-        {
-            string.Format(culture, summary.TrackCount == 1 ? labels.TrackSingular : labels.TrackPlural, summary.TrackCount)
-        };
+        string count = string.Format(culture, summary.TrackCount == 1 ? labels.TrackSingular : labels.TrackPlural, summary.TrackCount);
 
-        if (summary.TotalSeconds > 0)
+        return summary.TotalSeconds > 0
+            ? count + Separator + FormatDuration(summary.TotalSeconds, labels, culture)
+            : count;
+    }
+
+    public static string FormatEndTime(ListeningQueueSummary summary, ListeningSummaryLabels labels, CultureInfo culture)
+    {
+        ArgumentNullException.ThrowIfNull(summary);
+        ArgumentNullException.ThrowIfNull(labels);
+        ArgumentNullException.ThrowIfNull(culture);
+
+        if (summary.TrackCount <= 0 || summary.EndTime is not { } endTime)
         {
-            segments.Add(FormatDuration(summary.TotalSeconds, labels, culture));
+            return string.Empty;
         }
 
-        if (summary.EndTime is { } endTime)
-        {
-            segments.Add(string.Format(culture, labels.EndsAt, endTime.ToString("t", culture)));
-        }
-
-        return string.Join(Separator, segments);
+        return string.Format(culture, labels.EndsAt, endTime.ToString("t", culture));
     }
 
     private static string FormatDuration(long totalSeconds, ListeningSummaryLabels labels, CultureInfo culture)
