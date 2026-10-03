@@ -194,9 +194,13 @@ public static class DependencyInjection
         {
             DispatcherQueue dispatcherQueue = DispatcherQueue.GetForCurrentThread();
             ListeningDataLoader dataLoader = sp.GetRequiredService<ListeningDataLoader>();
-            return new ListeningPlaylistManager(dispatcherQueue, dataLoader);
+            ListeningEntityUpdateWatcher watcher = sp.GetRequiredService<ListeningEntityUpdateWatcher>();
+            ILogger<ListeningPlaylistManager> logger = sp.GetRequiredService<ILogger<ListeningPlaylistManager>>();
+            return new ListeningPlaylistManager(dispatcherQueue, dataLoader, watcher, logger);
         });
+        services.AddSingleton<ListeningEntityUpdateWatcher>();
         services.AddSingleton<ListeningPlaybackService>();
+        services.AddSingleton<ListeningSleepTimerTracker>();
 
         // Playlists ViewModel, services and handlers
         services.AddSingleton<PlaylistsViewModel>();

@@ -10,6 +10,8 @@ public sealed partial class ListeningPage : Page, IDisposable
 {
     public ListeningViewModel ViewModel { get; set; }
 
+    private const double NarrowHeaderThreshold = 800;
+
     private readonly ResourceLoader _resourceLoader;
 
 
@@ -51,8 +53,22 @@ public sealed partial class ListeningPage : Page, IDisposable
         return result == ContentDialogResult.Primary;
     }
 
+    private void Page_SizeChanged(object sender, SizeChangedEventArgs e)
+    {
+        ApplyHeaderLayout(e.NewSize.Width);
+    }
+
+    private void ApplyHeaderLayout(double width)
+    {
+        string state = width < NarrowHeaderThreshold ? "NarrowHeader" : "WideHeader";
+
+        VisualStateManager.GoToState(this, state, true);
+    }
+
     private void ListeningPage_Loaded(object sender, RoutedEventArgs e)
     {
+        ApplyHeaderLayout(ActualWidth);
+
         TrackViewModel? listeningTrack = ViewModel.Tracks.FirstOrDefault(track => track.Listening);
 
         if (listeningTrack != null)

@@ -1,6 +1,8 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+﻿using System.Globalization;
+using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Rok.Application.Player;
+using Rok.ViewModels.Album;
 using Rok.ViewModels.Artist;
 using Rok.ViewModels.Listening.Services;
 using Rok.ViewModels.Player.Services;
@@ -20,16 +22,24 @@ public sealed partial class ListeningViewModel : ObservableObject, IDisposable
     private readonly IPlayerSleepModeService _playerSleepModeService;
     private readonly PlayerStateManager _stateManager;
     private readonly IMessenger _messenger;
+    private readonly ListeningSleepTimerTracker _sleepTimerTracker;
+    private readonly TimeProvider _timeProvider;
     private readonly List<IDisposable> _subscriptions = new();
     private bool _disposed;
 
-    public int TrackCount => _playlistManager.TrackCount;
-    public long Duration => _playlistManager.Duration;
     public ArtistViewModel? Artist => _playlistManager.Artist;
+    public AlbumViewModel? Album => _playlistManager.Album;
     public RangeObservableCollection<TrackViewModel> Tracks => _playlistManager.Tracks;
     public TrackViewModel? CurrentTrack => _playlistManager.CurrentTrack;
     public bool IsSleepModeActive => _playerSleepModeService.IsSleepTimerActive;
-    public int RemainingSleepTime => _playerSleepModeService.GetRemainingSleepTimeInSeconds();
+    public TrackDto? HeaderTrack { get; private set; }
+    public ListeningHeaderState HeaderState { get; private set; } = ListeningHeaderState.From(null, null, null);
+    public string QueueOverviewText { get; private set; } = string.Empty;
+    public string QueueEndText { get; private set; } = string.Empty;
+    public string SleepButtonLabel { get; private set; } = string.Empty;
+    public string ArtistFavoriteLabel { get; private set; } = string.Empty;
+    public string AlbumFavoriteLabel { get; private set; } = string.Empty;
+    public string AlbumYear => Album?.ReleaseDateYear ?? string.Empty;
 
     /// <summary>
     /// Asks the view to confirm a multi-track removal from the queue, passing the number of tracks that would be removed.
@@ -45,6 +55,8 @@ public sealed partial class ListeningViewModel : ObservableObject, IDisposable
         PlayerStateManager stateManager,
         IPlayerSleepModeService playerSleepModeService,
         IMessenger messenger,
+        ListeningSleepTimerTracker sleepTimerTracker,
+        TimeProvider timeProvider,
         ResourceLoader resourceLoader,
         ILogger<ListeningViewModel> logger)
     {
@@ -55,6 +67,8 @@ public sealed partial class ListeningViewModel : ObservableObject, IDisposable
         _stateManager = Guard.NotNull(stateManager);
         _navigationService = Guard.NotNull(navigationService);
         _messenger = Guard.NotNull(messenger);
+        _sleepTimerTracker = Guard.NotNull(sleepTimerTracker);
+        _timeProvider = Guard.NotNull(timeProvider);
         _resourceLoader = Guard.NotNull(resourceLoader);
         _logger = Guard.NotNull(logger);
 
@@ -62,6 +76,7 @@ public sealed partial class ListeningViewModel : ObservableObject, IDisposable
         SubscribeToEvents();
 
         InitializeFromPlayerService();
+        RecomputeHeader();
     }
 
 
@@ -76,9 +91,10 @@ public sealed partial class ListeningViewModel : ObservableObject, IDisposable
         _playlistManager.PlaylistChanged += OnPlaylistChanged;
         _playlistManager.CurrentTrackChanged += OnCurrentTrackChanged;
         _playerSleepModeService.SleepTimerStateChanged += OnSleepTimerStateChanged;
+        _sleepTimerTracker.RemainingMinutesChanged += OnRemainingMinutesChanged;
     }
 
-    public void RefreshSleepTime() => OnPropertyChanged(nameof(RemainingSleepTime));
+    public void RefreshSleepTime() => UpdateSleepButtonLabel();
 
     private void InitializeFromPlayerService()
     {
@@ -91,19 +107,99 @@ public sealed partial class ListeningViewModel : ObservableObject, IDisposable
 
     private void OnSleepTimerStateChanged(object? sender, bool isActive)
     {
-        _stateManager.ExecuteOnUIThread(() => OnPropertyChanged(nameof(IsSleepModeActive)));
+        _stateManager.ExecuteOnUIThread(() =>
+        {
+            OnPropertyChanged(nameof(IsSleepModeActive));
+            UpdateSleepButtonLabel();
+        });
+    }
+
+    private void OnRemainingMinutesChanged(object? sender, int minutes)
+    {
+        _stateManager.ExecuteOnUIThread(UpdateSleepButtonLabel);
     }
 
     private void OnPlaylistChanged(object? sender, EventArgs e)
     {
-        OnPropertyChanged(nameof(TrackCount));
-        OnPropertyChanged(nameof(Duration));
+        _stateManager.ExecuteOnUIThread(RecomputeHeader);
     }
 
     private void OnCurrentTrackChanged(object? sender, EventArgs e)
     {
-        OnPropertyChanged(nameof(CurrentTrack));
-        OnPropertyChanged(nameof(Artist));
+        _stateManager.ExecuteOnUIThread(() =>
+        {
+            OnPropertyChanged(nameof(CurrentTrack));
+            OnPropertyChanged(nameof(Artist));
+            OnPropertyChanged(nameof(Album));
+            RecomputeHeader();
+        });
+    }
+
+    private void RecomputeHeader()
+    {
+        TrackDto? track = _playlistManager.DisplayedTrack;
+
+        HeaderTrack = track;
+        HeaderState = ListeningHeaderState.From(track, Artist?.Artist, Album?.Album);
+
+        UpdateQueueSummary();
+        UpdateSleepButtonLabel();
+        UpdateFavoriteLabels();
+
+        OnPropertyChanged(nameof(HeaderTrack));
+        OnPropertyChanged(nameof(HeaderState));
+        OnPropertyChanged(nameof(AlbumYear));
+    }
+
+    private void UpdateQueueSummary()
+    {
+        List<long> durations = Tracks.Select(t => t.Track.Duration).ToList();
+        int currentIndex = CurrentTrack is null ? -1 : Tracks.IndexOf(CurrentTrack);
+
+        ListeningQueueSummary summary = ListeningQueueSummary.Compute(
+            durations,
+            currentIndex,
+            _playerService.Position,
+            _timeProvider.GetLocalNow());
+
+        ListeningSummaryLabels labels = new(
+            _resourceLoader.GetString("listeningSummaryTrack"),
+            _resourceLoader.GetString("listeningSummaryTracks"),
+            _resourceLoader.GetString("listeningSummaryHoursMinutes"),
+            _resourceLoader.GetString("listeningSummaryHours"),
+            _resourceLoader.GetString("listeningSummaryMinutes"),
+            _resourceLoader.GetString("listeningSummaryEndsAt"));
+
+        QueueOverviewText = ListeningQueueSummaryFormatter.FormatOverview(summary, labels, CultureInfo.CurrentCulture);
+        QueueEndText = ListeningQueueSummaryFormatter.FormatEndTime(summary, labels, CultureInfo.CurrentCulture);
+        OnPropertyChanged(nameof(QueueOverviewText));
+        OnPropertyChanged(nameof(QueueEndText));
+    }
+
+    private void UpdateSleepButtonLabel()
+    {
+        SleepButtonLabel = ListeningHeaderLabels.SleepButton(
+            IsSleepModeActive,
+            _playerSleepModeService.GetRemainingSleepTimeInSeconds(),
+            _resourceLoader.GetString("listeningSleepIdle"),
+            _resourceLoader.GetString("listeningSleepRemaining"));
+        OnPropertyChanged(nameof(SleepButtonLabel));
+    }
+
+    private void UpdateFavoriteLabels()
+    {
+        string addFormat = _resourceLoader.GetString("listeningFavoriteAdd");
+        string removeFormat = _resourceLoader.GetString("listeningFavoriteRemove");
+
+        ArtistFavoriteLabel = Artist is null
+            ? string.Empty
+            : ListeningHeaderLabels.FavoriteToggle(Artist.Artist.Name, Artist.IsFavorite, addFormat, removeFormat);
+        AlbumFavoriteLabel = Album is null
+            ? string.Empty
+            : ListeningHeaderLabels.FavoriteToggle(Album.Album.Name, Album.IsFavorite, addFormat, removeFormat);
+
+        OnPropertyChanged(nameof(ArtistFavoriteLabel));
+        OnPropertyChanged(nameof(AlbumFavoriteLabel));
     }
 
     private Task MediaChangedAsync(MediaChangedMessage message)
@@ -211,7 +307,7 @@ public sealed partial class ListeningViewModel : ObservableObject, IDisposable
     [RelayCommand]
     private void ArtistOpen()
     {
-        long? artistId = CurrentTrack?.Track.ArtistId;
+        long? artistId = HeaderTrack?.ArtistId;
         if (!artistId.HasValue)
             return;
 
@@ -221,7 +317,7 @@ public sealed partial class ListeningViewModel : ObservableObject, IDisposable
     [RelayCommand]
     private void AlbumOpen()
     {
-        long? albumId = CurrentTrack?.Track.AlbumId;
+        long? albumId = HeaderTrack?.AlbumId;
         if (!albumId.HasValue)
             return;
 
@@ -229,9 +325,39 @@ public sealed partial class ListeningViewModel : ObservableObject, IDisposable
     }
 
     [RelayCommand]
+    private void GenreOpen()
+    {
+        long? genreId = HeaderTrack?.GenreId;
+        if (!genreId.HasValue)
+            return;
+
+        _navigationService.NavigateToGenre(genreId.Value);
+    }
+
+    [RelayCommand]
+    private async Task ToggleArtistFavoriteAsync()
+    {
+        if (Artist is null)
+            return;
+
+        await Artist.ArtistFavoriteCommand.ExecuteAsync(null);
+        _stateManager.ExecuteOnUIThread(UpdateFavoriteLabels);
+    }
+
+    [RelayCommand]
+    private async Task ToggleAlbumFavoriteAsync()
+    {
+        if (Album is null)
+            return;
+
+        await Album.AlbumFavoriteCommand.ExecuteAsync(null);
+        _stateManager.ExecuteOnUIThread(UpdateFavoriteLabels);
+    }
+
+    [RelayCommand]
     private void TrackOpen()
     {
-        long? trackId = CurrentTrack?.Track.Id;
+        long? trackId = HeaderTrack?.Id;
         if (!trackId.HasValue)
             return;
 
@@ -242,6 +368,11 @@ public sealed partial class ListeningViewModel : ObservableObject, IDisposable
     {
         if (_disposed)
             return;
+
+        _playlistManager.PlaylistChanged -= OnPlaylistChanged;
+        _playlistManager.CurrentTrackChanged -= OnCurrentTrackChanged;
+        _playerSleepModeService.SleepTimerStateChanged -= OnSleepTimerStateChanged;
+        _sleepTimerTracker.RemainingMinutesChanged -= OnRemainingMinutesChanged;
 
         foreach (IDisposable subscription in _subscriptions)
             subscription.Dispose();

@@ -9,6 +9,7 @@ using Rok.Application.Player.Output;
 using Rok.Services;
 using Rok.ViewModels.Album;
 using Rok.ViewModels.Artist;
+using Rok.ViewModels.Listening.Services;
 using Rok.ViewModels.Player.Services;
 using Rok.ViewModels.Radio.Services;
 using Rok.ViewModels.Track;
@@ -84,6 +85,11 @@ public partial class PlayerViewModel : ObservableObject, IDisposable
 
     public bool IsSleepModeActive => _playerSleepModeService.IsSleepTimerActive;
     public int RemainingSleepTime => _playerSleepModeService.GetRemainingSleepTimeInSeconds();
+    public string SleepMenuLabel => ListeningHeaderLabels.SleepButton(
+        IsSleepModeActive,
+        RemainingSleepTime,
+        _resourceLoader.GetString("listeningSleepIdle"),
+        _resourceLoader.GetString("listeningSleepRemaining"));
 
     public bool RepeatAll
     {
@@ -332,7 +338,11 @@ public partial class PlayerViewModel : ObservableObject, IDisposable
             OnPropertyChanged(nameof(CurrentArtist));
     }
 
-    public void RefreshSleepTime() => OnPropertyChanged(nameof(RemainingSleepTime));
+    public void RefreshSleepTime()
+    {
+        OnPropertyChanged(nameof(RemainingSleepTime));
+        OnPropertyChanged(nameof(SleepMenuLabel));
+    }
 
     private void OnUpdateTimerTick(object? sender, EventArgs e)
     {
