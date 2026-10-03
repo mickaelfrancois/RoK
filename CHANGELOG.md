@@ -1,5 +1,34 @@
 ﻿# ChangeLog
 
+## [1.18.5] Store – 3 octobre 2026
+
+### Ajouté
+
+- Lecture des fichiers M4A/ALAC, AAC, WMA, WAV et AIFF, de l'import à la lecture (#421)
+- Lecture sans blanc entre les titres consécutifs d'un même album (#422)
+- Normalisation du volume ReplayGain, par titre, par album ou automatique (#425)
+- Choix du périphérique de sortie audio et mode WASAPI exclusif pour une lecture bit-perfect (#428)
+- Mode Mix : enchaînement des titres façon DJ, avec un fondu qui suit la musique (#434)
+- Mode Mix : échange des basses entre les deux titres pendant la transition (#440)
+- Mode Mix : détection du tempo et des temps de chaque titre (#441)
+- Mode Mix : transitions calées sur le temps (#442)
+- Mode Mix : départ de la transition sur une fin de phrase musicale ou un creux d'énergie (#444)
+- Mode Mix : le titre entrant est accéléré ou ralenti pour suivre le tempo du titre sortant, sans changer de hauteur (#448)
+
+### Modifié
+
+- Le mode Mix laisse la place à un fondu simple quand un titre live est en jeu (#447)
+- Nouvelle sortie audio WASAPI, plus stable lors des changements de périphérique (#430)
+
+### Corrigé
+
+- Les options sont toutes conservées au redémarrage de l'application (#427)
+- Les filtres enregistrés qui pointaient vers un genre ou un tag supprimé sont ignorés (#431)
+- Corrections issues des tests sur la sortie audio, l'actualisation de la bibliothèque, les options et le fondu enchaîné (#432)
+- Le titre affiché reste celui qui joue quand le titre suivant ne peut pas être ouvert pendant un fondu (#452)
+
+--
+
 ## [1.18.4] Store – 29 septembre 2026
 
 ### Ajouté
