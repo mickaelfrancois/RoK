@@ -401,7 +401,7 @@
 
                         <AppBarButton.Flyout>
                             <MenuFlyout Placement="Top" Opening="SleepFlyout_Opening">
-                                <MenuFlyoutItem IsEnabled="False" Text="{x:Bind ViewModel.RemainingSleepTime, Mode=OneWay, Converter={StaticResource SecondsToReadableConverter}}" Visibility="{x:Bind ViewModel.IsSleepModeActive, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" />
+                                <MenuFlyoutItem IsEnabled="False" Text="{x:Bind ViewModel.SleepMenuLabel, Mode=OneWay}" Visibility="{x:Bind ViewModel.IsSleepModeActive, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" />
                                 <MenuFlyoutItem x:Uid="playerSleepOff" Command="{x:Bind ViewModel.StopSleepTimerCommand}" Visibility="{x:Bind ViewModel.IsSleepModeActive, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">
                                     <MenuFlyoutItem.Icon>
                                         <SymbolIcon Symbol="Cancel" />
