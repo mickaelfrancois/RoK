@@ -39,11 +39,7 @@
                 <VisualState x:Name="WideHeader" />
                 <VisualState x:Name="NarrowHeader">
                     <VisualState.Setters>
-                        <Setter Target="headerActions.(Grid.Row)" Value="1" />
-                        <Setter Target="headerActions.(Grid.Column)" Value="1" />
-                        <Setter Target="headerActions.HorizontalAlignment" Value="Left" />
-                        <Setter Target="headerActions.Margin" Value="0,12,0,0" />
-                        <Setter Target="queueSummary.HorizontalAlignment" Value="Left" />
+                        <Setter Target="headerActions.Visibility" Value="Collapsed" />
                         <Setter Target="coverPicture.Width" Value="72" />
                         <Setter Target="coverPicture.Height" Value="72" />
                     </VisualState.Setters>
