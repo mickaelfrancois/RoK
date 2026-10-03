@@ -26,6 +26,19 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<Compile Include="..\..\..\tools\Rok.MetadataTool\ToolDatabase.cs" Link="Tools\ToolDatabase.cs" />
+		<Compile Include="..\..\..\tools\Rok.MetadataTool\RokInstanceProbe.cs" Link="Tools\RokInstanceProbe.cs" />
+		<Compile Include="..\..\..\tools\Rok.MetadataTool\MixScanDatabase.cs" Link="Tools\MixScanDatabase.cs" />
+		<Compile Include="..\..\..\tools\Rok.MetadataTool\MixScanTracks.cs" Link="Tools\MixScanTracks.cs" />
+		<Compile Include="..\..\..\tools\Rok.MetadataTool\MixScanSupport.cs" Link="Tools\MixScanSupport.cs" />
+		<Compile Include="..\..\..\tools\Rok.MetadataTool\MixScanCommand.cs" Link="Tools\MixScanCommand.cs" />
+		<Compile Include="..\..\..\tools\Rok.MetadataTool\MixScanner.cs" Link="Tools\MixScanner.cs" />
+		<Compile Include="..\..\..\tools\Rok.MetadataTool\MixScanOptions.cs" Link="Tools\MixScanOptions.cs" />
+		<Compile Include="..\..\..\tools\Rok.MetadataTool\MixScanReport.cs" Link="Tools\MixScanReport.cs" />
+		<Compile Include="..\..\..\tools\Rok.MetadataTool\MixPointStats.cs" Link="Tools\MixPointStats.cs" />
+	</ItemGroup>
+
+	<ItemGroup>
 		<Using Include="Xunit" />
 	</ItemGroup>
 
