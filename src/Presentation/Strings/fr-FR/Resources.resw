@@ -2397,4 +2397,31 @@
   <data name="artistSummaryAlbums" xml:space="preserve">
     <value>{0} albums</value>
   </data>
+  <data name="genreKicker.Text" xml:space="preserve">
+    <value>GENRE</value>
+  </data>
+  <data name="genreSortLabel.Text" xml:space="preserve">
+    <value>Trier par</value>
+  </data>
+  <data name="genreSortArtist.Text" xml:space="preserve">
+    <value>Artiste</value>
+  </data>
+  <data name="genreSortName.Text" xml:space="preserve">
+    <value>Nom de l'album</value>
+  </data>
+  <data name="genreSortYear.Text" xml:space="preserve">
+    <value>Année</value>
+  </data>
+  <data name="genreSortAdded.Text" xml:space="preserve">
+    <value>Date d'ajout</value>
+  </data>
+  <data name="genreSortListened.Text" xml:space="preserve">
+    <value>Les plus écoutés</value>
+  </data>
+  <data name="genreSummaryArtist" xml:space="preserve">
+    <value>{0} artiste</value>
+  </data>
+  <data name="genreSummaryArtists" xml:space="preserve">
+    <value>{0} artistes</value>
+  </data>
 </root>

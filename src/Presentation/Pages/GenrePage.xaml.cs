@@ -10,6 +10,8 @@ namespace Rok.Pages;
 
 public sealed partial class GenrePage : Page
 {
+    private const double NarrowHeaderThreshold = 800;
+
     public GenreViewModel ViewModel { get; set; }
     private readonly ILogger<GenrePage> _logger;
 
@@ -48,6 +50,23 @@ public sealed partial class GenrePage : Page
     {
         ViewModel.OnNavigatedFrom();
         base.OnNavigatedFrom(e);
+    }
+
+    private void Page_SizeChanged(object sender, SizeChangedEventArgs e)
+    {
+        ApplyHeaderLayout(e.NewSize.Width);
+    }
+
+    private void GenrePage_Loaded(object sender, RoutedEventArgs e)
+    {
+        ApplyHeaderLayout(ActualWidth);
+    }
+
+    private void ApplyHeaderLayout(double width)
+    {
+        string state = width < NarrowHeaderThreshold ? "NarrowHeader" : "WideHeader";
+
+        VisualStateManager.GoToState(this, state, true);
     }
 
     private void grid_ContainerContentChanging(ListViewBase sender, ContainerContentChangingEventArgs args)

@@ -2398,4 +2398,31 @@
   <data name="artistSummaryAlbums" xml:space="preserve">
     <value>{0} albums</value>
   </data>
+  <data name="genreKicker.Text" xml:space="preserve">
+    <value>GENRE</value>
+  </data>
+  <data name="genreSortLabel.Text" xml:space="preserve">
+    <value>Sort by</value>
+  </data>
+  <data name="genreSortArtist.Text" xml:space="preserve">
+    <value>Artist</value>
+  </data>
+  <data name="genreSortName.Text" xml:space="preserve">
+    <value>Album name</value>
+  </data>
+  <data name="genreSortYear.Text" xml:space="preserve">
+    <value>Year</value>
+  </data>
+  <data name="genreSortAdded.Text" xml:space="preserve">
+    <value>Date added</value>
+  </data>
+  <data name="genreSortListened.Text" xml:space="preserve">
+    <value>Most listened</value>
+  </data>
+  <data name="genreSummaryArtist" xml:space="preserve">
+    <value>{0} artist</value>
+  </data>
+  <data name="genreSummaryArtists" xml:space="preserve">
+    <value>{0} artists</value>
+  </data>
 </root>

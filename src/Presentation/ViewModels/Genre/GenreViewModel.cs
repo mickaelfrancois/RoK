@@ -1,4 +1,5 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+﻿using System.Globalization;
+using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Rok.Application.Player;
 using Rok.Application.Randomizer;
@@ -6,6 +7,7 @@ using Rok.ViewModels.Album;
 using Rok.ViewModels.Artist.Services;
 using Rok.ViewModels.Common;
 using Rok.ViewModels.Genre.Services;
+using Rok.ViewModels.Listening.Services;
 
 namespace Rok.ViewModels.Genre;
 
@@ -37,6 +39,8 @@ public partial class GenreViewModel : ObservableObject
             {
                 OnPropertyChanged(nameof(SubTitle));
                 OnPropertyChanged(nameof(IsFavorite));
+                OnPropertyChanged(nameof(HeaderSummary));
+                OnPropertyChanged(nameof(GenreFavoriteLabel));
             }
         }
     }
@@ -48,6 +52,7 @@ public partial class GenreViewModel : ObservableObject
     [NotifyPropertyChangedFor(nameof(HasNoAlbums))]
     [NotifyCanExecuteChangedFor(nameof(ListenCommand))]
     [NotifyCanExecuteChangedFor(nameof(GenreFavoriteCommand))]
+    [NotifyCanExecuteChangedFor(nameof(SortAlbumsCommand))]
     public partial DetailLoadState LoadState { get; set; } = DetailLoadState.Loading;
 
     public bool IsNotFound => LoadState == DetailLoadState.NotFound;
@@ -145,6 +150,29 @@ public partial class GenreViewModel : ObservableObject
             return label;
         }
     }
+
+    /// <summary>Artist, album and track counts, rendered with the same localized formats as the other headers.</summary>
+    public string HeaderSummary
+    {
+        get
+        {
+            List<string> parts = [];
+
+            if (Genre.ArtistCount > 0)
+                parts.Add(string.Format(CultureInfo.CurrentCulture, _resourceLoader.GetString(Genre.ArtistCount == 1 ? "genreSummaryArtist" : "genreSummaryArtists"), Genre.ArtistCount));
+
+            if (Genre.AlbumCount > 0)
+                parts.Add(string.Format(CultureInfo.CurrentCulture, _resourceLoader.GetString(Genre.AlbumCount == 1 ? "artistSummaryAlbum" : "artistSummaryAlbums"), Genre.AlbumCount));
+
+            if (Genre.TrackCount > 0)
+                parts.Add(string.Format(CultureInfo.CurrentCulture, _resourceLoader.GetString(Genre.TrackCount == 1 ? "listeningSummaryTrack" : "listeningSummaryTracks"), Genre.TrackCount));
+
+            return string.Join(" · ", parts);
+        }
+    }
+
+    public string GenreFavoriteLabel => ListeningHeaderLabels.FavoriteToggle(
+        Genre.Name, IsFavorite, _resourceLoader.GetString("listeningFavoriteAdd"), _resourceLoader.GetString("listeningFavoriteRemove"));
 
     public string ListenStats
     {
@@ -248,7 +276,10 @@ public partial class GenreViewModel : ObservableObject
         Albums.InitWithAddRange(albums);
         OnPropertyChanged(nameof(HasNoAlbums));
 
-        string? artistName = GenreArtistPicker.PickArtistName(albums.Select(a => a.Album.ArtistName), Random.Shared);
+        IReadOnlyList<string> rankedArtists = GenreArtistPicker.RankByListens(albums.Select(a => ((string?)a.Album.ArtistName, a.Album.ListenCount)));
+
+        // The most listened artist illustrates the genre; a few runners-up are tried when it has no picture.
+        string? artistName = rankedArtists.Take(5).FirstOrDefault(_pictureService.PictureExists) ?? rankedArtists.FirstOrDefault();
 
         if (artistName is null)
             return;
@@ -288,11 +319,21 @@ public partial class GenreViewModel : ObservableObject
     }
 
     [RelayCommand(CanExecute = nameof(IsEntityLoaded))]
+    private void SortAlbums(string? sort)
+    {
+        if (!Enum.TryParse(sort, ignoreCase: true, out GenreAlbumSort parsed) || !Enum.IsDefined(parsed))
+            return;
+
+        Albums.InitWithAddRange(GenreAlbumSorter.Sort(Albums.ToList(), album => album.Album, parsed));
+    }
+
+    [RelayCommand(CanExecute = nameof(IsEntityLoaded))]
     private async Task GenreFavoriteAsync()
     {
         bool newFavoriteState = !Genre.IsFavorite;
         await _editService.UpdateFavoriteAsync(Genre, newFavoriteState);
 
         OnPropertyChanged(nameof(IsFavorite));
+        OnPropertyChanged(nameof(GenreFavoriteLabel));
     }
 }
