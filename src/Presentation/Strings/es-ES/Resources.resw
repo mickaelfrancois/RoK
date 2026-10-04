@@ -2230,4 +2230,70 @@
   <data name="artistSummaryAlbums" xml:space="preserve">
     <value>{0} álbumes</value>
   </data>
+  <data name="genreKicker.Text" xml:space="preserve">
+    <value>GÉNERO</value>
+  </data>
+  <data name="genreSortLabel.Text" xml:space="preserve">
+    <value>Ordenar por</value>
+  </data>
+  <data name="genreSortArtist.Text" xml:space="preserve">
+    <value>Artista</value>
+  </data>
+  <data name="genreSortName.Text" xml:space="preserve">
+    <value>Nombre del álbum</value>
+  </data>
+  <data name="genreSortYear.Text" xml:space="preserve">
+    <value>Año</value>
+  </data>
+  <data name="genreSortAdded.Text" xml:space="preserve">
+    <value>Fecha de añadido</value>
+  </data>
+  <data name="genreSortListened.Text" xml:space="preserve">
+    <value>Más escuchados</value>
+  </data>
+  <data name="genreSummaryArtist" xml:space="preserve">
+    <value>{0} artista</value>
+  </data>
+  <data name="genreSummaryArtists" xml:space="preserve">
+    <value>{0} artistas</value>
+  </data>
+  <data name="playlistKicker.Text" xml:space="preserve">
+    <value>LISTA</value>
+  </data>
+  <data name="smartPlaylistKicker.Text" xml:space="preserve">
+    <value>LISTA INTELIGENTE</value>
+  </data>
+  <data name="playlistRefreshText.Text" xml:space="preserve">
+    <value>Actualizar</value>
+  </data>
+  <data name="playlistMenuShuffleOrder.Text" xml:space="preserve">
+    <value>Mezclar el orden</value>
+  </data>
+  <data name="playlistMenuExport.Text" xml:space="preserve">
+    <value>Exportar</value>
+  </data>
+  <data name="playlistMenuDelete.Text" xml:space="preserve">
+    <value>Eliminar</value>
+  </data>
+  <data name="trackKicker.Text" xml:space="preserve">
+    <value>CANCIÓN</value>
+  </data>
+  <data name="trackSectionListening.Text" xml:space="preserve">
+    <value>Reproducción</value>
+  </data>
+  <data name="trackSectionFile.Text" xml:space="preserve">
+    <value>Archivo</value>
+  </data>
+  <data name="playlistShuffleOnPlaySwitch.OnContent" xml:space="preserve">
+    <value>Reproducción aleatoria</value>
+  </data>
+  <data name="playlistShuffleOnPlaySwitch.OffContent" xml:space="preserve">
+    <value>Reproducción aleatoria</value>
+  </data>
+  <data name="playlistRefreshOnPlaySwitch.OnContent" xml:space="preserve">
+    <value>Actualizar al reproducir</value>
+  </data>
+  <data name="playlistRefreshOnPlaySwitch.OffContent" xml:space="preserve">
+    <value>Actualizar al reproducir</value>
+  </data>
 </root>

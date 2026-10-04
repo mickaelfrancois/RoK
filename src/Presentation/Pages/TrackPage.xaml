@@ -7,12 +7,14 @@
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
       xmlns:winui="using:Microsoft.UI.Xaml.Controls"
+      Loaded="TrackPage_Loaded"
+      SizeChanged="Page_SizeChanged"
       mc:Ignorable="d"
       Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition x:Name="headerRow" Height="150" />
+            <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
@@ -20,87 +22,150 @@
             <SolidColorBrush Color="{ThemeResource CardBackgroundFillColorDefault}" Opacity="{StaticResource HeaderBackgroundOpacity}" />
         </Grid.Background>
 
+        <VisualStateManager.VisualStateGroups>
+            <VisualStateGroup x:Name="HeaderLayoutStates">
+                <VisualState x:Name="WideHeader" />
+                <VisualState x:Name="NarrowHeader">
+                    <VisualState.Setters>
+                        <Setter Target="headerGrid.Padding" Value="12,8,12,8" />
+                        <Setter Target="kickerText.Visibility" Value="Collapsed" />
+                        <Setter Target="summaryText.Visibility" Value="Collapsed" />
+                        <Setter Target="coverPicture.Width" Value="72" />
+                        <Setter Target="coverPicture.Height" Value="72" />
+                        <Setter Target="infoGrid.RowSpacing" Value="24" />
+                        <Setter Target="fileSection.(Grid.Row)" Value="1" />
+                        <Setter Target="fileSection.(Grid.Column)" Value="0" />
+                        <Setter Target="fileSection.(Grid.ColumnSpan)" Value="2" />
+                        <Setter Target="listeningSection.(Grid.ColumnSpan)" Value="2" />
+                    </VisualState.Setters>
+                </VisualState>
+            </VisualStateGroup>
+        </VisualStateManager.VisualStateGroups>
+
         <Image x:Name="backdrop" Grid.RowSpan="2" Source="{x:Bind ViewModel.Backdrop,Mode=OneWay}" Opacity="{StaticResource HeaderBackdropOpacity}" Style="{StaticResource HeaderBackdropStyle}" Stretch="UniformToFill" IsHitTestVisible="False" />
 
         <!-- Header -->
-        <StackPanel Grid.Row="0" Orientation="Vertical" Padding="6" Spacing="4">
-            <TextBlock x:Uid="trackTitle" x:Name="trackTitle" Text="{x:Bind ViewModel.Track.Title}" FontSize="{StaticResource FontSizeLarge}" FontWeight="Bold" Foreground="{ThemeResource BrandAccentBrush}" />
+        <Grid x:Name="headerGrid" Padding="16,10,16,10" ColumnSpacing="{StaticResource SpacingMedium}">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
 
-            <StackPanel Orientation="Horizontal">
-                <TextBlock x:Uid="genByLabel" FontSize="{StaticResource FontSizeMedium}" Margin="0,0,6,0" />
-                <HyperlinkButton x:Name="artistName" Content="{x:Bind ViewModel.ArtistName, Mode=OneWay}" Command="{x:Bind ViewModel.ArtistOpenCommand}" FontSize="{StaticResource FontSizeMedium}" FontWeight="SemiBold" Padding="0" Style="{StaticResource HeaderHyperlinkStyle}" />
+            <!-- Album cover -->
+            <Grid VerticalAlignment="Top" Margin="0" Style="{StaticResource HeaderPictureGridStyle}">
+                <common:PictureControl x:Name="coverPicture" Width="160" Height="160" Style="{StaticResource HeaderPictureStyle}" />
+            </Grid>
+
+            <!-- Infos -->
+            <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="4">
+                <TextBlock x:Name="kickerText" x:Uid="trackKicker" Style="{StaticResource CaptionTextBlockStyle}" FontWeight="SemiBold" CharacterSpacing="80" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+
+                <TextBlock Style="{StaticResource HeaderTitleTextStyle}" Text="{x:Bind ViewModel.Track.Title, Mode=OneWay}" MaxLines="2" TextWrapping="Wrap" TextTrimming="CharacterEllipsis" />
+
+                <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingSmall}">
+                    <TextBlock x:Uid="genByLabel" VerticalAlignment="Center" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                    <HyperlinkButton Content="{x:Bind ViewModel.ArtistName, Mode=OneWay}" Command="{x:Bind ViewModel.ArtistOpenCommand}" FontSize="{StaticResource FontSizeMedium}" FontWeight="SemiBold" Padding="0" Style="{StaticResource HeaderHyperlinkStyle}" />
+                    <TextBlock x:Uid="genOnLabel" VerticalAlignment="Center" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                    <HyperlinkButton Content="{x:Bind ViewModel.AlbumName, Mode=OneWay}" Command="{x:Bind ViewModel.AlbumOpenCommand}" FontSize="{StaticResource FontSizeMedium}" Padding="0" Style="{StaticResource HeaderHyperlinkStyle}" />
+                </StackPanel>
+
+                <TextBlock x:Name="summaryText" Text="{x:Bind ViewModel.HeaderSummary, Mode=OneWay}" Style="{StaticResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+
+                <!-- Actions -->
+                <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingSmall}" Margin="0,6,0,0">
+                    <AppBarButton x:Uid="albumViewListen" Style="{StaticResource ListenAppBarButtonStyle}" Width="Auto" MinWidth="0" Command="{x:Bind ViewModel.ListenCommand}" />
+
+                    <Button>
+                        <StackPanel Orientation="Horizontal" Spacing="6">
+                            <SymbolIcon Symbol="Add" />
+                            <TextBlock x:Uid="albumAddToPlaylistText" VerticalAlignment="Center" />
+                        </StackPanel>
+                        <Button.Flyout>
+                            <MenuFlyout x:Name="albumPlaylistFlyout" common:MenuFlyoutExtensions.PlaylistMenuService="{x:Bind ViewModel.PlaylistMenuService}" common:MenuFlyoutExtensions.TrackId="{x:Bind ViewModel.Track.Id, Mode=OneWay}" common:MenuFlyoutExtensions.FlattenPlaylistMenu="True" />
+                        </Button.Flyout>
+                    </Button>
+
+                    <common:RatingControlLightControl Style="{StaticResource GridTracksScoreStyle}" HorizontalAlignment="Left" Margin="8,0,0,0" RatingValue="{x:Bind ViewModel.Score, Mode=TwoWay}" />
+                </StackPanel>
             </StackPanel>
+        </Grid>
 
-            <StackPanel Orientation="Horizontal">
-                <TextBlock x:Uid="genOnLabel" FontSize="{StaticResource FontSizeXMedium}" Margin="0,0,6,0" />
-                <HyperlinkButton x:Name="albumName" Content="{x:Bind ViewModel.AlbumName, Mode=OneWay}" Command="{x:Bind ViewModel.AlbumOpenCommand}" FontSize="{StaticResource FontSizeXMedium}" FontStyle="Italic" Padding="0" Style="{StaticResource HeaderHyperlinkStyle}" />
-            </StackPanel>
-
-            <CommandBar Style="{StaticResource HeaderCommandBarStyle}" HorizontalAlignment="Left">
-                <AppBarButton x:Uid="albumViewListen" Style="{StaticResource ListenAppBarButtonStyle}" Command="{x:Bind ViewModel.ListenCommand}" Margin="0,0,8,0" />
-                <AppBarButton x:Uid="albumViewPlaylist" Style="{StaticResource HeaderGenericButtonStyle}" Icon="Add">
-                    <AppBarButton.Flyout>
-                        <MenuFlyout x:Name="albumPlaylistFlyout" common:MenuFlyoutExtensions.PlaylistMenuService="{x:Bind ViewModel.PlaylistMenuService}" common:MenuFlyoutExtensions.TrackId="{x:Bind ViewModel.Track.Id}" common:MenuFlyoutExtensions.FlattenPlaylistMenu="True" />
-                    </AppBarButton.Flyout>
-                </AppBarButton>
-            </CommandBar>
-        </StackPanel>
-
-        
         <!-- Content -->
-        <Grid Grid.Row="1" Style="{StaticResource FileGridStyle}" Padding="10">
-            <StackPanel>
-                <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingLarge}">
-                    <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingSmall}">
-                        <SymbolIcon Symbol="Audio" Foreground="{ThemeResource BrandAccentBrush}" />
-                        <TextBlock Text="{x:Bind ViewModel.BitrateStr}" />
-                    </StackPanel>
-                    <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingSmall}">
-                        <SymbolIcon Symbol="Save" Foreground="{ThemeResource BrandAccentBrush}" />
-                        <TextBlock Text="{x:Bind ViewModel.SizeStr}" />
-                    </StackPanel>
-                    <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingSmall}">
-                        <FontIcon Glyph="&#xE823;" Foreground="{ThemeResource BrandAccentBrush}" />
-                        <TextBlock Text="{x:Bind ViewModel.DurationStr}" />
-                    </StackPanel>
-                    <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingSmall}" Visibility="{x:Bind ViewModel.Score, Converter={StaticResource IntToVisibilityConverter}}">
-                        <SymbolIcon Symbol="SolidStar" Foreground="{ThemeResource BrandAccentBrush}" />
-                        <TextBlock Text="{x:Bind ViewModel.Score}" />
-                    </StackPanel>
+        <Grid Grid.Row="1" Style="{StaticResource FileGridStyle}" Padding="24">
+            <Grid x:Name="infoGrid" ColumnSpacing="48" VerticalAlignment="Top">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+
+                <!-- Listening -->
+                <StackPanel x:Name="listeningSection" Spacing="10">
+                    <TextBlock x:Uid="trackSectionListening" Style="{ThemeResource BodyStrongTextBlockStyle}" />
+
+                    <Grid ColumnSpacing="12">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="170" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock x:Uid="trackListenCountLabel" Foreground="{ThemeResource TextFillColorSecondaryBrush}" TextWrapping="Wrap" />
+                        <TextBlock Grid.Column="1" Text="{x:Bind ViewModel.ListenCountText, Mode=OneWay}" IsTextSelectionEnabled="True" TextWrapping="Wrap" />
+                    </Grid>
+
+                    <Grid ColumnSpacing="12">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="170" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock x:Uid="trackLastListenLabel" Foreground="{ThemeResource TextFillColorSecondaryBrush}" TextWrapping="Wrap" />
+                        <TextBlock Grid.Column="1" Text="{x:Bind ViewModel.LastListenText, Mode=OneWay}" IsTextSelectionEnabled="True" TextWrapping="Wrap" />
+                    </Grid>
+
+                    <Grid ColumnSpacing="12">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="170" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock x:Uid="trackSkipCountLabel" Foreground="{ThemeResource TextFillColorSecondaryBrush}" TextWrapping="Wrap" />
+                        <TextBlock Grid.Column="1" Text="{x:Bind ViewModel.SkipCountText, Mode=OneWay}" IsTextSelectionEnabled="True" TextWrapping="Wrap" />
+                    </Grid>
+
+                    <Grid ColumnSpacing="12">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="170" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock x:Uid="trackLastSkipLabel" Foreground="{ThemeResource TextFillColorSecondaryBrush}" TextWrapping="Wrap" />
+                        <TextBlock Grid.Column="1" Text="{x:Bind ViewModel.LastSkipText, Mode=OneWay}" IsTextSelectionEnabled="True" TextWrapping="Wrap" />
+                    </Grid>
                 </StackPanel>
 
-                <StackPanel Margin="0,16,0,0">
-                    <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
-                        <TextBlock x:Uid="trackListenCountLabel" VerticalAlignment="Center" Margin="0,0,6,0" />
-                        <TextBlock Text="{x:Bind ViewModel.Track.ListenCount, Mode=OneWay}" VerticalAlignment="Center" />
-                    </StackPanel>
+                <!-- File -->
+                <StackPanel x:Name="fileSection" Grid.Column="1" Spacing="10">
+                    <TextBlock x:Uid="trackSectionFile" Style="{ThemeResource BodyStrongTextBlockStyle}" />
 
-                    <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
-                        <TextBlock x:Uid="trackLastListenLabel" VerticalAlignment="Center" Margin="0,0,6,0" />
-                        <TextBlock Text="{x:Bind ViewModel.Track.LastListen, Mode=OneWay}" VerticalAlignment="Center" />
-                    </StackPanel>
+                    <Grid ColumnSpacing="12">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="170" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock x:Uid="trackStorageLabel" Foreground="{ThemeResource TextFillColorSecondaryBrush}" TextWrapping="Wrap" />
+                        <TextBlock Grid.Column="1" Text="{x:Bind ViewModel.Track.MusicFile, Mode=OneWay}" IsTextSelectionEnabled="True" TextWrapping="Wrap" />
+                    </Grid>
 
-                    <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
-                        <TextBlock x:Uid="trackSkipCountLabel" VerticalAlignment="Center" Margin="0,0,6,0" />
-                        <TextBlock Text="{x:Bind ViewModel.Track.SkipCount, Mode=OneWay}" VerticalAlignment="Center" />
-                    </StackPanel>
-
-                    <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
-                        <TextBlock x:Uid="trackLastSkipLabel" VerticalAlignment="Center" Margin="0,0,6,0" />
-                        <TextBlock Text="{x:Bind ViewModel.Track.LastSkip, Mode=OneWay}" VerticalAlignment="Center" />
-                    </StackPanel>
-
-                    <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
-                        <TextBlock x:Uid="trackMusicBrainzIdLabel" VerticalAlignment="Center" Margin="0,0,6,0" />
-                        <TextBlock Text="{x:Bind ViewModel.Track.MusicBrainzID, Mode=OneWay}" VerticalAlignment="Center" />
-                    </StackPanel>
-
-                    <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
-                        <TextBlock x:Uid="trackStorageLabel" VerticalAlignment="Center" Margin="0,0,6,0" />
-                        <TextBlock Text="{x:Bind ViewModel.Track.MusicFile, Mode=OneWay}" VerticalAlignment="Center" />
-                    </StackPanel>
+                    <Grid ColumnSpacing="12">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="170" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock x:Uid="trackMusicBrainzIdLabel" Foreground="{ThemeResource TextFillColorSecondaryBrush}" TextWrapping="Wrap" />
+                        <TextBlock Grid.Column="1" Text="{x:Bind ViewModel.MusicBrainzIdText, Mode=OneWay}" IsTextSelectionEnabled="True" TextWrapping="Wrap" />
+                    </Grid>
                 </StackPanel>
-            </StackPanel>
+            </Grid>
         </Grid>
     </Grid>
 </Page>

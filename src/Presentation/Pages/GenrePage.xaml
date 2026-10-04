@@ -8,13 +8,15 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:common="using:Rok.Commons"
     xmlns:albums="using:Rok.ViewModels.Album"
+    Loaded="GenrePage_Loaded"
+    SizeChanged="Page_SizeChanged"
     mc:Ignorable="d"
     x:Name="genrePage"
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition x:Name="headerRow" Height="{StaticResource HeaderRowHeight}" />
+            <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
@@ -22,28 +24,73 @@
             <SolidColorBrush Color="{ThemeResource CardBackgroundFillColorDefault}" Opacity="{StaticResource HeaderBackgroundOpacity}" />
         </Grid.Background>
 
+        <VisualStateManager.VisualStateGroups>
+            <VisualStateGroup x:Name="HeaderLayoutStates">
+                <VisualState x:Name="WideHeader" />
+                <VisualState x:Name="NarrowHeader">
+                    <VisualState.Setters>
+                        <Setter Target="headerGrid.Padding" Value="12,8,12,8" />
+                        <Setter Target="kickerText.Visibility" Value="Collapsed" />
+                        <Setter Target="summaryText.Visibility" Value="Collapsed" />
+                        <Setter Target="genrePicture.Width" Value="72" />
+                        <Setter Target="genrePicture.Height" Value="72" />
+                    </VisualState.Setters>
+                </VisualState>
+            </VisualStateGroup>
+        </VisualStateManager.VisualStateGroups>
+
         <Image x:Name="backdrop" Grid.RowSpan="2" Style="{StaticResource HeaderBackdropStyle}" Source="{x:Bind ViewModel.Backdrop,Mode=OneWay}" Stretch="UniformToFill" IsHitTestVisible="False" />
 
         <!-- Header -->
-        <Grid Padding="2">
+        <Grid x:Name="headerGrid" Padding="16,10,16,10" ColumnSpacing="{StaticResource SpacingMedium}">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition x:Name="pictureColumn" Width="{StaticResource HeaderPictureColumnWidth}" />
+                <ColumnDefinition Width="Auto" />
                 <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
 
-            <Grid Style="{StaticResource HeaderPictureGridStyle}">
-                <common:PictureControl x:Name="artistPicture" Style="{StaticResource HeaderPictureStyle}" Cover="{x:Bind ViewModel.Picture, Mode=OneWay}" />
+            <!-- Picture of the most listened artist of the genre -->
+            <Grid VerticalAlignment="Top" Margin="0" Style="{StaticResource HeaderPictureGridStyle}">
+                <common:PictureControl x:Name="genrePicture" Width="160" Height="160" Style="{StaticResource HeaderPictureStyle}" Cover="{x:Bind ViewModel.Picture, Mode=OneWay}" />
             </Grid>
 
-            <RelativePanel Grid.Column="1" Margin="6,0,0,0">
-                <TextBlock x:Name="genreName" Style="{StaticResource HeaderTitleTextStyle}" Text="{x:Bind ViewModel.Genre.Name, Mode=OneWay}" />
-                <TextBlock x:Name="panelExtendedInfo" Style="{StaticResource HeaderTextStyle}" RelativePanel.Below="genreName" Text="{x:Bind ViewModel.SubTitle}" />
+            <!-- Infos -->
+            <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="4">
+                <TextBlock x:Name="kickerText" x:Uid="genreKicker" Style="{StaticResource CaptionTextBlockStyle}" FontWeight="SemiBold" CharacterSpacing="80" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
 
-                <CommandBar  RelativePanel.AlignBottomWithPanel="True" RelativePanel.AlignLeftWith="genreName" Style="{StaticResource HeaderCommandBarStyle}">
-                    <AppBarButton x:Uid="albumViewListen" Style="{StaticResource ListenAppBarButtonStyle}" Command="{x:Bind ViewModel.ListenCommand}" />
-                    <AppBarToggleButton x:Uid="albumViewLike" x:Name="genreAppBarLike" Style="{StaticResource HeaderLikeButtonStyle}" IsChecked="{x:Bind ViewModel.IsFavorite, Mode=OneWay}" Command="{x:Bind ViewModel.GenreFavoriteCommand}" />
-                </CommandBar>
-            </RelativePanel>
+                <TextBlock Style="{StaticResource HeaderTitleTextStyle}" Text="{x:Bind ViewModel.Genre.Name, Mode=OneWay}" MaxLines="2" TextWrapping="Wrap" TextTrimming="CharacterEllipsis" />
+
+                <TextBlock x:Name="summaryText" Text="{x:Bind ViewModel.HeaderSummary, Mode=OneWay}" Style="{StaticResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+
+                <!-- Actions -->
+                <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingSmall}" Margin="0,6,0,0">
+                    <AppBarButton x:Uid="albumViewListen" Style="{StaticResource ListenAppBarButtonStyle}" Width="Auto" MinWidth="0" Command="{x:Bind ViewModel.ListenCommand}" />
+
+                    <Button Command="{x:Bind ViewModel.GenreFavoriteCommand}"
+                            ToolTipService.ToolTip="{x:Bind ViewModel.GenreFavoriteLabel, Mode=OneWay}"
+                            AutomationProperties.Name="{x:Bind ViewModel.GenreFavoriteLabel, Mode=OneWay}">
+                        <StackPanel Orientation="Horizontal" Spacing="6">
+                            <Path Data="{StaticResource HeartPath}" Fill="{x:Bind ViewModel.IsFavorite, Converter={StaticResource FavoriteToColorConverter}, Mode=OneWay}" Stretch="Uniform" Width="16" Height="16" VerticalAlignment="Center" />
+                            <TextBlock x:Uid="albumFavoriteText" VerticalAlignment="Center" />
+                        </StackPanel>
+                    </Button>
+
+                    <DropDownButton>
+                        <StackPanel Orientation="Horizontal" Spacing="6">
+                            <FontIcon Glyph="&#xE8CB;" FontSize="16" />
+                            <TextBlock x:Uid="genreSortLabel" VerticalAlignment="Center" />
+                        </StackPanel>
+                        <DropDownButton.Flyout>
+                            <MenuFlyout Placement="Bottom">
+                                <RadioMenuFlyoutItem x:Uid="genreSortArtist" GroupName="GenreSort" Command="{x:Bind ViewModel.SortAlbumsCommand}" CommandParameter="Artist" />
+                                <RadioMenuFlyoutItem x:Uid="genreSortName" GroupName="GenreSort" Command="{x:Bind ViewModel.SortAlbumsCommand}" CommandParameter="Name" />
+                                <RadioMenuFlyoutItem x:Uid="genreSortYear" GroupName="GenreSort" Command="{x:Bind ViewModel.SortAlbumsCommand}" CommandParameter="Year" />
+                                <RadioMenuFlyoutItem x:Uid="genreSortAdded" GroupName="GenreSort" Command="{x:Bind ViewModel.SortAlbumsCommand}" CommandParameter="DateAdded" />
+                                <RadioMenuFlyoutItem x:Uid="genreSortListened" GroupName="GenreSort" Command="{x:Bind ViewModel.SortAlbumsCommand}" CommandParameter="MostListened" />
+                            </MenuFlyout>
+                        </DropDownButton.Flyout>
+                    </DropDownButton>
+                </StackPanel>
+            </StackPanel>
         </Grid>
 
         <!-- Content -->

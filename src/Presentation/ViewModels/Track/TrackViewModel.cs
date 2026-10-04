@@ -1,4 +1,5 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+﻿using System.Globalization;
+using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.UI.Dispatching;
 using Rok.Application.Dto.Lyrics;
@@ -107,6 +108,19 @@ public partial class TrackViewModel : ObservableObject, IDisposable, IFilterable
             return time.Hours > 0 ? time.ToString(@"h\:mm\:ss") : time.ToString(@"mm\:ss");
         }
     }
+
+    /// <summary>Duration, bitrate and size on one line, skipping what the file does not tell.</summary>
+    public string HeaderSummary => TrackDetailFormatter.JoinSummary(DurationStr, BitrateStr, SizeStr);
+
+    public string ListenCountText => Track.ListenCount.ToString(CultureInfo.CurrentCulture);
+
+    public string LastListenText => TrackDetailFormatter.FormatDate(Track.LastListen, CultureInfo.CurrentCulture);
+
+    public string SkipCountText => Track.SkipCount.ToString(CultureInfo.CurrentCulture);
+
+    public string LastSkipText => TrackDetailFormatter.FormatDate(Track.LastSkip, CultureInfo.CurrentCulture);
+
+    public string MusicBrainzIdText => TrackDetailFormatter.FormatOptional(Track.MusicBrainzID);
 
     public int? TrackNumber => Track.TrackNumber;
 

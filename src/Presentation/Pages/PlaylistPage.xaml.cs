@@ -6,6 +6,8 @@ namespace Rok.Pages;
 
 public sealed partial class PlaylistPage : Page
 {
+    private const double NarrowHeaderThreshold = 800;
+
     public PlaylistViewModel ViewModel { get; set; }
     private readonly ResourceLoader _resourceLoader;
     private readonly ILogger<PlaylistPage> _logger;
@@ -22,21 +24,41 @@ public sealed partial class PlaylistPage : Page
 
     protected override async void OnNavigatedTo(NavigationEventArgs e)
     {
+        base.OnNavigatedTo(e);
+
         if (e.Parameter is not PlaylistOpenArgs options)
-            throw new ArgumentNullException(nameof(e), "PlaylistOpenArgs cannot be null");
+        {
+            _logger.LogError("Navigation to PlaylistPage without PlaylistOpenArgs (received {ParameterType})", e.Parameter?.GetType().Name ?? "null");
+            return;
+        }
 
         try
         {
             if (options.PlaylistId.HasValue)
                 await ViewModel.LoadDataAsync(options.PlaylistId.Value);
-
-            base.OnNavigatedTo(e);
         }
         catch (OperationCanceledException) { }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Navigation to PlaylistPage failed");
         }
+    }
+
+    private void Page_SizeChanged(object sender, SizeChangedEventArgs e)
+    {
+        ApplyHeaderLayout(e.NewSize.Width);
+    }
+
+    private void PlaylistPage_Loaded(object sender, RoutedEventArgs e)
+    {
+        ApplyHeaderLayout(ActualWidth);
+    }
+
+    private void ApplyHeaderLayout(double width)
+    {
+        string state = width < NarrowHeaderThreshold ? "NarrowHeader" : "WideHeader";
+
+        VisualStateManager.GoToState(this, state, true);
     }
 
     private async void DeleteButton_Click(object sender, RoutedEventArgs e)

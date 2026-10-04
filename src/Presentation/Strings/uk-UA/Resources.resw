@@ -2288,4 +2288,70 @@
   <data name="artistSummaryAlbums" xml:space="preserve">
     <value>{0} альбомів</value>
   </data>
+  <data name="genreKicker.Text" xml:space="preserve">
+    <value>ЖАНР</value>
+  </data>
+  <data name="genreSortLabel.Text" xml:space="preserve">
+    <value>Сортувати за</value>
+  </data>
+  <data name="genreSortArtist.Text" xml:space="preserve">
+    <value>Виконавець</value>
+  </data>
+  <data name="genreSortName.Text" xml:space="preserve">
+    <value>Назва альбому</value>
+  </data>
+  <data name="genreSortYear.Text" xml:space="preserve">
+    <value>Рік</value>
+  </data>
+  <data name="genreSortAdded.Text" xml:space="preserve">
+    <value>Дата додавання</value>
+  </data>
+  <data name="genreSortListened.Text" xml:space="preserve">
+    <value>Найпрослуховуваніші</value>
+  </data>
+  <data name="genreSummaryArtist" xml:space="preserve">
+    <value>{0} виконавець</value>
+  </data>
+  <data name="genreSummaryArtists" xml:space="preserve">
+    <value>{0} виконавців</value>
+  </data>
+  <data name="playlistKicker.Text" xml:space="preserve">
+    <value>ПЛЕЙЛИСТ</value>
+  </data>
+  <data name="smartPlaylistKicker.Text" xml:space="preserve">
+    <value>РОЗУМНИЙ ПЛЕЙЛИСТ</value>
+  </data>
+  <data name="playlistRefreshText.Text" xml:space="preserve">
+    <value>Оновити</value>
+  </data>
+  <data name="playlistMenuShuffleOrder.Text" xml:space="preserve">
+    <value>Перемішати порядок</value>
+  </data>
+  <data name="playlistMenuExport.Text" xml:space="preserve">
+    <value>Експортувати</value>
+  </data>
+  <data name="playlistMenuDelete.Text" xml:space="preserve">
+    <value>Видалити</value>
+  </data>
+  <data name="trackKicker.Text" xml:space="preserve">
+    <value>ТРЕК</value>
+  </data>
+  <data name="trackSectionListening.Text" xml:space="preserve">
+    <value>Прослуховування</value>
+  </data>
+  <data name="trackSectionFile.Text" xml:space="preserve">
+    <value>Файл</value>
+  </data>
+  <data name="playlistShuffleOnPlaySwitch.OnContent" xml:space="preserve">
+    <value>Випадкове відтворення</value>
+  </data>
+  <data name="playlistShuffleOnPlaySwitch.OffContent" xml:space="preserve">
+    <value>Випадкове відтворення</value>
+  </data>
+  <data name="playlistRefreshOnPlaySwitch.OnContent" xml:space="preserve">
+    <value>Оновлювати під час відтворення</value>
+  </data>
+  <data name="playlistRefreshOnPlaySwitch.OffContent" xml:space="preserve">
+    <value>Оновлювати під час відтворення</value>
+  </data>
 </root>

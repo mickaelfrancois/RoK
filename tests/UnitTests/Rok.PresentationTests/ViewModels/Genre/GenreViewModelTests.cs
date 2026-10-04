@@ -151,4 +151,74 @@ public class GenreViewModelTests
         // Assert
         Assert.True(sut.HasNoAlbums);
     }
+
+    [Fact(DisplayName = "when_the_genre_loads_then_the_genre_and_its_computed_properties_are_notified")]
+    public async Task LoadDataAsync_ShouldNotifyGenreAndComputedProperties()
+    {
+        // Arrange
+        SetupGenreFound(7);
+        GenreViewModel sut = BuildViewModel();
+        List<string?> raised = [];
+        sut.PropertyChanged += (_, e) => raised.Add(e.PropertyName);
+
+        // Act
+        await sut.LoadDataAsync(7);
+
+        // Assert
+        Assert.Contains(nameof(sut.Genre), raised);
+        Assert.Contains(nameof(sut.SubTitle), raised);
+        Assert.Contains(nameof(sut.IsFavorite), raised);
+    }
+
+    [Fact(DisplayName = "when_the_genre_has_artists_albums_and_tracks_then_the_header_summary_joins_them")]
+    public async Task HeaderSummary_ShouldJoinArtistsAlbumsAndTracks()
+    {
+        // Arrange
+        _mediator.Setup<GetGenreByIdRequest, Result<GenreDto>>()
+                 .Returns(Result<GenreDto>.Ok(new GenreDto { Id = 7, Name = "Jazz", ArtistCount = 14, AlbumCount = 1, TrackCount = 120 }));
+        _mediator.Setup<GetAlbumsByGenreIdRequest, IEnumerable<AlbumDto>>()
+                 .Returns(new List<AlbumDto>());
+        GenreViewModel sut = BuildViewModel();
+        _resources.Setup(r => r.GetString("genreSummaryArtists")).Returns("{0} artists");
+        _resources.Setup(r => r.GetString("artistSummaryAlbum")).Returns("{0} album");
+        _resources.Setup(r => r.GetString("listeningSummaryTracks")).Returns("{0} tracks");
+
+        // Act
+        await sut.LoadDataAsync(7);
+
+        // Assert
+        Assert.Equal("14 artists · 1 album · 120 tracks", sut.HeaderSummary);
+    }
+
+    [Fact(DisplayName = "when_the_genre_is_not_loaded_then_sorting_the_albums_is_disabled")]
+    public void SortAlbumsCommand_ShouldBeDisabled_UntilTheGenreIsLoaded()
+    {
+        // Arrange
+        GenreViewModel sut = BuildViewModel();
+
+        // Act
+        bool canSort = sut.SortAlbumsCommand.CanExecute("Name");
+
+        // Assert
+        Assert.False(canSort);
+    }
+
+    [Fact(DisplayName = "when_the_genre_is_a_favorite_then_the_favorite_label_offers_to_remove_it")]
+    public async Task GenreFavoriteLabel_ShouldOfferToRemove_WhenTheGenreIsAFavorite()
+    {
+        // Arrange
+        _mediator.Setup<GetGenreByIdRequest, Result<GenreDto>>()
+                 .Returns(Result<GenreDto>.Ok(new GenreDto { Id = 7, Name = "Jazz", IsFavorite = true }));
+        _mediator.Setup<GetAlbumsByGenreIdRequest, IEnumerable<AlbumDto>>()
+                 .Returns(new List<AlbumDto>());
+        GenreViewModel sut = BuildViewModel();
+        _resources.Setup(r => r.GetString("listeningFavoriteAdd")).Returns("Add {0}");
+        _resources.Setup(r => r.GetString("listeningFavoriteRemove")).Returns("Remove {0}");
+
+        // Act
+        await sut.LoadDataAsync(7);
+
+        // Assert
+        Assert.Equal("Remove Jazz", sut.GenreFavoriteLabel);
+    }
 }

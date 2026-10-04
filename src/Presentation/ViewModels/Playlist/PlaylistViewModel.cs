@@ -1,10 +1,12 @@
-﻿using System.Threading;
+﻿using System.Globalization;
+using System.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Rok.Application.Dto;
 using Rok.Application.Features.Playlists;
 using Rok.Application.Player;
 using Rok.Application.Randomizer;
+using Rok.ViewModels.Listening.Services;
 using Rok.ViewModels.Playlist.Services;
 using Rok.ViewModels.Track;
 
@@ -51,7 +53,7 @@ public partial class PlaylistViewModel : ObservableObject
         set
         {
             Playlist.Name = value;
-            _ = SavePlaylistAsync();
+            _ = SaveInBackgroundAsync();
         }
     }
 
@@ -61,7 +63,7 @@ public partial class PlaylistViewModel : ObservableObject
         set
         {
             Playlist.ShuffleOnPlay = value;
-            _ = SavePlaylistAsync();
+            _ = SaveInBackgroundAsync();
         }
     }
 
@@ -71,7 +73,7 @@ public partial class PlaylistViewModel : ObservableObject
         set
         {
             Playlist.RefreshOnPlay = value;
-            _ = SavePlaylistAsync();
+            _ = SaveInBackgroundAsync();
         }
     }
 
@@ -87,6 +89,7 @@ public partial class PlaylistViewModel : ObservableObject
     [NotifyPropertyChangedFor(nameof(IsArtistSorted))]
     [NotifyPropertyChangedFor(nameof(IsAlbumSorted))]
     [NotifyPropertyChangedFor(nameof(IsScoreSorted))]
+    [NotifyPropertyChangedFor(nameof(IsDurationSorted))]
     public partial string? CurrentSortColumn { get; set; }
 
     [ObservableProperty]
@@ -109,6 +112,25 @@ public partial class PlaylistViewModel : ObservableObject
         }
     }
 
+    /// <summary>Track count and total duration, rendered with the same localized formats as the Listening header.</summary>
+    public string HeaderSummary
+    {
+        get
+        {
+            ListeningSummaryLabels labels = new(
+                _resourceLoader.GetString("listeningSummaryTrack"),
+                _resourceLoader.GetString("listeningSummaryTracks"),
+                _resourceLoader.GetString("listeningSummaryHoursMinutes"),
+                _resourceLoader.GetString("listeningSummaryHours"),
+                _resourceLoader.GetString("listeningSummaryMinutes"),
+                _resourceLoader.GetString("listeningSummaryEndsAt"));
+
+            long duration = _tracks?.Sum(c => c.Duration) ?? Playlist.Duration;
+
+            return ListeningQueueSummaryFormatter.FormatOverview(new ListeningQueueSummary(TrackCount, duration, null), labels, CultureInfo.CurrentCulture);
+        }
+    }
+
     public string DurationTotalStr
     {
         get
@@ -123,6 +145,7 @@ public partial class PlaylistViewModel : ObservableObject
     public bool IsArtistSorted => CurrentSortColumn == "Artist";
     public bool IsAlbumSorted => CurrentSortColumn == "Album";
     public bool IsScoreSorted => CurrentSortColumn == "Score";
+    public bool IsDurationSorted => CurrentSortColumn == "Duration";
 
     public string GetSortGlyph(bool descending) => descending ? "\uE74B" : "\uE74A";
 
@@ -186,6 +209,7 @@ public partial class PlaylistViewModel : ObservableObject
         _logger.LogInformation("Playlist {PlaylistId} loaded in {ElapsedMilliseconds}ms", playlistId, stopwatch.ElapsedMilliseconds);
 
         OnPropertyChanged(nameof(SubTitle));
+        OnPropertyChanged(nameof(HeaderSummary));
     }
 
     private async Task LoadPlaylistAsync(long playlistId)
@@ -197,6 +221,7 @@ public partial class PlaylistViewModel : ObservableObject
         Playlist = playlist;
         LoadBackdrop();
         LoadPicture();
+        OnPropertyChanged(string.Empty);
     }
 
     private void LoadBackdrop()
@@ -235,6 +260,19 @@ public partial class PlaylistViewModel : ObservableObject
     }
 
 
+
+    /// <summary>Saves from a property setter, where nobody awaits: failures are logged instead of vanishing in an unobserved task.</summary>
+    private async Task SaveInBackgroundAsync()
+    {
+        try
+        {
+            await SavePlaylistAsync();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to save playlist {PlaylistId}", Playlist.Id);
+        }
+    }
 
     [RelayCommand]
     private async Task SavePlaylistAsync(List<PlaylistGroupDto>? groups)
@@ -369,9 +407,10 @@ public partial class PlaylistViewModel : ObservableObject
         if (originalTrack != null)
             _originalTracks.Remove(originalTrack);
 
-        _tracks = _tracks!.Where(t => t.Id != trackId).ToList();
+        _tracks = _tracks?.Where(t => t.Id != trackId).ToList();
 
         OnPropertyChanged(nameof(SubTitle));
+        OnPropertyChanged(nameof(HeaderSummary));
     }
 
     [RelayCommand]
@@ -406,6 +445,7 @@ public partial class PlaylistViewModel : ObservableObject
             "Artist" => SortDescending ? Tracks.OrderByDescending(t => t.ArtistName) : Tracks.OrderBy(t => t.ArtistName),
             "Album" => SortDescending ? Tracks.OrderByDescending(t => t.AlbumName) : Tracks.OrderBy(t => t.AlbumName),
             "Score" => SortDescending ? Tracks.OrderByDescending(t => t.Score) : Tracks.OrderBy(t => t.Score),
+            "Duration" => SortDescending ? Tracks.OrderByDescending(t => t.Track.Duration) : Tracks.OrderBy(t => t.Track.Duration),
             _ => _originalTracks
         };
 
