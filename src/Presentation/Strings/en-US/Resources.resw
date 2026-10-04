@@ -2383,4 +2383,7 @@
   <data name="albumArtistFavorite.AutomationProperties.Name" xml:space="preserve">
     <value>Favorite artist</value>
   </data>
+  <data name="gridHeaderDuration.Text" xml:space="preserve">
+    <value>Duration</value>
+  </data>
 </root>

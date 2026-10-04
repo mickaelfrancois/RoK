@@ -41,6 +41,9 @@ public partial class AlbumViewModel : ObservableObject, IFilterableAlbum, IGroup
     public RangeObservableCollection<TrackViewModel> Tracks { get; } = [];
     private IEnumerable<TrackDto>? _tracks = null;
 
+    /// <summary>True when the track numbers are unique, so they can label the rows instead of the row index.</summary>
+    public bool UseTrackNumbers { get; private set; }
+
     public bool HasNoTracks => LoadState == DetailLoadState.Loaded && Tracks.Count == 0;
 
     [ObservableProperty]
@@ -416,6 +419,7 @@ public partial class AlbumViewModel : ObservableObject, IFilterableAlbum, IGroup
             return;
 
         _tracks = tracks.Select(t => t.Track);
+        UseTrackNumbers = AlbumTrackNumbering.CanUseTrackNumbers(tracks.Select(t => t.TrackNumber).ToList());
         Tracks.InitWithAddRange(tracks);
         OnPropertyChanged(nameof(HasNoTracks));
     }

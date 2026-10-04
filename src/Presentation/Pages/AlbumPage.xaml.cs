@@ -14,7 +14,7 @@ public sealed partial class AlbumPage : Page
     private const double StatsPanelReservedWidth = 300;
 
     private static readonly Lazy<double> TitleAndScoreColumnsWidth = new(() =>
-        GetGridLengthResource("GridHeaderTracksTitleColumnWidth") + GetGridLengthResource("GridHeaderTracksScoreColumnWidth"));
+        GetGridLengthResource("GridHeaderTracksTitleColumnWidth") + GetGridLengthResource("GridHeaderTracksDurationColumnWidth") + GetGridLengthResource("GridHeaderTracksScoreColumnWidth"));
 
     private static readonly Lazy<double> ArtistColumnWidth = new(() => GetGridLengthResource("GridHeaderTracksArtistColumnWidth"));
 
@@ -112,7 +112,11 @@ public sealed partial class AlbumPage : Page
         if (args.ItemContainer?.ContentTemplateRoot is FrameworkElement root &&
             root.FindName("RowIndexText") is TextBlock tb)
         {
-            tb.Text = (args.ItemIndex + 1).ToString() + ".";
+            int number = ViewModel.UseTrackNumbers && args.Item is TrackViewModel { TrackNumber: > 0 } track
+                ? track.TrackNumber.Value
+                : args.ItemIndex + 1;
+
+            tb.Text = number.ToString() + ".";
         }
     }
 }

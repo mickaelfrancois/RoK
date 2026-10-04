@@ -7,10 +7,15 @@
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
       xmlns:common="using:Rok.Commons"
       xmlns:tracks="using:Rok.ViewModels.Track"
+      xmlns:converters="using:Rok.Converters"
       x:Name="albumPage"
       Loaded="AlbumPage_Loaded"
       SizeChanged="Page_SizeChanged"
       mc:Ignorable="d">
+
+    <Page.Resources>
+        <converters:BoolToGridLengthAutoConverter x:Key="ArtistColumnWidthConverter" TrueValue="{StaticResource GridHeaderTracksArtistColumnWidth}" />
+    </Page.Resources>
 
     <Grid>
         <Grid.RowDefinitions>
@@ -172,13 +177,15 @@
             <Grid Style="{StaticResource TracksGridStyle}">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="{StaticResource GridHeaderTracksTitleColumnWidth}" />
-                    <ColumnDefinition Width="{StaticResource GridHeaderTracksArtistColumnWidth}" />
+                    <ColumnDefinition Width="{x:Bind ViewModel.Album.IsCompilation, Mode=OneWay, Converter={StaticResource ArtistColumnWidthConverter}}" />
+                    <ColumnDefinition Width="{StaticResource GridHeaderTracksDurationColumnWidth}" />
                     <ColumnDefinition Width="{StaticResource GridHeaderTracksScoreColumnWidth}" />
                 </Grid.ColumnDefinitions>
 
                 <TextBlock x:Uid="gridHeaderTitle" Grid.Column="0" Style="{StaticResource GridHeaderTracksTextBlockStyle}" />
                 <TextBlock x:Uid="gridHeaderArtist" Grid.Column="1" Visibility="{x:Bind ViewModel.Album.IsCompilation, Converter={StaticResource BoolToVisibilityConverter}}" Style="{StaticResource GridHeaderTracksTextBlockStyle}" />
-                <TextBlock x:Uid="gridHeaderScore" Grid.Column="2" Style="{StaticResource GridHeaderTracksTextBlockStyle}" />
+                <TextBlock x:Uid="gridHeaderDuration" Grid.Column="2" HorizontalAlignment="Right" Margin="0,0,16,0" Style="{StaticResource GridHeaderTracksTextBlockStyle}" />
+                <TextBlock x:Uid="gridHeaderScore" Grid.Column="3" Style="{StaticResource GridHeaderTracksTextBlockStyle}" />
             </Grid>
 
             <ListView x:Name="tracksList" Grid.Row="1" ContainerContentChanging="tracksList_ContainerContentChanging" ItemsSource="{x:Bind ViewModel.Tracks}" ItemContainerStyle="{StaticResource TracksListViewItemStyle}" SelectionMode="Single">
@@ -187,7 +194,8 @@
                         <Grid Background="Transparent">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="{StaticResource GridHeaderTracksTitleColumnWidth}" />
-                                <ColumnDefinition Width="{StaticResource GridHeaderTracksArtistColumnWidth}" />
+                                <ColumnDefinition Width="{x:Bind Track.IsAlbumCompilation, Converter={StaticResource ArtistColumnWidthConverter}}" />
+                                <ColumnDefinition Width="{StaticResource GridHeaderTracksDurationColumnWidth}" />
                                 <ColumnDefinition Width="{StaticResource GridHeaderTracksScoreColumnWidth}" />
                             </Grid.ColumnDefinitions>
 
@@ -218,7 +226,8 @@
                             </StackPanel>
 
                             <HyperlinkButton Grid.Column="1" Visibility="{x:Bind Track.IsAlbumCompilation, Converter={StaticResource BoolToVisibilityConverter}}" Style="{StaticResource GridTracksArtistHyperlinkButtonStyle}" Command="{x:Bind ArtistOpenCommand}" />
-                            <common:RatingControlLightControl Grid.Column="2" Style="{StaticResource GridTracksScoreStyle}" RatingValue="{x:Bind Score, Mode=TwoWay}" />
+                            <TextBlock Grid.Column="2" Text="{x:Bind DurationStr}" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,16,0" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                            <common:RatingControlLightControl Grid.Column="3" Style="{StaticResource GridTracksScoreStyle}" RatingValue="{x:Bind Score, Mode=TwoWay}" />
                         </Grid>
                     </DataTemplate>
                 </ListView.ItemTemplate>
