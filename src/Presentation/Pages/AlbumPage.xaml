@@ -45,7 +45,7 @@
                     <common:BadgeControl x:Uid="badgeLive" Visibility="{x:Bind ViewModel.Album.IsLive, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" BadgeBackground="{StaticResource BadgeLiveBrush}"/>
                     <common:BadgeControl x:Uid="badgeBestof" Visibility="{x:Bind ViewModel.Album.IsBestOf, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" BadgeBackground="{StaticResource BadgeBestOfBrush}" />
                     <common:BadgeControl x:Uid="badgeCompilation" Visibility="{x:Bind ViewModel.Album.IsCompilation, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" BadgeBackground="{StaticResource BadgeCompilationBrush}" />
-                    <common:BadgeControl x:Uid="badgeNew" Visibility="{x:Bind ViewModel.ShowNewBadge, Converter={StaticResource BoolToVisibilityConverter}}" BadgeBackground="{StaticResource BadgeNewBrush}" />
+                    <common:BadgeControl x:Uid="badgeNew" Visibility="{x:Bind ViewModel.IsNew, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" BadgeBackground="{StaticResource BadgeNewBrush}" />
                     <common:BadgeControl x:Uid="badgeAnniversary" Visibility="{x:Bind ViewModel.ShowAnniversaryBadge, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" BadgeBackground="{StaticResource BadgeAnniversaryBrush}" ToolTipService.ToolTip="{x:Bind ViewModel.AnniversaryTooltip, Mode=OneWay}" />
                 </StackPanel>
 

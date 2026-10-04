@@ -37,7 +37,7 @@ public partial class AlbumViewModel : ObservableObject, IFilterableAlbum, IGroup
 
     private CancellationTokenSource _navigationCts = new();
 
-    public RangeObservableCollection<TrackViewModel> Tracks { get; set; } = [];
+    public RangeObservableCollection<TrackViewModel> Tracks { get; } = [];
     private IEnumerable<TrackDto>? _tracks = null;
 
     public bool HasNoTracks => LoadState == DetailLoadState.Loaded && Tracks.Count == 0;
@@ -61,7 +61,18 @@ public partial class AlbumViewModel : ObservableObject, IFilterableAlbum, IGroup
 
     private bool IsEntityLoaded => LoadState == DetailLoadState.Loaded;
 
-    public AlbumDto Album { get; private set; } = new();
+    private AlbumDto _album = new();
+
+    public AlbumDto Album
+    {
+        get => _album;
+        private set
+        {
+            if (SetProperty(ref _album, value))
+                NotifyAlbumDerivedProperties();
+        }
+    }
+
     public IPlaylistMenuService PlaylistMenuService { get; }
 
     public ObservableCollection<string> EditableTags { get; set; } = new();
@@ -121,6 +132,19 @@ public partial class AlbumViewModel : ObservableObject, IFilterableAlbum, IGroup
 
     [ObservableProperty]
     public partial BitmapImage? Backdrop { get; set; }
+
+    /// <summary>
+    /// Raises the notifications of everything computed from <see cref="Album"/>. Needed after the
+    /// DTO is mutated in place, which <see cref="SetProperty{T}(ref T, T, string?)"/> cannot see.
+    /// </summary>
+    private void NotifyAlbumDerivedProperties()
+    {
+        OnPropertyChanged(nameof(SubTitle));
+        OnPropertyChanged(nameof(ReleaseDateYear));
+        OnPropertyChanged(nameof(DurationTotal));
+        OnPropertyChanged(nameof(Tags));
+        OnPropertyChanged(nameof(IsFavorite));
+    }
 
     public override string ToString()
     {
@@ -326,6 +350,7 @@ public partial class AlbumViewModel : ObservableObject, IFilterableAlbum, IGroup
     public void OnNavigatedFrom()
     {
         InitNavigationCancellation();
+        EditableTags.CollectionChanged -= OnTagsCollectionChanged;
         Backdrop = null;
     }
 
@@ -459,11 +484,13 @@ public partial class AlbumViewModel : ObservableObject, IFilterableAlbum, IGroup
     {
         List<string> albumTags = Album.GetTags();
 
+        // Detached while filling: otherwise every Clear/Add would persist a partial tag list.
+        EditableTags.CollectionChanged -= OnTagsCollectionChanged;
+
         EditableTags.Clear();
         foreach (string tag in albumTags)
             EditableTags.Add(tag);
 
-        EditableTags.CollectionChanged -= OnTagsCollectionChanged;
         EditableTags.CollectionChanged += OnTagsCollectionChanged;
 
         SuggestedTags.Clear();
@@ -476,10 +503,15 @@ public partial class AlbumViewModel : ObservableObject, IFilterableAlbum, IGroup
 
     private async void OnTagsCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
     {
-        Album.TagsAsString = string.Join(",", EditableTags);
-        await _editService.UpdateTagsAsync(Album.Id, EditableTags);
-
-        Debug.WriteLine(Album.TagsAsString);
+        try
+        {
+            Album.TagsAsString = string.Join(",", EditableTags);
+            await _editService.UpdateTagsAsync(Album.Id, EditableTags);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to save tags for album {AlbumId}", Album.Id);
+        }
     }
 
     private async Task UpdateStatisticsIfNeededAsync()
@@ -487,7 +519,10 @@ public partial class AlbumViewModel : ObservableObject, IFilterableAlbum, IGroup
         bool updated = await _statisticsService.UpdateIfNeededAsync(Album, Tracks);
 
         if (updated)
+        {
+            NotifyAlbumDerivedProperties();
             _messenger.Send(new AlbumUpdateMessage(Album.Id, ActionType.Update));
+        }
     }
 
     [RelayCommand(CanExecute = nameof(IsEntityLoaded))]
@@ -570,6 +605,7 @@ public partial class AlbumViewModel : ObservableObject, IFilterableAlbum, IGroup
 
         _messenger.Send(new AlbumUpdateMessage(Album.Id, ActionType.Update));
         OnPropertyChanged(nameof(Album));
+        NotifyAlbumDerivedProperties();
     }
 
     [RelayCommand(CanExecute = nameof(IsEntityLoaded))]

@@ -217,4 +217,66 @@ public class AlbumViewModelTests
         // ICommand.Execute never checks CanExecute on its own.
         Assert.False(canListen);
     }
+
+    [Fact(DisplayName = "when_the_album_loads_then_the_album_and_its_computed_properties_are_notified")]
+    public async Task LoadDataAsync_ShouldNotifyAlbumAndComputedProperties()
+    {
+        // Arrange
+        _mediator.Setup<GetAlbumByIdRequest, Result<AlbumDto>>()
+                 .Returns(Result<AlbumDto>.Ok(new AlbumDto { Id = 42, Name = "Greatest Hits", TrackCount = 11, Year = 1977 }));
+        _mediator.Setup<GetTracksByAlbumIdRequest, Result<IEnumerable<TrackDto>>>()
+                 .Returns(Result<IEnumerable<TrackDto>>.Ok(new List<TrackDto>()));
+        AlbumViewModel sut = BuildViewModel();
+        List<string?> raised = [];
+        sut.PropertyChanged += (_, e) => raised.Add(e.PropertyName);
+
+        // Act
+        await sut.LoadDataAsync(42);
+
+        // Assert
+        Assert.Contains(nameof(sut.Album), raised);
+        Assert.Contains(nameof(sut.SubTitle), raised);
+        Assert.Contains(nameof(sut.ReleaseDateYear), raised);
+        Assert.Contains(nameof(sut.DurationTotal), raised);
+        Assert.Contains(nameof(sut.Tags), raised);
+    }
+
+    [Fact(DisplayName = "when_a_list_tile_calls_set_data_then_the_album_is_notified")]
+    public void SetData_ShouldNotifyAlbum()
+    {
+        // Arrange
+        AlbumViewModel sut = BuildViewModel();
+        List<string?> raised = [];
+        sut.PropertyChanged += (_, e) => raised.Add(e.PropertyName);
+
+        // Act
+        sut.SetData(new AlbumDto { Id = 42, Name = "Greatest Hits" });
+
+        // Assert
+        Assert.Contains(nameof(sut.Album), raised);
+    }
+
+    [Fact(DisplayName = "when_the_api_refreshes_the_album_then_the_album_and_the_subtitle_are_notified")]
+    public async Task GetDataFromApi_ShouldNotifyAlbumAndSubTitle_WhenDataIsUpdated()
+    {
+        // Arrange
+        AlbumViewModel sut = BuildViewModel();
+        sut.SetData(new AlbumDto { Id = 42, Name = "Greatest Hits" });
+
+        _apiService.Setup(a => a.GetAndUpdateAlbumDataAsync(It.IsAny<AlbumDto>(), It.IsAny<IAlbumPictureService>(), It.IsAny<CancellationToken>()))
+                   .ReturnsAsync(new AlbumApiUpdateResult(DataUpdated: true, PictureDownloaded: false));
+        _mediator.Setup<GetAlbumByIdRequest, Result<AlbumDto>>()
+                 .Returns(Result<AlbumDto>.Ok(new AlbumDto { Id = 42, Name = "Greatest Hits", TrackCount = 11 }));
+
+        List<string?> raised = [];
+        sut.PropertyChanged += (_, e) => raised.Add(e.PropertyName);
+
+        // Act
+        await sut.GetDataFromApiCommand.ExecuteAsync(null);
+
+        // Assert
+        Assert.Contains(nameof(sut.Album), raised);
+        Assert.Contains(nameof(sut.SubTitle), raised);
+        Assert.Equal(11, sut.Album.TrackCount);
+    }
 }
