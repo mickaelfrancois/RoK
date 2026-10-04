@@ -2464,9 +2464,6 @@
   <data name="playlistRefreshOnPlaySwitch.OffContent" xml:space="preserve">
     <value>Refresh on play</value>
   </data>
-  <data name="albumsKicker.Text" xml:space="preserve">
-    <value>COLLECTION</value>
-  </data>
   <data name="albumsTitle.Text" xml:space="preserve">
     <value>Albums</value>
   </data>
