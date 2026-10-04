@@ -215,4 +215,46 @@ public class ArtistViewModelTests
         Assert.False(sut.HasNoAlbums);
         Assert.False(sut.HasNoTracks);
     }
+
+    [Fact(DisplayName = "when_the_artist_loads_then_the_artist_and_its_computed_properties_are_notified")]
+    public async Task LoadDataAsync_ShouldNotifyArtistAndComputedProperties()
+    {
+        // Arrange
+        _mediator.Setup<GetArtistByIdRequest, Result<ArtistDto>>()
+                 .Returns(Result<ArtistDto>.Ok(new ArtistDto { Id = 7, Name = "Artist X", TrackCount = 12, FormedYear = 1970 }));
+        _mediator.Setup<GetAlbumsByArtistIdRequest, IEnumerable<AlbumDto>>()
+                 .Returns(new List<AlbumDto>());
+        _mediator.Setup<GetTracksByArtistIdRequest, Result<IEnumerable<TrackDto>>>()
+                 .Returns(Result<IEnumerable<TrackDto>>.Ok(new List<TrackDto>()));
+        _mediator.Setup<GetAllTagsRequest, IEnumerable<TagDto>>()
+                 .Returns(new List<TagDto>());
+        ArtistViewModel sut = BuildViewModel();
+        List<string?> raised = [];
+        sut.PropertyChanged += (_, e) => raised.Add(e.PropertyName);
+
+        // Act
+        await sut.LoadDataAsync(7, loadAlbums: true, loadTracks: true, fetchApi: false);
+
+        // Assert
+        Assert.Contains(nameof(sut.Artist), raised);
+        Assert.Contains(nameof(sut.SubTitle), raised);
+        Assert.Contains(nameof(sut.ActiveYears), raised);
+        Assert.Contains(nameof(sut.DurationTotal), raised);
+        Assert.Contains(nameof(sut.Tags), raised);
+    }
+
+    [Fact(DisplayName = "when_a_list_tile_calls_set_data_then_the_artist_is_notified")]
+    public void SetData_ShouldNotifyArtist()
+    {
+        // Arrange
+        ArtistViewModel sut = BuildViewModel();
+        List<string?> raised = [];
+        sut.PropertyChanged += (_, e) => raised.Add(e.PropertyName);
+
+        // Act
+        sut.SetData(new ArtistDto { Id = 7, Name = "Artist X" });
+
+        // Assert
+        Assert.Contains(nameof(sut.Artist), raised);
+    }
 }

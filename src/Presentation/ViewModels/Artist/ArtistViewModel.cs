@@ -42,9 +42,20 @@ public partial class ArtistViewModel : ObservableObject, IFilterableArtist, IGro
     private CancellationTokenSource _navigationCts = new();
 
     public IPlaylistMenuService PlaylistMenuService { get; }
-    public ArtistDto Artist { get; private set; } = new();
-    public RangeObservableCollection<TrackViewModel> Tracks { get; set; } = [];
-    public RangeObservableCollection<AlbumViewModel> Albums { get; set; } = [];
+    private ArtistDto _artist = new();
+
+    public ArtistDto Artist
+    {
+        get => _artist;
+        private set
+        {
+            if (SetProperty(ref _artist, value))
+                NotifyArtistDerivedProperties();
+        }
+    }
+
+    public RangeObservableCollection<TrackViewModel> Tracks { get; } = [];
+    public RangeObservableCollection<AlbumViewModel> Albums { get; } = [];
 
     public bool HasNoAlbums => LoadState == DetailLoadState.Loaded && Albums.Count == 0;
     public bool HasNoTracks => LoadState == DetailLoadState.Loaded && Tracks.Count == 0;
@@ -71,9 +82,9 @@ public partial class ArtistViewModel : ObservableObject, IFilterableArtist, IGro
     public ListeningStatsViewModel ListeningStats { get; } = new();
 
 
-    public ObservableCollection<string> EditableTags { get; set; } = new();
+    public ObservableCollection<string> EditableTags { get; } = new();
 
-    public ObservableCollection<string> SuggestedTags { get; set; } = new();
+    public ObservableCollection<string> SuggestedTags { get; } = new();
 
     public bool IsFavorite
     {
@@ -250,6 +261,19 @@ public partial class ArtistViewModel : ObservableObject, IFilterableArtist, IGro
     DateTime IGroupable.CreatDate => Artist.CreatDate;
     DateTime? IGroupable.LastListen => Artist.LastListen;
 
+    /// <summary>
+    /// Raises the notifications of everything computed from <see cref="Artist"/>. Needed after the
+    /// DTO is mutated in place, which <see cref="SetProperty{T}(ref T, T, string?)"/> cannot see.
+    /// </summary>
+    private void NotifyArtistDerivedProperties()
+    {
+        OnPropertyChanged(nameof(SubTitle));
+        OnPropertyChanged(nameof(ActiveYears));
+        OnPropertyChanged(nameof(DurationTotal));
+        OnPropertyChanged(nameof(Tags));
+        OnPropertyChanged(nameof(IsFavorite));
+    }
+
     public override string ToString() => Artist?.Name ?? string.Empty;
 
 
@@ -368,6 +392,7 @@ public partial class ArtistViewModel : ObservableObject, IFilterableArtist, IGro
     public void OnNavigatedFrom()
     {
         InitNavigationCancellation();
+        EditableTags.CollectionChanged -= OnTagsCollectionChanged;
         Backdrop = null;
     }
 
@@ -506,11 +531,13 @@ public partial class ArtistViewModel : ObservableObject, IFilterableArtist, IGro
     {
         List<string> artistTags = Artist.GetTags();
 
+        // Detached while filling: otherwise every Clear/Add would persist a partial tag list.
+        EditableTags.CollectionChanged -= OnTagsCollectionChanged;
+
         EditableTags.Clear();
         foreach (string tag in artistTags)
             EditableTags.Add(tag);
 
-        EditableTags.CollectionChanged -= OnTagsCollectionChanged;
         EditableTags.CollectionChanged += OnTagsCollectionChanged;
 
         SuggestedTags.Clear();
@@ -523,10 +550,15 @@ public partial class ArtistViewModel : ObservableObject, IFilterableArtist, IGro
 
     private async void OnTagsCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
     {
-        Artist.TagsAsString = string.Join(",", EditableTags);
-        await _editService.UpdateTagsAsync(Artist.Id, EditableTags);
-
-        Debug.WriteLine(Artist.TagsAsString);
+        try
+        {
+            Artist.TagsAsString = string.Join(",", EditableTags);
+            await _editService.UpdateTagsAsync(Artist.Id, EditableTags);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to save tags for artist {ArtistId}", Artist.Id);
+        }
     }
 
     private async Task UpdateStatisticsIfNeededAsync()
@@ -534,6 +566,7 @@ public partial class ArtistViewModel : ObservableObject, IFilterableArtist, IGro
         bool updated = await _statisticsService.UpdateIfNeededAsync(Artist, Albums, Tracks);
         if (updated)
         {
+            NotifyArtistDerivedProperties();
             _messenger.Send(new ArtistUpdateMessage(Artist.Id, ActionType.Update));
         }
     }
@@ -624,6 +657,7 @@ public partial class ArtistViewModel : ObservableObject, IFilterableArtist, IGro
 
         _messenger.Send(new ArtistUpdateMessage(Artist.Id, ActionType.Update));
         OnPropertyChanged(nameof(Artist));
+        NotifyArtistDerivedProperties();
     }
 
     [RelayCommand(CanExecute = nameof(IsEntityLoaded))]
