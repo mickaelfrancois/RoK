@@ -51,7 +51,6 @@ public partial class AlbumViewModel : ObservableObject, IFilterableAlbum, IGroup
     [NotifyCanExecuteChangedFor(nameof(GenreOpenCommand))]
     [NotifyCanExecuteChangedFor(nameof(ListenCommand))]
     [NotifyCanExecuteChangedFor(nameof(ShuffleCommand))]
-    [NotifyCanExecuteChangedFor(nameof(ArtistFavoriteCommand))]
     [NotifyCanExecuteChangedFor(nameof(AlbumFavoriteCommand))]
     [NotifyCanExecuteChangedFor(nameof(GetDataFromApiCommand))]
     [NotifyCanExecuteChangedFor(nameof(EditAlbumCommand))]
@@ -63,8 +62,6 @@ public partial class AlbumViewModel : ObservableObject, IFilterableAlbum, IGroup
     public bool IsNotFound => LoadState == DetailLoadState.NotFound;
 
     private bool IsEntityLoaded => LoadState == DetailLoadState.Loaded;
-
-    private bool CanToggleArtistFavorite => IsEntityLoaded && Album.ArtistId.HasValue;
 
     private AlbumDto _album = new();
 
@@ -156,8 +153,6 @@ public partial class AlbumViewModel : ObservableObject, IFilterableAlbum, IGroup
         OnPropertyChanged(nameof(HasCountry));
         OnPropertyChanged(nameof(CountryName));
         OnPropertyChanged(nameof(AlbumFavoriteLabel));
-        OnPropertyChanged(nameof(ArtistFavoriteLabel));
-        ArtistFavoriteCommand.NotifyCanExecuteChanged();
     }
 
     public override string ToString()
@@ -241,9 +236,6 @@ public partial class AlbumViewModel : ObservableObject, IFilterableAlbum, IGroup
 
     public string AlbumFavoriteLabel => ListeningHeaderLabels.FavoriteToggle(
         Album.Name, IsFavorite, _resourceLoader.GetString("listeningFavoriteAdd"), _resourceLoader.GetString("listeningFavoriteRemove"));
-
-    public string ArtistFavoriteLabel => ListeningHeaderLabels.FavoriteToggle(
-        Album.ArtistName, IsArtistFavorite, _resourceLoader.GetString("listeningFavoriteAdd"), _resourceLoader.GetString("listeningFavoriteRemove"));
 
     public string ReleaseDateYear
     {
@@ -599,20 +591,6 @@ public partial class AlbumViewModel : ObservableObject, IFilterableAlbum, IGroup
         OnPropertyChanged(nameof(IsFavorite));
         OnPropertyChanged(nameof(AlbumFavoriteLabel));
         _messenger.Send(new AlbumUpdateMessage(Album.Id, ActionType.Update));
-    }
-
-    [RelayCommand(CanExecute = nameof(CanToggleArtistFavorite))]
-    private async Task ArtistFavoriteAsync()
-    {
-        if (!Album.ArtistId.HasValue)
-            return;
-
-        bool newFavoriteState = !Album.IsArtistFavorite;
-        await _editService.UpdateArtistFavoriteAsync(Album, newFavoriteState);
-
-        OnPropertyChanged(nameof(IsArtistFavorite));
-        OnPropertyChanged(nameof(ArtistFavoriteLabel));
-        _messenger.Send(new ArtistUpdateMessage(Album.ArtistId.Value, ActionType.Update));
     }
 
     [RelayCommand(CanExecute = nameof(IsEntityLoaded))]

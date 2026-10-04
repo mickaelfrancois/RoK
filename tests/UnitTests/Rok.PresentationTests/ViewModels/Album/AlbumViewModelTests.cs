@@ -6,7 +6,6 @@ using Rok.Application.Dto;
 using Rok.Application.Errors;
 using Rok.Application.Features.Albums.Requests;
 using Rok.Application.Features.Albums.Services;
-using Rok.Application.Features.Artists.Requests;
 using Rok.Application.Features.Playlists.PlaylistMenu;
 using Rok.Application.Features.Tracks.Requests;
 using Rok.Application.Interfaces;
@@ -76,7 +75,6 @@ public class AlbumViewModelTests
         Watch(nameof(sut.GenreOpenCommand), sut.GenreOpenCommand);
         Watch(nameof(sut.ListenCommand), sut.ListenCommand);
         Watch(nameof(sut.ShuffleCommand), sut.ShuffleCommand);
-        Watch(nameof(sut.ArtistFavoriteCommand), sut.ArtistFavoriteCommand);
         Watch(nameof(sut.AlbumFavoriteCommand), sut.AlbumFavoriteCommand);
         Watch(nameof(sut.GetDataFromApiCommand), sut.GetDataFromApiCommand);
         Watch(nameof(sut.EditAlbumCommand), sut.EditAlbumCommand);
@@ -358,45 +356,6 @@ public class AlbumViewModelTests
 
         // Assert
         Assert.Equal("Remove Rumours", sut.AlbumFavoriteLabel);
-        Assert.Equal("Add Fleetwood Mac", sut.ArtistFavoriteLabel);
-    }
-
-    [Fact(DisplayName = "when_the_artist_favorite_is_toggled_then_the_artist_is_updated_and_notified")]
-    public async Task ArtistFavoriteCommand_ShouldUpdateTheArtistAndNotify()
-    {
-        // Arrange
-        AlbumViewModel sut = BuildViewModel();
-        sut.SetData(new AlbumDto { Id = 42, ArtistId = 7, ArtistName = "Fleetwood Mac", IsArtistFavorite = false });
-        _mediator.Setup<UpdateArtistFavoriteRequest, Result<bool>>().Returns(Result<bool>.Ok(true));
-
-        List<string?> raised = [];
-        sut.PropertyChanged += (_, e) => raised.Add(e.PropertyName);
-
-        // Act
-        await sut.ArtistFavoriteCommand.ExecuteAsync(null);
-
-        // Assert
-        UpdateArtistFavoriteRequest sent = Assert.Single(_mediator.Sent<UpdateArtistFavoriteRequest>());
-        Assert.Equal(7, sent.Id);
-        Assert.True(sent.IsFavorite);
-        Assert.True(sut.IsArtistFavorite);
-        Assert.Contains(nameof(sut.IsArtistFavorite), raised);
-        Assert.Contains(nameof(sut.ArtistFavoriteLabel), raised);
-    }
-
-    [Theory(DisplayName = "when_the_album_has_an_artist_then_the_artist_favorite_command_can_execute")]
-    [InlineData(7L, true)]
-    [InlineData(null, false)]
-    public void ArtistFavoriteCommand_CanExecute_ShouldRequireAnArtist(long? artistId, bool expected)
-    {
-        // Arrange
-        AlbumViewModel sut = BuildViewModel();
-
-        // Act
-        sut.SetData(new AlbumDto { Id = 42, ArtistId = artistId });
-
-        // Assert
-        Assert.Equal(expected, sut.ArtistFavoriteCommand.CanExecute(null));
     }
 
     [Fact(DisplayName = "when_the_album_has_no_tracks_then_shuffle_does_not_load_a_playlist")]

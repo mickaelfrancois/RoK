@@ -27,9 +27,23 @@
                 <VisualState x:Name="WideHeader" />
                 <VisualState x:Name="NarrowHeader">
                     <VisualState.Setters>
+                        <Setter Target="headerGrid.Padding" Value="12,8,12,8" />
                         <Setter Target="shuffleButton.Visibility" Value="Collapsed" />
+                        <Setter Target="kickerText.Visibility" Value="Collapsed" />
+                        <Setter Target="summaryRow.Visibility" Value="Collapsed" />
                         <Setter Target="coverPicture.Width" Value="72" />
                         <Setter Target="coverPicture.Height" Value="72" />
+                    </VisualState.Setters>
+                </VisualState>
+                <VisualState x:Name="CompactHeader">
+                    <VisualState.Setters>
+                        <Setter Target="headerGrid.Padding" Value="12,8,12,8" />
+                        <Setter Target="shuffleButton.Visibility" Value="Collapsed" />
+                        <Setter Target="kickerText.Visibility" Value="Collapsed" />
+                        <Setter Target="summaryRow.Visibility" Value="Collapsed" />
+                        <Setter Target="coverPicture.Width" Value="72" />
+                        <Setter Target="coverPicture.Height" Value="72" />
+                        <Setter Target="artistExtras.Visibility" Value="Collapsed" />
                     </VisualState.Setters>
                 </VisualState>
             </VisualStateGroup>
@@ -41,7 +55,7 @@
         <Border Opacity="0.18" IsHitTestVisible="False" Background="{x:Bind ViewModel.DominantColor, Mode=OneWay, Converter={StaticResource ColorToAccentBrushConverter}}" />
 
         <!-- Header -->
-        <Grid Padding="16,10,16,10" ColumnSpacing="{StaticResource SpacingMedium}">
+        <Grid x:Name="headerGrid" Padding="16,10,16,10" ColumnSpacing="{StaticResource SpacingMedium}">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto" />
                 <ColumnDefinition Width="*" />
@@ -56,7 +70,7 @@
             <!-- Infos -->
             <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="4">
                 <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingSmall}">
-                    <TextBlock x:Uid="albumKicker" VerticalAlignment="Center" Style="{StaticResource CaptionTextBlockStyle}" FontWeight="SemiBold" CharacterSpacing="80" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                    <TextBlock x:Name="kickerText" x:Uid="albumKicker" VerticalAlignment="Center" Style="{StaticResource CaptionTextBlockStyle}" FontWeight="SemiBold" CharacterSpacing="80" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
 
                     <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
                         <common:BadgeControl x:Uid="badgeLive" Visibility="{x:Bind ViewModel.Album.IsLive, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" BadgeBackground="{StaticResource BadgeLiveBrush}" />
@@ -73,27 +87,24 @@
                     <HyperlinkButton Command="{x:Bind ViewModel.ArtistOpenCommand}" Padding="0" Margin="0" Style="{StaticResource HeaderHyperlinkStyle}">
                         <TextBlock Text="{x:Bind ViewModel.Album.ArtistName, Mode=OneWay}" MaxWidth="320" FontSize="{StaticResource FontSizeMedium}" FontWeight="SemiBold" TextTrimming="CharacterEllipsis" />
                     </HyperlinkButton>
-                    <common:AnimatedButton VerticalAlignment="Center"
-                                           Icon="{StaticResource HeartPath}"
-                                           Color="{x:Bind ViewModel.IsArtistFavorite, Converter={StaticResource FavoriteToColorConverter}, Mode=OneWay}"
-                                           Command="{x:Bind ViewModel.ArtistFavoriteCommand}"
-                                           ToolTipService.ToolTip="{x:Bind ViewModel.ArtistFavoriteLabel, Mode=OneWay}"
-                                           AutomationProperties.Name="{x:Bind ViewModel.ArtistFavoriteLabel, Mode=OneWay}" />
+                    <Path x:Uid="albumArtistFavorite" Data="{StaticResource HeartPath}" Fill="Gold" Stretch="Uniform" Width="14" Height="14" VerticalAlignment="Center" Visibility="{x:Bind ViewModel.IsArtistFavorite, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" />
 
-                    <TextBlock Text="·" VerticalAlignment="Center" Foreground="{ThemeResource TextFillColorSecondaryBrush}" Visibility="{x:Bind ViewModel.HasGenre, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" />
-                    <Button Command="{x:Bind ViewModel.GenreOpenCommand}" Padding="10,2" CornerRadius="{StaticResource CornerRadiusMediumValue}" Visibility="{x:Bind ViewModel.HasGenre, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">
-                        <StackPanel Orientation="Horizontal" Spacing="6">
-                            <TextBlock Text="{x:Bind ViewModel.GenreName, Mode=OneWay}" FontSize="{StaticResource FontSizeSmall}" />
-                            <FontIcon Glyph="&#xE76C;" FontSize="10" VerticalAlignment="Center" />
-                        </StackPanel>
-                    </Button>
+                    <StackPanel x:Name="artistExtras" Orientation="Horizontal" Spacing="{StaticResource SpacingSmall}">
+                        <TextBlock Text="·" VerticalAlignment="Center" Foreground="{ThemeResource TextFillColorSecondaryBrush}" Visibility="{x:Bind ViewModel.HasGenre, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" />
+                        <Button Command="{x:Bind ViewModel.GenreOpenCommand}" Padding="10,2" CornerRadius="{StaticResource CornerRadiusMediumValue}" Visibility="{x:Bind ViewModel.HasGenre, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">
+                            <StackPanel Orientation="Horizontal" Spacing="6">
+                                <TextBlock Text="{x:Bind ViewModel.GenreName, Mode=OneWay}" FontSize="{StaticResource FontSizeSmall}" />
+                                <FontIcon Glyph="&#xE76C;" FontSize="10" VerticalAlignment="Center" />
+                            </StackPanel>
+                        </Button>
 
-                    <TextBlock Text="·" VerticalAlignment="Center" Foreground="{ThemeResource TextFillColorSecondaryBrush}" Visibility="{x:Bind ViewModel.HasYear, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" />
-                    <TextBlock Text="{x:Bind ViewModel.YearText, Mode=OneWay}" VerticalAlignment="Center" FontSize="{StaticResource FontSizeSmall}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" Visibility="{x:Bind ViewModel.HasYear, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" />
-                    <Image Height="12" VerticalAlignment="Center" Source="{x:Bind ViewModel.Album.CountryCode, Mode=OneWay, Converter={StaticResource CountryCodeToImageSourceConverter}}" ToolTipService.ToolTip="{x:Bind ViewModel.CountryName, Mode=OneWay}" Visibility="{x:Bind ViewModel.HasCountry, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" />
+                        <TextBlock Text="·" VerticalAlignment="Center" Foreground="{ThemeResource TextFillColorSecondaryBrush}" Visibility="{x:Bind ViewModel.HasYear, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" />
+                        <TextBlock Text="{x:Bind ViewModel.YearText, Mode=OneWay}" VerticalAlignment="Center" FontSize="{StaticResource FontSizeSmall}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" Visibility="{x:Bind ViewModel.HasYear, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" />
+                        <Image Height="12" VerticalAlignment="Center" Source="{x:Bind ViewModel.Album.CountryCode, Mode=OneWay, Converter={StaticResource CountryCodeToImageSourceConverter}}" ToolTipService.ToolTip="{x:Bind ViewModel.CountryName, Mode=OneWay}" Visibility="{x:Bind ViewModel.HasCountry, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" />
+                    </StackPanel>
                 </StackPanel>
 
-                <StackPanel Orientation="Horizontal" Spacing="6">
+                <StackPanel x:Name="summaryRow" Orientation="Horizontal" Spacing="6">
                     <TextBlock Text="{x:Bind ViewModel.HeaderSummary, Mode=OneWay}" Style="{StaticResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
                     <TextBlock Text="·" Style="{StaticResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" Visibility="{x:Bind ViewModel.HasDetails, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" />
                     <TextBlock Text="{x:Bind ViewModel.HeaderDetails, Mode=OneWay}" Style="{StaticResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" Visibility="{x:Bind ViewModel.HasDetails, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" />

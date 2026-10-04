@@ -2377,4 +2377,10 @@
   <data name="albumFavoriteText.Text" xml:space="preserve">
     <value>Favorite</value>
   </data>
+  <data name="albumArtistFavorite.ToolTipService.ToolTip" xml:space="preserve">
+    <value>Favorite artist</value>
+  </data>
+  <data name="albumArtistFavorite.AutomationProperties.Name" xml:space="preserve">
+    <value>Favorite artist</value>
+  </data>
 </root>

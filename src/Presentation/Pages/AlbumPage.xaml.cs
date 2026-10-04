@@ -8,6 +8,7 @@ namespace Rok.Pages;
 public sealed partial class AlbumPage : Page
 {
     private const double NarrowHeaderThreshold = 800;
+    private const double CompactHeaderThreshold = 560;
 
     /// <summary>Width reserved by the stats panel (250px) plus its paddings and grid margins.</summary>
     private const double StatsPanelReservedWidth = 300;
@@ -72,7 +73,9 @@ public sealed partial class AlbumPage : Page
 
     private void ApplyHeaderLayout(double width)
     {
-        string state = width < NarrowHeaderThreshold ? "NarrowHeader" : "WideHeader";
+        string state = width < CompactHeaderThreshold
+            ? "CompactHeader"
+            : width < NarrowHeaderThreshold ? "NarrowHeader" : "WideHeader";
 
         VisualStateManager.GoToState(this, state, true);
     }
