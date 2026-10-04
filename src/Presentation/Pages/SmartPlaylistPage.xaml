@@ -69,12 +69,7 @@
                         </StackPanel>
                     </Button>
 
-                    <ToggleButton IsChecked="{x:Bind ViewModel.RefreshOnPlay, Mode=TwoWay}">
-                        <StackPanel Orientation="Horizontal" Spacing="6">
-                            <SymbolIcon Symbol="Sync" />
-                            <TextBlock x:Uid="playlistRefreshOnPlayText" VerticalAlignment="Center" />
-                        </StackPanel>
-                    </ToggleButton>
+                    <ToggleSwitch x:Uid="playlistRefreshOnPlaySwitch" IsOn="{x:Bind ViewModel.RefreshOnPlay, Mode=TwoWay}" MinWidth="0" VerticalAlignment="Center" />
 
                     <Button x:Uid="albumMoreButton">
                         <FontIcon Glyph="&#xE712;" />

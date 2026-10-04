@@ -2263,14 +2263,8 @@
   <data name="smartPlaylistKicker.Text" xml:space="preserve">
     <value>LISTA INTELIGENTE</value>
   </data>
-  <data name="playlistShuffleOnPlayText.Text" xml:space="preserve">
-    <value>Reproducción aleatoria</value>
-  </data>
   <data name="playlistRefreshText.Text" xml:space="preserve">
     <value>Actualizar</value>
-  </data>
-  <data name="playlistRefreshOnPlayText.Text" xml:space="preserve">
-    <value>Actualizar al reproducir</value>
   </data>
   <data name="playlistMenuShuffleOrder.Text" xml:space="preserve">
     <value>Mezclar el orden</value>
@@ -2289,5 +2283,17 @@
   </data>
   <data name="trackSectionFile.Text" xml:space="preserve">
     <value>Archivo</value>
+  </data>
+  <data name="playlistShuffleOnPlaySwitch.OnContent" xml:space="preserve">
+    <value>Reproducción aleatoria</value>
+  </data>
+  <data name="playlistShuffleOnPlaySwitch.OffContent" xml:space="preserve">
+    <value>Reproducción aleatoria</value>
+  </data>
+  <data name="playlistRefreshOnPlaySwitch.OnContent" xml:space="preserve">
+    <value>Actualizar al reproducir</value>
+  </data>
+  <data name="playlistRefreshOnPlaySwitch.OffContent" xml:space="preserve">
+    <value>Actualizar al reproducir</value>
   </data>
 </root>

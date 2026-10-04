@@ -62,12 +62,7 @@
                 <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingSmall}" Margin="0,6,0,0">
                     <AppBarButton x:Uid="playlistListen" Style="{StaticResource ListenAppBarButtonStyle}" Width="Auto" MinWidth="0" Command="{x:Bind ViewModel.ListenCommand}" />
 
-                    <ToggleButton IsChecked="{x:Bind ViewModel.ShuffleOnPlay, Mode=TwoWay}">
-                        <StackPanel Orientation="Horizontal" Spacing="6">
-                            <SymbolIcon Symbol="Shuffle" />
-                            <TextBlock x:Uid="playlistShuffleOnPlayText" VerticalAlignment="Center" />
-                        </StackPanel>
-                    </ToggleButton>
+                    <ToggleSwitch x:Uid="playlistShuffleOnPlaySwitch" IsOn="{x:Bind ViewModel.ShuffleOnPlay, Mode=TwoWay}" MinWidth="0" VerticalAlignment="Center" />
 
                     <Button x:Uid="albumMoreButton">
                         <FontIcon Glyph="&#xE712;" />

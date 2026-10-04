@@ -12,16 +12,16 @@
             <SolidColorBrush x:Key="BrandPrimaryPressedBrush" Color="{StaticResource Blue800}" />
             <SolidColorBrush x:Key="BrandAccentBrush" Color="{StaticResource Blue400}" />
 
-            <!-- Checked ToggleButton follows the brand instead of the Windows accent color. -->
-            <StaticResource x:Key="ToggleButtonBackgroundChecked" ResourceKey="BrandPrimaryBrush" />
-            <StaticResource x:Key="ToggleButtonBackgroundCheckedPointerOver" ResourceKey="BrandPrimaryHoverBrush" />
-            <StaticResource x:Key="ToggleButtonBackgroundCheckedPressed" ResourceKey="BrandPrimaryPressedBrush" />
-            <StaticResource x:Key="ToggleButtonBorderBrushChecked" ResourceKey="BrandPrimaryBrush" />
-            <StaticResource x:Key="ToggleButtonBorderBrushCheckedPointerOver" ResourceKey="BrandPrimaryHoverBrush" />
-            <StaticResource x:Key="ToggleButtonBorderBrushCheckedPressed" ResourceKey="BrandPrimaryPressedBrush" />
-            <StaticResource x:Key="ToggleButtonForegroundChecked" ResourceKey="OnSurfacePrimaryBrush" />
-            <StaticResource x:Key="ToggleButtonForegroundCheckedPointerOver" ResourceKey="OnSurfacePrimaryBrush" />
-            <StaticResource x:Key="ToggleButtonForegroundCheckedPressed" ResourceKey="OnSurfacePrimaryBrush" />
+            <!-- Checked toggles follow the brand instead of the Windows accent color. -->
+            <StaticResource x:Key="ToggleSwitchFillOn" ResourceKey="BrandPrimaryBrush" />
+            <StaticResource x:Key="ToggleSwitchFillOnPointerOver" ResourceKey="BrandPrimaryHoverBrush" />
+            <StaticResource x:Key="ToggleSwitchFillOnPressed" ResourceKey="BrandPrimaryPressedBrush" />
+            <StaticResource x:Key="ToggleSwitchStrokeOn" ResourceKey="BrandPrimaryBrush" />
+            <StaticResource x:Key="ToggleSwitchStrokeOnPointerOver" ResourceKey="BrandPrimaryHoverBrush" />
+            <StaticResource x:Key="ToggleSwitchStrokeOnPressed" ResourceKey="BrandPrimaryPressedBrush" />
+            <StaticResource x:Key="ToggleSwitchKnobFillOn" ResourceKey="OnSurfacePrimaryBrush" />
+            <StaticResource x:Key="ToggleSwitchKnobFillOnPointerOver" ResourceKey="OnSurfacePrimaryBrush" />
+            <StaticResource x:Key="ToggleSwitchKnobFillOnPressed" ResourceKey="OnSurfacePrimaryBrush" />
 
             <SolidColorBrush x:Key="SurfaceOverlayBrush" Color="{StaticResource Black85}" />
             <SolidColorBrush x:Key="OnSurfacePrimaryBrush" Color="White" />
@@ -56,16 +56,16 @@
             <SolidColorBrush x:Key="BrandPrimaryPressedBrush" Color="{StaticResource Blue800}" />
             <SolidColorBrush x:Key="BrandAccentBrush" Color="{StaticResource Blue400}" />
 
-            <!-- Checked ToggleButton follows the brand instead of the Windows accent color. -->
-            <StaticResource x:Key="ToggleButtonBackgroundChecked" ResourceKey="BrandPrimaryBrush" />
-            <StaticResource x:Key="ToggleButtonBackgroundCheckedPointerOver" ResourceKey="BrandPrimaryHoverBrush" />
-            <StaticResource x:Key="ToggleButtonBackgroundCheckedPressed" ResourceKey="BrandPrimaryPressedBrush" />
-            <StaticResource x:Key="ToggleButtonBorderBrushChecked" ResourceKey="BrandPrimaryBrush" />
-            <StaticResource x:Key="ToggleButtonBorderBrushCheckedPointerOver" ResourceKey="BrandPrimaryHoverBrush" />
-            <StaticResource x:Key="ToggleButtonBorderBrushCheckedPressed" ResourceKey="BrandPrimaryPressedBrush" />
-            <StaticResource x:Key="ToggleButtonForegroundChecked" ResourceKey="OnSurfacePrimaryBrush" />
-            <StaticResource x:Key="ToggleButtonForegroundCheckedPointerOver" ResourceKey="OnSurfacePrimaryBrush" />
-            <StaticResource x:Key="ToggleButtonForegroundCheckedPressed" ResourceKey="OnSurfacePrimaryBrush" />
+            <!-- Checked toggles follow the brand instead of the Windows accent color. -->
+            <StaticResource x:Key="ToggleSwitchFillOn" ResourceKey="BrandPrimaryBrush" />
+            <StaticResource x:Key="ToggleSwitchFillOnPointerOver" ResourceKey="BrandPrimaryHoverBrush" />
+            <StaticResource x:Key="ToggleSwitchFillOnPressed" ResourceKey="BrandPrimaryPressedBrush" />
+            <StaticResource x:Key="ToggleSwitchStrokeOn" ResourceKey="BrandPrimaryBrush" />
+            <StaticResource x:Key="ToggleSwitchStrokeOnPointerOver" ResourceKey="BrandPrimaryHoverBrush" />
+            <StaticResource x:Key="ToggleSwitchStrokeOnPressed" ResourceKey="BrandPrimaryPressedBrush" />
+            <StaticResource x:Key="ToggleSwitchKnobFillOn" ResourceKey="OnSurfacePrimaryBrush" />
+            <StaticResource x:Key="ToggleSwitchKnobFillOnPointerOver" ResourceKey="OnSurfacePrimaryBrush" />
+            <StaticResource x:Key="ToggleSwitchKnobFillOnPressed" ResourceKey="OnSurfacePrimaryBrush" />
             
             <SolidColorBrush x:Key="SurfaceOverlayBrush" Color="{StaticResource Black70}" />
             <SolidColorBrush x:Key="OnSurfacePrimaryBrush" Color="White" />
