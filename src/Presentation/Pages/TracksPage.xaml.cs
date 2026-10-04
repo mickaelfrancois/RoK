@@ -3,6 +3,7 @@ using System.Threading;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Navigation;
 using Rok.Commons;
+using Rok.ViewModels.Common;
 using Rok.ViewModels.Tracks;
 
 namespace Rok.Pages;
@@ -125,6 +126,12 @@ public sealed partial class TracksPage : Page, IDisposable
     private void FilterFlyout_Opened(object sender, object e)
     {
         _filterMenuBuilder.PopulateFilterMenu(filterMenu, ViewModel);
+    }
+
+    private void RemoveFilterChip_Click(object sender, RoutedEventArgs e)
+    {
+        if (sender is Button { DataContext: FilterChip chip })
+            ViewModel.RemoveFilterCommand.Execute(chip);
     }
 
     private void GroupButton_Tapped(object sender, Microsoft.UI.Xaml.Input.TappedRoutedEventArgs e)

@@ -1,9 +1,12 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+﻿using System.Globalization;
+using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.UI.Dispatching;
 using Rok.ViewModels.Album;
 using Rok.ViewModels.Albums.Interfaces;
 using Rok.ViewModels.Albums.Services;
+using Rok.ViewModels.Common;
+using Rok.ViewModels.Common.Services;
 
 namespace Rok.ViewModels.Albums;
 
@@ -37,6 +40,11 @@ public partial class AlbumsViewModel : ObservableObject, IDisposable
     public int Count => _filteredAlbums.Count;
     public bool HasNoData => _filteredAlbums.Count == 0;
     public double DurationText => TimeSpan.FromSeconds(_filteredAlbums.Sum(album => album.Album.Duration)).TotalHours;
+
+    /// <summary>One chip per active filter, whichever family (list, genre, tag) it comes from.</summary>
+    public ObservableCollection<FilterChip> ActiveFilters { get; } = [];
+    public bool HasActiveFilters => ActiveFilters.Count > 0;
+    public bool HasSeveralFilters => ActiveFilters.Count > 1;
 
     [ObservableProperty]
     public partial string FilterByText { get; set; } = string.Empty;
@@ -145,24 +153,20 @@ public partial class AlbumsViewModel : ObservableObject, IDisposable
 
     private void SetFilterLabel()
     {
-        if (_stateManager.SelectedFilters.Count > 0)
+        ActiveFilters.Clear();
+
+        foreach (FilterChip chip in FilterChipBuilder.Build(
+                     _stateManager.SelectedFilters, _stateManager.SelectedGenreFilters, _stateManager.SelectedTagFilters, Genres, _albumProvider.GetFilterLabel))
         {
-            string lastFilter = _stateManager.SelectedFilters[^1];
-            FilterByText = _albumProvider.GetFilterLabel(lastFilter);
+            ActiveFilters.Add(chip);
         }
-        else if (_stateManager.SelectedGenreFilters.Count > 0)
-        {
-            long lastGenreId = _stateManager.SelectedGenreFilters[^1];
-            FilterByText = Genres.FirstOrDefault(c => c.Id == lastGenreId)?.Name ?? _albumProvider.GetFilterLabel("");
-        }
-        else if (SelectedTagFilters.Count > 0)
-        {
-            FilterByText = SelectedTagFilters[^1];
-        }
-        else
-        {
-            FilterByText = _albumProvider.GetFilterLabel("");
-        }
+
+        FilterByText = ActiveFilters.Count > 0
+            ? ActiveFilters.Count.ToString(CultureInfo.CurrentCulture)
+            : _albumProvider.GetFilterLabel("");
+
+        OnPropertyChanged(nameof(HasActiveFilters));
+        OnPropertyChanged(nameof(HasSeveralFilters));
     }
 
     private void LoadState()
@@ -229,6 +233,23 @@ public partial class AlbumsViewModel : ObservableObject, IDisposable
 
         SetFilterLabel();
         FilterAndSort();
+    }
+
+    [RelayCommand]
+    private void RemoveFilter(FilterChip chip)
+    {
+        switch (chip.Kind)
+        {
+            case FilterKind.List:
+                FilterBy(chip.Value);
+                break;
+            case FilterKind.Genre:
+                FilterByGenre(long.Parse(chip.Value, CultureInfo.InvariantCulture));
+                break;
+            case FilterKind.Tag:
+                FilterByTag(chip.Value);
+                break;
+        }
     }
 
     [RelayCommand]

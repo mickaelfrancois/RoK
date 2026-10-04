@@ -6,6 +6,8 @@
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
       xmlns:common="using:Rok.Commons"
+      xmlns:controls="using:CommunityToolkit.WinUI.Controls"
+      xmlns:vmcommon="using:Rok.ViewModels.Common"
       xmlns:tracks="using:Rok.ViewModels.Track"
       xmlns:tracks1="using:Rok.ViewModels.Tracks"
       x:Name="tracksView"
@@ -20,6 +22,7 @@
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="{StaticResource HeaderListRowHeight}" />
+            <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
@@ -75,7 +78,37 @@
             </CommandBar.Content>
         </CommandBar>
         
-        <Grid Grid.Row="1" >
+        <!-- Active filters, one chip each -->
+        <Grid Grid.Row="1" Visibility="{x:Bind ViewModel.HasActiveFilters, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" ColumnSpacing="{StaticResource SpacingSmall}" Padding="12,2,12,6">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+
+            <ItemsControl ItemsSource="{x:Bind ViewModel.ActiveFilters}">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <controls:WrapPanel Orientation="Horizontal" HorizontalSpacing="6" VerticalSpacing="6" />
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate x:DataType="vmcommon:FilterChip">
+                        <Border CornerRadius="12" Padding="10,0,2,0" Background="{ThemeResource ControlFillColorDefaultBrush}" BorderBrush="{ThemeResource ControlStrokeColorDefaultBrush}" BorderThickness="1">
+                            <StackPanel Orientation="Horizontal" Spacing="2">
+                                <TextBlock Text="{x:Bind Label}" Style="{StaticResource CaptionTextBlockStyle}" FontWeight="SemiBold" VerticalAlignment="Center" />
+                                <Button x:Uid="filterChipRemove" Click="RemoveFilterChip_Click" Width="24" Height="24" MinWidth="0" MinHeight="0" Padding="0" Background="Transparent" BorderThickness="0" VerticalAlignment="Center">
+                                    <FontIcon Glyph="&#xE711;" FontSize="10" />
+                                </Button>
+                            </StackPanel>
+                        </Border>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+
+            <HyperlinkButton Grid.Column="1" x:Uid="filtersClearAll" Command="{x:Bind ViewModel.FilterByCommand}" CommandParameter="" Visibility="{x:Bind ViewModel.HasSeveralFilters, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" VerticalAlignment="Center" />
+        </Grid>
+
+        <Grid Grid.Row="2" >
             <Grid.RowDefinitions>
                 <RowDefinition Height="{StaticResource GridHeaderTracksHeight}" />
                 <RowDefinition />

@@ -2464,4 +2464,13 @@
   <data name="playlistRefreshOnPlaySwitch.OffContent" xml:space="preserve">
     <value>Refresh on play</value>
   </data>
+  <data name="filterChipRemove.AutomationProperties.Name" xml:space="preserve">
+    <value>Remove filter</value>
+  </data>
+  <data name="filterChipRemove.ToolTipService.ToolTip" xml:space="preserve">
+    <value>Remove filter</value>
+  </data>
+  <data name="filtersClearAll.Content" xml:space="preserve">
+    <value>Clear all</value>
+  </data>
 </root>

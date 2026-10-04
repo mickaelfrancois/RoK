@@ -7,6 +7,7 @@ using Microsoft.UI.Xaml.Navigation;
 using Rok.Commons;
 using Rok.ViewModels.Album;
 using Rok.ViewModels.Albums;
+using Rok.ViewModels.Common;
 
 namespace Rok.Pages;
 
@@ -142,6 +143,12 @@ public sealed partial class AlbumsPage : Page, IDisposable
     private void FilterFlyout_Opened(object sender, object e)
     {
         _filterMenuBuilder.PopulateFilterMenu(filterMenu, ViewModel);
+    }
+
+    private void RemoveFilterChip_Click(object sender, RoutedEventArgs e)
+    {
+        if (sender is Button { DataContext: FilterChip chip })
+            ViewModel.RemoveFilterCommand.Execute(chip);
     }
 
     private void GroupButton_Tapped(object sender, Microsoft.UI.Xaml.Input.TappedRoutedEventArgs e)

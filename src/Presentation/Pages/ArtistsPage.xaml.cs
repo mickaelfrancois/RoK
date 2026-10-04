@@ -7,6 +7,7 @@ using Microsoft.UI.Xaml.Navigation;
 using Rok.Commons;
 using Rok.ViewModels.Artist;
 using Rok.ViewModels.Artists;
+using Rok.ViewModels.Common;
 
 namespace Rok.Pages;
 
@@ -182,6 +183,12 @@ public sealed partial class ArtistsPage : Page, IDisposable
                 hideFavoriteButtonStoryboard?.Begin();
             }
         }
+    }
+
+    private void RemoveFilterChip_Click(object sender, RoutedEventArgs e)
+    {
+        if (sender is Button { DataContext: FilterChip chip })
+            ViewModel.RemoveFilterCommand.Execute(chip);
     }
 
     private void GroupButton_Tapped(object sender, Microsoft.UI.Xaml.Input.TappedRoutedEventArgs e)
