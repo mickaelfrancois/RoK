@@ -2349,4 +2349,40 @@
   <data name="listeningLinkYoutube.Text" xml:space="preserve">
     <value>YouTube</value>
   </data>
+  <data name="albumKicker.Text" xml:space="preserve">
+    <value>ALBUM</value>
+  </data>
+  <data name="albumShuffleText.Text" xml:space="preserve">
+    <value>Mélanger</value>
+  </data>
+  <data name="albumAddToPlaylistText.Text" xml:space="preserve">
+    <value>Ajouter à…</value>
+  </data>
+  <data name="albumMoreButton.ToolTipService.ToolTip" xml:space="preserve">
+    <value>Plus d'actions</value>
+  </data>
+  <data name="albumMoreButton.AutomationProperties.Name" xml:space="preserve">
+    <value>Plus d'actions</value>
+  </data>
+  <data name="albumMenuEdit.Text" xml:space="preserve">
+    <value>Modifier</value>
+  </data>
+  <data name="albumMenuBiography.Text" xml:space="preserve">
+    <value>Biographie</value>
+  </data>
+  <data name="albumMenuRefresh.Text" xml:space="preserve">
+    <value>Actualiser les données</value>
+  </data>
+  <data name="albumFavoriteText.Text" xml:space="preserve">
+    <value>Favori</value>
+  </data>
+  <data name="albumArtistFavorite.ToolTipService.ToolTip" xml:space="preserve">
+    <value>Artiste favori</value>
+  </data>
+  <data name="albumArtistFavorite.AutomationProperties.Name" xml:space="preserve">
+    <value>Artiste favori</value>
+  </data>
+  <data name="gridHeaderDuration.Text" xml:space="preserve">
+    <value>Durée</value>
+  </data>
 </root>

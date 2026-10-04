@@ -39,6 +39,7 @@
     <GridLength x:Key="GridHeaderTracksAlbumColumnWidth">250</GridLength>
     <GridLength x:Key="GridHeaderTracksArtistColumnWidth">350</GridLength>
     <GridLength x:Key="GridHeaderTracksGenreColumnWidth">250</GridLength>
+    <GridLength x:Key="GridHeaderTracksDurationColumnWidth">80</GridLength>
     <GridLength x:Key="GridHeaderTracksScoreColumnWidth">150</GridLength>
     <GridLength x:Key="GridHeaderTracksHeight">25</GridLength>
 

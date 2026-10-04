@@ -47,7 +47,6 @@ public class AlbumViewModelTests
             _player.Object,
             _resources.Object,
             new AlbumDataLoader(_mediator, _trackFactory.Object, NullLogger<AlbumDataLoader>.Instance),
-            new TagsProvider(_mediator, _messenger),
             new AlbumPictureService(_albumPicture.Object, NullLogger<AlbumPictureService>.Instance),
             _apiService.Object,
             new AlbumStatisticsService(_mediator),
@@ -75,6 +74,7 @@ public class AlbumViewModelTests
         Watch(nameof(sut.ArtistOpenCommand), sut.ArtistOpenCommand);
         Watch(nameof(sut.GenreOpenCommand), sut.GenreOpenCommand);
         Watch(nameof(sut.ListenCommand), sut.ListenCommand);
+        Watch(nameof(sut.ShuffleCommand), sut.ShuffleCommand);
         Watch(nameof(sut.AlbumFavoriteCommand), sut.AlbumFavoriteCommand);
         Watch(nameof(sut.GetDataFromApiCommand), sut.GetDataFromApiCommand);
         Watch(nameof(sut.EditAlbumCommand), sut.EditAlbumCommand);
@@ -91,6 +91,7 @@ public class AlbumViewModelTests
         Assert.Equal(expected, sut.ArtistOpenCommand.CanExecute(null));
         Assert.Equal(expected, sut.GenreOpenCommand.CanExecute(null));
         Assert.Equal(expected, sut.ListenCommand.CanExecute(null));
+        Assert.Equal(expected, sut.ShuffleCommand.CanExecute(null));
         Assert.Equal(expected, sut.AlbumFavoriteCommand.CanExecute(null));
         Assert.Equal(expected, sut.GetDataFromApiCommand.CanExecute(null));
         Assert.Equal(expected, sut.EditAlbumCommand.CanExecute(null));
@@ -278,5 +279,133 @@ public class AlbumViewModelTests
         Assert.Contains(nameof(sut.Album), raised);
         Assert.Contains(nameof(sut.SubTitle), raised);
         Assert.Equal(11, sut.Album.TrackCount);
+    }
+
+    [Fact(DisplayName = "when_the_album_has_tracks_and_a_duration_then_the_header_summary_joins_them")]
+    public void HeaderSummary_ShouldJoinTrackCountAndDuration()
+    {
+        // Arrange
+        AlbumViewModel sut = BuildViewModel();
+        _resources.Setup(r => r.GetString("listeningSummaryTracks")).Returns("{0} tracks");
+        _resources.Setup(r => r.GetString("listeningSummaryMinutes")).Returns("{0} min");
+
+        // Act
+        sut.SetData(new AlbumDto { Id = 42, TrackCount = 11, Duration = 2340 });
+
+        // Assert
+        Assert.Equal("11 tracks · 39 min", sut.HeaderSummary);
+    }
+
+    [Fact(DisplayName = "when_the_album_has_no_tracks_then_the_header_summary_is_empty")]
+    public void HeaderSummary_ShouldBeEmpty_WhenTheAlbumHasNoTracks()
+    {
+        // Arrange
+        AlbumViewModel sut = BuildViewModel();
+
+        // Act
+        sut.SetData(new AlbumDto { Id = 42, TrackCount = 0, Duration = 0 });
+
+        // Assert
+        Assert.Equal(string.Empty, sut.HeaderSummary);
+    }
+
+    [Theory(DisplayName = "when_the_album_has_a_release_date_or_a_year_then_the_year_text_prefers_the_release_date")]
+    [InlineData(1977, 1990, "1977")]
+    [InlineData(null, 1990, "1990")]
+    [InlineData(null, null, "")]
+    public void YearText_ShouldPreferTheReleaseDate(int? releaseYear, int? year, string expected)
+    {
+        // Arrange
+        AlbumViewModel sut = BuildViewModel();
+        DateTime? releaseDate = releaseYear.HasValue ? new DateTime(releaseYear.Value, 2, 4) : null;
+
+        // Act
+        sut.SetData(new AlbumDto { Id = 42, ReleaseDate = releaseDate, Year = year });
+
+        // Assert
+        Assert.Equal(expected, sut.YearText);
+        Assert.Equal(expected.Length > 0, sut.HasYear);
+    }
+
+    [Theory(DisplayName = "when_the_album_has_a_genre_id_and_a_name_then_the_genre_chip_is_shown")]
+    [InlineData(5L, "Rock", true)]
+    [InlineData(5L, "", false)]
+    [InlineData(null, "Rock", false)]
+    public void HasGenre_ShouldRequireAnIdAndAName(long? genreId, string genreName, bool expected)
+    {
+        // Arrange
+        AlbumViewModel sut = BuildViewModel();
+
+        // Act
+        sut.SetData(new AlbumDto { Id = 42, GenreId = genreId, GenreName = genreName });
+
+        // Assert
+        Assert.Equal(expected, sut.HasGenre);
+    }
+
+    [Fact(DisplayName = "when_the_album_is_a_favorite_then_the_favorite_label_offers_to_remove_it")]
+    public void AlbumFavoriteLabel_ShouldOfferToRemove_WhenTheAlbumIsAFavorite()
+    {
+        // Arrange
+        AlbumViewModel sut = BuildViewModel();
+        _resources.Setup(r => r.GetString("listeningFavoriteAdd")).Returns("Add {0}");
+        _resources.Setup(r => r.GetString("listeningFavoriteRemove")).Returns("Remove {0}");
+
+        // Act
+        sut.SetData(new AlbumDto { Id = 42, Name = "Rumours", ArtistName = "Fleetwood Mac", IsFavorite = true, IsArtistFavorite = false });
+
+        // Assert
+        Assert.Equal("Remove Rumours", sut.AlbumFavoriteLabel);
+    }
+
+    [Fact(DisplayName = "when_the_album_has_no_tracks_then_shuffle_does_not_load_a_playlist")]
+    public async Task ShuffleCommand_ShouldNotLoadAPlaylist_WhenTheAlbumHasNoTracks()
+    {
+        // Arrange
+        _mediator.Setup<GetAlbumByIdRequest, Result<AlbumDto>>()
+                 .Returns(Result<AlbumDto>.Ok(new AlbumDto { Id = 42, Name = "Greatest Hits" }));
+        _mediator.Setup<GetTracksByAlbumIdRequest, Result<IEnumerable<TrackDto>>>()
+                 .Returns(Result<IEnumerable<TrackDto>>.Ok(new List<TrackDto>()));
+        AlbumViewModel sut = BuildViewModel();
+        await sut.LoadDataAsync(42);
+
+        // Act
+        await sut.ShuffleCommand.ExecuteAsync(null);
+
+        // Assert
+        _player.Verify(p => p.LoadPlaylist(It.IsAny<List<TrackDto>>(), It.IsAny<TrackDto?>()), Times.Never);
+    }
+
+    [Theory(DisplayName = "when_the_album_has_a_label_or_a_format_then_the_header_details_join_them")]
+    [InlineData("Warner Bros.", "Vinyl", "Warner Bros. · Vinyl", true)]
+    [InlineData("Warner Bros.", null, "Warner Bros.", true)]
+    [InlineData(null, " CD ", "CD", true)]
+    [InlineData("  ", "", "", false)]
+    public void HeaderDetails_ShouldJoinTheLabelAndTheFormat(string? label, string? format, string expected, bool hasDetails)
+    {
+        // Arrange
+        AlbumViewModel sut = BuildViewModel();
+
+        // Act
+        sut.SetData(new AlbumDto { Id = 42, Label = label, ReleaseFormat = format });
+
+        // Assert
+        Assert.Equal(expected, sut.HeaderDetails);
+        Assert.Equal(hasDetails, sut.HasDetails);
+    }
+
+    [Theory(DisplayName = "when_the_album_has_a_country_code_then_the_country_flag_is_shown")]
+    [InlineData("GB", true)]
+    [InlineData("", false)]
+    public void HasCountry_ShouldFollowTheCountryCode(string countryCode, bool expected)
+    {
+        // Arrange
+        AlbumViewModel sut = BuildViewModel();
+
+        // Act
+        sut.SetData(new AlbumDto { Id = 42, CountryCode = countryCode });
+
+        // Assert
+        Assert.Equal(expected, sut.HasCountry);
     }
 }
