@@ -416,4 +416,37 @@ public class AlbumViewModelTests
         // Assert
         _player.Verify(p => p.LoadPlaylist(It.IsAny<List<TrackDto>>(), It.IsAny<TrackDto?>()), Times.Never);
     }
+
+    [Theory(DisplayName = "when_the_album_has_a_label_or_a_format_then_the_header_details_join_them")]
+    [InlineData("Warner Bros.", "Vinyl", "Warner Bros. · Vinyl", true)]
+    [InlineData("Warner Bros.", null, "Warner Bros.", true)]
+    [InlineData(null, " CD ", "CD", true)]
+    [InlineData("  ", "", "", false)]
+    public void HeaderDetails_ShouldJoinTheLabelAndTheFormat(string? label, string? format, string expected, bool hasDetails)
+    {
+        // Arrange
+        AlbumViewModel sut = BuildViewModel();
+
+        // Act
+        sut.SetData(new AlbumDto { Id = 42, Label = label, ReleaseFormat = format });
+
+        // Assert
+        Assert.Equal(expected, sut.HeaderDetails);
+        Assert.Equal(hasDetails, sut.HasDetails);
+    }
+
+    [Theory(DisplayName = "when_the_album_has_a_country_code_then_the_country_flag_is_shown")]
+    [InlineData("GB", true)]
+    [InlineData("", false)]
+    public void HasCountry_ShouldFollowTheCountryCode(string countryCode, bool expected)
+    {
+        // Arrange
+        AlbumViewModel sut = BuildViewModel();
+
+        // Act
+        sut.SetData(new AlbumDto { Id = 42, CountryCode = countryCode });
+
+        // Assert
+        Assert.Equal(expected, sut.HasCountry);
+    }
 }

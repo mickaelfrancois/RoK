@@ -151,6 +151,10 @@ public partial class AlbumViewModel : ObservableObject, IFilterableAlbum, IGroup
         OnPropertyChanged(nameof(HasYear));
         OnPropertyChanged(nameof(GenreName));
         OnPropertyChanged(nameof(HasGenre));
+        OnPropertyChanged(nameof(HeaderDetails));
+        OnPropertyChanged(nameof(HasDetails));
+        OnPropertyChanged(nameof(HasCountry));
+        OnPropertyChanged(nameof(CountryName));
         OnPropertyChanged(nameof(AlbumFavoriteLabel));
         OnPropertyChanged(nameof(ArtistFavoriteLabel));
         ArtistFavoriteCommand.NotifyCanExecuteChanged();
@@ -225,6 +229,15 @@ public partial class AlbumViewModel : ObservableObject, IFilterableAlbum, IGroup
     public string GenreName => Album.GenreName;
 
     public bool HasGenre => Album.GenreId.HasValue && !string.IsNullOrEmpty(Album.GenreName);
+
+    /// <summary>Record label and release format, joined, when the album carries them.</summary>
+    public string HeaderDetails => string.Join(" · ", new[] { Album.Label, Album.ReleaseFormat }.Where(value => !string.IsNullOrWhiteSpace(value)).Select(value => value!.Trim()));
+
+    public bool HasDetails => HeaderDetails.Length > 0;
+
+    public bool HasCountry => !string.IsNullOrEmpty(Album.CountryCode);
+
+    public string CountryName => Album.CountryName;
 
     public string AlbumFavoriteLabel => ListeningHeaderLabels.FavoriteToggle(
         Album.Name, IsFavorite, _resourceLoader.GetString("listeningFavoriteAdd"), _resourceLoader.GetString("listeningFavoriteRemove"));

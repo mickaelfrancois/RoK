@@ -90,9 +90,14 @@
 
                     <TextBlock Text="·" VerticalAlignment="Center" Foreground="{ThemeResource TextFillColorSecondaryBrush}" Visibility="{x:Bind ViewModel.HasYear, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" />
                     <TextBlock Text="{x:Bind ViewModel.YearText, Mode=OneWay}" VerticalAlignment="Center" FontSize="{StaticResource FontSizeSmall}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" Visibility="{x:Bind ViewModel.HasYear, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" />
+                    <Image Height="12" VerticalAlignment="Center" Source="{x:Bind ViewModel.Album.CountryCode, Mode=OneWay, Converter={StaticResource CountryCodeToImageSourceConverter}}" ToolTipService.ToolTip="{x:Bind ViewModel.CountryName, Mode=OneWay}" Visibility="{x:Bind ViewModel.HasCountry, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" />
                 </StackPanel>
 
-                <TextBlock Text="{x:Bind ViewModel.HeaderSummary, Mode=OneWay}" Style="{StaticResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                <StackPanel Orientation="Horizontal" Spacing="6">
+                    <TextBlock Text="{x:Bind ViewModel.HeaderSummary, Mode=OneWay}" Style="{StaticResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                    <TextBlock Text="·" Style="{StaticResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" Visibility="{x:Bind ViewModel.HasDetails, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" />
+                    <TextBlock Text="{x:Bind ViewModel.HeaderDetails, Mode=OneWay}" Style="{StaticResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" Visibility="{x:Bind ViewModel.HasDetails, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" />
+                </StackPanel>
 
                 <!-- Actions -->
                 <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingSmall}" Margin="0,6,0,0">
