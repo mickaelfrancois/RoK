@@ -28,7 +28,6 @@ public partial class AlbumViewModel : ObservableObject, IFilterableAlbum, IGroup
     private readonly IAppOptions _appOptions;
 
     private readonly AlbumDataLoader _dataLoader;
-    private readonly TagsProvider _tagsProvider;
     private readonly AlbumPictureService _pictureService;
     private readonly IAlbumApiService _apiService;
     private readonly AlbumStatisticsService _statisticsService;
@@ -80,10 +79,6 @@ public partial class AlbumViewModel : ObservableObject, IFilterableAlbum, IGroup
     }
 
     public IPlaylistMenuService PlaylistMenuService { get; }
-
-    public ObservableCollection<string> EditableTags { get; } = new();
-
-    public ObservableCollection<string> SuggestedTags { get; set; } = new();
 
     public bool IsFavorite
     {
@@ -280,7 +275,6 @@ public partial class AlbumViewModel : ObservableObject, IFilterableAlbum, IGroup
         IPlayerService playerService,
         IStringResourceProvider resourceLoader,
         AlbumDataLoader dataLoader,
-        TagsProvider tagsDataLoader,
         AlbumPictureService pictureService,
         IAlbumApiService apiService,
         AlbumStatisticsService statisticsService,
@@ -298,7 +292,6 @@ public partial class AlbumViewModel : ObservableObject, IFilterableAlbum, IGroup
         _playerService = Guard.NotNull(playerService);
         _resourceLoader = Guard.NotNull(resourceLoader);
         _dataLoader = Guard.NotNull(dataLoader);
-        _tagsProvider = Guard.NotNull(tagsDataLoader);
         _pictureService = Guard.NotNull(pictureService);
         _apiService = Guard.NotNull(apiService);
         _messenger = Guard.NotNull(messenger);
@@ -359,7 +352,7 @@ public partial class AlbumViewModel : ObservableObject, IFilterableAlbum, IGroup
     }
 
     /// <summary>
-    /// Loads everything the first render does not need (statistics, API metadata, tags,
+    /// Loads everything the first render does not need (statistics, API metadata,
     /// dominant color). Runs detached from the navigation path so the header and track
     /// list show up immediately; each panel fills in when its data arrives.
     /// </summary>
@@ -385,11 +378,6 @@ public partial class AlbumViewModel : ObservableObject, IFilterableAlbum, IGroup
             if (cancellationToken.IsCancellationRequested)
                 return;
 
-            await InitializeTagsAsync();
-
-            if (cancellationToken.IsCancellationRequested)
-                return;
-
             await CalculatePictureDominantColorAsync();
 
             stopwatch.Stop();
@@ -404,7 +392,6 @@ public partial class AlbumViewModel : ObservableObject, IFilterableAlbum, IGroup
     public void OnNavigatedFrom()
     {
         InitNavigationCancellation();
-        EditableTags.CollectionChanged -= OnTagsCollectionChanged;
         Backdrop = null;
     }
 
@@ -531,40 +518,6 @@ public partial class AlbumViewModel : ObservableObject, IFilterableAlbum, IGroup
         catch (Exception ex)
         {
             _logger.LogWarning(ex, "Failed to load picture or dominant color for {AlbumPath}", Album.AlbumPath);
-        }
-    }
-
-    private async Task InitializeTagsAsync()
-    {
-        List<string> albumTags = Album.GetTags();
-
-        // Detached while filling: otherwise every Clear/Add would persist a partial tag list.
-        EditableTags.CollectionChanged -= OnTagsCollectionChanged;
-
-        EditableTags.Clear();
-        foreach (string tag in albumTags)
-            EditableTags.Add(tag);
-
-        EditableTags.CollectionChanged += OnTagsCollectionChanged;
-
-        SuggestedTags.Clear();
-        List<string> suggestedTags = await _tagsProvider.GetTagsAsync();
-        foreach (string tag in suggestedTags)
-        {
-            SuggestedTags.Add(tag);
-        }
-    }
-
-    private async void OnTagsCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
-    {
-        try
-        {
-            Album.TagsAsString = string.Join(",", EditableTags);
-            await _editService.UpdateTagsAsync(Album.Id, EditableTags);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Failed to save tags for album {AlbumId}", Album.Id);
         }
     }
 

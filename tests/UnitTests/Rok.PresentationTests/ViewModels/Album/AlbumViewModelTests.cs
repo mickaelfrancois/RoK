@@ -48,7 +48,6 @@ public class AlbumViewModelTests
             _player.Object,
             _resources.Object,
             new AlbumDataLoader(_mediator, _trackFactory.Object, NullLogger<AlbumDataLoader>.Instance),
-            new TagsProvider(_mediator, _messenger),
             new AlbumPictureService(_albumPicture.Object, NullLogger<AlbumPictureService>.Instance),
             _apiService.Object,
             new AlbumStatisticsService(_mediator),

@@ -7,7 +7,6 @@
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
       xmlns:common="using:Rok.Commons"
       xmlns:tracks="using:Rok.ViewModels.Track"
-      xmlns:controls="using:CommunityToolkit.WinUI.Controls"
       x:Name="albumPage"
       Loaded="AlbumPage_Loaded"
       SizeChanged="Page_SizeChanged"
@@ -29,7 +28,6 @@
                 <VisualState x:Name="NarrowHeader">
                     <VisualState.Setters>
                         <Setter Target="shuffleButton.Visibility" Value="Collapsed" />
-                        <Setter Target="tagsPanel.Visibility" Value="Collapsed" />
                         <Setter Target="coverPicture.Width" Value="72" />
                         <Setter Target="coverPicture.Height" Value="72" />
                     </VisualState.Setters>
@@ -107,12 +105,11 @@
                         </StackPanel>
                     </Button>
 
-                    <common:AnimatedButton VerticalAlignment="Center"
-                                           Icon="{StaticResource HeartPath}"
-                                           Color="{x:Bind ViewModel.IsFavorite, Converter={StaticResource FavoriteToColorConverter}, Mode=OneWay}"
-                                           Command="{x:Bind ViewModel.AlbumFavoriteCommand}"
-                                           ToolTipService.ToolTip="{x:Bind ViewModel.AlbumFavoriteLabel, Mode=OneWay}"
-                                           AutomationProperties.Name="{x:Bind ViewModel.AlbumFavoriteLabel, Mode=OneWay}" />
+                    <Button Command="{x:Bind ViewModel.AlbumFavoriteCommand}"
+                            ToolTipService.ToolTip="{x:Bind ViewModel.AlbumFavoriteLabel, Mode=OneWay}"
+                            AutomationProperties.Name="{x:Bind ViewModel.AlbumFavoriteLabel, Mode=OneWay}">
+                        <Path Data="{StaticResource HeartPath}" Fill="{x:Bind ViewModel.IsFavorite, Converter={StaticResource FavoriteToColorConverter}, Mode=OneWay}" Stretch="Uniform" Width="16" Height="16" />
+                    </Button>
 
                     <Button>
                         <StackPanel Orientation="Horizontal" Spacing="6">
@@ -138,14 +135,6 @@
                     </Button>
                 </StackPanel>
 
-                <!-- Tags -->
-                <StackPanel x:Name="tagsPanel" Margin="0,4,0,0" HorizontalAlignment="Left">
-                    <controls:TokenizingTextBox x:Uid="TagsBox" x:Name="TagsBox" MaxWidth="480" Style="{StaticResource TokenizingTextBoxStyle}" ItemsSource="{x:Bind ViewModel.EditableTags}" SuggestedItemsSource="{x:Bind ViewModel.SuggestedTags, Mode=OneWay}">
-                        <controls:TokenizingTextBox.Resources>
-                            <Style TargetType="controls:TokenizingTextBoxItem" BasedOn="{StaticResource TokenizingTextBoxItemStyle}" />
-                        </controls:TokenizingTextBox.Resources>
-                    </controls:TokenizingTextBox>
-                </StackPanel>
             </StackPanel>
         </Grid>
 
