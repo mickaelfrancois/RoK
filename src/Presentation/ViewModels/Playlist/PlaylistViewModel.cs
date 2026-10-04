@@ -101,16 +101,9 @@ public partial class PlaylistViewModel : ObservableObject
 
     public int ArtistCount => _tracks?.DistinctBy(c => c.ArtistId).Count() ?? 0;
 
-    public string SubTitle
-    {
-        get
-        {
-            string label = $"{TrackCount} ";
-            label += TrackCount > 1 ? _resourceLoader.GetString("tracks") : _resourceLoader.GetString("track");
-            label += ", " + DurationTotalStr;
-            return label;
-        }
-    }
+    public string SubTitle => TrackCount > 0
+        ? HeaderSummary
+        : string.Format(CultureInfo.CurrentCulture, _resourceLoader.GetString("listeningSummaryTracks"), 0);
 
     /// <summary>Track count and total duration, rendered with the same localized formats as the Listening header.</summary>
     public string HeaderSummary

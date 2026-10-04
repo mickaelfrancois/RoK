@@ -4,11 +4,8 @@ namespace Rok.ViewModels.Playlist.Services;
 
 public class PlaylistPictureService(IArtistPicture artistPicture, ILogger<PlaylistPictureService> logger)
 {
-    private static string FallbackPictureUri => App.Current.Resources["ArtistFallbackPictureUri"] as string ?? "ms-appx:///Assets/artistFallback.png";
-    private static BitmapImage FallbackPicture => new(new Uri(FallbackPictureUri));
-
-
-    public BitmapImage LoadPicture(string? pictureName)
+    /// <summary>Returns <c>null</c> without a picture, so the picture control shows its themed placeholder.</summary>
+    public BitmapImage? LoadPicture(string? pictureName)
     {
         try
         {
@@ -18,12 +15,12 @@ public class PlaylistPictureService(IArtistPicture artistPicture, ILogger<Playli
                 return new BitmapImage(new Uri(filePath, UriKind.Absolute));
             }
 
-            return FallbackPicture;
+            return null;
         }
         catch (Exception ex)
         {
             logger.LogError(ex, "Failed to load picture for playlist: {PictureName}", pictureName);
-            return FallbackPicture;
+            return null;
         }
     }
 
