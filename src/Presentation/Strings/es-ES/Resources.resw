@@ -2206,4 +2206,7 @@
   <data name="albumMenuRefresh.Text" xml:space="preserve">
     <value>Actualizar los datos</value>
   </data>
+  <data name="albumFavoriteText.Text" xml:space="preserve">
+    <value>Favorito</value>
+  </data>
 </root>
