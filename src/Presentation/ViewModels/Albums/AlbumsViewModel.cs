@@ -1,9 +1,11 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+﻿using System.Globalization;
+using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.UI.Dispatching;
 using Rok.ViewModels.Album;
 using Rok.ViewModels.Albums.Interfaces;
 using Rok.ViewModels.Albums.Services;
+using Rok.ViewModels.Listening.Services;
 
 namespace Rok.ViewModels.Albums;
 
@@ -17,6 +19,7 @@ public partial class AlbumsViewModel : ObservableObject, IDisposable
     private readonly AlbumsStateManager _stateManager;
     private readonly AlbumsPlaybackService _playbackService;
     private readonly ITelemetryClient _telemetryClient;
+    private readonly IStringResourceProvider _resourceLoader;
     private readonly DispatcherQueue _dispatcherQueue = DispatcherQueue.GetForCurrentThread();
     private bool _stateLoaded = false;
     private bool _libraryUpdated = false;
@@ -37,6 +40,30 @@ public partial class AlbumsViewModel : ObservableObject, IDisposable
     public int Count => _filteredAlbums.Count;
     public bool HasNoData => _filteredAlbums.Count == 0;
     public double DurationText => TimeSpan.FromSeconds(_filteredAlbums.Sum(album => album.Album.Duration)).TotalHours;
+
+    /// <summary>Album count and total duration of the filtered list, with the localized formats of the other headers.</summary>
+    public string HeaderSummary
+    {
+        get
+        {
+            ListeningSummaryLabels labels = new(
+                _resourceLoader.GetString("artistSummaryAlbum"),
+                _resourceLoader.GetString("artistSummaryAlbums"),
+                _resourceLoader.GetString("listeningSummaryHoursMinutes"),
+                _resourceLoader.GetString("listeningSummaryHours"),
+                _resourceLoader.GetString("listeningSummaryMinutes"),
+                _resourceLoader.GetString("listeningSummaryEndsAt"));
+
+            long totalSeconds = _filteredAlbums.Sum(album => (long)album.Album.Duration);
+
+            return ListeningQueueSummaryFormatter.FormatOverview(new ListeningQueueSummary(_filteredAlbums.Count, totalSeconds, null), labels, CultureInfo.CurrentCulture);
+        }
+    }
+
+    /// <summary>One chip per active filter, whichever family (list, genre, tag) it comes from.</summary>
+    public ObservableCollection<AlbumFilterChip> ActiveFilters { get; } = [];
+    public bool HasActiveFilters => ActiveFilters.Count > 0;
+    public bool HasSeveralFilters => ActiveFilters.Count > 1;
 
     [ObservableProperty]
     public partial string FilterByText { get; set; } = string.Empty;
@@ -66,7 +93,7 @@ public partial class AlbumsViewModel : ObservableObject, IDisposable
     public string GroupById => SelectedGroupBy;
     public string GroupByText => _albumProvider.GetGroupByLabel(SelectedGroupBy);
 
-    public AlbumsViewModel(TagsProvider tagProvider, IAlbumProvider albumProvider, IAlbumLibraryMonitor libraryMonitor, AlbumsSelectionManager selectionManager, AlbumsStateManager stateManager, AlbumsPlaybackService playbackService, ITelemetryClient telemetryClient, ILogger<AlbumsViewModel> logger)
+    public AlbumsViewModel(TagsProvider tagProvider, IAlbumProvider albumProvider, IAlbumLibraryMonitor libraryMonitor, AlbumsSelectionManager selectionManager, AlbumsStateManager stateManager, AlbumsPlaybackService playbackService, ITelemetryClient telemetryClient, IStringResourceProvider resourceLoader, ILogger<AlbumsViewModel> logger)
     {
         _tagsProvider = tagProvider;
         _albumProvider = albumProvider;
@@ -75,6 +102,7 @@ public partial class AlbumsViewModel : ObservableObject, IDisposable
         _stateManager = stateManager;
         _playbackService = playbackService;
         _telemetryClient = telemetryClient;
+        _resourceLoader = resourceLoader;
         _logger = logger;
 
         IsGridView = _stateManager.GetGridView();
@@ -145,24 +173,20 @@ public partial class AlbumsViewModel : ObservableObject, IDisposable
 
     private void SetFilterLabel()
     {
-        if (_stateManager.SelectedFilters.Count > 0)
+        ActiveFilters.Clear();
+
+        foreach (AlbumFilterChip chip in AlbumFilterChipBuilder.Build(
+                     _stateManager.SelectedFilters, _stateManager.SelectedGenreFilters, _stateManager.SelectedTagFilters, Genres, _albumProvider.GetFilterLabel))
         {
-            string lastFilter = _stateManager.SelectedFilters[^1];
-            FilterByText = _albumProvider.GetFilterLabel(lastFilter);
+            ActiveFilters.Add(chip);
         }
-        else if (_stateManager.SelectedGenreFilters.Count > 0)
-        {
-            long lastGenreId = _stateManager.SelectedGenreFilters[^1];
-            FilterByText = Genres.FirstOrDefault(c => c.Id == lastGenreId)?.Name ?? _albumProvider.GetFilterLabel("");
-        }
-        else if (SelectedTagFilters.Count > 0)
-        {
-            FilterByText = SelectedTagFilters[^1];
-        }
-        else
-        {
-            FilterByText = _albumProvider.GetFilterLabel("");
-        }
+
+        FilterByText = ActiveFilters.Count > 0
+            ? ActiveFilters.Count.ToString(CultureInfo.CurrentCulture)
+            : _albumProvider.GetFilterLabel("");
+
+        OnPropertyChanged(nameof(HasActiveFilters));
+        OnPropertyChanged(nameof(HasSeveralFilters));
     }
 
     private void LoadState()
@@ -232,6 +256,23 @@ public partial class AlbumsViewModel : ObservableObject, IDisposable
     }
 
     [RelayCommand]
+    private void RemoveFilter(AlbumFilterChip chip)
+    {
+        switch (chip.Kind)
+        {
+            case AlbumFilterKind.List:
+                FilterBy(chip.Value);
+                break;
+            case AlbumFilterKind.Genre:
+                FilterByGenre(long.Parse(chip.Value, CultureInfo.InvariantCulture));
+                break;
+            case AlbumFilterKind.Tag:
+                FilterByTag(chip.Value);
+                break;
+        }
+    }
+
+    [RelayCommand]
     private void GroupBy(string groupBy)
     {
         SelectedGroupBy = groupBy;
@@ -275,6 +316,7 @@ public partial class AlbumsViewModel : ObservableObject, IDisposable
 
         OnPropertyChanged(nameof(Count));
         OnPropertyChanged(nameof(DurationText));
+        OnPropertyChanged(nameof(HeaderSummary));
         OnPropertyChanged(nameof(HasNoData));
     }
 

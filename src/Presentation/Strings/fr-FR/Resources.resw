@@ -2463,4 +2463,25 @@
   <data name="playlistRefreshOnPlaySwitch.OffContent" xml:space="preserve">
     <value>Actualiser à la lecture</value>
   </data>
+  <data name="albumsKicker.Text" xml:space="preserve">
+    <value>COLLECTION</value>
+  </data>
+  <data name="albumsTitle.Text" xml:space="preserve">
+    <value>Albums</value>
+  </data>
+  <data name="albumsSurprise.Text" xml:space="preserve">
+    <value>Surprends-moi</value>
+  </data>
+  <data name="albumsSurpriseButton.ToolTipService.ToolTip" xml:space="preserve">
+    <value>Écouter un album au hasard de la liste</value>
+  </data>
+  <data name="filterChipRemove.AutomationProperties.Name" xml:space="preserve">
+    <value>Retirer le filtre</value>
+  </data>
+  <data name="filterChipRemove.ToolTipService.ToolTip" xml:space="preserve">
+    <value>Retirer le filtre</value>
+  </data>
+  <data name="filtersClearAll.Content" xml:space="preserve">
+    <value>Tout effacer</value>
+  </data>
 </root>

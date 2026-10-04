@@ -103,6 +103,7 @@ public static class DependencyInjection
                         sp.GetRequiredService<AlbumsStateManager>(),
                         sp.GetRequiredService<AlbumsPlaybackService>(),
                         sp.GetRequiredService<ITelemetryClient>(),
+                        sp.GetRequiredService<IStringResourceProvider>(),
                         sp.GetRequiredService<ILogger<AlbumsViewModel>>()
                        );
         });

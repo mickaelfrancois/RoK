@@ -10,6 +10,7 @@
       xmlns:genre="using:Rok.Application.Dto"
       xmlns:converters="using:Rok.Converters"
       xmlns:albums1="using:Rok.ViewModels.Albums"
+      xmlns:controls="using:CommunityToolkit.WinUI.Controls"
       mc:Ignorable="d">
 
     <Page.Resources>
@@ -113,7 +114,7 @@
         </DataTemplate>
     </Page.Resources>
 
-    <Grid>
+    <Grid SizeChanged="Page_SizeChanged">
         <VisualStateManager.VisualStateGroups>
             <VisualStateGroup x:Name="DisplayModes">
                 <VisualState x:Name="GridViewState" />
@@ -125,72 +126,102 @@
                     </VisualState.Setters>
                 </VisualState>
             </VisualStateGroup>
+
+            <VisualStateGroup x:Name="HeaderLayoutStates">
+                <VisualState x:Name="WideHeader" />
+                <VisualState x:Name="NarrowHeader">
+                    <VisualState.Setters>
+                        <Setter Target="headerPanel.Padding" Value="12,8,12,6" />
+                        <Setter Target="kickerText.Visibility" Value="Collapsed" />
+                        <Setter Target="groupByLabel.Visibility" Value="Collapsed" />
+                        <Setter Target="filterByLabel.Visibility" Value="Collapsed" />
+                    </VisualState.Setters>
+                </VisualState>
+            </VisualStateGroup>
         </VisualStateManager.VisualStateGroups>
 
         <Grid.RowDefinitions>
-            <RowDefinition Height="{StaticResource HeaderListRowHeight}" />
+            <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
         
-        <CommandBar Grid.Row="0" Style="{StaticResource HeaderCommandBarListStyle}">
-            <CommandBar.Content>
-                <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Spacing="{StaticResource SpacingSmall}">
-                    <AppBarButton x:Uid="artistViewListen" Style="{StaticResource ListenAppBarButtonCompactStyle}" Command="{x:Bind ViewModel.ListenCommand}" />
+        <StackPanel x:Name="headerPanel" Grid.Row="0" Padding="16,12,16,8" Spacing="4">
+            <TextBlock x:Name="kickerText" x:Uid="albumsKicker" Style="{StaticResource CaptionTextBlockStyle}" FontWeight="SemiBold" CharacterSpacing="80" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
 
-                    <AppBarButton x:Uid="artistsViewSurpriseMe" MinWidth="150" Width="auto" Style="{StaticResource HeaderGenericButtonStyle}" Command="{x:Bind ViewModel.SurpriseMeCommand}">
-                        <AppBarButton.Icon>
-                            <FontIcon Glyph="&#xF158;" />
-                        </AppBarButton.Icon>
-                    </AppBarButton>
+            <TextBlock x:Uid="albumsTitle" Style="{StaticResource HeaderTitleTextStyle}" />
 
-                    <SplitButton x:Name="groupBySplitButton" VerticalAlignment="Center">
-                        <SplitButton.Content>
-                            <StackPanel Style="{StaticResource CommandBarSplitButtonPanelStyle}" AutomationProperties.Name="{x:Bind ViewModel.GroupByText, Mode=OneWay}" ToolTipService.ToolTip="{x:Bind ViewModel.GroupByText, Mode=OneWay}">
-                                <FontIcon Glyph="&#xE8CB;" Style="{StaticResource CommandBarSplitButtonIconStyle}" />
-                                <TextBlock x:Uid="artistsViewGroupBy" Style="{StaticResource CommandBarSplitButtonLabelTextStyle}" />
-                                <TextBlock Text="{x:Bind ViewModel.GroupByText, Mode=OneWay}" Style="{StaticResource CommandBarSplitButtonValueTextStyle}" />
-                            </StackPanel>
-                        </SplitButton.Content>
-                        <SplitButton.Flyout>
-                            <MenuFlyout x:Name="groupByMenu" ShowMode="TransientWithDismissOnPointerMoveAway" Placement="RightEdgeAlignedBottom" Opened="GroupByFlyout_Opened" />
-                        </SplitButton.Flyout>
-                    </SplitButton>
+            <TextBlock Text="{x:Bind ViewModel.HeaderSummary, Mode=OneWay}" Style="{StaticResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
 
-                    <SplitButton x:Name="buttonFilterSplitButton" VerticalAlignment="Center">
-                        <SplitButton.Content>
-                            <StackPanel Style="{StaticResource CommandBarSplitButtonPanelStyle}" AutomationProperties.Name="{x:Bind ViewModel.FilterByText, Mode=OneWay}" ToolTipService.ToolTip="{x:Bind ViewModel.FilterByText, Mode=OneWay}">
-                                <FontIcon Glyph="&#xE71C;" Style="{StaticResource CommandBarSplitButtonIconStyle}" />
-                                <TextBlock x:Uid="artistsViewFilterBy" Style="{StaticResource CommandBarSplitButtonLabelTextStyle}" />
-                                <TextBlock Text="{x:Bind ViewModel.FilterByText, Mode=OneWay}" Style="{StaticResource CommandBarSplitButtonValueTextStyle}" />
-                            </StackPanel>
-                        </SplitButton.Content>
-                        <SplitButton.Flyout>
-                            <MenuFlyout x:Name="filterMenu" ShowMode="TransientWithDismissOnPointerMoveAway" Placement="RightEdgeAlignedBottom" Opened="FilterFlyout_Opened" />
-                        </SplitButton.Flyout>
-                    </SplitButton>
+            <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingSmall}" Margin="0,6,0,0">
+                <AppBarButton x:Uid="albumViewListen" Style="{StaticResource ListenAppBarButtonStyle}" Width="Auto" MinWidth="0" Command="{x:Bind ViewModel.ListenCommand}" />
 
-                    <AutoSuggestBox x:Uid="inlineListSearch" QueryIcon="Find" Style="{StaticResource InlineSearchStyle}" Text="{x:Bind ViewModel.SearchText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-                    <AppBarSeparator />
-                    <AppBarButton x:Name="gridListModeButton" x:Uid="gridListModeButton" Style="{StaticResource AppBarButtonCompactStyle}" Icon="{x:Bind ViewModel.IsGridView, Mode=OneWay, Converter={StaticResource GridListIconConverter}}" Command="{x:Bind ViewModel.ToggleDisplayModeCommand}" />
-                    <AppBarSeparator />
-
-                    <!-- Info about albums count and duration -->
-                    <StackPanel Style="{StaticResource CommandBarStatInfoPanelStyle}">
-                        <FontIcon Glyph="&#xE93C;" Style="{StaticResource CommandBarStatInfoIconStyle}" />
-                        <TextBlock Style="{StaticResource CommandBarStatInfoTextStyle}">
-                            <Run x:Name="albumCountRun" FontWeight="SemiBold" />
-                            <Run x:Uid="albumsViewAlbums" />
-                        </TextBlock>
-                        <TextBlock Style="{StaticResource CommandBarStatInfoSeparatorStyle}" />
-                        <FontIcon Glyph="&#xE916;" Style="{StaticResource CommandBarStatInfoIconStyle}" />
-                        <TextBlock Style="{StaticResource CommandBarStatInfoTextStyle}">
-                            <Run x:Name="albumDurationRun" FontWeight="SemiBold" />
-                            <Run x:Uid="hours" />
-                        </TextBlock>
+                <Button x:Uid="albumsSurpriseButton" Command="{x:Bind ViewModel.SurpriseMeCommand}">
+                    <StackPanel Orientation="Horizontal" Spacing="6">
+                        <FontIcon Glyph="&#xF158;" FontSize="16" />
+                        <TextBlock x:Uid="albumsSurprise" VerticalAlignment="Center" />
                     </StackPanel>
-                </StackPanel>
-            </CommandBar.Content>
-        </CommandBar>
+                </Button>
+            </StackPanel>
+
+            <!-- View settings: sort, filter, search, display mode -->
+            <controls:WrapPanel Orientation="Horizontal" HorizontalSpacing="{StaticResource SpacingSmall}" VerticalSpacing="{StaticResource SpacingSmall}" Margin="0,8,0,0">
+                <DropDownButton x:Name="groupByButton" AutomationProperties.Name="{x:Bind ViewModel.GroupByText, Mode=OneWay}" ToolTipService.ToolTip="{x:Bind ViewModel.GroupByText, Mode=OneWay}">
+                    <StackPanel Style="{StaticResource CommandBarSplitButtonPanelStyle}">
+                        <FontIcon Glyph="&#xE8CB;" Style="{StaticResource CommandBarSplitButtonIconStyle}" />
+                        <TextBlock x:Name="groupByLabel" x:Uid="artistsViewGroupBy" Style="{StaticResource CommandBarSplitButtonLabelTextStyle}" />
+                        <TextBlock Text="{x:Bind ViewModel.GroupByText, Mode=OneWay}" Style="{StaticResource CommandBarSplitButtonValueTextStyle}" />
+                    </StackPanel>
+                    <DropDownButton.Flyout>
+                        <MenuFlyout x:Name="groupByMenu" Placement="Bottom" Opened="GroupByFlyout_Opened" />
+                    </DropDownButton.Flyout>
+                </DropDownButton>
+
+                <DropDownButton x:Name="filterByButton" AutomationProperties.Name="{x:Bind ViewModel.FilterByText, Mode=OneWay}" ToolTipService.ToolTip="{x:Bind ViewModel.FilterByText, Mode=OneWay}">
+                    <StackPanel Style="{StaticResource CommandBarSplitButtonPanelStyle}">
+                        <FontIcon Glyph="&#xE71C;" Style="{StaticResource CommandBarSplitButtonIconStyle}" />
+                        <TextBlock x:Name="filterByLabel" x:Uid="artistsViewFilterBy" Style="{StaticResource CommandBarSplitButtonLabelTextStyle}" />
+                        <TextBlock Text="{x:Bind ViewModel.FilterByText, Mode=OneWay}" Style="{StaticResource CommandBarSplitButtonValueTextStyle}" />
+                    </StackPanel>
+                    <DropDownButton.Flyout>
+                        <MenuFlyout x:Name="filterMenu" Placement="Bottom" Opened="FilterFlyout_Opened" />
+                    </DropDownButton.Flyout>
+                </DropDownButton>
+
+                <AutoSuggestBox x:Uid="inlineListSearch" QueryIcon="Find" Style="{StaticResource InlineSearchStyle}" Width="220" Text="{x:Bind ViewModel.SearchText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+
+                <Button x:Name="gridListModeButton" x:Uid="gridListModeButton" Command="{x:Bind ViewModel.ToggleDisplayModeCommand}" Content="{x:Bind ViewModel.IsGridView, Mode=OneWay, Converter={StaticResource GridListIconConverter}}" />
+            </controls:WrapPanel>
+
+            <!-- Active filters, one chip each -->
+            <Grid Visibility="{x:Bind ViewModel.HasActiveFilters, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" ColumnSpacing="{StaticResource SpacingSmall}" Margin="0,4,0,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+
+                <ItemsControl ItemsSource="{x:Bind ViewModel.ActiveFilters}">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <controls:WrapPanel Orientation="Horizontal" HorizontalSpacing="6" VerticalSpacing="6" />
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate x:DataType="albums1:AlbumFilterChip">
+                            <Border CornerRadius="12" Padding="10,0,2,0" Background="{ThemeResource ControlFillColorDefaultBrush}" BorderBrush="{ThemeResource ControlStrokeColorDefaultBrush}" BorderThickness="1">
+                                <StackPanel Orientation="Horizontal" Spacing="2">
+                                    <TextBlock Text="{x:Bind Label}" Style="{StaticResource CaptionTextBlockStyle}" FontWeight="SemiBold" VerticalAlignment="Center" />
+                                    <Button x:Uid="filterChipRemove" Click="RemoveFilterChip_Click" Width="24" Height="24" MinWidth="0" MinHeight="0" Padding="0" Background="Transparent" BorderThickness="0" VerticalAlignment="Center">
+                                        <FontIcon Glyph="&#xE711;" FontSize="10" />
+                                    </Button>
+                                </StackPanel>
+                            </Border>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+
+                <HyperlinkButton Grid.Column="1" x:Uid="filtersClearAll" Command="{x:Bind ViewModel.FilterByCommand}" CommandParameter="" Visibility="{x:Bind ViewModel.HasSeveralFilters, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" VerticalAlignment="Center" />
+            </Grid>
+        </StackPanel>
 
         <Grid Grid.Row="1" Style="{StaticResource GridListStyle}">
             <SemanticZoom x:Name="GridZoom" ScrollViewer.ZoomMode="Enabled" IsZoomOutButtonEnabled="True">
