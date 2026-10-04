@@ -1,4 +1,5 @@
 ﻿using System.Collections.Specialized;
+using System.Globalization;
 using System.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -11,6 +12,7 @@ using Rok.Application.Services.Grouping;
 using Rok.Commons;
 using Rok.ViewModels.Album.Services;
 using Rok.ViewModels.Common;
+using Rok.ViewModels.Listening.Services;
 using Rok.ViewModels.Track;
 
 namespace Rok.ViewModels.Album;
@@ -49,6 +51,8 @@ public partial class AlbumViewModel : ObservableObject, IFilterableAlbum, IGroup
     [NotifyCanExecuteChangedFor(nameof(ArtistOpenCommand))]
     [NotifyCanExecuteChangedFor(nameof(GenreOpenCommand))]
     [NotifyCanExecuteChangedFor(nameof(ListenCommand))]
+    [NotifyCanExecuteChangedFor(nameof(ShuffleCommand))]
+    [NotifyCanExecuteChangedFor(nameof(ArtistFavoriteCommand))]
     [NotifyCanExecuteChangedFor(nameof(AlbumFavoriteCommand))]
     [NotifyCanExecuteChangedFor(nameof(GetDataFromApiCommand))]
     [NotifyCanExecuteChangedFor(nameof(EditAlbumCommand))]
@@ -60,6 +64,8 @@ public partial class AlbumViewModel : ObservableObject, IFilterableAlbum, IGroup
     public bool IsNotFound => LoadState == DetailLoadState.NotFound;
 
     private bool IsEntityLoaded => LoadState == DetailLoadState.Loaded;
+
+    private bool CanToggleArtistFavorite => IsEntityLoaded && Album.ArtistId.HasValue;
 
     private AlbumDto _album = new();
 
@@ -75,7 +81,7 @@ public partial class AlbumViewModel : ObservableObject, IFilterableAlbum, IGroup
 
     public IPlaylistMenuService PlaylistMenuService { get; }
 
-    public ObservableCollection<string> EditableTags { get; set; } = new();
+    public ObservableCollection<string> EditableTags { get; } = new();
 
     public ObservableCollection<string> SuggestedTags { get; set; } = new();
 
@@ -144,6 +150,15 @@ public partial class AlbumViewModel : ObservableObject, IFilterableAlbum, IGroup
         OnPropertyChanged(nameof(DurationTotal));
         OnPropertyChanged(nameof(Tags));
         OnPropertyChanged(nameof(IsFavorite));
+        OnPropertyChanged(nameof(IsArtistFavorite));
+        OnPropertyChanged(nameof(HeaderSummary));
+        OnPropertyChanged(nameof(YearText));
+        OnPropertyChanged(nameof(HasYear));
+        OnPropertyChanged(nameof(GenreName));
+        OnPropertyChanged(nameof(HasGenre));
+        OnPropertyChanged(nameof(AlbumFavoriteLabel));
+        OnPropertyChanged(nameof(ArtistFavoriteLabel));
+        ArtistFavoriteCommand.NotifyCanExecuteChanged();
     }
 
     public override string ToString()
@@ -182,6 +197,45 @@ public partial class AlbumViewModel : ObservableObject, IFilterableAlbum, IGroup
             return label;
         }
     }
+
+    /// <summary>Track count and total duration, rendered with the same localized formats as the Listening header.</summary>
+    public string HeaderSummary
+    {
+        get
+        {
+            ListeningSummaryLabels labels = new(
+                _resourceLoader.GetString("listeningSummaryTrack"),
+                _resourceLoader.GetString("listeningSummaryTracks"),
+                _resourceLoader.GetString("listeningSummaryHoursMinutes"),
+                _resourceLoader.GetString("listeningSummaryHours"),
+                _resourceLoader.GetString("listeningSummaryMinutes"),
+                _resourceLoader.GetString("listeningSummaryEndsAt"));
+
+            return ListeningQueueSummaryFormatter.FormatOverview(new ListeningQueueSummary(Album.TrackCount, Album.Duration, null), labels, CultureInfo.CurrentCulture);
+        }
+    }
+
+    public string YearText
+    {
+        get
+        {
+            int? year = Album.ReleaseDate?.Year ?? Album.Year;
+
+            return year is > 0 ? year.Value.ToString(CultureInfo.InvariantCulture) : string.Empty;
+        }
+    }
+
+    public bool HasYear => YearText.Length > 0;
+
+    public string GenreName => Album.GenreName;
+
+    public bool HasGenre => Album.GenreId.HasValue && !string.IsNullOrEmpty(Album.GenreName);
+
+    public string AlbumFavoriteLabel => ListeningHeaderLabels.FavoriteToggle(
+        Album.Name, IsFavorite, _resourceLoader.GetString("listeningFavoriteAdd"), _resourceLoader.GetString("listeningFavoriteRemove"));
+
+    public string ArtistFavoriteLabel => ListeningHeaderLabels.FavoriteToggle(
+        Album.ArtistName, IsArtistFavorite, _resourceLoader.GetString("listeningFavoriteAdd"), _resourceLoader.GetString("listeningFavoriteRemove"));
 
     public string ReleaseDateYear
     {
@@ -556,13 +610,43 @@ public partial class AlbumViewModel : ObservableObject, IFilterableAlbum, IGroup
     }
 
     [RelayCommand(CanExecute = nameof(IsEntityLoaded))]
+    private async Task ShuffleAsync()
+    {
+        if (_tracks == null)
+            await LoadTracksAsync(Album.Id, CancellationToken.None);
+
+        if (_tracks?.Any() != true)
+            return;
+
+        TrackDto[] shuffled = _tracks.ToArray();
+        Random.Shared.Shuffle(shuffled);
+
+        _playerService.LoadPlaylist([.. shuffled]);
+    }
+
+    [RelayCommand(CanExecute = nameof(IsEntityLoaded))]
     private async Task AlbumFavoriteAsync()
     {
         bool newFavoriteState = !Album.IsFavorite;
         await _editService.UpdateFavoriteAsync(Album, newFavoriteState);
 
         OnPropertyChanged(nameof(IsFavorite));
+        OnPropertyChanged(nameof(AlbumFavoriteLabel));
         _messenger.Send(new AlbumUpdateMessage(Album.Id, ActionType.Update));
+    }
+
+    [RelayCommand(CanExecute = nameof(CanToggleArtistFavorite))]
+    private async Task ArtistFavoriteAsync()
+    {
+        if (!Album.ArtistId.HasValue)
+            return;
+
+        bool newFavoriteState = !Album.IsArtistFavorite;
+        await _editService.UpdateArtistFavoriteAsync(Album, newFavoriteState);
+
+        OnPropertyChanged(nameof(IsArtistFavorite));
+        OnPropertyChanged(nameof(ArtistFavoriteLabel));
+        _messenger.Send(new ArtistUpdateMessage(Album.ArtistId.Value, ActionType.Update));
     }
 
     [RelayCommand(CanExecute = nameof(IsEntityLoaded))]

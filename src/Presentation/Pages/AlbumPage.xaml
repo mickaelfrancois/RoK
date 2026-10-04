@@ -9,12 +9,13 @@
       xmlns:tracks="using:Rok.ViewModels.Track"
       xmlns:controls="using:CommunityToolkit.WinUI.Controls"
       x:Name="albumPage"
+      Loaded="AlbumPage_Loaded"
       SizeChanged="Page_SizeChanged"
       mc:Ignorable="d">
 
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition x:Name="headerRow" Height="{StaticResource HeaderRowHeight}" />
+            <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
@@ -22,62 +23,130 @@
             <SolidColorBrush Color="{ThemeResource CardBackgroundFillColorDefault}" Opacity="{StaticResource HeaderBackgroundOpacity}" />
         </Grid.Background>
 
+        <VisualStateManager.VisualStateGroups>
+            <VisualStateGroup x:Name="HeaderLayoutStates">
+                <VisualState x:Name="WideHeader" />
+                <VisualState x:Name="NarrowHeader">
+                    <VisualState.Setters>
+                        <Setter Target="shuffleButton.Visibility" Value="Collapsed" />
+                        <Setter Target="tagsPanel.Visibility" Value="Collapsed" />
+                        <Setter Target="coverPicture.Width" Value="72" />
+                        <Setter Target="coverPicture.Height" Value="72" />
+                    </VisualState.Setters>
+                </VisualState>
+            </VisualStateGroup>
+        </VisualStateManager.VisualStateGroups>
+
         <Image x:Name="backdrop" Grid.RowSpan="2" Style="{StaticResource HeaderBackdropStyle}" Source="{x:Bind ViewModel.Backdrop,Mode=OneWay}" Stretch="UniformToFill" IsHitTestVisible="False" />
 
+        <!-- Tint of the album cover dominant color over the header -->
+        <Border Opacity="0.18" IsHitTestVisible="False" Background="{x:Bind ViewModel.DominantColor, Mode=OneWay, Converter={StaticResource ColorToAccentBrushConverter}}" />
+
         <!-- Header -->
-        <Grid Padding="2">
+        <Grid Padding="28,20,24,20" ColumnSpacing="{StaticResource SpacingMedium}">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition x:Name="pictureColumn" Width="{StaticResource HeaderPictureColumnWidth}" />
+                <ColumnDefinition Width="Auto" />
                 <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
 
-            <Grid Style="{StaticResource HeaderPictureGridStyle}">
-                <common:PictureControl x:Name="artistPicture" Style="{StaticResource HeaderPictureStyle}" Cover="{x:Bind ViewModel.Picture, Mode=OneWay}" />
+            <!-- Cover -->
+            <Grid VerticalAlignment="Top" Style="{StaticResource HeaderPictureGridStyle}">
+                <common:PictureControl x:Name="coverPicture" Width="160" Height="160" Style="{StaticResource HeaderPictureStyle}" Cover="{x:Bind ViewModel.Picture, Mode=OneWay}" />
                 <Button x:Uid="selectPicture" Style="{StaticResource HeaderPictureSelectButtonStyle}" Command="{x:Bind ViewModel.SelectPictureCommand}" />
             </Grid>
 
-            <RelativePanel Grid.Column="1" Margin="6,0,0,0">
-                <TextBlock x:Name="albumName" Style="{StaticResource HeaderTitleTextStyle}" Text="{x:Bind ViewModel.Album.Name, Mode=OneWay}" />
+            <!-- Infos -->
+            <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="4">
+                <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingSmall}">
+                    <TextBlock x:Uid="albumKicker" VerticalAlignment="Center" Style="{StaticResource CaptionTextBlockStyle}" FontWeight="SemiBold" CharacterSpacing="80" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
 
-                <HyperlinkButton x:Name="artistName" Style="{StaticResource HeaderHyperlinkStyle}" Content="{x:Bind ViewModel.Album.ArtistName}" RelativePanel.Below="albumName" Command="{x:Bind ViewModel.ArtistOpenCommand}" />
-
-                <StackPanel x:Name="albumType" RelativePanel.RightOf="albumName" RelativePanel.AlignVerticalCenterWith="albumName" Orientation="Horizontal" Margin="4,0,0,0">
-                    <common:BadgeControl x:Uid="badgeLive" Visibility="{x:Bind ViewModel.Album.IsLive, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" BadgeBackground="{StaticResource BadgeLiveBrush}"/>
-                    <common:BadgeControl x:Uid="badgeBestof" Visibility="{x:Bind ViewModel.Album.IsBestOf, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" BadgeBackground="{StaticResource BadgeBestOfBrush}" />
-                    <common:BadgeControl x:Uid="badgeCompilation" Visibility="{x:Bind ViewModel.Album.IsCompilation, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" BadgeBackground="{StaticResource BadgeCompilationBrush}" />
-                    <common:BadgeControl x:Uid="badgeNew" Visibility="{x:Bind ViewModel.IsNew, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" BadgeBackground="{StaticResource BadgeNewBrush}" />
-                    <common:BadgeControl x:Uid="badgeAnniversary" Visibility="{x:Bind ViewModel.ShowAnniversaryBadge, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" BadgeBackground="{StaticResource BadgeAnniversaryBrush}" ToolTipService.ToolTip="{x:Bind ViewModel.AnniversaryTooltip, Mode=OneWay}" />
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                        <common:BadgeControl x:Uid="badgeLive" Visibility="{x:Bind ViewModel.Album.IsLive, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" BadgeBackground="{StaticResource BadgeLiveBrush}" />
+                        <common:BadgeControl x:Uid="badgeBestof" Visibility="{x:Bind ViewModel.Album.IsBestOf, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" BadgeBackground="{StaticResource BadgeBestOfBrush}" />
+                        <common:BadgeControl x:Uid="badgeCompilation" Visibility="{x:Bind ViewModel.Album.IsCompilation, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" BadgeBackground="{StaticResource BadgeCompilationBrush}" />
+                        <common:BadgeControl x:Uid="badgeNew" Visibility="{x:Bind ViewModel.IsNew, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" BadgeBackground="{StaticResource BadgeNewBrush}" />
+                        <common:BadgeControl x:Uid="badgeAnniversary" Visibility="{x:Bind ViewModel.ShowAnniversaryBadge, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" BadgeBackground="{StaticResource BadgeAnniversaryBrush}" ToolTipService.ToolTip="{x:Bind ViewModel.AnniversaryTooltip, Mode=OneWay}" />
+                    </StackPanel>
                 </StackPanel>
 
-                <TextBlock x:Name="panelExtendedInfo" Style="{StaticResource HeaderTextStyle}" RelativePanel.Below="albumName" RelativePanel.RightOf="artistName" RelativePanel.AlignVerticalCenterWith="artistName" Margin="6,0,0,0">
-                    <Run Text="🔹" />
-                    <Run Text="{x:Bind ViewModel.SubTitle}" />
-                </TextBlock>
+                <TextBlock Style="{StaticResource HeaderTitleTextStyle}" Text="{x:Bind ViewModel.Album.Name, Mode=OneWay}" MaxLines="2" TextWrapping="Wrap" TextTrimming="CharacterEllipsis" />
 
-                <CommandBar x:Name="panelNetwork" Style="{StaticResource HeaderCommandBarStyle}" RelativePanel.Below="tagsContainer" Margin="0">
-                    <common:SocialNetworkAppBarButton x:Uid="artistViewLastFm" Style="{StaticResource HeaderBrandButtonStyle}" ToolTipService.ToolTip="Last.FM" Command="{x:Bind ViewModel.OpenUrlCommand, Mode=OneWay}" Url="{x:Bind ViewModel.Album.LastFmUrl, Mode=OneWay}" IconFill="{StaticResource LastFmBrush}" IconData="{StaticResource BrandIconLastFm}" />
-                </CommandBar>
+                <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingSmall}">
+                    <HyperlinkButton Command="{x:Bind ViewModel.ArtistOpenCommand}" Padding="0" Margin="0" Style="{StaticResource HeaderHyperlinkStyle}">
+                        <TextBlock Text="{x:Bind ViewModel.Album.ArtistName, Mode=OneWay}" MaxWidth="320" FontSize="{StaticResource FontSizeMedium}" FontWeight="SemiBold" TextTrimming="CharacterEllipsis" />
+                    </HyperlinkButton>
+                    <common:AnimatedButton VerticalAlignment="Center"
+                                           Icon="{StaticResource HeartPath}"
+                                           Color="{x:Bind ViewModel.IsArtistFavorite, Converter={StaticResource FavoriteToColorConverter}, Mode=OneWay}"
+                                           Command="{x:Bind ViewModel.ArtistFavoriteCommand}"
+                                           ToolTipService.ToolTip="{x:Bind ViewModel.ArtistFavoriteLabel, Mode=OneWay}"
+                                           AutomationProperties.Name="{x:Bind ViewModel.ArtistFavoriteLabel, Mode=OneWay}" />
 
-                <StackPanel x:Name="tagsContainer" RelativePanel.Below="panelExtendedInfo" RelativePanel.AlignLeftWith="albumName" Orientation="Horizontal" Spacing="0" Margin="0">
-                    <controls:TokenizingTextBox x:Uid="TagsBox" x:Name="TagsBox" Style="{StaticResource TokenizingTextBoxStyle}"  ItemsSource="{x:Bind ViewModel.Tags, Mode=OneWay}" SuggestedItemsSource="{x:Bind ViewModel.SuggestedTags, Mode=OneWay}">
+                    <TextBlock Text="·" VerticalAlignment="Center" Foreground="{ThemeResource TextFillColorSecondaryBrush}" Visibility="{x:Bind ViewModel.HasGenre, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" />
+                    <Button Command="{x:Bind ViewModel.GenreOpenCommand}" Padding="10,2" CornerRadius="{StaticResource CornerRadiusMediumValue}" Visibility="{x:Bind ViewModel.HasGenre, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">
+                        <StackPanel Orientation="Horizontal" Spacing="6">
+                            <TextBlock Text="{x:Bind ViewModel.GenreName, Mode=OneWay}" FontSize="{StaticResource FontSizeSmall}" />
+                            <FontIcon Glyph="&#xE76C;" FontSize="10" VerticalAlignment="Center" />
+                        </StackPanel>
+                    </Button>
+
+                    <TextBlock Text="·" VerticalAlignment="Center" Foreground="{ThemeResource TextFillColorSecondaryBrush}" Visibility="{x:Bind ViewModel.HasYear, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" />
+                    <TextBlock Text="{x:Bind ViewModel.YearText, Mode=OneWay}" VerticalAlignment="Center" FontSize="{StaticResource FontSizeSmall}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" Visibility="{x:Bind ViewModel.HasYear, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" />
+                </StackPanel>
+
+                <TextBlock Text="{x:Bind ViewModel.HeaderSummary, Mode=OneWay}" Style="{StaticResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+
+                <!-- Actions -->
+                <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingSmall}" Margin="0,8,0,0">
+                    <AppBarButton x:Uid="albumViewListen" Style="{StaticResource ListenAppBarButtonStyle}" Width="Auto" MinWidth="0" Command="{x:Bind ViewModel.ListenCommand}" />
+
+                    <Button x:Name="shuffleButton" Command="{x:Bind ViewModel.ShuffleCommand}">
+                        <StackPanel Orientation="Horizontal" Spacing="6">
+                            <SymbolIcon Symbol="Shuffle" />
+                            <TextBlock x:Uid="albumShuffleText" VerticalAlignment="Center" />
+                        </StackPanel>
+                    </Button>
+
+                    <common:AnimatedButton VerticalAlignment="Center"
+                                           Icon="{StaticResource HeartPath}"
+                                           Color="{x:Bind ViewModel.IsFavorite, Converter={StaticResource FavoriteToColorConverter}, Mode=OneWay}"
+                                           Command="{x:Bind ViewModel.AlbumFavoriteCommand}"
+                                           ToolTipService.ToolTip="{x:Bind ViewModel.AlbumFavoriteLabel, Mode=OneWay}"
+                                           AutomationProperties.Name="{x:Bind ViewModel.AlbumFavoriteLabel, Mode=OneWay}" />
+
+                    <Button>
+                        <StackPanel Orientation="Horizontal" Spacing="6">
+                            <SymbolIcon Symbol="Add" />
+                            <TextBlock x:Uid="albumAddToPlaylistText" VerticalAlignment="Center" />
+                        </StackPanel>
+                        <Button.Flyout>
+                            <MenuFlyout x:Name="albumPlaylistFlyout" common:MenuFlyoutExtensions.PlaylistMenuService="{x:Bind ViewModel.PlaylistMenuService}" common:MenuFlyoutExtensions.AlbumId="{x:Bind ViewModel.Album.Id, Mode=OneWay}" common:MenuFlyoutExtensions.FlattenPlaylistMenu="True" />
+                        </Button.Flyout>
+                    </Button>
+
+                    <Button x:Uid="albumMoreButton">
+                        <FontIcon Glyph="&#xE712;" />
+                        <Button.Flyout>
+                            <MenuFlyout Placement="Bottom">
+                                <MenuFlyoutItem x:Uid="albumMenuEdit" Icon="Edit" Command="{x:Bind ViewModel.EditAlbumCommand}" />
+                                <MenuFlyoutItem x:Uid="albumMenuBiography" Icon="Library" Command="{x:Bind ViewModel.OpenBiographyCommand}" Visibility="{x:Bind ViewModel.Album.Biography, Mode=OneWay, Converter={StaticResource StringToVisibilityConverter}}" />
+                                <MenuFlyoutItem x:Uid="listeningLinkLastFm" Command="{x:Bind ViewModel.OpenUrlCommand, Mode=OneWay}" CommandParameter="{x:Bind ViewModel.Album.LastFmUrl, Mode=OneWay}" Visibility="{x:Bind ViewModel.Album.LastFmUrl, Mode=OneWay, Converter={StaticResource StringToVisibilityConverter}}" />
+                                <MenuFlyoutSeparator />
+                                <MenuFlyoutItem x:Uid="albumMenuRefresh" Icon="Refresh" Command="{x:Bind ViewModel.GetDataFromApiCommand}" />
+                            </MenuFlyout>
+                        </Button.Flyout>
+                    </Button>
+                </StackPanel>
+
+                <!-- Tags -->
+                <StackPanel x:Name="tagsPanel" Margin="0,4,0,0" HorizontalAlignment="Left">
+                    <controls:TokenizingTextBox x:Uid="TagsBox" x:Name="TagsBox" MaxWidth="480" Style="{StaticResource TokenizingTextBoxStyle}" ItemsSource="{x:Bind ViewModel.EditableTags}" SuggestedItemsSource="{x:Bind ViewModel.SuggestedTags, Mode=OneWay}">
                         <controls:TokenizingTextBox.Resources>
                             <Style TargetType="controls:TokenizingTextBoxItem" BasedOn="{StaticResource TokenizingTextBoxItemStyle}" />
                         </controls:TokenizingTextBox.Resources>
                     </controls:TokenizingTextBox>
                 </StackPanel>
-
-                <CommandBar RelativePanel.AlignBottomWithPanel="True" RelativePanel.AlignLeftWith="albumName" Style="{StaticResource HeaderCommandBarStyle}">
-                    <AppBarButton x:Uid="albumViewListen" Style="{StaticResource ListenAppBarButtonStyle}" Command="{x:Bind ViewModel.ListenCommand}" />
-                    <AppBarToggleButton x:Uid="albumViewLike" x:Name="albumAppBarLike" Style="{StaticResource HeaderLikeButtonStyle}" IsChecked="{x:Bind ViewModel.IsFavorite, Mode=OneWay}" Command="{x:Bind ViewModel.AlbumFavoriteCommand}" />
-                    <AppBarButton x:Uid="albumViewBiography" Style="{StaticResource HeaderGenericButtonStyle}" Icon="Library" Command="{x:Bind ViewModel.OpenBiographyCommand}" Visibility="{x:Bind ViewModel.Album.Biography, Mode=OneWay, Converter={StaticResource StringToVisibilityConverter}}" />
-                    <AppBarButton x:Uid="albumViewPlaylist" Style="{StaticResource HeaderGenericButtonStyle}" Icon="Add">
-                        <AppBarButton.Flyout>
-                            <MenuFlyout x:Name="albumPlaylistFlyout" common:MenuFlyoutExtensions.PlaylistMenuService="{x:Bind ViewModel.PlaylistMenuService}" common:MenuFlyoutExtensions.AlbumId="{x:Bind ViewModel.Album.Id}" common:MenuFlyoutExtensions.FlattenPlaylistMenu="True" />
-                        </AppBarButton.Flyout>
-                    </AppBarButton>
-                    <AppBarButton x:Uid="albumViewEdit" Style="{StaticResource HeaderGenericButtonStyle}" Icon="Edit" Command="{x:Bind ViewModel.EditAlbumCommand}" />
-                </CommandBar>
-            </RelativePanel>
+            </StackPanel>
         </Grid>
 
         <!-- Tracks grid -->

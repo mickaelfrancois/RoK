@@ -2350,4 +2350,28 @@
   <data name="listeningLinkYoutube.Text" xml:space="preserve">
     <value>YouTube</value>
   </data>
+  <data name="albumKicker.Text" xml:space="preserve">
+    <value>ALBUM</value>
+  </data>
+  <data name="albumShuffleText.Text" xml:space="preserve">
+    <value>Shuffle</value>
+  </data>
+  <data name="albumAddToPlaylistText.Text" xml:space="preserve">
+    <value>Add to…</value>
+  </data>
+  <data name="albumMoreButton.ToolTipService.ToolTip" xml:space="preserve">
+    <value>More actions</value>
+  </data>
+  <data name="albumMoreButton.AutomationProperties.Name" xml:space="preserve">
+    <value>More actions</value>
+  </data>
+  <data name="albumMenuEdit.Text" xml:space="preserve">
+    <value>Edit</value>
+  </data>
+  <data name="albumMenuBiography.Text" xml:space="preserve">
+    <value>Biography</value>
+  </data>
+  <data name="albumMenuRefresh.Text" xml:space="preserve">
+    <value>Refresh data</value>
+  </data>
 </root>

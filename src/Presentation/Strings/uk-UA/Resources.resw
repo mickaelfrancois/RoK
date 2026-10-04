@@ -2240,4 +2240,28 @@
   <data name="listeningLinkYoutube.Text" xml:space="preserve">
     <value>YouTube</value>
   </data>
+  <data name="albumKicker.Text" xml:space="preserve">
+    <value>АЛЬБОМ</value>
+  </data>
+  <data name="albumShuffleText.Text" xml:space="preserve">
+    <value>Перемішати</value>
+  </data>
+  <data name="albumAddToPlaylistText.Text" xml:space="preserve">
+    <value>Додати до…</value>
+  </data>
+  <data name="albumMoreButton.ToolTipService.ToolTip" xml:space="preserve">
+    <value>Більше дій</value>
+  </data>
+  <data name="albumMoreButton.AutomationProperties.Name" xml:space="preserve">
+    <value>Більше дій</value>
+  </data>
+  <data name="albumMenuEdit.Text" xml:space="preserve">
+    <value>Редагувати</value>
+  </data>
+  <data name="albumMenuBiography.Text" xml:space="preserve">
+    <value>Біографія</value>
+  </data>
+  <data name="albumMenuRefresh.Text" xml:space="preserve">
+    <value>Оновити дані</value>
+  </data>
 </root>

@@ -1,4 +1,5 @@
 ﻿using Rok.Application.Features.Albums.Requests;
+using Rok.Application.Features.Artists.Requests;
 
 namespace Rok.ViewModels.Album.Services;
 
@@ -55,6 +56,15 @@ public class AlbumEditService(IMediator mediator, IDialogService dialogService)
     {
         await mediator.Send(new UpdateAlbumFavoriteRequest(album.Id, isFavorite));
         album.IsFavorite = isFavorite;
+    }
+
+    public async Task UpdateArtistFavoriteAsync(AlbumDto album, bool isFavorite)
+    {
+        if (!album.ArtistId.HasValue)
+            return;
+
+        await mediator.Send(new UpdateArtistFavoriteRequest(album.ArtistId.Value, isFavorite));
+        album.IsArtistFavorite = isFavorite;
     }
 
     public Task UpdateTagsAsync(long id, IEnumerable<string> tags)

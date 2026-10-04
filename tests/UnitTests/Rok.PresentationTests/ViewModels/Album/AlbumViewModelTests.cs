@@ -6,6 +6,7 @@ using Rok.Application.Dto;
 using Rok.Application.Errors;
 using Rok.Application.Features.Albums.Requests;
 using Rok.Application.Features.Albums.Services;
+using Rok.Application.Features.Artists.Requests;
 using Rok.Application.Features.Playlists.PlaylistMenu;
 using Rok.Application.Features.Tracks.Requests;
 using Rok.Application.Interfaces;
@@ -75,6 +76,8 @@ public class AlbumViewModelTests
         Watch(nameof(sut.ArtistOpenCommand), sut.ArtistOpenCommand);
         Watch(nameof(sut.GenreOpenCommand), sut.GenreOpenCommand);
         Watch(nameof(sut.ListenCommand), sut.ListenCommand);
+        Watch(nameof(sut.ShuffleCommand), sut.ShuffleCommand);
+        Watch(nameof(sut.ArtistFavoriteCommand), sut.ArtistFavoriteCommand);
         Watch(nameof(sut.AlbumFavoriteCommand), sut.AlbumFavoriteCommand);
         Watch(nameof(sut.GetDataFromApiCommand), sut.GetDataFromApiCommand);
         Watch(nameof(sut.EditAlbumCommand), sut.EditAlbumCommand);
@@ -91,6 +94,7 @@ public class AlbumViewModelTests
         Assert.Equal(expected, sut.ArtistOpenCommand.CanExecute(null));
         Assert.Equal(expected, sut.GenreOpenCommand.CanExecute(null));
         Assert.Equal(expected, sut.ListenCommand.CanExecute(null));
+        Assert.Equal(expected, sut.ShuffleCommand.CanExecute(null));
         Assert.Equal(expected, sut.AlbumFavoriteCommand.CanExecute(null));
         Assert.Equal(expected, sut.GetDataFromApiCommand.CanExecute(null));
         Assert.Equal(expected, sut.EditAlbumCommand.CanExecute(null));
@@ -278,5 +282,139 @@ public class AlbumViewModelTests
         Assert.Contains(nameof(sut.Album), raised);
         Assert.Contains(nameof(sut.SubTitle), raised);
         Assert.Equal(11, sut.Album.TrackCount);
+    }
+
+    [Fact(DisplayName = "when_the_album_has_tracks_and_a_duration_then_the_header_summary_joins_them")]
+    public void HeaderSummary_ShouldJoinTrackCountAndDuration()
+    {
+        // Arrange
+        AlbumViewModel sut = BuildViewModel();
+        _resources.Setup(r => r.GetString("listeningSummaryTracks")).Returns("{0} tracks");
+        _resources.Setup(r => r.GetString("listeningSummaryMinutes")).Returns("{0} min");
+
+        // Act
+        sut.SetData(new AlbumDto { Id = 42, TrackCount = 11, Duration = 2340 });
+
+        // Assert
+        Assert.Equal("11 tracks · 39 min", sut.HeaderSummary);
+    }
+
+    [Fact(DisplayName = "when_the_album_has_no_tracks_then_the_header_summary_is_empty")]
+    public void HeaderSummary_ShouldBeEmpty_WhenTheAlbumHasNoTracks()
+    {
+        // Arrange
+        AlbumViewModel sut = BuildViewModel();
+
+        // Act
+        sut.SetData(new AlbumDto { Id = 42, TrackCount = 0, Duration = 0 });
+
+        // Assert
+        Assert.Equal(string.Empty, sut.HeaderSummary);
+    }
+
+    [Theory(DisplayName = "when_the_album_has_a_release_date_or_a_year_then_the_year_text_prefers_the_release_date")]
+    [InlineData(1977, 1990, "1977")]
+    [InlineData(null, 1990, "1990")]
+    [InlineData(null, null, "")]
+    public void YearText_ShouldPreferTheReleaseDate(int? releaseYear, int? year, string expected)
+    {
+        // Arrange
+        AlbumViewModel sut = BuildViewModel();
+        DateTime? releaseDate = releaseYear.HasValue ? new DateTime(releaseYear.Value, 2, 4) : null;
+
+        // Act
+        sut.SetData(new AlbumDto { Id = 42, ReleaseDate = releaseDate, Year = year });
+
+        // Assert
+        Assert.Equal(expected, sut.YearText);
+        Assert.Equal(expected.Length > 0, sut.HasYear);
+    }
+
+    [Theory(DisplayName = "when_the_album_has_a_genre_id_and_a_name_then_the_genre_chip_is_shown")]
+    [InlineData(5L, "Rock", true)]
+    [InlineData(5L, "", false)]
+    [InlineData(null, "Rock", false)]
+    public void HasGenre_ShouldRequireAnIdAndAName(long? genreId, string genreName, bool expected)
+    {
+        // Arrange
+        AlbumViewModel sut = BuildViewModel();
+
+        // Act
+        sut.SetData(new AlbumDto { Id = 42, GenreId = genreId, GenreName = genreName });
+
+        // Assert
+        Assert.Equal(expected, sut.HasGenre);
+    }
+
+    [Fact(DisplayName = "when_the_album_is_a_favorite_then_the_favorite_label_offers_to_remove_it")]
+    public void AlbumFavoriteLabel_ShouldOfferToRemove_WhenTheAlbumIsAFavorite()
+    {
+        // Arrange
+        AlbumViewModel sut = BuildViewModel();
+        _resources.Setup(r => r.GetString("listeningFavoriteAdd")).Returns("Add {0}");
+        _resources.Setup(r => r.GetString("listeningFavoriteRemove")).Returns("Remove {0}");
+
+        // Act
+        sut.SetData(new AlbumDto { Id = 42, Name = "Rumours", ArtistName = "Fleetwood Mac", IsFavorite = true, IsArtistFavorite = false });
+
+        // Assert
+        Assert.Equal("Remove Rumours", sut.AlbumFavoriteLabel);
+        Assert.Equal("Add Fleetwood Mac", sut.ArtistFavoriteLabel);
+    }
+
+    [Fact(DisplayName = "when_the_artist_favorite_is_toggled_then_the_artist_is_updated_and_notified")]
+    public async Task ArtistFavoriteCommand_ShouldUpdateTheArtistAndNotify()
+    {
+        // Arrange
+        AlbumViewModel sut = BuildViewModel();
+        sut.SetData(new AlbumDto { Id = 42, ArtistId = 7, ArtistName = "Fleetwood Mac", IsArtistFavorite = false });
+        _mediator.Setup<UpdateArtistFavoriteRequest, Result<bool>>().Returns(Result<bool>.Ok(true));
+
+        List<string?> raised = [];
+        sut.PropertyChanged += (_, e) => raised.Add(e.PropertyName);
+
+        // Act
+        await sut.ArtistFavoriteCommand.ExecuteAsync(null);
+
+        // Assert
+        UpdateArtistFavoriteRequest sent = Assert.Single(_mediator.Sent<UpdateArtistFavoriteRequest>());
+        Assert.Equal(7, sent.Id);
+        Assert.True(sent.IsFavorite);
+        Assert.True(sut.IsArtistFavorite);
+        Assert.Contains(nameof(sut.IsArtistFavorite), raised);
+        Assert.Contains(nameof(sut.ArtistFavoriteLabel), raised);
+    }
+
+    [Theory(DisplayName = "when_the_album_has_an_artist_then_the_artist_favorite_command_can_execute")]
+    [InlineData(7L, true)]
+    [InlineData(null, false)]
+    public void ArtistFavoriteCommand_CanExecute_ShouldRequireAnArtist(long? artistId, bool expected)
+    {
+        // Arrange
+        AlbumViewModel sut = BuildViewModel();
+
+        // Act
+        sut.SetData(new AlbumDto { Id = 42, ArtistId = artistId });
+
+        // Assert
+        Assert.Equal(expected, sut.ArtistFavoriteCommand.CanExecute(null));
+    }
+
+    [Fact(DisplayName = "when_the_album_has_no_tracks_then_shuffle_does_not_load_a_playlist")]
+    public async Task ShuffleCommand_ShouldNotLoadAPlaylist_WhenTheAlbumHasNoTracks()
+    {
+        // Arrange
+        _mediator.Setup<GetAlbumByIdRequest, Result<AlbumDto>>()
+                 .Returns(Result<AlbumDto>.Ok(new AlbumDto { Id = 42, Name = "Greatest Hits" }));
+        _mediator.Setup<GetTracksByAlbumIdRequest, Result<IEnumerable<TrackDto>>>()
+                 .Returns(Result<IEnumerable<TrackDto>>.Ok(new List<TrackDto>()));
+        AlbumViewModel sut = BuildViewModel();
+        await sut.LoadDataAsync(42);
+
+        // Act
+        await sut.ShuffleCommand.ExecuteAsync(null);
+
+        // Assert
+        _player.Verify(p => p.LoadPlaylist(It.IsAny<List<TrackDto>>(), It.IsAny<TrackDto?>()), Times.Never);
     }
 }
