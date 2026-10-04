@@ -10,6 +10,11 @@ public sealed partial class AlbumPage : Page
     /// <summary>Width reserved by the stats panel (250px) plus its paddings and grid margins.</summary>
     private const double StatsPanelReservedWidth = 300;
 
+    private static readonly Lazy<double> TitleAndScoreColumnsWidth = new(() =>
+        GetGridLengthResource("GridHeaderTracksTitleColumnWidth") + GetGridLengthResource("GridHeaderTracksScoreColumnWidth"));
+
+    private static readonly Lazy<double> ArtistColumnWidth = new(() => GetGridLengthResource("GridHeaderTracksArtistColumnWidth"));
+
     public AlbumViewModel ViewModel { get; set; }
     private readonly ILogger<AlbumPage> _logger;
 
@@ -25,14 +30,18 @@ public sealed partial class AlbumPage : Page
 
     protected override async void OnNavigatedTo(NavigationEventArgs e)
     {
+        base.OnNavigatedTo(e);
+
         if (e.Parameter is not AlbumOpenArgs options)
-            throw new ArgumentNullException(nameof(options), "AlbumOpenArgs cannot be null");
+        {
+            _logger.LogError("Navigation to AlbumPage without AlbumOpenArgs (received {ParameterType})", e.Parameter?.GetType().Name ?? "null");
+            return;
+        }
 
         try
         {
             await ViewModel.LoadDataAsync(options.AlbumId);
             UpdateStatsPanelVisibility(ActualWidth);
-            base.OnNavigatedTo(e);
         }
         catch (OperationCanceledException) { }
         catch (Exception ex)
@@ -55,11 +64,10 @@ public sealed partial class AlbumPage : Page
 
     private void UpdateStatsPanelVisibility(double pageWidth)
     {
-        double requiredTracksWidth = GetGridLengthResource("GridHeaderTracksTitleColumnWidth")
-                                   + GetGridLengthResource("GridHeaderTracksScoreColumnWidth");
+        double requiredTracksWidth = TitleAndScoreColumnsWidth.Value;
 
         if (ViewModel.Album.IsCompilation)
-            requiredTracksWidth += GetGridLengthResource("GridHeaderTracksArtistColumnWidth");
+            requiredTracksWidth += ArtistColumnWidth.Value;
 
         statsPanel.Visibility = pageWidth >= requiredTracksWidth + StatsPanelReservedWidth
             ? Visibility.Visible
