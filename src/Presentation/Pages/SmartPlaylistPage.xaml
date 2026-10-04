@@ -69,7 +69,6 @@
                         </StackPanel>
                     </Button>
 
-                    <ToggleSwitch x:Uid="playlistRefreshOnPlaySwitch" IsOn="{x:Bind ViewModel.RefreshOnPlay, Mode=TwoWay}" MinWidth="0" VerticalAlignment="Center" />
 
                     <Button x:Uid="albumMoreButton">
                         <FontIcon Glyph="&#xE712;" />
@@ -82,6 +81,9 @@
                         </Button.Flyout>
                     </Button>
                 </StackPanel>
+
+                <!-- Playback setting, kept apart from the action buttons -->
+                <ToggleSwitch x:Uid="playlistRefreshOnPlaySwitch" IsOn="{x:Bind ViewModel.RefreshOnPlay, Mode=TwoWay}" MinWidth="0" MinHeight="0" Margin="0,2,0,0" FontSize="{StaticResource FontSizeSmall}" />
             </StackPanel>
         </Grid>
 

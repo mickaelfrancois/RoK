@@ -62,7 +62,6 @@
                 <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingSmall}" Margin="0,6,0,0">
                     <AppBarButton x:Uid="playlistListen" Style="{StaticResource ListenAppBarButtonStyle}" Width="Auto" MinWidth="0" Command="{x:Bind ViewModel.ListenCommand}" />
 
-                    <ToggleSwitch x:Uid="playlistShuffleOnPlaySwitch" IsOn="{x:Bind ViewModel.ShuffleOnPlay, Mode=TwoWay}" MinWidth="0" VerticalAlignment="Center" />
 
                     <Button x:Uid="albumMoreButton">
                         <FontIcon Glyph="&#xE712;" />
@@ -76,6 +75,9 @@
                         </Button.Flyout>
                     </Button>
                 </StackPanel>
+
+                <!-- Playback setting, kept apart from the action buttons -->
+                <ToggleSwitch x:Uid="playlistShuffleOnPlaySwitch" IsOn="{x:Bind ViewModel.ShuffleOnPlay, Mode=TwoWay}" MinWidth="0" MinHeight="0" Margin="0,2,0,0" FontSize="{StaticResource FontSizeSmall}" />
             </StackPanel>
         </Grid>
 
