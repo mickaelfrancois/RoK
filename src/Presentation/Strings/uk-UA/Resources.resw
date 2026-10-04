@@ -2276,4 +2276,16 @@
   <data name="gridHeaderDuration.Text" xml:space="preserve">
     <value>Тривалість</value>
   </data>
+  <data name="artistKicker.Text" xml:space="preserve">
+    <value>ВИКОНАВЕЦЬ</value>
+  </data>
+  <data name="artistMenuLinks.Text" xml:space="preserve">
+    <value>Посилання</value>
+  </data>
+  <data name="artistSummaryAlbum" xml:space="preserve">
+    <value>{0} альбом</value>
+  </data>
+  <data name="artistSummaryAlbums" xml:space="preserve">
+    <value>{0} альбомів</value>
+  </data>
 </root>

@@ -52,7 +52,6 @@ public class ArtistViewModelTests
             _dialogService.Object,
             _resources.Object,
             new ArtistDataLoader(_mediator, _albumFactory.Object, _trackFactory.Object, NullLogger<ArtistDataLoader>.Instance),
-            new TagsProvider(_mediator, _messenger),
             new ArtistPictureService(_artistPicture.Object, NullLogger<ArtistPictureService>.Instance),
             _apiService.Object,
             new ArtistStatisticsService(_mediator),
@@ -256,5 +255,110 @@ public class ArtistViewModelTests
 
         // Assert
         Assert.Contains(nameof(sut.Artist), raised);
+    }
+
+    [Fact(DisplayName = "when_the_artist_has_albums_tracks_and_a_duration_then_the_header_summary_joins_them")]
+    public void HeaderSummary_ShouldJoinAlbumsTracksAndDuration()
+    {
+        // Arrange
+        ArtistViewModel sut = BuildViewModel();
+        _resources.Setup(r => r.GetString("artistSummaryAlbums")).Returns("{0} albums");
+        _resources.Setup(r => r.GetString("listeningSummaryTracks")).Returns("{0} tracks");
+        _resources.Setup(r => r.GetString("listeningSummaryHoursMinutes")).Returns("{0} h {1} min");
+
+        // Act
+        sut.SetData(new ArtistDto { Id = 7, AlbumCount = 5, TrackCount = 60, TotalDurationSeconds = 13800 });
+
+        // Assert
+        Assert.Equal("5 albums · 60 tracks · 3 h 50 min", sut.HeaderSummary);
+    }
+
+    [Fact(DisplayName = "when_the_artist_has_a_single_album_then_the_header_summary_uses_the_singular")]
+    public void HeaderSummary_ShouldUseTheSingular_WhenTheArtistHasOneAlbum()
+    {
+        // Arrange
+        ArtistViewModel sut = BuildViewModel();
+        _resources.Setup(r => r.GetString("artistSummaryAlbum")).Returns("{0} album");
+
+        // Act
+        sut.SetData(new ArtistDto { Id = 7, AlbumCount = 1 });
+
+        // Assert
+        Assert.Equal("1 album", sut.HeaderSummary);
+    }
+
+    [Fact(DisplayName = "when_the_artist_has_nothing_to_count_then_the_header_summary_is_empty")]
+    public void HeaderSummary_ShouldBeEmpty_WhenTheArtistHasNothingToCount()
+    {
+        // Arrange
+        ArtistViewModel sut = BuildViewModel();
+
+        // Act
+        sut.SetData(new ArtistDto { Id = 7 });
+
+        // Assert
+        Assert.Equal(string.Empty, sut.HeaderSummary);
+    }
+
+    [Theory(DisplayName = "when_the_artist_has_a_genre_id_and_a_name_then_the_genre_chip_is_shown")]
+    [InlineData(5L, "Rock", true)]
+    [InlineData(5L, "", false)]
+    [InlineData(null, "Rock", false)]
+    public void HasGenre_ShouldRequireAnIdAndAName(long? genreId, string genreName, bool expected)
+    {
+        // Arrange
+        ArtistViewModel sut = BuildViewModel();
+
+        // Act
+        sut.SetData(new ArtistDto { Id = 7, GenreId = genreId, GenreName = genreName });
+
+        // Assert
+        Assert.Equal(expected, sut.HasGenre);
+    }
+
+    [Theory(DisplayName = "when_the_artist_has_a_country_code_then_the_country_flag_is_shown")]
+    [InlineData("GB", true)]
+    [InlineData("", false)]
+    public void HasCountry_ShouldFollowTheCountryCode(string countryCode, bool expected)
+    {
+        // Arrange
+        ArtistViewModel sut = BuildViewModel();
+
+        // Act
+        sut.SetData(new ArtistDto { Id = 7, CountryCode = countryCode });
+
+        // Assert
+        Assert.Equal(expected, sut.HasCountry);
+    }
+
+    [Theory(DisplayName = "when_the_artist_has_at_least_one_link_then_the_links_menu_is_shown")]
+    [InlineData("https://example.org", true)]
+    [InlineData("  ", false)]
+    [InlineData(null, false)]
+    public void HasLinks_ShouldBeTrue_WhenAtLeastOneLinkIsKnown(string? lastFmUrl, bool expected)
+    {
+        // Arrange
+        ArtistViewModel sut = BuildViewModel();
+
+        // Act
+        sut.SetData(new ArtistDto { Id = 7, LastFmUrl = lastFmUrl });
+
+        // Assert
+        Assert.Equal(expected, sut.HasLinks);
+    }
+
+    [Fact(DisplayName = "when_the_artist_is_a_favorite_then_the_favorite_label_offers_to_remove_it")]
+    public void ArtistFavoriteLabel_ShouldOfferToRemove_WhenTheArtistIsAFavorite()
+    {
+        // Arrange
+        ArtistViewModel sut = BuildViewModel();
+        _resources.Setup(r => r.GetString("listeningFavoriteAdd")).Returns("Add {0}");
+        _resources.Setup(r => r.GetString("listeningFavoriteRemove")).Returns("Remove {0}");
+
+        // Act
+        sut.SetData(new ArtistDto { Id = 7, Name = "Fleetwood Mac", IsFavorite = true });
+
+        // Assert
+        Assert.Equal("Remove Fleetwood Mac", sut.ArtistFavoriteLabel);
     }
 }

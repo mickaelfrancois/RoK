@@ -1,4 +1,5 @@
 ﻿using System.Collections.Specialized;
+using System.Globalization;
 using System.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -14,6 +15,7 @@ using Rok.Infrastructure.Files;
 using Rok.ViewModels.Album;
 using Rok.ViewModels.Artist.Services;
 using Rok.ViewModels.Common;
+using Rok.ViewModels.Listening.Services;
 using Rok.ViewModels.Track;
 
 namespace Rok.ViewModels.Artist;
@@ -29,7 +31,6 @@ public partial class ArtistViewModel : ObservableObject, IFilterableArtist, IGro
     private readonly IAppOptions _appOptions;
 
     private readonly ArtistDataLoader _dataLoader;
-    private readonly TagsProvider _tagsProvider;
     private readonly ArtistPictureService _pictureService;
     private readonly IArtistApiService _apiService;
     private readonly ArtistStatisticsService _statisticsService;
@@ -81,10 +82,6 @@ public partial class ArtistViewModel : ObservableObject, IFilterableArtist, IGro
 
     public ListeningStatsViewModel ListeningStats { get; } = new();
 
-
-    public ObservableCollection<string> EditableTags { get; } = new();
-
-    public ObservableCollection<string> SuggestedTags { get; } = new();
 
     public bool IsFavorite
     {
@@ -211,6 +208,48 @@ public partial class ArtistViewModel : ObservableObject, IFilterableArtist, IGro
         }
     }
 
+    /// <summary>Album count, track count and total duration, rendered with the same localized formats as the Listening header.</summary>
+    public string HeaderSummary
+    {
+        get
+        {
+            ListeningSummaryLabels labels = new(
+                _resourceLoader.GetString("listeningSummaryTrack"),
+                _resourceLoader.GetString("listeningSummaryTracks"),
+                _resourceLoader.GetString("listeningSummaryHoursMinutes"),
+                _resourceLoader.GetString("listeningSummaryHours"),
+                _resourceLoader.GetString("listeningSummaryMinutes"),
+                _resourceLoader.GetString("listeningSummaryEndsAt"));
+
+            string albums = Artist.AlbumCount > 0
+                ? string.Format(CultureInfo.CurrentCulture, _resourceLoader.GetString(Artist.AlbumCount == 1 ? "artistSummaryAlbum" : "artistSummaryAlbums"), Artist.AlbumCount)
+                : string.Empty;
+
+            string tracks = ListeningQueueSummaryFormatter.FormatOverview(new ListeningQueueSummary(Artist.TrackCount, Artist.TotalDurationSeconds, null), labels, CultureInfo.CurrentCulture);
+
+            return string.Join(" · ", new[] { albums, tracks }.Where(part => part.Length > 0));
+        }
+    }
+
+    public bool HasActiveYears => ActiveYears.Length > 0;
+
+    public string GenreName => Artist.GenreName;
+
+    public bool HasGenre => Artist.GenreId.HasValue && !string.IsNullOrEmpty(Artist.GenreName);
+
+    public string CountryName => Artist.CountryName;
+
+    public bool HasCountry => !string.IsNullOrEmpty(Artist.CountryCode);
+
+    public bool HasLinks => new[]
+    {
+        Artist.OfficialSiteUrl, Artist.LastFmUrl, Artist.WikipediaUrl, Artist.FacebookUrl, Artist.InstagramUrl,
+        Artist.TwitterUrl, Artist.ThreadsUrl, Artist.TiktokUrl, Artist.YoutubeUrl
+    }.Any(url => !string.IsNullOrWhiteSpace(url));
+
+    public string ArtistFavoriteLabel => ListeningHeaderLabels.FavoriteToggle(
+        Artist.Name, IsFavorite, _resourceLoader.GetString("listeningFavoriteAdd"), _resourceLoader.GetString("listeningFavoriteRemove"));
+
     public string DurationTotal
     {
         get
@@ -272,6 +311,14 @@ public partial class ArtistViewModel : ObservableObject, IFilterableArtist, IGro
         OnPropertyChanged(nameof(DurationTotal));
         OnPropertyChanged(nameof(Tags));
         OnPropertyChanged(nameof(IsFavorite));
+        OnPropertyChanged(nameof(HeaderSummary));
+        OnPropertyChanged(nameof(HasActiveYears));
+        OnPropertyChanged(nameof(GenreName));
+        OnPropertyChanged(nameof(HasGenre));
+        OnPropertyChanged(nameof(CountryName));
+        OnPropertyChanged(nameof(HasCountry));
+        OnPropertyChanged(nameof(HasLinks));
+        OnPropertyChanged(nameof(ArtistFavoriteLabel));
     }
 
     public override string ToString() => Artist?.Name ?? string.Empty;
@@ -284,7 +331,6 @@ public partial class ArtistViewModel : ObservableObject, IFilterableArtist, IGro
         IDialogService dialogService,
         IStringResourceProvider resourceLoader,
         ArtistDataLoader dataLoader,
-        TagsProvider tagsDataLoader,
         ArtistPictureService pictureService,
         IArtistApiService apiService,
         ArtistStatisticsService statisticsService,
@@ -302,7 +348,6 @@ public partial class ArtistViewModel : ObservableObject, IFilterableArtist, IGro
         _dialogService = Guard.NotNull(dialogService);
         _resourceLoader = Guard.NotNull(resourceLoader);
         _dataLoader = Guard.NotNull(dataLoader);
-        _tagsProvider = Guard.NotNull(tagsDataLoader);
         _pictureService = Guard.NotNull(pictureService);
         _messenger = Guard.NotNull(messenger);
         _apiService = Guard.NotNull(apiService);
@@ -382,8 +427,6 @@ public partial class ArtistViewModel : ObservableObject, IFilterableArtist, IGro
 
         await CalculatePictureDominantColorAsync();
 
-        await InitializeTagsAsync();
-
         stopwatch.Stop();
         _logger.LogInformation("Artist {ArtistId} loaded in {ElapsedMilliseconds} ms (albums: {LoadAlbums}, tracks: {LoadTracks}, api: {FetchApi})",
                                 artistId, stopwatch.ElapsedMilliseconds, loadAlbums, loadTracks, fetchApi);
@@ -392,7 +435,6 @@ public partial class ArtistViewModel : ObservableObject, IFilterableArtist, IGro
     public void OnNavigatedFrom()
     {
         InitNavigationCancellation();
-        EditableTags.CollectionChanged -= OnTagsCollectionChanged;
         Backdrop = null;
     }
 
@@ -527,40 +569,6 @@ public partial class ArtistViewModel : ObservableObject, IFilterableArtist, IGro
         OnPropertyChanged(nameof(DurationTotal));
     }
 
-    private async Task InitializeTagsAsync()
-    {
-        List<string> artistTags = Artist.GetTags();
-
-        // Detached while filling: otherwise every Clear/Add would persist a partial tag list.
-        EditableTags.CollectionChanged -= OnTagsCollectionChanged;
-
-        EditableTags.Clear();
-        foreach (string tag in artistTags)
-            EditableTags.Add(tag);
-
-        EditableTags.CollectionChanged += OnTagsCollectionChanged;
-
-        SuggestedTags.Clear();
-        List<string> suggestedTags = await _tagsProvider.GetTagsAsync();
-        foreach (string tag in suggestedTags)
-        {
-            SuggestedTags.Add(tag);
-        }
-    }
-
-    private async void OnTagsCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
-    {
-        try
-        {
-            Artist.TagsAsString = string.Join(",", EditableTags);
-            await _editService.UpdateTagsAsync(Artist.Id, EditableTags);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Failed to save tags for artist {ArtistId}", Artist.Id);
-        }
-    }
-
     private async Task UpdateStatisticsIfNeededAsync()
     {
         bool updated = await _statisticsService.UpdateIfNeededAsync(Artist, Albums, Tracks);
@@ -638,6 +646,7 @@ public partial class ArtistViewModel : ObservableObject, IFilterableArtist, IGro
         await _editService.UpdateFavoriteAsync(Artist, newFavoriteState);
 
         OnPropertyChanged(nameof(IsFavorite));
+        OnPropertyChanged(nameof(ArtistFavoriteLabel));
         _messenger.Send(new ArtistUpdateMessage(Artist.Id, ActionType.Update));
     }
 
