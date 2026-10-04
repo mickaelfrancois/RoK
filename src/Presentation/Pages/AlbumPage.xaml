@@ -226,7 +226,7 @@
                             </StackPanel>
 
                             <HyperlinkButton Grid.Column="1" Visibility="{x:Bind Track.IsAlbumCompilation, Converter={StaticResource BoolToVisibilityConverter}}" Style="{StaticResource GridTracksArtistHyperlinkButtonStyle}" Command="{x:Bind ArtistOpenCommand}" />
-                            <TextBlock Grid.Column="2" Text="{x:Bind DurationStr}" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,16,0" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                            <TextBlock Grid.Column="2" Text="{x:Bind DurationStr}" Typography.NumeralAlignment="Tabular" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,16,0" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
                             <common:RatingControlLightControl Grid.Column="3" Style="{StaticResource GridTracksScoreStyle}" RatingValue="{x:Bind Score, Mode=TwoWay}" />
                         </Grid>
                     </DataTemplate>
