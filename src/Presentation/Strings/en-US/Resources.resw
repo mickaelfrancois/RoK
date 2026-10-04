@@ -2386,4 +2386,16 @@
   <data name="gridHeaderDuration.Text" xml:space="preserve">
     <value>Duration</value>
   </data>
+  <data name="artistKicker.Text" xml:space="preserve">
+    <value>ARTIST</value>
+  </data>
+  <data name="artistMenuLinks.Text" xml:space="preserve">
+    <value>Links</value>
+  </data>
+  <data name="artistSummaryAlbum" xml:space="preserve">
+    <value>{0} album</value>
+  </data>
+  <data name="artistSummaryAlbums" xml:space="preserve">
+    <value>{0} albums</value>
+  </data>
 </root>

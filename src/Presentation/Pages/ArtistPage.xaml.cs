@@ -9,8 +9,18 @@ namespace Rok.Pages;
 
 public sealed partial class ArtistPage : Page
 {
+    private const double NarrowHeaderThreshold = 800;
+    private const double CompactHeaderThreshold = 560;
+
     /// <summary>Width reserved by the stats panel (250px) plus its paddings and grid margins.</summary>
     private const double StatsPanelReservedWidth = 300;
+
+    /// <summary>The tracks tab is the widest pivot content: title, album and score fixed columns.</summary>
+    private static readonly Lazy<double> TracksColumnsWidth = new(() =>
+        GetGridLengthResource("GridHeaderTracksTitleColumnWidth")
+        + GetGridLengthResource("GridHeaderTracksAlbumColumnWidth")
+        + GetGridLengthResource("GridHeaderTracksDurationColumnWidth")
+        + GetGridLengthResource("GridHeaderTracksScoreColumnWidth"));
 
     public ArtistViewModel ViewModel { get; set; } = null!;
     private readonly ILogger<ArtistPage> _logger;
@@ -25,8 +35,13 @@ public sealed partial class ArtistPage : Page
 
     protected override async void OnNavigatedTo(NavigationEventArgs e)
     {
+        base.OnNavigatedTo(e);
+
         if (e.Parameter is not ArtistOpenArgs options)
-            throw new ArgumentException("Navigation parameters must be type of ArtistOpenArgs", nameof(e));
+        {
+            _logger.LogError("Navigation to ArtistPage without ArtistOpenArgs (received {ParameterType})", e.Parameter?.GetType().Name ?? "null");
+            return;
+        }
 
         try
         {
@@ -35,7 +50,6 @@ public sealed partial class ArtistPage : Page
 
             await ViewModel.LoadDataAsync(options.ArtistId);
             UpdateStatsPanelVisibility(ActualWidth);
-            base.OnNavigatedTo(e);
         }
         catch (OperationCanceledException) { }
         catch (Exception ex)
@@ -47,24 +61,34 @@ public sealed partial class ArtistPage : Page
 
     protected override void OnNavigatedFrom(NavigationEventArgs e)
     {
-        ViewModel.OnNavigatedFrom();
+        ViewModel?.OnNavigatedFrom();
         base.OnNavigatedFrom(e);
     }
 
 
     private void Page_SizeChanged(object sender, SizeChangedEventArgs e)
     {
+        ApplyHeaderLayout(e.NewSize.Width);
         UpdateStatsPanelVisibility(e.NewSize.Width);
+    }
+
+    private void ArtistPage_Loaded(object sender, RoutedEventArgs e)
+    {
+        ApplyHeaderLayout(ActualWidth);
+    }
+
+    private void ApplyHeaderLayout(double width)
+    {
+        string state = width < CompactHeaderThreshold
+            ? "CompactHeader"
+            : width < NarrowHeaderThreshold ? "NarrowHeader" : "WideHeader";
+
+        VisualStateManager.GoToState(this, state, true);
     }
 
     private void UpdateStatsPanelVisibility(double pageWidth)
     {
-        // The tracks tab is the widest pivot content: title, album and score fixed columns.
-        double requiredTracksWidth = GetGridLengthResource("GridHeaderTracksTitleColumnWidth")
-                                   + GetGridLengthResource("GridHeaderTracksAlbumColumnWidth")
-                                   + GetGridLengthResource("GridHeaderTracksScoreColumnWidth");
-
-        statsPanel.Visibility = pageWidth >= requiredTracksWidth + StatsPanelReservedWidth
+        statsPanel.Visibility = pageWidth >= TracksColumnsWidth.Value + StatsPanelReservedWidth
             ? Visibility.Visible
             : Visibility.Collapsed;
     }

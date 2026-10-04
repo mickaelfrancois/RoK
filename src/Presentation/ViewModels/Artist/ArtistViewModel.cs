@@ -1,4 +1,5 @@
 ﻿using System.Collections.Specialized;
+using System.Globalization;
 using System.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -14,6 +15,7 @@ using Rok.Infrastructure.Files;
 using Rok.ViewModels.Album;
 using Rok.ViewModels.Artist.Services;
 using Rok.ViewModels.Common;
+using Rok.ViewModels.Listening.Services;
 using Rok.ViewModels.Track;
 
 namespace Rok.ViewModels.Artist;
@@ -29,7 +31,6 @@ public partial class ArtistViewModel : ObservableObject, IFilterableArtist, IGro
     private readonly IAppOptions _appOptions;
 
     private readonly ArtistDataLoader _dataLoader;
-    private readonly TagsProvider _tagsProvider;
     private readonly ArtistPictureService _pictureService;
     private readonly IArtistApiService _apiService;
     private readonly ArtistStatisticsService _statisticsService;
@@ -42,9 +43,20 @@ public partial class ArtistViewModel : ObservableObject, IFilterableArtist, IGro
     private CancellationTokenSource _navigationCts = new();
 
     public IPlaylistMenuService PlaylistMenuService { get; }
-    public ArtistDto Artist { get; private set; } = new();
-    public RangeObservableCollection<TrackViewModel> Tracks { get; set; } = [];
-    public RangeObservableCollection<AlbumViewModel> Albums { get; set; } = [];
+    private ArtistDto _artist = new();
+
+    public ArtistDto Artist
+    {
+        get => _artist;
+        private set
+        {
+            if (SetProperty(ref _artist, value))
+                NotifyArtistDerivedProperties();
+        }
+    }
+
+    public RangeObservableCollection<TrackViewModel> Tracks { get; } = [];
+    public RangeObservableCollection<AlbumViewModel> Albums { get; } = [];
 
     public bool HasNoAlbums => LoadState == DetailLoadState.Loaded && Albums.Count == 0;
     public bool HasNoTracks => LoadState == DetailLoadState.Loaded && Tracks.Count == 0;
@@ -70,10 +82,6 @@ public partial class ArtistViewModel : ObservableObject, IFilterableArtist, IGro
 
     public ListeningStatsViewModel ListeningStats { get; } = new();
 
-
-    public ObservableCollection<string> EditableTags { get; set; } = new();
-
-    public ObservableCollection<string> SuggestedTags { get; set; } = new();
 
     public bool IsFavorite
     {
@@ -200,6 +208,48 @@ public partial class ArtistViewModel : ObservableObject, IFilterableArtist, IGro
         }
     }
 
+    /// <summary>Album count, track count and total duration, rendered with the same localized formats as the Listening header.</summary>
+    public string HeaderSummary
+    {
+        get
+        {
+            ListeningSummaryLabels labels = new(
+                _resourceLoader.GetString("listeningSummaryTrack"),
+                _resourceLoader.GetString("listeningSummaryTracks"),
+                _resourceLoader.GetString("listeningSummaryHoursMinutes"),
+                _resourceLoader.GetString("listeningSummaryHours"),
+                _resourceLoader.GetString("listeningSummaryMinutes"),
+                _resourceLoader.GetString("listeningSummaryEndsAt"));
+
+            string albums = Artist.AlbumCount > 0
+                ? string.Format(CultureInfo.CurrentCulture, _resourceLoader.GetString(Artist.AlbumCount == 1 ? "artistSummaryAlbum" : "artistSummaryAlbums"), Artist.AlbumCount)
+                : string.Empty;
+
+            string tracks = ListeningQueueSummaryFormatter.FormatOverview(new ListeningQueueSummary(Artist.TrackCount, Artist.TotalDurationSeconds, null), labels, CultureInfo.CurrentCulture);
+
+            return string.Join(" · ", new[] { albums, tracks }.Where(part => part.Length > 0));
+        }
+    }
+
+    public bool HasActiveYears => ActiveYears.Length > 0;
+
+    public string GenreName => Artist.GenreName;
+
+    public bool HasGenre => Artist.GenreId.HasValue && !string.IsNullOrEmpty(Artist.GenreName);
+
+    public string CountryName => Artist.CountryName;
+
+    public bool HasCountry => !string.IsNullOrEmpty(Artist.CountryCode);
+
+    public bool HasLinks => new[]
+    {
+        Artist.OfficialSiteUrl, Artist.LastFmUrl, Artist.WikipediaUrl, Artist.FacebookUrl, Artist.InstagramUrl,
+        Artist.TwitterUrl, Artist.ThreadsUrl, Artist.TiktokUrl, Artist.YoutubeUrl
+    }.Any(url => !string.IsNullOrWhiteSpace(url));
+
+    public string ArtistFavoriteLabel => ListeningHeaderLabels.FavoriteToggle(
+        Artist.Name, IsFavorite, _resourceLoader.GetString("listeningFavoriteAdd"), _resourceLoader.GetString("listeningFavoriteRemove"));
+
     public string DurationTotal
     {
         get
@@ -250,6 +300,27 @@ public partial class ArtistViewModel : ObservableObject, IFilterableArtist, IGro
     DateTime IGroupable.CreatDate => Artist.CreatDate;
     DateTime? IGroupable.LastListen => Artist.LastListen;
 
+    /// <summary>
+    /// Raises the notifications of everything computed from <see cref="Artist"/>. Needed after the
+    /// DTO is mutated in place, which <see cref="SetProperty{T}(ref T, T, string?)"/> cannot see.
+    /// </summary>
+    private void NotifyArtistDerivedProperties()
+    {
+        OnPropertyChanged(nameof(SubTitle));
+        OnPropertyChanged(nameof(ActiveYears));
+        OnPropertyChanged(nameof(DurationTotal));
+        OnPropertyChanged(nameof(Tags));
+        OnPropertyChanged(nameof(IsFavorite));
+        OnPropertyChanged(nameof(HeaderSummary));
+        OnPropertyChanged(nameof(HasActiveYears));
+        OnPropertyChanged(nameof(GenreName));
+        OnPropertyChanged(nameof(HasGenre));
+        OnPropertyChanged(nameof(CountryName));
+        OnPropertyChanged(nameof(HasCountry));
+        OnPropertyChanged(nameof(HasLinks));
+        OnPropertyChanged(nameof(ArtistFavoriteLabel));
+    }
+
     public override string ToString() => Artist?.Name ?? string.Empty;
 
 
@@ -260,7 +331,6 @@ public partial class ArtistViewModel : ObservableObject, IFilterableArtist, IGro
         IDialogService dialogService,
         IStringResourceProvider resourceLoader,
         ArtistDataLoader dataLoader,
-        TagsProvider tagsDataLoader,
         ArtistPictureService pictureService,
         IArtistApiService apiService,
         ArtistStatisticsService statisticsService,
@@ -278,7 +348,6 @@ public partial class ArtistViewModel : ObservableObject, IFilterableArtist, IGro
         _dialogService = Guard.NotNull(dialogService);
         _resourceLoader = Guard.NotNull(resourceLoader);
         _dataLoader = Guard.NotNull(dataLoader);
-        _tagsProvider = Guard.NotNull(tagsDataLoader);
         _pictureService = Guard.NotNull(pictureService);
         _messenger = Guard.NotNull(messenger);
         _apiService = Guard.NotNull(apiService);
@@ -357,8 +426,6 @@ public partial class ArtistViewModel : ObservableObject, IFilterableArtist, IGro
             return;
 
         await CalculatePictureDominantColorAsync();
-
-        await InitializeTagsAsync();
 
         stopwatch.Stop();
         _logger.LogInformation("Artist {ArtistId} loaded in {ElapsedMilliseconds} ms (albums: {LoadAlbums}, tracks: {LoadTracks}, api: {FetchApi})",
@@ -502,38 +569,12 @@ public partial class ArtistViewModel : ObservableObject, IFilterableArtist, IGro
         OnPropertyChanged(nameof(DurationTotal));
     }
 
-    private async Task InitializeTagsAsync()
-    {
-        List<string> artistTags = Artist.GetTags();
-
-        EditableTags.Clear();
-        foreach (string tag in artistTags)
-            EditableTags.Add(tag);
-
-        EditableTags.CollectionChanged -= OnTagsCollectionChanged;
-        EditableTags.CollectionChanged += OnTagsCollectionChanged;
-
-        SuggestedTags.Clear();
-        List<string> suggestedTags = await _tagsProvider.GetTagsAsync();
-        foreach (string tag in suggestedTags)
-        {
-            SuggestedTags.Add(tag);
-        }
-    }
-
-    private async void OnTagsCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
-    {
-        Artist.TagsAsString = string.Join(",", EditableTags);
-        await _editService.UpdateTagsAsync(Artist.Id, EditableTags);
-
-        Debug.WriteLine(Artist.TagsAsString);
-    }
-
     private async Task UpdateStatisticsIfNeededAsync()
     {
         bool updated = await _statisticsService.UpdateIfNeededAsync(Artist, Albums, Tracks);
         if (updated)
         {
+            NotifyArtistDerivedProperties();
             _messenger.Send(new ArtistUpdateMessage(Artist.Id, ActionType.Update));
         }
     }
@@ -605,6 +646,7 @@ public partial class ArtistViewModel : ObservableObject, IFilterableArtist, IGro
         await _editService.UpdateFavoriteAsync(Artist, newFavoriteState);
 
         OnPropertyChanged(nameof(IsFavorite));
+        OnPropertyChanged(nameof(ArtistFavoriteLabel));
         _messenger.Send(new ArtistUpdateMessage(Artist.Id, ActionType.Update));
     }
 
@@ -624,6 +666,7 @@ public partial class ArtistViewModel : ObservableObject, IFilterableArtist, IGro
 
         _messenger.Send(new ArtistUpdateMessage(Artist.Id, ActionType.Update));
         OnPropertyChanged(nameof(Artist));
+        NotifyArtistDerivedProperties();
     }
 
     [RelayCommand(CanExecute = nameof(IsEntityLoaded))]
