@@ -2354,15 +2354,6 @@
   <data name="playlistRefreshOnPlaySwitch.OffContent" xml:space="preserve">
     <value>Оновлювати під час відтворення</value>
   </data>
-  <data name="albumsTitle.Text" xml:space="preserve">
-    <value>Альбоми</value>
-  </data>
-  <data name="albumsSurprise.Text" xml:space="preserve">
-    <value>Здивуй мене</value>
-  </data>
-  <data name="albumsSurpriseButton.ToolTipService.ToolTip" xml:space="preserve">
-    <value>Відтворити випадковий альбом зі списку</value>
-  </data>
   <data name="filterChipRemove.AutomationProperties.Name" xml:space="preserve">
     <value>Прибрати фільтр</value>
   </data>

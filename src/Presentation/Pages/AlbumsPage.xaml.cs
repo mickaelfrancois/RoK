@@ -12,8 +12,6 @@ namespace Rok.Pages;
 
 public sealed partial class AlbumsPage : Page, IDisposable
 {
-    private const double NarrowHeaderThreshold = 800;
-
     private readonly ILogger<AlbumsPage> _logger;
 
     public AlbumsViewModel ViewModel { get; set; }
@@ -22,7 +20,11 @@ public sealed partial class AlbumsPage : Page, IDisposable
     private readonly AlbumsGroupByMenuBuilder _groupByMenuBuilder = new();
 
     private bool _disposed;
+    private bool _pageLoaded;
     private string? _visualState;
+
+    private readonly AnimatedNumberHelper _countAnimation;
+    private readonly AnimatedNumberHelper _durationAnimation;
 
     private readonly GroupedItemsSourceBinder _binder;
 
@@ -30,6 +32,9 @@ public sealed partial class AlbumsPage : Page, IDisposable
     public AlbumsPage()
     {
         InitializeComponent();
+
+        _countAnimation = new AnimatedNumberHelper(t => albumCountRun.Text = t);
+        _durationAnimation = new AnimatedNumberHelper(t => albumDurationRun.Text = t);
 
         _logger = App.ServiceProvider.GetRequiredService<ILogger<AlbumsPage>>();
         ViewModel = App.ServiceProvider.GetRequiredService<AlbumsViewModel>();
@@ -65,6 +70,7 @@ public sealed partial class AlbumsPage : Page, IDisposable
         ScrollStateHelper.SaveScrollOffset(grid);
         ViewModel.SaveState();
 
+        _pageLoaded = false;
         Dispose();
 
         base.OnNavigatingFrom(e);
@@ -72,29 +78,14 @@ public sealed partial class AlbumsPage : Page, IDisposable
 
     private void Page_Loaded(object sender, RoutedEventArgs e)
     {
+        _pageLoaded = true;
+
         // The display mode must be settled before the list receives its items.
         UpdateVisualState();
         UpdateItemsSource();
         ScrollStateHelper.RestoreScrollOffset(grid);
-        ApplyHeaderLayout(ActualWidth);
-    }
-
-    private void Page_SizeChanged(object sender, SizeChangedEventArgs e)
-    {
-        ApplyHeaderLayout(e.NewSize.Width);
-    }
-
-    private void ApplyHeaderLayout(double width)
-    {
-        string state = width < NarrowHeaderThreshold ? "NarrowHeader" : "WideHeader";
-
-        VisualStateManager.GoToState(this, state, true);
-    }
-
-    private void RemoveFilterChip_Click(object sender, RoutedEventArgs e)
-    {
-        if (sender is Button { DataContext: AlbumFilterChip chip })
-            ViewModel.RemoveFilterCommand.Execute(chip);
+        _countAnimation.AnimateTo(ViewModel.Count);
+        _durationAnimation.AnimateTo(ViewModel.DurationText);
     }
 
     private void Page_Unloaded(object sender, RoutedEventArgs e)
@@ -106,6 +97,20 @@ public sealed partial class AlbumsPage : Page, IDisposable
 
     private void ViewModel_PropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
+        if (e.PropertyName == nameof(ViewModel.Count))
+        {
+            if (_pageLoaded)
+                _countAnimation.AnimateTo(ViewModel.Count);
+            return;
+        }
+
+        if (e.PropertyName == nameof(ViewModel.DurationText))
+        {
+            if (_pageLoaded)
+                _durationAnimation.AnimateTo(ViewModel.DurationText);
+            return;
+        }
+
         if (e.PropertyName == nameof(ViewModel.IsGridView))
         {
             UpdateVisualState();
@@ -137,6 +142,12 @@ public sealed partial class AlbumsPage : Page, IDisposable
     private void FilterFlyout_Opened(object sender, object e)
     {
         _filterMenuBuilder.PopulateFilterMenu(filterMenu, ViewModel);
+    }
+
+    private void RemoveFilterChip_Click(object sender, RoutedEventArgs e)
+    {
+        if (sender is Button { DataContext: AlbumFilterChip chip })
+            ViewModel.RemoveFilterCommand.Execute(chip);
     }
 
     private void GroupButton_Tapped(object sender, Microsoft.UI.Xaml.Input.TappedRoutedEventArgs e)
@@ -239,6 +250,9 @@ public sealed partial class AlbumsPage : Page, IDisposable
         try
         {
             Loaded -= Page_Loaded;
+
+            _countAnimation.Dispose();
+            _durationAnimation.Dispose();
 
             if (ViewModel != null)
             {

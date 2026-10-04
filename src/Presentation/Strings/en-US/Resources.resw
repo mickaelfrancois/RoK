@@ -2464,15 +2464,6 @@
   <data name="playlistRefreshOnPlaySwitch.OffContent" xml:space="preserve">
     <value>Refresh on play</value>
   </data>
-  <data name="albumsTitle.Text" xml:space="preserve">
-    <value>Albums</value>
-  </data>
-  <data name="albumsSurprise.Text" xml:space="preserve">
-    <value>Surprise me</value>
-  </data>
-  <data name="albumsSurpriseButton.ToolTipService.ToolTip" xml:space="preserve">
-    <value>Play a random album from the list</value>
-  </data>
   <data name="filterChipRemove.AutomationProperties.Name" xml:space="preserve">
     <value>Remove filter</value>
   </data>
