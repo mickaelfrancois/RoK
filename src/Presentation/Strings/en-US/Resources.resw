@@ -2425,4 +2425,37 @@
   <data name="genreSummaryArtists" xml:space="preserve">
     <value>{0} artists</value>
   </data>
+  <data name="playlistKicker.Text" xml:space="preserve">
+    <value>PLAYLIST</value>
+  </data>
+  <data name="smartPlaylistKicker.Text" xml:space="preserve">
+    <value>SMART PLAYLIST</value>
+  </data>
+  <data name="playlistShuffleOnPlayText.Text" xml:space="preserve">
+    <value>Shuffle play</value>
+  </data>
+  <data name="playlistRefreshText.Text" xml:space="preserve">
+    <value>Refresh</value>
+  </data>
+  <data name="playlistRefreshOnPlayText.Text" xml:space="preserve">
+    <value>Refresh on play</value>
+  </data>
+  <data name="playlistMenuShuffleOrder.Text" xml:space="preserve">
+    <value>Shuffle order</value>
+  </data>
+  <data name="playlistMenuExport.Text" xml:space="preserve">
+    <value>Export</value>
+  </data>
+  <data name="playlistMenuDelete.Text" xml:space="preserve">
+    <value>Delete</value>
+  </data>
+  <data name="trackKicker.Text" xml:space="preserve">
+    <value>TRACK</value>
+  </data>
+  <data name="trackSectionListening.Text" xml:space="preserve">
+    <value>Listening</value>
+  </data>
+  <data name="trackSectionFile.Text" xml:space="preserve">
+    <value>File</value>
+  </data>
 </root>

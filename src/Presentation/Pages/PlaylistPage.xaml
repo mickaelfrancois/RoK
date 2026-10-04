@@ -9,11 +9,13 @@
     xmlns:common="using:Rok.Commons" 
     xmlns:track="using:Rok.ViewModels.Track"
     x:Name="playlistPage"    
+    Loaded="PlaylistPage_Loaded"
+    SizeChanged="Page_SizeChanged"
     mc:Ignorable="d">
 
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition x:Name="headerRow" Height="{StaticResource HeaderRowHeight}" />
+            <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
@@ -21,30 +23,65 @@
             <SolidColorBrush Color="{ThemeResource CardBackgroundFillColorDefault}" Opacity="{StaticResource HeaderBackgroundOpacity}" />
         </Grid.Background>
 
+        <VisualStateManager.VisualStateGroups>
+            <VisualStateGroup x:Name="HeaderLayoutStates">
+                <VisualState x:Name="WideHeader" />
+                <VisualState x:Name="NarrowHeader">
+                    <VisualState.Setters>
+                        <Setter Target="headerGrid.Padding" Value="12,8,12,8" />
+                        <Setter Target="kickerText.Visibility" Value="Collapsed" />
+                        <Setter Target="summaryText.Visibility" Value="Collapsed" />
+                        <Setter Target="playlistPicture.Width" Value="72" />
+                        <Setter Target="playlistPicture.Height" Value="72" />
+                    </VisualState.Setters>
+                </VisualState>
+            </VisualStateGroup>
+        </VisualStateManager.VisualStateGroups>
+
         <Image x:Name="backdrop" Grid.RowSpan="2" Style="{StaticResource HeaderBackdropStyle}" Source="{x:Bind ViewModel.Backdrop,Mode=OneWay}" Stretch="UniformToFill" IsHitTestVisible="False" />
 
-        <Grid>
+        <!-- Header -->
+        <Grid x:Name="headerGrid" Padding="16,10,16,10" ColumnSpacing="{StaticResource SpacingMedium}">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition x:Name="pictureColumn" Width="{StaticResource HeaderPictureColumnWidth}" />
+                <ColumnDefinition Width="Auto" />
                 <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
 
-            <Grid Style="{StaticResource HeaderPictureGridStyle}">
-                <common:PictureControl x:Name="artistPicture" Style="{StaticResource HeaderPictureStyle}" Cover="{x:Bind ViewModel.Picture, Mode=OneWay}" />
+            <Grid VerticalAlignment="Top" Margin="0" Style="{StaticResource HeaderPictureGridStyle}">
+                <common:PictureControl x:Name="playlistPicture" Width="160" Height="160" Style="{StaticResource HeaderPictureStyle}" Cover="{x:Bind ViewModel.Picture, Mode=OneWay}" />
             </Grid>
 
-            <RelativePanel Grid.Column="1" Margin="6,0,0,0">
-                <common:InlineEditableText x:Name="playlistName" Text="{x:Bind ViewModel.Name, Mode=TwoWay}" TextStyle="{StaticResource HeaderStyle}" />
-                <TextBlock x:Name="panelExtendedInfo" RelativePanel.Below="playlistName" Style="{StaticResource HeaderTextStyle}" Text="{x:Bind ViewModel.SubTitle, Mode=OneWay}" />
+            <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="4">
+                <TextBlock x:Name="kickerText" x:Uid="playlistKicker" Style="{StaticResource CaptionTextBlockStyle}" FontWeight="SemiBold" CharacterSpacing="80" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
 
-                <CommandBar RelativePanel.AlignBottomWithPanel="True" Style="{StaticResource HeaderCommandBarStyle}">
-                    <AppBarButton x:Uid="playlistListen" Style="{StaticResource ListenAppBarButtonStyle}" Command="{x:Bind ViewModel.ListenCommand}" />
-                    <AppBarButton x:Uid="shuffleButton" Style="{StaticResource AppBarButtonCompactStyle}" Icon="Shuffle" Command="{x:Bind ViewModel.ShufflePlaylistCommand}" />
-                    <AppBarToggleButton x:Uid="shuffleOnPlayButton" Style="{StaticResource AppBarToggleButtonCompactStyle}" Icon="Shuffle" IsChecked="{x:Bind ViewModel.ShuffleOnPlay, Mode=TwoWay}" />
-                    <AppBarButton x:Uid="playlistDelete" Style="{StaticResource AppBarButtonCompactStyle}" Icon="Delete" Click="DeleteButton_Click" />
-                    <AppBarButton x:Uid="playlistExport" Style="{StaticResource AppBarButtonCompactStyle}" Icon="Save" Command="{x:Bind ViewModel.ExportPlaylistCommand}" />
-                </CommandBar>
-            </RelativePanel>
+                <common:InlineEditableText x:Name="playlistName" Text="{x:Bind ViewModel.Name, Mode=TwoWay}" TextStyle="{StaticResource HeaderTitleTextStyle}" />
+
+                <TextBlock x:Name="summaryText" Text="{x:Bind ViewModel.HeaderSummary, Mode=OneWay}" Style="{StaticResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+
+                <!-- Actions -->
+                <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingSmall}" Margin="0,6,0,0">
+                    <AppBarButton x:Uid="playlistListen" Style="{StaticResource ListenAppBarButtonStyle}" Width="Auto" MinWidth="0" Command="{x:Bind ViewModel.ListenCommand}" />
+
+                    <ToggleButton IsChecked="{x:Bind ViewModel.ShuffleOnPlay, Mode=TwoWay}">
+                        <StackPanel Orientation="Horizontal" Spacing="6">
+                            <SymbolIcon Symbol="Shuffle" />
+                            <TextBlock x:Uid="playlistShuffleOnPlayText" VerticalAlignment="Center" />
+                        </StackPanel>
+                    </ToggleButton>
+
+                    <Button x:Uid="albumMoreButton">
+                        <FontIcon Glyph="&#xE712;" />
+                        <Button.Flyout>
+                            <MenuFlyout Placement="Bottom">
+                                <MenuFlyoutItem x:Uid="playlistMenuShuffleOrder" Icon="Shuffle" Command="{x:Bind ViewModel.ShufflePlaylistCommand}" />
+                                <MenuFlyoutItem x:Uid="playlistMenuExport" Icon="Save" Command="{x:Bind ViewModel.ExportPlaylistCommand}" />
+                                <MenuFlyoutSeparator />
+                                <MenuFlyoutItem x:Uid="playlistMenuDelete" Icon="Delete" Click="DeleteButton_Click" />
+                            </MenuFlyout>
+                        </Button.Flyout>
+                    </Button>
+                </StackPanel>
+            </StackPanel>
         </Grid>
 
         <!-- Tracks -->
@@ -55,11 +92,12 @@
             </Grid.RowDefinitions>
 
             <!-- Grid headers -->
-            <Grid Style="{StaticResource TracksGridStyle}">
+            <Grid Style="{StaticResource TracksGridStyle}" Padding="8,0,0,0">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="{StaticResource GridHeaderTracksTitleColumnWidth}" />
                     <ColumnDefinition Width="{StaticResource GridHeaderTracksArtistColumnWidth}" />
                     <ColumnDefinition Width="{StaticResource GridHeaderTracksAlbumColumnWidth}" />
+                    <ColumnDefinition Width="{StaticResource GridHeaderTracksDurationColumnWidth}" />
                     <ColumnDefinition Width="{StaticResource GridHeaderTracksScoreColumnWidth}" />
                 </Grid.ColumnDefinitions>
 
@@ -84,7 +122,14 @@
                     </StackPanel>
                 </HyperlinkButton>
 
-                <HyperlinkButton Grid.Column="3" Command="{x:Bind ViewModel.SortCommand}" CommandParameter="Score" Style="{StaticResource HeaderHyperlinkStyle}" Margin="20,0,0,0">
+                <HyperlinkButton Grid.Column="3" Command="{x:Bind ViewModel.SortCommand}" CommandParameter="Duration" Style="{StaticResource HeaderHyperlinkStyle}" HorizontalAlignment="Right" Margin="0,0,14,0">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock x:Uid="gridHeaderDuration" Style="{StaticResource GridHeaderTracksTextBlockStyle}" Margin="0" />
+                        <FontIcon Glyph="{x:Bind ViewModel.GetSortGlyph(ViewModel.SortDescending), Mode=OneWay}" FontSize="{StaticResource FontSizeXSmall}" Margin="5,0,0,0" Visibility="{x:Bind ViewModel.IsDurationSorted, Converter={StaticResource BoolToVisibilityConverter}, Mode=OneWay}" />
+                    </StackPanel>
+                </HyperlinkButton>
+
+                <HyperlinkButton Grid.Column="4" Command="{x:Bind ViewModel.SortCommand}" CommandParameter="Score" Style="{StaticResource HeaderHyperlinkStyle}" Margin="20,0,0,0">
                     <StackPanel Orientation="Horizontal">
                         <TextBlock x:Uid="gridHeaderScore" Style="{StaticResource GridHeaderTracksTextBlockStyle}" Margin="0" />
                         <FontIcon Glyph="{x:Bind ViewModel.GetSortGlyph(ViewModel.SortDescending), Mode=OneWay}" FontSize="{StaticResource FontSizeXSmall}" Margin="5,0,0,0" Visibility="{x:Bind ViewModel.IsScoreSorted, Converter={StaticResource BoolToVisibilityConverter}, Mode=OneWay}" />
@@ -100,6 +145,7 @@
                                 <ColumnDefinition Width="{StaticResource GridHeaderTracksTitleColumnWidth}" />
                                 <ColumnDefinition Width="{StaticResource GridHeaderTracksArtistColumnWidth}" />
                                 <ColumnDefinition Width="{StaticResource GridHeaderTracksAlbumColumnWidth}" />
+                                <ColumnDefinition Width="{StaticResource GridHeaderTracksDurationColumnWidth}" />
                                 <ColumnDefinition Width="{StaticResource GridHeaderTracksScoreColumnWidth}" />
                             </Grid.ColumnDefinitions>
 
@@ -138,7 +184,8 @@
                             <HyperlinkButton Grid.Column="1" Style="{StaticResource GridTracksArtistHyperlinkButtonStyle}" Command="{x:Bind ArtistOpenCommand}" />
                             <HyperlinkButton Grid.Column="2" Style="{StaticResource GridTracksAlbumHyperlinkButtonStyle}" Command="{x:Bind AlbumOpenCommand}" />
 
-                            <common:RatingControlLightControl Grid.Column="3" Style="{StaticResource GridTracksScoreStyle}" RatingValue="{x:Bind Score, Mode=TwoWay}" />
+                            <TextBlock Grid.Column="3" Text="{x:Bind DurationStr}" Typography.NumeralAlignment="Tabular" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,16,0" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                            <common:RatingControlLightControl Grid.Column="4" Style="{StaticResource GridTracksScoreStyle}" RatingValue="{x:Bind Score, Mode=TwoWay}" />
                         </Grid>
                     </DataTemplate>
                 </ListView.ItemTemplate>

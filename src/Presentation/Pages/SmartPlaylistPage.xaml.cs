@@ -8,6 +8,8 @@ namespace Rok.Pages;
 
 public sealed partial class SmartPlaylistPage : Page
 {
+    private const double NarrowHeaderThreshold = 800;
+
     public PlaylistViewModel ViewModel { get; set; }
     private readonly ResourceLoader _resourceLoader;
     private readonly ILogger<SmartPlaylistPage> _logger;
@@ -24,8 +26,13 @@ public sealed partial class SmartPlaylistPage : Page
 
     protected override async void OnNavigatedTo(NavigationEventArgs e)
     {
+        base.OnNavigatedTo(e);
+
         if (e.Parameter is not PlaylistOpenArgs options)
-            throw new ArgumentNullException(nameof(e), "PlaylistOpenArgs cannot be null");
+        {
+            _logger.LogError("Navigation to SmartPlaylistPage without PlaylistOpenArgs (received {ParameterType})", e.Parameter?.GetType().Name ?? "null");
+            return;
+        }
 
         try
         {
@@ -39,14 +46,29 @@ public sealed partial class SmartPlaylistPage : Page
 
             if (ViewModel.Tracks.Count > 0)
                 playlistPivot.SelectedItem = playlistViewTabTracks;
-
-            base.OnNavigatedTo(e);
         }
         catch (OperationCanceledException) { }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Navigation to SmartPlaylistPage failed");
         }
+    }
+
+    private void Page_SizeChanged(object sender, SizeChangedEventArgs e)
+    {
+        ApplyHeaderLayout(e.NewSize.Width);
+    }
+
+    private void SmartPlaylistPage_Loaded(object sender, RoutedEventArgs e)
+    {
+        ApplyHeaderLayout(ActualWidth);
+    }
+
+    private void ApplyHeaderLayout(double width)
+    {
+        string state = width < NarrowHeaderThreshold ? "NarrowHeader" : "WideHeader";
+
+        VisualStateManager.GoToState(this, state, true);
     }
 
     private void LoadGroups()

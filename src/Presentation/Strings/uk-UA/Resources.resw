@@ -2315,4 +2315,37 @@
   <data name="genreSummaryArtists" xml:space="preserve">
     <value>{0} виконавців</value>
   </data>
+  <data name="playlistKicker.Text" xml:space="preserve">
+    <value>ПЛЕЙЛИСТ</value>
+  </data>
+  <data name="smartPlaylistKicker.Text" xml:space="preserve">
+    <value>РОЗУМНИЙ ПЛЕЙЛИСТ</value>
+  </data>
+  <data name="playlistShuffleOnPlayText.Text" xml:space="preserve">
+    <value>Випадкове відтворення</value>
+  </data>
+  <data name="playlistRefreshText.Text" xml:space="preserve">
+    <value>Оновити</value>
+  </data>
+  <data name="playlistRefreshOnPlayText.Text" xml:space="preserve">
+    <value>Оновлювати під час відтворення</value>
+  </data>
+  <data name="playlistMenuShuffleOrder.Text" xml:space="preserve">
+    <value>Перемішати порядок</value>
+  </data>
+  <data name="playlistMenuExport.Text" xml:space="preserve">
+    <value>Експортувати</value>
+  </data>
+  <data name="playlistMenuDelete.Text" xml:space="preserve">
+    <value>Видалити</value>
+  </data>
+  <data name="trackKicker.Text" xml:space="preserve">
+    <value>ТРЕК</value>
+  </data>
+  <data name="trackSectionListening.Text" xml:space="preserve">
+    <value>Прослуховування</value>
+  </data>
+  <data name="trackSectionFile.Text" xml:space="preserve">
+    <value>Файл</value>
+  </data>
 </root>

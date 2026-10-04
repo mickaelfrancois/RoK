@@ -2424,4 +2424,37 @@
   <data name="genreSummaryArtists" xml:space="preserve">
     <value>{0} artistes</value>
   </data>
+  <data name="playlistKicker.Text" xml:space="preserve">
+    <value>PLAYLIST</value>
+  </data>
+  <data name="smartPlaylistKicker.Text" xml:space="preserve">
+    <value>PLAYLIST INTELLIGENTE</value>
+  </data>
+  <data name="playlistShuffleOnPlayText.Text" xml:space="preserve">
+    <value>Lecture aléatoire</value>
+  </data>
+  <data name="playlistRefreshText.Text" xml:space="preserve">
+    <value>Actualiser</value>
+  </data>
+  <data name="playlistRefreshOnPlayText.Text" xml:space="preserve">
+    <value>Actualiser à la lecture</value>
+  </data>
+  <data name="playlistMenuShuffleOrder.Text" xml:space="preserve">
+    <value>Mélanger l'ordre</value>
+  </data>
+  <data name="playlistMenuExport.Text" xml:space="preserve">
+    <value>Exporter</value>
+  </data>
+  <data name="playlistMenuDelete.Text" xml:space="preserve">
+    <value>Supprimer</value>
+  </data>
+  <data name="trackKicker.Text" xml:space="preserve">
+    <value>CHANSON</value>
+  </data>
+  <data name="trackSectionListening.Text" xml:space="preserve">
+    <value>Écoute</value>
+  </data>
+  <data name="trackSectionFile.Text" xml:space="preserve">
+    <value>Fichier</value>
+  </data>
 </root>
