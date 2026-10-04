@@ -5,6 +5,8 @@ using Microsoft.UI.Dispatching;
 using Rok.ViewModels.Album;
 using Rok.ViewModels.Albums.Interfaces;
 using Rok.ViewModels.Albums.Services;
+using Rok.ViewModels.Common;
+using Rok.ViewModels.Common.Services;
 
 namespace Rok.ViewModels.Albums;
 
@@ -40,7 +42,7 @@ public partial class AlbumsViewModel : ObservableObject, IDisposable
     public double DurationText => TimeSpan.FromSeconds(_filteredAlbums.Sum(album => album.Album.Duration)).TotalHours;
 
     /// <summary>One chip per active filter, whichever family (list, genre, tag) it comes from.</summary>
-    public ObservableCollection<AlbumFilterChip> ActiveFilters { get; } = [];
+    public ObservableCollection<FilterChip> ActiveFilters { get; } = [];
     public bool HasActiveFilters => ActiveFilters.Count > 0;
     public bool HasSeveralFilters => ActiveFilters.Count > 1;
 
@@ -153,7 +155,7 @@ public partial class AlbumsViewModel : ObservableObject, IDisposable
     {
         ActiveFilters.Clear();
 
-        foreach (AlbumFilterChip chip in AlbumFilterChipBuilder.Build(
+        foreach (FilterChip chip in FilterChipBuilder.Build(
                      _stateManager.SelectedFilters, _stateManager.SelectedGenreFilters, _stateManager.SelectedTagFilters, Genres, _albumProvider.GetFilterLabel))
         {
             ActiveFilters.Add(chip);
@@ -234,17 +236,17 @@ public partial class AlbumsViewModel : ObservableObject, IDisposable
     }
 
     [RelayCommand]
-    private void RemoveFilter(AlbumFilterChip chip)
+    private void RemoveFilter(FilterChip chip)
     {
         switch (chip.Kind)
         {
-            case AlbumFilterKind.List:
+            case FilterKind.List:
                 FilterBy(chip.Value);
                 break;
-            case AlbumFilterKind.Genre:
+            case FilterKind.Genre:
                 FilterByGenre(long.Parse(chip.Value, CultureInfo.InvariantCulture));
                 break;
-            case AlbumFilterKind.Tag:
+            case FilterKind.Tag:
                 FilterByTag(chip.Value);
                 break;
         }

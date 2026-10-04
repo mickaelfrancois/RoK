@@ -1,9 +1,12 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+﻿using System.Globalization;
+using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.UI.Dispatching;
 using Rok.ViewModels.Artist;
 using Rok.ViewModels.Artists.Interfaces;
 using Rok.ViewModels.Artists.Services;
+using Rok.ViewModels.Common;
+using Rok.ViewModels.Common.Services;
 
 namespace Rok.ViewModels.Artists;
 
@@ -41,6 +44,11 @@ public partial class ArtistsViewModel : ObservableObject, IDisposable
 
     [ObservableProperty]
     public partial string FilterByText { get; set; } = string.Empty;
+
+    /// <summary>One chip per active filter, whichever family it comes from.</summary>
+    public ObservableCollection<FilterChip> ActiveFilters { get; } = [];
+    public bool HasActiveFilters => ActiveFilters.Count > 0;
+    public bool HasSeveralFilters => ActiveFilters.Count > 1;
 
     [ObservableProperty]
     public partial bool IsGroupingEnabled { get; set; }
@@ -150,20 +158,20 @@ public partial class ArtistsViewModel : ObservableObject, IDisposable
 
     private void SetFilterLabel()
     {
-        if (_stateManager.SelectedFilters.Count > 0)
+        ActiveFilters.Clear();
+
+        foreach (FilterChip chip in FilterChipBuilder.Build(
+                     _stateManager.SelectedFilters, _stateManager.SelectedGenreFilters, _stateManager.SelectedTagFilters, Genres, _artistProvider.GetFilterLabel))
         {
-            string lastFilter = _stateManager.SelectedFilters[^1];
-            FilterByText = _artistProvider.GetFilterLabel(lastFilter);
+            ActiveFilters.Add(chip);
         }
-        else if (_stateManager.SelectedGenreFilters.Count > 0)
-        {
-            long lastGenreId = _stateManager.SelectedGenreFilters[^1];
-            FilterByText = Genres.FirstOrDefault(c => c.Id == lastGenreId)?.Name ?? _artistProvider.GetFilterLabel("");
-        }
-        else
-        {
-            FilterByText = _artistProvider.GetFilterLabel("");
-        }
+
+        FilterByText = ActiveFilters.Count > 0
+            ? ActiveFilters.Count.ToString(CultureInfo.CurrentCulture)
+            : _artistProvider.GetFilterLabel("");
+
+        OnPropertyChanged(nameof(HasActiveFilters));
+        OnPropertyChanged(nameof(HasSeveralFilters));
     }
 
     private void LoadState()
@@ -232,6 +240,23 @@ public partial class ArtistsViewModel : ObservableObject, IDisposable
 
         SetFilterLabel();
         FilterAndSort();
+    }
+
+    [RelayCommand]
+    private void RemoveFilter(FilterChip chip)
+    {
+        switch (chip.Kind)
+        {
+            case FilterKind.List:
+                FilterBy(chip.Value);
+                break;
+            case FilterKind.Genre:
+                FilterByGenre(long.Parse(chip.Value, CultureInfo.InvariantCulture));
+                break;
+            case FilterKind.Tag:
+                FilterByTag(chip.Value);
+                break;
+        }
     }
 
     [RelayCommand]

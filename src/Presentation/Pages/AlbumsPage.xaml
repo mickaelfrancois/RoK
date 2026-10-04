@@ -11,6 +11,7 @@
       xmlns:converters="using:Rok.Converters"
       xmlns:albums1="using:Rok.ViewModels.Albums"
       xmlns:controls="using:CommunityToolkit.WinUI.Controls"
+      xmlns:vmcommon="using:Rok.ViewModels.Common"
       mc:Ignorable="d">
 
     <Page.Resources>
@@ -208,7 +209,7 @@
                     </ItemsPanelTemplate>
                 </ItemsControl.ItemsPanel>
                 <ItemsControl.ItemTemplate>
-                    <DataTemplate x:DataType="albums1:AlbumFilterChip">
+                    <DataTemplate x:DataType="vmcommon:FilterChip">
                         <Border CornerRadius="12" Padding="10,0,2,0" Background="{ThemeResource ControlFillColorDefaultBrush}" BorderBrush="{ThemeResource ControlStrokeColorDefaultBrush}" BorderThickness="1">
                             <StackPanel Orientation="Horizontal" Spacing="2">
                                 <TextBlock Text="{x:Bind Label}" Style="{StaticResource CaptionTextBlockStyle}" FontWeight="SemiBold" VerticalAlignment="Center" />

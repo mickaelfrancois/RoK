@@ -7,6 +7,7 @@ using Microsoft.UI.Xaml.Navigation;
 using Rok.Commons;
 using Rok.ViewModels.Album;
 using Rok.ViewModels.Albums;
+using Rok.ViewModels.Common;
 
 namespace Rok.Pages;
 
@@ -146,7 +147,7 @@ public sealed partial class AlbumsPage : Page, IDisposable
 
     private void RemoveFilterChip_Click(object sender, RoutedEventArgs e)
     {
-        if (sender is Button { DataContext: AlbumFilterChip chip })
+        if (sender is Button { DataContext: FilterChip chip })
             ViewModel.RemoveFilterCommand.Execute(chip);
     }
 
