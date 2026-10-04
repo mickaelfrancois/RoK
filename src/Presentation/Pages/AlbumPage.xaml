@@ -174,7 +174,7 @@
             </Grid.ColumnDefinitions>
 
             <!-- Grid headers -->
-            <Grid Style="{StaticResource TracksGridStyle}">
+            <Grid Style="{StaticResource TracksGridStyle}" Padding="8,0,0,0">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="{StaticResource GridHeaderTracksTitleColumnWidth}" />
                     <ColumnDefinition Width="{x:Bind ViewModel.Album.IsCompilation, Mode=OneWay, Converter={StaticResource ArtistColumnWidthConverter}}" />
@@ -184,7 +184,7 @@
 
                 <TextBlock x:Uid="gridHeaderTitle" Grid.Column="0" Style="{StaticResource GridHeaderTracksTextBlockStyle}" />
                 <TextBlock x:Uid="gridHeaderArtist" Grid.Column="1" Visibility="{x:Bind ViewModel.Album.IsCompilation, Converter={StaticResource BoolToVisibilityConverter}}" Style="{StaticResource GridHeaderTracksTextBlockStyle}" />
-                <TextBlock x:Uid="gridHeaderDuration" Grid.Column="2" HorizontalAlignment="Right" Margin="0,0,16,0" Style="{StaticResource GridHeaderTracksTextBlockStyle}" />
+                <TextBlock x:Uid="gridHeaderDuration" Grid.Column="2" HorizontalAlignment="Right" Margin="0,0,14,0" Style="{StaticResource GridHeaderTracksTextBlockStyle}" />
                 <TextBlock x:Uid="gridHeaderScore" Grid.Column="3" Style="{StaticResource GridHeaderTracksTextBlockStyle}" />
             </Grid>
 
