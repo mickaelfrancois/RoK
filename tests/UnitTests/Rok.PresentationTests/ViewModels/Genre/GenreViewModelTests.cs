@@ -151,4 +151,22 @@ public class GenreViewModelTests
         // Assert
         Assert.True(sut.HasNoAlbums);
     }
+
+    [Fact(DisplayName = "when_the_genre_loads_then_the_genre_and_its_computed_properties_are_notified")]
+    public async Task LoadDataAsync_ShouldNotifyGenreAndComputedProperties()
+    {
+        // Arrange
+        SetupGenreFound(7);
+        GenreViewModel sut = BuildViewModel();
+        List<string?> raised = [];
+        sut.PropertyChanged += (_, e) => raised.Add(e.PropertyName);
+
+        // Act
+        await sut.LoadDataAsync(7);
+
+        // Assert
+        Assert.Contains(nameof(sut.Genre), raised);
+        Assert.Contains(nameof(sut.SubTitle), raised);
+        Assert.Contains(nameof(sut.IsFavorite), raised);
+    }
 }

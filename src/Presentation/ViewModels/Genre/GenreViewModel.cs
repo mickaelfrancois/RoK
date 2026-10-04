@@ -24,8 +24,22 @@ public partial class GenreViewModel : ObservableObject
 
     private CancellationTokenSource _navigationCts = new();
 
-    public RangeObservableCollection<AlbumViewModel> Albums { get; set; } = [];
-    public GenreDto Genre { get; private set; } = new();
+    private GenreDto _genre = new();
+
+    public RangeObservableCollection<AlbumViewModel> Albums { get; } = [];
+
+    public GenreDto Genre
+    {
+        get => _genre;
+        private set
+        {
+            if (SetProperty(ref _genre, value))
+            {
+                OnPropertyChanged(nameof(SubTitle));
+                OnPropertyChanged(nameof(IsFavorite));
+            }
+        }
+    }
 
     public bool HasNoAlbums => LoadState == DetailLoadState.Loaded && Albums.Count == 0;
 
@@ -234,15 +248,13 @@ public partial class GenreViewModel : ObservableObject
         Albums.InitWithAddRange(albums);
         OnPropertyChanged(nameof(HasNoAlbums));
 
-        if (albums.Count == 0)
+        string? artistName = GenreArtistPicker.PickArtistName(albums.Select(a => a.Album.ArtistName), Random.Shared);
+
+        if (artistName is null)
             return;
 
-        List<AlbumViewModel> albumsWithArtist = albums.Where(a => !string.IsNullOrEmpty(a.Album.ArtistName)).ToList();
-        int index = Random.Shared.Next(albumsWithArtist.Count);
-        AlbumViewModel randomAlbum = albumsWithArtist[index];
-
-        LoadPicture(randomAlbum.Album.ArtistName);
-        LoadBackdrop(randomAlbum.Album.ArtistName, cancellationToken);
+        LoadPicture(artistName);
+        LoadBackdrop(artistName, cancellationToken);
     }
 
 

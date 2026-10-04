@@ -25,19 +25,29 @@ public sealed partial class GenrePage : Page
 
     protected override async void OnNavigatedTo(NavigationEventArgs e)
     {
+        base.OnNavigatedTo(e);
+
         if (e.Parameter is not GenreOpenArgs options)
-            throw new ArgumentNullException(nameof(options), "GenreOpenArgs cannot be null");
+        {
+            _logger.LogError("Navigation to GenrePage without GenreOpenArgs (received {ParameterType})", e.Parameter?.GetType().Name ?? "null");
+            return;
+        }
 
         try
         {
             await ViewModel.LoadDataAsync(options.GenreId);
-            base.OnNavigatedTo(e);
         }
         catch (OperationCanceledException) { }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Navigation to GenrePage failed");
         }
+    }
+
+    protected override void OnNavigatedFrom(NavigationEventArgs e)
+    {
+        ViewModel.OnNavigatedFrom();
+        base.OnNavigatedFrom(e);
     }
 
     private void grid_ContainerContentChanging(ListViewBase sender, ContainerContentChangingEventArgs args)
