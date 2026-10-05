@@ -1,5 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using Microsoft.UI.Dispatching;
+using Rok.Services.Diagnostics;
 using Rok.ViewModels.Album;
 using Rok.ViewModels.Artist;
 using Rok.ViewModels.Track;
@@ -12,6 +13,7 @@ public partial class ListeningPlaylistManager : ObservableObject
     private readonly ListeningDataLoader _dataLoader;
     private readonly ListeningEntityUpdateWatcher _watcher;
     private readonly ILogger<ListeningPlaylistManager> _logger;
+    private readonly ICrashBreadcrumbs _breadcrumbs;
     private volatile TrackDto? _latestTrack;
 
     public RangeObservableCollection<TrackViewModel> Tracks { get; private set; } = [];
@@ -29,9 +31,10 @@ public partial class ListeningPlaylistManager : ObservableObject
     public event EventHandler? PlaylistChanged;
     public event EventHandler? CurrentTrackChanged;
 
-    public ListeningPlaylistManager(DispatcherQueue dispatcherQueue, ListeningDataLoader dataLoader, ListeningEntityUpdateWatcher watcher, ILogger<ListeningPlaylistManager> logger)
+    public ListeningPlaylistManager(DispatcherQueue dispatcherQueue, ListeningDataLoader dataLoader, ListeningEntityUpdateWatcher watcher, ILogger<ListeningPlaylistManager> logger, ICrashBreadcrumbs breadcrumbs)
     {
         _logger = logger;
+        _breadcrumbs = breadcrumbs;
         _dispatcherQueue = dispatcherQueue;
         _dataLoader = dataLoader;
         _watcher = watcher;
@@ -93,10 +96,9 @@ public partial class ListeningPlaylistManager : ObservableObject
 
     public void LoadTracksList(List<TrackDto> tracks)
     {
-        Tracks.Clear();
-
-        if (tracks != null)
-            Tracks.AddRange(_dataLoader.CreateTracksViewModels(tracks));
+        // One Reset for every list still bound to the singleton queue, not two.
+        Tracks.InitWithAddRange(tracks is null ? [] : _dataLoader.CreateTracksViewModels(tracks));
+        _breadcrumbs.Add("listening.tracks", $"n={Tracks.Count} ui={(_dispatcherQueue.HasThreadAccess ? 1 : 0)}");
 
         OnPropertyChanged(nameof(TrackCount));
         OnPropertyChanged(nameof(Duration));

@@ -1,6 +1,8 @@
-﻿using Microsoft.UI.Xaml.Controls;
+﻿using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Navigation;
 using Rok.Pages;
+using Rok.Services.Diagnostics;
 using Rok.ViewModels.Album;
 using Rok.ViewModels.Artist;
 using Rok.ViewModels.Genre;
@@ -10,9 +12,14 @@ using Rok.ViewModels.Track;
 
 namespace Rok.Services;
 
-public class NavigationService(ITelemetryClient telemetryClient)
+public class NavigationService(ITelemetryClient telemetryClient, NavigationTrail trail, ICrashBreadcrumbs breadcrumbs)
 {
     private Frame _mainFrame = default!;
+
+    public NavigationService(ITelemetryClient telemetryClient)
+        : this(telemetryClient, new NavigationTrail(TimeProvider.System), new CrashBreadcrumbs(TimeProvider.System))
+    {
+    }
 
     public Frame MainFrame
     {
@@ -20,25 +27,82 @@ public class NavigationService(ITelemetryClient telemetryClient)
         set
         {
             if (_mainFrame is not null)
+            {
+                _mainFrame.Navigating -= OnFrameNavigating;
                 _mainFrame.Navigated -= OnFrameNavigated;
+                _mainFrame.NavigationFailed -= OnFrameNavigationFailed;
+            }
 
             _mainFrame = value;
 
             if (_mainFrame is not null)
+            {
+                _mainFrame.Navigating += OnFrameNavigating;
                 _mainFrame.Navigated += OnFrameNavigated;
+                _mainFrame.NavigationFailed += OnFrameNavigationFailed;
+            }
         }
     }
 
     // Tracked for crash telemetry: a bare MeasureOverride COMException carries no app frame,
-    // so the current/previous page is the only clue to which screen triggered it.
-    public string? CurrentPageName { get; private set; }
+    // so the navigation phase and the current/previous page are the only clues to which
+    // screen triggered it.
+    public NavigationTrail Trail => trail;
 
-    public string? PreviousPageName { get; private set; }
+    public string? CurrentPageName => trail.Snapshot().CurrentPage;
+
+    public string? PreviousPageName => trail.Snapshot().PreviousPage;
+
+    private void OnFrameNavigating(object sender, NavigatingCancelEventArgs e)
+    {
+        string target = e.SourcePageType?.Name ?? "unknown";
+
+        trail.OnNavigating(target);
+        breadcrumbs.Add("nav.navigating", target);
+    }
 
     private void OnFrameNavigated(object sender, NavigationEventArgs e)
     {
-        PreviousPageName = CurrentPageName;
-        CurrentPageName = e.SourcePageType?.Name ?? e.Content?.GetType().Name;
+        string? page = e.SourcePageType?.Name ?? e.Content?.GetType().Name;
+
+        trail.OnNavigated(page);
+        breadcrumbs.Add("nav.navigated", page ?? "unknown");
+
+        if (page is not null && e.Content is FrameworkElement content)
+            ReportLoadedOnce(content, page);
+    }
+
+    private void OnFrameNavigationFailed(object sender, NavigationFailedEventArgs e)
+    {
+        string target = e.SourcePageType?.Name ?? "unknown";
+
+        trail.OnFailed(target);
+        breadcrumbs.Add("nav.failed", target);
+    }
+
+    private void ReportLoadedOnce(FrameworkElement content, string page)
+    {
+        void OnLoaded(object sender, RoutedEventArgs args)
+        {
+            content.Loaded -= OnLoaded;
+            trail.OnLoaded(page);
+            breadcrumbs.Add("nav.loaded", page);
+        }
+
+        content.Loaded += OnLoaded;
+    }
+
+    // Pages whose rebuild on a repeated request only costs: ListeningPage rebuilds the whole queue.
+    // Other list pages keep their "click again to reload" behaviour.
+    private static readonly HashSet<string> _pagesWithoutRenavigation = [nameof(ListeningPage)];
+
+    private bool ShouldSkipRedundantNavigation(string pageName, bool hasParameter)
+    {
+        if (!_pagesWithoutRenavigation.Contains(pageName) || !trail.IsRedundant(pageName, hasParameter))
+            return false;
+
+        breadcrumbs.Add("nav.skip", pageName);
+        return true;
     }
 
     public void NavigateTo(Type pageType)
@@ -48,6 +112,9 @@ public class NavigationService(ITelemetryClient telemetryClient)
 
     public void NavigateTo(Type pageType, object? parameter)
     {
+        if (ShouldSkipRedundantNavigation(pageType.Name, parameter is not null))
+            return;
+
         _ = telemetryClient.CaptureScreenAsync(pageType.Name);
         MainFrame.Navigate(pageType, parameter);
     }
@@ -106,6 +173,9 @@ public class NavigationService(ITelemetryClient telemetryClient)
 
     public void NavigateToListening()
     {
+        if (ShouldSkipRedundantNavigation(nameof(ListeningPage), hasParameter: false))
+            return;
+
         _ = telemetryClient.CaptureScreenAsync("ListeningPage");
         MainFrame.Navigate(typeof(ListeningPage));
     }

@@ -1,5 +1,5 @@
 using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml.Navigation;
+using Rok.Services.Diagnostics;
 using Rok.ViewModels.Listening;
 using Rok.ViewModels.Track;
 
@@ -13,6 +13,8 @@ public sealed partial class ListeningPage : Page, IDisposable
     private const double NarrowHeaderThreshold = 800;
 
     private readonly ResourceLoader _resourceLoader;
+    private readonly ICrashBreadcrumbs _breadcrumbs;
+    private readonly Func<int, Task<bool>> _confirmQueueRemoval;
 
 
     public ListeningPage()
@@ -20,15 +22,21 @@ public sealed partial class ListeningPage : Page, IDisposable
         this.InitializeComponent();
 
         _resourceLoader = App.ServiceProvider.GetRequiredService<ResourceLoader>();
+        _breadcrumbs = App.ServiceProvider.GetRequiredService<ICrashBreadcrumbs>();
         ViewModel = App.ServiceProvider.GetRequiredService<ListeningViewModel>();
-        ViewModel.RemovalConfirmationRequested = ConfirmQueueRemovalAsync;
+        _confirmQueueRemoval = ConfirmQueueRemovalAsync;
+        ViewModel.RemovalConfirmationRequested = _confirmQueueRemoval;
         DataContext = ViewModel;
+
+        Unloaded += ListeningPage_Unloaded;
     }
 
-    protected override void OnNavigatingFrom(NavigatingCancelEventArgs e)
+    private void ListeningPage_Unloaded(object sender, RoutedEventArgs e)
     {
+        // The page has left the visual tree: no container is realized any more, so the list can
+        // be detached from the singleton queue without feeding a null item to the bindings.
+        _breadcrumbs.Add("listening.page", "unloaded");
         Dispose();
-        base.OnNavigatingFrom(e);
     }
 
     private void SleepFlyout_Opening(object sender, object e)
@@ -67,7 +75,9 @@ public sealed partial class ListeningPage : Page, IDisposable
 
     private void ListeningPage_Loaded(object sender, RoutedEventArgs e)
     {
+        _breadcrumbs.Add("listening.page", "loaded");
         ApplyHeaderLayout(ActualWidth);
+        tracksList.ItemsSource ??= ViewModel.Tracks;
 
         TrackViewModel? listeningTrack = ViewModel.Tracks.FirstOrDefault(track => track.Listening);
 
@@ -90,8 +100,13 @@ public sealed partial class ListeningPage : Page, IDisposable
 
     public void Dispose()
     {
-        // ListeningViewModel is a singleton; releasing the x:Bind tracking lets the page be collected.
-        ViewModel.RemovalConfirmationRequested = null;
+        // ListeningViewModel is a singleton: detaching the list and the x:Bind tracking lets the page be
+        // collected. The confirmation delegate is cleared only if a newer page has not taken it over.
+        tracksList.ItemsSource = null;
+
+        if (ViewModel.RemovalConfirmationRequested == _confirmQueueRemoval)
+            ViewModel.RemovalConfirmationRequested = null;
+
         Bindings.StopTracking();
         DataContext = null;
     }
