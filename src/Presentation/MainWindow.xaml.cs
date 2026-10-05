@@ -89,6 +89,7 @@ public sealed partial class MainWindow : Window, IReviewPromptView
         _subscriptions.Add(_messenger.Subscribe<SearchNoResultMessage>(async (message) => await SearchNoResultHandleAsync()));
         _subscriptions.Add(_messenger.Subscribe<CompactModeMessage>((message) => ToggleCompactMode()));
 
+        _navigationService.MainFrame = ContentFrame;
         ContentFrame.Navigated += ContentFrame_Navigated;
 
         TrySetSystemBackdrop();
@@ -139,8 +140,6 @@ public sealed partial class MainWindow : Window, IReviewPromptView
 
     private async void NavigationView_Loaded(object sender, RoutedEventArgs e)
     {
-        _navigationService.MainFrame = ContentFrame;
-
         if (_dbContext.IsFirstStart)
         {
             PlaylistsSeed playlistsSeed = App.ServiceProvider.GetRequiredService<PlaylistsSeed>();

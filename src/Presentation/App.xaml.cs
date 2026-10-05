@@ -296,15 +296,13 @@ public partial class App : Microsoft.UI.Xaml.Application
         try
         {
             Rok.Services.NavigationService? navigation = ServiceProvider.GetService<Rok.Services.NavigationService>();
+            Rok.Services.Diagnostics.ICrashBreadcrumbs? breadcrumbs = ServiceProvider.GetService<Rok.Services.Diagnostics.ICrashBreadcrumbs>();
             ITelemetryClient telemetry = ServiceProvider.GetRequiredService<ITelemetryClient>();
 
-            Dictionary<string, object> properties = new()
-            {
-                ["currentPage"] = navigation?.CurrentPageName ?? "unknown",
-                ["previousPage"] = navigation?.PreviousPageName ?? "unknown",
-                ["exceptionType"] = exception.GetType().FullName ?? exception.GetType().Name,
-                ["hresult"] = exception.HResult
-            };
+            Dictionary<string, object> properties = Rok.Services.Diagnostics.CrashContextBuilder.Build(
+                exception,
+                navigation?.Trail.Snapshot(),
+                breadcrumbs?.Snapshot() ?? []);
 
             Task.Run(async () => await telemetry.CaptureEventAsync("crash", exception.GetType().Name, properties))
                 .Wait(TimeSpan.FromSeconds(2));

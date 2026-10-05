@@ -6,6 +6,7 @@ using Rok.Application.Interfaces.Pictures;
 using Rok.Commons;
 using Rok.Import.Services;
 using Rok.Pages;
+using Rok.Services.Diagnostics;
 using Windows.Storage;
 using Windows.Storage.AccessCache;
 
@@ -30,6 +31,7 @@ public sealed partial class StartViewModel : ObservableObject, IDisposable
     private readonly ISettingsFile _settingsFile;
     private readonly ITelemetryClient _telemetryClient;
     private readonly IFolderResolver _folderResolver;
+    private readonly ICrashBreadcrumbs _breadcrumbs;
     private readonly List<IDisposable> _subscriptions = new();
     private bool _disposed;
 
@@ -65,7 +67,7 @@ public sealed partial class StartViewModel : ObservableObject, IDisposable
     [ObservableProperty]
     public partial string? ErrorBannerMessage { get; set; }
 
-    public StartViewModel(IAlbumPicture albumPicture, ISettingsFile settingsFile, NavigationService navigationService, IResourceService resourceService, IMediator mediator, IMessenger messenger, IImport importService, IAppOptions appOptions, ITelemetryClient telemetryClient, IFolderResolver folderResolver)
+    public StartViewModel(IAlbumPicture albumPicture, ISettingsFile settingsFile, NavigationService navigationService, IResourceService resourceService, IMediator mediator, IMessenger messenger, IImport importService, IAppOptions appOptions, ITelemetryClient telemetryClient, IFolderResolver folderResolver, ICrashBreadcrumbs breadcrumbs)
     {
         Debug.Assert(
             ImportMessageThrottler.MaxMessagesBeforeThrottle >= KMinAlbumsToUnlockApp,
@@ -80,6 +82,7 @@ public sealed partial class StartViewModel : ObservableObject, IDisposable
         _appOptions = appOptions;
         _telemetryClient = telemetryClient;
         _folderResolver = folderResolver;
+        _breadcrumbs = breadcrumbs;
 
         _albumsImportedMessage = resourceService.GetString("AlbumsImported");
         _importBackgroundTitle = resourceService.GetString("notification_import_background_title");
@@ -123,18 +126,39 @@ public sealed partial class StartViewModel : ObservableObject, IDisposable
 
     private void OnDisplayTimerTick(DispatcherQueueTimer sender, object args)
     {
-        IReadOnlyList<AlbumImportedModel> batch = _displayPacer.DrainBatch(_pendingAlbums);
+        switch (_displayPacer.Next(AlbumsImported.Count, _pendingAlbums.Count))
+        {
+            case AlbumStreamStep.Reveal:
+                RevealNextBatch();
+                break;
 
-        if (batch.Count == 0)
-            return;
+            case AlbumStreamStep.Leave:
+                LeaveToAlbums(AlbumsImported.Count >= KMinAlbumsToUnlockApp ? "threshold" : "scan");
+                break;
+        }
+    }
+
+    private void RevealNextBatch()
+    {
+        IReadOnlyList<AlbumImportedModel> batch = _displayPacer.DrainBatch(_pendingAlbums);
 
         foreach (AlbumImportedModel album in batch)
             AlbumsImported.Insert(0, album);
 
         ImportProgressText = $"{AlbumsImported.Count} {_albumsImportedMessage}";
         ImportProgress = AlbumStreamPacer.ProgressPercent(AlbumsImported.Count, KMinAlbumsToUnlockApp);
+        _breadcrumbs.Add("welcome.reveal", $"n={AlbumsImported.Count}");
+    }
 
-        if (_displayPacer.ShouldUnlock(AlbumsImported.Count))
+    /// <summary>
+    /// Leaves the onboarding for the albums page. The caller must own the exit, either through
+    /// <see cref="AlbumStreamStep.Leave"/> or <see cref="AlbumStreamPacer.TryLeaveNow"/>.
+    /// </summary>
+    private void LeaveToAlbums(string reason)
+    {
+        _breadcrumbs.Add("welcome.leave", $"reason={reason}");
+
+        if (reason == "threshold")
         {
             _messenger.Send(new ShowNotificationMessage
             {
@@ -142,10 +166,11 @@ public sealed partial class StartViewModel : ObservableObject, IDisposable
                 Message = _importBackgroundMessage,
                 Type = NotificationType.Informational
             });
-            UnregisterEvents();
-            _navigationService.NavigateToAlbums();
-            _navigationService.RemoveLastEntry();
         }
+
+        UnregisterEvents();
+        _navigationService.NavigateToAlbums();
+        _navigationService.RemoveLastEntry();
     }
 
     public void Dispose()
@@ -189,11 +214,13 @@ public sealed partial class StartViewModel : ObservableObject, IDisposable
                         _ = _telemetryClient.CaptureEventAsync("Onboarding", "NoAudioFiles", OnboardingTelemetry.BuildUnsupportedFormatProperties(unsupportedCounts));
                     }
                 }
-                else
+                else if (_albumStreamStarted)
                 {
-                    UnregisterEvents();
-                    _navigationService.NavigateToAlbums();
-                    _navigationService.RemoveLastEntry();
+                    _displayPacer.RequestLeave();
+                }
+                else if (_displayPacer.TryLeaveNow())
+                {
+                    LeaveToAlbums("scan");
                 }
             });
         }
@@ -325,6 +352,10 @@ public sealed partial class StartViewModel : ObservableObject, IDisposable
     [RelayCommand]
     private void ListenToRadio()
     {
+        if (!_displayPacer.TryLeaveNow())
+            return;
+
+        _breadcrumbs.Add("welcome.leave", "reason=radio");
         UnregisterEvents();
         _ = _telemetryClient.CaptureEventAsync("Onboarding", "RadioFallback", OnboardingTelemetry.BuildRadioFallbackProperties(_lastErrorReason));
         _navigationService.NavigateTo(typeof(RadiosPage));

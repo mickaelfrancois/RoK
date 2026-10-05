@@ -29,6 +29,14 @@ public sealed partial class WelcomePage : Page
         _fallbackStreamStartTimer.Interval = FallbackStreamStartDelay;
         _fallbackStreamStartTimer.IsRepeating = false;
         _fallbackStreamStartTimer.Tick += (_, _) => ViewModel.StartAlbumStream();
+
+        Unloaded += WelcomePage_Unloaded;
+    }
+
+    private void WelcomePage_Unloaded(object sender, RoutedEventArgs e)
+    {
+        _fallbackStreamStartTimer.Stop();
+        ViewModel.Dispose();
     }
 
 

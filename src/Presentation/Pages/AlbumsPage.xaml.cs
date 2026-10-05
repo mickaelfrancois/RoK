@@ -5,6 +5,7 @@ using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media.Animation;
 using Microsoft.UI.Xaml.Navigation;
 using Rok.Commons;
+using Rok.Services.Diagnostics;
 using Rok.ViewModels.Album;
 using Rok.ViewModels.Albums;
 using Rok.ViewModels.Common;
@@ -14,6 +15,7 @@ namespace Rok.Pages;
 public sealed partial class AlbumsPage : Page, IDisposable
 {
     private readonly ILogger<AlbumsPage> _logger;
+    private readonly ICrashBreadcrumbs _breadcrumbs;
 
     public AlbumsViewModel ViewModel { get; set; }
 
@@ -38,6 +40,7 @@ public sealed partial class AlbumsPage : Page, IDisposable
         _durationAnimation = new AnimatedNumberHelper(t => albumDurationRun.Text = t);
 
         _logger = App.ServiceProvider.GetRequiredService<ILogger<AlbumsPage>>();
+        _breadcrumbs = App.ServiceProvider.GetRequiredService<ICrashBreadcrumbs>();
         ViewModel = App.ServiceProvider.GetRequiredService<AlbumsViewModel>();
 
         _binder = new GroupedItemsSourceBinder(grid, ZoomoutCollectionGrid, groupedItemsViewSource, ViewModel.GroupedItems, _logger);
@@ -129,6 +132,12 @@ public sealed partial class AlbumsPage : Page, IDisposable
 
     private void GroupedItems_CollectionChanged(object? sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
     {
+        _breadcrumbs.Add("albums.items", $"loaded={(_pageLoaded ? 1 : 0)} n={ViewModel.GroupedItems.Count}");
+
+        // Before Loaded the list is not in the visual tree: Page_Loaded applies the source once it is.
+        if (!_pageLoaded)
+            return;
+
         if (ViewModel.GroupedItems.Count == 0 && !GridZoom.IsZoomedInViewActive)
             GridZoom.IsZoomedInViewActive = true;
 

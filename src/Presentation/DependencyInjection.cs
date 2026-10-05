@@ -5,6 +5,7 @@ using Rok.Application.Services.Filters;
 using Rok.Application.Services.Grouping;
 using Rok.Commons.Equalizer;
 using Rok.Services;
+using Rok.Services.Diagnostics;
 using Rok.Services.PlayerCommand;
 using Rok.Services.PlayerCommand.Api;
 using Rok.Services.PlayerCommand.Terminal;
@@ -54,6 +55,8 @@ public static class DependencyInjection
     {
         services.AddSingleton<ResourceLoader>((c) => ResourceLoader.GetForViewIndependentUse());
         services.AddSingleton<IStringResourceProvider, WindowsStringResourceProvider>();
+        services.AddSingleton<NavigationTrail>();
+        services.AddSingleton<ICrashBreadcrumbs, CrashBreadcrumbs>();
         services.AddSingleton<NavigationService>();
         services.AddSingleton<PlaylistsSeed>();
         services.AddSingleton<IDialogService, DialogService>();
@@ -196,7 +199,8 @@ public static class DependencyInjection
             ListeningDataLoader dataLoader = sp.GetRequiredService<ListeningDataLoader>();
             ListeningEntityUpdateWatcher watcher = sp.GetRequiredService<ListeningEntityUpdateWatcher>();
             ILogger<ListeningPlaylistManager> logger = sp.GetRequiredService<ILogger<ListeningPlaylistManager>>();
-            return new ListeningPlaylistManager(dispatcherQueue, dataLoader, watcher, logger);
+            ICrashBreadcrumbs breadcrumbs = sp.GetRequiredService<ICrashBreadcrumbs>();
+            return new ListeningPlaylistManager(dispatcherQueue, dataLoader, watcher, logger, breadcrumbs);
         });
         services.AddSingleton<ListeningEntityUpdateWatcher>();
         services.AddSingleton<ListeningPlaybackService>();

@@ -48,44 +48,105 @@ public class AlbumStreamPacerTests
         Assert.Empty(batch);
     }
 
-    [Fact(DisplayName = "ShouldUnlock should signal once when the batch crosses the threshold")]
-    public void ShouldUnlock_ShouldSignalOnce_WhenBatchCrossesThreshold()
+    [Fact(DisplayName = "next_returns_reveal_while_below_threshold_with_pending_items")]
+    public void Next_ReturnsReveal_WhileBelowThresholdWithPendingItems()
     {
         // Arrange
-        AlbumStreamPacer pacer = new(batchSize: 4, unlockThreshold: 10);
+        AlbumStreamPacer pacer = new(batchSize: 4, unlockThreshold: 100);
 
         // Act
-        bool unlocked = pacer.ShouldUnlock(displayedCount: 12);
+        AlbumStreamStep step = pacer.Next(displayedCount: 40, pendingCount: 8);
 
         // Assert
-        Assert.True(unlocked);
+        Assert.Equal(AlbumStreamStep.Reveal, step);
     }
 
-    [Fact(DisplayName = "ShouldUnlock should never signal again after the threshold is crossed")]
-    public void ShouldUnlock_ShouldNeverSignalAgain_AfterThresholdIsCrossed()
+    [Fact(DisplayName = "next_returns_idle_when_nothing_is_pending_below_threshold")]
+    public void Next_ReturnsIdle_WhenNothingIsPendingBelowThreshold()
     {
         // Arrange
-        AlbumStreamPacer pacer = new(batchSize: 4, unlockThreshold: 10);
-        pacer.ShouldUnlock(displayedCount: 12);
+        AlbumStreamPacer pacer = new(batchSize: 4, unlockThreshold: 100);
 
         // Act
-        bool unlockedAgain = pacer.ShouldUnlock(displayedCount: 16);
+        AlbumStreamStep step = pacer.Next(displayedCount: 40, pendingCount: 0);
 
         // Assert
-        Assert.False(unlockedAgain);
+        Assert.Equal(AlbumStreamStep.Idle, step);
     }
 
-    [Fact(DisplayName = "ShouldUnlock should stay silent below the threshold")]
-    public void ShouldUnlock_ShouldStaySilent_BelowThreshold()
+    [Fact(DisplayName = "next_never_leaves_in_the_tick_that_reaches_the_threshold")]
+    public void Next_NeverLeaves_InTheTickThatReachesTheThreshold()
     {
         // Arrange
-        AlbumStreamPacer pacer = new(batchSize: 4, unlockThreshold: 10);
+        AlbumStreamPacer pacer = new(batchSize: 4, unlockThreshold: 100);
 
         // Act
-        bool unlocked = pacer.ShouldUnlock(displayedCount: 8);
+        AlbumStreamStep reachingTick = pacer.Next(displayedCount: 96, pendingCount: 20);
+        AlbumStreamStep followingTick = pacer.Next(displayedCount: 100, pendingCount: 16);
 
         // Assert
-        Assert.False(unlocked);
+        Assert.Equal(AlbumStreamStep.Reveal, reachingTick);
+        Assert.Equal(AlbumStreamStep.Leave, followingTick);
+    }
+
+    [Fact(DisplayName = "next_returns_leave_once_then_done")]
+    public void Next_ReturnsLeaveOnce_ThenDone()
+    {
+        // Arrange
+        AlbumStreamPacer pacer = new(batchSize: 4, unlockThreshold: 100);
+
+        // Act
+        AlbumStreamStep first = pacer.Next(displayedCount: 100, pendingCount: 0);
+        AlbumStreamStep second = pacer.Next(displayedCount: 104, pendingCount: 4);
+
+        // Assert
+        Assert.Equal(AlbumStreamStep.Leave, first);
+        Assert.Equal(AlbumStreamStep.Done, second);
+    }
+
+    [Fact(DisplayName = "request_leave_makes_the_next_tick_leave_without_revealing")]
+    public void RequestLeave_MakesTheNextTickLeave_WithoutRevealing()
+    {
+        // Arrange
+        AlbumStreamPacer pacer = new(batchSize: 4, unlockThreshold: 100);
+        pacer.RequestLeave();
+
+        // Act
+        AlbumStreamStep step = pacer.Next(displayedCount: 8, pendingCount: 12);
+
+        // Assert
+        Assert.Equal(AlbumStreamStep.Leave, step);
+    }
+
+    [Fact(DisplayName = "try_leave_now_succeeds_only_once")]
+    public void TryLeaveNow_SucceedsOnlyOnce()
+    {
+        // Arrange
+        AlbumStreamPacer pacer = new(batchSize: 4, unlockThreshold: 100);
+
+        // Act
+        bool first = pacer.TryLeaveNow();
+        bool second = pacer.TryLeaveNow();
+        AlbumStreamStep step = pacer.Next(displayedCount: 100, pendingCount: 0);
+
+        // Assert
+        Assert.True(first);
+        Assert.False(second);
+        Assert.Equal(AlbumStreamStep.Done, step);
+    }
+
+    [Fact(DisplayName = "try_leave_now_fails_after_threshold_leave")]
+    public void TryLeaveNow_Fails_AfterThresholdLeave()
+    {
+        // Arrange
+        AlbumStreamPacer pacer = new(batchSize: 4, unlockThreshold: 100);
+        pacer.Next(displayedCount: 100, pendingCount: 0);
+
+        // Act
+        bool claimed = pacer.TryLeaveNow();
+
+        // Assert
+        Assert.False(claimed);
     }
 
     [Theory(DisplayName = "ProgressPercent should cap at 100 and scale on the displayed count")]
