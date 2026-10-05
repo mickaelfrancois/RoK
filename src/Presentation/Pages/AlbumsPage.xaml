@@ -97,7 +97,7 @@
                 </Grid.ColumnDefinitions>
 
                 <Border CornerRadius="{StaticResource ControlCornerRadius}" Width="{StaticResource ListCoverWidth}" Height="{StaticResource ListCoverHeight}" VerticalAlignment="Center">
-                    <common:PictureControl Cover="{x:Bind Picture, Mode=OneWay}" PlayButtonVisibility="Visible" Command="{x:Bind ListenCommand}" />
+                    <common:PictureControl Cover="{x:Bind Picture, Mode=OneWay}" IsHoverEnabled="False" />
                 </Border>
                 
                 <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="{StaticResource ListItemTextMargin}">

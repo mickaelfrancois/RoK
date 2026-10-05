@@ -20,6 +20,9 @@ public sealed partial class PictureControl : UserControl
     public static readonly DependencyProperty UseArtistFallbackProperty =
         DependencyProperty.Register(nameof(UseArtistFallback), typeof(bool), typeof(PictureControl), new PropertyMetadata(false));
 
+    public static readonly DependencyProperty IsHoverEnabledProperty =
+        DependencyProperty.Register(nameof(IsHoverEnabled), typeof(bool), typeof(PictureControl), new PropertyMetadata(true));
+
     public static readonly DependencyProperty CommandParameterProperty =
         DependencyProperty.Register(nameof(CommandParameter), typeof(object), typeof(PictureControl), new PropertyMetadata(null));
 
@@ -70,9 +73,18 @@ public sealed partial class PictureControl : UserControl
 
     private void Cover_PointerEntered(object sender, PointerRoutedEventArgs e)
     {
+        if (!IsHoverEnabled)
+            return;
+
         VisualStateManager.GoToState(this, "PointerOver", false);
     }
 
+
+    public bool IsHoverEnabled
+    {
+        get => (bool)GetValue(IsHoverEnabledProperty);
+        set => SetValue(IsHoverEnabledProperty, value);
+    }
 
     public ICommand Command
     {
