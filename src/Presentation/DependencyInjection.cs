@@ -1,6 +1,7 @@
 ﻿using Microsoft.UI.Dispatching;
 using Rok.Application.Features.Playlists.PlaylistMenu;
 using Rok.Application.Interfaces.Pictures;
+using Rok.Application.Player;
 using Rok.Application.Services.Filters;
 using Rok.Application.Services.Grouping;
 using Rok.Commons.Equalizer;
@@ -9,6 +10,7 @@ using Rok.Services.Diagnostics;
 using Rok.Services.PlayerCommand;
 using Rok.Services.PlayerCommand.Api;
 using Rok.Services.PlayerCommand.Terminal;
+using Rok.Services.Taskbar;
 using Rok.ViewModels.Album;
 using Rok.ViewModels.Album.Services;
 using Rok.ViewModels.Albums;
@@ -68,6 +70,24 @@ public static class DependencyInjection
 
         services.AddSingleton<IPlayerCommandService, PlayerCommandService>();
         services.AddSingleton<IPlayerCommandHandler, PlayerCommandHandler>();
+
+        services.AddSingleton<IThumbBarHost>((sp) => new Win32ThumbBarHost(
+            App.MainWindowHandle,
+            ThumbBarLabels.From(sp.GetRequiredService<IStringResourceProvider>()),
+            sp.GetRequiredService<ILogger<Win32ThumbBarHost>>()));
+        services.AddSingleton<ThumbBarController>((sp) =>
+        {
+            DispatcherQueue dispatcherQueue = DispatcherQueue.GetForCurrentThread();
+
+            return new ThumbBarController(
+                sp.GetRequiredService<IPlayerService>(),
+                sp.GetRequiredService<IPlayerCommandService>(),
+                sp.GetRequiredService<IMessenger>(),
+                sp.GetRequiredService<IThumbBarHost>(),
+                action => dispatcherQueue.TryEnqueue(() => action()),
+                sp.GetRequiredService<ILogger<ThumbBarController>>());
+        });
+
         services.AddSingleton<IWebApiRouteHandler, ListenPlaylistRouteHandler>();
         services.AddSingleton<IWebApiRouteHandler, ListenAlbumRouteHandler>();
         services.AddSingleton<IWebApiRouteHandler, ListenArtistRouteHandler>();

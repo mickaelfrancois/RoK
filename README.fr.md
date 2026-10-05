@@ -29,6 +29,7 @@ Rok est une application de bureau Windows permettant de gérer et d'écouter vot
 - 🕒 **Historique d'écoute** — Suivi de ce que vous écoutez au fil du temps
 - 🎮 **Intégration Discord** — Affichage de votre écoute en cours sur Discord
 - 🎛️ **Contrôles média Windows** — Intégration aux System Media Transport Controls (SMTC)
+- 🖼️ **Contrôles dans la miniature de la barre des tâches** — Boutons Précédent / Lecture-Pause / Suivant sur la miniature
 - 🔗 **Liens Last.fm** — Accès rapide aux pages artiste et album
 - 🌓 **Thèmes** — Support des modes clair et sombre
 - 🎯 **Mode compact** — Vue minimale du lecteur

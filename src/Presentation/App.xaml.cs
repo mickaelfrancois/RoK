@@ -8,6 +8,7 @@ using Rok.Import;
 using Rok.Infrastructure;
 using Rok.Services.PlayerCommand.Api;
 using Rok.Services.PlayerCommand.Terminal;
+using Rok.Services.Taskbar;
 using Rok.ViewModels.Player.Services;
 using Serilog;
 using Windows.ApplicationModel.Activation;
@@ -68,10 +69,12 @@ public partial class App : Microsoft.UI.Xaml.Application
 #if DEBUG
             MainWindow.Title += " [DEBUG]";
 #endif
+            MainWindowHandle = WindowNative.GetWindowHandle(MainWindow);
+
+            ServiceProvider.GetRequiredService<ThumbBarController>().Start();
+
             MainWindow.Activate();
             MainWindow.Closed += MainWindow_Closed;
-
-            MainWindowHandle = WindowNative.GetWindowHandle(MainWindow);
 
 #if DEBUG
             TryEnableXamlDiagnostics();
@@ -243,6 +246,8 @@ public partial class App : Microsoft.UI.Xaml.Application
 
     private async void MainWindow_Closed(object sender, WindowEventArgs args)
     {
+        ServiceProvider.GetRequiredService<ThumbBarController>().Dispose();
+
         IAppOptions options = ServiceProvider.GetRequiredService<IAppOptions>();
         ISettingsFile settingFileService = ServiceProvider.GetRequiredService<ISettingsFile>();
         ITelemetryClient telemetryClient = ServiceProvider.GetRequiredService<ITelemetryClient>();
