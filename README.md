@@ -30,6 +30,7 @@ Rok is a Windows desktop application for managing and playing your local music c
 - 🕒 **Listening History** — Track what you play over time
 - 🎮 **Discord Integration** — Show your current listening activity on Discord
 - 🎛️ **Windows Media Controls** — System Media Transport Controls (SMTC) integration
+- 🖼️ **Taskbar thumbnail controls** — Previous / Play-Pause / Next buttons on the taskbar thumbnail
 - 🔗 **Last.fm Links** — Quick access to artist and album pages
 - 🌓 **Themes** — Light and dark mode support
 - 🎯 **Compact Mode** — Minimal player view

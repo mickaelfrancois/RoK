@@ -2473,4 +2473,16 @@
   <data name="filtersClearAll.Content" xml:space="preserve">
     <value>Clear all</value>
   </data>
+  <data name="taskbarThumbPrevious" xml:space="preserve">
+    <value>Previous</value>
+  </data>
+  <data name="taskbarThumbPlay" xml:space="preserve">
+    <value>Play</value>
+  </data>
+  <data name="taskbarThumbPause" xml:space="preserve">
+    <value>Pause</value>
+  </data>
+  <data name="taskbarThumbNext" xml:space="preserve">
+    <value>Next</value>
+  </data>
 </root>

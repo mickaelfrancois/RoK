@@ -100,6 +100,8 @@ public sealed class PlayerService : IPlayerService, IDisposable
 
             _isLoopingEnabled = value;
 
+            _messenger.Send(new LoopingChanged(value));
+
             if (CurrentTrack != null)
                 RequestMixPreparation();
         }
