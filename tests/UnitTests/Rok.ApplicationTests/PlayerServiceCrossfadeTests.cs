@@ -344,8 +344,8 @@ public class PlayerServiceCrossfadeTests
         Assert.Equal(2, sut.CurrentTrack?.Id);
     }
 
-    [Fact(DisplayName = "failed_crossfade_fallback_does_not_loop_when_next_track_fails")]
-    public void Failed_crossfade_fallback_does_not_loop_when_next_track_fails()
+    [Fact(DisplayName = "failed_crossfade_fallback_skips_unreadable_next_track")]
+    public void Failed_crossfade_fallback_skips_unreadable_next_track()
     {
         // Arrange
         SetEnginePosition(position: 95, length: 100);
@@ -361,8 +361,9 @@ public class PlayerServiceCrossfadeTests
 
         // Assert
         VerifySetTrack(2, Times.Once());
-        VerifySetTrack(3, Times.Never());
+        VerifySetTrack(3, Times.Once());
         _engine.Verify(o => o.CrossfadeToAsync(It.IsAny<TrackDto>(), It.IsAny<float>(), It.IsAny<double>(), It.IsAny<CancellationToken>()), Times.Once);
+        Assert.Equal(3, sut.CurrentTrack?.Id);
     }
 
     [Fact(DisplayName = "cancelled_failed_crossfade_does_not_call_next")]

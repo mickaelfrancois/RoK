@@ -855,20 +855,33 @@ public sealed class PlayerService : IPlayerService, IDisposable
 
     public void Start(TrackDto? startTrack = null)
     {
-        TrackDto? track;
+        int startIndex;
 
         lock (_transitionLock)
         {
-            _currentIndex = startTrack == null ? 0 : Playlist.FindIndex(c => c.Id == startTrack.Id);
-            track = _currentIndex >= 0 && _currentIndex < Playlist.Count ? Playlist[_currentIndex] : null;
+            startIndex = startTrack == null ? 0 : Playlist.FindIndex(c => c.Id == startTrack.Id);
+
+            if (startIndex < 0 || startIndex >= Playlist.Count)
+            {
+                _currentIndex = startIndex;
+
+                return;
+            }
         }
 
-        if (track == null)
+        if (TryLoadFirstReadable(startIndex, 1))
+        {
+            Play();
+
             return;
+        }
 
-        LoadFile(track);
+        lock (_transitionLock)
+        {
+            _currentIndex = startIndex;
+        }
 
-        Play();
+        StopAfterUnreadable();
     }
 
     public void Pause() => Pause(PauseReason.User);
@@ -949,23 +962,17 @@ public sealed class PlayerService : IPlayerService, IDisposable
         // Cancel any ongoing crossfade
         CancelCrossfade();
 
-        TrackDto? track = null;
+        var candidate = -1;
 
         lock (_transitionLock)
         {
             if (_currentIndex + 1 < Playlist.Count)
-            {
-                _currentIndex++;
-                track = Playlist[_currentIndex];
-            }
+                candidate = _currentIndex + 1;
             else if (IsLoopingEnabled && Playlist.Count > 0)
-            {
-                _currentIndex = 0;
-                track = Playlist[0];
-            }
+                candidate = 0;
         }
 
-        if (track == null)
+        if (candidate < 0)
         {
             // Playlist ended
             PlaybackState = EPlaybackState.Stopped;
@@ -974,8 +981,10 @@ public sealed class PlayerService : IPlayerService, IDisposable
             return;
         }
 
-        LoadFile(track);
-        Play();
+        if (TryLoadFirstReadable(candidate, 1))
+            Play();
+        else
+            StopAfterUnreadable();
     }
 
     public void Previous()
@@ -983,30 +992,26 @@ public sealed class PlayerService : IPlayerService, IDisposable
         if (_mode == EPlaybackMode.Radio)
             return;
 
-        TrackDto? track = null;
+        var candidate = -1;
 
         lock (_transitionLock)
         {
             if (_currentIndex - 1 >= 0)
-            {
-                _currentIndex--;
-                track = Playlist[_currentIndex];
-            }
+                candidate = _currentIndex - 1;
             else if (IsLoopingEnabled && Playlist.Count > 0)
-            {
-                _currentIndex = Playlist.Count - 1;
-                track = Playlist[_currentIndex];
-            }
+                candidate = Playlist.Count - 1;
         }
 
-        if (track == null)
+        if (candidate < 0)
         {
             PlaybackState = EPlaybackState.Stopped;
             return;
         }
 
-        LoadFile(track);
-        Play();
+        if (TryLoadFirstReadable(candidate, -1))
+            Play();
+        else
+            StopAfterUnreadable();
     }
 
     public void ShuffleTracks()
@@ -1070,25 +1075,90 @@ public sealed class PlayerService : IPlayerService, IDisposable
 
     #region Engine
 
-    private void LoadFile(TrackDto track)
+    private bool TryLoadFirstReadable(int firstIndex, int step)
     {
         long durationPlayed = (long)_player.Position;
+        TrackDto? previousTrack = CurrentTrack;
+
         ResetPendingTransition();
         _player.Stop();
 
-        bool res = _player.SetTrack(track, ResolveCurrentReplayGain());
+        int budget;
 
-        if (res)
+        lock (_transitionLock)
         {
-            TrackDto? previousTrack = CurrentTrack;
-            CurrentTrack = track;
-
-            if ((previousTrack == null || previousTrack.Id != _currentTrack?.Id) && _currentTrack != null)
-                _messenger.Send(new MediaChangedMessage(_currentTrack, previousTrack, durationPlayed));
-
-            UpdateDiscordPresence(track, isPlaying: false);
-            RequestMixPreparation();
+            budget = Playlist.Count;
         }
+
+        var index = firstIndex;
+        var attempts = 0;
+
+        while (attempts < budget)
+        {
+            TrackDto track;
+            float gain;
+
+            lock (_transitionLock)
+            {
+                if (index < 0 || index >= Playlist.Count)
+                    break;
+
+                track = Playlist[index];
+                gain = ResolveReplayGainLocked(index);
+            }
+
+            attempts++;
+
+            if (_player.SetTrack(track, gain))
+            {
+                CommitLoadedTrack(index, track, previousTrack, durationPlayed);
+
+                return true;
+            }
+
+            _logger.LogWarning("Skipping unreadable track {Track} ({File})", track.Title, track.MusicFile);
+
+            index += step;
+
+            if (IsLoopingEnabled)
+                index = ((index % budget) + budget) % budget;
+        }
+
+        if (attempts > 0)
+            _logger.LogError("No readable track found after {Attempts} attempts", attempts);
+
+        return false;
+    }
+
+    private void CommitLoadedTrack(int index, TrackDto track, TrackDto? previousTrack, long durationPlayed)
+    {
+        lock (_transitionLock)
+        {
+            if (index >= Playlist.Count || !ReferenceEquals(Playlist[index], track))
+            {
+                var movedIndex = Playlist.IndexOf(track);
+
+                index = movedIndex >= 0 ? movedIndex : Math.Clamp(index, 0, Math.Max(Playlist.Count - 1, 0));
+            }
+
+            _currentIndex = index;
+        }
+
+        CurrentTrack = track;
+
+        if (previousTrack == null || previousTrack.Id != track.Id)
+            _messenger.Send(new MediaChangedMessage(track, previousTrack, durationPlayed));
+
+        UpdateDiscordPresence(track, isPlaying: false);
+        RequestMixPreparation();
+    }
+
+    private void StopAfterUnreadable()
+    {
+        PlaybackState = EPlaybackState.Stopped;
+        _smtcService?.UpdatePlaybackState(PlaybackStatus.Stopped);
+        StopSmtcTimelineTimer();
+        _discordService?.ClearPresence();
     }
 
     private void UpdateDiscordPresence(TrackDto track, bool isPlaying)
@@ -1363,14 +1433,6 @@ public sealed class PlayerService : IPlayerService, IDisposable
         lock (_transitionLock)
         {
             return ResolveReplayGainLocked(index);
-        }
-    }
-
-    private float ResolveCurrentReplayGain()
-    {
-        lock (_transitionLock)
-        {
-            return ResolveReplayGainLocked(_currentIndex);
         }
     }
 

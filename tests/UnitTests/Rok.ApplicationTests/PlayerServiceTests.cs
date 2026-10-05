@@ -16,6 +16,7 @@ public class PlayerServiceTests
     private readonly Mock<IAlbumPicture> mockAlbumPicture;
     private readonly Mock<ILogger<PlayerService>> mockLogger;
     private readonly FakeTimeProvider fakeTimeProvider;
+    private readonly Messenger messenger = new();
     private readonly PlayerService playerService;
 
     public PlayerServiceTests()
@@ -30,7 +31,25 @@ public class PlayerServiceTests
         mockPlayerEngine.Setup(o => o.SetTrack(It.IsAny<TrackDto>(), It.IsAny<float>())).Returns(true);
         mockAppOptions.SetupGet(o => o.CrossFade).Returns(false);
 
-        playerService = new PlayerService(mockCallDetectionService.Object, mockPlayerEngine.Object, mockAppOptions.Object, null, null, mockAlbumPicture.Object, fakeTimeProvider, new Messenger(), Mock.Of<IMixCueProvider>(), mockLogger.Object);
+        playerService = new PlayerService(mockCallDetectionService.Object, mockPlayerEngine.Object, mockAppOptions.Object, null, null, mockAlbumPicture.Object, fakeTimeProvider, messenger, Mock.Of<IMixCueProvider>(), mockLogger.Object);
+    }
+
+    private static List<TrackDto> BuildTracks(int count)
+    {
+        return Enumerable.Range(1, count).Select(id => new TrackDto { Id = id, Title = $"Track {id}" }).ToList();
+    }
+
+    private void MarkUnreadable(params int[] ids)
+    {
+        foreach (int id in ids)
+        {
+            mockPlayerEngine.Setup(o => o.SetTrack(It.Is<TrackDto>(t => t.Id == id), It.IsAny<float>())).Returns(false);
+        }
+    }
+
+    private void VerifySetTrack(int id, Times times)
+    {
+        mockPlayerEngine.Verify(o => o.SetTrack(It.Is<TrackDto>(t => t.Id == id), It.IsAny<float>()), times);
     }
 
     [Fact]
@@ -134,6 +153,202 @@ public class PlayerServiceTests
 
         // Assert
         Assert.Equal(EPlaybackState.Stopped, playerService.PlaybackState);
+    }
+
+    [Fact(DisplayName = "next_skips_unreadable_track_and_plays_first_readable_one")]
+    public void Next_skips_unreadable_track_and_plays_first_readable_one()
+    {
+        // Arrange
+        MarkUnreadable(2);
+        playerService.LoadPlaylist(BuildTracks(3));
+
+        // Act
+        playerService.Next();
+
+        // Assert
+        Assert.Equal(3, playerService.CurrentTrack?.Id);
+        Assert.Equal(EPlaybackState.Playing, playerService.PlaybackState);
+        VerifySetTrack(2, Times.Once());
+        VerifySetTrack(3, Times.Once());
+
+        playerService.Next();
+
+        Assert.Equal(EPlaybackState.Stopped, playerService.PlaybackState);
+        Assert.Equal(3, playerService.CurrentTrack?.Id);
+    }
+
+    [Fact(DisplayName = "next_skips_unreadable_tracks_with_looping_wraps_to_start")]
+    public void Next_skips_unreadable_tracks_with_looping_wraps_to_start()
+    {
+        // Arrange
+        playerService.IsLoopingEnabled = true;
+        MarkUnreadable(3);
+        playerService.LoadPlaylist(BuildTracks(3));
+        playerService.Next();
+
+        // Act
+        playerService.Next();
+
+        // Assert
+        Assert.Equal(1, playerService.CurrentTrack?.Id);
+        Assert.Equal(EPlaybackState.Playing, playerService.PlaybackState);
+    }
+
+    [Fact(DisplayName = "next_with_all_following_tracks_unreadable_stops_without_play")]
+    public void Next_with_all_following_tracks_unreadable_stops_without_play()
+    {
+        // Arrange
+        MarkUnreadable(2, 3);
+        playerService.LoadPlaylist(BuildTracks(3));
+
+        // Act
+        playerService.Next();
+
+        // Assert
+        Assert.Equal(EPlaybackState.Stopped, playerService.PlaybackState);
+        Assert.Equal(1, playerService.CurrentTrack?.Id);
+        mockPlayerEngine.Verify(o => o.Play(), Times.Once);
+        VerifySetTrack(2, Times.Once());
+        VerifySetTrack(3, Times.Once());
+    }
+
+    [Fact(DisplayName = "previous_skips_unreadable_track_backwards")]
+    public void Previous_skips_unreadable_track_backwards()
+    {
+        // Arrange
+        MarkUnreadable(2);
+        playerService.LoadPlaylist(BuildTracks(3));
+        playerService.Next();
+        Assert.Equal(3, playerService.CurrentTrack?.Id);
+
+        // Act
+        playerService.Previous();
+
+        // Assert
+        Assert.Equal(1, playerService.CurrentTrack?.Id);
+        Assert.Equal(EPlaybackState.Playing, playerService.PlaybackState);
+    }
+
+    [Fact(DisplayName = "previous_with_looping_wraps_to_last_readable_track")]
+    public void Previous_with_looping_wraps_to_last_readable_track()
+    {
+        // Arrange
+        playerService.IsLoopingEnabled = true;
+        MarkUnreadable(3);
+        playerService.LoadPlaylist(BuildTracks(3));
+
+        // Act
+        playerService.Previous();
+
+        // Assert
+        Assert.Equal(2, playerService.CurrentTrack?.Id);
+        Assert.Equal(EPlaybackState.Playing, playerService.PlaybackState);
+    }
+
+    [Fact(DisplayName = "start_on_unreadable_track_plays_next_readable_one")]
+    public void Start_on_unreadable_track_plays_next_readable_one()
+    {
+        // Arrange
+        List<TrackDto> tracks = BuildTracks(3);
+        MarkUnreadable(2);
+
+        // Act
+        playerService.LoadPlaylist(tracks, tracks[1]);
+
+        // Assert
+        Assert.Equal(3, playerService.CurrentTrack?.Id);
+        Assert.Equal(EPlaybackState.Playing, playerService.PlaybackState);
+    }
+
+    [Fact(DisplayName = "start_with_first_track_unreadable_plays_second")]
+    public void Start_with_first_track_unreadable_plays_second()
+    {
+        // Arrange
+        MarkUnreadable(1);
+
+        // Act
+        playerService.LoadPlaylist(BuildTracks(2));
+
+        // Assert
+        Assert.Equal(2, playerService.CurrentTrack?.Id);
+        Assert.Equal(EPlaybackState.Playing, playerService.PlaybackState);
+        VerifySetTrack(1, Times.Once());
+        VerifySetTrack(2, Times.Once());
+    }
+
+    [Fact(DisplayName = "fully_unreadable_playlist_stops_after_one_attempt_per_track")]
+    public void Fully_unreadable_playlist_stops_after_one_attempt_per_track()
+    {
+        // Arrange
+        MarkUnreadable(1, 2, 3);
+
+        // Act
+        playerService.LoadPlaylist(BuildTracks(3));
+
+        // Assert
+        mockPlayerEngine.Verify(o => o.SetTrack(It.IsAny<TrackDto>(), It.IsAny<float>()), Times.Exactly(3));
+        mockPlayerEngine.Verify(o => o.Play(), Times.Never);
+        Assert.Equal(EPlaybackState.Stopped, playerService.PlaybackState);
+        Assert.Null(playerService.CurrentTrack);
+    }
+
+    [Fact(DisplayName = "fully_unreadable_playlist_with_looping_does_not_loop_forever")]
+    public void Fully_unreadable_playlist_with_looping_does_not_loop_forever()
+    {
+        // Arrange
+        playerService.IsLoopingEnabled = true;
+        playerService.LoadPlaylist(BuildTracks(3));
+        MarkUnreadable(1, 2, 3);
+        mockPlayerEngine.Invocations.Clear();
+
+        // Act
+        playerService.Next();
+
+        // Assert
+        mockPlayerEngine.Verify(o => o.SetTrack(It.IsAny<TrackDto>(), It.IsAny<float>()), Times.Exactly(3));
+        Assert.Equal(EPlaybackState.Stopped, playerService.PlaybackState);
+        Assert.Equal(1, playerService.CurrentTrack?.Id);
+    }
+
+    [Fact(DisplayName = "each_skipped_track_logs_a_warning")]
+    public void Each_skipped_track_logs_a_warning()
+    {
+        // Arrange
+        MarkUnreadable(2, 3);
+        playerService.LoadPlaylist(BuildTracks(4));
+
+        // Act
+        playerService.Next();
+
+        // Assert
+        Assert.Equal(4, playerService.CurrentTrack?.Id);
+        mockLogger.Verify(
+            l => l.Log(LogLevel.Warning, It.IsAny<EventId>(), It.IsAny<It.IsAnyType>(), It.IsAny<Exception?>(), It.IsAny<Func<It.IsAnyType, Exception?, string>>()),
+            Times.Exactly(2));
+    }
+
+    [Fact(DisplayName = "skipping_tracks_keeps_played_duration_of_previous_track")]
+    public void Skipping_tracks_keeps_played_duration_of_previous_track()
+    {
+        // Arrange
+        double position = 0;
+        mockPlayerEngine.SetupGet(o => o.Position).Returns(() => position);
+        mockPlayerEngine.Setup(o => o.Stop()).Callback(() => position = 0);
+        MarkUnreadable(2);
+        List<TrackDto> tracks = BuildTracks(3);
+        playerService.LoadPlaylist(tracks);
+        position = 42;
+        List<MediaChangedMessage> messages = [];
+        using IDisposable subscription = messenger.Subscribe<MediaChangedMessage>(messages.Add);
+
+        // Act
+        playerService.Next();
+
+        // Assert
+        MediaChangedMessage message = Assert.Single(messages);
+        Assert.Same(tracks[2], message.NewTrack);
+        Assert.Same(tracks[0], message.PreviousTrack);
+        Assert.Equal(42L, message.DurationPlayed);
     }
 
     [Fact]
