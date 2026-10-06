@@ -70,6 +70,23 @@ public class PlayerServiceRadioModeTests
         Assert.False(service.CanNext);
     }
 
+    [Fact(DisplayName = "when_in_radio_mode_previous_does_not_restart_even_after_three_seconds")]
+    public void Previous_ShouldBeNoOp_WhenInRadioModeAfterThreshold()
+    {
+        // Arrange
+        (PlayerService service, Mock<IPlayerEngine> engine) = CreateService();
+        engine.Setup(e => e.SetStream(It.IsAny<RadioStationDto>())).Returns(true);
+        engine.SetupGet(e => e.Position).Returns(10);
+        service.PlayRadioStation(new RadioStationDto(Id: 0, Name: "N", StreamUrl: "http://s/", HomepageUrl: null, StationUuid: null, FaviconUrl: null, CountryCode: null, Codec: null, Bitrate: null, AddedAt: DateTime.UtcNow, LastListen: null));
+
+        // Act
+        service.Previous();
+
+        // Assert
+        engine.Verify(e => e.SetPosition(It.IsAny<double>()), Times.Never);
+        Assert.False(service.CanPrevious);
+    }
+
     [Fact(DisplayName = "Starting music should stop active radio and switch mode to Music")]
     public void Start_ShouldStopRadio_AndSwitchToMusic()
     {

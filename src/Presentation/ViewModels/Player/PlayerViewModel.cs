@@ -348,6 +348,8 @@ public partial class PlayerViewModel : ObservableObject, IDisposable
     {
         if (IsPlaying)
         {
+            CanSkipPrevious = _player.CanPrevious;
+
             OnPropertyChanged(nameof(Progression));
             OnPropertyChanged(nameof(DurationTotal));
             OnPropertyChanged(nameof(DurationTotalStr));
@@ -581,7 +583,7 @@ public partial class PlayerViewModel : ObservableObject, IDisposable
             return;
 
         _player.Previous();
-        CanSkipPrevious = false;
+        CanSkipPrevious = _player.CanPrevious;
     }
 
     [RelayCommand]

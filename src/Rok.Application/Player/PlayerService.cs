@@ -147,6 +147,8 @@ public sealed class PlayerService : IPlayerService, IDisposable
 
     private const double KDefaultMuteVolume = 50;
 
+    private const double RestartThresholdSeconds = 3;
+
     private bool _isMuted;
 
     public bool IsMuted
@@ -188,6 +190,9 @@ public sealed class PlayerService : IPlayerService, IDisposable
         {
             if (_mode == EPlaybackMode.Radio)
                 return false;
+
+            if (_player.Position > RestartThresholdSeconds)
+                return true;
 
             if (IsLoopingEnabled)
                 return true;
@@ -662,6 +667,16 @@ public sealed class PlayerService : IPlayerService, IDisposable
         return false;
     }
 
+    private void RestartCurrentTrack()
+    {
+        InvalidatePendingTransition();
+
+        _player.SetPosition(0);
+
+        if (PlaybackState == EPlaybackState.Ended)
+            Play();
+    }
+
     private void InvalidatePendingTransition()
     {
         CancelCrossfade();
@@ -999,6 +1014,12 @@ public sealed class PlayerService : IPlayerService, IDisposable
     {
         if (_mode == EPlaybackMode.Radio)
             return;
+
+        if (_player.Position > RestartThresholdSeconds)
+        {
+            RestartCurrentTrack();
+            return;
+        }
 
         var candidate = -1;
 
