@@ -85,7 +85,7 @@
                         </StackPanel>
                     </Button>
 
-                    <TextBlock Text="·" VerticalAlignment="Center" Foreground="{ThemeResource TextFillColorSecondaryBrush}" Visibility="{x:Bind ViewModel.HasActiveYears, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" />
+                    <TextBlock Text="·" VerticalAlignment="Center" Foreground="{ThemeResource TextFillColorSecondaryBrush}" Visibility="{x:Bind ViewModel.ShowActiveYearsSeparator, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" />
                     <TextBlock Text="{x:Bind ViewModel.ActiveYears, Mode=OneWay}" VerticalAlignment="Center" FontSize="{StaticResource FontSizeSmall}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" Visibility="{x:Bind ViewModel.HasActiveYears, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" />
                     <Image Height="12" VerticalAlignment="Center" Source="{x:Bind ViewModel.Artist.CountryCode, Mode=OneWay, Converter={StaticResource CountryCodeToImageSourceConverter}}" ToolTipService.ToolTip="{x:Bind ViewModel.CountryName, Mode=OneWay}" Visibility="{x:Bind ViewModel.HasCountry, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" />
                 </StackPanel>

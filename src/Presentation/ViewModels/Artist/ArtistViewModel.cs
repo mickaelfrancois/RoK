@@ -237,6 +237,8 @@ public partial class ArtistViewModel : ObservableObject, IFilterableArtist, IGro
 
     public bool HasGenre => Artist.GenreId.HasValue && !string.IsNullOrEmpty(Artist.GenreName);
 
+    public bool ShowActiveYearsSeparator => HasGenre && HasActiveYears;
+
     public string CountryName => Artist.CountryName;
 
     public bool HasCountry => !string.IsNullOrEmpty(Artist.CountryCode);
@@ -315,6 +317,7 @@ public partial class ArtistViewModel : ObservableObject, IFilterableArtist, IGro
         OnPropertyChanged(nameof(HasActiveYears));
         OnPropertyChanged(nameof(GenreName));
         OnPropertyChanged(nameof(HasGenre));
+        OnPropertyChanged(nameof(ShowActiveYearsSeparator));
         OnPropertyChanged(nameof(CountryName));
         OnPropertyChanged(nameof(HasCountry));
         OnPropertyChanged(nameof(HasLinks));

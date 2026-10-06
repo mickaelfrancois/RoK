@@ -89,13 +89,15 @@
                 <TextBlock Style="{StaticResource HeaderTitleTextStyle}" Text="{x:Bind ViewModel.Album.Name, Mode=OneWay}" MaxLines="2" TextWrapping="Wrap" TextTrimming="CharacterEllipsis" />
 
                 <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingSmall}">
-                    <HyperlinkButton Command="{x:Bind ViewModel.ArtistOpenCommand}" Padding="0" Margin="0" Style="{StaticResource HeaderHyperlinkStyle}">
-                        <TextBlock Text="{x:Bind ViewModel.Album.ArtistName, Mode=OneWay}" MaxWidth="320" FontSize="{StaticResource FontSizeMedium}" FontWeight="SemiBold" TextTrimming="CharacterEllipsis" />
-                    </HyperlinkButton>
-                    <Path x:Uid="albumArtistFavorite" Data="{StaticResource HeartPath}" Fill="Gold" Stretch="Uniform" Width="14" Height="14" VerticalAlignment="Center" Visibility="{x:Bind ViewModel.IsArtistFavorite, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" />
+                    <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingSmall}" Visibility="{x:Bind ViewModel.HasArtist, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">
+                        <HyperlinkButton Command="{x:Bind ViewModel.ArtistOpenCommand}" Padding="0" Margin="0" Style="{StaticResource HeaderHyperlinkStyle}">
+                            <TextBlock Text="{x:Bind ViewModel.Album.ArtistName, Mode=OneWay}" MaxWidth="320" FontSize="{StaticResource FontSizeMedium}" FontWeight="SemiBold" TextTrimming="CharacterEllipsis" />
+                        </HyperlinkButton>
+                        <Path x:Uid="albumArtistFavorite" Data="{StaticResource HeartPath}" Fill="Gold" Stretch="Uniform" Width="14" Height="14" VerticalAlignment="Center" Visibility="{x:Bind ViewModel.IsArtistFavorite, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" />
+                    </StackPanel>
 
                     <StackPanel x:Name="artistExtras" Orientation="Horizontal" Spacing="{StaticResource SpacingSmall}">
-                        <TextBlock Text="·" VerticalAlignment="Center" Foreground="{ThemeResource TextFillColorSecondaryBrush}" Visibility="{x:Bind ViewModel.HasGenre, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" />
+                        <TextBlock Text="·" VerticalAlignment="Center" Foreground="{ThemeResource TextFillColorSecondaryBrush}" Visibility="{x:Bind ViewModel.ShowGenreSeparator, Mode=OneWay,Converter={StaticResource BoolToVisibilityConverter}}" />
                         <Button Command="{x:Bind ViewModel.GenreOpenCommand}" Padding="10,2" CornerRadius="{StaticResource CornerRadiusMediumValue}" Visibility="{x:Bind ViewModel.HasGenre, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">
                             <StackPanel Orientation="Horizontal" Spacing="6">
                                 <TextBlock Text="{x:Bind ViewModel.GenreName, Mode=OneWay}" FontSize="{StaticResource FontSizeSmall}" />
