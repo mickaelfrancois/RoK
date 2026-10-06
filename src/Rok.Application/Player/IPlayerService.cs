@@ -53,6 +53,9 @@ public interface IPlayerService
 
     void Play();
 
+    /// <summary>
+    /// Restarts the current track when it has played for more than three seconds, otherwise moves to the previous track.
+    /// </summary>
     void Previous();
 
     void Start(TrackDto? startTrack = null);

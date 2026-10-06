@@ -122,6 +122,77 @@ public class PlayerServiceTests
         Assert.Equal(track1, playerService.CurrentTrack);
     }
 
+    [Fact(DisplayName = "when_the_track_has_played_more_than_three_seconds_previous_restarts_it")]
+    public void Previous_ShouldRestartCurrentTrack_WhenPositionIsOverThreshold()
+    {
+        // Arrange
+        List<TrackDto> tracks = BuildTracks(3);
+        playerService.LoadPlaylist(tracks);
+        playerService.Next();
+        mockPlayerEngine.SetupGet(o => o.Position).Returns(10);
+
+        // Act
+        playerService.Previous();
+
+        // Assert
+        mockPlayerEngine.Verify(o => o.SetPosition(0), Times.Once);
+        Assert.Equal(tracks[1], playerService.CurrentTrack);
+    }
+
+    [Theory(DisplayName = "when_the_track_has_played_three_seconds_or_less_previous_moves_to_the_previous_track")]
+    [InlineData(2)]
+    [InlineData(3)]
+    public void Previous_ShouldMoveToPreviousTrack_WhenPositionIsAtOrUnderThreshold(double position)
+    {
+        // Arrange
+        List<TrackDto> tracks = BuildTracks(3);
+        playerService.LoadPlaylist(tracks);
+        playerService.Next();
+        mockPlayerEngine.SetupGet(o => o.Position).Returns(position);
+
+        // Act
+        playerService.Previous();
+
+        // Assert
+        Assert.Equal(tracks[0], playerService.CurrentTrack);
+        mockPlayerEngine.Verify(o => o.SetPosition(It.IsAny<double>()), Times.Never);
+    }
+
+    [Fact(DisplayName = "when_the_first_track_has_played_more_than_three_seconds_previous_restarts_it_instead_of_stopping")]
+    public void Previous_ShouldRestartFirstTrack_WhenPositionIsOverThresholdWithoutLooping()
+    {
+        // Arrange
+        List<TrackDto> tracks = BuildTracks(2);
+        playerService.LoadPlaylist(tracks);
+        playerService.Start();
+        mockPlayerEngine.SetupGet(o => o.Position).Returns(10);
+
+        // Act
+        playerService.Previous();
+
+        // Assert
+        mockPlayerEngine.Verify(o => o.SetPosition(0), Times.Once);
+        Assert.Equal(tracks[0], playerService.CurrentTrack);
+        Assert.NotEqual(EPlaybackState.Stopped, playerService.PlaybackState);
+    }
+
+    [Theory(DisplayName = "on_the_first_track_previous_is_available_only_after_three_seconds")]
+    [InlineData(10, true)]
+    [InlineData(1, false)]
+    public void CanPrevious_ShouldDependOnPosition_OnFirstTrackWithoutLooping(double position, bool expected)
+    {
+        // Arrange
+        playerService.LoadPlaylist(BuildTracks(2));
+        playerService.Start();
+        mockPlayerEngine.SetupGet(o => o.Position).Returns(position);
+
+        // Act
+        bool canPrevious = playerService.CanPrevious;
+
+        // Assert
+        Assert.Equal(expected, canPrevious);
+    }
+
     [Fact]
     public void PreviousTrack_ShouldLoopToLastTrack_WhenLoopingIsEnabled()
     {
