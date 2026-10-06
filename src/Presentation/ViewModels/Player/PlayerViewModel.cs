@@ -112,11 +112,11 @@ public partial class PlayerViewModel : ObservableObject, IDisposable
         }
     }
 
-    public string DurationTotalStr => DurationTotal.ToString(@"mm\:ss");
+    public string DurationTotalStr => PlaybackTimeFormatter.Format(DurationTotal, DurationTotal);
 
     public TimeSpan ListenDuration => TimeSpan.FromSeconds(_player.Position);
 
-    public string ListenDurationStr => ListenDuration.ToString(@"mm\:ss");
+    public string ListenDurationStr => PlaybackTimeFormatter.Format(ListenDuration, DurationTotal);
 
     public int Progression
     {
