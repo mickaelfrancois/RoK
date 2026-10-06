@@ -838,10 +838,13 @@ public sealed class PlayerService : IPlayerService, IDisposable
         List<TrackDto> itemsToInsert = new(tracks.Count);
         itemsToInsert.AddRange(tracks);
 
+        bool hasTracks;
         TrackDto? imminentBefore;
 
         lock (_transitionLock)
         {
+            hasTracks = Playlist.Count > 0;
+
             index ??= _currentIndex + 1;
             index = Math.Clamp(index.Value, 0, Playlist.Count);
 
@@ -850,7 +853,10 @@ public sealed class PlayerService : IPlayerService, IDisposable
             Playlist.InsertRange(index.Value, itemsToInsert);
         }
 
-        InvalidateIfImminentChanged(imminentBefore);
+        if (!hasTracks)
+            Start();
+        else
+            InvalidateIfImminentChanged(imminentBefore);
 
         _messenger.Send(new PlaylistChanged(Playlist));
     }

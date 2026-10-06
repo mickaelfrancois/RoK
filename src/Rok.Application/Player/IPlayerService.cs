@@ -35,6 +35,10 @@ public interface IPlayerService
 
     void AddTracksToPlaylist(List<TrackDto> tracks);
 
+    /// <summary>
+    /// Inserts <paramref name="tracks"/> at <paramref name="index"/>, or right after the current track when it is null.
+    /// Starts playback when the queue was empty.
+    /// </summary>
     void InsertTracksToPlaylist(List<TrackDto> tracks, int? index = null);
 
     void InitEvents();

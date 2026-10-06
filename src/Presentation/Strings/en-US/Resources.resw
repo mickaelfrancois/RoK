@@ -1240,6 +1240,18 @@
   <data name="MenuFlyout_CurrentListening_Text" xml:space="preserve">
     <value>Current listening</value>
   </data>
+  <data name="MenuFlyout_PlayNext_Text" xml:space="preserve">
+    <value>Play next</value>
+  </data>
+  <data name="MenuFlyout_AddToQueue_Text" xml:space="preserve">
+    <value>Add to queue</value>
+  </data>
+  <data name="notification_queue_play_next" xml:space="preserve">
+    <value>Will play next</value>
+  </data>
+  <data name="notification_queue_added" xml:space="preserve">
+    <value>Added to queue</value>
+  </data>
   <data name="SupportProjectButtonText.Text" xml:space="preserve">
     <value>Support the project, buy me a coffee</value>
   </data>

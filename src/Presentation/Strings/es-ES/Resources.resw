@@ -1123,6 +1123,18 @@
   <data name="MenuFlyout_CurrentListening_Text" xml:space="preserve">
     <value>Escucha actual</value>
   </data>
+  <data name="MenuFlyout_PlayNext_Text" xml:space="preserve">
+    <value>Reproducir a continuación</value>
+  </data>
+  <data name="MenuFlyout_AddToQueue_Text" xml:space="preserve">
+    <value>Añadir a la cola</value>
+  </data>
+  <data name="notification_queue_play_next" xml:space="preserve">
+    <value>Se reproducirá a continuación</value>
+  </data>
+  <data name="notification_queue_added" xml:space="preserve">
+    <value>Añadido a la cola</value>
+  </data>
   <data name="SupportProjectButtonText.Text" xml:space="preserve">
     <value>Apoya el proyecto, cómprame un café</value>
   </data>

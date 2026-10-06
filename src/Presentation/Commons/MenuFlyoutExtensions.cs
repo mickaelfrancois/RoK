@@ -65,6 +65,8 @@ public static class MenuFlyoutExtensions
     private static readonly ConditionalWeakTable<IPlaylistMenuService, List<WeakReference<MenuFlyout>>> s_serviceMenus = new();
     private static readonly object s_lock = new();
 
+    private static readonly HashSet<string> s_injectedItemTags = ["PlaylistItem", "NewPlaylistItem", "CurrentListeningItem", "PlayNextItem", "AddToQueueItem"];
+
     public static void SetPlaylistMenuService(DependencyObject obj, IPlaylistMenuService value)
         => obj.SetValue(PlaylistMenuServiceProperty, value);
 
@@ -240,7 +242,7 @@ public static class MenuFlyoutExtensions
         }
 
         foreach (MenuFlyoutItem? mi in menuFlyout.Items.OfType<MenuFlyoutItem>()
-                     .Where(item => item.Tag?.ToString() == "PlaylistItem" || item.Tag?.ToString() == "NewPlaylistItem")
+                     .Where(item => item.Tag?.ToString() is string tag && s_injectedItemTags.Contains(tag))
                      .ToList())
         {
             RoutedEventHandler? handler = GetMenuItemClickHandler(mi);
@@ -273,9 +275,9 @@ public static class MenuFlyoutExtensions
     {
         ResourceLoader resourceLoader = ResourceLoader.GetForViewIndependentUse();
 
-        CleanupExistingSubmenuClickHandlers(menuFlyout);
-
         IEnumerable<PlaylistMenuItem> playlists = await service.GetPlaylistMenuItemsAsync();
+
+        CleanupExistingSubmenuClickHandlers(menuFlyout);
 
         bool flatten = GetFlattenPlaylistMenu(menuFlyout);
 
@@ -345,40 +347,50 @@ public static class MenuFlyoutExtensions
         SetMenuItemClickHandler(newPlaylistItem, newHandler);
 
 
-        MenuFlyoutItem addToCurrentListeningItem = new()
-        {
-            Text = resourceLoader.GetString("MenuFlyout_CurrentListening_Text") ?? "Current Listening...",
-            Icon = new FontIcon { Glyph = "\uE7F6" },
-            Tag = "CurrentListeningItem"
-        };
-
-        SetMenuItemPlaylistId(addToCurrentListeningItem, -1);
-        SetMenuItemServiceWeakRef(addToCurrentListeningItem, new WeakReference<IPlaylistMenuService>(service));
-
-        SetTrackId(addToCurrentListeningItem, trackId);
-        SetAlbumId(addToCurrentListeningItem, albumId);
-        SetArtistId(addToCurrentListeningItem, artistId);
-
-        RoutedEventHandler addToCurrentListeningHandler = AddToCurrentListeningStaticClickHandler;
-        addToCurrentListeningItem.Click += addToCurrentListeningHandler;
-        SetMenuItemClickHandler(addToCurrentListeningItem, addToCurrentListeningHandler);
-
-
-
         if (flatten)
         {
             if (playlists.Any())
                 menuFlyout.Items.Add(new MenuFlyoutSeparator { Tag = "AddToPlaylistInnerSeparator" });
 
             menuFlyout.Items.Add(newPlaylistItem);
-            menuFlyout.Items.Add(addToCurrentListeningItem);
+            menuFlyout.Items.Add(CreateQueueMenuItem(
+                resourceLoader.GetString("MenuFlyout_CurrentListening_Text") ?? "Current Listening...", "\uE7F6", "CurrentListeningItem",
+                AddToCurrentListeningStaticClickHandler, service, trackId, albumId, artistId));
         }
         else
         {
+            menuFlyout.Items.Add(CreateQueueMenuItem(
+                resourceLoader.GetString("MenuFlyout_PlayNext_Text") ?? "Play next", "\uE893", "PlayNextItem",
+                PlayNextStaticClickHandler, service, trackId, albumId, artistId));
+            menuFlyout.Items.Add(CreateQueueMenuItem(
+                resourceLoader.GetString("MenuFlyout_AddToQueue_Text") ?? "Add to queue", "\uE7F6", "AddToQueueItem",
+                AddToCurrentListeningStaticClickHandler, service, trackId, albumId, artistId));
+
             addToSubMenu.Items.Add(newPlaylistItem);
-            addToSubMenu.Items.Add(addToCurrentListeningItem);
             menuFlyout.Items.Add(addToSubMenu);
         }
+    }
+
+    private static MenuFlyoutItem CreateQueueMenuItem(string text, string glyph, string tag, RoutedEventHandler handler, IPlaylistMenuService service, long trackId, long albumId, long artistId)
+    {
+        MenuFlyoutItem item = new()
+        {
+            Text = text,
+            Icon = new FontIcon { Glyph = glyph },
+            Tag = tag
+        };
+
+        SetMenuItemPlaylistId(item, -1);
+        SetMenuItemServiceWeakRef(item, new WeakReference<IPlaylistMenuService>(service));
+
+        SetTrackId(item, trackId);
+        SetAlbumId(item, albumId);
+        SetArtistId(item, artistId);
+
+        item.Click += handler;
+        SetMenuItemClickHandler(item, handler);
+
+        return item;
     }
 
     private static async void MenuItemStaticClickHandler(object? sender, RoutedEventArgs e)
@@ -469,6 +481,35 @@ public static class MenuFlyoutExtensions
                     await service.AddAlbumToCurrentListeningAsync(albumId);
                 else if (artistId > 0)
                     await service.AddArtistToCurrentListeningAsync(artistId);
+            }
+            catch
+            {
+                // ignore
+            }
+        }
+    }
+
+
+    private static async void PlayNextStaticClickHandler(object? sender, RoutedEventArgs e)
+    {
+        if (sender is not MenuFlyoutItem mi)
+            return;
+
+        object? wr = GetMenuItemServiceWeakRef(mi);
+        long trackId = GetTrackId(mi);
+        long albumId = GetAlbumId(mi);
+        long artistId = GetArtistId(mi);
+
+        if (wr is WeakReference<IPlaylistMenuService> weak && weak.TryGetTarget(out IPlaylistMenuService? service))
+        {
+            try
+            {
+                if (trackId > 0)
+                    await service.PlayTrackNextAsync(trackId);
+                else if (albumId > 0)
+                    await service.PlayAlbumNextAsync(albumId);
+                else if (artistId > 0)
+                    await service.PlayArtistNextAsync(artistId);
             }
             catch
             {
