@@ -151,6 +151,8 @@ public partial class AlbumViewModel : ObservableObject, IFilterableAlbum, IGroup
         OnPropertyChanged(nameof(HasYear));
         OnPropertyChanged(nameof(GenreName));
         OnPropertyChanged(nameof(HasGenre));
+        OnPropertyChanged(nameof(HasArtist));
+        OnPropertyChanged(nameof(ShowGenreSeparator));
         OnPropertyChanged(nameof(HeaderDetails));
         OnPropertyChanged(nameof(HasDetails));
         OnPropertyChanged(nameof(HasCountry));
@@ -227,6 +229,11 @@ public partial class AlbumViewModel : ObservableObject, IFilterableAlbum, IGroup
     public string GenreName => Album.GenreName;
 
     public bool HasGenre => Album.GenreId.HasValue && !string.IsNullOrEmpty(Album.GenreName);
+
+    /// <summary>A compilation has no single artist to link to, so the header hides the artist link.</summary>
+    public bool HasArtist => !Album.IsCompilation;
+
+    public bool ShowGenreSeparator => HasArtist && HasGenre;
 
     /// <summary>Record label and release format, joined, when the album carries them.</summary>
     public string HeaderDetails => string.Join(" · ", new[] { Album.Label, Album.ReleaseFormat }.Where(value => !string.IsNullOrWhiteSpace(value)).Select(value => value!.Trim()));
