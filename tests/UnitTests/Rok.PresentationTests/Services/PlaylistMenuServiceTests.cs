@@ -374,4 +374,169 @@ public class PlaylistMenuServiceTests
         Assert.Equal(NotificationType.Error, notification!.Type);
         _playerService.Verify(p => p.AddTracksToPlaylist(It.IsAny<List<TrackDto>>()), Times.Never);
     }
+
+    [Fact(DisplayName = "when_tracks_are_added_to_the_queue_then_a_success_notification_is_sent")]
+    public async Task AddTrackToCurrentListeningAsync_SendsSuccess_WhenTrackFound()
+    {
+        // Arrange
+        _mediator.Setup<GetTrackByIdRequest, Result<TrackDto>>()
+                 .Returns(Result<TrackDto>.Ok(new TrackDto { Id = 99 }));
+        _resources.Setup(r => r.GetString("notification_queue_added")).Returns("Added to queue");
+        ShowNotificationMessage? notification = null;
+        _messenger.Subscribe<ShowNotificationMessage>(m => notification = m);
+        PlaylistMenuService sut = BuildService();
+
+        // Act
+        await sut.AddTrackToCurrentListeningAsync(trackId: 99);
+
+        // Assert
+        Assert.NotNull(notification);
+        Assert.Equal(NotificationType.Success, notification!.Type);
+        Assert.Equal("Added to queue", notification.Message);
+    }
+
+    // --- Play*NextAsync ---
+
+    [Fact(DisplayName = "when_a_track_is_played_next_then_it_is_inserted_after_the_current_track")]
+    public async Task PlayTrackNextAsync_InsertsTrack_WhenTrackFound()
+    {
+        // Arrange
+        _mediator.Setup<GetTrackByIdRequest, Result<TrackDto>>()
+                 .Returns(Result<TrackDto>.Ok(new TrackDto { Id = 99 }));
+        _resources.Setup(r => r.GetString("notification_queue_play_next")).Returns("Will play next");
+        ShowNotificationMessage? notification = null;
+        _messenger.Subscribe<ShowNotificationMessage>(m => notification = m);
+        PlaylistMenuService sut = BuildService();
+
+        // Act
+        await sut.PlayTrackNextAsync(trackId: 99);
+
+        // Assert
+        _playerService.Verify(p => p.InsertTracksToPlaylist(
+            It.Is<List<TrackDto>>(l => l.Count == 1 && l[0].Id == 99), null), Times.Once);
+        _playerService.Verify(p => p.AddTracksToPlaylist(It.IsAny<List<TrackDto>>()), Times.Never);
+        Assert.NotNull(notification);
+        Assert.Equal(NotificationType.Success, notification!.Type);
+        Assert.Equal("Will play next", notification.Message);
+    }
+
+    [Fact(DisplayName = "when_an_album_is_played_next_then_its_tracks_keep_the_album_order")]
+    public async Task PlayAlbumNextAsync_InsertsTracksInAlbumOrder_WhenTracksFound()
+    {
+        // Arrange
+        List<TrackDto> tracks = new() { new TrackDto { Id = 10 }, new TrackDto { Id = 11 }, new TrackDto { Id = 12 } };
+        _mediator.Setup<GetTracksByAlbumIdRequest, Result<IEnumerable<TrackDto>>>()
+                 .Returns(Result<IEnumerable<TrackDto>>.Ok(tracks));
+        ShowNotificationMessage? notification = null;
+        _messenger.Subscribe<ShowNotificationMessage>(m => notification = m);
+        PlaylistMenuService sut = BuildService();
+
+        // Act
+        await sut.PlayAlbumNextAsync(albumId: 5);
+
+        // Assert
+        _playerService.Verify(p => p.InsertTracksToPlaylist(
+            It.Is<List<TrackDto>>(l => l.Select(t => t.Id).SequenceEqual(new long[] { 10, 11, 12 })), null), Times.Once);
+        Assert.NotNull(notification);
+        Assert.Equal(NotificationType.Success, notification!.Type);
+    }
+
+    [Fact(DisplayName = "when_an_artist_is_played_next_then_its_tracks_keep_the_returned_order")]
+    public async Task PlayArtistNextAsync_InsertsTracksInReturnedOrder_WhenTracksFound()
+    {
+        // Arrange
+        List<TrackDto> tracks = new() { new TrackDto { Id = 3 }, new TrackDto { Id = 1 }, new TrackDto { Id = 2 } };
+        _mediator.Setup<GetTracksByArtistIdRequest, Result<IEnumerable<TrackDto>>>()
+                 .Returns(Result<IEnumerable<TrackDto>>.Ok(tracks));
+        ShowNotificationMessage? notification = null;
+        _messenger.Subscribe<ShowNotificationMessage>(m => notification = m);
+        PlaylistMenuService sut = BuildService();
+
+        // Act
+        await sut.PlayArtistNextAsync(artistId: 7);
+
+        // Assert
+        _playerService.Verify(p => p.InsertTracksToPlaylist(
+            It.Is<List<TrackDto>>(l => l.Select(t => t.Id).SequenceEqual(new long[] { 3, 1, 2 })), null), Times.Once);
+        Assert.NotNull(notification);
+        Assert.Equal(NotificationType.Success, notification!.Type);
+    }
+
+    [Fact(DisplayName = "when_the_track_to_play_next_is_not_found_then_an_error_notification_is_sent")]
+    public async Task PlayTrackNextAsync_SendsError_WhenTrackNotFound()
+    {
+        // Arrange
+        _mediator.Setup<GetTrackByIdRequest, Result<TrackDto>>()
+                 .Returns(Result<TrackDto>.Fail(NotFoundError.ForEntity("Track", 1L)));
+        ShowNotificationMessage? notification = null;
+        _messenger.Subscribe<ShowNotificationMessage>(m => notification = m);
+        PlaylistMenuService sut = BuildService();
+
+        // Act
+        await sut.PlayTrackNextAsync(trackId: 99);
+
+        // Assert
+        Assert.NotNull(notification);
+        Assert.Equal(NotificationType.Error, notification!.Type);
+        _playerService.Verify(p => p.InsertTracksToPlaylist(It.IsAny<List<TrackDto>>(), It.IsAny<int?>()), Times.Never);
+    }
+
+    [Fact(DisplayName = "when_the_album_to_play_next_has_no_track_then_an_error_notification_is_sent")]
+    public async Task PlayAlbumNextAsync_SendsError_WhenNoTracks()
+    {
+        // Arrange
+        _mediator.Setup<GetTracksByAlbumIdRequest, Result<IEnumerable<TrackDto>>>()
+                 .Returns(Result<IEnumerable<TrackDto>>.Ok(Enumerable.Empty<TrackDto>()));
+        ShowNotificationMessage? notification = null;
+        _messenger.Subscribe<ShowNotificationMessage>(m => notification = m);
+        PlaylistMenuService sut = BuildService();
+
+        // Act
+        await sut.PlayAlbumNextAsync(albumId: 5);
+
+        // Assert
+        Assert.NotNull(notification);
+        Assert.Equal(NotificationType.Error, notification!.Type);
+        _playerService.Verify(p => p.InsertTracksToPlaylist(It.IsAny<List<TrackDto>>(), It.IsAny<int?>()), Times.Never);
+    }
+
+    [Fact(DisplayName = "when_the_artist_track_request_fails_on_play_next_then_an_error_notification_is_sent")]
+    public async Task PlayArtistNextAsync_SendsError_WhenResultIsFailure()
+    {
+        // Arrange
+        _mediator.Setup<GetTracksByArtistIdRequest, Result<IEnumerable<TrackDto>>>()
+                 .Returns(Result<IEnumerable<TrackDto>>.Fail(new OperationError("track.load_failed", "Validation failed")));
+        ShowNotificationMessage? notification = null;
+        _messenger.Subscribe<ShowNotificationMessage>(m => notification = m);
+        PlaylistMenuService sut = BuildService();
+
+        // Act
+        await sut.PlayArtistNextAsync(artistId: 7);
+
+        // Assert
+        Assert.NotNull(notification);
+        Assert.Equal(NotificationType.Error, notification!.Type);
+        _playerService.Verify(p => p.InsertTracksToPlaylist(It.IsAny<List<TrackDto>>(), It.IsAny<int?>()), Times.Never);
+    }
+
+    [Fact(DisplayName = "when_the_player_throws_on_play_next_then_an_error_notification_is_sent")]
+    public async Task PlayAlbumNextAsync_SendsError_WhenPlayerThrows()
+    {
+        // Arrange
+        _mediator.Setup<GetTracksByAlbumIdRequest, Result<IEnumerable<TrackDto>>>()
+                 .Returns(Result<IEnumerable<TrackDto>>.Ok(new List<TrackDto> { new() { Id = 10 } }));
+        _playerService.Setup(p => p.InsertTracksToPlaylist(It.IsAny<List<TrackDto>>(), It.IsAny<int?>()))
+                      .Throws(new InvalidOperationException("boom"));
+        ShowNotificationMessage? notification = null;
+        _messenger.Subscribe<ShowNotificationMessage>(m => notification = m);
+        PlaylistMenuService sut = BuildService();
+
+        // Act
+        Exception? thrown = await Record.ExceptionAsync(() => sut.PlayAlbumNextAsync(albumId: 5));
+
+        // Assert
+        Assert.Null(thrown);
+        Assert.NotNull(notification);
+        Assert.Equal(NotificationType.Error, notification!.Type);
+    }
 }

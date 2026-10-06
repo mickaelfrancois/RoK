@@ -1181,6 +1181,18 @@
   <data name="MenuFlyout_CurrentListening_Text" xml:space="preserve">
     <value>Поточне прослуховування</value>
   </data>
+  <data name="MenuFlyout_PlayNext_Text" xml:space="preserve">
+    <value>Відтворити наступним</value>
+  </data>
+  <data name="MenuFlyout_AddToQueue_Text" xml:space="preserve">
+    <value>Додати до черги</value>
+  </data>
+  <data name="notification_queue_play_next" xml:space="preserve">
+    <value>Буде відтворено наступним</value>
+  </data>
+  <data name="notification_queue_added" xml:space="preserve">
+    <value>Додано до черги</value>
+  </data>
   <data name="SupportProjectButtonText.Text" xml:space="preserve">
     <value>Підтримай проект, купи мені каву</value>
   </data>

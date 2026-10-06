@@ -207,19 +207,39 @@ public sealed partial class PlaylistMenuService : IPlaylistMenuService, IDisposa
     }
 
 
-    public async Task AddArtistToCurrentListeningAsync(long artistId)
+    public Task AddArtistToCurrentListeningAsync(long artistId)
+        => EnqueueAsync(() => LoadArtistTracksAsync(artistId), tracks => _playerService.AddTracksToPlaylist(tracks), "notification_queue_added");
+
+    public Task AddAlbumToCurrentListeningAsync(long albumId)
+        => EnqueueAsync(() => LoadAlbumTracksAsync(albumId), tracks => _playerService.AddTracksToPlaylist(tracks), "notification_queue_added");
+
+    public Task AddTrackToCurrentListeningAsync(long trackId)
+        => EnqueueAsync(() => LoadTrackAsync(trackId), tracks => _playerService.AddTracksToPlaylist(tracks), "notification_queue_added");
+
+    public Task PlayArtistNextAsync(long artistId)
+        => EnqueueAsync(() => LoadArtistTracksAsync(artistId), tracks => _playerService.InsertTracksToPlaylist(tracks), "notification_queue_play_next");
+
+    public Task PlayAlbumNextAsync(long albumId)
+        => EnqueueAsync(() => LoadAlbumTracksAsync(albumId), tracks => _playerService.InsertTracksToPlaylist(tracks), "notification_queue_play_next");
+
+    public Task PlayTrackNextAsync(long trackId)
+        => EnqueueAsync(() => LoadTrackAsync(trackId), tracks => _playerService.InsertTracksToPlaylist(tracks), "notification_queue_play_next");
+
+
+    private async Task EnqueueAsync(Func<Task<List<TrackDto>?>> loadTracks, Action<List<TrackDto>> enqueue, string successResourceKey)
     {
         try
         {
-            Result<IEnumerable<TrackDto>> result = await _mediator.Send(new GetTracksByArtistIdRequest(artistId));
-            if (result.IsFailure || !result.Value.Any())
+            List<TrackDto>? tracks = await loadTracks();
+            if (tracks == null)
             {
                 _messenger.Send(new ShowNotificationMessage() { Message = _resourceProvider.GetString("notification_playlist_track_add_error"), Type = NotificationType.Error });
-                _logger.LogWarning("No tracks found for artist '{ArtistId}'", artistId);
                 return;
             }
 
-            _playerService.AddTracksToPlaylist(result.Value.ToList());
+            enqueue(tracks);
+
+            _messenger.Send(new ShowNotificationMessage() { Message = _resourceProvider.GetString(successResourceKey), Type = NotificationType.Success });
         }
         catch (Exception ex)
         {
@@ -228,46 +248,40 @@ public sealed partial class PlaylistMenuService : IPlaylistMenuService, IDisposa
         }
     }
 
-    public async Task AddAlbumToCurrentListeningAsync(long albumId)
+    private async Task<List<TrackDto>?> LoadArtistTracksAsync(long artistId)
     {
-        try
+        Result<IEnumerable<TrackDto>> result = await _mediator.Send(new GetTracksByArtistIdRequest(artistId));
+        if (result.IsFailure || !result.Value.Any())
         {
-            Result<IEnumerable<TrackDto>> result = await _mediator.Send(new GetTracksByAlbumIdRequest(albumId));
-            if (result.IsFailure || !result.Value.Any())
-            {
-                _messenger.Send(new ShowNotificationMessage() { Message = _resourceProvider.GetString("notification_playlist_track_add_error"), Type = NotificationType.Error });
-                _logger.LogWarning("No tracks found for album '{AlbumId}'", albumId);
-                return;
-            }
+            _logger.LogWarning("No tracks found for artist '{ArtistId}'", artistId);
+            return null;
+        }
 
-            _playerService.AddTracksToPlaylist(result.Value.ToList());
-        }
-        catch (Exception ex)
-        {
-            _messenger.Send(new ShowNotificationMessage() { Message = _resourceProvider.GetString("notification_playlist_track_add_error"), Type = NotificationType.Error });
-            _logger.LogError(ex, "Error while add tracks to current listening");
-        }
+        return result.Value.ToList();
     }
 
-    public async Task AddTrackToCurrentListeningAsync(long trackId)
+    private async Task<List<TrackDto>?> LoadAlbumTracksAsync(long albumId)
     {
-        try
+        Result<IEnumerable<TrackDto>> result = await _mediator.Send(new GetTracksByAlbumIdRequest(albumId));
+        if (result.IsFailure || !result.Value.Any())
         {
-            Result<TrackDto> trackResult = await _mediator.Send(new GetTrackByIdRequest(trackId));
-            if (!trackResult.IsSuccess || trackResult.Value == null)
-            {
-                _messenger.Send(new ShowNotificationMessage() { Message = _resourceProvider.GetString("notification_playlist_track_add_error"), Type = NotificationType.Error });
-                _logger.LogWarning("No track found for id '{TrackId}'", trackId);
-                return;
-            }
+            _logger.LogWarning("No tracks found for album '{AlbumId}'", albumId);
+            return null;
+        }
 
-            _playerService.AddTracksToPlaylist(new List<TrackDto> { trackResult.Value });
-        }
-        catch (Exception ex)
+        return result.Value.ToList();
+    }
+
+    private async Task<List<TrackDto>?> LoadTrackAsync(long trackId)
+    {
+        Result<TrackDto> trackResult = await _mediator.Send(new GetTrackByIdRequest(trackId));
+        if (!trackResult.IsSuccess || trackResult.Value == null)
         {
-            _messenger.Send(new ShowNotificationMessage() { Message = _resourceProvider.GetString("notification_playlist_track_add_error"), Type = NotificationType.Error });
-            _logger.LogError(ex, "Error while add tracks to current listening");
+            _logger.LogWarning("No track found for id '{TrackId}'", trackId);
+            return null;
         }
+
+        return new List<TrackDto> { trackResult.Value };
     }
 
 

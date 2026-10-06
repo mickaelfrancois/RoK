@@ -485,6 +485,67 @@ public class PlayerServiceTests
         Assert.Equal(track2, playerService.Playlist.Last());
     }
 
+    [Fact(DisplayName = "when_tracks_are_inserted_into_an_empty_queue_playback_starts")]
+    public void InsertTracksToPlaylist_ShouldStartPlayback_WhenPlaylistContainsNoTracks()
+    {
+        // Arrange
+        TrackDto track1 = new() { Id = 1, Title = "Track 1" };
+        TrackDto track2 = new() { Id = 2, Title = "Track 2" };
+
+        // Act
+        playerService.InsertTracksToPlaylist(new List<TrackDto> { track1, track2 });
+
+        // Assert
+        Assert.Equal(EPlaybackState.Playing, playerService.PlaybackState);
+        Assert.Equal(track1, playerService.CurrentTrack);
+    }
+
+    [Fact(DisplayName = "when_tracks_are_inserted_next_they_follow_the_current_track_in_order")]
+    public void InsertTracksToPlaylist_ShouldInsertAfterCurrentTrackInOrder_WhenIndexIsNull()
+    {
+        // Arrange
+        TrackDto current = new() { Id = 1, Title = "Current" };
+        TrackDto later = new() { Id = 2, Title = "Later" };
+        TrackDto first = new() { Id = 3, Title = "First" };
+        TrackDto second = new() { Id = 4, Title = "Second" };
+        playerService.AddTracksToPlaylist(new List<TrackDto> { current, later });
+
+        // Act
+        playerService.InsertTracksToPlaylist(new List<TrackDto> { first, second });
+
+        // Assert
+        Assert.Equal(new[] { current, first, second, later }, playerService.Playlist);
+        Assert.Equal(current, playerService.CurrentTrack);
+    }
+
+    [Fact(DisplayName = "when_play_next_is_used_twice_the_last_insert_plays_first")]
+    public void InsertTracksToPlaylist_ShouldPlaceLastInsertFirst_WhenCalledTwice()
+    {
+        // Arrange
+        TrackDto current = new() { Id = 1, Title = "Current" };
+        TrackDto x = new() { Id = 2, Title = "X" };
+        TrackDto y = new() { Id = 3, Title = "Y" };
+        playerService.AddTracksToPlaylist(new List<TrackDto> { current });
+
+        // Act
+        playerService.InsertTracksToPlaylist(new List<TrackDto> { x });
+        playerService.InsertTracksToPlaylist(new List<TrackDto> { y });
+
+        // Assert
+        Assert.Equal(new[] { current, y, x }, playerService.Playlist);
+    }
+
+    [Fact(DisplayName = "when_no_track_is_inserted_into_an_empty_queue_playback_does_not_start")]
+    public void InsertTracksToPlaylist_ShouldNotStartPlayback_WhenTracksAreEmpty()
+    {
+        // Act
+        playerService.InsertTracksToPlaylist(new List<TrackDto>());
+
+        // Assert
+        Assert.Empty(playerService.Playlist);
+        Assert.NotEqual(EPlaybackState.Playing, playerService.PlaybackState);
+    }
+
     [Fact]
     public void InsertTracksToPlaylist_ShouldInsertTracksAtEnd_WhenIndexIsOutOfRange()
     {
