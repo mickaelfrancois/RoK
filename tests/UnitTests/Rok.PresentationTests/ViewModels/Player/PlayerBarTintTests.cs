@@ -23,6 +23,19 @@ public class PlayerBarTintTests
         Assert.True(ColorContrast.ContrastRatio(tint, White) >= 4.5);
     }
 
+    [Fact(DisplayName = "resolve_keeps_the_brand_blue_and_blends_in_twenty_percent_of_the_album_color")]
+    public void Resolve_BlendsAlbumColorIntoBrandBlue()
+    {
+        // Arrange
+        Color red = Color.FromArgb(255, 255, 0, 0);
+
+        // Act
+        Color tint = PlayerBarTint.Resolve(EPlaybackMode.Music, red);
+
+        // Assert
+        Assert.Equal(Color.FromArgb(255, 0x44, 0x37, 0x6C), tint);
+    }
+
     [Fact(DisplayName = "resolve_signals_fallback_when_there_is_no_dominant_color")]
     public void Resolve_SignalsFallback_WhenNoDominantColor()
     {
