@@ -1,5 +1,6 @@
 using Microsoft.UI;
 using Microsoft.UI.Dispatching;
+using Microsoft.UI.Input;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media.Animation;
@@ -128,6 +129,17 @@ public sealed partial class PlayerView : UserControl
 
         if (ViewModel != null)
             ViewModel.Volume = Math.Max(0d, ViewModel.Volume - 5);
+    }
+
+    private void OnVolumeWheelChanged(object sender, PointerRoutedEventArgs e)
+    {
+        PointerPointProperties properties = e.GetCurrentPoint((UIElement)sender).Properties;
+
+        if (properties.IsHorizontalMouseWheel)
+            return;
+
+        ViewModel?.ApplyWheelDelta(properties.MouseWheelDelta);
+        e.Handled = true;
     }
 
     private void OnMuteAccelerator(KeyboardAccelerator sender, KeyboardAcceleratorInvokedEventArgs args)

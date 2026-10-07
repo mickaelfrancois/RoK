@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel;
+using System.Globalization;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Rok.Application.Dto.Lyrics;
@@ -35,6 +36,7 @@ public partial class PlayerViewModel : ObservableObject, IDisposable
     private readonly RadioPictureService _radioPictureService;
     private readonly IMessenger _messenger;
     private readonly List<IDisposable> _subscriptions = new();
+    private readonly VolumeWheelAccumulator _volumeWheel = new();
 
     private bool _isFullScreen;
     private readonly IEqualizerWindowService _equalizerWindowService;
@@ -198,6 +200,8 @@ public partial class PlayerViewModel : ObservableObject, IDisposable
 
             _player.Volume = (float)value;
             OnPropertyChanged();
+            OnPropertyChanged(nameof(IsMuted));
+            OnPropertyChanged(nameof(VolumeToolTip));
         }
     }
 
@@ -209,7 +213,30 @@ public partial class PlayerViewModel : ObservableObject, IDisposable
             _player.IsMuted = value;
             OnPropertyChanged();
             OnPropertyChanged(nameof(Volume));
+            OnPropertyChanged(nameof(VolumeToolTip));
         }
+    }
+
+    /// <summary>Gets the localized tooltip showing the current volume as a percentage.</summary>
+    public string VolumeToolTip => string.Format(CultureInfo.CurrentCulture, _resourceLoader.GetString("playerVolumePercentToolTip"), VolumeWheelAccumulator.ToPercent(Volume));
+
+    /// <summary>Applies a mouse wheel delta (120 per notch) to the volume.</summary>
+    /// <param name="wheelDelta">The raw wheel delta reported by the pointer.</param>
+    public void ApplyWheelDelta(int wheelDelta)
+    {
+        Volume = _volumeWheel.Apply(Volume, wheelDelta);
+    }
+
+    private void NotifyVolumeChanged()
+    {
+        OnPropertyChanged(nameof(Volume));
+        OnPropertyChanged(nameof(IsMuted));
+        OnPropertyChanged(nameof(VolumeToolTip));
+    }
+
+    private void OnVolumeChanged(VolumeChanged message)
+    {
+        _stateManager.ExecuteOnUIThread(NotifyVolumeChanged);
     }
 
     private bool IsPlaying => _player.PlaybackState == EPlaybackState.Playing;
@@ -293,6 +320,7 @@ public partial class PlayerViewModel : ObservableObject, IDisposable
         _subscriptions.Add(_messenger.Subscribe<PlaylistChanged>(OnPlaylistChanged));
         _subscriptions.Add(_messenger.Subscribe<RepeatModeChanged>(OnRepeatModeChanged));
         _subscriptions.Add(_messenger.Subscribe<ShuffleModeChanged>(OnShuffleModeChanged));
+        _subscriptions.Add(_messenger.Subscribe<VolumeChanged>(OnVolumeChanged));
         _subscriptions.Add(_messenger.Subscribe<RadioStationChanged>(OnRadioStationChanged));
         _subscriptions.Add(_messenger.Subscribe<RadioMetadataChanged>(OnRadioMetadataChanged));
         _subscriptions.Add(_messenger.Subscribe<BufferingChanged>(OnBufferingChanged));
