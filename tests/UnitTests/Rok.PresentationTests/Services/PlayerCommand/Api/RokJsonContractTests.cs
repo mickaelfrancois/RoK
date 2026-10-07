@@ -45,6 +45,39 @@ public class RokJsonContractTests
         Assert.Equal(231, status.Current.Duration);
     }
 
+    [Fact(DisplayName = "A status carrying the repeat and shuffle modes should read them back")]
+    public void StatusPayload_ShouldReadBackRepeatAndShuffleModes()
+    {
+        // Arrange
+        const string payload =
+            """
+            {"state":"Playing","mode":"Music","volume":5,"isMuted":false,"position":0,"canNext":true,
+            "canPrevious":false,"canSeek":true,"isLooping":true,"repeatMode":"One","isShuffleEnabled":true,
+            "isBuffering":false,"queueLength":2,"queueSignature":1}
+            """;
+
+        // Act
+        PlayerStatus? status = JsonSerializer.Deserialize<PlayerStatus>(payload, RokJson.Options);
+
+        // Assert
+        Assert.NotNull(status);
+        Assert.True(status.IsLooping);
+        Assert.Equal("One", status.RepeatMode);
+        Assert.True(status.IsShuffleEnabled);
+    }
+
+    [Fact(DisplayName = "A status from an older desktop without the new members should read back with defaults")]
+    public void StatusPayload_ShouldReadBackOlderPayloadWithoutNewMembers()
+    {
+        // Arrange & Act
+        PlayerStatus? status = JsonSerializer.Deserialize<PlayerStatus>(StatusPayload, RokJson.Options);
+
+        // Assert
+        Assert.NotNull(status);
+        Assert.Null(status.RepeatMode);
+        Assert.False(status.IsShuffleEnabled);
+    }
+
     [Fact(DisplayName = "A status without a current track should read back with a null member")]
     public void StatusPayload_ShouldReadBackWithoutCurrentTrack()
     {

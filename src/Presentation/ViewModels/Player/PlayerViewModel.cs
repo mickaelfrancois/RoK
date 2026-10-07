@@ -91,14 +91,62 @@ public partial class PlayerViewModel : ObservableObject, IDisposable
         _resourceLoader.GetString("listeningSleepIdle"),
         _resourceLoader.GetString("listeningSleepRemaining"));
 
-    public bool RepeatAll
+    public ERepeatMode RepeatMode => _player.RepeatMode;
+
+    public bool IsRepeatActive => _player.RepeatMode != ERepeatMode.Off;
+
+    public bool IsRepeatOne => _player.RepeatMode == ERepeatMode.One;
+
+    [RelayCommand]
+    private void CycleRepeatMode()
     {
-        get => _player.IsLoopingEnabled;
-        set
+        _player.RepeatMode = RepeatModeCycle.Next(_player.RepeatMode);
+
+        NotifyRepeatModeChanged();
+    }
+
+    public bool IsShuffleEnabled => _player.IsShuffleEnabled;
+
+    public string RepeatToolTip => _resourceLoader.GetString(PlayerModeTextKeys.Repeat(_player.RepeatMode));
+
+    public string ShuffleToolTip => _resourceLoader.GetString(PlayerModeTextKeys.Shuffle(_player.IsShuffleEnabled));
+
+    [RelayCommand]
+    private void ToggleShuffle()
+    {
+        _player.IsShuffleEnabled = !_player.IsShuffleEnabled;
+
+        NotifyShuffleModeChanged();
+    }
+
+    private void NotifyRepeatModeChanged()
+    {
+        OnPropertyChanged(nameof(RepeatMode));
+        OnPropertyChanged(nameof(IsRepeatActive));
+        OnPropertyChanged(nameof(IsRepeatOne));
+        OnPropertyChanged(nameof(RepeatToolTip));
+    }
+
+    private void NotifyShuffleModeChanged()
+    {
+        OnPropertyChanged(nameof(IsShuffleEnabled));
+        OnPropertyChanged(nameof(ShuffleToolTip));
+    }
+
+    private void OnRepeatModeChanged(RepeatModeChanged message)
+    {
+        _stateManager.ExecuteOnUIThread(() =>
         {
-            _player.IsLoopingEnabled = value;
-            OnPropertyChanged();
-        }
+            NotifyRepeatModeChanged();
+
+            CanSkipNext = _player.CanNext;
+            CanSkipPrevious = _player.CanPrevious;
+        });
+    }
+
+    private void OnShuffleModeChanged(ShuffleModeChanged message)
+    {
+        _stateManager.ExecuteOnUIThread(NotifyShuffleModeChanged);
     }
 
     public TimeSpan DurationTotal
@@ -243,6 +291,8 @@ public partial class PlayerViewModel : ObservableObject, IDisposable
         _subscriptions.Add(_messenger.Subscribe<MediaAboutToEndEvent>(OnMediaAboutToEnd));
         _subscriptions.Add(_messenger.Subscribe<TrackScoreUpdateMessage>(OnTrackScoreUpdated));
         _subscriptions.Add(_messenger.Subscribe<PlaylistChanged>(OnPlaylistChanged));
+        _subscriptions.Add(_messenger.Subscribe<RepeatModeChanged>(OnRepeatModeChanged));
+        _subscriptions.Add(_messenger.Subscribe<ShuffleModeChanged>(OnShuffleModeChanged));
         _subscriptions.Add(_messenger.Subscribe<RadioStationChanged>(OnRadioStationChanged));
         _subscriptions.Add(_messenger.Subscribe<RadioMetadataChanged>(OnRadioMetadataChanged));
         _subscriptions.Add(_messenger.Subscribe<BufferingChanged>(OnBufferingChanged));

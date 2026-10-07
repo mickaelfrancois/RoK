@@ -345,7 +345,7 @@ public class PlayerServiceGaplessTests
         TrackDto first = BuildTrack(1);
         PlayerService sut = BuildService();
         sut.LoadPlaylist([first, BuildTrack(2)]);
-        sut.IsLoopingEnabled = true;
+        sut.RepeatMode = ERepeatMode.All;
         sut.Next();
 
         // Act

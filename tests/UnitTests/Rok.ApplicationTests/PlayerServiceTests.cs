@@ -71,7 +71,7 @@ public class PlayerServiceTests
     public void NextTrack_ShouldLoopToFirstTrack_WhenLoopingIsEnabled()
     {
         // Arrange
-        playerService.IsLoopingEnabled = true;
+        playerService.RepeatMode = ERepeatMode.All;
 
         TrackDto track1 = new() { Id = 1, Title = "Track 1" };
         TrackDto track2 = new() { Id = 2, Title = "Track 2" };
@@ -90,7 +90,7 @@ public class PlayerServiceTests
     public void NextTrack_ShouldStop_WhenLoopingIsDisabled()
     {
         // Arrange
-        playerService.IsLoopingEnabled = false;
+        playerService.RepeatMode = ERepeatMode.Off;
 
         TrackDto track1 = new() { Id = 1, Title = "Track 1" };
         TrackDto track2 = new() { Id = 2, Title = "Track 2" };
@@ -197,7 +197,7 @@ public class PlayerServiceTests
     public void PreviousTrack_ShouldLoopToLastTrack_WhenLoopingIsEnabled()
     {
         // Arrange
-        playerService.IsLoopingEnabled = true;
+        playerService.RepeatMode = ERepeatMode.All;
 
         TrackDto track1 = new() { Id = 1, Title = "Track 1" };
         TrackDto track2 = new() { Id = 2, Title = "Track 2" };
@@ -214,7 +214,7 @@ public class PlayerServiceTests
     public void PreviousTrack_ShouldStop_WhenLoopingIsDisabled()
     {
         // Arrange
-        playerService.IsLoopingEnabled = false;
+        playerService.RepeatMode = ERepeatMode.Off;
         TrackDto track1 = new() { Id = 1, Title = "Track 1" };
         TrackDto track2 = new() { Id = 2, Title = "Track 2" };
         playerService.LoadPlaylist(new List<TrackDto> { track1, track2 });
@@ -252,7 +252,7 @@ public class PlayerServiceTests
     public void Next_skips_unreadable_tracks_with_looping_wraps_to_start()
     {
         // Arrange
-        playerService.IsLoopingEnabled = true;
+        playerService.RepeatMode = ERepeatMode.All;
         MarkUnreadable(3);
         playerService.LoadPlaylist(BuildTracks(3));
         playerService.Next();
@@ -304,7 +304,7 @@ public class PlayerServiceTests
     public void Previous_with_looping_wraps_to_last_readable_track()
     {
         // Arrange
-        playerService.IsLoopingEnabled = true;
+        playerService.RepeatMode = ERepeatMode.All;
         MarkUnreadable(3);
         playerService.LoadPlaylist(BuildTracks(3));
 
@@ -367,7 +367,7 @@ public class PlayerServiceTests
     public void Fully_unreadable_playlist_with_looping_does_not_loop_forever()
     {
         // Arrange
-        playerService.IsLoopingEnabled = true;
+        playerService.RepeatMode = ERepeatMode.All;
         playerService.LoadPlaylist(BuildTracks(3));
         MarkUnreadable(1, 2, 3);
         mockPlayerEngine.Invocations.Clear();

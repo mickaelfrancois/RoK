@@ -2496,4 +2496,19 @@
   <data name="taskbarThumbNext" xml:space="preserve">
     <value>Suivant</value>
   </data>
+  <data name="playerShuffleOn" xml:space="preserve">
+    <value>Lecture aléatoire activée</value>
+  </data>
+  <data name="playerShuffleOff" xml:space="preserve">
+    <value>Lecture aléatoire désactivée</value>
+  </data>
+  <data name="playerRepeatOff" xml:space="preserve">
+    <value>Répétition désactivée</value>
+  </data>
+  <data name="playerRepeatAll" xml:space="preserve">
+    <value>Répéter tout</value>
+  </data>
+  <data name="playerRepeatOne" xml:space="preserve">
+    <value>Répéter la piste</value>
+  </data>
 </root>

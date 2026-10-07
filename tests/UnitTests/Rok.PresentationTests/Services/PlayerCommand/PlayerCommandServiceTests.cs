@@ -84,6 +84,39 @@ public class PlayerCommandServiceTests
         Assert.True(_player.Object.IsMuted);
     }
 
+    [Theory(DisplayName = "CycleRepeatMode should move the player to the next repeat mode")]
+    [InlineData(ERepeatMode.Off, ERepeatMode.All)]
+    [InlineData(ERepeatMode.All, ERepeatMode.One)]
+    [InlineData(ERepeatMode.One, ERepeatMode.Off)]
+    public void CycleRepeatMode_ShouldApplyNextMode(ERepeatMode current, ERepeatMode expected)
+    {
+        // Arrange
+        _player.SetupProperty(p => p.RepeatMode, current);
+        PlayerCommandService sut = BuildService();
+
+        // Act
+        sut.CycleRepeatMode();
+
+        // Assert
+        Assert.Equal(expected, _player.Object.RepeatMode);
+    }
+
+    [Theory(DisplayName = "ToggleShuffle should flip the shuffle mode")]
+    [InlineData(false, true)]
+    [InlineData(true, false)]
+    public void ToggleShuffle_ShouldFlipShuffleMode(bool current, bool expected)
+    {
+        // Arrange
+        _player.SetupProperty(p => p.IsShuffleEnabled, current);
+        PlayerCommandService sut = BuildService();
+
+        // Act
+        sut.ToggleShuffle();
+
+        // Assert
+        Assert.Equal(expected, _player.Object.IsShuffleEnabled);
+    }
+
     [Theory(DisplayName = "Toggle should pause when playing and play otherwise")]
     [InlineData(EPlaybackState.Playing, false, true)]
     [InlineData(EPlaybackState.Paused, true, false)]

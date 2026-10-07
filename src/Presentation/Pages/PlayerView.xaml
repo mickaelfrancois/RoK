@@ -330,6 +330,11 @@
 
             <!-- Player commands -->
             <StackPanel Grid.Row="0" Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Center">
+                <AppBarToggleButton Command="{x:Bind ViewModel.ToggleShuffleCommand}" IsChecked="{x:Bind ViewModel.IsShuffleEnabled, Mode=OneWay}" ToolTipService.ToolTip="{x:Bind ViewModel.ShuffleToolTip, Mode=OneWay}" AutomationProperties.Name="{x:Bind ViewModel.ShuffleToolTip, Mode=OneWay}" Visibility="{x:Bind ViewModel.IsRadioMode, Mode=OneWay, Converter={StaticResource BoolToInvertVisibilityConverter}}" Foreground="White" RequestedTheme="Dark" VerticalAlignment="Center" Width="40" Margin="0">
+                    <AppBarToggleButton.Icon>
+                        <SymbolIcon Symbol="Shuffle" />
+                    </AppBarToggleButton.Icon>
+                </AppBarToggleButton>
                 <AppBarButton Icon="Previous" Command="{x:Bind ViewModel.SkipPreviousCommand}" IsEnabled="{x:Bind ViewModel.CanSkipPrevious, Mode=OneWay}" Foreground="White" RequestedTheme="Dark" VerticalAlignment="Center" Width="40" Margin="0" />
                 <Grid VerticalAlignment="Center" Margin="10,0,0,0">
                     <Border x:Name="sleepModeHalo"
@@ -346,6 +351,11 @@
                     </AppBarButton>
                 </Grid>
                 <AppBarButton Icon="Next" Command="{x:Bind ViewModel.SkipNextCommand}" IsEnabled="{x:Bind ViewModel.CanSkipNext, Mode=OneWay}" Foreground="White" RequestedTheme="Dark" VerticalAlignment="Center" Width="40" Margin="10,0,0,0" />
+                <AppBarToggleButton Command="{x:Bind ViewModel.CycleRepeatModeCommand}" IsChecked="{x:Bind ViewModel.IsRepeatActive, Mode=OneWay}" ToolTipService.ToolTip="{x:Bind ViewModel.RepeatToolTip, Mode=OneWay}" AutomationProperties.Name="{x:Bind ViewModel.RepeatToolTip, Mode=OneWay}" Visibility="{x:Bind ViewModel.IsRadioMode, Mode=OneWay, Converter={StaticResource BoolToInvertVisibilityConverter}}" Foreground="White" RequestedTheme="Dark" VerticalAlignment="Center" Width="40" Margin="10,0,0,0">
+                    <AppBarToggleButton.Icon>
+                        <SymbolIcon Symbol="{x:Bind ViewModel.RepeatMode, Mode=OneWay, Converter={StaticResource RepeatModeToSymbolConverter}}" />
+                    </AppBarToggleButton.Icon>
+                </AppBarToggleButton>
             </StackPanel>
         </Grid>
 

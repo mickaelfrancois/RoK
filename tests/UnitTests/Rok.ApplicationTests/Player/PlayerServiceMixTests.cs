@@ -592,12 +592,74 @@ public class PlayerServiceMixTests
         PlayerService sut = BuildLoadedService(BuildTrack(1), BuildTrack(2));
 
         // Act
-        sut.IsLoopingEnabled = true;
+        sut.RepeatMode = ERepeatMode.All;
         staleOutro.SetResult(new OutroCues(MusicEnd - 8, 0));
 
         // Assert
         _engine.Verify(o => o.SetTransitionCue(1, MusicEnd - 8 - SliderSeconds), Times.Never);
         _engine.Verify(o => o.SetTransitionCue(1, MusicEnd - SliderSeconds), Times.Once);
+    }
+
+    [Fact(DisplayName = "repeat_one_never_prepares_a_mix_transition")]
+    public void Repeat_one_never_prepares_a_mix_transition()
+    {
+        // Arrange
+        PlayerService sut = BuildService();
+        sut.RepeatMode = ERepeatMode.One;
+
+        // Act
+        sut.LoadPlaylist([BuildTrack(1), BuildTrack(2)]);
+        RaiseCue();
+
+        // Assert
+        VerifyCueSet(Times.Never());
+        _cues.Verify(c => c.GetIntroAsync(It.IsAny<TrackDto>(), It.IsAny<CancellationToken>()), Times.Never);
+        VerifyMixCrossfade(Times.Never());
+    }
+
+    [Fact(DisplayName = "switching_to_repeat_one_during_a_slow_mix_preparation_drops_the_plan")]
+    public void Switching_to_repeat_one_during_a_slow_mix_preparation_drops_the_plan()
+    {
+        // Arrange
+        TaskCompletionSource<OutroCues?> slowOutro = new();
+        _cues.Setup(c => c.GetOutroAsync(It.IsAny<TrackDto>(), It.IsAny<CancellationToken>())).Returns(slowOutro.Task);
+        PlayerService sut = BuildLoadedService(BuildTrack(1), BuildTrack(2));
+
+        // Act
+        sut.RepeatMode = ERepeatMode.One;
+        slowOutro.SetResult(new OutroCues(MusicEnd, 0));
+
+        // Assert
+        VerifyCueSet(Times.Never());
+    }
+
+    [Fact(DisplayName = "leaving_repeat_one_prepares_the_mix_for_the_next_track_again")]
+    public void Leaving_repeat_one_prepares_the_mix_for_the_next_track_again()
+    {
+        // Arrange
+        PlayerService sut = BuildService();
+        sut.RepeatMode = ERepeatMode.One;
+        sut.LoadPlaylist([BuildTrack(1), BuildTrack(2)]);
+
+        // Act
+        sut.RepeatMode = ERepeatMode.Off;
+
+        // Assert
+        _engine.Verify(o => o.SetTransitionCue(1, MusicEnd - SliderSeconds), Times.Once);
+    }
+
+    [Fact(DisplayName = "when_shuffle_changes_the_imminent_track_the_mix_is_prepared_again")]
+    public void Changing_the_imminent_track_through_shuffle_prepares_the_mix_again()
+    {
+        // Arrange
+        PlayerService sut = BuildLoadedService([.. Enumerable.Range(1, 40).Select(i => BuildTrack(i))]);
+
+        // Act
+        sut.IsShuffleEnabled = true;
+
+        // Assert
+        bool imminentChanged = sut.GetQueue()[0].Id != 2;
+        VerifyCueSet(imminentChanged ? Times.Exactly(2) : Times.Once());
     }
 
     [Fact(DisplayName = "cancelled_crossfade_does_not_reset_the_running_flag_of_the_next_one")]

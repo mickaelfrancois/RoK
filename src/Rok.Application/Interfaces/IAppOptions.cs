@@ -41,6 +41,12 @@ public interface IAppOptions
 
     EAudioOutputMode OutputMode { get; set; }
 
+    /// <summary>Repeat mode of the player, restored at startup.</summary>
+    ERepeatMode RepeatMode { get; set; }
+
+    /// <summary>Whether the reversible shuffle is enabled, restored at startup.</summary>
+    bool ShuffleEnabled { get; set; }
+
     bool IsGridView { get; set; }
 
     bool PauseOnCall { get; set; }

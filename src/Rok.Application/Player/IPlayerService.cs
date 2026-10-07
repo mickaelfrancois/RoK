@@ -21,7 +21,18 @@ public interface IPlayerService
 
     bool IsBuffering { get; }
 
-    bool IsLoopingEnabled { get; set; }
+    /// <summary>
+    /// Repeat mode. <see cref="ERepeatMode.All"/> loops the queue; <see cref="ERepeatMode.One"/> restarts the current track
+    /// when it ends naturally (no gapless, crossfade or mix transition is prepared), while manual next/previous
+    /// behave as with <see cref="ERepeatMode.Off"/>.
+    /// </summary>
+    ERepeatMode RepeatMode { get; set; }
+
+    /// <summary>
+    /// Reversible shuffle. Enabling shuffles the upcoming tracks and remembers the original order;
+    /// disabling restores it around the current track without reloading it.
+    /// </summary>
+    bool IsShuffleEnabled { get; set; }
 
     bool IsMuted { get; set; }
 
@@ -62,6 +73,9 @@ public interface IPlayerService
 
     void Stop(bool firePlaybackStateChange);
 
+    /// <summary>
+    /// One-off reshuffle of the upcoming tracks. Does not enable <see cref="IsShuffleEnabled"/>.
+    /// </summary>
     void ShuffleTracks();
 
     List<TrackDto> GetQueue();

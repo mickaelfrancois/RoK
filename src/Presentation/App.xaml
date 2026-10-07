@@ -33,6 +33,7 @@
             <converters:TimeSpanToDoubleConverter x:Key="TimeSpanToDoubleConverter" />
             <converters:BoolToInvertVisibilityConverter x:Key="BoolToInvertVisibilityConverter" />
             <converters:PlaybackStateToButtonIconConverter x:Key="PlaybackStateToButtonIconConverter" />
+            <converters:RepeatModeToSymbolConverter x:Key="RepeatModeToSymbolConverter" />
             <converters:VolumeToGlyphConverter x:Key="VolumeToGlyphConverter" />
             <converters:GridListIconConverter x:Key="GridListIconConverter" />
             <converters:BoolToOpacityConverter x:Key="BoolToOpacityConverter" />

@@ -142,16 +142,16 @@ public sealed partial class PlayerView : UserControl
     {
         args.Handled = true;
 
-        IPlayerService playerService = App.ServiceProvider.GetRequiredService<IPlayerService>();
-        playerService.ShuffleTracks();
+        if (ViewModel?.ToggleShuffleCommand?.CanExecute(null) == true)
+            ViewModel.ToggleShuffleCommand.Execute(null);
     }
 
     private void OnRepeatAccelerator(KeyboardAccelerator sender, KeyboardAcceleratorInvokedEventArgs args)
     {
         args.Handled = true;
 
-        if (ViewModel != null)
-            ViewModel.RepeatAll = !ViewModel.RepeatAll;
+        if (ViewModel?.CycleRepeatModeCommand?.CanExecute(null) == true)
+            ViewModel.CycleRepeatModeCommand.Execute(null);
     }
 
     private void OnSeekForwardAccelerator(KeyboardAccelerator sender, KeyboardAcceleratorInvokedEventArgs args)

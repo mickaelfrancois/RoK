@@ -218,4 +218,35 @@ public class TracksRandomizerTests
         List<long> shuffledIds = tracks.Select(track => track.Id).ToList();
         Assert.NotEqual(new List<long> { 1, 2, 3, 4, 5 }, shuffledIds);
     }
+
+    [Fact(DisplayName = "when_a_start_track_is_given_shuffle_for_playback_puts_it_first_and_keeps_every_track")]
+    public void ShuffleForPlayback_ShouldPutStartTrackFirst()
+    {
+        // Arrange
+        List<TrackDto> playlist = Enumerable.Range(1, 10).Select(i => new TrackDto { Id = i, ArtistName = $"Artist {i % 3}" }).ToList();
+        TrackDto start = playlist[6];
+
+        // Act
+        TracksRandomizer.ShuffleForPlayback(playlist, start, new Random(42));
+
+        // Assert
+        Assert.Same(start, playlist[0]);
+        Assert.Equal(Enumerable.Range(1, 10).Select(i => (long)i), playlist.Select(track => track.Id).Order());
+    }
+
+    [Fact(DisplayName = "when_no_start_track_is_given_shuffle_for_playback_keeps_every_track_and_is_seed_deterministic")]
+    public void ShuffleForPlayback_WithoutStartTrack_ShouldBeDeterministicForASeed()
+    {
+        // Arrange
+        List<TrackDto> first = Enumerable.Range(1, 10).Select(i => new TrackDto { Id = i, ArtistName = $"Artist {i % 3}" }).ToList();
+        List<TrackDto> second = [.. first];
+
+        // Act
+        TracksRandomizer.ShuffleForPlayback(first, null, new Random(7));
+        TracksRandomizer.ShuffleForPlayback(second, null, new Random(7));
+
+        // Assert
+        Assert.Equal(first.Select(track => track.Id), second.Select(track => track.Id));
+        Assert.Equal(Enumerable.Range(1, 10).Select(i => (long)i), first.Select(track => track.Id).Order());
+    }
 }

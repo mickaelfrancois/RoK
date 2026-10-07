@@ -138,7 +138,7 @@ public class PlayerServiceCrossfadeTests
         SetCrossfadeDelay(5);
         PlayerService sut = BuildService();
         sut.LoadPlaylist(new List<TrackDto> { BuildTrack(1), BuildTrack(2) });
-        sut.IsLoopingEnabled = true;
+        sut.RepeatMode = ERepeatMode.All;
         sut.Next();
         _engine.Invocations.Clear();
 

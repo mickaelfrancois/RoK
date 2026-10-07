@@ -125,6 +125,26 @@ public class PlayerStatusRouteHandlerTests
             second.GetProperty("queueSignature").GetInt64());
     }
 
+    [Theory(DisplayName = "HandleAsync should expose the repeat mode, the legacy looping flag and the shuffle flag")]
+    [InlineData(ERepeatMode.Off, "Off", false, false)]
+    [InlineData(ERepeatMode.All, "All", true, true)]
+    [InlineData(ERepeatMode.One, "One", true, false)]
+    public async Task HandleAsync_ShouldExposeRepeatAndShuffleModes(ERepeatMode mode, string expectedName, bool expectedLooping, bool shuffle)
+    {
+        // Arrange
+        _playerService.SetupGet(p => p.RepeatMode).Returns(mode);
+        _playerService.SetupGet(p => p.IsShuffleEnabled).Returns(shuffle);
+        PlayerStatusRouteHandler sut = BuildHandler();
+
+        // Act
+        JsonElement status = await ReadStatusAsync(sut);
+
+        // Assert
+        Assert.Equal(expectedName, status.GetProperty("repeatMode").GetString());
+        Assert.Equal(expectedLooping, status.GetProperty("isLooping").GetBoolean());
+        Assert.Equal(shuffle, status.GetProperty("isShuffleEnabled").GetBoolean());
+    }
+
     private static async Task<JsonElement> ReadStatusAsync(PlayerStatusRouteHandler handler)
     {
         WebApiResult result = await handler.HandleAsync("/api/player/status");

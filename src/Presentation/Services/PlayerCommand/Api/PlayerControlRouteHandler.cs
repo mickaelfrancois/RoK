@@ -30,8 +30,8 @@ public sealed class PlayerControlRouteHandler(IPlayerCommandService commandServi
             "next" => commandService.Next,
             "previous" => commandService.Previous,
             "mute" => commandService.ToggleMute,
-            "shuffle" => commandService.Shuffle,
-            "loop" => commandService.ToggleLoop,
+            "shuffle" => commandService.ToggleShuffle,
+            "loop" => commandService.CycleRepeatMode,
             _ => null
         };
 

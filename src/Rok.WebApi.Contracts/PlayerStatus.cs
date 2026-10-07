@@ -11,7 +11,9 @@ namespace Rok.WebApi.Contracts;
 /// <param name="CanNext">Whether a next track is available.</param>
 /// <param name="CanPrevious">Whether a previous track is available.</param>
 /// <param name="CanSeek">Whether the current source supports seeking.</param>
-/// <param name="IsLooping">Whether looping is enabled.</param>
+/// <param name="IsLooping">Kept for compatibility with older companions: <c>true</c> when <paramref name="RepeatMode"/> is not <c>Off</c>.</param>
+/// <param name="RepeatMode">The repeat mode name (<c>Off</c>, <c>All</c> or <c>One</c>); <c>null</c> when sent by an older desktop.</param>
+/// <param name="IsShuffleEnabled">Whether the reversible shuffle mode is enabled.</param>
 /// <param name="IsBuffering">Whether the engine is currently buffering.</param>
 /// <param name="QueueLength">The number of tracks currently loaded in the queue.</param>
 /// <param name="QueueSignature">
@@ -30,6 +32,8 @@ public sealed record PlayerStatus(
     bool CanPrevious,
     bool CanSeek,
     bool IsLooping,
+    string? RepeatMode,
+    bool IsShuffleEnabled,
     bool IsBuffering,
     int QueueLength,
     long QueueSignature,

@@ -48,6 +48,10 @@ public class AppOptions : IAppOptions
 
     public EAudioOutputMode OutputMode { get; set; } = EAudioOutputMode.Shared;
 
+    public ERepeatMode RepeatMode { get; set; } = ERepeatMode.Off;
+
+    public bool ShuffleEnabled { get; set; }
+
     public bool IsGridView { get; set; } = true;
 
     public bool PauseOnCall { get; set; } = true;
@@ -151,6 +155,8 @@ public class AppOptions : IAppOptions
         ReplayGainPreampDb = options.ReplayGainPreampDb;
         OutputDeviceId = options.OutputDeviceId;
         OutputMode = options.OutputMode;
+        RepeatMode = options.RepeatMode;
+        ShuffleEnabled = options.ShuffleEnabled;
         WebApiPort = options.WebApiPort;
         EnableWebApi = options.EnableWebApi;
         WebApiAllowLan = options.WebApiAllowLan;

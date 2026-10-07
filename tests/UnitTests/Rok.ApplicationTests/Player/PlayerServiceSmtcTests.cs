@@ -126,7 +126,7 @@ public class PlayerServiceSmtcTests
             timeProvider: time, messenger: new Messenger(), mixCues: Mock.Of<IMixCueProvider>(), logger: NullLogger<PlayerService>.Instance);
 
         sut.LoadPlaylist(new List<TrackDto> { onlyTrack });
-        sut.IsLoopingEnabled = false;
+        sut.RepeatMode = ERepeatMode.Off;
 
         smtc.Invocations.Clear();
 
