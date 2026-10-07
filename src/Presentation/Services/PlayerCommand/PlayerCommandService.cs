@@ -27,9 +27,9 @@ public sealed class PlayerCommandService(IPlayerService playerService, IMediator
 
     public void SetVolume(double volume) => playerService.Volume = Math.Clamp(volume, 0, 100);
 
-    public void Shuffle() => playerService.ShuffleTracks();
+    public void ToggleShuffle() => playerService.IsShuffleEnabled = !playerService.IsShuffleEnabled;
 
-    public void ToggleLoop() => playerService.IsLoopingEnabled = !playerService.IsLoopingEnabled;
+    public void CycleRepeatMode() => playerService.RepeatMode = RepeatModeCycle.Next(playerService.RepeatMode);
 
 
     public void Seek(double positionSeconds)

@@ -80,7 +80,11 @@ public sealed class PlayerService : IPlayerService, IDisposable
 
     private TrackDto? _invalidatedGapless;
 
-    private bool _isLoopingEnabled;
+    private ERepeatMode _repeatMode;
+
+    private bool _isShuffleEnabled;
+
+    private readonly OriginalQueueOrder _originalOrder = new();
 
     private MixPlan? _mixPlan;
 
@@ -90,20 +94,89 @@ public sealed class PlayerService : IPlayerService, IDisposable
 
     private long _crossfadeGeneration;
 
-    public bool IsLoopingEnabled
+    public ERepeatMode RepeatMode
     {
-        get => _isLoopingEnabled;
+        get
+        {
+            lock (_transitionLock)
+            {
+                return _repeatMode;
+            }
+        }
         set
         {
-            if (_isLoopingEnabled == value)
-                return;
+            TrackDto? imminentBefore;
 
-            _isLoopingEnabled = value;
+            lock (_transitionLock)
+            {
+                if (_repeatMode == value)
+                    return;
 
-            _messenger.Send(new LoopingChanged(value));
+                imminentBefore = PeekNextLocked();
+                _repeatMode = value;
+            }
 
-            if (CurrentTrack != null)
+            _appOptions.RepeatMode = value;
+            _messenger.Send(new RepeatModeChanged(value));
+
+            if (PeekNext()?.Id != imminentBefore?.Id)
+            {
+                InvalidatePendingTransition();
                 RequestMixPreparation();
+            }
+            else if (CurrentTrack != null)
+            {
+                RequestMixPreparation();
+            }
+        }
+    }
+
+    public bool IsShuffleEnabled
+    {
+        get
+        {
+            lock (_transitionLock)
+            {
+                return _isShuffleEnabled;
+            }
+        }
+        set
+        {
+            TrackDto? imminentBefore;
+
+            lock (_transitionLock)
+            {
+                if (_isShuffleEnabled == value)
+                    return;
+
+                imminentBefore = PeekNextLocked();
+                _isShuffleEnabled = value;
+
+                if (value)
+                {
+                    _originalOrder.Capture(Playlist);
+                    TracksRandomizer.ArtistBalancedTrackRandomize(Playlist, _currentIndex);
+                }
+                else
+                {
+                    TrackDto? current = _currentIndex >= 0 && _currentIndex < Playlist.Count ? Playlist[_currentIndex] : null;
+                    (List<TrackDto> order, int currentIndex) = _originalOrder.Restore(Playlist, current);
+
+                    Playlist = order;
+
+                    if (current != null)
+                        _currentIndex = currentIndex;
+
+                    _originalOrder.Clear();
+                }
+            }
+
+            _appOptions.ShuffleEnabled = value;
+            _messenger.Send(new ShuffleModeChanged(value));
+
+            InvalidateIfImminentChanged(imminentBefore);
+
+            _messenger.Send(new PlaylistChanged(Playlist));
         }
     }
 
@@ -177,7 +250,7 @@ public sealed class PlayerService : IPlayerService, IDisposable
             if (_mode == EPlaybackMode.Radio)
                 return false;
 
-            if (IsLoopingEnabled)
+            if (RepeatMode == ERepeatMode.All)
                 return true;
 
             return _currentIndex + 1 < Playlist.Count;
@@ -194,7 +267,7 @@ public sealed class PlayerService : IPlayerService, IDisposable
             if (_player.Position > RestartThresholdSeconds)
                 return true;
 
-            if (IsLoopingEnabled)
+            if (RepeatMode == ERepeatMode.All)
                 return true;
 
             return _currentIndex - 1 >= 0;
@@ -231,7 +304,8 @@ public sealed class PlayerService : IPlayerService, IDisposable
         _messenger = Guard.NotNull(messenger, nameof(messenger));
         _mixCues = Guard.NotNull(mixCues, nameof(mixCues));
         _logger = Guard.NotNull(logger, nameof(logger));
-
+        _repeatMode = _appOptions.RepeatMode;
+        _isShuffleEnabled = _appOptions.ShuffleEnabled;
 
         _discordService?.Initialize();
 
@@ -346,7 +420,31 @@ public sealed class PlayerService : IPlayerService, IDisposable
         if (CurrentTrack != null)
             _messenger.Send(new MediaEvent(EPlaybackState.Stopped, CurrentTrack));
 
+        if (RepeatMode == ERepeatMode.One && CurrentTrack != null)
+        {
+            ReplayCurrentTrack();
+
+            return;
+        }
+
         Next();
+    }
+
+    private void ReplayCurrentTrack()
+    {
+        CancelCrossfade();
+
+        int index;
+
+        lock (_transitionLock)
+        {
+            index = _currentIndex;
+        }
+
+        if (TryLoadFirstReadable(index, 1))
+            Play();
+        else
+            StopAfterUnreadable();
     }
 
     private void OnMediaChanged(object? sender, EventArgs e)
@@ -724,8 +822,19 @@ public sealed class PlayerService : IPlayerService, IDisposable
 
         lock (_transitionLock)
         {
-            Playlist = tracks;
             _currentIndex = 0;
+
+            if (_isShuffleEnabled)
+            {
+                Playlist = [.. tracks];
+                _originalOrder.Capture(Playlist);
+                TracksRandomizer.ShuffleForPlayback(Playlist, startTrack);
+            }
+            else
+            {
+                Playlist = tracks;
+                _originalOrder.Clear();
+            }
         }
 
         _currentTrack = null;
@@ -833,6 +942,19 @@ public sealed class PlayerService : IPlayerService, IDisposable
             imminentBefore = PeekNextLocked();
 
             Playlist.AddRange(tracks);
+
+            if (_isShuffleEnabled)
+            {
+                if (hasTracks)
+                {
+                    _originalOrder.Append(tracks);
+                }
+                else
+                {
+                    _originalOrder.Capture(Playlist);
+                    TracksRandomizer.ShuffleForPlayback(Playlist, null);
+                }
+            }
         }
 
         if (!hasTracks)
@@ -865,7 +987,22 @@ public sealed class PlayerService : IPlayerService, IDisposable
 
             imminentBefore = PeekNextLocked();
 
+            TrackDto? anchor = index.Value > 0 ? Playlist[index.Value - 1] : null;
+
             Playlist.InsertRange(index.Value, itemsToInsert);
+
+            if (_isShuffleEnabled)
+            {
+                if (hasTracks)
+                {
+                    _originalOrder.InsertAfter(anchor, itemsToInsert);
+                }
+                else
+                {
+                    _originalOrder.Capture(Playlist);
+                    TracksRandomizer.ShuffleForPlayback(Playlist, null);
+                }
+            }
         }
 
         if (!hasTracks)
@@ -991,7 +1128,7 @@ public sealed class PlayerService : IPlayerService, IDisposable
         {
             if (_currentIndex + 1 < Playlist.Count)
                 candidate = _currentIndex + 1;
-            else if (IsLoopingEnabled && Playlist.Count > 0)
+            else if (_repeatMode == ERepeatMode.All && Playlist.Count > 0)
                 candidate = 0;
         }
 
@@ -1027,7 +1164,7 @@ public sealed class PlayerService : IPlayerService, IDisposable
         {
             if (_currentIndex - 1 >= 0)
                 candidate = _currentIndex - 1;
-            else if (IsLoopingEnabled && Playlist.Count > 0)
+            else if (_repeatMode == ERepeatMode.All && Playlist.Count > 0)
                 candidate = Playlist.Count - 1;
         }
 
@@ -1068,6 +1205,7 @@ public sealed class PlayerService : IPlayerService, IDisposable
         lock (_transitionLock)
         {
             Playlist.Clear();
+            _originalOrder.Clear();
         }
 
         _currentTrack = null;
@@ -1149,7 +1287,7 @@ public sealed class PlayerService : IPlayerService, IDisposable
 
             index += step;
 
-            if (IsLoopingEnabled)
+            if (RepeatMode == ERepeatMode.All)
                 index = ((index % budget) + budget) % budget;
         }
 
@@ -1298,10 +1436,13 @@ public sealed class PlayerService : IPlayerService, IDisposable
     {
         nextIndex = _currentIndex + 1;
 
+        if (_repeatMode == ERepeatMode.One)
+            return false;
+
         if (nextIndex < Playlist.Count)
             return true;
 
-        if (!IsLoopingEnabled)
+        if (_repeatMode != ERepeatMode.All || Playlist.Count == 0)
             return false;
 
         nextIndex = 0;

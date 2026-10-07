@@ -2497,4 +2497,19 @@
   <data name="taskbarThumbNext" xml:space="preserve">
     <value>Next</value>
   </data>
+  <data name="playerShuffleOn" xml:space="preserve">
+    <value>Shuffle on</value>
+  </data>
+  <data name="playerShuffleOff" xml:space="preserve">
+    <value>Shuffle off</value>
+  </data>
+  <data name="playerRepeatOff" xml:space="preserve">
+    <value>Repeat off</value>
+  </data>
+  <data name="playerRepeatAll" xml:space="preserve">
+    <value>Repeat all</value>
+  </data>
+  <data name="playerRepeatOne" xml:space="preserve">
+    <value>Repeat one</value>
+  </data>
 </root>

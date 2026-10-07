@@ -71,8 +71,8 @@ public class ThumbBarControllerTests
         _host.Verify(h => h.Apply(It.Is<ThumbBarState>(s => s.IsNextEnabled)), Times.Once);
     }
 
-    [Fact(DisplayName = "looping_change_refreshes_previous_and_next")]
-    public void LoopingChanged_RefreshesPreviousAndNext()
+    [Fact(DisplayName = "repeat_mode_change_refreshes_previous_and_next")]
+    public void RepeatModeChanged_RefreshesPreviousAndNext()
     {
         // Arrange
         _player.SetupGet(p => p.CanNext).Returns(false);
@@ -83,7 +83,7 @@ public class ThumbBarControllerTests
         _player.SetupGet(p => p.CanPrevious).Returns(true);
 
         // Act
-        _messenger.Send(new LoopingChanged(true));
+        _messenger.Send(new RepeatModeChanged(ERepeatMode.All));
 
         // Assert
         _host.Verify(h => h.Apply(It.Is<ThumbBarState>(s => s.IsNextEnabled && s.IsPreviousEnabled)), Times.Once);
@@ -131,7 +131,7 @@ public class ThumbBarControllerTests
         sut.Start();
 
         // Act
-        _messenger.Send(new LoopingChanged(true));
+        _messenger.Send(new RepeatModeChanged(ERepeatMode.All));
         _messenger.Send(new MediaStateChanged(EPlaybackState.Stopped));
 
         // Assert

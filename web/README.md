@@ -145,6 +145,11 @@ pour le companion terminal. Le companion web utilise l'espace `/api/` :
 | POST | `/api/surprise/artist` | tire un artiste au hasard et joue son catalogue mélangé |
 | GET | `/current/album-cover` | pochette de la piste courante |
 
+`shuffle` bascule le mode aléatoire réversible : le désactiver restaure l’ordre d’origine de la file
+en gardant la piste en cours. `loop` fait tourner le mode de répétition `Off` → `All` → `One` → `Off`.
+`/api/player/status` expose `repeatMode` (`Off`, `All` ou `One`) et `isShuffleEnabled` ;
+`isLooping` reste présent pour compatibilité et vaut `true` dès que `repeatMode` n’est pas `Off`.
+
 Les deux routes `surprise` répondent avec ce qui a été tiré (`kind`, `name`, `artistName`,
 `trackCount`) et reproduisent exactement la commande du bureau : un album garde son ordre de pistes,
 un artiste est mélangé. Un tirage tombant sur une entrée sans piste en retente une autre, puis

@@ -100,6 +100,32 @@ public class AppOptionsTests
         Assert.True(target.MixMode);
     }
 
+    [Fact(DisplayName = "player_modes_default_to_repeat_off_and_shuffle_disabled")]
+    public void PlayerModes_DefaultToRepeatOffAndShuffleDisabled()
+    {
+        // Act
+        AppOptions options = new();
+
+        // Assert
+        Assert.Equal(ERepeatMode.Off, options.RepeatMode);
+        Assert.False(options.ShuffleEnabled);
+    }
+
+    [Fact(DisplayName = "copy_from_preserves_player_modes")]
+    public void CopyFrom_PreservesPlayerModes()
+    {
+        // Arrange
+        AppOptions source = new() { RepeatMode = ERepeatMode.One, ShuffleEnabled = true };
+        AppOptions target = new();
+
+        // Act
+        target.CopyFrom(source);
+
+        // Assert
+        Assert.Equal(ERepeatMode.One, target.RepeatMode);
+        Assert.True(target.ShuffleEnabled);
+    }
+
     [Fact(DisplayName = "copy_from_copies_every_interface_property")]
     public void CopyFrom_CopiesEveryInterfaceProperty()
     {

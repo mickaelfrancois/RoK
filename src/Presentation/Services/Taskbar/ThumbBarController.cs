@@ -47,7 +47,7 @@ public sealed class ThumbBarController : IDisposable
         _subscriptions.Add(_messenger.Subscribe<MediaChangedMessage>(_ => RequestRefresh()));
         _subscriptions.Add(_messenger.Subscribe<PlaylistChanged>(_ => RequestRefresh()));
         _subscriptions.Add(_messenger.Subscribe<RadioStationChanged>(_ => RequestRefresh()));
-        _subscriptions.Add(_messenger.Subscribe<LoopingChanged>(_ => RequestRefresh()));
+        _subscriptions.Add(_messenger.Subscribe<RepeatModeChanged>(_ => RequestRefresh()));
         _host.ButtonClicked += OnButtonClicked;
 
         RequestRefresh();

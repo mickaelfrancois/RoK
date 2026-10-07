@@ -324,6 +324,55 @@ public class SettingsFileServiceTests
         Assert.False(restored.MixMode);
     }
 
+    [Fact(DisplayName = "player_modes_survive_save_load_and_copy")]
+    public async Task PlayerModes_SurviveSaveLoadAndCopy()
+    {
+        // Arrange
+        AppOptions options = new() { RepeatMode = ERepeatMode.One, ShuffleEnabled = true };
+        string? capturedJson = null;
+
+        Mock<IFileSystem> fs = CreateFileSystemMock();
+        fs.Setup(f => f.WriteAllTextAsync(SettingsFilePath, It.IsAny<string>(), It.IsAny<CancellationToken>()))
+            .Callback<string, string, CancellationToken>((_, json, _) => capturedJson = json)
+            .Returns(Task.CompletedTask);
+        fs.Setup(f => f.FileExists(SettingsFilePath)).Returns(true);
+        fs.Setup(f => f.ReadAllTextAsync(SettingsFilePath, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(() => capturedJson!);
+        SettingsFileService sut = new(ApplicationPath, CreateFolderResolverMock().Object, fs.Object);
+
+        // Act
+        await sut.SaveAsync(options);
+        IAppOptions? loaded = await sut.LoadAsync<AppOptions>();
+        AppOptions restored = new();
+        restored.CopyFrom(loaded!);
+
+        // Assert
+        Assert.Equal(ERepeatMode.One, restored.RepeatMode);
+        Assert.True(restored.ShuffleEnabled);
+    }
+
+    [Fact(DisplayName = "settings_without_player_modes_load_them_as_off_and_disabled")]
+    public async Task SettingsWithoutPlayerModes_LoadThemAsOffAndDisabled()
+    {
+        // Arrange
+        const string legacyJson = """{ "CrossFade": true }""";
+
+        Mock<IFileSystem> fs = CreateFileSystemMock();
+        fs.Setup(f => f.FileExists(SettingsFilePath)).Returns(true);
+        fs.Setup(f => f.ReadAllTextAsync(SettingsFilePath, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(legacyJson);
+        SettingsFileService sut = new(ApplicationPath, CreateFolderResolverMock().Object, fs.Object);
+
+        // Act
+        IAppOptions? loaded = await sut.LoadAsync<AppOptions>();
+        AppOptions restored = new();
+        restored.CopyFrom(loaded!);
+
+        // Assert
+        Assert.Equal(ERepeatMode.Off, restored.RepeatMode);
+        Assert.False(restored.ShuffleEnabled);
+    }
+
     [Fact(DisplayName = "output_options_survive_save_load_and_copy")]
     public async Task OutputOptions_SurviveSaveLoadAndCopy()
     {

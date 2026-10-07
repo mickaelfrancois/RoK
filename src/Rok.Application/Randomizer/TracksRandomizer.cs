@@ -56,6 +56,23 @@ public static class TracksRandomizer
     }
 
 
+    public static void ShuffleForPlayback(List<TrackDto> playlist, TrackDto? startTrack, Random? random = null)
+    {
+        if (playlist == null || playlist.Count == 0)
+            return;
+
+        random ??= Random.Shared;
+
+        int headIndex = startTrack == null ? -1 : playlist.FindIndex(track => track.Id == startTrack.Id);
+
+        if (headIndex < 0)
+            headIndex = random.Next(playlist.Count);
+
+        (playlist[0], playlist[headIndex]) = (playlist[headIndex], playlist[0]);
+
+        ArtistBalancedTrackRandomize(playlist, 0, random);
+    }
+
     public static void Randomize(List<TrackDto> tracks, Random? random = null)
     {
         if (tracks == null || tracks.Count <= 1)

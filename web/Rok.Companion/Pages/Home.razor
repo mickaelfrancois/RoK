@@ -56,11 +56,11 @@
     </section>
 
     <section class="transport">
-        <button type="button" class="@(_status?.IsLooping == true ? "ghost active" : "ghost")" title="Répéter" @onclick="OnToggleLoopAsync">&#8635;</button>
+        <button type="button" class="@(IsRepeatActive ? "ghost active" : "ghost")" title="@RepeatTitle" @onclick="OnCycleRepeatAsync">@(IsRepeatOne ? "🔂" : "🔁")</button>
         <button type="button" class="ghost" title="Précédent" disabled="@(_status?.CanPrevious != true)" @onclick="OnPreviousAsync">&#9198;</button>
         <button type="button" class="primary" title="Lecture ou pause" @onclick="OnToggleAsync">@(IsPlaying ? "⏸" : "▶")</button>
         <button type="button" class="ghost" title="Suivant" disabled="@(_status?.CanNext != true)" @onclick="OnNextAsync">&#9197;</button>
-        <button type="button" class="ghost" title="Mélanger la file" @onclick="OnShuffleAsync">&#8644;</button>
+        <button type="button" class="@(_status?.IsShuffleEnabled == true ? "ghost active" : "ghost")" title="Lecture aléatoire" @onclick="OnToggleShuffleAsync">&#8644;</button>
     </section>
 
     <section class="volume">
@@ -287,17 +287,36 @@
 
     private Task OnPreviousAsync() => Api.PreviousAsync();
 
-    /// <summary>Reorders the queue, then pulls it back so the new order shows without waiting for a poll.</summary>
-    private async Task OnShuffleAsync()
+    /// <summary>Toggles the shuffle mode, then pulls status and queue back so the new order shows without waiting for a poll.</summary>
+    private async Task OnToggleShuffleAsync()
     {
-        if (!await Api.ShuffleAsync())
+        if (!await Api.ToggleShuffleAsync())
             return;
 
         await RefreshStatusAsync();
         await RefreshQueueAsync();
     }
 
-    private Task OnToggleLoopAsync() => Api.ToggleLoopAsync();
+    /// <summary>Cycles the repeat mode, then pulls the status back so the button reflects it at once.</summary>
+    private async Task OnCycleRepeatAsync()
+    {
+        if (!await Api.CycleRepeatAsync())
+            return;
+
+        await RefreshStatusAsync();
+    }
+
+    private bool IsRepeatOne => _status?.RepeatMode == "One";
+
+    private bool IsRepeatActive => _status?.RepeatMode is { } mode ? mode != "Off" : _status?.IsLooping == true;
+
+    private string RepeatTitle => _status?.RepeatMode switch
+    {
+        "One" => "Répéter la piste",
+        "All" => "Répéter la file",
+        "Off" => "Répétition désactivée",
+        _ => "Répéter"
+    };
 
     private Task OnToggleMuteAsync() => Api.ToggleMuteAsync();
 

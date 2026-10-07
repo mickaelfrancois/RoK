@@ -340,7 +340,7 @@ public class PlayerServiceRemovalTests
         TrackDto t2 = BuildTrack(2);
         PlayerService sut = BuildService();
         sut.LoadPlaylist(new List<TrackDto> { t1, t2 });
-        sut.IsLoopingEnabled = true;
+        sut.RepeatMode = ERepeatMode.All;
         sut.Next();
 
         // Act
@@ -359,7 +359,7 @@ public class PlayerServiceRemovalTests
         TrackDto t2 = BuildTrack(2);
         PlayerService sut = BuildService();
         sut.LoadPlaylist(new List<TrackDto> { t1, t2 });
-        sut.IsLoopingEnabled = true;
+        sut.RepeatMode = ERepeatMode.All;
 
         // Act
         sut.Previous();

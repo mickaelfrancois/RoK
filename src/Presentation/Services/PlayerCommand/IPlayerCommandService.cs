@@ -21,11 +21,11 @@ public interface IPlayerCommandService
     /// <summary>Moves the playhead of the current track, in seconds. Does nothing when the source cannot seek.</summary>
     void Seek(double positionSeconds);
 
-    /// <summary>Shuffles the tracks queued after the current one.</summary>
-    void Shuffle();
+    /// <summary>Toggles the reversible shuffle mode.</summary>
+    void ToggleShuffle();
 
-    /// <summary>Turns looping on or off.</summary>
-    void ToggleLoop();
+    /// <summary>Moves to the next repeat mode: off, all, one, then off again.</summary>
+    void CycleRepeatMode();
 
     /// <summary>Restarts playback at the queued track carrying the given identifier. Returns <c>false</c> when it is not queued.</summary>
     bool PlayQueuedTrack(long trackId);

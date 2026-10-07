@@ -2387,4 +2387,19 @@
   <data name="taskbarThumbNext" xml:space="preserve">
     <value>Наступний</value>
   </data>
+  <data name="playerShuffleOn" xml:space="preserve">
+    <value>Випадковий порядок увімкнено</value>
+  </data>
+  <data name="playerShuffleOff" xml:space="preserve">
+    <value>Випадковий порядок вимкнено</value>
+  </data>
+  <data name="playerRepeatOff" xml:space="preserve">
+    <value>Повтор вимкнено</value>
+  </data>
+  <data name="playerRepeatAll" xml:space="preserve">
+    <value>Повторити все</value>
+  </data>
+  <data name="playerRepeatOne" xml:space="preserve">
+    <value>Повторити одну композицію</value>
+  </data>
 </root>

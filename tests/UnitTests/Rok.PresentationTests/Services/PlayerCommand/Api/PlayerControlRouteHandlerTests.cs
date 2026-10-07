@@ -56,8 +56,8 @@ public class PlayerControlRouteHandlerTests
         // Assert
         Assert.Equal(200, shuffle.StatusCode);
         Assert.Equal(200, loop.StatusCode);
-        _commandService.Verify(c => c.Shuffle(), Times.Once);
-        _commandService.Verify(c => c.ToggleLoop(), Times.Once);
+        _commandService.Verify(c => c.ToggleShuffle(), Times.Once);
+        _commandService.Verify(c => c.CycleRepeatMode(), Times.Once);
     }
 
     [Fact(DisplayName = "HandleAsync should read the volume as an invariant number")]

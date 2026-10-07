@@ -36,9 +36,9 @@ public sealed class RokApiClient(HttpClient http)
 
     public Task<bool> ToggleMuteAsync() => PostAsync("api/player/mute");
 
-    public Task<bool> ShuffleAsync() => PostAsync("api/player/shuffle");
+    public Task<bool> ToggleShuffleAsync() => PostAsync("api/player/shuffle");
 
-    public Task<bool> ToggleLoopAsync() => PostAsync("api/player/loop");
+    public Task<bool> CycleRepeatAsync() => PostAsync("api/player/loop");
 
     public Task<bool> SetVolumeAsync(double volume) => PostAsync($"api/player/volume/{Number(volume)}");
 
