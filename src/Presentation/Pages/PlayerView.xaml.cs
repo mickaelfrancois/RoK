@@ -5,6 +5,7 @@ using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media.Animation;
 using Rok.Application.Player;
+using Rok.Commons;
 using Rok.Services.Accessibility;
 using Rok.ViewModels.Player;
 
@@ -17,11 +18,15 @@ public sealed partial class PlayerView : UserControl
 {
     public PlayerViewModel ViewModel { get; set; }
 
+    private const double TitleGap = 12;
+    private const double TitleMinWidth = 100;
+
     private readonly DispatcherTimer _progressionTimer;
     private static readonly SolidColorBrush _haloWarningBrush = new(Colors.Red);
     private static readonly SolidColorBrush _haloDefaultBrush = new(Colors.White);
 
     private Storyboard? _sleepModeStoryboard;
+    private bool _titleWidthUpdatePending;
 
     private readonly IDisposable _mediaChangedSubscription;
 
@@ -56,6 +61,9 @@ public sealed partial class PlayerView : UserControl
     private void OnLoaded(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
     {
         ViewModel.PropertyChanged += OnViewModelPropertyChanged;
+        mainGrid.SizeChanged += OnMainGridSizeChanged;
+        layoutStates.CurrentStateChanged += OnLayoutStateChanged;
+        UpdateTitleMaxWidth();
         SetupSleepModeAnimation();
 
         KeyboardShortcutInstaller installer = App.ServiceProvider.GetRequiredService<KeyboardShortcutInstaller>();
@@ -200,8 +208,51 @@ public sealed partial class PlayerView : UserControl
     private void OnUnloaded(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
     {
         ViewModel.PropertyChanged -= OnViewModelPropertyChanged;
+        mainGrid.SizeChanged -= OnMainGridSizeChanged;
+        layoutStates.CurrentStateChanged -= OnLayoutStateChanged;
         _sleepModeStoryboard?.Stop();
         _mediaChangedSubscription.Dispose();
+    }
+
+    private void OnMainGridSizeChanged(object sender, SizeChangedEventArgs e)
+    {
+        UpdateTitleMaxWidth();
+    }
+
+    private void OnLayoutStateChanged(object sender, VisualStateChangedEventArgs e)
+    {
+        UpdateTitleMaxWidth();
+        ScheduleTitleMaxWidthUpdate();
+    }
+
+    private void ScheduleTitleMaxWidthUpdate()
+    {
+        if (_titleWidthUpdatePending)
+            return;
+
+        _titleWidthUpdatePending = DispatcherQueue.TryEnqueue(DispatcherQueuePriority.Low, () =>
+        {
+            _titleWidthUpdatePending = false;
+            UpdateTitleMaxWidth();
+        });
+    }
+
+    private void UpdateTitleMaxWidth()
+    {
+        if (currentTrack.Visibility != Visibility.Visible || currentTrack.ActualWidth <= 0 || playerButtons.ActualWidth <= 0)
+            return;
+
+        double titleLeft = trackTitle.TransformToVisual(mainGrid).TransformPoint(new Windows.Foundation.Point(0, 0)).X;
+        double controlsLeft = playerButtons.TransformToVisual(mainGrid).TransformPoint(new Windows.Foundation.Point(0, 0)).X;
+        double columnRight = currentTrack.TransformToVisual(mainGrid).TransformPoint(new Windows.Foundation.Point(currentTrack.ActualWidth, 0)).X;
+        double scoreBlockWidth = trackScore.Visibility == Visibility.Visible
+            ? trackScore.ActualWidth + trackScore.Margin.Left
+            : 0;
+
+        double maxWidth = PlayerTitleWidth.Compute(titleLeft, controlsLeft, columnRight, scoreBlockWidth, TitleGap, TitleMinWidth);
+
+        if (double.IsInfinity(trackTitle.MaxWidth) || Math.Abs(trackTitle.MaxWidth - maxWidth) > 1)
+            trackTitle.MaxWidth = maxWidth;
     }
 
     private void SetupSleepModeAnimation()
@@ -230,6 +281,14 @@ public sealed partial class PlayerView : UserControl
 
     private void OnViewModelPropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
     {
+        if (string.IsNullOrEmpty(e.PropertyName)
+            || e.PropertyName == nameof(ViewModel.IsMusicMode)
+            || e.PropertyName == nameof(ViewModel.IsRadioMode)
+            || e.PropertyName == nameof(ViewModel.Mode))
+        {
+            ScheduleTitleMaxWidthUpdate();
+        }
+
         if (e.PropertyName == nameof(ViewModel.IsSleepModeActive))
         {
             if (ViewModel.IsSleepModeActive)

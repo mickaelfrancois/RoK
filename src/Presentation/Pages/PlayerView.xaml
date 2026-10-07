@@ -7,9 +7,11 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:commons="using:Rok.Commons"
              xmlns:controls="using:Rok.Commons"
+             xmlns:converters="using:Rok.Converters"
              mc:Ignorable="d">
 
     <UserControl.Resources>
+        <converters:PlayerBarTintBrushConverter x:Key="PlayerBarTintBrushConverter" FallbackBrush="{StaticResource BrandPrimaryBrush}" />
         <Style x:Key="MiniLinkStyle" TargetType="HyperlinkButton">
             <Setter Property="Background" Value="Transparent"/>
             <Setter Property="Padding" Value="0" />
@@ -153,9 +155,12 @@
 
     </UserControl.Resources>
 
-    <Grid x:Name="mainGrid" HorizontalAlignment="Stretch" Padding="4,4,4,4" ColumnSpacing="12" Background="{ThemeResource BrandPrimaryBrush}">
+    <Grid x:Name="mainGrid" HorizontalAlignment="Stretch" Padding="4,4,4,4" ColumnSpacing="12" Background="{x:Bind ViewModel.BarTintColor, Mode=OneWay, Converter={StaticResource PlayerBarTintBrushConverter}}">
+        <Grid.BackgroundTransition>
+            <BrushTransition Duration="0:0:0.3" />
+        </Grid.BackgroundTransition>
         <VisualStateManager.VisualStateGroups>
-            <VisualStateGroup>
+            <VisualStateGroup x:Name="layoutStates">
                 <VisualState x:Name="WideLayout">
                     <VisualState.StateTriggers>
                         <AdaptiveTrigger MinWindowWidth="1200" />
@@ -211,7 +216,6 @@
                         <Setter Target="trackColumn.Width" Value="180" />
                         <Setter Target="trackProgression.Width" Value="250" />
                         <Setter Target="progressSlider.Width" Value="130" />
-                        <Setter Target="trackTitle.MaxWidth" Value="150" />
                         <Setter Target="trackArtist.MaxWidth" Value="100" />
                         <Setter Target="trackAlbum.MaxWidth" Value="100" />
                     </VisualState.Setters>
@@ -244,23 +248,23 @@
                 <VisualStateGroup x:Name="visualChangeGroup">
                     <VisualState x:Name="changeTrackTitleAnimation">
                         <Storyboard>
-                            <DoubleAnimation Storyboard.TargetName="trackTitle" From="0" To="1" Storyboard.TargetProperty="Opacity" Duration="0:0:2" />
+                            <DoubleAnimation Storyboard.TargetName="trackTitle" From="0" To="1" Storyboard.TargetProperty="Opacity" Duration="0:0:0.3" />
                         </Storyboard>
                     </VisualState>
                     <VisualState x:Name="changeTrackScoreAnimation">
                         <Storyboard>
-                            <DoubleAnimation Storyboard.TargetName="trackScore" From="0" To="1" Storyboard.TargetProperty="Opacity" Duration="0:0:2" />
+                            <DoubleAnimation Storyboard.TargetName="trackScore" From="0" To="1" Storyboard.TargetProperty="Opacity" Duration="0:0:0.3" />
                         </Storyboard>
                     </VisualState>
                     <VisualState x:Name="changeTrackArtistAnimation">
                         <Storyboard>
-                            <DoubleAnimation Storyboard.TargetName="trackArtist" From="0" To="1" Storyboard.TargetProperty="Opacity" Duration="0:0:2" />
+                            <DoubleAnimation Storyboard.TargetName="trackArtist" From="0" To="1" Storyboard.TargetProperty="Opacity" Duration="0:0:0.3" />
                         </Storyboard>
                     </VisualState>
                     <VisualState x:Name="changeTrackAlbumAnimation">
                         <Storyboard>
-                            <DoubleAnimation Storyboard.TargetName="trackAlbum" From="0" To="1" Storyboard.TargetProperty="Opacity" Duration="0:0:2" />
-                            <DoubleAnimation Storyboard.TargetName="currentTrackCover" From="0" To="1" Storyboard.TargetProperty="Opacity" Duration="0:0:2" />
+                            <DoubleAnimation Storyboard.TargetName="trackAlbum" From="0" To="1" Storyboard.TargetProperty="Opacity" Duration="0:0:0.3" />
+                            <DoubleAnimation Storyboard.TargetName="currentTrackCover" From="0" To="1" Storyboard.TargetProperty="Opacity" Duration="0:0:0.3" />
                         </Storyboard>
                     </VisualState>
                 </VisualStateGroup>
@@ -291,7 +295,7 @@
 
                 <!--Title line-->
                 <StackPanel x:Name="trackTitleLine" Grid.Column="1" Grid.Row="0" Orientation="Horizontal" Margin="6,0,0,0">
-                    <HyperlinkButton Grid.Column="0" x:Name="trackTitle" HorizontalAlignment="Left" HorizontalContentAlignment="Left" MinWidth="100" MaxWidth="200" Style="{StaticResource MiniLinkStyle}" Command="{x:Bind ViewModel.CurrentTrack.TrackOpenCommand, Mode=OneWay}" Content="{x:Bind ViewModel.CurrentTrack.Title, Mode=OneWay, FallbackValue=''}" ContentTemplate="{StaticResource EllipsisTemplate}" ToolTipService.ToolTip="{x:Bind ViewModel.CurrentTrack.Title, Mode=OneWay, FallbackValue=''}" Visibility="{x:Bind ViewModel.IsMusicMode, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" />
+                    <HyperlinkButton Grid.Column="0" x:Name="trackTitle" HorizontalAlignment="Left" HorizontalContentAlignment="Left" MinWidth="100" Style="{StaticResource MiniLinkStyle}" Command="{x:Bind ViewModel.CurrentTrack.TrackOpenCommand, Mode=OneWay}" Content="{x:Bind ViewModel.CurrentTrack.Title, Mode=OneWay, FallbackValue=''}" ContentTemplate="{StaticResource EllipsisTemplate}" ToolTipService.ToolTip="{x:Bind ViewModel.CurrentTrack.Title, Mode=OneWay, FallbackValue=''}" Visibility="{x:Bind ViewModel.IsMusicMode, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" />
                     <commons:RatingControlDarkControl x:Name="trackScore" Margin="30,0,0,0" HorizontalAlignment="Right" InitialValue="{x:Bind ViewModel.CurrentTrack.Score, Mode=OneWay}" Value="{x:Bind ViewModel.CurrentTrack.Score, Mode=TwoWay}" Width="150" VerticalAlignment="Center" Visibility="{x:Bind ViewModel.IsMusicMode, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">
                     </commons:RatingControlDarkControl>
                 </StackPanel>
@@ -331,7 +335,7 @@
 
 
             <!-- Player commands -->
-            <StackPanel Grid.Row="0" Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Center">
+            <StackPanel x:Name="playerButtons" Grid.Row="0" Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Center">
                 <AppBarToggleButton Command="{x:Bind ViewModel.ToggleShuffleCommand}" IsChecked="{x:Bind ViewModel.IsShuffleEnabled, Mode=OneWay}" ToolTipService.ToolTip="{x:Bind ViewModel.ShuffleToolTip, Mode=OneWay}" AutomationProperties.Name="{x:Bind ViewModel.ShuffleLabel, Mode=OneWay}" Visibility="{x:Bind ViewModel.IsRadioMode, Mode=OneWay, Converter={StaticResource BoolToInvertVisibilityConverter}}" Foreground="White" RequestedTheme="Dark" VerticalAlignment="Center" Width="40" Margin="0">
                     <AppBarToggleButton.Icon>
                         <SymbolIcon Symbol="Shuffle" />
