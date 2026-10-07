@@ -8,6 +8,7 @@ using Rok.Application.Messages;
 using Rok.Application.Player;
 using Rok.Application.Player.Output;
 using Rok.Services;
+using Rok.Services.Accessibility;
 using Rok.ViewModels.Album;
 using Rok.ViewModels.Artist;
 using Rok.ViewModels.Listening.Services;
@@ -146,9 +147,19 @@ public partial class PlayerViewModel : ObservableObject, IDisposable
 
     public bool IsShuffleEnabled => _player.IsShuffleEnabled;
 
-    public string RepeatToolTip => _resourceLoader.GetString(PlayerModeTextKeys.Repeat(_player.RepeatMode));
+    public string RepeatLabel => _resourceLoader.GetString(PlayerModeTextKeys.Repeat(_player.RepeatMode));
 
-    public string ShuffleToolTip => _resourceLoader.GetString(PlayerModeTextKeys.Shuffle(_player.IsShuffleEnabled));
+    public string RepeatToolTip => KeyboardShortcutFormatter.WithShortcut(RepeatLabel, ShortcutId.Repeat);
+
+    public string ShuffleLabel => _resourceLoader.GetString(PlayerModeTextKeys.Shuffle(_player.IsShuffleEnabled));
+
+    public string ShuffleToolTip => KeyboardShortcutFormatter.WithShortcut(ShuffleLabel, ShortcutId.Shuffle);
+
+    public PlayerCommandTexts CommandTexts { get; }
+
+    public string PlayPauseLabel => PlayerCommandTexts.PlayPauseLabel(PlaybackState, _resourceLoader.GetString);
+
+    public string PlayPauseToolTip => PlayerCommandTexts.PlayPauseToolTip(PlaybackState, _resourceLoader.GetString);
 
     [RelayCommand]
     private void ToggleShuffle()
@@ -163,12 +174,14 @@ public partial class PlayerViewModel : ObservableObject, IDisposable
         OnPropertyChanged(nameof(RepeatMode));
         OnPropertyChanged(nameof(IsRepeatActive));
         OnPropertyChanged(nameof(IsRepeatOne));
+        OnPropertyChanged(nameof(RepeatLabel));
         OnPropertyChanged(nameof(RepeatToolTip));
     }
 
     private void NotifyShuffleModeChanged()
     {
         OnPropertyChanged(nameof(IsShuffleEnabled));
+        OnPropertyChanged(nameof(ShuffleLabel));
         OnPropertyChanged(nameof(ShuffleToolTip));
     }
 
@@ -320,6 +333,7 @@ public partial class PlayerViewModel : ObservableObject, IDisposable
         EqualizerViewModel = Guard.NotNull(equalizerViewModel);
         _equalizerWindowService = Guard.NotNull(equalizerWindowService);
         _resourceLoader = Guard.NotNull(resourceLoader);
+        CommandTexts = PlayerCommandTexts.Create(_resourceLoader.GetString);
         _playerSleepModeService = Guard.NotNull(playerSleepModeService);
         _telemetryClient = Guard.NotNull(telemetryClient);
         _radioPictureService = Guard.NotNull(radioPictureService);
@@ -343,6 +357,12 @@ public partial class PlayerViewModel : ObservableObject, IDisposable
 
         if (e.PropertyName == nameof(LyricsExist))
             NotifyLyricsAvailabilityChanged();
+
+        if (e.PropertyName == nameof(PlaybackState))
+        {
+            OnPropertyChanged(nameof(PlayPauseLabel));
+            OnPropertyChanged(nameof(PlayPauseToolTip));
+        }
     }
 
     private void OnSleepTimerStateChanged(object? sender, bool isActive)

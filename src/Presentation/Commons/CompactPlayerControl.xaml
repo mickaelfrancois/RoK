@@ -172,12 +172,16 @@
                     <AppBarButton RequestedTheme="Dark"
                                   Style="{StaticResource AppBarButtonRevealStyle}"
                                   Icon="Previous"
+                                  AutomationProperties.Name="{x:Bind PlayerViewModel.CommandTexts.PreviousLabel}"
+                                  ToolTipService.ToolTip="{x:Bind PlayerViewModel.CommandTexts.PreviousLabel}"
                                   Command="{x:Bind PlayerViewModel.SkipPreviousCommand}"
                                   IsEnabled="{x:Bind PlayerViewModel.CanSkipPrevious, Mode=OneWay}"
                                   Visibility="{x:Bind PlayerViewModel.IsMusicMode, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" />
 
                     <AppBarButton RequestedTheme="Dark"
                                   Style="{StaticResource AppBarButtonRevealStyle}"
+                                  AutomationProperties.Name="{x:Bind PlayerViewModel.PlayPauseLabel, Mode=OneWay}"
+                                  ToolTipService.ToolTip="{x:Bind PlayerViewModel.PlayPauseLabel, Mode=OneWay}"
                                   Command="{x:Bind PlayerViewModel.TogglePlayPauseCommand}">
                         <SymbolIcon Symbol="{x:Bind PlayerViewModel.PlaybackState, Mode=OneWay, Converter={StaticResource PlaybackStateToButtonIconConverter}}" />
                     </AppBarButton>
@@ -185,6 +189,8 @@
                     <AppBarButton RequestedTheme="Dark"
                                   Style="{StaticResource AppBarButtonRevealStyle}"
                                   Icon="Next"
+                                  AutomationProperties.Name="{x:Bind PlayerViewModel.CommandTexts.NextLabel}"
+                                  ToolTipService.ToolTip="{x:Bind PlayerViewModel.CommandTexts.NextLabel}"
                                   Command="{x:Bind PlayerViewModel.SkipNextCommand}"
                                   IsEnabled="{x:Bind PlayerViewModel.CanSkipNext, Mode=OneWay}"
                                   Visibility="{x:Bind PlayerViewModel.IsMusicMode, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" />
@@ -201,7 +207,8 @@
                 Command="{x:Bind PlayerViewModel.CompactModeCommand}"
                 Margin="0,6,6,0"
                 Padding="6"
-                x:Uid="compactExitButton">
+                AutomationProperties.Name="{x:Bind PlayerViewModel.CommandTexts.ExitCompactLabel}"
+                ToolTipService.ToolTip="{x:Bind PlayerViewModel.CommandTexts.ExitCompactToolTip}">
             <SymbolIcon Symbol="StopSlideShow" />
         </Button>
     </Grid>

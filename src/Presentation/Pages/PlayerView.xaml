@@ -332,12 +332,12 @@
 
             <!-- Player commands -->
             <StackPanel Grid.Row="0" Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Center">
-                <AppBarToggleButton Command="{x:Bind ViewModel.ToggleShuffleCommand}" IsChecked="{x:Bind ViewModel.IsShuffleEnabled, Mode=OneWay}" ToolTipService.ToolTip="{x:Bind ViewModel.ShuffleToolTip, Mode=OneWay}" AutomationProperties.Name="{x:Bind ViewModel.ShuffleToolTip, Mode=OneWay}" Visibility="{x:Bind ViewModel.IsRadioMode, Mode=OneWay, Converter={StaticResource BoolToInvertVisibilityConverter}}" Foreground="White" RequestedTheme="Dark" VerticalAlignment="Center" Width="40" Margin="0">
+                <AppBarToggleButton Command="{x:Bind ViewModel.ToggleShuffleCommand}" IsChecked="{x:Bind ViewModel.IsShuffleEnabled, Mode=OneWay}" ToolTipService.ToolTip="{x:Bind ViewModel.ShuffleToolTip, Mode=OneWay}" AutomationProperties.Name="{x:Bind ViewModel.ShuffleLabel, Mode=OneWay}" Visibility="{x:Bind ViewModel.IsRadioMode, Mode=OneWay, Converter={StaticResource BoolToInvertVisibilityConverter}}" Foreground="White" RequestedTheme="Dark" VerticalAlignment="Center" Width="40" Margin="0">
                     <AppBarToggleButton.Icon>
                         <SymbolIcon Symbol="Shuffle" />
                     </AppBarToggleButton.Icon>
                 </AppBarToggleButton>
-                <AppBarButton Icon="Previous" Command="{x:Bind ViewModel.SkipPreviousCommand}" IsEnabled="{x:Bind ViewModel.CanSkipPrevious, Mode=OneWay}" Foreground="White" RequestedTheme="Dark" VerticalAlignment="Center" Width="40" Margin="0" />
+                <AppBarButton Icon="Previous" AutomationProperties.Name="{x:Bind ViewModel.CommandTexts.PreviousLabel}" ToolTipService.ToolTip="{x:Bind ViewModel.CommandTexts.PreviousToolTip}" Command="{x:Bind ViewModel.SkipPreviousCommand}" IsEnabled="{x:Bind ViewModel.CanSkipPrevious, Mode=OneWay}" Foreground="White" RequestedTheme="Dark" VerticalAlignment="Center" Width="40" Margin="0" />
                 <Grid VerticalAlignment="Center" Margin="10,0,0,0">
                     <Border x:Name="sleepModeHalo"
                             Width="48"
@@ -348,12 +348,12 @@
                             IsHitTestVisible="False"
                             HorizontalAlignment="Center"
                             VerticalAlignment="Center" />
-                    <AppBarButton x:Name="playPauseButton" Command="{x:Bind ViewModel.TogglePlayPauseCommand}" Foreground="White" Margin="0" RequestedTheme="Dark" Style="{StaticResource PlayPauseButtonStyle}" HorizontalAlignment="Center" VerticalAlignment="Center">
+                    <AppBarButton x:Name="playPauseButton" AutomationProperties.Name="{x:Bind ViewModel.PlayPauseLabel, Mode=OneWay}" ToolTipService.ToolTip="{x:Bind ViewModel.PlayPauseToolTip, Mode=OneWay}" KeyboardAcceleratorPlacementMode="Hidden" Command="{x:Bind ViewModel.TogglePlayPauseCommand}" Foreground="White" Margin="0" RequestedTheme="Dark" Style="{StaticResource PlayPauseButtonStyle}" HorizontalAlignment="Center" VerticalAlignment="Center">
                         <SymbolIcon Symbol="{x:Bind ViewModel.PlaybackState, Mode=OneWay, Converter={StaticResource PlaybackStateToButtonIconConverter}}" />
                     </AppBarButton>
                 </Grid>
-                <AppBarButton Icon="Next" Command="{x:Bind ViewModel.SkipNextCommand}" IsEnabled="{x:Bind ViewModel.CanSkipNext, Mode=OneWay}" Foreground="White" RequestedTheme="Dark" VerticalAlignment="Center" Width="40" Margin="10,0,0,0" />
-                <AppBarToggleButton Command="{x:Bind ViewModel.CycleRepeatModeCommand}" IsChecked="{x:Bind ViewModel.IsRepeatActive, Mode=OneWay}" ToolTipService.ToolTip="{x:Bind ViewModel.RepeatToolTip, Mode=OneWay}" AutomationProperties.Name="{x:Bind ViewModel.RepeatToolTip, Mode=OneWay}" Visibility="{x:Bind ViewModel.IsRadioMode, Mode=OneWay, Converter={StaticResource BoolToInvertVisibilityConverter}}" Foreground="White" RequestedTheme="Dark" VerticalAlignment="Center" Width="40" Margin="10,0,0,0">
+                <AppBarButton Icon="Next" AutomationProperties.Name="{x:Bind ViewModel.CommandTexts.NextLabel}" ToolTipService.ToolTip="{x:Bind ViewModel.CommandTexts.NextToolTip}" Command="{x:Bind ViewModel.SkipNextCommand}" IsEnabled="{x:Bind ViewModel.CanSkipNext, Mode=OneWay}" Foreground="White" RequestedTheme="Dark" VerticalAlignment="Center" Width="40" Margin="10,0,0,0" />
+                <AppBarToggleButton Command="{x:Bind ViewModel.CycleRepeatModeCommand}" IsChecked="{x:Bind ViewModel.IsRepeatActive, Mode=OneWay}" ToolTipService.ToolTip="{x:Bind ViewModel.RepeatToolTip, Mode=OneWay}" AutomationProperties.Name="{x:Bind ViewModel.RepeatLabel, Mode=OneWay}" Visibility="{x:Bind ViewModel.IsRadioMode, Mode=OneWay, Converter={StaticResource BoolToInvertVisibilityConverter}}" Foreground="White" RequestedTheme="Dark" VerticalAlignment="Center" Width="40" Margin="10,0,0,0">
                     <AppBarToggleButton.Icon>
                         <SymbolIcon Symbol="{x:Bind ViewModel.RepeatMode, Mode=OneWay, Converter={StaticResource RepeatModeToSymbolConverter}}" />
                     </AppBarToggleButton.Icon>
@@ -375,7 +375,9 @@
                             Height="48"
                             Padding="0"
                             HorizontalAlignment="Center"
-                            VerticalAlignment="Center">
+                            VerticalAlignment="Center"
+                            AutomationProperties.Name="{x:Bind ViewModel.CommandTexts.QueueLabel}"
+                            ToolTipService.ToolTip="{x:Bind ViewModel.CommandTexts.QueueToolTip}">
                         <Grid>
                             <SymbolIcon Symbol="List" />
                             <InfoBadge Value="{x:Bind ViewModel.UpcomingCount, Mode=OneWay}"
@@ -384,9 +386,6 @@
                                        VerticalAlignment="Top"
                                        Margin="0,-14,-14,0" />
                         </Grid>
-                        <ToolTipService.ToolTip>
-                            <TextBlock x:Uid="PlayerCurrentListeningToolTips" />
-                        </ToolTipService.ToolTip>
                     </Button>
                 </AppBarElementContainer>
 
@@ -455,10 +454,10 @@
                     <AppBarButton.Flyout>
                         <Flyout>
                             <StackPanel Orientation="Horizontal" VerticalAlignment="Center" PointerWheelChanged="OnVolumeWheelChanged">
-                                <Button Margin="0,0,4,0" Command="{x:Bind ViewModel.MuteCommand}" Background="Transparent">
+                                <Button Margin="0,0,4,0" Command="{x:Bind ViewModel.MuteCommand}" Background="Transparent" AutomationProperties.Name="{x:Bind ViewModel.CommandTexts.MuteLabel}" ToolTipService.ToolTip="{x:Bind ViewModel.CommandTexts.MuteToolTip}">
                                     <FontIcon Glyph="{x:Bind ViewModel.Volume, Mode=OneWay, Converter={StaticResource VolumeToGlyphConverter}}" />
                                 </Button>
-                                <Slider Width="200" Value="{x:Bind ViewModel.Volume, Mode=TwoWay}" Minimum="0" Maximum="100"></Slider>
+                                <Slider Width="200" AutomationProperties.Name="{x:Bind ViewModel.CommandTexts.VolumeLabel}" Value="{x:Bind ViewModel.Volume, Mode=TwoWay}" Minimum="0" Maximum="100"></Slider>
                             </StackPanel>
                         </Flyout>
                     </AppBarButton.Flyout>
@@ -466,7 +465,7 @@
 
                 <AppBarElementContainer x:Name="volumeInline" Visibility="Collapsed" VerticalAlignment="Center" ToolTipService.ToolTip="{x:Bind ViewModel.VolumeToolTip, Mode=OneWay}" PointerWheelChanged="OnVolumeWheelChanged">
                     <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                        <Button Margin="0,0,4,0" Command="{x:Bind ViewModel.MuteCommand}" Background="Transparent" Foreground="White">
+                        <Button Margin="0,0,4,0" Command="{x:Bind ViewModel.MuteCommand}" Background="Transparent" Foreground="White" AutomationProperties.Name="{x:Bind ViewModel.CommandTexts.MuteLabel}" ToolTipService.ToolTip="{x:Bind ViewModel.CommandTexts.MuteToolTip}">
                             <FontIcon Glyph="{x:Bind ViewModel.Volume, Mode=OneWay, Converter={StaticResource VolumeToGlyphConverter}}" />
                         </Button>
                         <Slider x:Uid="playerVolumeSlider" Width="96" Minimum="0" Maximum="100" Value="{x:Bind ViewModel.Volume, Mode=TwoWay}" VerticalAlignment="Center" />
@@ -480,13 +479,13 @@
                         </AppBarButton.Icon>
                     </AppBarButton>
 
-                    <AppBarButton x:Uid="playerCompactModeAppBarButton" x:Name="btCompactMode" Command="{x:Bind ViewModel.CompactModeCommand}">
+                    <AppBarButton x:Uid="playerCompactModeAppBarButton" x:Name="btCompactMode" KeyboardAcceleratorTextOverride="{x:Bind ViewModel.CommandTexts.CompactShortcutText}" Command="{x:Bind ViewModel.CompactModeCommand}">
                         <AppBarButton.Icon>
                             <SymbolIcon Symbol="StopSlideShow" />
                         </AppBarButton.Icon>
                     </AppBarButton>
 
-                    <AppBarButton x:Uid="playerFullscreenAppBarButton" Command="{x:Bind ViewModel.FullscreenCommand}"
+                    <AppBarButton x:Uid="playerFullscreenAppBarButton" KeyboardAcceleratorTextOverride="{x:Bind ViewModel.CommandTexts.FullScreenShortcutText}" Command="{x:Bind ViewModel.FullscreenCommand}"
                                   Visibility="{x:Bind ViewModel.IsMusicMode, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">
                         <AppBarButton.Icon>
                             <SymbolIcon Symbol="FullScreen" />
