@@ -1836,8 +1836,26 @@
   <data name="EqualizerBuiltin_Latin" xml:space="preserve">
     <value>Latin</value>
   </data>
-  <data name="playerSleepModeAppBarButton.Label" xml:space="preserve">
-    <value>Minuteur de sommeil</value>
+  <data name="playerLyricsToggle.Label" xml:space="preserve">
+    <value>Paroles</value>
+  </data>
+  <data name="PlayerLyricsPanelToolTips.Text" xml:space="preserve">
+    <value>Afficher les paroles</value>
+  </data>
+  <data name="PlayerSleepTimerToolTips.Text" xml:space="preserve">
+    <value>Minuterie de sommeil</value>
+  </data>
+  <data name="playerSleepBadgeMinutes" xml:space="preserve">
+    <value>{0} min</value>
+  </data>
+  <data name="playerSleepBadgeSeconds" xml:space="preserve">
+    <value>{0} s</value>
+  </data>
+  <data name="lyricsPanelTitle.Text" xml:space="preserve">
+    <value>Paroles</value>
+  </data>
+  <data name="lyricsPanelCloseToolTips.Text" xml:space="preserve">
+    <value>Fermer les paroles</value>
   </data>
   <data name="notification_sleepTimer_Start" xml:space="preserve">
     <value>La minuterie de mise en veille est activée — RoK arrêtera automatiquement la lecture</value>

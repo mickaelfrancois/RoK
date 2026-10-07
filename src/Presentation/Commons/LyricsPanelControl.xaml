@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<UserControl x:Class="Rok.Commons.LyricsPanelControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d">
+
+    <Grid Width="340"
+          Padding="16,12"
+          RowSpacing="8"
+          Background="{ThemeResource LayerFillColorDefaultBrush}"
+          BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+          BorderThickness="1,0,0,0"
+          Visibility="{x:Bind PlayerViewModel.IsLyricsPanelVisible, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <Grid Grid.Row="0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+
+            <TextBlock x:Uid="lyricsPanelTitle"
+                       Grid.Column="0"
+                       VerticalAlignment="Center"
+                       Style="{StaticResource SubtitleTextBlockStyle}" />
+
+            <Button Grid.Column="1"
+                    Background="Transparent"
+                    BorderThickness="0"
+                    Command="{x:Bind PlayerViewModel.CloseLyricsPanelCommand}">
+                <SymbolIcon Symbol="Cancel" />
+                <ToolTipService.ToolTip>
+                    <TextBlock x:Uid="lyricsPanelCloseToolTips" />
+                </ToolTipService.ToolTip>
+            </Button>
+        </Grid>
+
+        <StackPanel Grid.Row="1">
+            <TextBlock Text="{x:Bind PlayerViewModel.CurrentTrack.Title, Mode=OneWay, FallbackValue=''}"
+                       FontWeight="SemiBold"
+                       TextTrimming="CharacterEllipsis" />
+            <TextBlock Text="{x:Bind PlayerViewModel.CurrentTrack.ArtistName, Mode=OneWay, FallbackValue=''}"
+                       Opacity="0.7"
+                       TextTrimming="CharacterEllipsis" />
+        </StackPanel>
+
+        <StackPanel Grid.Row="2"
+                    VerticalAlignment="Center"
+                    Spacing="16"
+                    Visibility="{x:Bind PlayerViewModel.IsSynchronizedLyrics, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">
+            <TextBlock Text="{x:Bind PlayerViewModel.PreviousLyric, Mode=OneWay}"
+                       FontSize="16"
+                       Opacity="0.5"
+                       TextWrapping="Wrap"
+                       TextAlignment="Center" />
+            <TextBlock Text="{x:Bind PlayerViewModel.CurrentLyric.Lyric, Mode=OneWay}"
+                       FontSize="24"
+                       FontWeight="SemiBold"
+                       Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}"
+                       TextWrapping="Wrap"
+                       TextAlignment="Center" />
+            <TextBlock Text="{x:Bind PlayerViewModel.NextLyric, Mode=OneWay}"
+                       FontSize="16"
+                       Opacity="0.5"
+                       TextWrapping="Wrap"
+                       TextAlignment="Center" />
+        </StackPanel>
+
+        <ScrollViewer Grid.Row="2"
+                      Visibility="{x:Bind PlayerViewModel.IsSynchronizedLyrics, Mode=OneWay, Converter={StaticResource BoolToInvertVisibilityConverter}}">
+            <TextBlock Text="{x:Bind PlayerViewModel.PlainLyrics, Mode=OneWay}"
+                       TextWrapping="Wrap"
+                       IsTextSelectionEnabled="True" />
+        </ScrollViewer>
+    </Grid>
+</UserControl>

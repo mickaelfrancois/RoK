@@ -18,6 +18,9 @@ public sealed partial class PlayerView : UserControl
     public PlayerViewModel ViewModel { get; set; }
 
     private readonly DispatcherTimer _progressionTimer;
+    private static readonly SolidColorBrush _haloWarningBrush = new(Colors.Red);
+    private static readonly SolidColorBrush _haloDefaultBrush = new(Colors.White);
+
     private Storyboard? _sleepModeStoryboard;
 
     private readonly IDisposable _mediaChangedSubscription;
@@ -237,8 +240,8 @@ public sealed partial class PlayerView : UserControl
         else if (e.PropertyName == nameof(ViewModel.RemainingSleepTime))
         {
             sleepModeHalo.Background = ViewModel.RemainingSleepTime < 60
-                ? new SolidColorBrush(Colors.Red)
-                : new SolidColorBrush(Colors.White);
+                ? _haloWarningBrush
+                : _haloDefaultBrush;
         }
     }
 

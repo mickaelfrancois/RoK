@@ -1778,8 +1778,26 @@
   <data name="EqualizerBuiltin_Latin" xml:space="preserve">
     <value>Латинська</value>
   </data>
-  <data name="playerSleepModeAppBarButton.Label" xml:space="preserve">
-    <value>Sleep Timer (Таймер сну)</value>
+  <data name="playerLyricsToggle.Label" xml:space="preserve">
+    <value>Тексти</value>
+  </data>
+  <data name="PlayerLyricsPanelToolTips.Text" xml:space="preserve">
+    <value>Показати текст</value>
+  </data>
+  <data name="PlayerSleepTimerToolTips.Text" xml:space="preserve">
+    <value>Таймер сну</value>
+  </data>
+  <data name="playerSleepBadgeMinutes" xml:space="preserve">
+    <value>{0} хв</value>
+  </data>
+  <data name="playerSleepBadgeSeconds" xml:space="preserve">
+    <value>{0} с</value>
+  </data>
+  <data name="lyricsPanelTitle.Text" xml:space="preserve">
+    <value>Тексти</value>
+  </data>
+  <data name="lyricsPanelCloseToolTips.Text" xml:space="preserve">
+    <value>Закрити текст</value>
   </data>
   <data name="notification_sleepTimer_Start" xml:space="preserve">
     <value>Таймер сну ввімкнено — РК автоматично припинить відтворення</value>

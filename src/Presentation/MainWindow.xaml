@@ -17,6 +17,10 @@
     <Grid>
         <Grid DataContext="{x:Bind ViewModel, FallbackValue={x:Null}}">
             <Grid x:Name="MainGrid" Visibility="Collapsed">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="*" />
                     <RowDefinition Height="Auto" x:Name="PlayerRow" />
@@ -191,8 +195,10 @@
 
                 </NavigationView>
 
+                <c:LyricsPanelControl Grid.Row="0" Grid.Column="1" />
+
                 <!-- Player -->
-                <Border Grid.Row="1" x:Name="HorizontalPlayer" Style="{StaticResource HorizontalPlayerBorderStyle}" Visibility="{Binding PlayerVisible, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">
+                <Border Grid.Row="1" Grid.ColumnSpan="2" x:Name="HorizontalPlayer" Style="{StaticResource HorizontalPlayerBorderStyle}" Visibility="{Binding PlayerVisible, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">
                     <v:PlayerView x:Name="HorizontalPlayerView" HorizontalAlignment="Stretch"></v:PlayerView>
                 </Border>
             </Grid>

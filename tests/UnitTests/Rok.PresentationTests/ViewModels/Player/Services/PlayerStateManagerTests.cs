@@ -121,4 +121,18 @@ public class PlayerStateManagerTests
         // Assert
         Assert.Equal(string.Empty, sut.CurrentLyric.Lyric);
     }
+
+    [Fact(DisplayName = "ResetLyrics clears the lyrics exist flag")]
+    public void ResetLyrics_ClearsLyricsExist()
+    {
+        // Arrange
+        PlayerStateManager sut = BuildManager();
+        sut.LyricsExist = true;
+
+        // Act
+        sut.ResetLyrics();
+
+        // Assert
+        Assert.False(sut.LyricsExist);
+    }
 }
