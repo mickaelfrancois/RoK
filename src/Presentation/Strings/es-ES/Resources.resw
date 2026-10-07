@@ -1720,8 +1720,26 @@
   <data name="EqualizerBuiltin_Latin" xml:space="preserve">
     <value>Latino</value>
   </data>
-  <data name="playerSleepModeAppBarButton.Label" xml:space="preserve">
-    <value>Temporizador de apagado</value>
+  <data name="playerLyricsToggle.Label" xml:space="preserve">
+    <value>Letras</value>
+  </data>
+  <data name="PlayerLyricsPanelToolTips.Text" xml:space="preserve">
+    <value>Mostrar letras</value>
+  </data>
+  <data name="PlayerSleepTimerToolTips.Text" xml:space="preserve">
+    <value>Temporizador</value>
+  </data>
+  <data name="playerSleepBadgeMinutes" xml:space="preserve">
+    <value>{0} min</value>
+  </data>
+  <data name="playerSleepBadgeSeconds" xml:space="preserve">
+    <value>{0} s</value>
+  </data>
+  <data name="lyricsPanelTitle.Text" xml:space="preserve">
+    <value>Letras</value>
+  </data>
+  <data name="lyricsPanelCloseToolTips.Text" xml:space="preserve">
+    <value>Cerrar letras</value>
   </data>
   <data name="notification_sleepTimer_Start" xml:space="preserve">
     <value>El temporizador de apagado automático está activado: RoK detendrá la reproducción automáticamente</value>

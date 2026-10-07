@@ -186,7 +186,7 @@
                         <Setter Target="radioPanel.Width" Value="350" />
                         <Setter Target="playerControls.Width" Value="300" />
                         <Setter Target="playerControls.HorizontalAlignment" Value="Center" />
-                        <Setter Target="playerCommands.Width" Value="200" />
+                        <Setter Target="playerCommands.Width" Value="250" />
                         <Setter Target="playerCommands.Visibility" Value="Visible" />
                         <Setter Target="trackScore.Visibility" Value="Collapsed" />
                         <Setter Target="trackColumn.Width" Value="280" />
@@ -390,6 +390,66 @@
                     </Button>
                 </AppBarElementContainer>
 
+                <AppBarToggleButton x:Uid="playerLyricsToggle"
+                                    Command="{x:Bind ViewModel.ToggleLyricsPanelCommand}"
+                                    IsChecked="{x:Bind ViewModel.IsLyricsPanelOpen, Mode=OneWay}"
+                                    Visibility="{x:Bind ViewModel.IsLyricsButtonVisible, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}"
+                                    Foreground="White">
+                    <AppBarToggleButton.Icon>
+                        <SymbolIcon Symbol="Audio" />
+                    </AppBarToggleButton.Icon>
+                    <ToolTipService.ToolTip>
+                        <TextBlock x:Uid="PlayerLyricsPanelToolTips" />
+                    </ToolTipService.ToolTip>
+                </AppBarToggleButton>
+
+                <AppBarElementContainer>
+                    <Button x:Name="sleepTimerButton"
+                            Background="Transparent"
+                            BorderThickness="0"
+                            Foreground="White"
+                            Width="48"
+                            Height="48"
+                            Padding="0"
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center"
+                            AutomationProperties.Name="{x:Bind ViewModel.SleepMenuLabel, Mode=OneWay}"
+                            ToolTipService.ToolTip="{x:Bind ViewModel.SleepMenuLabel, Mode=OneWay}">
+                        <Grid>
+                            <SymbolIcon Symbol="Clock" />
+                            <Border Background="{ThemeResource InfoBadgeBackground}"
+                                    CornerRadius="8"
+                                    Padding="4,0"
+                                    HorizontalAlignment="Right"
+                                    VerticalAlignment="Top"
+                                    Margin="0,-14,-18,0"
+                                    IsHitTestVisible="False"
+                                    Visibility="{x:Bind ViewModel.IsSleepModeActive, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">
+                                <TextBlock Text="{x:Bind ViewModel.SleepTimerBadgeText, Mode=OneWay}"
+                                           FontSize="10"
+                                           Foreground="White" />
+                            </Border>
+                        </Grid>
+                        <Button.Flyout>
+                            <MenuFlyout Placement="Top" Opening="SleepFlyout_Opening">
+                                <MenuFlyoutItem IsEnabled="False" Text="{x:Bind ViewModel.SleepMenuLabel, Mode=OneWay}" Visibility="{x:Bind ViewModel.IsSleepModeActive, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" />
+                                <MenuFlyoutItem x:Uid="playerSleepOff" Command="{x:Bind ViewModel.StopSleepTimerCommand}" Visibility="{x:Bind ViewModel.IsSleepModeActive, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">
+                                    <MenuFlyoutItem.Icon>
+                                        <SymbolIcon Symbol="Cancel" />
+                                    </MenuFlyoutItem.Icon>
+                                </MenuFlyoutItem>
+                                <MenuFlyoutSeparator Visibility="{x:Bind ViewModel.IsSleepModeActive, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" />
+                                <MenuFlyoutItem x:Uid="playerSleep5" Command="{x:Bind ViewModel.SetSleepTimerCommand}" CommandParameter="{StaticResource SleepTimer5}" />
+                                <MenuFlyoutItem x:Uid="playerSleep10" Command="{x:Bind ViewModel.SetSleepTimerCommand}" CommandParameter="{StaticResource SleepTimer10}" />
+                                <MenuFlyoutItem x:Uid="playerSleep15" Command="{x:Bind ViewModel.SetSleepTimerCommand}" CommandParameter="{StaticResource SleepTimer15}" />
+                                <MenuFlyoutItem x:Uid="playerSleep30" Command="{x:Bind ViewModel.SetSleepTimerCommand}" CommandParameter="{StaticResource SleepTimer30}" />
+                                <MenuFlyoutItem x:Uid="playerSleep45" Command="{x:Bind ViewModel.SetSleepTimerCommand}" CommandParameter="{StaticResource SleepTimer45}" />
+                                <MenuFlyoutItem x:Uid="playerSleep60" Command="{x:Bind ViewModel.SetSleepTimerCommand}" CommandParameter="{StaticResource SleepTimer60}" />
+                            </MenuFlyout>
+                        </Button.Flyout>
+                    </Button>
+                </AppBarElementContainer>
+
                 <AppBarButton x:Name="volume" x:Uid="playerVolumeButton" Foreground="White" ToolTipService.ToolTip="{x:Bind ViewModel.VolumeToolTip, Mode=OneWay}" PointerWheelChanged="OnVolumeWheelChanged">
                     <FontIcon Glyph="{x:Bind ViewModel.Volume, Mode=OneWay, Converter={StaticResource VolumeToGlyphConverter}}" />
                     <AppBarButton.Flyout>
@@ -431,30 +491,6 @@
                         <AppBarButton.Icon>
                             <SymbolIcon Symbol="FullScreen" />
                         </AppBarButton.Icon>
-                    </AppBarButton>
-
-                    <AppBarButton x:Uid="playerSleepModeAppBarButton">
-                        <AppBarButton.Icon>
-                            <SymbolIcon Symbol="Clock"/>
-                        </AppBarButton.Icon>
-
-                        <AppBarButton.Flyout>
-                            <MenuFlyout Placement="Top" Opening="SleepFlyout_Opening">
-                                <MenuFlyoutItem IsEnabled="False" Text="{x:Bind ViewModel.SleepMenuLabel, Mode=OneWay}" Visibility="{x:Bind ViewModel.IsSleepModeActive, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" />
-                                <MenuFlyoutItem x:Uid="playerSleepOff" Command="{x:Bind ViewModel.StopSleepTimerCommand}" Visibility="{x:Bind ViewModel.IsSleepModeActive, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">
-                                    <MenuFlyoutItem.Icon>
-                                        <SymbolIcon Symbol="Cancel" />
-                                    </MenuFlyoutItem.Icon>
-                                </MenuFlyoutItem>
-                                <MenuFlyoutSeparator Visibility="{x:Bind ViewModel.IsSleepModeActive, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" />
-                                <MenuFlyoutItem x:Uid="playerSleep5" Command="{x:Bind ViewModel.SetSleepTimerCommand}" CommandParameter="{StaticResource SleepTimer5}" />
-                                <MenuFlyoutItem x:Uid="playerSleep10" Command="{x:Bind ViewModel.SetSleepTimerCommand}" CommandParameter="{StaticResource SleepTimer10}" />
-                                <MenuFlyoutItem x:Uid="playerSleep15" Command="{x:Bind ViewModel.SetSleepTimerCommand}" CommandParameter="{StaticResource SleepTimer15}" />
-                                <MenuFlyoutItem x:Uid="playerSleep30" Command="{x:Bind ViewModel.SetSleepTimerCommand}" CommandParameter="{StaticResource SleepTimer30}" />
-                                <MenuFlyoutItem x:Uid="playerSleep45" Command="{x:Bind ViewModel.SetSleepTimerCommand}" CommandParameter="{StaticResource SleepTimer45}" />
-                                <MenuFlyoutItem x:Uid="playerSleep60" Command="{x:Bind ViewModel.SetSleepTimerCommand}" CommandParameter="{StaticResource SleepTimer60}" />
-                            </MenuFlyout>
-                        </AppBarButton.Flyout>
                     </AppBarButton>
                 </CommandBar.SecondaryCommands>
             </CommandBar>

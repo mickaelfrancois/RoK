@@ -100,6 +100,36 @@ public partial class PlayerViewModel : ObservableObject, IDisposable
         _resourceLoader.GetString("listeningSleepIdle"),
         _resourceLoader.GetString("listeningSleepRemaining"));
 
+    public string SleepTimerBadgeText => SleepTimerBadgeFormatter.Format(
+        IsSleepModeActive,
+        RemainingSleepTime,
+        _resourceLoader.GetString("playerSleepBadgeMinutes"),
+        _resourceLoader.GetString("playerSleepBadgeSeconds"));
+
+    /// <summary>Gets or sets whether the user opened the lyrics side panel. Kept in memory only.</summary>
+    [ObservableProperty]
+    public partial bool IsLyricsPanelOpen { get; set; }
+
+    /// <summary>Gets whether the lyrics button of the playback bar is visible.</summary>
+    public bool IsLyricsButtonVisible => PlayerBarVisibility.IsLyricsButtonVisible(Mode, LyricsExist);
+
+    /// <summary>Gets whether the lyrics side panel is displayed.</summary>
+    public bool IsLyricsPanelVisible => PlayerBarVisibility.IsLyricsPanelVisible(IsLyricsPanelOpen, Mode, LyricsExist);
+
+    [RelayCommand]
+    private void ToggleLyricsPanel() => IsLyricsPanelOpen = !IsLyricsPanelOpen;
+
+    [RelayCommand]
+    private void CloseLyricsPanel() => IsLyricsPanelOpen = false;
+
+    private void NotifyLyricsAvailabilityChanged()
+    {
+        OnPropertyChanged(nameof(IsLyricsButtonVisible));
+        OnPropertyChanged(nameof(IsLyricsPanelVisible));
+    }
+
+    partial void OnIsLyricsPanelOpenChanged(bool value) => NotifyLyricsAvailabilityChanged();
+
     public ERepeatMode RepeatMode => _player.RepeatMode;
 
     public bool IsRepeatActive => _player.RepeatMode != ERepeatMode.Off;
@@ -310,11 +340,18 @@ public partial class PlayerViewModel : ObservableObject, IDisposable
             return;
 
         OnPropertyChanged(e.PropertyName);
+
+        if (e.PropertyName == nameof(LyricsExist))
+            NotifyLyricsAvailabilityChanged();
     }
 
     private void OnSleepTimerStateChanged(object? sender, bool isActive)
     {
-        _stateManager.ExecuteOnUIThread(() => OnPropertyChanged(nameof(IsSleepModeActive)));
+        _stateManager.ExecuteOnUIThread(() =>
+        {
+            OnPropertyChanged(nameof(IsSleepModeActive));
+            RefreshSleepTime();
+        });
     }
 
     private void SubscribeToMessages()
@@ -352,6 +389,7 @@ public partial class PlayerViewModel : ObservableObject, IDisposable
             OnPropertyChanged(nameof(CurrentStationImage));
             OnPropertyChanged(nameof(CurrentStreamTitle));
             OnPropertyChanged(nameof(CurrentTrack));
+            NotifyLyricsAvailabilityChanged();
         });
     }
 
@@ -359,6 +397,7 @@ public partial class PlayerViewModel : ObservableObject, IDisposable
     {
         OnPropertyChanged(nameof(IsMusicMode));
         OnPropertyChanged(nameof(IsRadioMode));
+        NotifyLyricsAvailabilityChanged();
     }
 
     private void OnRadioStationChanged(RadioStationChanged message)
@@ -428,10 +467,14 @@ public partial class PlayerViewModel : ObservableObject, IDisposable
     {
         OnPropertyChanged(nameof(RemainingSleepTime));
         OnPropertyChanged(nameof(SleepMenuLabel));
+        OnPropertyChanged(nameof(SleepTimerBadgeText));
     }
 
     private void OnUpdateTimerTick(object? sender, EventArgs e)
     {
+        if (IsSleepModeActive)
+            RefreshSleepTime();
+
         if (IsPlaying)
         {
             CanSkipPrevious = _player.CanPrevious;
@@ -628,6 +671,7 @@ public partial class PlayerViewModel : ObservableObject, IDisposable
         OnPropertyChanged(nameof(LyricsExist));
         OnPropertyChanged(nameof(IsSynchronizedLyrics));
         OnPropertyChanged(nameof(PlainLyrics));
+        NotifyLyricsAvailabilityChanged();
     }
 
     [RelayCommand]

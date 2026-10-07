@@ -158,6 +158,7 @@ public partial class PlayerStateManager : ObservableObject
     public void ResetLyrics()
     {
         _lyrics = new();
+        LyricsExist = false;
         SyncLyrics = new();
         SyncLyrics.Lyrics.Clear();
         _lyricsCurrentIndex = -1;
