@@ -45,6 +45,11 @@ public partial class PlayerViewModel : ObservableObject, IDisposable
     public TrackViewModel? CurrentTrack => _stateManager.CurrentTrack;
     public ArtistViewModel? CurrentArtist => _stateManager.CurrentArtist;
     public AlbumViewModel? CurrentAlbum => _stateManager.CurrentAlbum;
+
+    /// <summary>
+    /// Background tint of the player bar; alpha 0 means "keep the default brand color".
+    /// </summary>
+    public Windows.UI.Color BarTintColor => PlayerBarTint.Resolve(Mode, CurrentAlbum?.DominantColor ?? default);
     public bool CanSkipNext
     {
         get => _stateManager.CanSkipNext;
@@ -403,6 +408,7 @@ public partial class PlayerViewModel : ObservableObject, IDisposable
         _stateManager.ExecuteOnUIThread(() =>
         {
             OnPropertyChanged(nameof(Mode));
+            OnPropertyChanged(nameof(BarTintColor));
             OnPropertyChanged(nameof(IsMusicMode));
             OnPropertyChanged(nameof(IsRadioMode));
             OnPropertyChanged(nameof(CurrentStationName));
@@ -415,6 +421,7 @@ public partial class PlayerViewModel : ObservableObject, IDisposable
 
     partial void OnModeChanged(EPlaybackMode value)
     {
+        OnPropertyChanged(nameof(BarTintColor));
         OnPropertyChanged(nameof(IsMusicMode));
         OnPropertyChanged(nameof(IsRadioMode));
         NotifyLyricsAvailabilityChanged();
@@ -586,6 +593,7 @@ public partial class PlayerViewModel : ObservableObject, IDisposable
                 _stateManager.CurrentTrack = trackViewModel;
                 _stateManager.CurrentAlbum = albumViewModel;
                 _stateManager.CurrentArtist = artistViewModel;
+                OnPropertyChanged(nameof(BarTintColor));
 
                 await UpdateListenCountAsync();
                 trackViewModel.Listening = true;
