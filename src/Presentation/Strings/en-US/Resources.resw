@@ -868,6 +868,9 @@
   <data name="PlayerFullScreenToolTips.Text" xml:space="preserve">
     <value>Exit fullscreen</value>
   </data>
+  <data name="PlayerCurrentListeningToolTips.Text" xml:space="preserve">
+    <value>Queue</value>
+  </data>
   <data name="PlayerFullScreenCurrentListeningToolTips.Text" xml:space="preserve">
     <value>Show current playlist</value>
   </data>
@@ -2325,6 +2328,9 @@
   </data>
   <data name="listeningShuffleButton.Label" xml:space="preserve">
     <value>Shuffle</value>
+  </data>
+  <data name="listeningClearUpcomingButton.Label" xml:space="preserve">
+    <value>Clear upcoming</value>
   </data>
   <data name="listeningArtistLinksButton.ToolTipService.ToolTip" xml:space="preserve">
     <value>Artist links</value>

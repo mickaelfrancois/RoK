@@ -15,6 +15,8 @@ public sealed partial class ListeningPage : Page, IDisposable
     private readonly ResourceLoader _resourceLoader;
     private readonly ICrashBreadcrumbs _breadcrumbs;
     private readonly Func<int, Task<bool>> _confirmQueueRemoval;
+    private TrackViewModel? _dragItem;
+    private int _dragFromIndex = -1;
 
 
     public ListeningPage()
@@ -86,7 +88,7 @@ public sealed partial class ListeningPage : Page, IDisposable
     }
 
 
-    private void tracksList_ContainerContentChanging(ListViewBase sender, ContainerContentChangingEventArgs args)
+    private void TracksListContainerContentChanging(ListViewBase sender, ContainerContentChangingEventArgs args)
     {
         if (args.InRecycleQueue)
             return;
@@ -96,6 +98,36 @@ public sealed partial class ListeningPage : Page, IDisposable
         {
             tb.Text = (args.ItemIndex + 1).ToString() + ".";
         }
+    }
+
+    private void TracksListDragItemsStarting(object sender, DragItemsStartingEventArgs e)
+    {
+        _dragItem = null;
+        _dragFromIndex = -1;
+
+        if (e.Items.Count != 1 || e.Items[0] is not TrackViewModel { IsUpcoming: true } item)
+        {
+            e.Cancel = true;
+            return;
+        }
+
+        _dragItem = item;
+        _dragFromIndex = ViewModel.Tracks.IndexOf(item);
+    }
+
+    private void TracksListDragItemsCompleted(ListViewBase sender, DragItemsCompletedEventArgs args)
+    {
+        TrackViewModel? item = _dragItem;
+        int fromIndex = _dragFromIndex;
+
+        _dragItem = null;
+        _dragFromIndex = -1;
+
+        if (item is null || fromIndex < 0 || args.DropResult != Windows.ApplicationModel.DataTransfer.DataPackageOperation.Move)
+            return;
+
+        // Deferred so the list is not rebuilt while the drag operation is still ending.
+        DispatcherQueue.TryEnqueue(() => ViewModel.MoveUpcoming(item, fromIndex));
     }
 
     public void Dispose()

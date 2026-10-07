@@ -809,6 +809,9 @@
   <data name="PlayerFullScreenToolTips.Text" xml:space="preserve">
     <value>&amp; Звичайний режим</value>
   </data>
+  <data name="PlayerCurrentListeningToolTips.Text" xml:space="preserve">
+    <value>Черга відтворення</value>
+  </data>
   <data name="PlayerFullScreenCurrentListeningToolTips.Text" xml:space="preserve">
     <value>Поточний список композицій</value>
   </data>
@@ -2215,6 +2218,9 @@
   </data>
   <data name="listeningShuffleButton.Label" xml:space="preserve">
     <value>Перемішати</value>
+  </data>
+  <data name="listeningClearUpcomingButton.Label" xml:space="preserve">
+    <value>Очистити наступні</value>
   </data>
   <data name="listeningArtistLinksButton.ToolTipService.ToolTip" xml:space="preserve">
     <value>Посилання виконавця</value>

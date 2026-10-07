@@ -751,6 +751,9 @@
   <data name="PlayerFullScreenToolTips.Text" xml:space="preserve">
     <value>&amp;amp; Sale del modo de pantalla completa</value>
   </data>
+  <data name="PlayerCurrentListeningToolTips.Text" xml:space="preserve">
+    <value>Cola de reproducción</value>
+  </data>
   <data name="PlayerFullScreenCurrentListeningToolTips.Text" xml:space="preserve">
     <value>Lista de reproducción actual</value>
   </data>
@@ -2157,6 +2160,9 @@
   </data>
   <data name="listeningShuffleButton.Label" xml:space="preserve">
     <value>Barajar</value>
+  </data>
+  <data name="listeningClearUpcomingButton.Label" xml:space="preserve">
+    <value>Vaciar lo siguiente</value>
   </data>
   <data name="listeningArtistLinksButton.ToolTipService.ToolTip" xml:space="preserve">
     <value>Enlaces del artista</value>
