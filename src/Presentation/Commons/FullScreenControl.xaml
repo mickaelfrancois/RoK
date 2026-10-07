@@ -192,6 +192,8 @@
                             HorizontalAlignment="Center"
                             VerticalContentAlignment="Center">
                     <AppBarButton Icon="Previous"
+                                  AutomationProperties.Name="{x:Bind PlayerViewModel.CommandTexts.PreviousLabel}"
+                                  ToolTipService.ToolTip="{x:Bind PlayerViewModel.CommandTexts.PreviousLabel}"
                                   Command="{x:Bind PlayerViewModel.SkipPreviousCommand}"
                                   IsEnabled="{x:Bind PlayerViewModel.CanSkipPrevious, Mode=OneWay}"
                                   RequestedTheme="Dark"
@@ -203,11 +205,15 @@
                     <AppBarButton RequestedTheme="Dark"
                                   IsCompact="False"
                                   Style="{StaticResource RoundAppBarButtonStyle}"
+                                  AutomationProperties.Name="{x:Bind PlayerViewModel.PlayPauseLabel, Mode=OneWay}"
+                                  ToolTipService.ToolTip="{x:Bind PlayerViewModel.PlayPauseLabel, Mode=OneWay}"
                                   Command="{x:Bind PlayerViewModel.TogglePlayPauseCommand}">
                         <SymbolIcon Symbol="{x:Bind PlayerViewModel.PlaybackState, Mode=OneWay, Converter={StaticResource PlaybackStateToButtonIconConverter}}" />
                     </AppBarButton>
 
                     <AppBarButton Icon="Next"
+                                  AutomationProperties.Name="{x:Bind PlayerViewModel.CommandTexts.NextLabel}"
+                                  ToolTipService.ToolTip="{x:Bind PlayerViewModel.CommandTexts.NextLabel}"
                                   Command="{x:Bind PlayerViewModel.SkipNextCommand}"
                                   IsEnabled="{x:Bind PlayerViewModel.CanSkipNext, Mode=OneWay}"
                                   RequestedTheme="Dark"
@@ -231,6 +237,8 @@
                     <AppBarButton x:Name="volume"
                                   RequestedTheme="Dark"
                                   IsCompact="False"
+                                  AutomationProperties.Name="{x:Bind PlayerViewModel.CommandTexts.VolumeLabel}"
+                                  ToolTipService.ToolTip="{x:Bind PlayerViewModel.VolumeToolTip, Mode=OneWay}"
                                   Style="{StaticResource AppBarButtonRevealStyle}">
                         <FontIcon FontFamily="Segoe MDL2 Assets"
                                   Glyph="{x:Bind PlayerViewModel.Volume, Mode=OneWay, Converter={StaticResource VolumeToGlyphConverter}}" />
@@ -240,11 +248,14 @@
                                             VerticalAlignment="Center">
                                     <Button Margin="0,0,4,0"
                                             Command="{x:Bind PlayerViewModel.MuteCommand}"
+                                            AutomationProperties.Name="{x:Bind PlayerViewModel.CommandTexts.MuteLabel}"
+                                            ToolTipService.ToolTip="{x:Bind PlayerViewModel.CommandTexts.MuteLabel}"
                                             Background="Transparent">
                                         <FontIcon FontFamily="Segoe MDL2 Assets"
                                                   Glyph="{x:Bind PlayerViewModel.Volume, Mode=OneWay, Converter={StaticResource VolumeToGlyphConverter}}" />
                                     </Button>
                                     <Slider Width="200"
+                                            AutomationProperties.Name="{x:Bind PlayerViewModel.CommandTexts.VolumeLabel}"
                                             Value="{x:Bind PlayerViewModel.Volume, Mode=TwoWay}"
                                             Minimum="0"
                                             Maximum="100" />
@@ -257,30 +268,24 @@
                                   IsCompact="False"
                                   Icon="MusicInfo"
                                   Style="{StaticResource AppBarButtonRevealStyle}"
-                                  Command="{x:Bind PlayerViewModel.OpenListeningCommand}">
-                        <ToolTipService.ToolTip>
-                            <TextBlock x:Uid="PlayerFullScreenCurrentListeningToolTips" />
-                        </ToolTipService.ToolTip>
-                    </AppBarButton>
+                                  AutomationProperties.Name="{x:Bind PlayerViewModel.CommandTexts.ShowCurrentPlaylistLabel}"
+                                  ToolTipService.ToolTip="{x:Bind PlayerViewModel.CommandTexts.ShowCurrentPlaylistLabel}"
+                                  Command="{x:Bind PlayerViewModel.OpenListeningCommand}" />
 
                     <AppBarToggleButton x:Name="displayLyricsToggle"
                                         Icon="Audio"
                                         RequestedTheme="Dark"
                                         Style="{StaticResource AppBarToggleButtonRevealStyle}"
-                                        Visibility="{x:Bind PlayerViewModel.LyricsExist, Converter={StaticResource BoolToVisibilityConverter}}">
-                        <ToolTipService.ToolTip>
-                            <TextBlock x:Uid="PlayerFullScreenLyricsToolTips" />
-                        </ToolTipService.ToolTip>
-                    </AppBarToggleButton>
+                                        AutomationProperties.Name="{x:Bind PlayerViewModel.CommandTexts.ShowLyricsLabel}"
+                                        ToolTipService.ToolTip="{x:Bind PlayerViewModel.CommandTexts.ShowLyricsLabel}"
+                                        Visibility="{x:Bind PlayerViewModel.LyricsExist, Converter={StaticResource BoolToVisibilityConverter}}" />
 
                     <AppBarButton RequestedTheme="Dark"
                                   Icon="BackToWindow"
                                   Style="{StaticResource AppBarButtonRevealStyle}"
-                                  Command="{x:Bind PlayerViewModel.FullscreenCommand}">
-                        <ToolTipService.ToolTip>
-                            <TextBlock x:Uid="PlayerFullScreenToolTips" />
-                        </ToolTipService.ToolTip>
-                    </AppBarButton>
+                                  AutomationProperties.Name="{x:Bind PlayerViewModel.CommandTexts.ExitFullScreenLabel}"
+                                  ToolTipService.ToolTip="{x:Bind PlayerViewModel.CommandTexts.ExitFullScreenToolTip}"
+                                  Command="{x:Bind PlayerViewModel.FullscreenCommand}" />
                 </CommandBar>
             </Grid>
 

@@ -803,18 +803,6 @@
   <data name="noTitle" xml:space="preserve">
     <value>Без назви</value>
   </data>
-  <data name="PlayerFullScreenLyricsToolTips.Text" xml:space="preserve">
-    <value>Показати текст пісні</value>
-  </data>
-  <data name="PlayerFullScreenToolTips.Text" xml:space="preserve">
-    <value>&amp; Звичайний режим</value>
-  </data>
-  <data name="PlayerCurrentListeningToolTips.Text" xml:space="preserve">
-    <value>Черга відтворення</value>
-  </data>
-  <data name="PlayerFullScreenCurrentListeningToolTips.Text" xml:space="preserve">
-    <value>Поточний список композицій</value>
-  </data>
   <data name="AlbumViewListenCount.Text" xml:space="preserve">
     <value>&lt;g id="1"&gt;Слухали:&lt;/g&gt; </value>
   </data>
@@ -1784,9 +1772,6 @@
   <data name="PlayerLyricsPanelToolTips.Text" xml:space="preserve">
     <value>Показати текст</value>
   </data>
-  <data name="PlayerSleepTimerToolTips.Text" xml:space="preserve">
-    <value>Таймер сну</value>
-  </data>
   <data name="playerSleepBadgeMinutes" xml:space="preserve">
     <value>{0} хв</value>
   </data>
@@ -2071,12 +2056,6 @@
   </data>
   <data name="playerVolumeSlider.AutomationProperties.Name" xml:space="preserve">
     <value>Гучність</value>
-  </data>
-  <data name="compactExitButton.AutomationProperties.Name" xml:space="preserve">
-    <value>Вийти з компактного режиму</value>
-  </data>
-  <data name="compactExitButton.ToolTipService.ToolTip" xml:space="preserve">
-    <value>Вийти з компактного режиму</value>
   </data>
   <data name="Insights_ProfileDiversity.Text" xml:space="preserve">
     <value>• Різноманітність: </value>
@@ -2413,6 +2392,30 @@
   </data>
   <data name="taskbarThumbNext" xml:space="preserve">
     <value>Наступний</value>
+  </data>
+  <data name="playerPlay" xml:space="preserve">
+    <value>Відтворити</value>
+  </data>
+  <data name="playerPause" xml:space="preserve">
+    <value>Пауза</value>
+  </data>
+  <data name="playerQueue" xml:space="preserve">
+    <value>Черга відтворення</value>
+  </data>
+  <data name="playerShowCurrentPlaylist" xml:space="preserve">
+    <value>Поточний список композицій</value>
+  </data>
+  <data name="playerShowLyrics" xml:space="preserve">
+    <value>Показати текст пісні</value>
+  </data>
+  <data name="playerExitFullScreen" xml:space="preserve">
+    <value>Вийти з повноекранного режиму</value>
+  </data>
+  <data name="playerExitCompactMode" xml:space="preserve">
+    <value>Вийти з компактного режиму</value>
+  </data>
+  <data name="playerVolume" xml:space="preserve">
+    <value>Гучність</value>
   </data>
   <data name="playerShuffleOn" xml:space="preserve">
     <value>Випадковий порядок увімкнено</value>

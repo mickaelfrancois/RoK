@@ -861,18 +861,6 @@
   <data name="noTitle" xml:space="preserve">
     <value>{sans titre}</value>
   </data>
-  <data name="PlayerFullScreenLyricsToolTips.Text" xml:space="preserve">
-    <value>Voir les paroles</value>
-  </data>
-  <data name="PlayerFullScreenToolTips.Text" xml:space="preserve">
-    <value>Quitter le mode plein écran</value>
-  </data>
-  <data name="PlayerCurrentListeningToolTips.Text" xml:space="preserve">
-    <value>File d'attente</value>
-  </data>
-  <data name="PlayerFullScreenCurrentListeningToolTips.Text" xml:space="preserve">
-    <value>Voir la playlist</value>
-  </data>
   <data name="AlbumViewListenCount.Text" xml:space="preserve">
     <value>Ecouté</value>
   </data>
@@ -1842,9 +1830,6 @@
   <data name="PlayerLyricsPanelToolTips.Text" xml:space="preserve">
     <value>Afficher les paroles</value>
   </data>
-  <data name="PlayerSleepTimerToolTips.Text" xml:space="preserve">
-    <value>Minuterie de sommeil</value>
-  </data>
   <data name="playerSleepBadgeMinutes" xml:space="preserve">
     <value>{0} min</value>
   </data>
@@ -2181,12 +2166,6 @@
   <data name="playerVolumeSlider.AutomationProperties.Name" xml:space="preserve">
     <value>Volume</value>
   </data>
-  <data name="compactExitButton.AutomationProperties.Name" xml:space="preserve">
-    <value>Quitter le mode compact</value>
-  </data>
-  <data name="compactExitButton.ToolTipService.ToolTip" xml:space="preserve">
-    <value>Quitter le mode compact</value>
-  </data>
   <data name="Insights_ProfileDiversity.Text" xml:space="preserve">
     <value>• Diversité : </value>
   </data>
@@ -2522,6 +2501,30 @@
   </data>
   <data name="taskbarThumbNext" xml:space="preserve">
     <value>Suivant</value>
+  </data>
+  <data name="playerPlay" xml:space="preserve">
+    <value>Lecture</value>
+  </data>
+  <data name="playerPause" xml:space="preserve">
+    <value>Pause</value>
+  </data>
+  <data name="playerQueue" xml:space="preserve">
+    <value>File d'attente</value>
+  </data>
+  <data name="playerShowCurrentPlaylist" xml:space="preserve">
+    <value>Voir la playlist</value>
+  </data>
+  <data name="playerShowLyrics" xml:space="preserve">
+    <value>Voir les paroles</value>
+  </data>
+  <data name="playerExitFullScreen" xml:space="preserve">
+    <value>Quitter le mode plein écran</value>
+  </data>
+  <data name="playerExitCompactMode" xml:space="preserve">
+    <value>Quitter le mode compact</value>
+  </data>
+  <data name="playerVolume" xml:space="preserve">
+    <value>Volume</value>
   </data>
   <data name="playerShuffleOn" xml:space="preserve">
     <value>Lecture aléatoire activée</value>
