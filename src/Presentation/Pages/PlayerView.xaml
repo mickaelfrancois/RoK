@@ -365,12 +365,30 @@
         <!-- Player extra commands -->
         <Grid x:Name="playerCommands" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="0,0,4,0">
             <CommandBar HorizontalAlignment="Right" Background="Transparent" DefaultLabelPosition="Collapsed" RequestedTheme="Dark">
-                <AppBarButton Icon="MusicInfo" Command="{x:Bind ViewModel.OpenListeningCommand}" Foreground="White"
-                              Visibility="{x:Bind ViewModel.IsMusicMode, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">
-                    <ToolTipService.ToolTip>
-                        <TextBlock x:Uid="PlayerCurrentListeningToolTips" />
-                    </ToolTipService.ToolTip>
-                </AppBarButton>
+                <AppBarElementContainer Visibility="{x:Bind ViewModel.IsMusicMode, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">
+                    <Button x:Name="queueButton"
+                            Command="{x:Bind ViewModel.OpenListeningCommand}"
+                            Background="Transparent"
+                            BorderThickness="0"
+                            Foreground="White"
+                            Width="48"
+                            Height="48"
+                            Padding="0"
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center">
+                        <Grid>
+                            <SymbolIcon Symbol="List" />
+                            <InfoBadge Value="{x:Bind ViewModel.UpcomingCount, Mode=OneWay}"
+                                       Visibility="{x:Bind ViewModel.HasUpcoming, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}"
+                                       HorizontalAlignment="Right"
+                                       VerticalAlignment="Top"
+                                       Margin="0,-14,-14,0" />
+                        </Grid>
+                        <ToolTipService.ToolTip>
+                            <TextBlock x:Uid="PlayerCurrentListeningToolTips" />
+                        </ToolTipService.ToolTip>
+                    </Button>
+                </AppBarElementContainer>
 
                 <AppBarButton x:Name="volume" x:Uid="playerVolumeButton" Foreground="White" ToolTipService.ToolTip="{x:Bind ViewModel.VolumeToolTip, Mode=OneWay}" PointerWheelChanged="OnVolumeWheelChanged">
                     <FontIcon Glyph="{x:Bind ViewModel.Volume, Mode=OneWay, Converter={StaticResource VolumeToGlyphConverter}}" />

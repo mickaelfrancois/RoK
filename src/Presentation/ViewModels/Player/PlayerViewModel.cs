@@ -82,6 +82,13 @@ public partial class PlayerViewModel : ObservableObject, IDisposable
     [ObservableProperty]
     public partial string? OutputFallbackToolTip { get; set; }
 
+    /// <summary>Number of tracks queued after the current one. 0 in radio mode.</summary>
+    [ObservableProperty]
+    public partial int UpcomingCount { get; set; }
+
+    [ObservableProperty]
+    public partial bool HasUpcoming { get; set; }
+
     public bool IsMusicMode => Mode == EPlaybackMode.Music;
     public bool IsRadioMode => Mode == EPlaybackMode.Radio;
 
@@ -364,6 +371,7 @@ public partial class PlayerViewModel : ObservableObject, IDisposable
             Mode = EPlaybackMode.Radio;
             CanSkipNext = false;
             CanSkipPrevious = false;
+            RefreshUpcomingCount();
         });
     }
 
@@ -494,6 +502,7 @@ public partial class PlayerViewModel : ObservableObject, IDisposable
 
             CanSkipNext = _player.CanNext;
             CanSkipPrevious = _player.CanPrevious;
+            RefreshUpcomingCount();
 
             if (previousTrack != null)
             {
@@ -554,12 +563,22 @@ public partial class PlayerViewModel : ObservableObject, IDisposable
 
             if (_player.Mode != EPlaybackMode.Radio)
                 Mode = _player.Mode;
+
+            RefreshUpcomingCount();
         });
     }
 
     private void OnPlaylistChanged(PlaylistChanged message)
     {
         _listenTracker.ClearCache();
+
+        _stateManager.ExecuteOnUIThread(RefreshUpcomingCount);
+    }
+
+    private void RefreshUpcomingCount()
+    {
+        UpcomingCount = _player.Mode == EPlaybackMode.Radio ? 0 : _player.UpcomingCount;
+        HasUpcoming = UpcomingCount > 0;
     }
 
     private void LoadBackdrop()

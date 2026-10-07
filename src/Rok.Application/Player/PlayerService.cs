@@ -942,6 +942,77 @@ public sealed class PlayerService : IPlayerService, IDisposable
         return removed;
     }
 
+    public bool MoveUpcoming(int fromIndex, int toIndex)
+    {
+        if (_mode == EPlaybackMode.Radio)
+            return false;
+
+        TrackDto? imminentBefore;
+
+        lock (_transitionLock)
+        {
+            if (fromIndex <= _currentIndex || fromIndex >= Playlist.Count)
+                return false;
+
+            int target = Math.Clamp(toIndex, _currentIndex + 1, Playlist.Count - 1);
+
+            if (target == fromIndex)
+                return false;
+
+            imminentBefore = PeekNextLocked();
+
+            TrackDto track = Playlist[fromIndex];
+            Playlist.RemoveAt(fromIndex);
+            Playlist.Insert(target, track);
+        }
+
+        InvalidateIfImminentChanged(imminentBefore);
+
+        _messenger.Send(new PlaylistChanged(Playlist));
+
+        return true;
+    }
+
+    public int UpcomingCount
+    {
+        get
+        {
+            if (_mode == EPlaybackMode.Radio)
+                return 0;
+
+            lock (_transitionLock)
+            {
+                return Math.Max(0, Playlist.Count - _currentIndex - 1);
+            }
+        }
+    }
+
+    public int ClearUpcoming()
+    {
+        if (_mode == EPlaybackMode.Radio)
+            return 0;
+
+        TrackDto? imminentBefore;
+        int removed;
+
+        lock (_transitionLock)
+        {
+            removed = Math.Max(0, Playlist.Count - _currentIndex - 1);
+
+            if (removed == 0)
+                return 0;
+
+            imminentBefore = PeekNextLocked();
+            Playlist.RemoveRange(_currentIndex + 1, removed);
+        }
+
+        InvalidateIfImminentChanged(imminentBefore);
+
+        _messenger.Send(new PlaylistChanged(Playlist));
+
+        return removed;
+    }
+
     private void CancelCrossfade()
     {
         lock (_transitionLock)

@@ -104,6 +104,19 @@ public interface IPlayerService
     /// <summary>Removes the upcoming tracks belonging to the given genre. The current and already-played tracks are never removed. Returns the number removed.</summary>
     int RemoveUpcomingByGenre(long genreId);
 
+    /// <summary>
+    /// Moves the upcoming track at <paramref name="fromIndex"/> so it ends at <paramref name="toIndex"/> (RemoveAt + Insert semantics).
+    /// The current and already-played tracks never move: the call is refused when <paramref name="fromIndex"/> is not upcoming,
+    /// and <paramref name="toIndex"/> is clamped to the upcoming range. Returns false when nothing moved.
+    /// </summary>
+    bool MoveUpcoming(int fromIndex, int toIndex);
+
+    /// <summary>Number of tracks queued after the current one. 0 in radio mode.</summary>
+    int UpcomingCount { get; }
+
+    /// <summary>Removes every track after the current one; the current and already-played tracks are kept and playback is not interrupted. Returns the number removed.</summary>
+    int ClearUpcoming();
+
     void HandleMediaControlCommand(MediaControlCommandMessage message);
 
     void PlayRadioStation(RadioStationDto station);

@@ -121,6 +121,7 @@
 
                 <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingSmall}">
                     <AppBarButton x:Uid="listeningShuffleButton" Style="{StaticResource ListenAppBarButtonStyle}" Width="Auto" MinWidth="0" Icon="Shuffle" Command="{x:Bind ViewModel.ShufflePlaylistCommand}" />
+                    <AppBarButton x:Uid="listeningClearUpcomingButton" Style="{StaticResource ListenAppBarButtonStyle}" Width="Auto" MinWidth="0" Icon="Clear" Command="{x:Bind ViewModel.ClearUpcomingCommand}" />
 
                     <Button>
                         <StackPanel Orientation="Horizontal" Spacing="6">
@@ -192,7 +193,7 @@
                 <TextBlock x:Uid="gridHeaderScore" Grid.Column="4" Style="{StaticResource GridHeaderTracksTextBlockStyle}" />
             </Grid>
 
-            <common:ListViewExtended x:Name="tracksList" ItemsSource="{x:Bind ViewModel.Tracks}" ContainerContentChanging="tracksList_ContainerContentChanging" Grid.Row="1" BorderThickness="0" ItemContainerStyle="{StaticResource TracksListViewItemStyle}" Margin="0" >
+            <common:ListViewExtended x:Name="tracksList" ItemsSource="{x:Bind ViewModel.Tracks}" ContainerContentChanging="TracksListContainerContentChanging" CanReorderItems="True" CanDragItems="True" AllowDrop="True" DragItemsStarting="TracksListDragItemsStarting" DragItemsCompleted="TracksListDragItemsCompleted" Grid.Row="1" BorderThickness="0" ItemContainerStyle="{StaticResource TracksListViewItemStyle}" Margin="0" >
                 <ListView.ItemTemplate>
                     <DataTemplate x:DataType="track:TrackViewModel">
                         <Grid HorizontalAlignment="Stretch" VerticalAlignment="Center" Background="{x:Bind Listening, Mode=OneWay, Converter={StaticResource ListeningRowBackgroundConverter}}" Margin="0,0,20,0">

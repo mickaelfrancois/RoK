@@ -867,6 +867,9 @@
   <data name="PlayerFullScreenToolTips.Text" xml:space="preserve">
     <value>Quitter le mode plein écran</value>
   </data>
+  <data name="PlayerCurrentListeningToolTips.Text" xml:space="preserve">
+    <value>File d'attente</value>
+  </data>
   <data name="PlayerFullScreenCurrentListeningToolTips.Text" xml:space="preserve">
     <value>Voir la playlist</value>
   </data>
@@ -2327,6 +2330,9 @@
   </data>
   <data name="listeningShuffleButton.Label" xml:space="preserve">
     <value>Mélanger</value>
+  </data>
+  <data name="listeningClearUpcomingButton.Label" xml:space="preserve">
+    <value>Vider la suite</value>
   </data>
   <data name="listeningArtistLinksButton.ToolTipService.ToolTip" xml:space="preserve">
     <value>Liens de l'artiste</value>

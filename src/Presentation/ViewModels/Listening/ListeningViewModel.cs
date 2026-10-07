@@ -40,6 +40,7 @@ public sealed partial class ListeningViewModel : ObservableObject, IDisposable
     public string ArtistFavoriteLabel { get; private set; } = string.Empty;
     public string AlbumFavoriteLabel { get; private set; } = string.Empty;
     public string AlbumYear => Album?.ReleaseDateYear ?? string.Empty;
+    public bool HasUpcoming => _playerService.UpcomingCount > 0;
 
     /// <summary>
     /// Asks the view to confirm a multi-track removal from the queue, passing the number of tracks that would be removed.
@@ -149,6 +150,8 @@ public sealed partial class ListeningViewModel : ObservableObject, IDisposable
         OnPropertyChanged(nameof(HeaderTrack));
         OnPropertyChanged(nameof(HeaderState));
         OnPropertyChanged(nameof(AlbumYear));
+        OnPropertyChanged(nameof(HasUpcoming));
+        ClearUpcomingCommand.NotifyCanExecuteChanged();
     }
 
     private void UpdateQueueSummary()
@@ -265,6 +268,26 @@ public sealed partial class ListeningViewModel : ObservableObject, IDisposable
         return RemoveFromQueueAsync(
             _playerService.CountUpcomingByGenre(genreId),
             () => _playerService.RemoveUpcomingByGenre(genreId));
+    }
+
+    [RelayCommand(CanExecute = nameof(HasUpcoming))]
+    private Task ClearUpcomingAsync()
+        => RemoveFromQueueAsync(_playerService.UpcomingCount, _playerService.ClearUpcoming);
+
+    /// <summary>
+    /// Applies a drag-and-drop reorder to the player queue. The list view has already moved the item, so its
+    /// current position is the target. Must be called on the UI thread. When the player refuses the move,
+    /// the list is rebuilt from the queue so the display does not keep an order the player did not adopt.
+    /// </summary>
+    public void MoveUpcoming(TrackViewModel item, int fromIndex)
+    {
+        int toIndex = Tracks.IndexOf(item);
+
+        if (toIndex >= 0 && _playerService.MoveUpcoming(fromIndex, toIndex))
+            return;
+
+        _playlistManager.LoadTracksList(_playerService.Playlist);
+        _ = _playlistManager.SetCurrentTrackAsync(_playerService.CurrentTrack);
     }
 
     private async Task RemoveFromQueueAsync(int upcomingCount, Func<int> remove)
