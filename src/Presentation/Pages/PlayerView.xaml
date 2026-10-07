@@ -167,7 +167,9 @@
                         <Setter Target="radioPanel.Width" Value="500" />
                         <Setter Target="playerControls.Width" Value="350" />
                         <Setter Target="playerControls.HorizontalAlignment" Value="Center" />
-                        <Setter Target="playerCommands.Width" Value="300" />
+                        <Setter Target="playerCommands.Width" Value="400" />
+                        <Setter Target="volume.Visibility" Value="Collapsed" />
+                        <Setter Target="volumeInline.Visibility" Value="Visible" />
                         <Setter Target="playerCommands.Visibility" Value="Visible" />
                         <Setter Target="trackColumn.Width" Value="430" />
                     </VisualState.Setters>
@@ -370,11 +372,11 @@
                     </ToolTipService.ToolTip>
                 </AppBarButton>
 
-                <AppBarButton x:Name="volume" x:Uid="playerVolumeButton" Foreground="White">
+                <AppBarButton x:Name="volume" x:Uid="playerVolumeButton" Foreground="White" ToolTipService.ToolTip="{x:Bind ViewModel.VolumeToolTip, Mode=OneWay}" PointerWheelChanged="OnVolumeWheelChanged">
                     <FontIcon Glyph="{x:Bind ViewModel.Volume, Mode=OneWay, Converter={StaticResource VolumeToGlyphConverter}}" />
                     <AppBarButton.Flyout>
                         <Flyout>
-                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center" PointerWheelChanged="OnVolumeWheelChanged">
                                 <Button Margin="0,0,4,0" Command="{x:Bind ViewModel.MuteCommand}" Background="Transparent">
                                     <FontIcon Glyph="{x:Bind ViewModel.Volume, Mode=OneWay, Converter={StaticResource VolumeToGlyphConverter}}" />
                                 </Button>
@@ -383,6 +385,15 @@
                         </Flyout>
                     </AppBarButton.Flyout>
                 </AppBarButton>
+
+                <AppBarElementContainer x:Name="volumeInline" Visibility="Collapsed" VerticalAlignment="Center" ToolTipService.ToolTip="{x:Bind ViewModel.VolumeToolTip, Mode=OneWay}" PointerWheelChanged="OnVolumeWheelChanged">
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                        <Button Margin="0,0,4,0" Command="{x:Bind ViewModel.MuteCommand}" Background="Transparent" Foreground="White">
+                            <FontIcon Glyph="{x:Bind ViewModel.Volume, Mode=OneWay, Converter={StaticResource VolumeToGlyphConverter}}" />
+                        </Button>
+                        <Slider x:Uid="playerVolumeSlider" Width="96" Minimum="0" Maximum="100" Value="{x:Bind ViewModel.Volume, Mode=TwoWay}" VerticalAlignment="Center" />
+                    </StackPanel>
+                </AppBarElementContainer>
 
                 <CommandBar.SecondaryCommands>
                     <AppBarButton x:Uid="playerEqualizerAppBarButton" x:Name="btEqualizer" Command="{x:Bind ViewModel.ToggleEqualizerCommand}">

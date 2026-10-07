@@ -66,9 +66,29 @@ public sealed class PlayerService : IPlayerService, IDisposable
         get => _volume;
         set
         {
-            _volume = value;
-            _player.SetVolume(_volume);
+            double volumeBefore = _volume;
+            bool mutedBefore = _isMuted;
+
+            if (_isMuted && value > 0)
+                _isMuted = false;
+
+            ApplyVolume(value);
+            NotifyVolumeChanged(volumeBefore, mutedBefore);
         }
+    }
+
+    private void ApplyVolume(double value)
+    {
+        _volume = value;
+        _player.SetVolume(_volume);
+    }
+
+    private void NotifyVolumeChanged(double volumeBefore, bool mutedBefore)
+    {
+        if (volumeBefore == _volume && mutedBefore == _isMuted)
+            return;
+
+        _messenger.Send(new VolumeChanged(_volume, _isMuted));
     }
 
 
@@ -229,17 +249,21 @@ public sealed class PlayerService : IPlayerService, IDisposable
         get => _isMuted;
         set
         {
+            double volumeBefore = _volume;
+            bool mutedBefore = _isMuted;
+
             if (value)
             {
-                _volumeBeforeMute = Volume;
-                Volume = 0;
+                _volumeBeforeMute = _volume;
+                ApplyVolume(0);
             }
             else
             {
-                Volume = _volumeBeforeMute > 0 ? _volumeBeforeMute : KDefaultMuteVolume;
+                ApplyVolume(_volumeBeforeMute > 0 ? _volumeBeforeMute : KDefaultMuteVolume);
             }
 
             _isMuted = value;
+            NotifyVolumeChanged(volumeBefore, mutedBefore);
         }
     }
 

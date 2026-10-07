@@ -1987,7 +1987,10 @@
   <data name="playerVolumeButton.AutomationProperties.Name" xml:space="preserve">
     <value>Volumen</value>
   </data>
-  <data name="playerVolumeButton.ToolTipService.ToolTip" xml:space="preserve">
+  <data name="playerVolumePercentToolTip" xml:space="preserve">
+    <value>Volumen: {0} %</value>
+  </data>
+  <data name="playerVolumeSlider.AutomationProperties.Name" xml:space="preserve">
     <value>Volumen</value>
   </data>
   <data name="compactExitButton.AutomationProperties.Name" xml:space="preserve">
