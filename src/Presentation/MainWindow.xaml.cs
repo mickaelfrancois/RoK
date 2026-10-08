@@ -1,3 +1,4 @@
+using Microsoft.UI.Input;
 using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
@@ -8,8 +9,10 @@ using Rok.Dialogs;
 using Rok.Infrastructure;
 using Rok.Services.Accessibility;
 using Rok.ViewModels.Main;
+using Rok.ViewModels.Player;
 using Windows.Graphics;
 using Windows.System;
+using Windows.UI.Core;
 
 namespace Rok;
 
@@ -442,9 +445,58 @@ public sealed partial class MainWindow : Window, IReviewPromptView
             root.KeyboardAccelerators.Add(installer.Build(ShortcutId.ToggleFullScreen, OnToggleFullScreenAccelerator));
             root.KeyboardAccelerators.Add(installer.Build(ShortcutId.ToggleCompact, OnToggleCompactAccelerator));
             root.KeyboardAccelerators.Add(installer.Build(ShortcutId.Back, OnBackAccelerator));
+            root.PreviewKeyDown += OnPreviewKeyDown;
         }
     }
 
+
+    private void OnPreviewKeyDown(object sender, KeyRoutedEventArgs e)
+    {
+        KeyboardShortcut next = KeyboardShortcutCatalog.ById(ShortcutId.Next);
+        KeyboardShortcut previous = KeyboardShortcutCatalog.ById(ShortcutId.Previous);
+
+        bool isNext = Matches(next, e.Key);
+
+        if (!isNext && !Matches(previous, e.Key))
+            return;
+
+        if (FocusManager.GetFocusedElement(Content.XamlRoot) is TextBox or AutoSuggestBox or PasswordBox)
+            return;
+
+        PlayerViewModel player = App.ServiceProvider.GetRequiredService<PlayerViewModel>();
+        System.Windows.Input.ICommand command = isNext ? player.SkipNextCommand : player.SkipPreviousCommand;
+
+        e.Handled = true;
+
+        if (command.CanExecute(null))
+            command.Execute(null);
+    }
+
+    private static bool Matches(KeyboardShortcut shortcut, VirtualKey key)
+    {
+        return shortcut.Key == key && GetPressedModifiers() == shortcut.Modifiers;
+    }
+
+    private static VirtualKeyModifiers GetPressedModifiers()
+    {
+        VirtualKeyModifiers modifiers = VirtualKeyModifiers.None;
+
+        if (IsKeyDown(VirtualKey.Control))
+            modifiers |= VirtualKeyModifiers.Control;
+
+        if (IsKeyDown(VirtualKey.Shift))
+            modifiers |= VirtualKeyModifiers.Shift;
+
+        if (IsKeyDown(VirtualKey.Menu))
+            modifiers |= VirtualKeyModifiers.Menu;
+
+        return modifiers;
+    }
+
+    private static bool IsKeyDown(VirtualKey key)
+    {
+        return InputKeyboardSource.GetKeyStateForCurrentThread(key).HasFlag(CoreVirtualKeyStates.Down);
+    }
 
     private bool IsInFullScreenMode() => FullScreenGrid.Visibility == Visibility.Visible;
 
