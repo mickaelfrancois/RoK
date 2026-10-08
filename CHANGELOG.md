@@ -1,5 +1,41 @@
 ﻿# ChangeLog
 
+## [2.0.0] Store – 8 octobre 2026
+
+### Ajouté
+
+- Nouvel en-tête de la page En cours d'écoute (#460)
+- Nouvel en-tête de la page Album (#462)
+- Nouvel en-tête de la page Artiste (#463)
+- Nouveaux en-têtes des pages Genre, Playlist et Titre (#464)
+- Filtres actifs affichés sous forme d'étiquettes supprimables sur les pages Albums, Artistes et Titres (#465)
+- Boutons de lecture dans la miniature de la barre des tâches (#471)
+- « Lire ensuite » et « Ajouter à la file d'attente » dans le menu contextuel des titres (#486)
+- « Précédent » revient au début du titre en cours après trois secondes de lecture (#487)
+- Boutons Aléatoire et Répéter, avec un mode de répétition d'un seul titre (#488)
+- Réorganisation des titres à venir par glisser-déposer et vidage de la file d'attente (#489)
+- Curseur de volume dans la barre de lecture, réglable à la molette de la souris (#490)
+- Boutons Paroles et Minuterie de mise en veille dans la barre de lecture (#491)
+
+### Modifié
+
+- Barre de lecture retravaillée : titre qui s'adapte à la largeur, fondu plus rapide et teinte aux couleurs de l'album (#493)
+- La barre de lecture garde le bleu de Rok, nuancé d'un cinquième de la couleur de l'album (#494)
+
+### Corrigé
+
+- Les modifications d'un album sont bien répercutées et l'enregistrement des tags est plus fiable sur la page Album (#461)
+- Mise en page de la vue liste des playlists, format des durées et pochette par défaut (#466)
+- Plus de plantage à la sortie du premier démarrage ni sur la page En cours d'écoute (#468)
+- Retrait du bouton de lecture superposé aux miniatures en vue liste des playlists, albums et artistes (#469)
+- Les titres illisibles sont ignorés sans décaler la position dans la playlist (#470)
+- Lien vers l'artiste masqué sur les compilations et séparateurs en trop retirés des en-têtes (#473)
+- Affichage des heures pour les titres d'une heure ou plus (#485)
+- Infobulles et noms accessibles sur les commandes du lecteur (#492)
+- Ctrl+← et Ctrl+→ passent au titre précédent ou suivant depuis n'importe quel endroit de la fenêtre (#496)
+
+--
+
 ## [1.18.5] Store – 3 octobre 2026
 
 ### Ajouté
