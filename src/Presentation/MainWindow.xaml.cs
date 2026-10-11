@@ -8,6 +8,7 @@ using Rok.Application.Player;
 using Rok.Dialogs;
 using Rok.Infrastructure;
 using Rok.Services.Accessibility;
+using Rok.Services.Diagnostics;
 using Rok.ViewModels.Main;
 using Rok.ViewModels.Player;
 using Windows.Graphics;
@@ -22,6 +23,7 @@ public sealed partial class MainWindow : Window, IReviewPromptView
     private readonly ITelemetryClient _telemetryClient;
     private readonly ResourceLoader _resourceLoader;
     private readonly IMessenger _messenger;
+    private readonly ICrashBreadcrumbs _breadcrumbs;
     private readonly List<IDisposable> _subscriptions = new();
 
     private PointInt32? _compactModeAppPosition;
@@ -64,7 +66,7 @@ public sealed partial class MainWindow : Window, IReviewPromptView
 
 
 
-    public MainWindow(NavigationService navigationService, ITelemetryClient telemetryClient, ResourceLoader resourceLoader, IAppDbContext dbContext, IAppOptions appOptions, IReviewPromptService reviewPromptService, IMessenger messenger)
+    public MainWindow(NavigationService navigationService, ITelemetryClient telemetryClient, ResourceLoader resourceLoader, IAppDbContext dbContext, IAppOptions appOptions, IReviewPromptService reviewPromptService, IMessenger messenger, ICrashBreadcrumbs breadcrumbs)
     {
         _navigationService = Guard.NotNull(navigationService);
         _telemetryClient = Guard.NotNull(telemetryClient);
@@ -73,6 +75,7 @@ public sealed partial class MainWindow : Window, IReviewPromptView
         _appOptions = Guard.NotNull(appOptions);
         _reviewPromptService = Guard.NotNull(reviewPromptService);
         _messenger = Guard.NotNull(messenger);
+        _breadcrumbs = Guard.NotNull(breadcrumbs);
 
         this.InitializeComponent();
 
@@ -365,11 +368,31 @@ public sealed partial class MainWindow : Window, IReviewPromptView
         if (_isOnboardingActive && e.Content is not Pages.WelcomePage)
         {
             _isOnboardingActive = false;
-            navMenu.IsPaneVisible = true;
-            AttachGlobalShortcuts();
+
+            // Reshaping the NavigationView inside Frame.Navigate fails the navigation with E_UNEXPECTED
+            // (GH#467): the onboarding exit is applied once the navigation has completed.
+            _dispatcherQueue.TryEnqueue(CompleteOnboardingExit);
+            return;
         }
 
-        if (e.Content is Pages.OptionsPage)
+        SyncMenuSelection(e.Content);
+    }
+
+    private void CompleteOnboardingExit()
+    {
+        _breadcrumbs.Add("onboarding.pane", "show");
+        navMenu.IsPaneVisible = true;
+
+        _breadcrumbs.Add("onboarding.shortcuts", "attach");
+        AttachGlobalShortcuts();
+
+        _breadcrumbs.Add("onboarding.select", ContentFrame.Content?.GetType().Name ?? "none");
+        SyncMenuSelection(ContentFrame.Content);
+    }
+
+    private void SyncMenuSelection(object? content)
+    {
+        if (content is Pages.OptionsPage)
         {
             navMenu.SelectedItem = navMenu.SettingsItem;
             return;
@@ -377,7 +400,7 @@ public sealed partial class MainWindow : Window, IReviewPromptView
 
         // Keep the menu selection in sync with the displayed page (back navigation included);
         // pages without a menu entry clear the selection.
-        navMenu.SelectedItem = FindMenuItemForPage(e.Content.GetType());
+        navMenu.SelectedItem = content is null ? null : FindMenuItemForPage(content.GetType());
     }
 
     private NavigationViewItem? FindMenuItemForPage(Type pageType)
