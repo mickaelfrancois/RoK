@@ -1,5 +1,13 @@
 ﻿# ChangeLog
 
+## [2.0.1] Store – 11 octobre 2026
+
+### Corrigé
+
+- Plus de plantage à l'arrivée sur la page Albums à la fin du premier démarrage (#498)
+
+--
+
 ## [2.0.0] Store – 8 octobre 2026
 
 ### Ajouté
