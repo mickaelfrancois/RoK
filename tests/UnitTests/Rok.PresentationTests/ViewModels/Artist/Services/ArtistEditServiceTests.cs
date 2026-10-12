@@ -150,19 +150,19 @@ public class ArtistEditServiceTests
         // Assert
         UpdateArtistRequest sent = Assert.Single(_mediator.Sent<UpdateArtistRequest>());
         Assert.Equal(7, sent.Id);
-        Assert.Equal("mb", sent.MusicBrainzID);
-        Assert.Equal(1990, sent.FormedYear);
-        Assert.Equal(1960, sent.BornYear);
-        Assert.Equal(2020, sent.DiedYear);
-        Assert.True(sent.Disbanded);
-        Assert.Equal("members", sent.Members);
-        Assert.Equal("bio", sent.Biography);
+        Assert.Equal("mb", sent.MusicBrainzID.Value);
+        Assert.Equal(1990, sent.FormedYear.Value);
+        Assert.Equal(1960, sent.BornYear.Value);
+        Assert.Equal(2020, sent.DiedYear.Value);
+        Assert.True(sent.Disbanded.Value);
+        Assert.Equal("members", sent.Members.Value);
+        Assert.Equal("bio", sent.Biography.Value);
     }
 
-    [Fact(DisplayName = "EditArtistAsync confirmed should preserve fields not shown in the dialog (social URLs)")]
-    public async Task EditArtistAsync_Confirmed_ShouldPreserveHiddenFields()
+    [Fact(DisplayName = "EditArtistAsync confirmed should not set fields not shown in the dialog (social URLs)")]
+    public async Task EditArtistAsync_Confirmed_ShouldNotSetHiddenFields()
     {
-        // Arrange - a URL that the dialog never edits must survive the round-trip via ToCommand().
+        // Arrange - a URL that the dialog never edits must stay out of the patch.
         ArtistDto artist = new()
         {
             Id = 7,
@@ -179,9 +179,44 @@ public class ArtistEditServiceTests
 
         // Assert
         UpdateArtistRequest sent = Assert.Single(_mediator.Sent<UpdateArtistRequest>());
-        Assert.Equal("https://facebook.com/band", sent.FacebookUrl);
-        Assert.Equal("https://wikipedia.org/band", sent.WikipediaUrl);
-        Assert.Equal("Some Other Band", sent.SimilarArtists);
+        Assert.False(sent.FacebookUrl.IsSet);
+        Assert.False(sent.WikipediaUrl.IsSet);
+        Assert.False(sent.SimilarArtists.IsSet);
+    }
+
+    [Fact(DisplayName = "edit_artist_sends_is_lock_and_only_dialog_fields")]
+    public async Task EditArtistAsync_Confirmed_ShouldRoundTripIsLock()
+    {
+        // Arrange
+        ArtistDto artist = new()
+        {
+            Id = 7,
+            IsLock = false,
+            FacebookUrl = "https://facebook.com/band",
+            WikipediaUrl = "https://wikipedia.org/band"
+        };
+
+        ArtistEditValues? shown = null;
+
+        _dialogService
+            .Setup(x => x.ShowEditArtistAsync(It.IsAny<ArtistEditValues>()))
+            .Callback<ArtistEditValues>(values => shown = values)
+            .ReturnsAsync(new ArtistEditValues { IsLock = true });
+
+        ArtistEditService sut = BuildService();
+
+        // Act
+        await sut.EditArtistAsync(artist);
+
+        // Assert
+        Assert.NotNull(shown);
+        Assert.False(shown.IsLock);
+        UpdateArtistRequest sent = Assert.Single(_mediator.Sent<UpdateArtistRequest>());
+        Assert.True(sent.IsLock.IsSet);
+        Assert.True(sent.IsLock.Value);
+        Assert.False(sent.FacebookUrl.IsSet);
+        Assert.False(sent.WikipediaUrl.IsSet);
+        Assert.True(artist.IsLock);
     }
 
     [Fact(DisplayName = "EditArtistAsync confirmed with a cleared biography should send an empty biography")]
@@ -198,7 +233,8 @@ public class ArtistEditServiceTests
 
         // Assert
         UpdateArtistRequest sent = Assert.Single(_mediator.Sent<UpdateArtistRequest>());
-        Assert.True(string.IsNullOrEmpty(sent.Biography));
+        Assert.True(sent.Biography.IsSet);
+        Assert.True(string.IsNullOrEmpty(sent.Biography.Value));
         Assert.True(string.IsNullOrEmpty(artist.Biography));
     }
 
@@ -220,7 +256,8 @@ public class ArtistEditServiceTests
 
         // Assert
         UpdateArtistRequest sent = Assert.Single(_mediator.Sent<UpdateArtistRequest>());
-        Assert.Null(sent.FormedYear);
+        Assert.True(sent.FormedYear.IsSet);
+        Assert.Null(sent.FormedYear.Value);
         Assert.Null(artist.FormedYear);
     }
 

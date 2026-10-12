@@ -976,6 +976,12 @@
   <data name="compilationSwitch.OffContent" xml:space="preserve">
     <value>Compilación</value>
   </data>
+  <data name="lockSwitch.OnContent" xml:space="preserve">
+    <value>Bloqueado</value>
+  </data>
+  <data name="lockSwitch.OffContent" xml:space="preserve">
+    <value>Bloqueado</value>
+  </data>
   <data name="trackFlyoutTrack.Text" xml:space="preserve">
     <value>Mostrar información de la vía</value>
   </data>

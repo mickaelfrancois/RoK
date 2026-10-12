@@ -70,6 +70,8 @@ public class ArtistDto
 
     public bool IsFavorite { get; set; }
 
+    public bool IsLock { get; set; }
+
     public int ListenCount { get; set; }
 
     public DateTime? LastListen { get; set; }

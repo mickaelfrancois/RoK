@@ -51,7 +51,10 @@ public class UpdateArtistRequestHandlerTests
         repository.Setup(r => r.UpdateAsync(entity, It.IsAny<RepositoryConnectionKind>())).ReturnsAsync(true);
         UpdateArtistRequestHandler handler = new(repository.Object);
 
-        UpdateArtistRequest command = new() { Id = 1, WikipediaUrl = "wiki", Biography = "new bio", Disbanded = true };
+        UpdateArtistRequest command = new() { Id = 1 };
+        command.WikipediaUrl.Set("wiki");
+        command.Biography.Set("new bio");
+        command.Disbanded.Set(true);
 
         // Act
         Result<bool> result = await handler.Handle(command, CancellationToken.None);
@@ -73,12 +76,59 @@ public class UpdateArtistRequestHandlerTests
         repository.Setup(r => r.UpdateAsync(entity, It.IsAny<RepositoryConnectionKind>())).ReturnsAsync(true);
         UpdateArtistRequestHandler handler = new(repository.Object);
 
+        UpdateArtistRequest command = new() { Id = 1 };
+        command.Biography.Set("  ");
+
         // Act
-        Result<bool> result = await handler.Handle(new UpdateArtistRequest { Id = 1, Biography = "  " }, CancellationToken.None);
+        Result<bool> result = await handler.Handle(command, CancellationToken.None);
 
         // Assert
         result.Should().BeSuccess();
         Assert.Equal("  ", entity.Biography);
+    }
+
+    [Fact(DisplayName = "when_patch_omits_fields_handler_keeps_existing_values")]
+    public async Task Handle_ShouldKeepExistingValues_WhenPatchOmitsFields()
+    {
+        // Arrange
+        ArtistEntity entity = new() { Id = 1, Members = "a", FormedYear = 1990 };
+        Mock<IArtistRepository> repository = new();
+        repository.Setup(r => r.GetByIdAsync(1, It.IsAny<RepositoryConnectionKind>())).ReturnsAsync(entity);
+        repository.Setup(r => r.UpdateAsync(entity, It.IsAny<RepositoryConnectionKind>())).ReturnsAsync(true);
+        UpdateArtistRequestHandler handler = new(repository.Object);
+
+        UpdateArtistRequest command = new() { Id = 1 };
+        command.WikipediaUrl.Set("wiki");
+
+        // Act
+        Result<bool> result = await handler.Handle(command, CancellationToken.None);
+
+        // Assert
+        result.Should().BeSuccess();
+        Assert.Equal("wiki", entity.WikipediaUrl);
+        Assert.Equal("a", entity.Members);
+        Assert.Equal(1990, entity.FormedYear);
+    }
+
+    [Fact(DisplayName = "handler_applies_is_lock_patch")]
+    public async Task Handle_ShouldApplyIsLock_WhenPatchSetsIt()
+    {
+        // Arrange
+        ArtistEntity entity = new() { Id = 1 };
+        Mock<IArtistRepository> repository = new();
+        repository.Setup(r => r.GetByIdAsync(1, It.IsAny<RepositoryConnectionKind>())).ReturnsAsync(entity);
+        repository.Setup(r => r.UpdateAsync(entity, It.IsAny<RepositoryConnectionKind>())).ReturnsAsync(true);
+        UpdateArtistRequestHandler handler = new(repository.Object);
+
+        UpdateArtistRequest command = new() { Id = 1 };
+        command.IsLock.Set(true);
+
+        // Act
+        Result<bool> result = await handler.Handle(command, CancellationToken.None);
+
+        // Assert
+        result.Should().BeSuccess();
+        Assert.True(entity.IsLock);
     }
 
     [Fact(DisplayName = "Handle should return failure when artist is not found")]

@@ -1,5 +1,6 @@
 using Rok.Application.Interfaces.Repositories;
 using Rok.Shared;
+using Rok.Shared.Extensions;
 
 namespace Rok.Application.Features.Albums.Requests;
 
@@ -50,6 +51,8 @@ public class UpdateAlbumRequest : IRequest<Result<bool>>
     public PatchField<bool> IsLock { get; set; } = new();
 
     public PatchField<string?> LastFmUrl { get; set; } = new();
+
+    public PatchField<string?> ReleaseFormat { get; set; } = new();
 }
 
 public sealed class UpdateAlbumRequestValidator : Validator<UpdateAlbumRequest>
@@ -69,11 +72,19 @@ public class UpdateAlbumRequestHandler(IAlbumRepository _albumRepository) : IReq
         if (entity is null)
             return Result<bool>.Fail(NotFoundError.ForEntity("Album", command.Id));
 
+        bool identifierChanged = false;
+
         if (command.MusicBrainzID.TryGetValue(out string? musicBrainzID))
+        {
+            identifierChanged |= entity.MusicBrainzID.AreDifferent(musicBrainzID);
             entity.MusicBrainzID = musicBrainzID;
+        }
 
         if (command.ReleaseGroupMusicBrainzID.TryGetValue(out string? releaseGroupMusicBrainzID))
+        {
+            identifierChanged |= entity.ReleaseGroupMusicBrainzID.AreDifferent(releaseGroupMusicBrainzID);
             entity.ReleaseGroupMusicBrainzID = releaseGroupMusicBrainzID;
+        }
 
         if (command.Sales.TryGetValue(out string? sales))
             entity.Sales = sales;
@@ -135,7 +146,10 @@ public class UpdateAlbumRequestHandler(IAlbumRepository _albumRepository) : IReq
         if (command.Biography.TryGetValue(out string? biography))
             entity.Biography = biography;
 
-        if (command.MusicBrainzID.IsSet || command.ReleaseGroupMusicBrainzID.IsSet)
+        if (command.ReleaseFormat.TryGetValue(out string? releaseFormat))
+            entity.ReleaseFormat = releaseFormat;
+
+        if (identifierChanged)
             entity.GetMetaDataLastAttempt = null;
 
         bool result = await _albumRepository.UpdateAsync(entity);

@@ -19,6 +19,8 @@ public sealed record ArtistEditValues
 
     public bool Disbanded { get; init; }
 
+    public bool IsLock { get; init; }
+
     public string? Members { get; init; }
 
     public string? Biography { get; init; }

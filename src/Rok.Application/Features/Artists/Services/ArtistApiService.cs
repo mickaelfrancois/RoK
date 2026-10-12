@@ -3,6 +3,7 @@ using Rok.Application.Dto.MusicDataApi;
 using Rok.Application.Features.Artists.Requests;
 using Rok.Application.Interfaces;
 using Rok.Application.Interfaces.Pictures;
+using Rok.Shared;
 using Rok.Shared.Extensions;
 
 namespace Rok.Application.Features.Artists.Services;
@@ -34,7 +35,7 @@ public class ArtistApiService(
         bool backdropsDownloaded = await DownloadBackdropsIfNeededAsync(artist, artistApi, backdropPicture, cancellationToken);
 
         bool dataUpdated = false;
-        if (CompareArtistFromApi(artist, artistApi))
+        if (!artist.IsLock)
             dataUpdated = await UpdateArtistDataIfNeededAsync(artist, artistApi);
 
         return new ArtistApiUpdateResult(dataUpdated, pictureDownloaded, backdropsDownloaded);
@@ -69,64 +70,75 @@ public class ArtistApiService(
 
     private async Task<bool> UpdateArtistDataIfNeededAsync(ArtistDto artist, MusicDataArtistDto artistApi)
     {
+        UpdateArtistRequest command = new() { Id = artist.Id };
+
+        if (!BuildPatch(command, artist, artistApi))
+            return false;
+
         logger.LogTrace("Patch artist '{Name}' with API data.", artist.Name);
-
-        UpdateArtistRequest command = new()
-        {
-            Id = artist.Id,
-            MusicBrainzID = artistApi.MusicBrainzID ?? artist.MusicBrainzID,
-            AllMusicUrl = artistApi.AllMusic ?? artist.AllMusicUrl,
-            WikipediaUrl = artistApi.Wikipedia ?? artist.WikipediaUrl,
-            OfficialSiteUrl = artistApi.Website ?? artist.OfficialSiteUrl,
-            FacebookUrl = artistApi.Facebook ?? artist.FacebookUrl,
-            TwitterUrl = artistApi.Twitter ?? artist.TwitterUrl,
-            FlickrUrl = artistApi.Flickr ?? artist.FlickrUrl,
-            InstagramUrl = artistApi.Instagram ?? artist.InstagramUrl,
-            TiktokUrl = artistApi.TikTok ?? artist.TiktokUrl,
-            ThreadsUrl = artistApi.Threads ?? artist.ThreadsUrl,
-            SongkickUrl = artistApi.SongKick ?? artist.SongkickUrl,
-            SoundcloundUrl = artistApi.SoundCloud ?? artist.SoundcloundUrl,
-            ImdbUrl = artistApi.Imdb ?? artist.ImdbUrl,
-            LastFmUrl = artistApi.LastFM ?? artist.LastFmUrl,
-            DiscogsUrl = artistApi.Discogs ?? artist.DiscogsUrl,
-            BandsintownUrl = artistApi.Bandsintown ?? artist.BandsintownUrl,
-            YoutubeUrl = artistApi.Youtube ?? artist.YoutubeUrl,
-            AudioDbID = artistApi.AudioDbID ?? artist.AudioDbID,
-            BornYear = artistApi.BeginYear ?? artist.BornYear,
-            DiedYear = artistApi.EndYear ?? artist.DiedYear,
-        };
-
-        command.Biography = string.IsNullOrEmpty(artist.Biography) ? artistApi.Biography : artist.Biography;
 
         await mediator.Send(command);
 
         return true;
     }
 
-    private static bool CompareArtistFromApi(ArtistDto artist, MusicDataArtistDto artistApi)
+    private static bool BuildPatch(UpdateArtistRequest command, ArtistDto artist, MusicDataArtistDto artistApi)
     {
-        if (artist.FlickrUrl.AreDifferent(artistApi.Flickr)) return true;
-        if (artist.InstagramUrl.AreDifferent(artistApi.Instagram)) return true;
-        if (artist.TiktokUrl.AreDifferent(artistApi.TikTok)) return true;
-        if (artist.ThreadsUrl.AreDifferent(artistApi.Threads)) return true;
-        if (artist.SongkickUrl.AreDifferent(artistApi.SongKick)) return true;
-        if (artist.SoundcloundUrl.AreDifferent(artistApi.SoundCloud)) return true;
-        if (artist.ImdbUrl.AreDifferent(artistApi.Imdb)) return true;
-        if (artist.LastFmUrl.AreDifferent(artistApi.LastFM)) return true;
-        if (artist.DiscogsUrl.AreDifferent(artistApi.Discogs)) return true;
-        if (artist.BandsintownUrl.AreDifferent(artistApi.Bandsintown)) return true;
-        if (artist.YoutubeUrl.AreDifferent(artistApi.Youtube)) return true;
-        if (artist.AudioDbID.AreDifferent(artistApi.AudioDbID)) return true;
-        if (artist.AllMusicUrl.AreDifferent(artistApi.AllMusic)) return true;
-        if (artist.TwitterUrl.AreDifferent(artistApi.Twitter)) return true;
-        if (artist.OfficialSiteUrl.AreDifferent(artistApi.Website)) return true;
-        if (artist.FacebookUrl.AreDifferent(artistApi.Facebook)) return true;
-        if (artist.WikipediaUrl.AreDifferent(artistApi.Wikipedia)) return true;
-        if (artist.MusicBrainzID.AreDifferent(artistApi.MusicBrainzID)) return true;
-        if (artist.BornYear.AreDifferent(artistApi.BeginYear)) return true;
-        if (artist.DiedYear.AreDifferent(artistApi.EndYear)) return true;
-        if (artist.Disbanded != artistApi.Disbanded) return true;
+        bool hasChanges = false;
 
-        return string.IsNullOrWhiteSpace(artist.Biography) && !string.IsNullOrWhiteSpace(artistApi.Biography);
+        hasChanges |= FillIfEmpty(command.MusicBrainzID, artist.MusicBrainzID, artistApi.MusicBrainzID);
+        hasChanges |= FillIfEmpty(command.BornYear, artist.BornYear, artistApi.BeginYear);
+        hasChanges |= FillIfEmpty(command.DiedYear, artist.DiedYear, artistApi.EndYear);
+        hasChanges |= FillIfEmpty(command.Biography, artist.Biography, artistApi.Biography);
+
+        hasChanges |= UpdateIfDifferent(command.AllMusicUrl, artist.AllMusicUrl, artistApi.AllMusic);
+        hasChanges |= UpdateIfDifferent(command.WikipediaUrl, artist.WikipediaUrl, artistApi.Wikipedia);
+        hasChanges |= UpdateIfDifferent(command.OfficialSiteUrl, artist.OfficialSiteUrl, artistApi.Website);
+        hasChanges |= UpdateIfDifferent(command.FacebookUrl, artist.FacebookUrl, artistApi.Facebook);
+        hasChanges |= UpdateIfDifferent(command.TwitterUrl, artist.TwitterUrl, artistApi.Twitter);
+        hasChanges |= UpdateIfDifferent(command.FlickrUrl, artist.FlickrUrl, artistApi.Flickr);
+        hasChanges |= UpdateIfDifferent(command.InstagramUrl, artist.InstagramUrl, artistApi.Instagram);
+        hasChanges |= UpdateIfDifferent(command.TiktokUrl, artist.TiktokUrl, artistApi.TikTok);
+        hasChanges |= UpdateIfDifferent(command.ThreadsUrl, artist.ThreadsUrl, artistApi.Threads);
+        hasChanges |= UpdateIfDifferent(command.SongkickUrl, artist.SongkickUrl, artistApi.SongKick);
+        hasChanges |= UpdateIfDifferent(command.SoundcloundUrl, artist.SoundcloundUrl, artistApi.SoundCloud);
+        hasChanges |= UpdateIfDifferent(command.ImdbUrl, artist.ImdbUrl, artistApi.Imdb);
+        hasChanges |= UpdateIfDifferent(command.LastFmUrl, artist.LastFmUrl, artistApi.LastFM);
+        hasChanges |= UpdateIfDifferent(command.DiscogsUrl, artist.DiscogsUrl, artistApi.Discogs);
+        hasChanges |= UpdateIfDifferent(command.BandsintownUrl, artist.BandsintownUrl, artistApi.Bandsintown);
+        hasChanges |= UpdateIfDifferent(command.YoutubeUrl, artist.YoutubeUrl, artistApi.Youtube);
+        hasChanges |= UpdateIfDifferent(command.AudioDbID, artist.AudioDbID, artistApi.AudioDbID);
+
+        return hasChanges;
+    }
+
+    private static bool FillIfEmpty(PatchField<string?> field, string? current, string? api)
+    {
+        if (string.IsNullOrWhiteSpace(api) || !string.IsNullOrWhiteSpace(current))
+            return false;
+
+        field.Set(api);
+
+        return true;
+    }
+
+    private static bool FillIfEmpty(PatchField<int?> field, int? current, int? api)
+    {
+        if (!api.HasValue || current.HasValue)
+            return false;
+
+        field.Set(api);
+
+        return true;
+    }
+
+    private static bool UpdateIfDifferent(PatchField<string?> field, string? current, string? api)
+    {
+        if (string.IsNullOrWhiteSpace(api) || !current.AreDifferent(api))
+            return false;
+
+        field.Set(api);
+
+        return true;
     }
 }

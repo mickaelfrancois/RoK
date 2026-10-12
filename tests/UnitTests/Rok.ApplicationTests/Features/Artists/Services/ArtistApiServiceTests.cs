@@ -219,7 +219,7 @@ public class ArtistApiServiceTests
 
         // Assert
         UpdateArtistRequest sent = Assert.Single(_mediator.Sent<UpdateArtistRequest>());
-        Assert.Equal("manual bio", sent.Biography);
+        Assert.False(sent.Biography.IsSet);
     }
 
     [Fact(DisplayName = "GetAndUpdateArtistDataAsync should adopt the API biography when the current one is empty")]
@@ -239,7 +239,183 @@ public class ArtistApiServiceTests
 
         // Assert
         UpdateArtistRequest sent = Assert.Single(_mediator.Sent<UpdateArtistRequest>());
-        Assert.Equal("api bio", sent.Biography);
+        Assert.True(sent.Biography.IsSet);
+        Assert.Equal("api bio", sent.Biography.Value);
+    }
+
+    [Fact(DisplayName = "when_api_sync_runs_user_members_formed_year_similar_and_disbanded_are_not_sent")]
+    public async Task GetAndUpdateArtistDataAsync_ShouldNotSendUserOnlyFields()
+    {
+        // Arrange
+        ArtistDto artist = new() { Id = 1, Name = "Beatles", MusicBrainzID = "mbid", Members = "members", FormedYear = 1960, SimilarArtists = "similar", Disbanded = true, FlickrUrl = "old-flickr" };
+        MusicDataArtistDto artistApi = new() { MusicBrainzID = "mbid", Flickr = "new-flickr", Disbanded = false };
+        _musicData.Setup(m => m.IsApiRetryAllowed(It.IsAny<DateTime?>())).Returns(true);
+        _musicData.Setup(m => m.GetArtistAsync(It.IsAny<string>(), It.IsAny<string?>())).ReturnsAsync(artistApi);
+        _pictureService.Setup(p => p.PictureExists(artist.Name)).Returns(true);
+        _backdropPicture.Setup(b => b.HasBackdrops(artist.Name)).Returns(true);
+        ArtistApiService sut = BuildService();
+
+        // Act
+        ArtistApiUpdateResult result = await sut.GetAndUpdateArtistDataAsync(artist, _pictureService.Object, _backdropPicture.Object);
+
+        // Assert
+        UpdateArtistRequest sent = Assert.Single(_mediator.Sent<UpdateArtistRequest>());
+        Assert.True(result.DataUpdated);
+        Assert.Equal("new-flickr", sent.FlickrUrl.Value);
+        Assert.False(sent.Members.IsSet);
+        Assert.False(sent.FormedYear.IsSet);
+        Assert.False(sent.SimilarArtists.IsSet);
+        Assert.False(sent.Disbanded.IsSet);
+    }
+
+    [Fact(DisplayName = "when_artist_is_locked_no_data_is_written_but_missing_images_are_downloaded")]
+    public async Task GetAndUpdateArtistDataAsync_ShouldOnlyDownloadImages_WhenArtistIsLocked()
+    {
+        // Arrange
+        ArtistDto artist = new() { Id = 1, Name = "Beatles", IsLock = true, MusicBrainzID = "old", FlickrUrl = "old-flickr" };
+        MusicDataArtistDto artistApi = new() { MusicBrainzID = "mbid", Flickr = "new-flickr", PictureUrl = "https://example.com/pic.jpg" };
+        _musicData.Setup(m => m.IsApiRetryAllowed(It.IsAny<DateTime?>())).Returns(true);
+        _musicData.Setup(m => m.GetArtistAsync(It.IsAny<string>(), It.IsAny<string?>())).ReturnsAsync(artistApi);
+        _pictureService.SetupSequence(p => p.PictureExists(artist.Name)).Returns(false).Returns(true);
+        _pictureService.Setup(p => p.GetPictureFilePath(artist.Name)).Returns("C:/tmp/Beatles.jpg");
+        _backdropPicture.SetupSequence(b => b.HasBackdrops(artist.Name)).Returns(false).Returns(true);
+        _backdropPicture.Setup(b => b.GetArtistPictureFolder(artist.Name)).Returns("C:/tmp/backdrops");
+        ArtistApiService sut = BuildService();
+
+        // Act
+        ArtistApiUpdateResult result = await sut.GetAndUpdateArtistDataAsync(artist, _pictureService.Object, _backdropPicture.Object);
+
+        // Assert
+        Assert.Empty(_mediator.Sent<UpdateArtistRequest>());
+        Assert.False(result.DataUpdated);
+        Assert.True(result.PictureDownloaded);
+        Assert.True(result.BackdropsDownloaded);
+        Assert.Single(_mediator.Sent<UpdateArtistGetMetaDataLastAttemptRequest>());
+    }
+
+    [Fact(DisplayName = "when_artist_matches_api_no_update_is_sent")]
+    public async Task GetAndUpdateArtistDataAsync_ShouldSendNothing_WhenArtistMatchesApi()
+    {
+        // Arrange
+        ArtistDto artist = new()
+        {
+            Id = 1,
+            Name = "Beatles",
+            MusicBrainzID = "mbid",
+            FlickrUrl = "flickr",
+            WikipediaUrl = "wiki",
+            BornYear = 1940,
+            Biography = "local bio",
+            OfficialSiteUrl = "https://local.example.com",
+            YoutubeUrl = "https://youtube.com/local"
+        };
+        MusicDataArtistDto artistApi = new() { MusicBrainzID = "mbid", Flickr = "flickr", Wikipedia = "wiki", BeginYear = 1940, Biography = null, Website = null, Youtube = string.Empty };
+        _musicData.Setup(m => m.IsApiRetryAllowed(It.IsAny<DateTime?>())).Returns(true);
+        _musicData.Setup(m => m.GetArtistAsync(It.IsAny<string>(), It.IsAny<string?>())).ReturnsAsync(artistApi);
+        _pictureService.Setup(p => p.PictureExists(artist.Name)).Returns(true);
+        _backdropPicture.Setup(b => b.HasBackdrops(artist.Name)).Returns(true);
+        ArtistApiService sut = BuildService();
+
+        // Act
+        ArtistApiUpdateResult result = await sut.GetAndUpdateArtistDataAsync(artist, _pictureService.Object, _backdropPicture.Object);
+
+        // Assert
+        Assert.Empty(_mediator.Sent<UpdateArtistRequest>());
+        Assert.False(result.DataUpdated);
+    }
+
+    [Fact(DisplayName = "when_api_disbanded_differs_no_update_is_sent")]
+    public async Task GetAndUpdateArtistDataAsync_ShouldSendNothing_WhenOnlyDisbandedDiffers()
+    {
+        // Arrange
+        ArtistDto artist = new() { Id = 1, Name = "Beatles", MusicBrainzID = "mbid", Disbanded = false };
+        MusicDataArtistDto artistApi = new() { MusicBrainzID = "mbid", Disbanded = true };
+        _musicData.Setup(m => m.IsApiRetryAllowed(It.IsAny<DateTime?>())).Returns(true);
+        _musicData.Setup(m => m.GetArtistAsync(It.IsAny<string>(), It.IsAny<string?>())).ReturnsAsync(artistApi);
+        _pictureService.Setup(p => p.PictureExists(artist.Name)).Returns(true);
+        _backdropPicture.Setup(b => b.HasBackdrops(artist.Name)).Returns(true);
+        ArtistApiService sut = BuildService();
+
+        // Act
+        ArtistApiUpdateResult result = await sut.GetAndUpdateArtistDataAsync(artist, _pictureService.Object, _backdropPicture.Object);
+
+        // Assert
+        Assert.Empty(_mediator.Sent<UpdateArtistRequest>());
+        Assert.False(result.DataUpdated);
+    }
+
+    [Fact(DisplayName = "when_artist_mbid_or_years_are_set_api_values_are_not_sent")]
+    public async Task GetAndUpdateArtistDataAsync_ShouldNotSendMbidOrYears_WhenLocalValuesAreSet()
+    {
+        // Arrange
+        ArtistDto artist = new() { Id = 1, Name = "Beatles", MusicBrainzID = "local-mbid", BornYear = 1941, DiedYear = 1971, FlickrUrl = "old-flickr" };
+        MusicDataArtistDto artistApi = new() { MusicBrainzID = "api-mbid", BeginYear = 1940, EndYear = 1970, Flickr = "new-flickr" };
+        _musicData.Setup(m => m.IsApiRetryAllowed(It.IsAny<DateTime?>())).Returns(true);
+        _musicData.Setup(m => m.GetArtistAsync(It.IsAny<string>(), It.IsAny<string?>())).ReturnsAsync(artistApi);
+        _pictureService.Setup(p => p.PictureExists(artist.Name)).Returns(true);
+        _backdropPicture.Setup(b => b.HasBackdrops(artist.Name)).Returns(true);
+        ArtistApiService sut = BuildService();
+
+        // Act
+        await sut.GetAndUpdateArtistDataAsync(artist, _pictureService.Object, _backdropPicture.Object);
+
+        // Assert
+        UpdateArtistRequest sent = Assert.Single(_mediator.Sent<UpdateArtistRequest>());
+        Assert.False(sent.MusicBrainzID.IsSet);
+        Assert.False(sent.BornYear.IsSet);
+        Assert.False(sent.DiedYear.IsSet);
+        Assert.Equal("new-flickr", sent.FlickrUrl.Value);
+    }
+
+    [Fact(DisplayName = "when_artist_years_are_empty_api_values_are_sent")]
+    public async Task GetAndUpdateArtistDataAsync_ShouldSendYears_WhenLocalYearsAreEmpty()
+    {
+        // Arrange
+        ArtistDto artist = new() { Id = 1, Name = "Beatles", MusicBrainzID = "mbid" };
+        MusicDataArtistDto artistApi = new() { MusicBrainzID = "mbid", BeginYear = 1940, EndYear = 1980 };
+        _musicData.Setup(m => m.IsApiRetryAllowed(It.IsAny<DateTime?>())).Returns(true);
+        _musicData.Setup(m => m.GetArtistAsync(It.IsAny<string>(), It.IsAny<string?>())).ReturnsAsync(artistApi);
+        _pictureService.Setup(p => p.PictureExists(artist.Name)).Returns(true);
+        _backdropPicture.Setup(b => b.HasBackdrops(artist.Name)).Returns(true);
+        ArtistApiService sut = BuildService();
+
+        // Act
+        await sut.GetAndUpdateArtistDataAsync(artist, _pictureService.Object, _backdropPicture.Object);
+
+        // Assert
+        UpdateArtistRequest sent = Assert.Single(_mediator.Sent<UpdateArtistRequest>());
+        Assert.Equal(1940, sent.BornYear.Value);
+        Assert.Equal(1980, sent.DiedYear.Value);
+    }
+
+    [Theory(DisplayName = "when_api_url_differs_it_is_updated_and_when_empty_it_is_kept")]
+    [InlineData("https://new.example.com", true)]
+    [InlineData("", false)]
+    [InlineData(null, false)]
+    public async Task GetAndUpdateArtistDataAsync_ShouldUpdateUrlOnlyWhenApiValueIsNonEmptyAndDifferent(string? apiUrl, bool expectedSet)
+    {
+        // Arrange
+        ArtistDto artist = new() { Id = 1, Name = "Beatles", MusicBrainzID = "mbid", WikipediaUrl = "https://old.example.com", FlickrUrl = "old-flickr" };
+        MusicDataArtistDto artistApi = new() { MusicBrainzID = "mbid", Wikipedia = apiUrl, Flickr = "old-flickr" };
+        _musicData.Setup(m => m.IsApiRetryAllowed(It.IsAny<DateTime?>())).Returns(true);
+        _musicData.Setup(m => m.GetArtistAsync(It.IsAny<string>(), It.IsAny<string?>())).ReturnsAsync(artistApi);
+        _pictureService.Setup(p => p.PictureExists(artist.Name)).Returns(true);
+        _backdropPicture.Setup(b => b.HasBackdrops(artist.Name)).Returns(true);
+        ArtistApiService sut = BuildService();
+
+        // Act
+        await sut.GetAndUpdateArtistDataAsync(artist, _pictureService.Object, _backdropPicture.Object);
+
+        // Assert
+        if (expectedSet)
+        {
+            UpdateArtistRequest sent = Assert.Single(_mediator.Sent<UpdateArtistRequest>());
+            Assert.Equal(apiUrl, sent.WikipediaUrl.Value);
+        }
+        else
+        {
+            Assert.Empty(_mediator.Sent<UpdateArtistRequest>());
+        }
     }
 
     [Fact(DisplayName = "GetAndUpdateArtistDataAsync should report PictureDownloaded independently of DataUpdated")]

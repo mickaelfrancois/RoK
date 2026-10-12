@@ -42,6 +42,21 @@ public class ArtistMappingTests
         Assert.Equal("british;legendary", dto.TagsAsString);
     }
 
+    [Theory(DisplayName = "to_dto_maps_is_lock")]
+    [InlineData(true)]
+    [InlineData(false)]
+    public void ToDto_ShouldMapIsLock(bool isLock)
+    {
+        // Arrange
+        ArtistEntity entity = new() { Id = 12, Name = "Locked", IsLock = isLock };
+
+        // Act
+        ArtistDto dto = entity.ToDto();
+
+        // Assert
+        Assert.Equal(isLock, dto.IsLock);
+    }
+
     [Fact(DisplayName = "ToEntity should map a CreateArtistRequest to an ArtistEntity")]
     public void ToEntity_ShouldMapCreateCommand()
     {
@@ -76,35 +91,5 @@ public class ArtistMappingTests
         Assert.Equal(2, entity.CountryId);
         Assert.Equal(50, entity.TrackCount);
         Assert.Equal(10, entity.AlbumCount);
-    }
-
-    [Fact(DisplayName = "ToCommand should map an ArtistDto to an UpdateArtistRequest")]
-    public void ToCommand_ShouldMapDtoToUpdateCommand()
-    {
-        // Arrange
-        ArtistDto dto = new()
-        {
-            Id = 11,
-            MusicBrainzID = "mbid",
-            WikipediaUrl = "wiki",
-            BornYear = 1960,
-            DiedYear = 1970,
-            Disbanded = true,
-            FormedYear = 1958,
-            Biography = "bio"
-        };
-
-        // Act
-        UpdateArtistRequest command = dto.ToCommand();
-
-        // Assert
-        Assert.Equal(11, command.Id);
-        Assert.Equal("mbid", command.MusicBrainzID);
-        Assert.Equal("wiki", command.WikipediaUrl);
-        Assert.Equal(1960, command.BornYear);
-        Assert.Equal(1970, command.DiedYear);
-        Assert.True(command.Disbanded);
-        Assert.Equal(1958, command.FormedYear);
-        Assert.Equal("bio", command.Biography);
     }
 }

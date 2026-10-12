@@ -1034,6 +1034,12 @@
   <data name="compilationSwitch.OffContent" xml:space="preserve">
     <value>Компільовані</value>
   </data>
+  <data name="lockSwitch.OnContent" xml:space="preserve">
+    <value>Заблоковано</value>
+  </data>
+  <data name="lockSwitch.OffContent" xml:space="preserve">
+    <value>Заблоковано</value>
+  </data>
   <data name="trackFlyoutTrack.Text" xml:space="preserve">
     <value>Показати доріжку</value>
   </data>

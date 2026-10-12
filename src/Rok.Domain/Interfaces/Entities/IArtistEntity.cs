@@ -27,6 +27,7 @@ public interface IArtistEntity : IEntity
     string? InstagramUrl { get; set; }
     bool IsFavorite { get; set; }
     bool IsGenreFavorite { get; set; }
+    bool IsLock { get; set; }
     string? LastFmUrl { get; set; }
     DateTime? LastListen { get; set; }
     int ListenCount { get; set; }

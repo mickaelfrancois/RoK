@@ -161,4 +161,126 @@ public class AlbumApiServiceTests
         Assert.False(result.DataUpdated);
         Assert.Empty(_mediator.Sent<UpdateAlbumRequest>());
     }
+
+    private Task<AlbumApiUpdateResult> RunAsync(AlbumDto album, MusicDataAlbumDto albumApi)
+    {
+        _musicData.Setup(m => m.IsApiRetryAllowed(It.IsAny<DateTime?>())).Returns(true);
+        _musicData.Setup(m => m.GetAlbumAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string?>(), It.IsAny<string?>())).ReturnsAsync(albumApi);
+        _pictureService.Setup(p => p.PictureExists(It.IsAny<string>())).Returns(true);
+
+        return BuildService().GetAndUpdateAlbumDataAsync(album, _pictureService.Object);
+    }
+
+    [Fact(DisplayName = "when_album_is_locked_mbid_and_label_are_kept")]
+    public async Task GetAndUpdateAlbumDataAsync_ShouldSendNothing_WhenAlbumIsLocked()
+    {
+        // Arrange
+        AlbumDto album = new() { Id = 1, Name = "Album", ArtistName = "Artist", IsLock = true, MusicBrainzID = "a", Label = "L1" };
+        MusicDataAlbumDto albumApi = new() { MusicBrainzID = "b", Label = "L2" };
+
+        // Act
+        AlbumApiUpdateResult result = await RunAsync(album, albumApi);
+
+        // Assert
+        Assert.False(result.DataUpdated);
+        Assert.Empty(_mediator.Sent<UpdateAlbumRequest>());
+    }
+
+    [Fact(DisplayName = "when_album_is_locked_missing_cover_is_still_downloaded")]
+    public async Task GetAndUpdateAlbumDataAsync_ShouldDownloadCover_WhenAlbumIsLocked()
+    {
+        // Arrange
+        AlbumDto album = new() { Id = 1, Name = "Album", ArtistName = "Artist", AlbumPath = "C:/music/Album", IsLock = true };
+        MusicDataAlbumDto albumApi = new() { MusicBrainzID = "mbid" };
+        _musicData.Setup(m => m.IsApiRetryAllowed(It.IsAny<DateTime?>())).Returns(true);
+        _musicData.Setup(m => m.GetAlbumAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string?>(), It.IsAny<string?>())).ReturnsAsync(albumApi);
+        _pictureService.SetupSequence(p => p.PictureExists(album.AlbumPath)).Returns(false).Returns(true);
+        _pictureService.Setup(p => p.GetPictureFilePath(album.AlbumPath)).Returns("C:/music/Album/cover.jpg");
+
+        // Act
+        AlbumApiUpdateResult result = await BuildService().GetAndUpdateAlbumDataAsync(album, _pictureService.Object);
+
+        // Assert
+        Assert.True(result.PictureDownloaded);
+        Assert.False(result.DataUpdated);
+        _musicData.Verify(m => m.DownloadCoverAsync(albumApi, "C:/music/Album/cover.jpg", It.IsAny<CancellationToken>()), Times.Once);
+    }
+
+    [Fact(DisplayName = "when_api_label_is_empty_and_local_is_set_no_album_update_is_sent")]
+    public async Task GetAndUpdateAlbumDataAsync_ShouldSendNothing_WhenApiLabelIsEmpty()
+    {
+        // Arrange
+        AlbumDto album = new() { Id = 1, Name = "Album", ArtistName = "Artist", MusicBrainzID = "mbid", Label = "X" };
+        MusicDataAlbumDto albumApi = new() { MusicBrainzID = "mbid", Label = null };
+
+        // Act
+        AlbumApiUpdateResult result = await RunAsync(album, albumApi);
+
+        // Assert
+        Assert.False(result.DataUpdated);
+        Assert.Empty(_mediator.Sent<UpdateAlbumRequest>());
+    }
+
+    [Fact(DisplayName = "when_release_format_is_set_and_differs_no_album_update_is_sent")]
+    public async Task GetAndUpdateAlbumDataAsync_ShouldSendNothing_WhenReleaseFormatIsSetAndDiffers()
+    {
+        // Arrange
+        AlbumDto album = new() { Id = 1, Name = "Album", ArtistName = "Artist", MusicBrainzID = "mbid", ReleaseFormat = "CD" };
+        MusicDataAlbumDto albumApi = new() { MusicBrainzID = "mbid", ReleaseFormat = "Vinyl" };
+
+        // Act
+        AlbumApiUpdateResult result = await RunAsync(album, albumApi);
+
+        // Assert
+        Assert.False(result.DataUpdated);
+        Assert.Empty(_mediator.Sent<UpdateAlbumRequest>());
+    }
+
+    [Fact(DisplayName = "when_album_mbid_is_set_api_mbid_is_not_sent")]
+    public async Task GetAndUpdateAlbumDataAsync_ShouldNotSendMbid_WhenLocalMbidIsSet()
+    {
+        // Arrange
+        AlbumDto album = new() { Id = 1, Name = "Album", ArtistName = "Artist", MusicBrainzID = "a", Label = "L1" };
+        MusicDataAlbumDto albumApi = new() { MusicBrainzID = "b", Label = "L2" };
+
+        // Act
+        AlbumApiUpdateResult result = await RunAsync(album, albumApi);
+
+        // Assert
+        UpdateAlbumRequest sent = Assert.Single(_mediator.Sent<UpdateAlbumRequest>());
+        Assert.True(result.DataUpdated);
+        Assert.False(sent.MusicBrainzID.IsSet);
+        Assert.True(sent.Label.IsSet);
+        Assert.Equal("L2", sent.Label.Value);
+    }
+
+    [Fact(DisplayName = "when_album_mbid_is_empty_api_mbid_is_sent")]
+    public async Task GetAndUpdateAlbumDataAsync_ShouldSendMbid_WhenLocalMbidIsEmpty()
+    {
+        // Arrange
+        AlbumDto album = new() { Id = 1, Name = "Album", ArtistName = "Artist" };
+        MusicDataAlbumDto albumApi = new() { MusicBrainzID = "b" };
+
+        // Act
+        await RunAsync(album, albumApi);
+
+        // Assert
+        UpdateAlbumRequest sent = Assert.Single(_mediator.Sent<UpdateAlbumRequest>());
+        Assert.Equal("b", sent.MusicBrainzID.Value);
+    }
+
+    [Fact(DisplayName = "when_release_format_is_empty_api_value_is_sent")]
+    public async Task GetAndUpdateAlbumDataAsync_ShouldSendReleaseFormat_WhenLocalIsEmpty()
+    {
+        // Arrange
+        AlbumDto album = new() { Id = 1, Name = "Album", ArtistName = "Artist", MusicBrainzID = "mbid" };
+        MusicDataAlbumDto albumApi = new() { MusicBrainzID = "mbid", ReleaseFormat = "CD" };
+
+        // Act
+        await RunAsync(album, albumApi);
+
+        // Assert
+        UpdateAlbumRequest sent = Assert.Single(_mediator.Sent<UpdateAlbumRequest>());
+        Assert.Equal("CD", sent.ReleaseFormat.Value);
+    }
 }
