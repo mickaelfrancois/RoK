@@ -3,6 +3,7 @@ using Rok.Application.Dto.MusicDataApi;
 using Rok.Application.Features.Albums.Requests;
 using Rok.Application.Interfaces;
 using Rok.Application.Interfaces.Pictures;
+using Rok.Shared;
 using Rok.Shared.Extensions;
 
 namespace Rok.Application.Features.Albums.Services;
@@ -33,7 +34,7 @@ public class AlbumApiService(
         bool pictureDownloaded = await DownloadPictureIfNeededAsync(album, albumApi, pictureService, cancellationToken);
 
         bool dataUpdated = false;
-        if (CompareAlbumFromApi(album, albumApi))
+        if (!album.IsLock)
             dataUpdated = await UpdateAlbumDataIfNeededAsync(album, albumApi);
 
         return new AlbumApiUpdateResult(dataUpdated, pictureDownloaded);
@@ -55,73 +56,72 @@ public class AlbumApiService(
 
     private async Task<bool> UpdateAlbumDataIfNeededAsync(AlbumDto album, MusicDataAlbumDto albumApi)
     {
+        UpdateAlbumRequest command = new() { Id = album.Id };
+
+        if (!BuildPatch(command, album, albumApi))
+            return false;
+
         logger.LogTrace("Patch album '{Name}' from API response.", album.Name);
-
-        UpdateAlbumRequest command = new()
-        {
-            Id = album.Id
-        };
-
-        if (!string.IsNullOrEmpty(albumApi.Label))
-            command.Label.Set(albumApi.Label);
-        if (!string.IsNullOrEmpty(albumApi.Sales))
-            command.Sales.Set(albumApi.Sales);
-        if (!string.IsNullOrEmpty(albumApi.MusicBrainzID))
-            command.MusicBrainzID.Set(albumApi.MusicBrainzID);
-        if (albumApi.ReleaseDate.HasValue)
-            command.ReleaseDate.Set(albumApi.ReleaseDate);
-        if (!string.IsNullOrEmpty(albumApi.Wikipedia))
-            command.Wikipedia.Set(albumApi.Wikipedia);
-        if (!string.IsNullOrEmpty(albumApi.AllMusicID))
-            command.AllMusicID.Set(albumApi.AllMusicID);
-        if (!string.IsNullOrEmpty(albumApi.AmazonID))
-            command.AmazonID.Set(albumApi.AmazonID);
-        if (!string.IsNullOrEmpty(albumApi.AudioDbArtistID))
-            command.AudioDbArtistID.Set(albumApi.AudioDbArtistID);
-        if (!string.IsNullOrEmpty(albumApi.AudioDbID))
-            command.AudioDbID.Set(albumApi.AudioDbID);
-        if (!string.IsNullOrEmpty(albumApi.DiscogsID))
-            command.DiscogsID.Set(albumApi.DiscogsID);
-        if (!string.IsNullOrEmpty(albumApi.GeniusID))
-            command.GeniusID.Set(albumApi.GeniusID);
-        if (!string.IsNullOrEmpty(albumApi.LyricWikiID))
-            command.LyricWikiID.Set(albumApi.LyricWikiID);
-        if (!string.IsNullOrEmpty(albumApi.MusicMozID))
-            command.MusicMozID.Set(albumApi.MusicMozID);
-        if (!string.IsNullOrEmpty(albumApi.ReleaseGroupMusicBrainzID))
-            command.ReleaseGroupMusicBrainzID.Set(albumApi.ReleaseGroupMusicBrainzID);
-        if (!string.IsNullOrEmpty(albumApi.WikidataID))
-            command.WikidataID.Set(albumApi.WikidataID);
-        if (!string.IsNullOrEmpty(albumApi.WikipediaID))
-            command.WikipediaID.Set(albumApi.WikipediaID);
-        if (string.IsNullOrWhiteSpace(album.Biography) && !string.IsNullOrWhiteSpace(albumApi.Biography))
-            command.Biography.Set(albumApi.Biography);
 
         await mediator.Send(command);
 
         return true;
     }
 
-    private static bool CompareAlbumFromApi(AlbumDto album, MusicDataAlbumDto albumApi)
+    private static bool BuildPatch(UpdateAlbumRequest command, AlbumDto album, MusicDataAlbumDto albumApi)
     {
-        if (album.Label.AreDifferent(albumApi.Label)) return true;
-        if (album.Sales.AreDifferent(albumApi.Sales)) return true;
-        if (album.MusicBrainzID.AreDifferent(albumApi.MusicBrainzID)) return true;
-        if (album.ReleaseDate != albumApi.ReleaseDate) return true;
-        if (album.ReleaseFormat.AreDifferent(albumApi.ReleaseFormat)) return true;
-        if (album.Wikipedia.AreDifferent(albumApi.Wikipedia)) return true;
-        if (album.AllMusicID.AreDifferent(albumApi.AllMusicID)) return true;
-        if (album.AmazonID.AreDifferent(albumApi.AmazonID)) return true;
-        if (album.AudioDbArtistID.AreDifferent(albumApi.AudioDbArtistID)) return true;
-        if (album.AudioDbID.AreDifferent(albumApi.AudioDbID)) return true;
-        if (album.DiscogsID.AreDifferent(albumApi.DiscogsID)) return true;
-        if (album.GeniusID.AreDifferent(albumApi.GeniusID)) return true;
-        if (album.LyricWikiID.AreDifferent(albumApi.LyricWikiID)) return true;
-        if (album.MusicMozID.AreDifferent(albumApi.MusicMozID)) return true;
-        if (album.ReleaseGroupMusicBrainzID.AreDifferent(albumApi.ReleaseGroupMusicBrainzID)) return true;
-        if (album.WikidataID.AreDifferent(albumApi.WikidataID)) return true;
-        if (album.WikipediaID.AreDifferent(albumApi.WikipediaID)) return true;
+        bool hasChanges = false;
 
-        return string.IsNullOrWhiteSpace(album.Biography) && !string.IsNullOrWhiteSpace(albumApi.Biography);
+        hasChanges |= FillIfEmpty(command.MusicBrainzID, album.MusicBrainzID, albumApi.MusicBrainzID);
+        hasChanges |= FillIfEmpty(command.ReleaseGroupMusicBrainzID, album.ReleaseGroupMusicBrainzID, albumApi.ReleaseGroupMusicBrainzID);
+        hasChanges |= FillIfEmpty(command.Biography, album.Biography, albumApi.Biography);
+        hasChanges |= FillIfEmpty(command.ReleaseFormat, album.ReleaseFormat, albumApi.ReleaseFormat);
+
+        hasChanges |= UpdateIfDifferent(command.Label, album.Label, albumApi.Label);
+        hasChanges |= UpdateIfDifferent(command.Sales, album.Sales, albumApi.Sales);
+        hasChanges |= UpdateIfDifferent(command.Wikipedia, album.Wikipedia, albumApi.Wikipedia);
+        hasChanges |= UpdateIfDifferent(command.AllMusicID, album.AllMusicID, albumApi.AllMusicID);
+        hasChanges |= UpdateIfDifferent(command.AmazonID, album.AmazonID, albumApi.AmazonID);
+        hasChanges |= UpdateIfDifferent(command.AudioDbArtistID, album.AudioDbArtistID, albumApi.AudioDbArtistID);
+        hasChanges |= UpdateIfDifferent(command.AudioDbID, album.AudioDbID, albumApi.AudioDbID);
+        hasChanges |= UpdateIfDifferent(command.DiscogsID, album.DiscogsID, albumApi.DiscogsID);
+        hasChanges |= UpdateIfDifferent(command.GeniusID, album.GeniusID, albumApi.GeniusID);
+        hasChanges |= UpdateIfDifferent(command.LyricWikiID, album.LyricWikiID, albumApi.LyricWikiID);
+        hasChanges |= UpdateIfDifferent(command.MusicMozID, album.MusicMozID, albumApi.MusicMozID);
+        hasChanges |= UpdateIfDifferent(command.WikidataID, album.WikidataID, albumApi.WikidataID);
+        hasChanges |= UpdateIfDifferent(command.WikipediaID, album.WikipediaID, albumApi.WikipediaID);
+        hasChanges |= UpdateIfDifferent(command.ReleaseDate, album.ReleaseDate, albumApi.ReleaseDate);
+
+        return hasChanges;
+    }
+
+    private static bool FillIfEmpty(PatchField<string?> field, string? current, string? api)
+    {
+        if (string.IsNullOrWhiteSpace(api) || !string.IsNullOrWhiteSpace(current))
+            return false;
+
+        field.Set(api);
+
+        return true;
+    }
+
+    private static bool UpdateIfDifferent(PatchField<string?> field, string? current, string? api)
+    {
+        if (string.IsNullOrWhiteSpace(api) || !current.AreDifferent(api))
+            return false;
+
+        field.Set(api);
+
+        return true;
+    }
+
+    private static bool UpdateIfDifferent(PatchField<DateTime?> field, DateTime? current, DateTime? api)
+    {
+        if (!api.HasValue || current == api)
+            return false;
+
+        field.Set(api);
+
+        return true;
     }
 }

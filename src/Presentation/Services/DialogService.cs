@@ -52,6 +52,7 @@ public sealed class DialogService(ResourceLoader resourceLoader, ITranslateServi
             BornYear = current.BornYear,
             DiedYear = current.DiedYear,
             Disbanded = current.Disbanded,
+            IsLock = current.IsLock,
             Members = current.Members,
             Biography = current.Biography,
 
@@ -70,6 +71,7 @@ public sealed class DialogService(ResourceLoader resourceLoader, ITranslateServi
             BornYear = dialog.BornYear,
             DiedYear = dialog.DiedYear,
             Disbanded = dialog.Disbanded,
+            IsLock = dialog.IsLock,
             Members = dialog.Members,
             Biography = dialog.Biography
         };

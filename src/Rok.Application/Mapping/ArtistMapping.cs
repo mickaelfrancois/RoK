@@ -42,6 +42,7 @@ public static class ArtistMapping
             CompilationCount = entity.CompilationCount,
             BestofCount = entity.BestofCount,
             IsFavorite = entity.IsFavorite,
+            IsLock = entity.IsLock,
             ListenCount = entity.ListenCount,
             LastListen = entity.LastListen,
             GenreId = entity.GenreId,
@@ -100,39 +101,6 @@ public static class ArtistMapping
             Members = command.Members,
             GenreId = command.GenreId,
             CountryId = command.CountryId
-        };
-    }
-
-    public static UpdateArtistRequest ToCommand(this ArtistDto dto)
-    {
-        return new UpdateArtistRequest
-        {
-            Id = dto.Id,
-            MusicBrainzID = dto.MusicBrainzID,
-            WikipediaUrl = dto.WikipediaUrl,
-            OfficialSiteUrl = dto.OfficialSiteUrl,
-            FacebookUrl = dto.FacebookUrl,
-            TwitterUrl = dto.TwitterUrl,
-            AllMusicUrl = dto.AllMusicUrl,
-            BandsintownUrl = dto.BandsintownUrl,
-            DiscogsUrl = dto.DiscogsUrl,
-            FlickrUrl = dto.FlickrUrl,
-            InstagramUrl = dto.InstagramUrl,
-            ImdbUrl = dto.ImdbUrl,
-            LastFmUrl = dto.LastFmUrl,
-            SoundcloundUrl = dto.SoundcloundUrl,
-            SongkickUrl = dto.SongkickUrl,
-            ThreadsUrl = dto.ThreadsUrl,
-            TiktokUrl = dto.TiktokUrl,
-            YoutubeUrl = dto.YoutubeUrl,
-            AudioDbID = dto.AudioDbID,
-            BornYear = dto.BornYear,
-            DiedYear = dto.DiedYear,
-            Biography = dto.Biography,
-            SimilarArtists = dto.SimilarArtists,
-            Members = dto.Members,
-            FormedYear = dto.FormedYear,
-            Disbanded = dto.Disbanded,
         };
     }
 }

@@ -287,6 +287,49 @@ public class UpdateAlbumRequestHandlerTests
         Assert.Null(entity.GetMetaDataLastAttempt);
     }
 
+    [Fact(DisplayName = "when_mbid_is_patched_with_same_value_last_attempt_is_kept")]
+    public async Task Handle_ShouldKeepMetadataAttemptTimestamp_WhenMusicBrainzIdIsUnchanged()
+    {
+        // Arrange
+        DateTime attempt = DateTime.UtcNow;
+        AlbumEntity entity = new() { Id = 1, MusicBrainzID = "m", GetMetaDataLastAttempt = attempt };
+        Mock<IAlbumRepository> repository = new();
+        repository.Setup(r => r.GetByIdAsync(1, It.IsAny<RepositoryConnectionKind>())).ReturnsAsync(entity);
+        repository.Setup(r => r.UpdateAsync(entity, It.IsAny<RepositoryConnectionKind>())).ReturnsAsync(true);
+        UpdateAlbumRequestHandler handler = new(repository.Object);
+
+        UpdateAlbumRequest command = new() { Id = 1 };
+        command.MusicBrainzID.Set("m");
+
+        // Act
+        Result<bool> result = await handler.Handle(command, CancellationToken.None);
+
+        // Assert
+        result.Should().BeSuccess();
+        Assert.Equal(attempt, entity.GetMetaDataLastAttempt);
+    }
+
+    [Fact(DisplayName = "handler_applies_release_format_patch")]
+    public async Task Handle_ShouldApplyReleaseFormat_WhenPatched()
+    {
+        // Arrange
+        AlbumEntity entity = new() { Id = 1, ReleaseFormat = "CD" };
+        Mock<IAlbumRepository> repository = new();
+        repository.Setup(r => r.GetByIdAsync(1, It.IsAny<RepositoryConnectionKind>())).ReturnsAsync(entity);
+        repository.Setup(r => r.UpdateAsync(entity, It.IsAny<RepositoryConnectionKind>())).ReturnsAsync(true);
+        UpdateAlbumRequestHandler handler = new(repository.Object);
+
+        UpdateAlbumRequest command = new() { Id = 1 };
+        command.ReleaseFormat.Set("Vinyl");
+
+        // Act
+        Result<bool> result = await handler.Handle(command, CancellationToken.None);
+
+        // Assert
+        result.Should().BeSuccess();
+        Assert.Equal("Vinyl", entity.ReleaseFormat);
+    }
+
     [Fact(DisplayName = "Handle should return failure when album is not found")]
     public async Task Handle_ShouldReturnFailure_WhenAlbumNotFound()
     {

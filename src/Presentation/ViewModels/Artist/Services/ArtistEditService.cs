@@ -1,6 +1,5 @@
 ﻿using System.Globalization;
 using Rok.Application.Features.Artists.Requests;
-using Rok.Application.Mapping;
 
 namespace Rok.ViewModels.Artist.Services;
 
@@ -15,6 +14,7 @@ public class ArtistEditService(IMediator mediator, IDialogService dialogService,
             BornYear = artist.BornYear?.ToString(CultureInfo.InvariantCulture),
             DiedYear = artist.DiedYear?.ToString(CultureInfo.InvariantCulture),
             Disbanded = artist.Disbanded,
+            IsLock = artist.IsLock,
             Members = artist.Members,
             Biography = artist.Biography
         };
@@ -28,16 +28,15 @@ public class ArtistEditService(IMediator mediator, IDialogService dialogService,
         int? bornYear = ParseYear(edited.BornYear);
         int? diedYear = ParseYear(edited.DiedYear);
 
-        // Start from the full command so URLs and other fields not shown in the dialog are
-        // preserved, then overwrite only the edited subset.
-        UpdateArtistRequest command = artist.ToCommand();
-        command.MusicBrainzID = edited.MusicBrainzID;
-        command.FormedYear = formedYear;
-        command.BornYear = bornYear;
-        command.DiedYear = diedYear;
-        command.Disbanded = edited.Disbanded;
-        command.Members = edited.Members;
-        command.Biography = edited.Biography;
+        UpdateArtistRequest command = new() { Id = artist.Id };
+        command.MusicBrainzID.Set(edited.MusicBrainzID);
+        command.FormedYear.Set(formedYear);
+        command.BornYear.Set(bornYear);
+        command.DiedYear.Set(diedYear);
+        command.Disbanded.Set(edited.Disbanded);
+        command.IsLock.Set(edited.IsLock);
+        command.Members.Set(edited.Members);
+        command.Biography.Set(edited.Biography);
 
         await mediator.Send(command);
 
@@ -46,6 +45,7 @@ public class ArtistEditService(IMediator mediator, IDialogService dialogService,
         artist.BornYear = bornYear;
         artist.DiedYear = diedYear;
         artist.Disbanded = edited.Disbanded;
+        artist.IsLock = edited.IsLock;
         artist.Members = edited.Members;
         artist.Biography = edited.Biography;
 

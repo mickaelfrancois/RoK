@@ -65,6 +65,8 @@ public class ArtistEntity : BaseEntity, IArtistEntity
 
     public bool IsFavorite { get; set; }
 
+    public bool IsLock { get; set; }
+
     public int ListenCount { get; set; }
 
     public DateTime? LastListen { get; set; }

@@ -1,4 +1,6 @@
 using Rok.Application.Interfaces.Repositories;
+using Rok.Shared;
+using Rok.Shared.Extensions;
 
 namespace Rok.Application.Features.Artists.Requests;
 
@@ -6,57 +8,59 @@ public class UpdateArtistRequest : IRequest<Result<bool>>
 {
     public long Id { get; set; }
 
-    public string? MusicBrainzID { get; set; }
+    public PatchField<string?> MusicBrainzID { get; set; } = new();
 
     /* Social networks and external links */
 
-    public string? WikipediaUrl { get; set; }
+    public PatchField<string?> WikipediaUrl { get; set; } = new();
 
-    public string? OfficialSiteUrl { get; set; }
+    public PatchField<string?> OfficialSiteUrl { get; set; } = new();
 
-    public string? FacebookUrl { get; set; }
+    public PatchField<string?> FacebookUrl { get; set; } = new();
 
-    public string? TwitterUrl { get; set; }
+    public PatchField<string?> TwitterUrl { get; set; } = new();
 
-    public string? FlickrUrl { get; set; }
+    public PatchField<string?> FlickrUrl { get; set; } = new();
 
-    public string? InstagramUrl { get; set; }
+    public PatchField<string?> InstagramUrl { get; set; } = new();
 
-    public string? TiktokUrl { get; set; }
+    public PatchField<string?> TiktokUrl { get; set; } = new();
 
-    public string? ThreadsUrl { get; set; }
+    public PatchField<string?> ThreadsUrl { get; set; } = new();
 
-    public string? SongkickUrl { get; set; }
+    public PatchField<string?> SongkickUrl { get; set; } = new();
 
-    public string? SoundcloundUrl { get; set; }
+    public PatchField<string?> SoundcloundUrl { get; set; } = new();
 
-    public string? ImdbUrl { get; set; }
+    public PatchField<string?> ImdbUrl { get; set; } = new();
 
-    public string? LastFmUrl { get; set; }
+    public PatchField<string?> LastFmUrl { get; set; } = new();
 
-    public string? DiscogsUrl { get; set; }
+    public PatchField<string?> DiscogsUrl { get; set; } = new();
 
-    public string? BandsintownUrl { get; set; }
+    public PatchField<string?> BandsintownUrl { get; set; } = new();
 
-    public string? YoutubeUrl { get; set; }
+    public PatchField<string?> YoutubeUrl { get; set; } = new();
 
-    public string? AudioDbID { get; set; }
+    public PatchField<string?> AudioDbID { get; set; } = new();
 
-    public string? AllMusicUrl { get; set; }
+    public PatchField<string?> AllMusicUrl { get; set; } = new();
 
-    public int? FormedYear { get; set; }
+    public PatchField<int?> FormedYear { get; set; } = new();
 
-    public int? BornYear { get; set; }
+    public PatchField<int?> BornYear { get; set; } = new();
 
-    public int? DiedYear { get; set; }
+    public PatchField<int?> DiedYear { get; set; } = new();
 
-    public bool Disbanded { get; set; }
+    public PatchField<bool> Disbanded { get; set; } = new();
 
-    public string? Members { get; set; }
+    public PatchField<string?> Members { get; set; } = new();
 
-    public string? SimilarArtists { get; set; }
+    public PatchField<string?> SimilarArtists { get; set; } = new();
 
-    public string? Biography { get; set; }
+    public PatchField<string?> Biography { get; set; } = new();
+
+    public PatchField<bool> IsLock { get; set; } = new();
 }
 
 public sealed class UpdateArtistRequestValidator : Validator<UpdateArtistRequest>
@@ -73,32 +77,91 @@ public class UpdateArtistRequestHandler(IArtistRepository _artistRepository) : I
         if (entity is null)
             return Result<bool>.Fail(NotFoundError.ForEntity("Artist", command.Id));
 
-        entity.YoutubeUrl = command.YoutubeUrl;
-        entity.MusicBrainzID = command.MusicBrainzID;
-        entity.WikipediaUrl = command.WikipediaUrl;
-        entity.OfficialSiteUrl = command.OfficialSiteUrl;
-        entity.FacebookUrl = command.FacebookUrl;
-        entity.TwitterUrl = command.TwitterUrl;
-        entity.FlickrUrl = command.FlickrUrl;
-        entity.InstagramUrl = command.InstagramUrl;
-        entity.TiktokUrl = command.TiktokUrl;
-        entity.ThreadsUrl = command.ThreadsUrl;
-        entity.SongkickUrl = command.SongkickUrl;
-        entity.SoundcloundUrl = command.SoundcloundUrl;
-        entity.ImdbUrl = command.ImdbUrl;
-        entity.LastFmUrl = command.LastFmUrl;
-        entity.DiscogsUrl = command.DiscogsUrl;
-        entity.BandsintownUrl = command.BandsintownUrl;
-        entity.AudioDbID = command.AudioDbID;
-        entity.AllMusicUrl = command.AllMusicUrl;
-        entity.FormedYear = command.FormedYear;
-        entity.BornYear = command.BornYear;
-        entity.DiedYear = command.DiedYear;
-        entity.Disbanded = command.Disbanded;
-        entity.Members = command.Members;
-        entity.SimilarArtists = command.SimilarArtists;
+        bool identifierChanged = false;
 
-        entity.Biography = command.Biography;
+        if (command.MusicBrainzID.TryGetValue(out string? musicBrainzID))
+        {
+            identifierChanged = entity.MusicBrainzID.AreDifferent(musicBrainzID);
+            entity.MusicBrainzID = musicBrainzID;
+        }
+
+        if (command.WikipediaUrl.TryGetValue(out string? wikipediaUrl))
+            entity.WikipediaUrl = wikipediaUrl;
+
+        if (command.OfficialSiteUrl.TryGetValue(out string? officialSiteUrl))
+            entity.OfficialSiteUrl = officialSiteUrl;
+
+        if (command.FacebookUrl.TryGetValue(out string? facebookUrl))
+            entity.FacebookUrl = facebookUrl;
+
+        if (command.TwitterUrl.TryGetValue(out string? twitterUrl))
+            entity.TwitterUrl = twitterUrl;
+
+        if (command.FlickrUrl.TryGetValue(out string? flickrUrl))
+            entity.FlickrUrl = flickrUrl;
+
+        if (command.InstagramUrl.TryGetValue(out string? instagramUrl))
+            entity.InstagramUrl = instagramUrl;
+
+        if (command.TiktokUrl.TryGetValue(out string? tiktokUrl))
+            entity.TiktokUrl = tiktokUrl;
+
+        if (command.ThreadsUrl.TryGetValue(out string? threadsUrl))
+            entity.ThreadsUrl = threadsUrl;
+
+        if (command.SongkickUrl.TryGetValue(out string? songkickUrl))
+            entity.SongkickUrl = songkickUrl;
+
+        if (command.SoundcloundUrl.TryGetValue(out string? soundcloundUrl))
+            entity.SoundcloundUrl = soundcloundUrl;
+
+        if (command.ImdbUrl.TryGetValue(out string? imdbUrl))
+            entity.ImdbUrl = imdbUrl;
+
+        if (command.LastFmUrl.TryGetValue(out string? lastFmUrl))
+            entity.LastFmUrl = lastFmUrl;
+
+        if (command.DiscogsUrl.TryGetValue(out string? discogsUrl))
+            entity.DiscogsUrl = discogsUrl;
+
+        if (command.BandsintownUrl.TryGetValue(out string? bandsintownUrl))
+            entity.BandsintownUrl = bandsintownUrl;
+
+        if (command.YoutubeUrl.TryGetValue(out string? youtubeUrl))
+            entity.YoutubeUrl = youtubeUrl;
+
+        if (command.AudioDbID.TryGetValue(out string? audioDbID))
+            entity.AudioDbID = audioDbID;
+
+        if (command.AllMusicUrl.TryGetValue(out string? allMusicUrl))
+            entity.AllMusicUrl = allMusicUrl;
+
+        if (command.FormedYear.TryGetValue(out int? formedYear))
+            entity.FormedYear = formedYear;
+
+        if (command.BornYear.TryGetValue(out int? bornYear))
+            entity.BornYear = bornYear;
+
+        if (command.DiedYear.TryGetValue(out int? diedYear))
+            entity.DiedYear = diedYear;
+
+        if (command.Disbanded.TryGetValue(out bool disbanded))
+            entity.Disbanded = disbanded;
+
+        if (command.Members.TryGetValue(out string? members))
+            entity.Members = members;
+
+        if (command.SimilarArtists.TryGetValue(out string? similarArtists))
+            entity.SimilarArtists = similarArtists;
+
+        if (command.Biography.TryGetValue(out string? biography))
+            entity.Biography = biography;
+
+        if (command.IsLock.TryGetValue(out bool isLock))
+            entity.IsLock = isLock;
+
+        if (identifierChanged)
+            entity.GetMetaDataLastAttempt = null;
 
         bool result = await _artistRepository.UpdateAsync(entity);
 

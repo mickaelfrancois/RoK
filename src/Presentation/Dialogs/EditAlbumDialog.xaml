@@ -18,6 +18,8 @@
                           IsOn="{x:Bind IsBestOf, Mode=TwoWay}"></ToggleSwitch>
             <ToggleSwitch x:Uid="compilationSwitch"
                           IsOn="{x:Bind IsCompilation, Mode=TwoWay}"></ToggleSwitch>
+            <ToggleSwitch x:Uid="lockSwitch"
+                          IsOn="{x:Bind IsLock, Mode=TwoWay}"></ToggleSwitch>
         </StackPanel>
         <MenuFlyoutSeparator></MenuFlyoutSeparator>
 

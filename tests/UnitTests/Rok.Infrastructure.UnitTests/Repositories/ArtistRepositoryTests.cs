@@ -481,6 +481,36 @@ public class ArtistRepositoryTests
         Assert.Equal(25, updated?.TrackCount);
     }
 
+    [Theory(DisplayName = "update_then_get_round_trips_is_lock")]
+    [InlineData(true)]
+    [InlineData(false)]
+    public async Task UpdateAsync_PersistsIsLock_RoundTrip(bool isLock)
+    {
+        // Arrange
+        using SqliteDatabaseFixture fixture = CreateFixture();
+        ArtistRepository repo = CreateRepository(fixture);
+        DateTime now = DateTime.UtcNow;
+        long testArtistId = 7030;
+
+        await fixture.Connection.ExecuteAsync(@"
+            INSERT INTO Artists(id, name, trackCount, albumCount, liveCount, compilationCount, bestofCount, totalDurationSeconds, disbanded, isFavorite, isLock, listenCount, creatDate)
+            VALUES (@id, 'Artist Lock', 0, 0, 0, 0, 0, 0, 0, 0, @initial, 0, @now)",
+            new { id = testArtistId, initial = isLock ? 0 : 1, now });
+
+        ArtistEntity? artist = await repo.GetByIdAsync(testArtistId);
+        Assert.NotNull(artist);
+        Assert.Equal(!isLock, artist!.IsLock);
+        artist.IsLock = isLock;
+
+        // Act
+        bool result = await repo.UpdateAsync(artist);
+
+        // Assert
+        Assert.True(result);
+        ArtistEntity? updated = await repo.GetByIdAsync(testArtistId);
+        Assert.Equal(isLock, updated?.IsLock);
+    }
+
     [Fact]
     public async Task DeleteAsync_DeletesExistingArtist_ReturnsTrue()
     {

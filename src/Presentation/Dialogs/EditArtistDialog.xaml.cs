@@ -14,6 +14,8 @@ public sealed partial class EditArtistDialog : ContentDialog
 
     public bool Disbanded { get; set; }
 
+    public bool IsLock { get; set; }
+
     public string? Members { get; set; }
 
     public string? Biography { get; set; }

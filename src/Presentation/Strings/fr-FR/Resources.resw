@@ -1092,6 +1092,12 @@
   <data name="compilationSwitch.OffContent" xml:space="preserve">
     <value>Compilation</value>
   </data>
+  <data name="lockSwitch.OnContent" xml:space="preserve">
+    <value>Verrouillé</value>
+  </data>
+  <data name="lockSwitch.OffContent" xml:space="preserve">
+    <value>Verrouillé</value>
+  </data>
   <data name="trackFlyoutTrack.Text" xml:space="preserve">
     <value>Voir la chanson</value>
   </data>
