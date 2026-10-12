@@ -71,4 +71,19 @@ public class CrashContextBuilderTests
         // Assert
         Assert.True(json.Length <= 2048, $"payload is {json.Length} characters");
     }
+
+    [Fact(DisplayName = "build_adds_first_chance_only_when_recorded")]
+    public void Build_AddsFirstChanceOnlyWhenRecorded()
+    {
+        // Arrange
+        NavigationSnapshot snapshot = new("AlbumsPage", "AlbumPage", null, NavigationPhase.Loaded, 87);
+
+        // Act
+        Dictionary<string, object> without = CrashContextBuilder.Build(_exception, snapshot, []);
+        Dictionary<string, object> with = CrashContextBuilder.Build(_exception, snapshot, [], "-5 Foo.Bar");
+
+        // Assert
+        Assert.False(without.ContainsKey("firstChance"));
+        Assert.Equal("-5 Foo.Bar", with["firstChance"]);
+    }
 }

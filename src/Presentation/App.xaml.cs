@@ -25,6 +25,8 @@ public partial class App : Microsoft.UI.Xaml.Application
     public static Window MainWindow { get; private set; } = null!;
     public static nint MainWindowHandle { get; private set; }
 
+    private readonly Rok.Services.Diagnostics.FirstChanceRecorder _firstChanceRecorder = new(TimeProvider.System);
+
     public App()
     {
         HookGlobalDiagnostics();
@@ -307,7 +309,8 @@ public partial class App : Microsoft.UI.Xaml.Application
             Dictionary<string, object> properties = Rok.Services.Diagnostics.CrashContextBuilder.Build(
                 exception,
                 navigation?.Trail.Snapshot(),
-                breadcrumbs?.Snapshot() ?? []);
+                breadcrumbs?.Snapshot() ?? [],
+                _firstChanceRecorder.Snapshot());
 
             Task.Run(async () => await telemetry.CaptureEventAsync("crash", exception.GetType().Name, properties))
                 .Wait(TimeSpan.FromSeconds(2));
@@ -324,6 +327,8 @@ public partial class App : Microsoft.UI.Xaml.Application
         // 1st chance
         AppDomain.CurrentDomain.FirstChanceException += (_, e) =>
         {
+            _firstChanceRecorder.Record(e.Exception);
+
 #if DEBUG
             if (e.Exception is NullReferenceException or InvalidOperationException or FileNotFoundException)
                 Debug.WriteLine("[FirstChance] " + e.Exception.GetType().Name + " - " + e.Exception.Message);
