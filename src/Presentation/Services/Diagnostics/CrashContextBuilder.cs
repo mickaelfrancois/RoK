@@ -11,14 +11,16 @@ public static class CrashContextBuilder
     /// <summary>
     /// Keeps the four historical keys (<c>currentPage</c>, <c>previousPage</c>, <c>exceptionType</c>,
     /// <c>hresult</c>) unchanged and adds the navigation phase, the pending page, the time spent in
-    /// the phase and the recent breadcrumbs.
+    /// the phase and the recent breadcrumbs, plus the throw site of the last null-reference error when
+    /// one was recorded.
     /// </summary>
     public static Dictionary<string, object> Build(
         Exception exception,
         NavigationSnapshot? navigation,
-        IReadOnlyList<string> breadcrumbs)
+        IReadOnlyList<string> breadcrumbs,
+        string? firstChance = null)
     {
-        return new Dictionary<string, object>
+        Dictionary<string, object> properties = new()
         {
             ["currentPage"] = navigation?.CurrentPage ?? Unknown,
             ["previousPage"] = navigation?.PreviousPage ?? Unknown,
@@ -29,5 +31,10 @@ public static class CrashContextBuilder
             ["msInPhase"] = navigation?.MsInPhase ?? 0L,
             ["breadcrumbs"] = breadcrumbs.Count == 0 ? Unknown : string.Join(" | ", breadcrumbs)
         };
+
+        if (firstChance is not null)
+            properties["firstChance"] = firstChance;
+
+        return properties;
     }
 }
