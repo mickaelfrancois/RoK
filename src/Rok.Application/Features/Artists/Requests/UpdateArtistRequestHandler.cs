@@ -1,5 +1,6 @@
 using Rok.Application.Interfaces.Repositories;
 using Rok.Shared;
+using Rok.Shared.Extensions;
 
 namespace Rok.Application.Features.Artists.Requests;
 
@@ -76,8 +77,13 @@ public class UpdateArtistRequestHandler(IArtistRepository _artistRepository) : I
         if (entity is null)
             return Result<bool>.Fail(NotFoundError.ForEntity("Artist", command.Id));
 
+        bool identifierChanged = false;
+
         if (command.MusicBrainzID.TryGetValue(out string? musicBrainzID))
+        {
+            identifierChanged = entity.MusicBrainzID.AreDifferent(musicBrainzID);
             entity.MusicBrainzID = musicBrainzID;
+        }
 
         if (command.WikipediaUrl.TryGetValue(out string? wikipediaUrl))
             entity.WikipediaUrl = wikipediaUrl;
@@ -153,6 +159,9 @@ public class UpdateArtistRequestHandler(IArtistRepository _artistRepository) : I
 
         if (command.IsLock.TryGetValue(out bool isLock))
             entity.IsLock = isLock;
+
+        if (identifierChanged)
+            entity.GetMetaDataLastAttempt = null;
 
         bool result = await _artistRepository.UpdateAsync(entity);
 

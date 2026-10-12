@@ -131,6 +131,50 @@ public class UpdateArtistRequestHandlerTests
         Assert.True(entity.IsLock);
     }
 
+    [Fact(DisplayName = "when_mbid_changes_artist_last_attempt_is_reset")]
+    public async Task Handle_ShouldResetMetadataAttemptTimestamp_WhenMusicBrainzIdChanges()
+    {
+        // Arrange
+        DateTime attempt = DateTime.UtcNow;
+        ArtistEntity entity = new() { Id = 1, MusicBrainzID = "old", GetMetaDataLastAttempt = attempt };
+        Mock<IArtistRepository> repository = new();
+        repository.Setup(r => r.GetByIdAsync(1, It.IsAny<RepositoryConnectionKind>())).ReturnsAsync(entity);
+        repository.Setup(r => r.UpdateAsync(entity, It.IsAny<RepositoryConnectionKind>())).ReturnsAsync(true);
+        UpdateArtistRequestHandler handler = new(repository.Object);
+
+        UpdateArtistRequest command = new() { Id = 1 };
+        command.MusicBrainzID.Set("new");
+
+        // Act
+        Result<bool> result = await handler.Handle(command, CancellationToken.None);
+
+        // Assert
+        result.Should().BeSuccess();
+        Assert.Null(entity.GetMetaDataLastAttempt);
+    }
+
+    [Fact(DisplayName = "when_mbid_is_patched_with_same_value_artist_last_attempt_is_kept")]
+    public async Task Handle_ShouldKeepMetadataAttemptTimestamp_WhenMusicBrainzIdIsUnchanged()
+    {
+        // Arrange
+        DateTime attempt = DateTime.UtcNow;
+        ArtistEntity entity = new() { Id = 1, MusicBrainzID = "same", GetMetaDataLastAttempt = attempt };
+        Mock<IArtistRepository> repository = new();
+        repository.Setup(r => r.GetByIdAsync(1, It.IsAny<RepositoryConnectionKind>())).ReturnsAsync(entity);
+        repository.Setup(r => r.UpdateAsync(entity, It.IsAny<RepositoryConnectionKind>())).ReturnsAsync(true);
+        UpdateArtistRequestHandler handler = new(repository.Object);
+
+        UpdateArtistRequest command = new() { Id = 1 };
+        command.MusicBrainzID.Set("same");
+
+        // Act
+        Result<bool> result = await handler.Handle(command, CancellationToken.None);
+
+        // Assert
+        result.Should().BeSuccess();
+        Assert.Equal(attempt, entity.GetMetaDataLastAttempt);
+    }
+
     [Fact(DisplayName = "Handle should return failure when artist is not found")]
     public async Task Handle_ShouldReturnFailure_WhenArtistNotFound()
     {
