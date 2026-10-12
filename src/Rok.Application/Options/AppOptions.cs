@@ -56,6 +56,8 @@ public class AppOptions : IAppOptions
 
     public bool PauseOnCall { get; set; } = true;
 
+    public bool WriteTagsEnabled { get; set; }
+
     public bool HideArtistsWithoutAlbum { get; set; } = true;
 
     public bool RefreshLibraryAtStartup { get; set; } = true;
@@ -147,6 +149,7 @@ public class AppOptions : IAppOptions
         NovaApiEnabled = options.NovaApiEnabled;
         DiscordRichPresenceEnabled = options.DiscordRichPresenceEnabled;
         PauseOnCall = options.PauseOnCall;
+        WriteTagsEnabled = options.WriteTagsEnabled;
         CrossFade = options.CrossFade;
         CrossfadeDurationSeconds = options.CrossfadeDurationSeconds;
         MixMode = options.MixMode;

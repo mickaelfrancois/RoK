@@ -311,5 +311,22 @@ public class TrackMetadataServiceTests
         Assert.False(result);
     }
 
+    [Fact(DisplayName = "rescan_is_neutral_for_a_track_aligned_with_a_written_file")]
+    public async Task ShouldUpdateMetadataAsync_TrackAlignedWithWrittenFile_ShouldReturnFalse()
+    {
+        Mock<ITrackRepository> mockRepo = new();
+        TrackImport importTrack = new(mockRepo.Object);
+        Mock<ILogger<TrackMetadataService>> mockLogger = new();
+        TrackMetadataService service = new(importTrack, mockLogger.Object, TimeProvider.System);
+
+        DateTimeOffset writtenFileDate = new(new DateTime(2025, 3, 4, 12, 0, 37, DateTimeKind.Utc).AddTicks(1234567));
+        TrackEntity track = BuildTrack(title: "Edited title", size: 4242, fileDate: DateTime.SpecifyKind(writtenFileDate.DateTime, DateTimeKind.Unspecified));
+        TrackFile file = BuildFile(title: "Edited title", size: 4242, fileDate: writtenFileDate);
+
+        bool result = await service.ShouldUpdateMetadataAsync(file, track);
+
+        Assert.False(result);
+    }
+
     #endregion
 }

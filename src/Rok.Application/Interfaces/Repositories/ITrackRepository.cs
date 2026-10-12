@@ -26,6 +26,11 @@ public interface ITrackRepository : IRepository<TrackEntity>
 
     Task<bool> UpdateFileDateAsync(long id, DateTime fileDate, RepositoryConnectionKind kind = RepositoryConnectionKind.Foreground);
 
+    /// <summary>
+    /// Updates the title, file date and file size of a track, and stamps its edit date, without touching score, listen counts or playlist links.
+    /// </summary>
+    Task<bool> UpdateTitleAndFileInfoAsync(long id, string title, DateTime fileDate, long size, RepositoryConnectionKind kind = RepositoryConnectionKind.Foreground);
+
     Task<bool> UpdateGetLyricsLastAttemptAsync(long id, RepositoryConnectionKind kind = RepositoryConnectionKind.Foreground);
 
     Task<TrackEntity?> GetByFilePathAsync(string filePath, CancellationToken cancellationToken);

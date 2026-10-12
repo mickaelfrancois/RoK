@@ -10,7 +10,8 @@ public enum AudioFixtureFormat
     Aiff,
     Aif,
     M4a,
-    Wma
+    Wma,
+    Mp3
 }
 
 internal static class AudioFixtureFactory
@@ -35,6 +36,7 @@ internal static class AudioFixtureFactory
             AudioFixtureFormat.Aif => ConvertToAiff(wavPath, Path.Combine(folder, "fixture.aif")),
             AudioFixtureFormat.M4a => Encode(wavPath, Path.Combine(folder, "fixture.m4a"), MediaFoundationEncoder.EncodeToAac),
             AudioFixtureFormat.Wma => Encode(wavPath, Path.Combine(folder, "fixture.wma"), MediaFoundationEncoder.EncodeToWma),
+            AudioFixtureFormat.Mp3 => Encode(wavPath, Path.Combine(folder, "fixture.mp3"), MediaFoundationEncoder.EncodeToMp3),
             _ => throw new ArgumentOutOfRangeException(nameof(format), format, null)
         };
 
@@ -49,6 +51,7 @@ internal static class AudioFixtureFactory
         {
             AudioFixtureFormat.M4a => AudioSubtypes.MFAudioFormat_AAC,
             AudioFixtureFormat.Wma => AudioSubtypes.MFAudioFormat_WMAudioV8,
+            AudioFixtureFormat.Mp3 => AudioSubtypes.MFAudioFormat_MP3,
             _ => null
         };
 

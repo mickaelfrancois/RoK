@@ -25,6 +25,7 @@ FolderImportProcessor folderProcessor,
 PostImportDominantColorTask postImportDominantColorTask,
 PostImportApiEnrichmentTask postImportApiEnrichmentTask,
 ImportMessageThrottler messageThrottler,
+ILibraryWriteGate libraryWriteGate,
 ILogger<ImportService> logger) : IImport
 {
     public bool UpdateInProgress { get; private set; }
@@ -44,6 +45,7 @@ ILogger<ImportService> logger) : IImport
     private readonly FileSystemService _fileSystemService = Guard.NotNull(fileSystemService);
     private readonly FolderImportProcessor _folderProcessor = Guard.NotNull(folderProcessor);
     private readonly ImportMessageThrottler _messageThrottler = Guard.NotNull(messageThrottler);
+    private readonly ILibraryWriteGate _libraryWriteGate = Guard.NotNull(libraryWriteGate);
     private readonly PostImportDominantColorTask _postImportDominantColorTask = Guard.NotNull(postImportDominantColorTask);
     private readonly PostImportApiEnrichmentTask _postImportApiEnrichmentTask = Guard.NotNull(postImportApiEnrichmentTask);
 
@@ -101,6 +103,8 @@ ILogger<ImportService> logger) : IImport
         {
             if (delayInSeconds > 0)
                 await Task.Delay(delayInSeconds, _cts!.Token);
+
+            using IDisposable lease = await _libraryWriteGate.EnterAsync(_cts!.Token);
 
             await Task.Run(() => ImportAsync(_cts!.Token), _cts!.Token);
         }

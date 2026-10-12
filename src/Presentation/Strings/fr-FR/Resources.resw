@@ -2547,4 +2547,67 @@
   <data name="playerRepeatOne" xml:space="preserve">
     <value>Répéter la piste</value>
   </data>
+  <data name="EditTrackTitleDialog.Title" xml:space="preserve">
+    <value>Modifier le titre</value>
+  </data>
+  <data name="EditTrackTitleDialog.PrimaryButtonText" xml:space="preserve">
+    <value>Enregistrer</value>
+  </data>
+  <data name="EditTrackTitleDialog.CloseButtonText" xml:space="preserve">
+    <value>Annuler</value>
+  </data>
+  <data name="EditTrackTitleInput.Header" xml:space="preserve">
+    <value>Titre</value>
+  </data>
+  <data name="EditTrackTitlePreviewLabel.Text" xml:space="preserve">
+    <value>Aperçu</value>
+  </data>
+  <data name="trackEditText.Text" xml:space="preserve">
+    <value>Modifier</value>
+  </data>
+  <data name="OptionsWriteTagsSwitch.Header" xml:space="preserve">
+    <value>Écrire les tags dans les fichiers</value>
+  </data>
+  <data name="OptionsWriteTagsDescription.Text" xml:space="preserve">
+    <value>Écrit dans vos fichiers MP3. Testez d’abord sur une copie.</value>
+  </data>
+  <data name="trackEditError_Playing" xml:space="preserve">
+    <value>Cette piste est en cours de lecture. Arrêtez-la, puis réessayez.</value>
+  </data>
+  <data name="trackEditError_ImportInProgress" xml:space="preserve">
+    <value>Un import de la bibliothèque est en cours. Réessayez à la fin.</value>
+  </data>
+  <data name="trackEditError_UnsupportedFormat" xml:space="preserve">
+    <value>Seuls les fichiers MP3 peuvent être modifiés.</value>
+  </data>
+  <data name="trackEditError_ReadOnly" xml:space="preserve">
+    <value>Le fichier est en lecture seule.</value>
+  </data>
+  <data name="trackEditError_Locked" xml:space="preserve">
+    <value>Le fichier est utilisé par un autre programme.</value>
+  </data>
+  <data name="trackEditError_CloudPlaceholder" xml:space="preserve">
+    <value>Le fichier n’est pas encore sur cet ordinateur (fichier cloud). Téléchargez-le d’abord.</value>
+  </data>
+  <data name="trackEditError_NotFound" xml:space="preserve">
+    <value>Le fichier n’existe plus.</value>
+  </data>
+  <data name="trackEditError_InsufficientDiskSpace" xml:space="preserve">
+    <value>Espace disque insuffisant pour écrire le fichier.</value>
+  </data>
+  <data name="trackEditError_UnsupportedTagVersion" xml:space="preserve">
+    <value>La version du tag ID3 de ce fichier (2.2) n’est pas prise en charge. Rien n’a été modifié.</value>
+  </data>
+  <data name="trackEditError_VerificationFailed" xml:space="preserve">
+    <value>La vérification du fichier écrit a échoué. Le fichier d’origine n’a pas été modifié.</value>
+  </data>
+  <data name="trackEditError_IoError" xml:space="preserve">
+    <value>Le fichier n’a pas pu être écrit. Le fichier d’origine n’a pas été modifié.</value>
+  </data>
+  <data name="trackEditError_Disabled" xml:space="preserve">
+    <value>L’écriture des tags est désactivée dans les options.</value>
+  </data>
+  <data name="trackEditError_Generic" xml:space="preserve">
+    <value>Le titre n’a pas pu être enregistré.</value>
+  </data>
 </root>

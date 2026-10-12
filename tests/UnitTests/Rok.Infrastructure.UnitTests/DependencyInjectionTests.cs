@@ -1,6 +1,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Rok.Application.Interfaces;
 using Rok.Application.Interfaces.Repositories;
+using Rok.Application.Tag;
 using Rok.Infrastructure.Migration;
 
 namespace Rok.Infrastructure.UnitTests;
@@ -23,6 +24,23 @@ public class DependencyInjectionTests
 
         // Assert
         Assert.Contains(services, d => d.ServiceType == typeof(IMigration) && d.ImplementationType == typeof(Migration19));
+    }
+
+    [Fact(DisplayName = "tag_writer_is_exposed_as_writer_and_recovery_through_one_singleton")]
+    public void AddInfrastructure_ExposesTagWriterAndRecoveryThroughOneSingleton()
+    {
+        // Arrange
+        var services = Register();
+        services.AddLogging();
+        using var provider = services.BuildServiceProvider();
+
+        // Act
+        var writer = provider.GetRequiredService<ITagWriter>();
+        var recovery = provider.GetRequiredService<ITagWriteRecovery>();
+
+        // Assert
+        Assert.Same(writer, recovery);
+        Assert.Same(writer, provider.GetRequiredService<ITagWriter>());
     }
 
     [Fact(DisplayName = "every_migration_target_version_is_unique")]

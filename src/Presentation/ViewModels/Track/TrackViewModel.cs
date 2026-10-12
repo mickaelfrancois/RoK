@@ -22,6 +22,7 @@ public partial class TrackViewModel : ObservableObject, IDisposable, IFilterable
     private readonly TrackDetailDataLoader _dataLoader;
     private readonly TrackLyricsService _lyricsService;
     private readonly TrackScoreService _scoreService;
+    private readonly TrackTitleEditService _titleEditService;
     private readonly TrackNavigationService _navigationService;
     private readonly IMessenger _messenger;
     private readonly IDisposable _trackScoreUpdateSubscription;
@@ -170,6 +171,9 @@ public partial class TrackViewModel : ObservableObject, IDisposable, IFilterable
 
     public bool IsLive => Track.IsLive;
 
+    /// <summary>Gets whether the user turned on the writing of tags in the files.</summary>
+    public bool CanEditTags => _appOptions.WriteTagsEnabled;
+
     public long? GenreId => Track.GenreId;
 
     public int ListenCount => Track.ListenCount;
@@ -197,6 +201,7 @@ public partial class TrackViewModel : ObservableObject, IDisposable, IFilterable
         TrackDetailDataLoader dataLoader,
         TrackLyricsService lyricsService,
         TrackScoreService scoreService,
+        TrackTitleEditService titleEditService,
         TrackNavigationService navigationService,
         IAppOptions appOptions,
         IMessenger messenger,
@@ -210,6 +215,7 @@ public partial class TrackViewModel : ObservableObject, IDisposable, IFilterable
         _dataLoader = Guard.NotNull(dataLoader);
         _lyricsService = Guard.NotNull(lyricsService);
         _scoreService = Guard.NotNull(scoreService);
+        _titleEditService = Guard.NotNull(titleEditService);
         _navigationService = Guard.NotNull(navigationService);
         _appOptions = Guard.NotNull(appOptions);
         _messenger = Guard.NotNull(messenger);
@@ -350,6 +356,19 @@ public partial class TrackViewModel : ObservableObject, IDisposable, IFilterable
 
             await _dialogService.ShowTextAsync($"{ArtistName} - {Title}", lyrics, showTranslateButton: _appOptions.NovaApiEnabled, language);
         }
+    }
+
+    [RelayCommand]
+    private async Task EditTitleAsync()
+    {
+        string? title = await _titleEditService.EditTitleAsync(Track.Id, Track.Title);
+
+        if (title is null)
+            return;
+
+        Track.Title = title;
+        OnPropertyChanged(nameof(Title));
+        OnPropertyChanged(nameof(Track));
     }
 
     [RelayCommand]

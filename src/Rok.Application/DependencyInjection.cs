@@ -30,10 +30,12 @@ public static class DependencyInjection
         services.AddSingleton<IReviewPromptEligibilityService, ReviewPromptEligibilityService>();
         services.AddSingleton<IReviewPromptService, ReviewPromptService>();
         services.AddSingleton<IEqualizerPresetResolver, EqualizerPresetResolver>();
+        services.AddSingleton<ILibraryWriteGate, LibraryWriteGate>();
 
         services.AddSingleton<IPlayerSleepModeService, PlayerSleepModeService>();
 
         services.AddTransient<TrackLyricsService>();
+        services.AddTransient<TrackTagEditService>();
         services.AddTransient<IArtistApiService, ArtistApiService>();
         services.AddTransient<IAlbumApiService, AlbumApiService>();
 

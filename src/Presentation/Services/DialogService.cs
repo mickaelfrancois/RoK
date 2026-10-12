@@ -77,6 +77,47 @@ public sealed class DialogService(ResourceLoader resourceLoader, ITranslateServi
         };
     }
 
+    public async Task<string?> ShowEditTrackTitleAsync(string currentTitle, Func<string, Task<string?>> trySaveAsync)
+    {
+        EditTrackTitleDialog dialog = new(currentTitle)
+        {
+            XamlRoot = App.MainWindow.Content.XamlRoot
+        };
+
+        string? savedTitle = null;
+
+        dialog.PrimaryButtonClick += async (_, args) =>
+        {
+            ContentDialogButtonClickDeferral deferral = args.GetDeferral();
+
+            try
+            {
+                dialog.SetBusy(true);
+
+                string title = TrackTitleEditRules.Normalize(dialog.Candidate);
+                string? error = await trySaveAsync(title);
+
+                if (error is null)
+                {
+                    savedTitle = title;
+                    return;
+                }
+
+                args.Cancel = true;
+                dialog.ShowError(error);
+            }
+            finally
+            {
+                dialog.SetBusy(false);
+                deferral.Complete();
+            }
+        };
+
+        await dialog.ShowAsync();
+
+        return savedTitle;
+    }
+
     public Task ShowTextAsync(string title, string content, bool showTranslateButton = false, string targetLanguage = "fr")
     {
         string closeButtonText = resourceLoader.GetString("Close");

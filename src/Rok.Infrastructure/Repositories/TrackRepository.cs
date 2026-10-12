@@ -13,6 +13,7 @@ public class TrackRepository(IDbConnection db, [FromKeyedServices("BackgroundCon
     private const string ResetListenCountSql = "UPDATE tracks SET listenCount = 0";
     private const string UpdateSkipCountSql = "UPDATE tracks SET skipCount = skipCount + 1, lastSkip = @lastSkip WHERE Id = @id";
     private const string UpdateFileDateSql = "UPDATE tracks SET fileDate = @fileDate WHERE id = @id";
+    private const string UpdateTitleAndFileInfoSql = "UPDATE tracks SET title = @title, fileDate = @fileDate, size = @size, editDate = @editDate WHERE id = @id";
     private const string UpdateGetLyricsLastAttemptSql = "UPDATE tracks SET getLyricsLastAttempt = @lastAttemptDate WHERE id = @id";
     private const string DefaultGroupBy = " GROUP BY tracks.id ";
 
@@ -149,6 +150,14 @@ public class TrackRepository(IDbConnection db, [FromKeyedServices("BackgroundCon
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(id);
 
         return ExecuteUpdateAsync(UpdateFileDateSql, new { fileDate, id }, kind);
+    }
+
+    public Task<bool> UpdateTitleAndFileInfoAsync(long id, string title, DateTime fileDate, long size, RepositoryConnectionKind kind = RepositoryConnectionKind.Foreground)
+    {
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(id);
+        ArgumentException.ThrowIfNullOrWhiteSpace(title);
+
+        return ExecuteUpdateAsync(UpdateTitleAndFileInfoSql, new { title, fileDate, size, editDate = _timeProvider.GetLocalNow().DateTime, id }, kind);
     }
 
     public Task<bool> UpdateGetLyricsLastAttemptAsync(long id, RepositoryConnectionKind kind = RepositoryConnectionKind.Foreground)

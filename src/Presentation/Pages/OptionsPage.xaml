@@ -149,6 +149,12 @@
                                               VerticalAlignment="Center" />
                                 <ToggleSwitch x:Uid="OptionsImportWithArtistGenreSwitch"
                                               IsOn="{x:Bind Options.ImportTrackWithArtistGenre, Mode=TwoWay}" />
+                                <ToggleSwitch x:Uid="OptionsWriteTagsSwitch"
+                                              IsOn="{x:Bind Options.WriteTagsEnabled, Mode=TwoWay}" />
+                                <TextBlock x:Uid="OptionsWriteTagsDescription"
+                                           Style="{ThemeResource CaptionTextBlockStyle}"
+                                           Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                           TextWrapping="WrapWholeWords" />
                             </StackPanel>
                         </Border>
                         <Border Background="{ThemeResource CardBackgroundFillColorSecondaryBrush}"

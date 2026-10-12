@@ -275,6 +275,33 @@ public class SettingsFileServiceTests
         Assert.Empty(restored.AlbumsFilterByGenresId);
         Assert.Equal(string.Empty, restored.OutputDeviceId);
         Assert.Equal(EAudioOutputMode.Shared, restored.OutputMode);
+        Assert.False(restored.WriteTagsEnabled);
+    }
+
+    [Fact(DisplayName = "write_tags_enabled_survives_a_save_and_reload")]
+    public async Task WriteTagsEnabled_SurvivesASaveAndReload()
+    {
+        // Arrange
+        AppOptions options = new() { WriteTagsEnabled = true };
+        string? capturedJson = null;
+
+        Mock<IFileSystem> fs = CreateFileSystemMock();
+        fs.Setup(f => f.WriteAllTextAsync(SettingsFilePath, It.IsAny<string>(), It.IsAny<CancellationToken>()))
+            .Callback<string, string, CancellationToken>((_, json, _) => capturedJson = json)
+            .Returns(Task.CompletedTask);
+        fs.Setup(f => f.FileExists(SettingsFilePath)).Returns(true);
+        fs.Setup(f => f.ReadAllTextAsync(SettingsFilePath, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(() => capturedJson!);
+        SettingsFileService sut = new(ApplicationPath, CreateFolderResolverMock().Object, fs.Object);
+
+        // Act
+        await sut.SaveAsync(options);
+        IAppOptions? loaded = await sut.LoadAsync<AppOptions>();
+        AppOptions restored = new();
+        restored.CopyFrom(loaded!);
+
+        // Assert
+        Assert.True(restored.WriteTagsEnabled);
     }
 
     [Fact(DisplayName = "mix_mode_survives_a_save_and_reload")]
