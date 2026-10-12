@@ -1,5 +1,13 @@
 ﻿# ChangeLog
 
+## [2.0.2] Store – 12 octobre 2026
+
+### Ajouté
+
+- Diagnostic des plantages enrichi : l'emplacement de la dernière erreur de référence nulle est joint au rapport (#512)
+
+--
+
 ## [2.0.1] Store – 11 octobre 2026
 
 ### Corrigé
