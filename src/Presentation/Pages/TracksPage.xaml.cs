@@ -18,6 +18,7 @@ public sealed partial class TracksPage : Page, IDisposable
 
     private bool _disposed;
     private bool _pageLoaded;
+    private bool _dataReady;
 
     private readonly AnimatedNumberHelper _countAnimation;
     private readonly AnimatedNumberHelper _durationAnimation;
@@ -56,6 +57,15 @@ public sealed partial class TracksPage : Page, IDisposable
         {
             _logger.LogError(ex, "Navigation to TracksPage failed");
         }
+        finally
+        {
+            // The list only receives its items once the reload settled: a Reset that lands while
+            // the first containers are being realized feeds a null item to the generated bindings.
+            _dataReady = true;
+
+            if (_pageLoaded && !_disposed)
+                ShowItems();
+        }
     }
 
     protected override void OnNavigatingFrom(NavigatingCancelEventArgs e)
@@ -72,6 +82,13 @@ public sealed partial class TracksPage : Page, IDisposable
     private void Page_Loaded(object sender, RoutedEventArgs e)
     {
         _pageLoaded = true;
+
+        if (_dataReady)
+            ShowItems();
+    }
+
+    private void ShowItems()
+    {
         UpdateItemsSource();
         ScrollStateHelper.RestoreScrollOffset(tracksList);
         _countAnimation.AnimateTo(ViewModel.Count);
@@ -112,10 +129,15 @@ public sealed partial class TracksPage : Page, IDisposable
 
     private void GroupedItems_CollectionChanged(object? sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
     {
+        // Before Loaded the list is not in the visual tree: Page_Loaded applies the source once it is.
+        if (!_pageLoaded)
+            return;
+
         if (ViewModel.GroupedItems.Count == 0 && !tracksListZoom.IsZoomedInViewActive)
             tracksListZoom.IsZoomedInViewActive = true;
 
-        UpdateItemsSource();
+        if (_dataReady)
+            UpdateItemsSource();
     }
 
     private void UpdateItemsSource()
