@@ -62,15 +62,27 @@ public sealed class FirstChanceRecorder(TimeProvider timeProvider)
     /// </summary>
     public string? Snapshot()
     {
+        FirstChanceSite? site = Last();
+
+        if (site is null)
+            return null;
+
+        string entry = $"-{site.AgeMs} {site.Frames}";
+
+        return entry.Length > MaxLength ? entry[..MaxLength] : entry;
+    }
+
+    /// <summary>
+    /// Returns the last recorded throw site, or <see langword="null"/> when nothing was recorded.
+    /// </summary>
+    public FirstChanceSite? Last()
+    {
         lock (_lock)
         {
             if (_frames is null)
                 return null;
 
-            long ageMs = (long)timeProvider.GetElapsedTime(_timestamp).TotalMilliseconds;
-            string entry = $"-{ageMs} {_frames}";
-
-            return entry.Length > MaxLength ? entry[..MaxLength] : entry;
+            return new FirstChanceSite((long)timeProvider.GetElapsedTime(_timestamp).TotalMilliseconds, _frames);
         }
     }
 }
