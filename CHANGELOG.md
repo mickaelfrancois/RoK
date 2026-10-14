@@ -1,5 +1,15 @@
 ﻿# ChangeLog
 
+## [2.0.3] Store – 14 octobre 2026
+
+### Corrigé
+
+- Les informations d'artiste modifiées à la main et les artistes verrouillés ne sont plus écrasés par la synchronisation en ligne (#514)
+- Plus de plantage en arrivant sur les pages Artistes, Albums ou Chansons pendant le chargement de leur liste (#520)
+- L'application ne se ferme plus quand une ligne de liste reçoit un élément vide : l'incident est remonté au diagnostic sans interrompre l'écoute (#521)
+
+--
+
 ## [2.0.2] Store – 12 octobre 2026
 
 ### Ajouté
