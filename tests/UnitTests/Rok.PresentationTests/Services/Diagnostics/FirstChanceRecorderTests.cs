@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Time.Testing;
 using Rok.Services.Diagnostics;
 
 namespace Rok.PresentationTests.Services.Diagnostics;
@@ -41,5 +42,36 @@ public class FirstChanceRecorderTests
 
         // Assert
         Assert.True(recorder.Snapshot()!.Length <= FirstChanceRecorder.MaxLength);
+    }
+
+    [Fact(DisplayName = "last_returns_null_when_nothing_was_recorded")]
+    public void Last_NothingRecorded_ReturnsNull()
+    {
+        // Arrange
+        FirstChanceRecorder recorder = new(TimeProvider.System);
+
+        // Act
+        FirstChanceSite? site = recorder.Last();
+
+        // Assert
+        Assert.Null(site);
+    }
+
+    [Fact(DisplayName = "last_returns_the_age_and_frames_of_the_recorded_throw")]
+    public void Last_AfterRecord_ReturnsAgeAndFrames()
+    {
+        // Arrange
+        FakeTimeProvider time = new();
+        FirstChanceRecorder recorder = new(time);
+        recorder.Record(new NullReferenceException());
+        time.Advance(TimeSpan.FromMilliseconds(90));
+
+        // Act
+        FirstChanceSite? site = recorder.Last();
+
+        // Assert
+        Assert.NotNull(site);
+        Assert.Equal(90, site.AgeMs);
+        Assert.Contains(nameof(Last_AfterRecord_ReturnsAgeAndFrames), site.Frames);
     }
 }

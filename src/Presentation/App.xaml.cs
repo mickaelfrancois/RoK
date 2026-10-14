@@ -27,6 +27,11 @@ public partial class App : Microsoft.UI.Xaml.Application
 
     private readonly Rok.Services.Diagnostics.FirstChanceRecorder _firstChanceRecorder = new(TimeProvider.System);
 
+#if !DEBUG
+    private const int MaxRecoveredBindingFailureReports = 3;
+    private int _recoveredBindingFailures;
+#endif
+
     public App()
     {
         HookGlobalDiagnostics();
@@ -278,6 +283,13 @@ public partial class App : Microsoft.UI.Xaml.Application
 #if DEBUG
             e.Handled = true;
 #else
+            if (Rok.Services.Diagnostics.RecoverableBindingFailure.IsMatch(e.Exception, _firstChanceRecorder.Last()))
+            {
+                e.Handled = true;
+                ReportRecoveredBindingFailure(e.Exception);
+                return;
+            }
+
             CrashStore crashStore = new();
             crashStore.IncrementCrashCount();
 
@@ -302,15 +314,8 @@ public partial class App : Microsoft.UI.Xaml.Application
     {
         try
         {
-            Rok.Services.NavigationService? navigation = ServiceProvider.GetService<Rok.Services.NavigationService>();
-            Rok.Services.Diagnostics.ICrashBreadcrumbs? breadcrumbs = ServiceProvider.GetService<Rok.Services.Diagnostics.ICrashBreadcrumbs>();
             ITelemetryClient telemetry = ServiceProvider.GetRequiredService<ITelemetryClient>();
-
-            Dictionary<string, object> properties = Rok.Services.Diagnostics.CrashContextBuilder.Build(
-                exception,
-                navigation?.Trail.Snapshot(),
-                breadcrumbs?.Snapshot() ?? [],
-                _firstChanceRecorder.Snapshot());
+            Dictionary<string, object> properties = BuildCrashProperties(exception);
 
             Task.Run(async () => await telemetry.CaptureEventAsync("crash", exception.GetType().Name, properties))
                 .Wait(TimeSpan.FromSeconds(2));
@@ -319,6 +324,36 @@ public partial class App : Microsoft.UI.Xaml.Application
         {
             // Never let crash diagnostics throw inside an exception handler.
         }
+    }
+
+    // The app survives a null item in generated x:Bind code, so the report is neither blocking
+    // nor counted as a crash. A failure that repeats on every layout pass is reported only a few times.
+    private void ReportRecoveredBindingFailure(Exception exception)
+    {
+        try
+        {
+            if (Interlocked.Increment(ref _recoveredBindingFailures) > MaxRecoveredBindingFailureReports)
+                return;
+
+            ITelemetryClient telemetry = ServiceProvider.GetRequiredService<ITelemetryClient>();
+            _ = telemetry.CaptureEventAsync("binding_failure_recovered", exception.GetType().Name, BuildCrashProperties(exception));
+        }
+        catch
+        {
+            // Never let crash diagnostics throw inside an exception handler.
+        }
+    }
+
+    private Dictionary<string, object> BuildCrashProperties(Exception exception)
+    {
+        Rok.Services.NavigationService? navigation = ServiceProvider.GetService<Rok.Services.NavigationService>();
+        Rok.Services.Diagnostics.ICrashBreadcrumbs? breadcrumbs = ServiceProvider.GetService<Rok.Services.Diagnostics.ICrashBreadcrumbs>();
+
+        return Rok.Services.Diagnostics.CrashContextBuilder.Build(
+            exception,
+            navigation?.Trail.Snapshot(),
+            breadcrumbs?.Snapshot() ?? [],
+            _firstChanceRecorder.Snapshot());
     }
 #endif
 

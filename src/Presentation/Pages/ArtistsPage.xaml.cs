@@ -5,6 +5,7 @@ using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media.Animation;
 using Microsoft.UI.Xaml.Navigation;
 using Rok.Commons;
+using Rok.Services.Diagnostics;
 using Rok.ViewModels.Artist;
 using Rok.ViewModels.Artists;
 using Rok.ViewModels.Common;
@@ -14,6 +15,7 @@ namespace Rok.Pages;
 public sealed partial class ArtistsPage : Page, IDisposable
 {
     private readonly ILogger<ArtistsPage> _logger;
+    private readonly ICrashBreadcrumbs _breadcrumbs;
 
     public ArtistsViewModel ViewModel { get; set; }
 
@@ -40,6 +42,7 @@ public sealed partial class ArtistsPage : Page, IDisposable
         _durationAnimation = new AnimatedNumberHelper(t => artistDurationRun.Text = t);
 
         _logger = App.ServiceProvider.GetRequiredService<ILogger<ArtistsPage>>();
+        _breadcrumbs = App.ServiceProvider.GetRequiredService<ICrashBreadcrumbs>();
         ViewModel = App.ServiceProvider.GetRequiredService<ArtistsViewModel>();
 
         _binder = new GroupedItemsSourceBinder(grid, ZoomoutCollectionGrid, groupedItemsViewSource, ViewModel.GroupedItems, _logger);
@@ -104,6 +107,8 @@ public sealed partial class ArtistsPage : Page, IDisposable
 
     private void ShowItems()
     {
+        _breadcrumbs.Add("artists.show", $"grouped={(ViewModel.IsGroupingEnabled ? 1 : 0)} n={ViewModel.GroupedItems.Count}");
+
         UpdateItemsSource();
         ScrollStateHelper.RestoreScrollOffset(grid);
         _countAnimation.AnimateTo(ViewModel.Count);
@@ -150,6 +155,8 @@ public sealed partial class ArtistsPage : Page, IDisposable
 
     private void GroupedItems_CollectionChanged(object? sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
     {
+        _breadcrumbs.Add("artists.items", $"loaded={(_pageLoaded ? 1 : 0)} ready={(_dataReady ? 1 : 0)} n={ViewModel.GroupedItems.Count}");
+
         // Before Loaded the list is not in the visual tree: Page_Loaded applies the source once it is.
         if (!_pageLoaded)
             return;
@@ -260,7 +267,10 @@ public sealed partial class ArtistsPage : Page, IDisposable
 
         // A call made before the visual tree is built fails: leave _visualState unset so the next
         // call retries instead of skipping the state for good.
-        if (VisualStateManager.GoToState(this, state, true))
+        bool applied = VisualStateManager.GoToState(this, state, true);
+        _breadcrumbs.Add("artists.state", $"{state} applied={(applied ? 1 : 0)} n={ViewModel.GroupedItems.Count}");
+
+        if (applied)
             _visualState = state;
     }
 
