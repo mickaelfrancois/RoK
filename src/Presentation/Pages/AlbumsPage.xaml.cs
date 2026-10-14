@@ -24,6 +24,7 @@ public sealed partial class AlbumsPage : Page, IDisposable
 
     private bool _disposed;
     private bool _pageLoaded;
+    private bool _dataReady;
     private string? _visualState;
 
     private readonly AnimatedNumberHelper _countAnimation;
@@ -67,6 +68,15 @@ public sealed partial class AlbumsPage : Page, IDisposable
         {
             _logger.LogError(ex, "Navigation to AlbumsPage failed");
         }
+        finally
+        {
+            // The list only receives its items once the reload settled: a Reset that lands while
+            // the first containers are being realized feeds a null item to the generated bindings.
+            _dataReady = true;
+
+            if (_pageLoaded && !_disposed)
+                ShowItems();
+        }
     }
 
     protected override void OnNavigatingFrom(NavigatingCancelEventArgs e)
@@ -86,6 +96,13 @@ public sealed partial class AlbumsPage : Page, IDisposable
 
         // The display mode must be settled before the list receives its items.
         UpdateVisualState();
+
+        if (_dataReady)
+            ShowItems();
+    }
+
+    private void ShowItems()
+    {
         UpdateItemsSource();
         ScrollStateHelper.RestoreScrollOffset(grid);
         _countAnimation.AnimateTo(ViewModel.Count);
@@ -141,7 +158,8 @@ public sealed partial class AlbumsPage : Page, IDisposable
         if (ViewModel.GroupedItems.Count == 0 && !GridZoom.IsZoomedInViewActive)
             GridZoom.IsZoomedInViewActive = true;
 
-        UpdateItemsSource();
+        if (_dataReady)
+            UpdateItemsSource();
     }
 
     private void UpdateItemsSource()
