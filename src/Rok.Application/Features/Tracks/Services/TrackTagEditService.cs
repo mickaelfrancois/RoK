@@ -8,7 +8,7 @@ using Rok.Domain.Entities;
 namespace Rok.Application.Features.Tracks.Services;
 
 /// <summary>
-/// Edits track titles: checks the rules, writes the audio files, then updates the database.
+/// Edits track tags: checks the rules, writes the audio files, then updates the database.
 /// </summary>
 public class TrackTagEditService(
     ITrackRepository trackRepository,
@@ -20,20 +20,20 @@ public class TrackTagEditService(
     ILogger<TrackTagEditService> logger)
 {
     /// <summary>
-    /// Writes new titles in the tags of the track files and in the database.
+    /// Writes the edited fields in the tags of the track files, then stores in the database the values read back from the files.
     /// </summary>
-    /// <param name="changes">Track ids with their new title.</param>
+    /// <param name="edits">Track ids with the fields to change.</param>
     /// <param name="cancellationToken">Token observed between two files.</param>
-    /// <returns>One result per change, in the same order.</returns>
-    public async Task<IReadOnlyList<TrackTagEditResult>> UpdateTitlesAsync(IReadOnlyList<(long TrackId, string Title)> changes, CancellationToken cancellationToken)
+    /// <returns>One result per edit, in the same order.</returns>
+    public async Task<IReadOnlyList<TrackTagEditResult>> UpdateAsync(IReadOnlyList<TrackTagsEdit> edits, CancellationToken cancellationToken)
     {
-        ArgumentNullException.ThrowIfNull(changes);
+        ArgumentNullException.ThrowIfNull(edits);
 
         if (!appOptions.WriteTagsEnabled)
-            return changes.Select(c => TrackTagEditResult.Disabled(c.TrackId, c.Title)).ToList();
+            return edits.Select(e => TrackTagEditResult.Disabled(e.TrackId, e.Title)).ToList();
 
-        TrackTagEditResult?[] results = new TrackTagEditResult?[changes.Count];
-        List<(int Index, TrackEntity Track)> candidates = await SelectCandidatesAsync(changes, results);
+        TrackTagEditResult?[] results = new TrackTagEditResult?[edits.Count];
+        List<(int Index, TrackEntity Track)> candidates = await SelectCandidatesAsync(edits, results);
 
         if (candidates.Count == 0)
             return Complete(results);
@@ -45,13 +45,13 @@ public class TrackTagEditService(
             if (import.UpdateInProgress || !libraryWriteGate.TryEnter(out lease))
             {
                 foreach ((int index, _) in candidates)
-                    results[index] = TrackTagEditResult.Skip(changes[index].TrackId, changes[index].Title, ETagWriteReason.ImportInProgress);
+                    results[index] = TrackTagEditResult.Skip(edits[index].TrackId, edits[index].Title, ETagWriteReason.ImportInProgress);
 
                 return Complete(results);
             }
 
             List<TagWriteRequest> requests = candidates
-                .Select(c => new TagWriteRequest(c.Track.MusicFile, new TagChanges { Title = changes[c.Index].Title }))
+                .Select(c => new TagWriteRequest(c.Track.MusicFile, ToChanges(edits[c.Index])))
                 .ToList();
 
             IReadOnlyList<TagWriteResult> writeResults = await tagWriter.WriteAsync(requests, cancellationToken);
@@ -59,7 +59,7 @@ public class TrackTagEditService(
             for (int i = 0; i < candidates.Count; i++)
             {
                 int index = candidates[i].Index;
-                results[index] = await ApplyWriteResultAsync(changes[index], writeResults[i]);
+                results[index] = await ApplyWriteResultAsync(edits[index], writeResults[i]);
             }
         }
         finally
@@ -70,25 +70,44 @@ public class TrackTagEditService(
         return Complete(results);
     }
 
-    private async Task<List<(int Index, TrackEntity Track)>> SelectCandidatesAsync(IReadOnlyList<(long TrackId, string Title)> changes, TrackTagEditResult?[] results)
+    private static TagChanges ToChanges(TrackTagsEdit edit)
+    {
+        return new TagChanges
+        {
+            Title = edit.Title,
+            TrackNumber = edit.TrackNumber,
+            Disc = edit.Disc,
+            Composers = edit.Composers,
+            Bpm = edit.Bpm
+        };
+    }
+
+    private async Task<List<(int Index, TrackEntity Track)>> SelectCandidatesAsync(IReadOnlyList<TrackTagsEdit> edits, TrackTagEditResult?[] results)
     {
         List<(int Index, TrackEntity Track)> candidates = [];
         TrackDto? current = playerService.CurrentTrack;
 
-        for (int i = 0; i < changes.Count; i++)
+        for (int i = 0; i < edits.Count; i++)
         {
-            (long trackId, string title) = changes[i];
-            TrackEntity? track = await trackRepository.GetByIdAsync(trackId);
+            TrackTagsEdit edit = edits[i];
+
+            if (!ToChanges(edit).HasChanges)
+            {
+                results[i] = TrackTagEditResult.Skip(edit.TrackId, edit.Title, ETagWriteReason.Cancelled);
+                continue;
+            }
+
+            TrackEntity? track = await trackRepository.GetByIdAsync(edit.TrackId);
 
             if (track is null)
             {
-                results[i] = TrackTagEditResult.Skip(trackId, title, ETagWriteReason.NotFound);
+                results[i] = TrackTagEditResult.Skip(edit.TrackId, edit.Title, ETagWriteReason.NotFound);
                 continue;
             }
 
             if (IsPlaying(current, track))
             {
-                results[i] = TrackTagEditResult.Skip(trackId, title, ETagWriteReason.Playing);
+                results[i] = TrackTagEditResult.Skip(edit.TrackId, edit.Title, ETagWriteReason.Playing);
                 continue;
             }
 
@@ -106,36 +125,45 @@ public class TrackTagEditService(
         return current.Id == track.Id || string.Equals(current.MusicFile, track.MusicFile, StringComparison.OrdinalIgnoreCase);
     }
 
-    private async Task<TrackTagEditResult> ApplyWriteResultAsync((long TrackId, string Title) change, TagWriteResult writeResult)
+    private async Task<TrackTagEditResult> ApplyWriteResultAsync(TrackTagsEdit edit, TagWriteResult writeResult)
     {
         if (writeResult.Outcome == ETagWriteOutcome.Skipped)
-            return TrackTagEditResult.Skip(change.TrackId, change.Title, writeResult.Reason);
+            return TrackTagEditResult.Skip(edit.TrackId, edit.Title, writeResult.Reason);
 
         if (writeResult.Outcome == ETagWriteOutcome.Failed)
-            return TrackTagEditResult.Fail(change.TrackId, change.Title, writeResult.Reason);
+            return TrackTagEditResult.Fail(edit.TrackId, edit.Title, writeResult.Reason);
 
-        if (writeResult.FileDateModified is null || writeResult.Size is null)
+        if (writeResult.FileDateModified is null || writeResult.Size is null || writeResult.Values is null)
         {
-            logger.LogError("Tag written for track id {Id} without file information.", change.TrackId);
+            logger.LogError("Tag already written in the file of track id {Id} but the values could not be read back, so the database is not updated. The next rescan will realign it.", edit.TrackId);
 
-            return TrackTagEditResult.Fail(change.TrackId, change.Title, ETagWriteReason.IoError);
+            return TrackTagEditResult.Fail(edit.TrackId, edit.Title, ETagWriteReason.IoError);
         }
+
+        TagFieldValues values = writeResult.Values;
+        DateTime fileDate = writeResult.FileDateModified.Value.DateTime;
+        long size = writeResult.Size.Value;
 
         try
         {
-            bool updated = await trackRepository.UpdateTitleAndFileInfoAsync(change.TrackId, change.Title, writeResult.FileDateModified.Value.DateTime, writeResult.Size.Value);
+            bool updated = await trackRepository.UpdateTagFieldsAndFileInfoAsync(edit.TrackId, values, fileDate, size);
 
             if (updated)
-                return TrackTagEditResult.Succeed(change.TrackId, change.Title);
+            {
+                string? composers = string.IsNullOrEmpty(values.Composers) ? null : values.Composers;
+                TrackEditSaved saved = new(values.Title, values.TrackNumber, values.Disc, composers, values.Bpm, fileDate, size);
 
-            logger.LogError("Tag written but database not updated for track id {Id}.", change.TrackId);
+                return TrackTagEditResult.Succeed(edit.TrackId, edit.Title, saved);
+            }
+
+            logger.LogError("Tag written but database not updated for track id {Id}.", edit.TrackId);
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Tag written but database update failed for track id {Id}.", change.TrackId);
+            logger.LogError(ex, "Tag written but database update failed for track id {Id}.", edit.TrackId);
         }
 
-        return TrackTagEditResult.Fail(change.TrackId, change.Title, ETagWriteReason.IoError);
+        return TrackTagEditResult.Fail(edit.TrackId, edit.Title, ETagWriteReason.IoError);
     }
 
     private static List<TrackTagEditResult> Complete(TrackTagEditResult?[] results)

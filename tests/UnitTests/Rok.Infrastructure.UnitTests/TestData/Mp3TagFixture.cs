@@ -12,6 +12,12 @@ internal static class Mp3TagFixture
     public const string ReplayGainDescription = "REPLAYGAIN_TRACK_GAIN";
     public const string ReplayGainValue = "-6.50 dB";
     public const string LyricsText = "Line one\nLine two";
+    public const uint OriginalTrack = 3;
+    public const uint OriginalTrackCount = 12;
+    public const uint OriginalDisc = 1;
+    public const uint OriginalDiscCount = 2;
+    public const string OriginalComposer = "Original composer";
+    public const uint OriginalBpm = 120;
 
     public static readonly byte[] PictureBytes = [0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A, 1, 2, 3, 4, 5, 6, 7, 8];
     public static readonly byte[] UnknownFrameBytes = [9, 8, 7, 6, 5, 4, 3, 2, 1];
@@ -27,6 +33,12 @@ internal static class Mp3TagFixture
         tag.Version = version;
         tag.Title = OriginalTitle;
         tag.Performers = ["Original artist"];
+        tag.Track = OriginalTrack;
+        tag.TrackCount = OriginalTrackCount;
+        tag.Disc = OriginalDisc;
+        tag.DiscCount = OriginalDiscCount;
+        tag.Composers = [OriginalComposer];
+        tag.BeatsPerMinute = OriginalBpm;
 
         tag.AddFrame(new TagLib.Id3v2.AttachmentFrame
         {
@@ -44,6 +56,24 @@ internal static class Mp3TagFixture
         tag.AddFrame(new TagLib.Id3v2.UnknownFrame(new TagLib.ByteVector(UnknownFrameId), new TagLib.ByteVector(UnknownFrameBytes)));
 
         file.RemoveTags(TagLib.TagTypes.Id3v1);
+        file.Save();
+
+        return path;
+    }
+
+    /// <summary>Creates a rich MP3 that also carries an APE tag repeating the title, track, composer and BPM.</summary>
+    public static string CreateWithApe(string folder, byte version, string fileName = "song.mp3")
+    {
+        string path = CreateRich(folder, version, fileName);
+
+        using TagLib.File file = TagLib.File.Create(path, "taglib/mp3", TagLib.ReadStyle.Average);
+        TagLib.Tag ape = file.GetTag(TagLib.TagTypes.Ape, true);
+
+        ape.Title = OriginalTitle;
+        ape.Track = OriginalTrack;
+        ape.Composers = [OriginalComposer];
+        ape.BeatsPerMinute = OriginalBpm;
+
         file.Save();
 
         return path;

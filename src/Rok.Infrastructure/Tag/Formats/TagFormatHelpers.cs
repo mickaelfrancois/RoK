@@ -1,4 +1,5 @@
 using System.Security.Cryptography;
+using Rok.Application.Tag;
 
 namespace Rok.Infrastructure.Tag.Formats;
 
@@ -9,6 +10,10 @@ internal static class TagFormatHelpers
 {
     private const int Id3v22MajorVersion = 2;
     private const string TitleFrameId = "TIT2";
+    private const string TrackFrameId = "TRCK";
+    private const string DiscFrameId = "TPOS";
+    private const string ComposerFrameId = "TCOM";
+    private const string BpmFrameId = "TBPM";
 
     private static readonly TagLib.TagTypes[] SecondaryTagTypes = [TagLib.TagTypes.Id3v1, TagLib.TagTypes.Ape];
 
@@ -26,33 +31,81 @@ internal static class TagFormatHelpers
     }
 
     /// <summary>
-    /// Lists the ID3v2 frame ids of the file except the title frame, sorted in ordinal order.
+    /// Lists the ids of the ID3v2 frames that a write with these changes may alter.
+    /// </summary>
+    /// <param name="changes">Changes being written.</param>
+    /// <returns>The frame ids to leave out of the preserved fields.</returns>
+    public static IReadOnlySet<string> ChangedId3v2FrameIds(TagChanges changes)
+    {
+        HashSet<string> ids = [TitleFrameId];
+
+        if (changes.TrackNumber is not null)
+            ids.Add(TrackFrameId);
+
+        if (changes.Disc is not null)
+            ids.Add(DiscFrameId);
+
+        if (changes.Composers is not null)
+            ids.Add(ComposerFrameId);
+
+        if (changes.Bpm is not null)
+            ids.Add(BpmFrameId);
+
+        return ids;
+    }
+
+    /// <summary>
+    /// Lists the ID3v2 frame ids of the file except the given ones, sorted in ordinal order.
     /// </summary>
     /// <param name="file">Open file.</param>
+    /// <param name="excludedIds">Frame ids to leave out.</param>
     /// <returns>The sorted frame ids, empty when there is no ID3v2 tag.</returns>
-    public static string[] Id3v2FrameIdsExceptTitle(TagLib.File file)
+    public static string[] Id3v2FrameIdsExcept(TagLib.File file, IReadOnlySet<string> excludedIds)
     {
         if (file.GetTag(TagLib.TagTypes.Id3v2, false) is not TagLib.Id3v2.Tag id3v2)
             return [];
 
         return id3v2.GetFrames()
             .Select(f => f.FrameId.ToString())
-            .Where(id => id != TitleFrameId)
+            .Where(id => !excludedIds.Contains(id))
             .Order(StringComparer.Ordinal)
             .ToArray();
     }
 
     /// <summary>
-    /// Writes the title into the secondary tags that exist on disk and removes the absent ones, never creating any.
+    /// Applies the changes to a tag.
+    /// </summary>
+    /// <param name="tag">Tag to write.</param>
+    /// <param name="changes">Changes to apply.</param>
+    public static void ApplyChanges(TagLib.Tag tag, TagChanges changes)
+    {
+        if (changes.Title is not null)
+            tag.Title = changes.Title;
+
+        if (changes.TrackNumber is not null)
+            tag.Track = (uint)changes.TrackNumber.Value;
+
+        if (changes.Disc is not null)
+            tag.Disc = (uint)changes.Disc.Value;
+
+        if (changes.Composers is not null)
+            tag.Composers = changes.Composers.Length == 0 ? [] : [changes.Composers];
+
+        if (changes.Bpm is not null)
+            tag.BeatsPerMinute = (uint)changes.Bpm.Value;
+    }
+
+    /// <summary>
+    /// Applies the changes to the secondary tags that exist on disk and removes the absent ones, never creating any.
     /// </summary>
     /// <param name="file">Open file.</param>
-    /// <param name="title">New title.</param>
-    public static void SyncSecondaryTags(TagLib.File file, string title)
+    /// <param name="changes">Changes to apply.</param>
+    public static void SyncSecondaryTags(TagLib.File file, TagChanges changes)
     {
         foreach (TagLib.TagTypes type in SecondaryTagTypes)
         {
             if (file.TagTypesOnDisk.HasFlag(type))
-                file.GetTag(type, false).Title = title;
+                ApplyChanges(file.GetTag(type, false), changes);
             else
                 file.RemoveTags(type);
         }

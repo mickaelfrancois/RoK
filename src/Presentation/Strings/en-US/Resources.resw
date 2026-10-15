@@ -2548,20 +2548,29 @@
   <data name="playerRepeatOne" xml:space="preserve">
     <value>Repeat one</value>
   </data>
-  <data name="EditTrackTitleDialog.Title" xml:space="preserve">
-    <value>Edit title</value>
+  <data name="EditTrackDialog.Title" xml:space="preserve">
+    <value>Edit track</value>
   </data>
-  <data name="EditTrackTitleDialog.PrimaryButtonText" xml:space="preserve">
+  <data name="EditTrackDialog.PrimaryButtonText" xml:space="preserve">
     <value>Save</value>
   </data>
-  <data name="EditTrackTitleDialog.CloseButtonText" xml:space="preserve">
+  <data name="EditTrackDialog.CloseButtonText" xml:space="preserve">
     <value>Cancel</value>
   </data>
   <data name="EditTrackTitleInput.Header" xml:space="preserve">
     <value>Title</value>
   </data>
-  <data name="EditTrackTitlePreviewLabel.Text" xml:space="preserve">
-    <value>Preview</value>
+  <data name="EditTrackNumberInput.Header" xml:space="preserve">
+    <value>Track number</value>
+  </data>
+  <data name="EditTrackDiscInput.Header" xml:space="preserve">
+    <value>Disc number</value>
+  </data>
+  <data name="EditTrackComposerInput.Header" xml:space="preserve">
+    <value>Composer</value>
+  </data>
+  <data name="EditTrackBpmInput.Header" xml:space="preserve">
+    <value>BPM</value>
   </data>
   <data name="trackEditText.Text" xml:space="preserve">
     <value>Edit</value>
@@ -2609,6 +2618,18 @@
     <value>Writing tags is turned off in the options.</value>
   </data>
   <data name="trackEditError_Generic" xml:space="preserve">
-    <value>The title could not be saved.</value>
+    <value>The changes could not be saved.</value>
+  </data>
+  <data name="trackEditRequired" xml:space="preserve">
+    <value>This value is required.</value>
+  </data>
+  <data name="trackEditInvalid_TrackNumber" xml:space="preserve">
+    <value>Enter a track number from 1 to 999.</value>
+  </data>
+  <data name="trackEditInvalid_Disc" xml:space="preserve">
+    <value>Enter a disc number from 1 to 99.</value>
+  </data>
+  <data name="trackEditInvalid_Bpm" xml:space="preserve">
+    <value>Enter a BPM from 1 to 999, or leave it empty to remove it.</value>
   </data>
 </root>

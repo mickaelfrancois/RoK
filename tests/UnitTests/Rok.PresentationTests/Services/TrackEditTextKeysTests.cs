@@ -11,11 +11,14 @@ public class TrackEditTextKeysTests
 
     private static readonly string[] ScreenKeys =
     [
-        "EditTrackTitleDialog.Title",
-        "EditTrackTitleDialog.PrimaryButtonText",
-        "EditTrackTitleDialog.CloseButtonText",
+        "EditTrackDialog.Title",
+        "EditTrackDialog.PrimaryButtonText",
+        "EditTrackDialog.CloseButtonText",
         "EditTrackTitleInput.Header",
-        "EditTrackTitlePreviewLabel.Text",
+        "EditTrackNumberInput.Header",
+        "EditTrackDiscInput.Header",
+        "EditTrackComposerInput.Header",
+        "EditTrackBpmInput.Header",
         "trackEditText.Text",
         "OptionsWriteTagsSwitch.Header",
         "OptionsWriteTagsDescription.Text"
@@ -74,7 +77,7 @@ public class TrackEditTextKeysTests
     {
         // Arrange
         string folder = StringsFolder();
-        string[] expected = [.. TrackEditTextKeys.AllErrorKeys, .. ScreenKeys];
+        string[] expected = [.. TrackEditTextKeys.AllErrorKeys, .. TrackEditTextKeys.AllValidationKeys, .. ScreenKeys];
 
         foreach (string language in Languages)
         {

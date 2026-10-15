@@ -55,6 +55,31 @@ public class TrackDtoMappingTests
         Assert.Equal(128, dto.Bpm);
     }
 
+    [Fact(DisplayName = "map_copies_disc_and_composers")]
+    public void Map_CopiesDiscAndComposers()
+    {
+        // Arrange
+        TrackEntity entity = new() { Id = 5, Title = "t5", Disc = 2, Composers = "A; B" };
+
+        // Act
+        TrackDto dto = TrackDtoMapping.Map(entity);
+
+        // Assert
+        Assert.Equal(2, dto.Disc);
+        Assert.Equal("A; B", dto.Composers);
+    }
+
+    [Fact(DisplayName = "map_keeps_disc_and_composers_null_when_the_entity_has_none")]
+    public void Map_KeepsDiscAndComposersNull_WhenEntityHasNone()
+    {
+        // Act
+        TrackDto dto = TrackDtoMapping.Map(new TrackEntity { Id = 6, Title = "t6" });
+
+        // Assert
+        Assert.Null(dto.Disc);
+        Assert.Null(dto.Composers);
+    }
+
     [Fact(DisplayName = "map_keeps_bpm_null_when_the_entity_has_none")]
     public void Map_KeepsBpmNull_WhenEntityHasNone()
     {

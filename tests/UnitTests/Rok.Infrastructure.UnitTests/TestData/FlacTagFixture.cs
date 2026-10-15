@@ -15,6 +15,12 @@ internal static class FlacTagFixture
     public const string LowercaseFieldValue = "lowercase value";
     public const string ApplicationId = "ROKT";
     public const int PaddingSize = 1024;
+    public const uint OriginalTrack = 3;
+    public const uint OriginalTrackCount = 12;
+    public const uint OriginalDisc = 1;
+    public const uint OriginalDiscCount = 2;
+    public const string OriginalComposer = "Original composer";
+    public const uint OriginalBpm = 120;
 
     public static readonly byte[] PictureBytes = [0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A, 1, 2, 3, 4, 5, 6, 7, 8];
     public static readonly byte[] ApplicationPayload = [9, 8, 7, 6, 5, 4, 3, 2, 1];
@@ -47,6 +53,45 @@ internal static class FlacTagFixture
                     MimeType = "image/png"
                 }
             ];
+
+            file.Save();
+        }
+
+        LowercaseFieldNameOnDisk(path);
+
+        return path;
+    }
+
+    /// <summary>
+    /// Creates the rich FLAC plus track number, disc, composer and BPM fields. The track number is written either combined
+    /// (<c>TRACKNUMBER=3/12</c>) or split (<c>TRACKNUMBER=3</c> and <c>TRACKTOTAL=12</c>); <paramref name="withTempo"/>
+    /// adds a <c>TEMPO</c> field next to <c>BPM</c>.
+    /// </summary>
+    public static string CreateWithNumbers(string folder, bool combinedTrack, bool withTempo = false, string fileName = "song.flac")
+    {
+        string path = CreateRich(folder, fileName);
+
+        using (TagLib.File file = TagLib.File.Create(path, "taglib/flac", TagLib.ReadStyle.Average))
+        {
+            TagLib.Ogg.XiphComment xiph = (TagLib.Ogg.XiphComment)file.GetTag(TagLib.TagTypes.Xiph, true);
+
+            if (combinedTrack)
+            {
+                xiph.SetField("TRACKNUMBER", $"{OriginalTrack}/{OriginalTrackCount}");
+            }
+            else
+            {
+                xiph.SetField("TRACKNUMBER", OriginalTrack.ToString());
+                xiph.SetField("TRACKTOTAL", OriginalTrackCount.ToString());
+            }
+
+            xiph.SetField("DISCNUMBER", OriginalDisc.ToString());
+            xiph.SetField("DISCTOTAL", OriginalDiscCount.ToString());
+            xiph.SetField("COMPOSER", OriginalComposer);
+            xiph.SetField("BPM", OriginalBpm.ToString());
+
+            if (withTempo)
+                xiph.SetField("TEMPO", OriginalBpm.ToString());
 
             file.Save();
         }

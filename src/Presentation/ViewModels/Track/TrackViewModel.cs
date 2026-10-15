@@ -22,7 +22,7 @@ public partial class TrackViewModel : ObservableObject, IDisposable, IFilterable
     private readonly TrackDetailDataLoader _dataLoader;
     private readonly TrackLyricsService _lyricsService;
     private readonly TrackScoreService _scoreService;
-    private readonly TrackTitleEditService _titleEditService;
+    private readonly TrackEditService _editService;
     private readonly TrackNavigationService _navigationService;
     private readonly IMessenger _messenger;
     private readonly IDisposable _trackScoreUpdateSubscription;
@@ -201,7 +201,7 @@ public partial class TrackViewModel : ObservableObject, IDisposable, IFilterable
         TrackDetailDataLoader dataLoader,
         TrackLyricsService lyricsService,
         TrackScoreService scoreService,
-        TrackTitleEditService titleEditService,
+        TrackEditService editService,
         TrackNavigationService navigationService,
         IAppOptions appOptions,
         IMessenger messenger,
@@ -215,7 +215,7 @@ public partial class TrackViewModel : ObservableObject, IDisposable, IFilterable
         _dataLoader = Guard.NotNull(dataLoader);
         _lyricsService = Guard.NotNull(lyricsService);
         _scoreService = Guard.NotNull(scoreService);
-        _titleEditService = Guard.NotNull(titleEditService);
+        _editService = Guard.NotNull(editService);
         _navigationService = Guard.NotNull(navigationService);
         _appOptions = Guard.NotNull(appOptions);
         _messenger = Guard.NotNull(messenger);
@@ -359,15 +359,27 @@ public partial class TrackViewModel : ObservableObject, IDisposable, IFilterable
     }
 
     [RelayCommand]
-    private async Task EditTitleAsync()
+    private async Task EditAsync()
     {
-        string? title = await _titleEditService.EditTitleAsync(Track.Id, Track.Title);
+        TrackEditValues current = new(Track.Id, Track.Title, Track.TrackNumber, Track.Disc, Track.Composers, Track.Bpm);
+        TrackEditSaved? saved = await _editService.EditAsync(current);
 
-        if (title is null)
+        if (saved is null)
             return;
 
-        Track.Title = title;
+        Track.Title = saved.Title;
+        Track.TrackNumber = saved.TrackNumber;
+        Track.Disc = saved.Disc;
+        Track.Composers = saved.Composers;
+        Track.Bpm = saved.Bpm;
+        Track.FileDate = saved.FileDate;
+        Track.Size = saved.Size;
+
         OnPropertyChanged(nameof(Title));
+        OnPropertyChanged(nameof(TrackNumber));
+        OnPropertyChanged(nameof(TrackNumberStr));
+        OnPropertyChanged(nameof(SizeStr));
+        OnPropertyChanged(nameof(HeaderSummary));
         OnPropertyChanged(nameof(Track));
     }
 

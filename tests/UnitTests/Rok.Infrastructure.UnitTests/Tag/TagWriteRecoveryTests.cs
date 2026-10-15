@@ -159,6 +159,40 @@ public sealed class TagWriteRecoveryTests : IDisposable
             Assert.Equal("A brand new title", file.Tag.Title);
     }
 
+    [Fact(DisplayName = "write_should_succeed_without_values_when_the_read_back_fails_after_the_replacement")]
+    public async Task WriteAsync_ShouldSucceedWithoutValues_WhenReadBackFailsAfterReplace()
+    {
+        // Arrange
+        string path = FlacTagFixture.CreateRich(MusicFolder);
+        FileStream? lockStream = null;
+        _files.ReplaceOverride = (source, destination) =>
+        {
+            File.Replace(source, destination, null);
+            lockStream = new FileStream(destination, FileMode.Open, FileAccess.Read, FileShare.None);
+        };
+
+        try
+        {
+            // Act
+            IReadOnlyList<TagWriteResult> results = await CreateWriter(_files).WriteAsync([Request(path)], CancellationToken.None);
+
+            // Assert
+            TagWriteResult result = Assert.Single(results);
+            Assert.Equal(ETagWriteOutcome.Succeeded, result.Outcome);
+            Assert.Null(result.Values);
+            Assert.NotNull(result.FileDateModified);
+            Assert.NotNull(result.Size);
+        }
+        finally
+        {
+            if (lockStream is not null)
+                await lockStream.DisposeAsync();
+        }
+
+        using TagLib.File file = TagLib.File.Create(path);
+        Assert.Equal("A brand new title", file.Tag.Title);
+    }
+
     private async Task AssertTemporaryCopyRemovedAsync(string path)
     {
         // Arrange

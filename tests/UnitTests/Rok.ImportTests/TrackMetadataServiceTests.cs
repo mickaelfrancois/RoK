@@ -21,10 +21,16 @@ public class TrackMetadataServiceTests
         TimeSpan? duration = null,
         int bitrate = 320,
         string fullPath = @"C:\music\track.mp3",
-        DateTimeOffset? fileDate = null)
+        DateTimeOffset? fileDate = null,
+        int? disc = null,
+        int? bpm = null,
+        string composers = "")
     {
         return new TrackFile
         {
+            Disc = disc,
+            Bpm = bpm,
+            Composers = composers,
             Title = title,
             Artist = artist,
             Album = album,
@@ -46,10 +52,16 @@ public class TrackMetadataServiceTests
         string genreName = "Genre",
         int? trackNumber = 1,
         long size = 1000,
-        DateTime? fileDate = null)
+        DateTime? fileDate = null,
+        int? disc = null,
+        int? bpm = null,
+        string? composers = null)
     {
         return new TrackEntity
         {
+            Disc = disc,
+            Bpm = bpm,
+            Composers = composers,
             Id = id,
             Title = title,
             ArtistName = artistName,
@@ -149,6 +161,60 @@ public class TrackMetadataServiceTests
         bool result = TrackMetadataService.AreTrackAndFileEquals(track, file);
 
         Assert.True(result);
+    }
+
+    [Fact(DisplayName = "are_track_and_file_equals_false_when_disc_differs")]
+    public void AreTrackAndFileEquals_DiscDiffers_ReturnsFalse()
+    {
+        TrackEntity track = BuildTrack(disc: 1);
+        TrackFile file = BuildFile(disc: 2);
+
+        Assert.False(TrackMetadataService.AreTrackAndFileEquals(track, file));
+    }
+
+    [Fact(DisplayName = "are_track_and_file_equals_false_when_disc_removed_from_file")]
+    public void AreTrackAndFileEquals_DiscRemoved_ReturnsFalse()
+    {
+        TrackEntity track = BuildTrack(disc: 1);
+        TrackFile file = BuildFile(disc: null);
+
+        Assert.False(TrackMetadataService.AreTrackAndFileEquals(track, file));
+    }
+
+    [Fact(DisplayName = "are_track_and_file_equals_false_when_bpm_differs")]
+    public void AreTrackAndFileEquals_BpmDiffers_ReturnsFalse()
+    {
+        TrackEntity track = BuildTrack(bpm: 120);
+        TrackFile file = BuildFile(bpm: 128);
+
+        Assert.False(TrackMetadataService.AreTrackAndFileEquals(track, file));
+    }
+
+    [Fact(DisplayName = "are_track_and_file_equals_false_when_composers_differ")]
+    public void AreTrackAndFileEquals_ComposersDiffer_ReturnsFalse()
+    {
+        TrackEntity track = BuildTrack(composers: "Bach");
+        TrackFile file = BuildFile(composers: "Handel");
+
+        Assert.False(TrackMetadataService.AreTrackAndFileEquals(track, file));
+    }
+
+    [Fact(DisplayName = "are_track_and_file_equals_true_when_null_database_composers_meet_empty_file_composers")]
+    public void AreTrackAndFileEquals_NullVersusEmptyComposers_ReturnsTrue()
+    {
+        TrackEntity track = BuildTrack(composers: null);
+        TrackFile file = BuildFile(composers: "");
+
+        Assert.True(TrackMetadataService.AreTrackAndFileEquals(track, file));
+    }
+
+    [Fact(DisplayName = "are_track_and_file_equals_false_when_only_composers_casing_changes")]
+    public void AreTrackAndFileEquals_ComposersCasingChanges_ReturnsFalse()
+    {
+        TrackEntity track = BuildTrack(composers: "bach");
+        TrackFile file = BuildFile(composers: "Bach");
+
+        Assert.False(TrackMetadataService.AreTrackAndFileEquals(track, file));
     }
 
     #endregion

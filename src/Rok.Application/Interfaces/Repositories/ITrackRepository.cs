@@ -1,3 +1,5 @@
+using Rok.Application.Tag;
+
 ﻿namespace Rok.Application.Interfaces.Repositories;
 
 public interface ITrackRepository : IRepository<TrackEntity>
@@ -27,9 +29,9 @@ public interface ITrackRepository : IRepository<TrackEntity>
     Task<bool> UpdateFileDateAsync(long id, DateTime fileDate, RepositoryConnectionKind kind = RepositoryConnectionKind.Foreground);
 
     /// <summary>
-    /// Updates the title, file date and file size of a track, and stamps its edit date, without touching score, listen counts or playlist links.
+    /// Updates the title, track number, disc, composers, BPM, file date and file size of a track, and stamps its edit date, without touching score, listen counts or playlist links. Empty composers are stored as NULL.
     /// </summary>
-    Task<bool> UpdateTitleAndFileInfoAsync(long id, string title, DateTime fileDate, long size, RepositoryConnectionKind kind = RepositoryConnectionKind.Foreground);
+    Task<bool> UpdateTagFieldsAndFileInfoAsync(long id, TagFieldValues values, DateTime fileDate, long size, RepositoryConnectionKind kind = RepositoryConnectionKind.Foreground);
 
     Task<bool> UpdateGetLyricsLastAttemptAsync(long id, RepositoryConnectionKind kind = RepositoryConnectionKind.Foreground);
 

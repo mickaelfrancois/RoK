@@ -2547,20 +2547,29 @@
   <data name="playerRepeatOne" xml:space="preserve">
     <value>Répéter la piste</value>
   </data>
-  <data name="EditTrackTitleDialog.Title" xml:space="preserve">
-    <value>Modifier le titre</value>
+  <data name="EditTrackDialog.Title" xml:space="preserve">
+    <value>Modifier la piste</value>
   </data>
-  <data name="EditTrackTitleDialog.PrimaryButtonText" xml:space="preserve">
+  <data name="EditTrackDialog.PrimaryButtonText" xml:space="preserve">
     <value>Enregistrer</value>
   </data>
-  <data name="EditTrackTitleDialog.CloseButtonText" xml:space="preserve">
+  <data name="EditTrackDialog.CloseButtonText" xml:space="preserve">
     <value>Annuler</value>
   </data>
   <data name="EditTrackTitleInput.Header" xml:space="preserve">
     <value>Titre</value>
   </data>
-  <data name="EditTrackTitlePreviewLabel.Text" xml:space="preserve">
-    <value>Aperçu</value>
+  <data name="EditTrackNumberInput.Header" xml:space="preserve">
+    <value>N° de piste</value>
+  </data>
+  <data name="EditTrackDiscInput.Header" xml:space="preserve">
+    <value>N° de disque</value>
+  </data>
+  <data name="EditTrackComposerInput.Header" xml:space="preserve">
+    <value>Compositeur</value>
+  </data>
+  <data name="EditTrackBpmInput.Header" xml:space="preserve">
+    <value>BPM</value>
   </data>
   <data name="trackEditText.Text" xml:space="preserve">
     <value>Modifier</value>
@@ -2608,6 +2617,18 @@
     <value>L’écriture des tags est désactivée dans les options.</value>
   </data>
   <data name="trackEditError_Generic" xml:space="preserve">
-    <value>Le titre n’a pas pu être enregistré.</value>
+    <value>Les modifications n’ont pas pu être enregistrées.</value>
+  </data>
+  <data name="trackEditRequired" xml:space="preserve">
+    <value>Cette valeur est requise.</value>
+  </data>
+  <data name="trackEditInvalid_TrackNumber" xml:space="preserve">
+    <value>Saisissez un numéro de piste de 1 à 999.</value>
+  </data>
+  <data name="trackEditInvalid_Disc" xml:space="preserve">
+    <value>Saisissez un numéro de disque de 1 à 99.</value>
+  </data>
+  <data name="trackEditInvalid_Bpm" xml:space="preserve">
+    <value>Saisissez un BPM de 1 à 999, ou laissez vide pour le retirer.</value>
   </data>
 </root>

@@ -85,7 +85,7 @@
                         </Button.Flyout>
                     </Button>
 
-                    <Button Visibility="{x:Bind ViewModel.CanEditTags, Mode=OneWay}" Command="{x:Bind ViewModel.EditTitleCommand}">
+                    <Button Visibility="{x:Bind ViewModel.CanEditTags, Mode=OneWay}" Command="{x:Bind ViewModel.EditCommand}">
                         <StackPanel Orientation="Horizontal" Spacing="6">
                             <SymbolIcon Symbol="Edit" />
                             <TextBlock x:Uid="trackEditText" VerticalAlignment="Center" />

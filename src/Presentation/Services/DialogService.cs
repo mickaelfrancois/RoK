@@ -1,5 +1,6 @@
 ﻿using Microsoft.UI;
 using Microsoft.UI.Xaml.Controls;
+using Rok.Application.Features.Tracks.Services;
 using Rok.Dialogs;
 using Windows.Foundation;
 using Windows.UI;
@@ -77,14 +78,14 @@ public sealed class DialogService(ResourceLoader resourceLoader, ITranslateServi
         };
     }
 
-    public async Task<string?> ShowEditTrackTitleAsync(string currentTitle, Func<string, Task<string?>> trySaveAsync)
+    public async Task<TrackEditSaved?> ShowEditTrackAsync(TrackEditValues current, Func<TrackTagsEdit, Task<TrackEditAttempt>> trySaveAsync)
     {
-        EditTrackTitleDialog dialog = new(currentTitle)
+        EditTrackDialog dialog = new(current, resourceLoader)
         {
             XamlRoot = App.MainWindow.Content.XamlRoot
         };
 
-        string? savedTitle = null;
+        TrackEditSaved? saved = null;
 
         dialog.PrimaryButtonClick += async (_, args) =>
         {
@@ -94,17 +95,24 @@ public sealed class DialogService(ResourceLoader resourceLoader, ITranslateServi
             {
                 dialog.SetBusy(true);
 
-                string title = TrackTitleEditRules.Normalize(dialog.Candidate);
-                string? error = await trySaveAsync(title);
+                TrackEditEvaluation evaluation = TrackEditRules.Evaluate(current, dialog.Input);
 
-                if (error is null)
+                if (!evaluation.CanSave)
                 {
-                    savedTitle = title;
+                    args.Cancel = true;
+                    return;
+                }
+
+                TrackEditAttempt attempt = await trySaveAsync(evaluation.Edit);
+
+                if (attempt.Saved is not null)
+                {
+                    saved = attempt.Saved;
                     return;
                 }
 
                 args.Cancel = true;
-                dialog.ShowError(error);
+                dialog.ShowError(attempt.Error ?? string.Empty);
             }
             finally
             {
@@ -115,7 +123,7 @@ public sealed class DialogService(ResourceLoader resourceLoader, ITranslateServi
 
         await dialog.ShowAsync();
 
-        return savedTitle;
+        return saved;
     }
 
     public Task ShowTextAsync(string title, string content, bool showTranslateButton = false, string targetLanguage = "fr")

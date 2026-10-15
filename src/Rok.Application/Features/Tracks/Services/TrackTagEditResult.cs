@@ -6,16 +6,21 @@ namespace Rok.Application.Features.Tracks.Services;
 /// Outcome of a tag edit on one track.
 /// </summary>
 /// <param name="TrackId">Id of the track.</param>
-/// <param name="Title">Title requested for the track.</param>
+/// <param name="Title">Title requested for the track, null when the title was not edited.</param>
 /// <param name="Outcome">Final state.</param>
 /// <param name="Reason">Reason when not succeeded, otherwise <see cref="ETagWriteReason.None"/>.</param>
 /// <param name="ErrorCode">Stable error code when not succeeded, otherwise null.</param>
-public sealed record TrackTagEditResult(long TrackId, string Title, ETagWriteOutcome Outcome, ETagWriteReason Reason, string? ErrorCode)
+public sealed record TrackTagEditResult(long TrackId, string? Title, ETagWriteOutcome Outcome, ETagWriteReason Reason, string? ErrorCode)
 {
     /// <summary>
     /// Error code returned when the tag writing option is turned off.
     /// </summary>
     public const string DisabledCode = "track.tag_write.disabled";
+
+    /// <summary>
+    /// Values stored in the database after a successful edit, otherwise null.
+    /// </summary>
+    public TrackEditSaved? Saved { get; init; }
 
     /// <summary>
     /// Gets whether the track file and the database are both up to date.
@@ -46,22 +51,22 @@ public sealed record TrackTagEditResult(long TrackId, string Title, ETagWriteOut
         };
     }
 
-    internal static TrackTagEditResult Succeed(long trackId, string title)
+    internal static TrackTagEditResult Succeed(long trackId, string? title, TrackEditSaved saved)
     {
-        return new TrackTagEditResult(trackId, title, ETagWriteOutcome.Succeeded, ETagWriteReason.None, null);
+        return new TrackTagEditResult(trackId, title, ETagWriteOutcome.Succeeded, ETagWriteReason.None, null) { Saved = saved };
     }
 
-    internal static TrackTagEditResult Skip(long trackId, string title, ETagWriteReason reason)
+    internal static TrackTagEditResult Skip(long trackId, string? title, ETagWriteReason reason)
     {
         return new TrackTagEditResult(trackId, title, ETagWriteOutcome.Skipped, reason, CodeFor(reason));
     }
 
-    internal static TrackTagEditResult Fail(long trackId, string title, ETagWriteReason reason)
+    internal static TrackTagEditResult Fail(long trackId, string? title, ETagWriteReason reason)
     {
         return new TrackTagEditResult(trackId, title, ETagWriteOutcome.Failed, reason, CodeFor(reason));
     }
 
-    internal static TrackTagEditResult Disabled(long trackId, string title)
+    internal static TrackTagEditResult Disabled(long trackId, string? title)
     {
         return new TrackTagEditResult(trackId, title, ETagWriteOutcome.Skipped, ETagWriteReason.None, DisabledCode);
     }

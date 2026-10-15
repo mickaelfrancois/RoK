@@ -15,31 +15,37 @@ internal interface ITagFormat
     ETagWriteReason CheckFile(string path);
 
     /// <summary>
-    /// Writes the title into the file, opened with an explicit MIME type because the copy has a temporary extension.
+    /// MIME type used to open files of this format, needed because a copy has a temporary extension.
+    /// </summary>
+    string MimeType { get; }
+
+    /// <summary>
+    /// Writes the changes into the file.
     /// </summary>
     /// <param name="path">File to write.</param>
-    /// <param name="title">New title.</param>
-    void WriteTitle(string path, string title);
+    /// <param name="changes">Changes to apply.</param>
+    void Write(string path, TagChanges changes);
 
     /// <summary>
     /// Reads what must be identical between the original and the written copy.
     /// </summary>
     /// <param name="path">File to read.</param>
+    /// <param name="changes">Changes being written: the fields they alter are left out of the preserved fields.</param>
     /// <returns>The fingerprint of the file.</returns>
-    TagFingerprint ReadFingerprint(string path);
+    TagFingerprint ReadFingerprint(string path, TagChanges changes);
 }
 
 /// <summary>
 /// Properties of a file compared before and after a tag write.
 /// </summary>
-/// <param name="Title">Title read back from the file.</param>
+/// <param name="Values">Editable fields read back from the file, as the import reads them.</param>
 /// <param name="Duration">Audio duration.</param>
 /// <param name="Bitrate">Audio bitrate.</param>
 /// <param name="SampleRate">Audio sample rate.</param>
 /// <param name="AudioHash">Hash of the audio stream.</param>
 /// <param name="PreservedFields">Sorted descriptors of the fields the write must not alter.</param>
 internal sealed record TagFingerprint(
-    string? Title,
+    TagFieldSnapshot Values,
     TimeSpan Duration,
     int Bitrate,
     int SampleRate,

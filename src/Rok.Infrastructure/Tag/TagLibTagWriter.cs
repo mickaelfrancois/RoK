@@ -116,9 +116,9 @@ public sealed class TagLibTagWriter : ITagWriter, ITagWriteRecovery
             if (skipReason != ETagWriteReason.None || format is null)
                 return Skipped(path, skipReason);
 
-            string? title = request.Changes.Title;
+            TagChanges changes = request.Changes;
 
-            if (title is null)
+            if (!changes.HasChanges)
                 return Succeeded(path);
 
             string id = Guid.NewGuid().ToString("N");
@@ -127,9 +127,10 @@ public sealed class TagLibTagWriter : ITagWriter, ITagWriteRecovery
             _journal.Add(entry);
             _files.Copy(entry.Original, entry.Temp);
 
-            format.WriteTitle(entry.Temp, title);
+            format.Write(entry.Temp, changes);
+            _files.AfterTagWrite(entry.Temp);
 
-            if (!IsCopyValid(format, entry, title))
+            if (!IsCopyValid(format, entry, changes))
             {
                 _logger.LogWarning("Verification of the tag copy failed for {File}", path);
                 CleanUp(entry);
@@ -138,7 +139,7 @@ public sealed class TagLibTagWriter : ITagWriter, ITagWriteRecovery
             }
 
             bool clean = ReplaceOriginal(entry);
-            TagWriteResult result = Succeeded(path);
+            TagWriteResult result = ReadBackAfterReplace(path, format);
 
             if (clean)
                 TryRemoveFromJournal(entry);
@@ -217,12 +218,12 @@ public sealed class TagLibTagWriter : ITagWriter, ITagWriteRecovery
         }
     }
 
-    private static bool IsCopyValid(ITagFormat format, TagWriteJournalEntry entry, string title)
+    private static bool IsCopyValid(ITagFormat format, TagWriteJournalEntry entry, TagChanges changes)
     {
-        TagFingerprint original = format.ReadFingerprint(entry.Original);
-        TagFingerprint copy = format.ReadFingerprint(entry.Temp);
+        TagFingerprint original = format.ReadFingerprint(entry.Original, changes);
+        TagFingerprint copy = format.ReadFingerprint(entry.Temp, changes);
 
-        return copy.Title == title
+        return copy.Values == original.Values.WithChanges(changes)
             && copy.Duration == original.Duration
             && copy.Bitrate == original.Bitrate
             && copy.SampleRate == original.SampleRate
@@ -310,6 +311,36 @@ public sealed class TagLibTagWriter : ITagWriter, ITagWriteRecovery
             return ETagWriteReason.InsufficientDiskSpace;
 
         return ETagWriteReason.IoError;
+    }
+
+    private TagWriteResult ReadBackAfterReplace(string path, ITagFormat format)
+    {
+        try
+        {
+            return Succeeded(path, format);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "Tags written on {File} but the read-back failed, the result carries no values", path);
+        }
+
+        try
+        {
+            return Succeeded(path);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "Tags written on {File} but its file information could not be read", path);
+
+            return new TagWriteResult(path, ETagWriteOutcome.Succeeded, ETagWriteReason.None, null, null);
+        }
+    }
+
+    private static TagWriteResult Succeeded(string path, ITagFormat format)
+    {
+        TagFieldValues values = TagFieldReader.ReadFile(path, format.MimeType);
+
+        return Succeeded(path) with { Values = values };
     }
 
     private static TagWriteResult Succeeded(string path)

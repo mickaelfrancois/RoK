@@ -8,9 +8,14 @@ namespace Rok.Infrastructure.Tag.Formats;
 /// </summary>
 internal sealed class FlacTagFormat : ITagFormat
 {
-    private const string MimeType = "taglib/flac";
+    private const string Mime = "taglib/flac";
     private const string TitleFieldName = "TITLE";
+    private const string BpmFieldName = "BPM";
+    private const string TempoFieldName = "TEMPO";
     private const TagLib.TagTypes ParasiticTags = TagLib.TagTypes.Id3v1 | TagLib.TagTypes.Id3v2 | TagLib.TagTypes.Ape;
+
+    /// <inheritdoc />
+    public string MimeType => Mime;
 
     /// <inheritdoc />
     public ETagWriteReason CheckFile(string path)
@@ -21,32 +26,36 @@ internal sealed class FlacTagFormat : ITagFormat
     }
 
     /// <inheritdoc />
-    public void WriteTitle(string path, string title)
+    public void Write(string path, TagChanges changes)
     {
         using TagLib.File file = TagLib.File.Create(path, MimeType, TagLib.ReadStyle.Average);
 
-        file.GetTag(TagLib.TagTypes.Xiph, true).Title = title;
+        TagLib.Ogg.XiphComment xiph = (TagLib.Ogg.XiphComment)file.GetTag(TagLib.TagTypes.Xiph, true);
+
+        TagFormatHelpers.ApplyChanges(xiph, changes with { Bpm = null });
+        ApplyBpm(xiph, changes.Bpm);
 
         if (file.TagTypesOnDisk.HasFlag(TagLib.TagTypes.Id3v2))
-            file.GetTag(TagLib.TagTypes.Id3v2, false).Title = title;
+            TagFormatHelpers.ApplyChanges(file.GetTag(TagLib.TagTypes.Id3v2, false), changes);
         else
             file.RemoveTags(TagLib.TagTypes.Id3v2);
 
-        TagFormatHelpers.SyncSecondaryTags(file, title);
+        TagFormatHelpers.SyncSecondaryTags(file, changes);
 
         file.Save();
     }
 
     /// <inheritdoc />
-    public TagFingerprint ReadFingerprint(string path)
+    public TagFingerprint ReadFingerprint(string path, TagChanges changes)
     {
         FlacLayoutInfo layout = FlacLayout.Read(path);
+        IReadOnlySet<string> changedFields = ChangedXiphFields(changes);
 
         long end;
         TimeSpan duration;
         int bitrate;
         int sampleRate;
-        string? title;
+        TagFieldSnapshot values;
         string[] id3v2Frames;
         TagLib.TagTypes parasiticTags;
 
@@ -56,8 +65,8 @@ internal sealed class FlacTagFormat : ITagFormat
             duration = file.Properties.Duration;
             bitrate = file.Properties.AudioBitrate;
             sampleRate = file.Properties.AudioSampleRate;
-            title = file.GetTag(TagLib.TagTypes.Xiph, false)?.Title;
-            id3v2Frames = TagFormatHelpers.Id3v2FrameIdsExceptTitle(file);
+            values = TagFieldReader.ReadRaw(file.Tag);
+            id3v2Frames = TagFormatHelpers.Id3v2FrameIdsExcept(file, TagFormatHelpers.ChangedId3v2FrameIds(changes));
             parasiticTags = file.TagTypesOnDisk & ParasiticTags;
         }
 
@@ -78,7 +87,7 @@ internal sealed class FlacTagFormat : ITagFormat
             int separator = field.IndexOf('=');
             string name = (separator < 0 ? field : field[..separator]).ToUpperInvariant();
 
-            if (name == TitleFieldName)
+            if (changedFields.Contains(name))
                 continue;
 
             preserved.Add(separator < 0 ? $"xiph:{name}" : $"xiph:{name}={field[(separator + 1)..]}");
@@ -89,12 +98,61 @@ internal sealed class FlacTagFormat : ITagFormat
         preserved.Sort(StringComparer.Ordinal);
 
         return new TagFingerprint(
-            title,
+            values,
             duration,
             bitrate,
             sampleRate,
             TagFormatHelpers.HashRange(path, layout.FirstFrameOffset, end),
             preserved);
+    }
+
+    private static HashSet<string> ChangedXiphFields(TagChanges changes)
+    {
+        HashSet<string> names = [TitleFieldName];
+
+        if (changes.TrackNumber is not null)
+        {
+            names.Add("TRACKNUMBER");
+            names.Add("TRACKTOTAL");
+        }
+
+        if (changes.Disc is not null)
+        {
+            names.Add("DISCNUMBER");
+            names.Add("DISCTOTAL");
+        }
+
+        if (changes.Composers is not null)
+            names.Add("COMPOSER");
+
+        if (changes.Bpm is not null)
+        {
+            names.Add(BpmFieldName);
+            names.Add(TempoFieldName);
+        }
+
+        return names;
+    }
+
+    private static void ApplyBpm(TagLib.Ogg.XiphComment xiph, int? bpm)
+    {
+        if (bpm is null)
+            return;
+
+        if (bpm.Value == 0)
+        {
+            xiph.RemoveField(BpmFieldName);
+            xiph.RemoveField(TempoFieldName);
+
+            return;
+        }
+
+        string value = bpm.Value.ToString(System.Globalization.CultureInfo.InvariantCulture);
+
+        xiph.SetField(BpmFieldName, value);
+
+        if (xiph.GetField(TempoFieldName).Length > 0)
+            xiph.SetField(TempoFieldName, value);
     }
 
     /// <summary>

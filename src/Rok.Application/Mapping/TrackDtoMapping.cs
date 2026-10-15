@@ -19,6 +19,8 @@ internal static class TrackDtoMapping
             MusicFile = entity.MusicFile,
             FileDate = entity.FileDate,
             Bpm = entity.Bpm,
+            Disc = entity.Disc,
+            Composers = entity.Composers,
             IsLive = entity.IsLive,
             Score = entity.Score,
             ListenCount = entity.ListenCount,

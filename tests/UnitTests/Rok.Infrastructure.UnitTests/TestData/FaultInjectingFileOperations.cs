@@ -18,6 +18,8 @@ internal sealed class FaultInjectingFileOperations : ITagWriteFileOperations
 
     public Action<string>? DeleteOverride { get; set; }
 
+    public Action<string>? AfterWrite { get; set; }
+
     public bool Crashed { get; private set; }
 
     public void Crash()
@@ -58,6 +60,11 @@ internal sealed class FaultInjectingFileOperations : ITagWriteFileOperations
             DeleteOverride(path);
         else
             _inner.Delete(path);
+    }
+
+    public void AfterTagWrite(string temporaryPath)
+    {
+        AfterWrite?.Invoke(temporaryPath);
     }
 
     private void ThrowIfCrashed()

@@ -7,6 +7,12 @@ internal static class M4aTagFixture
 {
     public const string OriginalTitle = "Original title";
     public const string OriginalArtist = "Original artist";
+    public const string OriginalComposer = "Original composer";
+    public const uint OriginalTrack = 3;
+    public const uint OriginalTrackCount = 12;
+    public const uint OriginalDisc = 1;
+    public const uint OriginalDiscCount = 2;
+    public const uint OriginalBpm = 120;
     public const string LyricsText = "Line one\nLine two";
     public const string UnknownAtomType = "rokx";
     public const string DashMean = "com.apple.iTunes";
@@ -33,6 +39,12 @@ internal static class M4aTagFixture
             tag.Title = OriginalTitle;
             tag.Performers = [OriginalArtist];
             tag.Lyrics = LyricsText;
+            tag.Track = OriginalTrack;
+            tag.TrackCount = OriginalTrackCount;
+            tag.Disc = OriginalDisc;
+            tag.DiscCount = OriginalDiscCount;
+            tag.Composers = [OriginalComposer];
+            tag.BeatsPerMinute = OriginalBpm;
 
             tag.Pictures =
             [

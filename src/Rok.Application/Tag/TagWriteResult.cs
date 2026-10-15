@@ -43,4 +43,10 @@ public sealed record TagWriteResult(
     ETagWriteOutcome Outcome,
     ETagWriteReason Reason,
     DateTimeOffset? FileDateModified,
-    long? Size);
+    long? Size)
+{
+    /// <summary>
+    /// Field values read back from the final file, when a write succeeded with changes applied.
+    /// </summary>
+    public TagFieldValues? Values { get; init; }
+}

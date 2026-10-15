@@ -16,4 +16,9 @@ internal interface ITagWriteFileOperations
 
     /// <summary>Deletes a file.</summary>
     void Delete(string path);
+
+    /// <summary>Called once the format has written the temporary copy, before it is verified.</summary>
+    void AfterTagWrite(string temporaryPath)
+    {
+    }
 }

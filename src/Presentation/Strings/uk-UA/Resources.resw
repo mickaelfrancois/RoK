@@ -2438,20 +2438,29 @@
   <data name="playerRepeatOne" xml:space="preserve">
     <value>Повторити одну композицію</value>
   </data>
-  <data name="EditTrackTitleDialog.Title" xml:space="preserve">
-    <value>Редагувати назву</value>
+  <data name="EditTrackDialog.Title" xml:space="preserve">
+    <value>Редагувати трек</value>
   </data>
-  <data name="EditTrackTitleDialog.PrimaryButtonText" xml:space="preserve">
+  <data name="EditTrackDialog.PrimaryButtonText" xml:space="preserve">
     <value>Зберегти</value>
   </data>
-  <data name="EditTrackTitleDialog.CloseButtonText" xml:space="preserve">
+  <data name="EditTrackDialog.CloseButtonText" xml:space="preserve">
     <value>Скасувати</value>
   </data>
   <data name="EditTrackTitleInput.Header" xml:space="preserve">
     <value>Назва</value>
   </data>
-  <data name="EditTrackTitlePreviewLabel.Text" xml:space="preserve">
-    <value>Попередній перегляд</value>
+  <data name="EditTrackNumberInput.Header" xml:space="preserve">
+    <value>Номер треку</value>
+  </data>
+  <data name="EditTrackDiscInput.Header" xml:space="preserve">
+    <value>Номер диска</value>
+  </data>
+  <data name="EditTrackComposerInput.Header" xml:space="preserve">
+    <value>Композитор</value>
+  </data>
+  <data name="EditTrackBpmInput.Header" xml:space="preserve">
+    <value>BPM</value>
   </data>
   <data name="trackEditText.Text" xml:space="preserve">
     <value>Редагувати</value>
@@ -2499,6 +2508,18 @@
     <value>Запис тегів вимкнено в параметрах.</value>
   </data>
   <data name="trackEditError_Generic" xml:space="preserve">
-    <value>Не вдалося зберегти назву.</value>
+    <value>Не вдалося зберегти зміни.</value>
+  </data>
+  <data name="trackEditRequired" xml:space="preserve">
+    <value>Це значення обов’язкове.</value>
+  </data>
+  <data name="trackEditInvalid_TrackNumber" xml:space="preserve">
+    <value>Введіть номер треку від 1 до 999.</value>
+  </data>
+  <data name="trackEditInvalid_Disc" xml:space="preserve">
+    <value>Введіть номер диска від 1 до 99.</value>
+  </data>
+  <data name="trackEditInvalid_Bpm" xml:space="preserve">
+    <value>Введіть BPM від 1 до 999 або залиште порожнім, щоб прибрати.</value>
   </data>
 </root>
