@@ -72,6 +72,30 @@ public sealed class TagWriteRecoveryTests : IDisposable
         Assert.Empty(new TagWriteJournal(JournalFolder).GetEntries());
     }
 
+    [Fact(DisplayName = "recover_should_remove_the_temporary_copy_left_between_copy_and_replace_flac")]
+    public Task RecoverAsync_ShouldRemoveTemporaryCopy_LeftBetweenCopyAndReplace_Flac()
+    {
+        return AssertTemporaryCopyRemovedAsync(FlacTagFixture.CreateRich(MusicFolder));
+    }
+
+    [MediaFoundationEncoderFact(AudioFixtureFormat.M4a, DisplayName = "recover_should_remove_the_temporary_copy_left_between_copy_and_replace_m4a")]
+    public Task RecoverAsync_ShouldRemoveTemporaryCopy_LeftBetweenCopyAndReplace_M4a()
+    {
+        return AssertTemporaryCopyRemovedAsync(M4aTagFixture.CreateRich(MusicFolder, EMp4Layout.MoovBeforeMdat));
+    }
+
+    [Fact(DisplayName = "recover_should_restore_the_original_after_an_interrupted_fallback_flac")]
+    public Task RecoverAsync_ShouldRestoreOriginal_AfterInterruptedFallback_Flac()
+    {
+        return AssertOriginalRestoredAsync(FlacTagFixture.CreateRich(MusicFolder));
+    }
+
+    [MediaFoundationEncoderFact(AudioFixtureFormat.M4a, DisplayName = "recover_should_restore_the_original_after_an_interrupted_fallback_m4a")]
+    public Task RecoverAsync_ShouldRestoreOriginal_AfterInterruptedFallback_M4a()
+    {
+        return AssertOriginalRestoredAsync(M4aTagFixture.CreateRich(MusicFolder, EMp4Layout.MoovBeforeMdat));
+    }
+
     [Fact(DisplayName = "recover_should_do_nothing_when_there_is_no_journal")]
     public async Task RecoverAsync_ShouldDoNothing_WhenThereIsNoJournal()
     {
@@ -135,9 +159,61 @@ public sealed class TagWriteRecoveryTests : IDisposable
             Assert.Equal("A brand new title", file.Tag.Title);
     }
 
-    private TagLibMp3TagWriter CreateWriter(ITagWriteFileOperations files)
+    private async Task AssertTemporaryCopyRemovedAsync(string path)
     {
-        return new TagLibMp3TagWriter(JournalFolder, NullLogger<TagLibMp3TagWriter>.Instance, files);
+        // Arrange
+        byte[] before = await File.ReadAllBytesAsync(path);
+        _files.ReplaceOverride = (_, _) =>
+        {
+            _files.Crash();
+            throw new InvalidOperationException("Simulated crash.");
+        };
+
+        await CreateWriter(_files).WriteAsync([Request(path)], CancellationToken.None);
+
+        Assert.Equal(before, await File.ReadAllBytesAsync(path));
+        Assert.Single(Leftovers(".roktmp"));
+        Assert.Single(new TagWriteJournal(JournalFolder).GetEntries());
+
+        // Act
+        await CreateWriter(new DefaultTagWriteFileOperations()).RecoverAsync(CancellationToken.None);
+
+        // Assert
+        Assert.Equal(before, await File.ReadAllBytesAsync(path));
+        Assert.Empty(Leftovers(".roktmp"));
+        Assert.Empty(new TagWriteJournal(JournalFolder).GetEntries());
+    }
+
+    private async Task AssertOriginalRestoredAsync(string path)
+    {
+        // Arrange
+        byte[] before = await File.ReadAllBytesAsync(path);
+        _files.ReplaceOverride = (_, _) => throw new IOException("Replace is not available.");
+        _files.BeforeMove = (source, destination) =>
+        {
+            if (source.EndsWith(".roktmp", StringComparison.Ordinal) && destination == path)
+                _files.Crash();
+        };
+
+        await CreateWriter(_files).WriteAsync([Request(path)], CancellationToken.None);
+
+        Assert.False(File.Exists(path));
+        Assert.Single(Leftovers(".rokold"));
+        Assert.Single(Leftovers(".roktmp"));
+
+        // Act
+        await CreateWriter(new DefaultTagWriteFileOperations()).RecoverAsync(CancellationToken.None);
+
+        // Assert
+        Assert.Equal(before, await File.ReadAllBytesAsync(path));
+        Assert.Empty(Leftovers(".rokold"));
+        Assert.Empty(Leftovers(".roktmp"));
+        Assert.Empty(new TagWriteJournal(JournalFolder).GetEntries());
+    }
+
+    private TagLibTagWriter CreateWriter(ITagWriteFileOperations files)
+    {
+        return new TagLibTagWriter(JournalFolder, NullLogger<TagLibTagWriter>.Instance, files);
     }
 
     private static TagWriteRequest Request(string path)

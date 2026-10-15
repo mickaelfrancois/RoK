@@ -2460,7 +2460,7 @@
     <value>Записувати теги у файли</value>
   </data>
   <data name="OptionsWriteTagsDescription.Text" xml:space="preserve">
-    <value>Записує у ваші файли MP3. Спершу перевірте на копії.</value>
+    <value>Записує у ваші файли MP3, FLAC і M4A. Спершу перевірте на копії.</value>
   </data>
   <data name="trackEditError_Playing" xml:space="preserve">
     <value>Цей трек зараз відтворюється. Зупиніть його та повторіть спробу.</value>
@@ -2469,7 +2469,7 @@
     <value>Триває імпорт бібліотеки. Повторіть спробу після завершення.</value>
   </data>
   <data name="trackEditError_UnsupportedFormat" xml:space="preserve">
-    <value>Редагувати можна лише файли MP3.</value>
+    <value>Редагувати можна лише файли MP3, FLAC і M4A.</value>
   </data>
   <data name="trackEditError_ReadOnly" xml:space="preserve">
     <value>Файл доступний лише для читання.</value>

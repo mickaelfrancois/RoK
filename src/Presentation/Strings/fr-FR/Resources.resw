@@ -2569,7 +2569,7 @@
     <value>Écrire les tags dans les fichiers</value>
   </data>
   <data name="OptionsWriteTagsDescription.Text" xml:space="preserve">
-    <value>Écrit dans vos fichiers MP3. Testez d’abord sur une copie.</value>
+    <value>Écrit dans vos fichiers MP3, FLAC et M4A. Testez d’abord sur une copie.</value>
   </data>
   <data name="trackEditError_Playing" xml:space="preserve">
     <value>Cette piste est en cours de lecture. Arrêtez-la, puis réessayez.</value>
@@ -2578,7 +2578,7 @@
     <value>Un import de la bibliothèque est en cours. Réessayez à la fin.</value>
   </data>
   <data name="trackEditError_UnsupportedFormat" xml:space="preserve">
-    <value>Seuls les fichiers MP3 peuvent être modifiés.</value>
+    <value>Seuls les fichiers MP3, FLAC et M4A peuvent être modifiés.</value>
   </data>
   <data name="trackEditError_ReadOnly" xml:space="preserve">
     <value>Le fichier est en lecture seule.</value>

@@ -1,29 +1,31 @@
-using System.Security.Cryptography;
+using System.Collections.Frozen;
 using Microsoft.Extensions.Logging;
 using Rok.Application.Tag;
+using Rok.Infrastructure.Tag.Formats;
 using Rok.Shared;
 
 namespace Rok.Infrastructure.Tag;
 
 /// <summary>
-/// Writes ID3 tags into MP3 files through TagLibSharp, working on a temporary copy that replaces
+/// Writes tags into audio files through TagLibSharp, working on a temporary copy that replaces
 /// the original only once it is verified. Pending writes are journaled so they can be undone at startup.
 /// </summary>
-public sealed class TagLibMp3TagWriter : ITagWriter, ITagWriteRecovery
+public sealed class TagLibTagWriter : ITagWriter, ITagWriteRecovery
 {
-    private const string Mp3MimeType = "taglib/mp3";
-    private const string Mp3Extension = ".mp3";
     private const string TemporaryExtension = ".roktmp";
     private const string BackupExtension = ".rokold";
     private const long FreeSpaceMargin = 1024 * 1024;
-    private const int Id3v22MajorVersion = 2;
-    private const string TitleFrameId = "TIT2";
 
-    private static readonly TagLib.TagTypes[] SecondaryTagTypes = [TagLib.TagTypes.Id3v1, TagLib.TagTypes.Ape];
+    private static readonly FrozenDictionary<string, ITagFormat> Formats = new Dictionary<string, ITagFormat>(StringComparer.OrdinalIgnoreCase)
+    {
+        [".mp3"] = new Mp3TagFormat(),
+        [".flac"] = new FlacTagFormat(),
+        [".m4a"] = new Mp4TagFormat()
+    }.ToFrozenDictionary(StringComparer.OrdinalIgnoreCase);
 
     private readonly TagWriteJournal _journal;
     private readonly ITagWriteFileOperations _files;
-    private readonly ILogger<TagLibMp3TagWriter> _logger;
+    private readonly ILogger<TagLibTagWriter> _logger;
     private readonly SemaphoreSlim _writeLock = new(1, 1);
 
     /// <summary>
@@ -31,12 +33,12 @@ public sealed class TagLibMp3TagWriter : ITagWriter, ITagWriteRecovery
     /// </summary>
     /// <param name="applicationLocalPath">Folder where the write journal is kept.</param>
     /// <param name="logger">Logger.</param>
-    public TagLibMp3TagWriter(string applicationLocalPath, ILogger<TagLibMp3TagWriter> logger)
+    public TagLibTagWriter(string applicationLocalPath, ILogger<TagLibTagWriter> logger)
         : this(applicationLocalPath, logger, new DefaultTagWriteFileOperations())
     {
     }
 
-    internal TagLibMp3TagWriter(string applicationLocalPath, ILogger<TagLibMp3TagWriter> logger, ITagWriteFileOperations files)
+    internal TagLibTagWriter(string applicationLocalPath, ILogger<TagLibTagWriter> logger, ITagWriteFileOperations files)
     {
         _journal = new TagWriteJournal(applicationLocalPath);
         _logger = logger;
@@ -109,9 +111,9 @@ public sealed class TagLibMp3TagWriter : ITagWriter, ITagWriteRecovery
 
         try
         {
-            ETagWriteReason skipReason = CheckPreconditions(path);
+            ETagWriteReason skipReason = CheckPreconditions(path, out ITagFormat? format);
 
-            if (skipReason != ETagWriteReason.None)
+            if (skipReason != ETagWriteReason.None || format is null)
                 return Skipped(path, skipReason);
 
             string? title = request.Changes.Title;
@@ -125,9 +127,9 @@ public sealed class TagLibMp3TagWriter : ITagWriter, ITagWriteRecovery
             _journal.Add(entry);
             _files.Copy(entry.Original, entry.Temp);
 
-            WriteTitle(entry.Temp, title);
+            format.WriteTitle(entry.Temp, title);
 
-            if (!IsCopyValid(entry, title))
+            if (!IsCopyValid(format, entry, title))
             {
                 _logger.LogWarning("Verification of the tag copy failed for {File}", path);
                 CleanUp(entry);
@@ -154,12 +156,14 @@ public sealed class TagLibMp3TagWriter : ITagWriter, ITagWriteRecovery
         }
     }
 
-    private static ETagWriteReason CheckPreconditions(string path)
+    private static ETagWriteReason CheckPreconditions(string path, out ITagFormat? format)
     {
+        format = null;
+
         if (!File.Exists(path))
             return ETagWriteReason.NotFound;
 
-        if (!string.Equals(Path.GetExtension(path), Mp3Extension, StringComparison.OrdinalIgnoreCase))
+        if (!Formats.TryGetValue(Path.GetExtension(path), out ITagFormat? found))
             return ETagWriteReason.UnsupportedFormat;
 
         if (File.GetAttributes(path).HasFlag(FileAttributes.ReadOnly))
@@ -174,8 +178,12 @@ public sealed class TagLibMp3TagWriter : ITagWriter, ITagWriteRecovery
         if (!HasEnoughFreeSpace(path))
             return ETagWriteReason.InsufficientDiskSpace;
 
-        if (HasId3v22Tag(path))
-            return ETagWriteReason.UnsupportedTagVersion;
+        ETagWriteReason formatReason = found.CheckFile(path);
+
+        if (formatReason != ETagWriteReason.None)
+            return formatReason;
+
+        format = found;
 
         return ETagWriteReason.None;
     }
@@ -209,97 +217,17 @@ public sealed class TagLibMp3TagWriter : ITagWriter, ITagWriteRecovery
         }
     }
 
-    private static bool HasId3v22Tag(string path)
+    private static bool IsCopyValid(ITagFormat format, TagWriteJournalEntry entry, string title)
     {
-        using TagLib.File file = TagLib.File.Create(path, Mp3MimeType, TagLib.ReadStyle.None);
-
-        return file.GetTag(TagLib.TagTypes.Id3v2, false) is TagLib.Id3v2.Tag { Version: Id3v22MajorVersion };
-    }
-
-    private static void WriteTitle(string path, string title)
-    {
-        using TagLib.File file = TagLib.File.Create(path, Mp3MimeType, TagLib.ReadStyle.Average);
-
-        TagLib.Id3v2.Tag id3v2 = (TagLib.Id3v2.Tag)file.GetTag(TagLib.TagTypes.Id3v2, true);
-        id3v2.Title = title;
-
-        foreach (TagLib.TagTypes type in SecondaryTagTypes)
-        {
-            if (file.TagTypesOnDisk.HasFlag(type))
-                file.GetTag(type, false).Title = title;
-            else
-                file.RemoveTags(type);
-        }
-
-        file.Save();
-    }
-
-    private static bool IsCopyValid(TagWriteJournalEntry entry, string title)
-    {
-        AudioFingerprint original = ReadFingerprint(entry.Original);
-        AudioFingerprint copy = ReadFingerprint(entry.Temp);
+        TagFingerprint original = format.ReadFingerprint(entry.Original);
+        TagFingerprint copy = format.ReadFingerprint(entry.Temp);
 
         return copy.Title == title
             && copy.Duration == original.Duration
             && copy.Bitrate == original.Bitrate
             && copy.SampleRate == original.SampleRate
             && copy.AudioHash == original.AudioHash
-            && copy.FrameIds.SequenceEqual(original.FrameIds);
-    }
-
-    private static AudioFingerprint ReadFingerprint(string path)
-    {
-        long start;
-        long end;
-        TimeSpan duration;
-        int bitrate;
-        int sampleRate;
-        string? title;
-        string[] frameIds;
-
-        using (TagLib.File file = TagLib.File.Create(path, Mp3MimeType, TagLib.ReadStyle.Average))
-        {
-            start = file.InvariantStartPosition;
-            end = file.InvariantEndPosition;
-            duration = file.Properties.Duration;
-            bitrate = file.Properties.AudioBitrate;
-            sampleRate = file.Properties.AudioSampleRate;
-
-            TagLib.Id3v2.Tag? id3v2 = file.GetTag(TagLib.TagTypes.Id3v2, false) as TagLib.Id3v2.Tag;
-            title = id3v2?.Title;
-            frameIds = id3v2 is null
-                ? []
-                : id3v2.GetFrames()
-                    .Select(f => f.FrameId.ToString())
-                    .Where(id => id != TitleFrameId)
-                    .Order(StringComparer.Ordinal)
-                    .ToArray();
-        }
-
-        return new AudioFingerprint(duration, bitrate, sampleRate, HashRange(path, start, end), frameIds, title);
-    }
-
-    private static string HashRange(string path, long start, long end)
-    {
-        using FileStream stream = new(path, FileMode.Open, FileAccess.Read, FileShare.Read);
-        stream.Seek(start, SeekOrigin.Begin);
-
-        using IncrementalHash hash = IncrementalHash.CreateHash(HashAlgorithmName.SHA256);
-        byte[] buffer = new byte[81920];
-        long remaining = end - start;
-
-        while (remaining > 0)
-        {
-            int read = stream.Read(buffer, 0, (int)Math.Min(buffer.Length, remaining));
-
-            if (read == 0)
-                break;
-
-            hash.AppendData(buffer, 0, read);
-            remaining -= read;
-        }
-
-        return Convert.ToHexString(hash.GetHashAndReset());
+            && copy.PreservedFields.SequenceEqual(original.PreservedFields);
     }
 
     private bool ReplaceOriginal(TagWriteJournalEntry entry)
@@ -401,11 +329,4 @@ public sealed class TagLibMp3TagWriter : ITagWriter, ITagWriteRecovery
         return new TagWriteResult(path, ETagWriteOutcome.Failed, reason, null, null);
     }
 
-    private sealed record AudioFingerprint(
-        TimeSpan Duration,
-        int Bitrate,
-        int SampleRate,
-        string AudioHash,
-        string[] FrameIds,
-        string? Title);
 }

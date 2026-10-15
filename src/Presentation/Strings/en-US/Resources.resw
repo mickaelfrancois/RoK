@@ -2570,7 +2570,7 @@
     <value>Write tags into the files</value>
   </data>
   <data name="OptionsWriteTagsDescription.Text" xml:space="preserve">
-    <value>Writes into your MP3 files. Test on a copy first.</value>
+    <value>Writes into your MP3, FLAC and M4A files. Test on a copy first.</value>
   </data>
   <data name="trackEditError_Playing" xml:space="preserve">
     <value>This track is playing. Stop it, then try again.</value>
@@ -2579,7 +2579,7 @@
     <value>A library import is running. Try again when it ends.</value>
   </data>
   <data name="trackEditError_UnsupportedFormat" xml:space="preserve">
-    <value>Only MP3 files can be edited.</value>
+    <value>Only MP3, FLAC and M4A files can be edited.</value>
   </data>
   <data name="trackEditError_ReadOnly" xml:space="preserve">
     <value>The file is read-only.</value>

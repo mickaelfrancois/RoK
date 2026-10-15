@@ -20,7 +20,13 @@ public sealed class AudioFileReaderTests : IDisposable
         AssertDecodesAndSeeks(format);
     }
 
-    [MediaFoundationEncoderFact(AudioFixtureFormat.M4a, DisplayName = "audio_file_reader_should_decode_and_seek_m4a_aac")]
+    [Fact(DisplayName = "audio_file_reader_should_decode_and_seek_flac")]
+    public void AudioFileReader_ShouldDecodeAndSeek_Flac()
+    {
+        AssertDecodesAndSeeks(AudioFixtureFormat.Flac);
+    }
+
+    [MediaFoundationEncoderFact(AudioFixtureFormat.M4a,DisplayName = "audio_file_reader_should_decode_and_seek_m4a_aac")]
     public void AudioFileReader_ShouldDecodeAndSeek_M4a()
     {
         AssertDecodesAndSeeks(AudioFixtureFormat.M4a);

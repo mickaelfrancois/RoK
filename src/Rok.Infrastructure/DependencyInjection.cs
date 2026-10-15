@@ -56,9 +56,9 @@ public static class DependencyInjection
 
         services.AddSingleton<IFileSystem, DefaultFileSystem>();
         services.AddSingleton<ISettingsFile>(c => new SettingsFileService(applicationLocalPath, c.GetRequiredService<IFolderResolver>(), c.GetRequiredService<IFileSystem>()));
-        services.AddSingleton(c => new TagLibMp3TagWriter(applicationLocalPath, c.GetRequiredService<ILogger<TagLibMp3TagWriter>>()));
-        services.AddSingleton<ITagWriter>(c => c.GetRequiredService<TagLibMp3TagWriter>());
-        services.AddSingleton<ITagWriteRecovery>(c => c.GetRequiredService<TagLibMp3TagWriter>());
+        services.AddSingleton(c => new TagLibTagWriter(applicationLocalPath, c.GetRequiredService<ILogger<TagLibTagWriter>>()));
+        services.AddSingleton<ITagWriter>(c => c.GetRequiredService<TagLibTagWriter>());
+        services.AddSingleton<ITagWriteRecovery>(c => c.GetRequiredService<TagLibTagWriter>());
         services.AddSingleton<IArtistPicture, ArtistPicture>();
         services.AddSingleton<IAlbumPicture, AlbumPicture>();
         services.AddSingleton<IRadioPicture, RadioPicture>();

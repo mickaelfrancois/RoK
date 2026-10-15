@@ -12,11 +12,11 @@ public sealed class TagLibMp3TagWriterTests : IDisposable
 
     private readonly DirectoryInfo _tempDir = Directory.CreateTempSubdirectory("TagLibMp3TagWriterTests_");
     private readonly FaultInjectingFileOperations _files = new();
-    private readonly TagLibMp3TagWriter _sut;
+    private readonly TagLibTagWriter _sut;
 
     public TagLibMp3TagWriterTests()
     {
-        _sut = new TagLibMp3TagWriter(JournalFolder, NullLogger<TagLibMp3TagWriter>.Instance, _files);
+        _sut = new TagLibTagWriter(JournalFolder, NullLogger<TagLibTagWriter>.Instance, _files);
     }
 
     private string JournalFolder => Path.Combine(_tempDir.FullName, "journal");
@@ -188,12 +188,13 @@ public sealed class TagLibMp3TagWriterTests : IDisposable
         Assert.Equal(info.Length, result.Size);
     }
 
-    [Theory(DisplayName = "write_should_skip_non_mp3_files_and_leave_them_untouched")]
-    [InlineData(".flac")]
-    [InlineData(".m4a")]
+    [Theory(DisplayName = "write_should_skip_unsupported_formats_and_leave_them_untouched")]
     [InlineData(".wma")]
     [InlineData(".wav")]
-    public async Task WriteAsync_ShouldSkipNonMp3Files(string extension)
+    [InlineData(".aiff")]
+    [InlineData(".aif")]
+    [InlineData(".aac")]
+    public async Task WriteAsync_ShouldSkipUnsupportedFormats(string extension)
     {
         // Arrange
         Directory.CreateDirectory(MusicFolder);
