@@ -35,7 +35,9 @@ public class ArtistImport(IArtistRepository _artistRepository, TimeProvider _tim
 
         IEnumerable<ArtistEntity> artists = await _artistRepository.GetAllAsync(RepositoryConnectionKind.Background);
 
-        foreach (ArtistEntity artist in artists)
+        List<ArtistEntity> artistList = artists.ToList();
+
+        foreach (ArtistEntity artist in artistList)
         {
             string key = GetKey(artist.Name);
 
@@ -45,6 +47,13 @@ public class ArtistImport(IArtistRepository _artistRepository, TimeProvider _tim
                 Name = artist.Name,
                 GenreId = artist.GenreId
             });
+        }
+
+        // A rename in progress keeps the old name as a transient alias of the same artist, so a rescan never recreates it.
+        foreach (ArtistEntity artist in artistList.Where(a => !string.IsNullOrWhiteSpace(a.RenamePendingFrom)))
+        {
+            if (_cache.TryGetValue(GetKey(artist.Name), out ArtistCacheItem? item))
+                _cache.TryAdd(GetKey(artist.RenamePendingFrom!), item);
         }
     }
 
@@ -71,7 +80,7 @@ public class ArtistImport(IArtistRepository _artistRepository, TimeProvider _tim
     /// <summary>
     /// Asynchronously creates a new artist entry based on the provided track information and optional genre identifier.
     /// </summary>
-    /// <remarks>This method creates an artist entry by capitalizing the artist's name and associating it with
+    /// <remarks>This method creates an artist entry with the artist's name as tagged and associating it with
     /// the specified genre. It also updates the artist's data from an external API and caches the result. The method
     /// increments the created count for each successful entry.</remarks>
     /// <param name="track">The track file containing artist information. The <see cref="TrackFile.Artist"/> and <see
@@ -88,7 +97,7 @@ public class ArtistImport(IArtistRepository _artistRepository, TimeProvider _tim
 
         ArtistEntity artist = new()
         {
-            Name = track.Artist.Capitalize(),
+            Name = track.Artist,
             GenreId = genreId,
             MusicBrainzID = track.MusicbrainzArtistID,
             CreatDate = _timeProvider.GetLocalNow().DateTime,
@@ -117,6 +126,6 @@ public class ArtistImport(IArtistRepository _artistRepository, TimeProvider _tim
 
     private static string GetKey(string artistName)
     {
-        return artistName.NormalizeIndexedName().ToUpperInvariant();
+        return artistName.ToIndexKey();
     }
 }

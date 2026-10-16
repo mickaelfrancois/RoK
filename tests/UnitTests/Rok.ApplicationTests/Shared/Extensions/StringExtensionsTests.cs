@@ -26,20 +26,6 @@ public class StringExtensionsTests
         Assert.Equal("song", result);
     }
 
-    [Theory(DisplayName = "Capitalize should uppercase the first letter and lowercase the rest")]
-    [InlineData("HELLO", "Hello")]
-    [InlineData("a", "a")]
-    [InlineData("", "")]
-    [InlineData("mIxED", "Mixed")]
-    public void Capitalize_ShouldNormalizeFirstLetter(string input, string expected)
-    {
-        // Act
-        string result = input.Capitalize();
-
-        // Assert
-        Assert.Equal(expected, result);
-    }
-
     [Theory(DisplayName = "GetNameFirstLetter should return uppercase letter or hash placeholder")]
     [InlineData("apple", "A")]
     [InlineData("Étoile", "É")]
@@ -151,6 +137,21 @@ public class StringExtensionsTests
 
         Assert.NotEqual(composed, decomposed);
         Assert.Equal(composed, decomposed.NormalizeIndexedName());
+    }
+
+    [Theory(DisplayName = "ToIndexKey should fold case and normalize the name like the import cache")]
+    [InlineData("AC/DC", "AC/DC")]
+    [InlineData("ac/dc", "AC/DC")]
+    [InlineData("  Pro‐pain ", "PRO-PAIN")]
+    [InlineData("Daft Punk", "DAFT PUNK")]
+    [InlineData("", "")]
+    public void ToIndexKey_ShouldFoldCaseAndNormalize(string input, string expected)
+    {
+        // Act
+        string result = input.ToIndexKey();
+
+        // Assert
+        Assert.Equal(expected, result);
     }
 
     [Theory(DisplayName = "NormalizeIndexedName should return input unchanged when null or empty")]

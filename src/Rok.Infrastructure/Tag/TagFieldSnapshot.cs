@@ -12,6 +12,9 @@ namespace Rok.Infrastructure.Tag;
 /// <param name="DiscCount">Disc total.</param>
 /// <param name="Bpm">Beats per minute.</param>
 /// <param name="Composers">Composers in canonical form.</param>
+/// <param name="AlbumArtists">Album artists joined by a separator that cannot occur in a name.</param>
+/// <param name="Performers">Performers joined by a separator that cannot occur in a name.</param>
+/// <param name="ArtistSource">Field that defines the artist.</param>
 internal sealed record TagFieldSnapshot(
     string? Title,
     uint Track,
@@ -19,7 +22,10 @@ internal sealed record TagFieldSnapshot(
     uint Disc,
     uint DiscCount,
     uint Bpm,
-    string Composers)
+    string Composers,
+    string AlbumArtists,
+    string Performers,
+    EArtistSource ArtistSource)
 {
     /// <summary>
     /// Gives the snapshot a verified copy must have once the changes are applied.
@@ -28,8 +34,21 @@ internal sealed record TagFieldSnapshot(
     /// <returns>The expected snapshot.</returns>
     public TagFieldSnapshot WithChanges(TagChanges changes)
     {
+        string albumArtists = AlbumArtists;
+        string performers = Performers;
+
+        if (changes.Artist is not null)
+        {
+            if (ArtistSource == EArtistSource.AlbumArtist)
+                albumArtists = TagFieldReader.ReplaceFirstJoinedArtistValue(AlbumArtists, changes.Artist);
+            else
+                performers = TagFieldReader.ReplaceFirstJoinedArtistValue(Performers, changes.Artist);
+        }
+
         return this with
         {
+            AlbumArtists = albumArtists,
+            Performers = performers,
             Title = changes.Title ?? Title,
             Track = (uint?)changes.TrackNumber ?? Track,
             Disc = (uint?)changes.Disc ?? Disc,

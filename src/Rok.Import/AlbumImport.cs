@@ -80,7 +80,7 @@ public class AlbumImport(IAlbumRepository _albumRepository, TimeProvider _timePr
     /// Asynchronously creates a new album entry based on the provided track information and optional artist and genre
     /// identifiers.
     /// </summary>
-    /// <remarks>This method creates an album entry by capitalizing the album name and setting additional
+    /// <remarks>This method creates an album entry with the album name as tagged and setting additional
     /// properties from the provided track. It also completes the album data using an external API and caches the result
     /// for future retrieval.</remarks>
     /// <param name="track">The track file containing album details. The <see cref="TrackFile.Album"/> and <see cref="TrackFile.FullPath"/>
@@ -105,7 +105,7 @@ public class AlbumImport(IAlbumRepository _albumRepository, TimeProvider _timePr
 
         AlbumEntity album = new()
         {
-            Name = track.Album.Capitalize(),
+            Name = track.Album,
             ArtistId = artistId,
             GenreId = genreId,
             Year = track.Year,

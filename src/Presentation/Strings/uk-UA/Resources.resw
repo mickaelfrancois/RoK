@@ -2522,4 +2522,94 @@
   <data name="trackEditInvalid_Bpm" xml:space="preserve">
     <value>Введіть BPM від 1 до 999 або залиште порожнім, щоб прибрати.</value>
   </data>
+  <data name="artistNameInput.Header" xml:space="preserve">
+    <value>Ім’я</value>
+  </data>
+  <data name="RenameArtistDialog.Title" xml:space="preserve">
+    <value>Перейменування виконавця</value>
+  </data>
+  <data name="RenameArtistDialog.CloseButtonText" xml:space="preserve">
+    <value>Закрити</value>
+  </data>
+  <data name="artistRenamePendingBar.Title" xml:space="preserve">
+    <value>Перейменування не завершено</value>
+  </data>
+  <data name="artistRenamePendingBar.Message" xml:space="preserve">
+    <value>Деякі файли досі мають стару назву. Завершіть перейменування, щоб оновити їх.</value>
+  </data>
+  <data name="artistRenameResumeButton.Content" xml:space="preserve">
+    <value>Продовжити</value>
+  </data>
+  <data name="artistRenameCollision" xml:space="preserve">
+    <value>{0} вже існує ({1} альбомів, {2} треків).</value>
+  </data>
+  <data name="artistRenameCounts" xml:space="preserve">
+    <value>Буде оновлено файлів: {0}, альбомів: {1}.</value>
+  </data>
+  <data name="artistRenameBlockersHeader" xml:space="preserve">
+    <value>Перейменування неможливо почати:</value>
+  </data>
+  <data name="artistRenameFailuresHeader" xml:space="preserve">
+    <value>Ці файли не вдалося оновити:</value>
+  </data>
+  <data name="artistRenameStart" xml:space="preserve">
+    <value>Перейменувати</value>
+  </data>
+  <data name="artistRenameResume" xml:space="preserve">
+    <value>Продовжити</value>
+  </data>
+  <data name="artistRenameRetry" xml:space="preserve">
+    <value>Повторити</value>
+  </data>
+  <data name="artistRenameError_Generic" xml:space="preserve">
+    <value>Не вдалося перейменувати виконавця.</value>
+  </data>
+  <data name="artistRenameError_InvalidName" xml:space="preserve">
+    <value>Назва не може бути порожньою або довшою за 255 символів.</value>
+  </data>
+  <data name="artistRenameError_Collision" xml:space="preserve">
+    <value>Інший виконавець уже має таку назву.</value>
+  </data>
+  <data name="artistRenameError_Pending" xml:space="preserve">
+    <value>Перейменування очікує завершення.</value>
+  </data>
+  <data name="artistRenameError_Unchanged" xml:space="preserve">
+    <value>Виконавець уже має таку назву.</value>
+  </data>
+  <data name="artistRenameError_NotFound" xml:space="preserve">
+    <value>Виконавця більше не існує.</value>
+  </data>
+  <data name="artistRenameBlock_NotFound" xml:space="preserve">
+    <value>Файл більше не існує.</value>
+  </data>
+  <data name="artistRenameBlock_ReadOnly" xml:space="preserve">
+    <value>Файл доступний лише для читання.</value>
+  </data>
+  <data name="artistRenameBlock_CloudPlaceholder" xml:space="preserve">
+    <value>Файл ще не на цьому комп’ютері (хмарний файл). Спочатку завантажте його.</value>
+  </data>
+  <data name="artistRenameBlock_UnsupportedFormat" xml:space="preserve">
+    <value>Можна редагувати лише файли MP3, FLAC і M4A.</value>
+  </data>
+  <data name="artistRenameBlock_Locked" xml:space="preserve">
+    <value>Файл використовується іншою програмою.</value>
+  </data>
+  <data name="artistRenameBlock_InsufficientDiskSpace" xml:space="preserve">
+    <value>Недостатньо місця на диску для запису файлу.</value>
+  </data>
+  <data name="artistRenameBlock_UnsupportedTagVersion" xml:space="preserve">
+    <value>Версія тегу ID3 цього файлу (2.2) не підтримується.</value>
+  </data>
+  <data name="artistRenameBlock_Playing" xml:space="preserve">
+    <value>Цей файл відтворюється. Зупиніть його й повторіть спробу.</value>
+  </data>
+  <data name="artistRenameBlock_ImportInProgress" xml:space="preserve">
+    <value>Триває імпорт бібліотеки. Спробуйте, коли він завершиться.</value>
+  </data>
+  <data name="artistRenameBlock_OutOfSync" xml:space="preserve">
+    <value>Файл змінено поза Rok. Спочатку скануйте бібліотеку.</value>
+  </data>
+  <data name="artistRenameBlock_PictureFolder" xml:space="preserve">
+    <value>Папку із зображеннями виконавця не можна перемістити.</value>
+  </data>
 </root>

@@ -33,6 +33,11 @@ public interface ITrackRepository : IRepository<TrackEntity>
     /// </summary>
     Task<bool> UpdateTagFieldsAndFileInfoAsync(long id, TagFieldValues values, DateTime fileDate, long size, RepositoryConnectionKind kind = RepositoryConnectionKind.Foreground);
 
+    /// <summary>
+    /// Updates only the file date and the file size of a track. Used after a tag write that changes no database column of the track.
+    /// </summary>
+    Task<bool> UpdateFileInfoAsync(long id, DateTime fileDate, long size, RepositoryConnectionKind kind = RepositoryConnectionKind.Foreground);
+
     Task<bool> UpdateGetLyricsLastAttemptAsync(long id, RepositoryConnectionKind kind = RepositoryConnectionKind.Foreground);
 
     Task<TrackEntity?> GetByFilePathAsync(string filePath, CancellationToken cancellationToken);

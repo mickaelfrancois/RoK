@@ -2,6 +2,7 @@ using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using Rok.Application.Dto;
 using Rok.Application.Features.Artists.Requests;
+using Rok.Application.Interfaces;
 using Rok.Services;
 using Rok.ViewModels.Artist.Services;
 
@@ -13,7 +14,16 @@ public class ArtistEditServiceTests
 
     private readonly Mock<IDialogService> _dialogService = new();
 
-    private ArtistEditService BuildService() => new(_mediator, _dialogService.Object, NullLogger<ArtistEditService>.Instance);
+    private readonly Mock<IAppOptions> _appOptions = new();
+
+    private readonly Mock<IStringResourceProvider> _strings = new();
+
+    private ArtistEditService BuildService()
+    {
+        _strings.Setup(x => x.GetString(It.IsAny<string>())).Returns<string>(key => key);
+
+        return new(_mediator, _dialogService.Object, _appOptions.Object, _strings.Object, NullLogger<ArtistEditService>.Instance);
+    }
 
     [Fact(DisplayName = "UpdateFavoriteAsync should send the favorite command and update the artist state")]
     public async Task UpdateFavoriteAsync_ShouldSendCommandAndUpdateState()
@@ -111,10 +121,10 @@ public class ArtistEditServiceTests
         ArtistEditService sut = BuildService();
 
         // Act
-        bool result = await sut.EditArtistAsync(artist);
+        ArtistEditResult result = await sut.EditArtistAsync(artist);
 
         // Assert
-        Assert.True(result);
+        Assert.True(result.Updated);
         Assert.Equal("new-mb", artist.MusicBrainzID);
         Assert.Equal(1990, artist.FormedYear);
         Assert.Equal(1960, artist.BornYear);
@@ -199,8 +209,8 @@ public class ArtistEditServiceTests
         ArtistEditValues? shown = null;
 
         _dialogService
-            .Setup(x => x.ShowEditArtistAsync(It.IsAny<ArtistEditValues>()))
-            .Callback<ArtistEditValues>(values => shown = values)
+            .Setup(x => x.ShowEditArtistAsync(It.IsAny<ArtistEditValues>(), It.IsAny<ArtistNameMode>(), It.IsAny<Func<string, Task<string?>>>()))
+            .Callback<ArtistEditValues, ArtistNameMode, Func<string, Task<string?>>>((values, _, _) => shown = values)
             .ReturnsAsync(new ArtistEditValues { IsLock = true });
 
         ArtistEditService sut = BuildService();
@@ -268,16 +278,16 @@ public class ArtistEditServiceTests
         ArtistDto artist = new() { Id = 7, Biography = "old bio", FormedYear = 1980 };
 
         _dialogService
-            .Setup(x => x.ShowEditArtistAsync(It.IsAny<ArtistEditValues>()))
+            .Setup(x => x.ShowEditArtistAsync(It.IsAny<ArtistEditValues>(), It.IsAny<ArtistNameMode>(), It.IsAny<Func<string, Task<string?>>>()))
             .ReturnsAsync((ArtistEditValues?)null);
 
         ArtistEditService sut = BuildService();
 
         // Act
-        bool result = await sut.EditArtistAsync(artist);
+        ArtistEditResult result = await sut.EditArtistAsync(artist);
 
         // Assert
-        Assert.False(result);
+        Assert.False(result.Updated);
         Assert.Empty(_mediator.Sent<UpdateArtistRequest>());
         Assert.Equal("old bio", artist.Biography);
         Assert.Equal(1980, artist.FormedYear);
@@ -286,7 +296,7 @@ public class ArtistEditServiceTests
     private void SetupDialog(ArtistEditValues edited)
     {
         _dialogService
-            .Setup(x => x.ShowEditArtistAsync(It.IsAny<ArtistEditValues>()))
+            .Setup(x => x.ShowEditArtistAsync(It.IsAny<ArtistEditValues>(), It.IsAny<ArtistNameMode>(), It.IsAny<Func<string, Task<string?>>>()))
             .ReturnsAsync(edited);
     }
 }

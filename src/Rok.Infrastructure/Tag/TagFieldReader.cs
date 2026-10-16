@@ -1,4 +1,5 @@
 using Rok.Application.Tag;
+using Rok.Shared.Extensions;
 
 namespace Rok.Infrastructure.Tag;
 
@@ -7,7 +8,72 @@ namespace Rok.Infrastructure.Tag;
 /// </summary>
 internal static class TagFieldReader
 {
+    private const char ArtistValueSeparator = '\u001F';
+
     private static readonly char[] ComposerSeparators = [';', '/'];
+
+    /// <summary>
+    /// Tells which field defines the artist: the album artist when the tag has one, otherwise the performer.
+    /// This is the single rule shared by the import, the tag write and its verification.
+    /// </summary>
+    /// <param name="tag">Combined tag of an open file.</param>
+    /// <returns>The field that defines the artist.</returns>
+    public static EArtistSource ArtistSource(TagLib.Tag tag)
+    {
+        return tag.FirstAlbumArtist is not null ? EArtistSource.AlbumArtist : EArtistSource.Performer;
+    }
+
+    /// <summary>
+    /// Reads the artist with the normalization the library import applies.
+    /// </summary>
+    /// <param name="tag">Combined tag of an open file.</param>
+    /// <returns>The normalized artist, empty when absent.</returns>
+    public static string ReadArtist(TagLib.Tag tag)
+    {
+        string? artist = ArtistSource(tag) == EArtistSource.AlbumArtist ? tag.FirstAlbumArtist : tag.FirstPerformer;
+
+        return (artist?.Trim() ?? "").NormalizeIndexedName();
+    }
+
+    /// <summary>
+    /// Joins artist values into the canonical text kept in a snapshot.
+    /// </summary>
+    /// <param name="values">Values of an artist field.</param>
+    /// <returns>The joined values, empty when none.</returns>
+    public static string JoinArtistValues(IEnumerable<string?> values)
+    {
+        return string.Join(ArtistValueSeparator, values);
+    }
+
+    /// <summary>
+    /// Replaces the first value of an artist field and keeps the other ones.
+    /// </summary>
+    /// <param name="values">Current values, possibly empty.</param>
+    /// <param name="first">New first value.</param>
+    /// <returns>The new values.</returns>
+    public static string[] ReplaceFirstArtistValue(string[]? values, string first)
+    {
+        if (values is null || values.Length == 0)
+            return [first];
+
+        string[] result = [.. values];
+        result[0] = first;
+
+        return result;
+    }
+
+    /// <summary>
+    /// Replaces the first value of a joined artist field, as <see cref="ReplaceFirstArtistValue"/> does.
+    /// </summary>
+    /// <param name="joined">Values joined by <see cref="JoinArtistValues"/>.</param>
+    /// <param name="first">New first value.</param>
+    /// <returns>The joined new values.</returns>
+    public static string ReplaceFirstJoinedArtistValue(string joined, string first)
+    {
+        string[] values = joined.Length == 0 ? [] : joined.Split(ArtistValueSeparator);
+
+        return JoinArtistValues(ReplaceFirstArtistValue(values, first));
+    }
 
     /// <summary>
     /// Reads the fields with the normalization the library import applies.
@@ -21,7 +87,10 @@ internal static class TagFieldReader
             (int)tag.Track,
             tag.Disc > 0 ? (int)tag.Disc : null,
             tag.JoinedComposers?.Trim() ?? "",
-            tag.BeatsPerMinute > 0 ? (int)tag.BeatsPerMinute : null);
+            tag.BeatsPerMinute > 0 ? (int)tag.BeatsPerMinute : null)
+        {
+            Artist = ReadArtist(tag)
+        };
     }
 
     /// <summary>
@@ -38,7 +107,10 @@ internal static class TagFieldReader
             tag.Disc,
             tag.DiscCount,
             tag.BeatsPerMinute,
-            CanonicalComposers(tag.JoinedComposers));
+            CanonicalComposers(tag.JoinedComposers),
+            JoinArtistValues(tag.AlbumArtists),
+            JoinArtistValues(tag.Performers),
+            ArtistSource(tag));
     }
 
     /// <summary>

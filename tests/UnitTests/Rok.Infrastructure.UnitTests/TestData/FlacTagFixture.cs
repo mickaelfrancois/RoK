@@ -101,6 +101,30 @@ internal static class FlacTagFixture
         return path;
     }
 
+    /// <summary>
+    /// Creates the rich FLAC with exactly the given <c>ALBUMARTIST</c> and <c>ARTIST</c> values.
+    /// </summary>
+    public static string CreateWithArtists(string folder, string[] albumArtists, string[] performers, string fileName = "song.flac")
+    {
+        string path = CreateRich(folder, fileName);
+
+        using (TagLib.File file = TagLib.File.Create(path, "taglib/flac", TagLib.ReadStyle.Average))
+        {
+            TagLib.Ogg.XiphComment xiph = (TagLib.Ogg.XiphComment)file.GetTag(TagLib.TagTypes.Xiph, true);
+
+            xiph.RemoveField("ARTIST");
+            xiph.RemoveField("ALBUMARTIST");
+            xiph.AlbumArtists = albumArtists;
+            xiph.Performers = performers;
+
+            file.Save();
+        }
+
+        LowercaseFieldNameOnDisk(path);
+
+        return path;
+    }
+
     /// <summary>Creates a FLAC holding only STREAMINFO and audio frames: no Xiph comment, no padding.</summary>
     public static string CreateWithoutTags(string folder, string fileName = "song.flac")
     {

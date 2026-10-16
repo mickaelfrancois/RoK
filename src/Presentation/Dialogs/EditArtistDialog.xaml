@@ -11,6 +11,15 @@
                CloseButtonText="">
 
     <StackPanel>
+        <TextBox x:Uid="artistNameInput"
+                 x:Name="NameInput"
+                 Header=""
+                 Visibility="{x:Bind NameVisibility}"
+                 IsEnabled="{x:Bind IsNameEnabled}"
+                 Text="{x:Bind NameText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                 TextChanged="NameInput_TextChanged"
+                 Margin="0,0,0,8" />
+
         <StackPanel Orientation="Horizontal">
             <ToggleSwitch x:Uid="disbandedSwitch"
                           IsOn="{x:Bind Disbanded, Mode=TwoWay}"></ToggleSwitch>

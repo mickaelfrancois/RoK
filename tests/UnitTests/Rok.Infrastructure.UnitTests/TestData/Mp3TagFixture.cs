@@ -79,6 +79,33 @@ internal static class Mp3TagFixture
         return path;
     }
 
+    /// <summary>Creates a rich MP3 whose ID3v2 carries exactly the given album artists (TPE2) and performers (TPE1), with an optional APE tag repeating the performers.</summary>
+    public static string CreateWithArtists(string folder, byte version, string[] albumArtists, string[] performers, bool withApe = false, string fileName = "song.mp3")
+    {
+        string path = CreateRich(folder, version, fileName);
+
+        using TagLib.File file = TagLib.File.Create(path, "taglib/mp3", TagLib.ReadStyle.Average);
+        TagLib.Id3v2.Tag id3v2 = (TagLib.Id3v2.Tag)file.GetTag(TagLib.TagTypes.Id3v2, false);
+
+        id3v2.RemoveFrames("TPE1");
+        id3v2.RemoveFrames("TPE2");
+        id3v2.AlbumArtists = albumArtists;
+        id3v2.Performers = performers;
+
+        if (withApe)
+        {
+            TagLib.Tag ape = file.GetTag(TagLib.TagTypes.Ape, true);
+
+            ape.Title = OriginalTitle;
+            ape.Performers = performers;
+        }
+
+        file.RemoveTags(TagLib.TagTypes.Id3v1);
+        file.Save();
+
+        return path;
+    }
+
     /// <summary>Creates an MP3 with no tag at all.</summary>
     public static string CreateWithoutTags(string folder, string fileName = "song.mp3")
     {

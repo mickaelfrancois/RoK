@@ -3,6 +3,7 @@ using Rok.Application.Interfaces;
 using Rok.Application.Interfaces.Repositories;
 using Rok.Application.Tag;
 using Rok.Infrastructure.Migration;
+using Rok.Infrastructure.Repositories;
 
 namespace Rok.Infrastructure.UnitTests;
 
@@ -24,6 +25,26 @@ public class DependencyInjectionTests
 
         // Assert
         Assert.Contains(services, d => d.ServiceType == typeof(IMigration) && d.ImplementationType == typeof(Migration19));
+    }
+
+    [Fact(DisplayName = "migration_20_is_registered")]
+    public void AddInfrastructure_RegistersMigration20()
+    {
+        // Act
+        var services = Register();
+
+        // Assert
+        Assert.Contains(services, d => d.ServiceType == typeof(IMigration) && d.ImplementationType == typeof(Migration20));
+    }
+
+    [Fact(DisplayName = "artist_rename_repository_is_registered")]
+    public void AddInfrastructure_RegistersArtistRenameRepository()
+    {
+        // Act
+        var services = Register();
+
+        // Assert
+        Assert.Contains(services, d => d.ServiceType == typeof(IArtistRenameRepository) && d.ImplementationType == typeof(ArtistRenameRepository));
     }
 
     [Fact(DisplayName = "tag_writer_is_exposed_as_writer_and_recovery_through_one_singleton")]

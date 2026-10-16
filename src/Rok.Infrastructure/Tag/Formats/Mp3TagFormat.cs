@@ -25,10 +25,12 @@ internal sealed class Mp3TagFormat : ITagFormat
     {
         using TagLib.File file = TagLib.File.Create(path, MimeType, TagLib.ReadStyle.Average);
 
-        TagLib.Id3v2.Tag id3v2 = (TagLib.Id3v2.Tag)file.GetTag(TagLib.TagTypes.Id3v2, true);
-        TagFormatHelpers.ApplyChanges(id3v2, changes);
+        EArtistSource artistSource = TagFieldReader.ArtistSource(file.Tag);
 
-        TagFormatHelpers.SyncSecondaryTags(file, changes);
+        TagLib.Id3v2.Tag id3v2 = (TagLib.Id3v2.Tag)file.GetTag(TagLib.TagTypes.Id3v2, true);
+        TagFormatHelpers.ApplyChanges(id3v2, changes, artistSource);
+
+        TagFormatHelpers.SyncSecondaryTags(file, changes, artistSource);
 
         file.Save();
     }

@@ -2632,4 +2632,94 @@
   <data name="trackEditInvalid_Bpm" xml:space="preserve">
     <value>Enter a BPM from 1 to 999, or leave it empty to remove it.</value>
   </data>
+  <data name="artistNameInput.Header" xml:space="preserve">
+    <value>Name</value>
+  </data>
+  <data name="RenameArtistDialog.Title" xml:space="preserve">
+    <value>Rename artist</value>
+  </data>
+  <data name="RenameArtistDialog.CloseButtonText" xml:space="preserve">
+    <value>Close</value>
+  </data>
+  <data name="artistRenamePendingBar.Title" xml:space="preserve">
+    <value>Rename not finished</value>
+  </data>
+  <data name="artistRenamePendingBar.Message" xml:space="preserve">
+    <value>Some files still carry the old name. Finish the rename to update them.</value>
+  </data>
+  <data name="artistRenameResumeButton.Content" xml:space="preserve">
+    <value>Resume</value>
+  </data>
+  <data name="artistRenameCollision" xml:space="preserve">
+    <value>{0} already exists ({1} albums, {2} tracks).</value>
+  </data>
+  <data name="artistRenameCounts" xml:space="preserve">
+    <value>{0} files in {1} albums will be updated.</value>
+  </data>
+  <data name="artistRenameBlockersHeader" xml:space="preserve">
+    <value>The rename cannot start:</value>
+  </data>
+  <data name="artistRenameFailuresHeader" xml:space="preserve">
+    <value>These files could not be updated:</value>
+  </data>
+  <data name="artistRenameStart" xml:space="preserve">
+    <value>Rename</value>
+  </data>
+  <data name="artistRenameResume" xml:space="preserve">
+    <value>Resume</value>
+  </data>
+  <data name="artistRenameRetry" xml:space="preserve">
+    <value>Try again</value>
+  </data>
+  <data name="artistRenameError_Generic" xml:space="preserve">
+    <value>The artist could not be renamed.</value>
+  </data>
+  <data name="artistRenameError_InvalidName" xml:space="preserve">
+    <value>The name cannot be empty or longer than 255 characters.</value>
+  </data>
+  <data name="artistRenameError_Collision" xml:space="preserve">
+    <value>Another artist already has this name.</value>
+  </data>
+  <data name="artistRenameError_Pending" xml:space="preserve">
+    <value>A rename is already waiting to be finished.</value>
+  </data>
+  <data name="artistRenameError_Unchanged" xml:space="preserve">
+    <value>The artist already has this name.</value>
+  </data>
+  <data name="artistRenameError_NotFound" xml:space="preserve">
+    <value>The artist no longer exists.</value>
+  </data>
+  <data name="artistRenameBlock_NotFound" xml:space="preserve">
+    <value>The file no longer exists.</value>
+  </data>
+  <data name="artistRenameBlock_ReadOnly" xml:space="preserve">
+    <value>The file is read-only.</value>
+  </data>
+  <data name="artistRenameBlock_CloudPlaceholder" xml:space="preserve">
+    <value>The file is not on this computer yet (cloud file). Download it first.</value>
+  </data>
+  <data name="artistRenameBlock_UnsupportedFormat" xml:space="preserve">
+    <value>Only MP3, FLAC and M4A files can be edited.</value>
+  </data>
+  <data name="artistRenameBlock_Locked" xml:space="preserve">
+    <value>The file is in use by another program.</value>
+  </data>
+  <data name="artistRenameBlock_InsufficientDiskSpace" xml:space="preserve">
+    <value>Not enough disk space to write the file.</value>
+  </data>
+  <data name="artistRenameBlock_UnsupportedTagVersion" xml:space="preserve">
+    <value>The ID3 tag version of this file (2.2) is not supported.</value>
+  </data>
+  <data name="artistRenameBlock_Playing" xml:space="preserve">
+    <value>This file is playing. Stop it, then try again.</value>
+  </data>
+  <data name="artistRenameBlock_ImportInProgress" xml:space="preserve">
+    <value>A library import is running. Try again when it ends.</value>
+  </data>
+  <data name="artistRenameBlock_OutOfSync" xml:space="preserve">
+    <value>The file was changed outside Rok. Scan the library first.</value>
+  </data>
+  <data name="artistRenameBlock_PictureFolder" xml:space="preserve">
+    <value>The artist pictures folder cannot be moved.</value>
+  </data>
 </root>

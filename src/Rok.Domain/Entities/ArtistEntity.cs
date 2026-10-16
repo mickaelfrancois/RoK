@@ -93,6 +93,8 @@ public class ArtistEntity : BaseEntity, IArtistEntity
 
     public DateTime? GetMetaDataLastAttempt { get; set; }
 
+    public string? RenamePendingFrom { get; set; }
+
 
     [Write(false)]
     public string GenreName { get; set; } = string.Empty;

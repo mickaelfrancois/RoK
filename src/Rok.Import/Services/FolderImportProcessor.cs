@@ -54,7 +54,7 @@ public class FolderImportProcessor(
 
         statistics.FilesRead += files.Count;
 
-        if (!RequiresImport(files))
+        if (!MarkReadAndCheckImport(files))
             return;
 
         _trackFileProcessor.ReadMusicProperties(files);
@@ -133,24 +133,27 @@ public class FolderImportProcessor(
         }
     }
 
-    private bool RequiresImport(List<TrackFile> files)
+    internal bool MarkReadAndCheckImport(IReadOnlyList<TrackFile> files)
     {
+        bool requiresImport = false;
+
         foreach (TrackFile file in files)
         {
             TrackEntity? track = GetTrackByFile(file);
 
-            if (track != null)
+            if (track == null)
             {
-                _trackingService.TrackRead(track.Id);
-
-                if (track.FileDate.Ticks < file.FileDateModified.DateTime.Ticks)
-                    return true;
+                requiresImport = true;
+                continue;
             }
-            else
-                return true;
+
+            _trackingService.TrackRead(track.Id);
+
+            if (track.FileDate.Ticks < file.FileDateModified.DateTime.Ticks)
+                requiresImport = true;
         }
 
-        return false;
+        return requiresImport;
     }
 
     private TrackEntity? GetTrackByFile(TrackFile file)

@@ -74,6 +74,30 @@ public sealed class TagLibTagWriter : ITagWriter, ITagWriteRecovery
     }
 
     /// <inheritdoc />
+    public async Task<IReadOnlyList<TagWriteCheck>> CheckAsync(IReadOnlyList<string> paths, CancellationToken cancellationToken)
+    {
+        await _writeLock.WaitAsync(cancellationToken);
+
+        try
+        {
+            List<TagWriteCheck> checks = new(paths.Count);
+
+            foreach (string path in paths)
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+
+                checks.Add(await Task.Run(() => CheckFile(path), CancellationToken.None));
+            }
+
+            return checks;
+        }
+        finally
+        {
+            _writeLock.Release();
+        }
+    }
+
+    /// <inheritdoc />
     public async Task RecoverAsync(CancellationToken cancellationToken)
     {
         await _writeLock.WaitAsync(cancellationToken);
@@ -101,6 +125,32 @@ public sealed class TagLibTagWriter : ITagWriter, ITagWriteRecovery
             {
                 _logger.LogWarning("Could not recover an interrupted tag write on {File}, will retry at next start", entry.Original);
             }
+        }
+    }
+
+    private TagWriteCheck CheckFile(string path)
+    {
+        try
+        {
+            ETagWriteReason reason = CheckPreconditions(path, out ITagFormat? format);
+
+            if (reason != ETagWriteReason.None || format is null)
+                return new TagWriteCheck(path, reason, null);
+
+            string artist = TagFieldReader.ReadFile(path, format.MimeType).Artist;
+            FileInfo info = new(path);
+
+            return new TagWriteCheck(path, ETagWriteReason.None, artist)
+            {
+                FileDateModified = new DateTimeOffset(info.LastWriteTimeUtc),
+                Size = info.Length
+            };
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "Tag write pre-check failed for {File}", path);
+
+            return new TagWriteCheck(path, MapReason(ex), null);
         }
     }
 
@@ -139,7 +189,7 @@ public sealed class TagLibTagWriter : ITagWriter, ITagWriteRecovery
             }
 
             bool clean = ReplaceOriginal(entry);
-            TagWriteResult result = ReadBackAfterReplace(path, format);
+            TagWriteResult result = ReadBackAfterReplace(path, format, changes);
 
             if (clean)
                 TryRemoveFromJournal(entry);
@@ -313,11 +363,11 @@ public sealed class TagLibTagWriter : ITagWriter, ITagWriteRecovery
         return ETagWriteReason.IoError;
     }
 
-    private TagWriteResult ReadBackAfterReplace(string path, ITagFormat format)
+    private TagWriteResult ReadBackAfterReplace(string path, ITagFormat format, TagChanges changes)
     {
         try
         {
-            return Succeeded(path, format);
+            return Succeeded(path, format, changes);
         }
         catch (Exception ex)
         {
@@ -336,9 +386,12 @@ public sealed class TagLibTagWriter : ITagWriter, ITagWriteRecovery
         }
     }
 
-    private static TagWriteResult Succeeded(string path, ITagFormat format)
+    private static TagWriteResult Succeeded(string path, ITagFormat format, TagChanges changes)
     {
         TagFieldValues values = TagFieldReader.ReadFile(path, format.MimeType);
+
+        if (changes.Artist is null)
+            values = values with { Artist = "" };
 
         return Succeeded(path) with { Values = values };
     }

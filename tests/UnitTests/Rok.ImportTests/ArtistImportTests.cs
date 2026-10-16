@@ -38,6 +38,49 @@ public class ArtistImportTests
         Assert.NotNull(import.GetFromCache("daft punk"));
     }
 
+    [Fact(DisplayName = "load_cache_registers_the_pending_rename_as_an_alias")]
+    public async Task LoadCache_PendingRename_RegistersTheOldNameAsAlias()
+    {
+        // Arrange
+        List<ArtistEntity> artists = new()
+        {
+            new() { Id = 7, Name = "AC/DC", RenamePendingFrom = "Ac/dc", GenreId = 5 },
+            new() { Id = 8, Name = "Daft Punk" }
+        };
+        Mock<IArtistRepository> repository = new();
+        repository.Setup(r => r.GetAllAsync(It.IsAny<RepositoryConnectionKind>())).ReturnsAsync(artists);
+        ArtistImport import = new(repository.Object, TimeProvider.System);
+
+        // Act
+        await import.LoadCacheAsync();
+
+        // Assert
+        Assert.Equal(7, import.GetFromCache("Ac/dc")!.Id);
+        Assert.Equal(7, import.GetFromCache("AC/DC")!.Id);
+        Assert.Equal(8, import.GetFromCache("Daft Punk")!.Id);
+    }
+
+    [Fact(DisplayName = "load_cache_alias_never_shadows_an_existing_artist_name")]
+    public async Task LoadCache_AliasEqualToAnotherArtist_KeepsTheRealArtist()
+    {
+        // Arrange
+        List<ArtistEntity> artists = new()
+        {
+            new() { Id = 7, Name = "New Name", RenamePendingFrom = "Other" },
+            new() { Id = 8, Name = "Other" }
+        };
+        Mock<IArtistRepository> repository = new();
+        repository.Setup(r => r.GetAllAsync(It.IsAny<RepositoryConnectionKind>())).ReturnsAsync(artists);
+        ArtistImport import = new(repository.Object, TimeProvider.System);
+
+        // Act
+        await import.LoadCacheAsync();
+
+        // Assert
+        Assert.Equal(8, import.GetFromCache("Other")!.Id);
+        Assert.Equal(7, import.GetFromCache("New Name")!.Id);
+    }
+
     [Fact(DisplayName = "CreateAsync should return null when track artist name is empty")]
     public async Task CreateAsync_ShouldReturnNull_WhenTrackArtistIsEmpty()
     {
@@ -70,6 +113,60 @@ public class ArtistImportTests
         Assert.Equal(1, captured!.AlbumCount);
         Assert.Equal(0, captured.CompilationCount);
         Assert.Equal(7, captured.GenreId);
+    }
+
+    [Fact(DisplayName = "create_keeps_the_tag_casing")]
+    public async Task CreateAsync_ShouldKeepTagCasing()
+    {
+        // Arrange
+        ArtistEntity? captured = null;
+        Mock<IArtistRepository> repository = new();
+        repository.Setup(r => r.AddAsync(It.IsAny<ArtistEntity>(), It.IsAny<RepositoryConnectionKind>()))
+            .Callback<ArtistEntity, RepositoryConnectionKind>((a, _) => captured = a)
+            .ReturnsAsync(1);
+        ArtistImport import = new(repository.Object, TimeProvider.System);
+
+        // Act
+        ArtistCacheItem? created = await import.CreateAsync(new TrackFile { Artist = "AC/DC", FullPath = @"C:\m\t.mp3" }, null);
+
+        // Assert
+        Assert.Equal("AC/DC", captured!.Name);
+        Assert.Equal("AC/DC", created!.Name);
+    }
+
+    [Fact(DisplayName = "a_case_variant_of_an_existing_artist_maps_to_it")]
+    public async Task GetFromCache_ShouldMapCaseVariant_ToExistingArtist()
+    {
+        // Arrange
+        Mock<IArtistRepository> repository = new();
+        repository.Setup(r => r.GetAllAsync(It.IsAny<RepositoryConnectionKind>()))
+            .ReturnsAsync(new List<ArtistEntity> { new() { Id = 3, Name = "Ac/dc" } });
+        ArtistImport import = new(repository.Object, TimeProvider.System);
+        await import.LoadCacheAsync();
+
+        // Act
+        ArtistCacheItem? hit = import.GetFromCache("ac/dc");
+
+        // Assert
+        Assert.Equal(3, hit!.Id);
+        repository.Verify(r => r.AddAsync(It.IsAny<ArtistEntity>(), It.IsAny<RepositoryConnectionKind>()), Times.Never);
+    }
+
+    [Fact(DisplayName = "two_case_variants_in_one_import_resolve_to_one_artist")]
+    public async Task GetFromCache_ShouldResolveSecondCaseVariant_ToTheCreatedArtist()
+    {
+        // Arrange
+        Mock<IArtistRepository> repository = new();
+        repository.Setup(r => r.AddAsync(It.IsAny<ArtistEntity>(), It.IsAny<RepositoryConnectionKind>())).ReturnsAsync(1);
+        ArtistImport import = new(repository.Object, TimeProvider.System);
+
+        // Act
+        await import.CreateAsync(new TrackFile { Artist = "AC/DC", FullPath = @"C:\m\t.mp3" }, null);
+        ArtistCacheItem? second = import.GetFromCache("Ac/DC");
+
+        // Assert
+        Assert.Equal(1, second!.Id);
+        repository.Verify(r => r.AddAsync(It.IsAny<ArtistEntity>(), It.IsAny<RepositoryConnectionKind>()), Times.Once);
     }
 
     [Fact(DisplayName = "CreateAsync should set compilation count when track is a compilation")]

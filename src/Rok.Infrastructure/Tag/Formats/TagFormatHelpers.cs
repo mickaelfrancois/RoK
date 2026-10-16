@@ -14,6 +14,8 @@ internal static class TagFormatHelpers
     private const string DiscFrameId = "TPOS";
     private const string ComposerFrameId = "TCOM";
     private const string BpmFrameId = "TBPM";
+    private const string PerformerFrameId = "TPE1";
+    private const string AlbumArtistFrameId = "TPE2";
 
     private static readonly TagLib.TagTypes[] SecondaryTagTypes = [TagLib.TagTypes.Id3v1, TagLib.TagTypes.Ape];
 
@@ -51,6 +53,12 @@ internal static class TagFormatHelpers
         if (changes.Bpm is not null)
             ids.Add(BpmFrameId);
 
+        if (changes.Artist is not null)
+        {
+            ids.Add(PerformerFrameId);
+            ids.Add(AlbumArtistFrameId);
+        }
+
         return ids;
     }
 
@@ -77,7 +85,8 @@ internal static class TagFormatHelpers
     /// </summary>
     /// <param name="tag">Tag to write.</param>
     /// <param name="changes">Changes to apply.</param>
-    public static void ApplyChanges(TagLib.Tag tag, TagChanges changes)
+    /// <param name="artistSource">Field that defines the artist, resolved once on the combined tag before any write.</param>
+    public static void ApplyChanges(TagLib.Tag tag, TagChanges changes, EArtistSource artistSource)
     {
         if (changes.Title is not null)
             tag.Title = changes.Title;
@@ -93,6 +102,17 @@ internal static class TagFormatHelpers
 
         if (changes.Bpm is not null)
             tag.BeatsPerMinute = (uint)changes.Bpm.Value;
+
+        if (changes.Artist is not null)
+            ApplyArtist(tag, changes.Artist, artistSource);
+    }
+
+    private static void ApplyArtist(TagLib.Tag tag, string artist, EArtistSource artistSource)
+    {
+        if (artistSource == EArtistSource.AlbumArtist)
+            tag.AlbumArtists = TagFieldReader.ReplaceFirstArtistValue(tag.AlbumArtists, artist);
+        else
+            tag.Performers = TagFieldReader.ReplaceFirstArtistValue(tag.Performers, artist);
     }
 
     /// <summary>
@@ -100,12 +120,13 @@ internal static class TagFormatHelpers
     /// </summary>
     /// <param name="file">Open file.</param>
     /// <param name="changes">Changes to apply.</param>
-    public static void SyncSecondaryTags(TagLib.File file, TagChanges changes)
+    /// <param name="artistSource">Field that defines the artist.</param>
+    public static void SyncSecondaryTags(TagLib.File file, TagChanges changes, EArtistSource artistSource)
     {
         foreach (TagLib.TagTypes type in SecondaryTagTypes)
         {
             if (file.TagTypesOnDisk.HasFlag(type))
-                ApplyChanges(file.GetTag(type, false), changes);
+                ApplyChanges(file.GetTag(type, false), changes, artistSource);
             else
                 file.RemoveTags(type);
         }

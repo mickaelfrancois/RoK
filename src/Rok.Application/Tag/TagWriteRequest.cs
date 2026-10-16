@@ -31,9 +31,15 @@ public sealed record TagChanges
     public int? Bpm { get; init; }
 
     /// <summary>
+    /// New name for the field that defines the artist (the album artist when the file has one, otherwise the performer),
+    /// or null to keep it. Only the first value is replaced, the other ones are kept.
+    /// </summary>
+    public string? Artist { get; init; }
+
+    /// <summary>
     /// Tells whether at least one field is to be changed.
     /// </summary>
-    public bool HasChanges => Title is not null || TrackNumber is not null || Disc is not null || Composers is not null || Bpm is not null;
+    public bool HasChanges => Title is not null || TrackNumber is not null || Disc is not null || Composers is not null || Bpm is not null || Artist is not null;
 }
 
 /// <summary>
