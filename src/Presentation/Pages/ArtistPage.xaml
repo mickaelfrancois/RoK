@@ -133,6 +133,7 @@
                         <Button.Flyout>
                             <MenuFlyout Placement="Bottom">
                                 <MenuFlyoutItem x:Uid="albumMenuEdit" Icon="Edit" Command="{x:Bind ViewModel.EditArtistCommand}" />
+                                <MenuFlyoutItem x:Uid="artistMenuMerge" Icon="Switch" Command="{x:Bind ViewModel.MergeWithCommand}" Visibility="{x:Bind ViewModel.CanMerge, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" />
                                 <MenuFlyoutItem x:Uid="albumMenuBiography" Icon="Library" Command="{x:Bind ViewModel.OpenBiographyCommand}" Visibility="{x:Bind ViewModel.Artist.Biography, Mode=OneWay, Converter={StaticResource StringToVisibilityConverter}}" />
                                 <MenuFlyoutSubItem x:Uid="artistMenuLinks" Visibility="{x:Bind ViewModel.HasLinks, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">
                                     <MenuFlyoutSubItem.Icon>

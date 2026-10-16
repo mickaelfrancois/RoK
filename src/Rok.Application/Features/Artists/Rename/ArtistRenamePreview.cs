@@ -27,7 +27,13 @@ public sealed record ArtistRenamePreview(
 /// <param name="Name">Name of the existing artist.</param>
 /// <param name="AlbumCount">Number of albums of the existing artist.</param>
 /// <param name="TrackCount">Number of tracks of the existing artist.</param>
-public sealed record ArtistRenameCollision(string Name, int AlbumCount, int TrackCount);
+public sealed record ArtistRenameCollision(string Name, int AlbumCount, int TrackCount)
+{
+    /// <summary>
+    /// Id of the existing artist, to propose a merge with it.
+    /// </summary>
+    public long ArtistId { get; init; }
+}
 
 /// <summary>
 /// A reason that stops the whole rename before anything is written.

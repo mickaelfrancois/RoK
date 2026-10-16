@@ -1,5 +1,6 @@
 ﻿using Microsoft.UI;
 using Microsoft.UI.Xaml.Controls;
+using Rok.Application.Features.Artists.Merge;
 using Rok.Application.Features.Artists.Rename;
 using Rok.Application.Features.Tracks.Services;
 using Rok.Dialogs;
@@ -129,6 +130,55 @@ public sealed class DialogService(ResourceLoader resourceLoader, ITranslateServi
                 ArtistRenameAttempt attempt = await renameAsync(progress);
 
                 if (attempt.Outcome is not null)
+                    last = attempt.Outcome;
+
+                if (attempt.Outcome?.State == EArtistRenameState.Completed)
+                    return;
+
+                args.Cancel = true;
+                dialog.ShowAttempt(attempt);
+            }
+            finally
+            {
+                dialog.SetRunning(false);
+                deferral.Complete();
+            }
+        };
+
+        await dialog.ShowAsync();
+
+        return last;
+    }
+
+    public async Task<ArtistMergeOutcome?> ShowMergeArtistsAsync(ArtistMergeDialogRequest request, ArtistMergeDialogActions actions)
+    {
+        MergeArtistDialog dialog = new(request, actions, resourceLoader)
+        {
+            XamlRoot = App.MainWindow.Content.XamlRoot
+        };
+
+        ArtistMergeOutcome? last = null;
+
+        dialog.PrimaryButtonClick += async (_, args) =>
+        {
+            ContentDialogButtonClickDeferral deferral = args.GetDeferral();
+
+            try
+            {
+                (long SourceId, long TargetId)? pair = dialog.CurrentPair();
+
+                if (pair is null)
+                {
+                    args.Cancel = true;
+                    return;
+                }
+
+                dialog.SetRunning(true);
+
+                IProgress<ArtistRenameProgress> progress = new Progress<ArtistRenameProgress>(dialog.ReportProgress);
+                ArtistMergeAttempt attempt = await actions.MergeAsync(pair.Value.SourceId, pair.Value.TargetId, progress);
+
+                if (attempt.Outcome?.State is EArtistRenameState.Completed or EArtistRenameState.Partial)
                     last = attempt.Outcome;
 
                 if (attempt.Outcome?.State == EArtistRenameState.Completed)

@@ -119,7 +119,7 @@ public class NavigationService(ITelemetryClient telemetryClient, NavigationTrail
         MainFrame.Navigate(pageType, parameter);
     }
 
-    public void NavigateToArtist(long artistId)
+    public virtual void NavigateToArtist(long artistId)
     {
         Guard.NotNegativeOrZero(artistId);
         _ = telemetryClient.CaptureScreenAsync("ArtistPage");

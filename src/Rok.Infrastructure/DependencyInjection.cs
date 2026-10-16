@@ -102,6 +102,7 @@ public static class DependencyInjection
 
         services.AddScoped<IArtistRepository, ArtistRepository>();
         services.AddScoped<IArtistRenameRepository, ArtistRenameRepository>();
+        services.AddScoped<IArtistMergeRepository, ArtistMergeRepository>();
         services.AddScoped<IAlbumRepository, AlbumRepository>();
         services.AddScoped<IGenreRepository, GenreRepository>();
         services.AddScoped<ITrackRepository, TrackRepository>();

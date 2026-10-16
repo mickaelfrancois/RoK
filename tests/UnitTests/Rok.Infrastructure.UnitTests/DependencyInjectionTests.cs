@@ -47,6 +47,16 @@ public class DependencyInjectionTests
         Assert.Contains(services, d => d.ServiceType == typeof(IArtistRenameRepository) && d.ImplementationType == typeof(ArtistRenameRepository));
     }
 
+    [Fact(DisplayName = "artist_merge_repository_is_registered")]
+    public void AddInfrastructure_RegistersArtistMergeRepository()
+    {
+        // Act
+        var services = Register();
+
+        // Assert
+        Assert.Contains(services, d => d.ServiceType == typeof(IArtistMergeRepository) && d.ImplementationType == typeof(ArtistMergeRepository));
+    }
+
     [Fact(DisplayName = "tag_writer_is_exposed_as_writer_and_recovery_through_one_singleton")]
     public void AddInfrastructure_ExposesTagWriterAndRecoveryThroughOneSingleton()
     {

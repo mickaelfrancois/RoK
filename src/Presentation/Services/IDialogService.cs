@@ -1,4 +1,5 @@
-﻿using Rok.Application.Features.Artists.Rename;
+﻿using Rok.Application.Features.Artists.Merge;
+using Rok.Application.Features.Artists.Rename;
 using Rok.Application.Features.Tracks.Services;
 
 namespace Rok.Services;
@@ -23,6 +24,12 @@ public interface IDialogService
     /// <param name="renameAsync">Runs the rename and reports its progress; called again when the user retries.</param>
     /// <returns>The last outcome of the rename; <see langword="null"/> when the user left without starting it.</returns>
     Task<ArtistRenameOutcome?> ShowRenameArtistAsync(ArtistRenamePreview preview, Func<IProgress<ArtistRenameProgress>, Task<ArtistRenameAttempt>> renameAsync);
+
+    /// <summary>Shows the merge dialog: the choice of the artists, the preview, then the progress and the result.</summary>
+    /// <param name="request">What the dialog starts with.</param>
+    /// <param name="actions">What the dialog calls to preview, run and search.</param>
+    /// <returns>The last outcome that changed the library (completed or partial); <see langword="null"/> when nothing was merged.</returns>
+    Task<ArtistMergeOutcome?> ShowMergeArtistsAsync(ArtistMergeDialogRequest request, ArtistMergeDialogActions actions);
 
     /// <summary>Shows the track edit dialog. The dialog stays open while <paramref name="trySaveAsync"/> returns a refusal.</summary>
     /// <param name="current">The tag fields the track has now.</param>

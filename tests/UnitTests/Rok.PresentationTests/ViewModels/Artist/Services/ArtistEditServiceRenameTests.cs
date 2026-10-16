@@ -3,6 +3,7 @@ using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using Rok.Application.Dto;
 using Rok.Application.Errors;
+using Rok.Application.Features.Artists.Merge;
 using Rok.Application.Features.Artists.Rename;
 using Rok.Application.Features.Artists.Requests;
 using Rok.Application.Interfaces;
@@ -125,14 +126,13 @@ public class ArtistEditServiceRenameTests
         Assert.Empty(_mediator.Sent<RenameArtistRequest>());
     }
 
-    [Fact(DisplayName = "a_collision_is_refused_with_the_name_and_the_counts")]
-    public async Task ValidateName_Collision_ReturnsTheMessage()
+    [Fact(DisplayName = "a_collision_is_no_longer_refused_in_the_edit_dialog")]
+    public async Task ValidateName_Collision_IsAccepted()
     {
         // Arrange
         ArtistDto artist = new() { Id = 7, Name = "Old" };
-        _mediator.Setup<GetArtistRenamePreviewRequest, Result<ArtistRenamePreview>>().Returns(Result<ArtistRenamePreview>.Ok(Preview(collision: new ArtistRenameCollision("Taken", 2, 14))));
+        _mediator.Setup<GetArtistRenamePreviewRequest, Result<ArtistRenamePreview>>().Returns(Result<ArtistRenamePreview>.Ok(Preview(collision: new ArtistRenameCollision("Taken", 2, 14) { ArtistId = 9 })));
         ArtistEditService sut = BuildService();
-        _strings.Setup(strings => strings.GetString(ArtistRenameTextKeys.Collision)).Returns("{0} exists ({1} albums, {2} tracks)");
         (Func<string, Task<string?>> validate, _) = CaptureEditDialog(null);
         await sut.EditArtistAsync(artist);
 
@@ -140,9 +140,57 @@ public class ArtistEditServiceRenameTests
         string? message = await validate("Taken");
 
         // Assert
-        Assert.Equal("Taken exists (2 albums, 14 tracks)", message);
+        Assert.Null(message);
         GetArtistRenamePreviewRequest sent = Assert.Single(_mediator.Sent<GetArtistRenamePreviewRequest>());
         Assert.Equal("Taken", sent.NewName);
+    }
+
+    [Fact(DisplayName = "rename_collision_offers_a_merge_with_the_existing_artist")]
+    public async Task EditArtistAsync_Collision_OffersTheMergeWithTheExistingArtist()
+    {
+        // Arrange
+        ArtistDto artist = new() { Id = 7, Name = "Old", Biography = "old bio" };
+        ArtistMergeOutcome outcome = new(EArtistRenameState.Completed, 9, "Taken", [], [], [], 7, [], []);
+        _mediator.Setup<GetArtistRenamePreviewRequest, Result<ArtistRenamePreview>>().Returns(Result<ArtistRenamePreview>.Ok(Preview(newName: "Taken", collision: new ArtistRenameCollision("Taken", 2, 14) { ArtistId = 9 })));
+        ArtistEditService sut = BuildService();
+        _strings.Setup(strings => strings.GetString(ArtistMergeTextKeys.Collision)).Returns("{0} exists ({1} albums, {2} tracks). Merge?");
+        Func<string, Task<string?>>? validate = null;
+        string? validation = "not validated";
+
+        _dialogService
+            .Setup(x => x.ShowEditArtistAsync(It.IsAny<ArtistEditValues>(), It.IsAny<ArtistNameMode>(), It.IsAny<Func<string, Task<string?>>>()))
+            .Callback<ArtistEditValues, ArtistNameMode, Func<string, Task<string?>>>((_, _, validateNameAsync) => validate = validateNameAsync)
+            .Returns(async () =>
+            {
+                validation = await validate!("Taken");
+
+                return new ArtistEditValues { Name = "Taken", Biography = "new bio" };
+            });
+
+        ArtistMergeDialogRequest? shown = null;
+        _dialogService
+            .Setup(x => x.ShowMergeArtistsAsync(It.IsAny<ArtistMergeDialogRequest>(), It.IsAny<ArtistMergeDialogActions>()))
+            .Callback<ArtistMergeDialogRequest, ArtistMergeDialogActions>((request, _) => shown = request)
+            .ReturnsAsync(outcome);
+
+        // Act
+        ArtistEditResult result = await sut.EditArtistAsync(artist);
+
+        // Assert
+        Assert.Null(validation);
+        Assert.True(result.Updated);
+        Assert.Same(outcome, result.Merge);
+        Assert.True(result.MergeApplied);
+        Assert.Null(result.Rename);
+        Assert.Equal("new bio", Assert.Single(_mediator.Sent<UpdateArtistRequest>()).Biography.Value);
+        Assert.NotNull(shown);
+        Assert.Equal(new ArtistMergeChoice(7, "Old"), shown.First);
+        Assert.Equal(new ArtistMergeChoice(9, "Taken"), shown.Second);
+        Assert.False(shown.KeepFirst);
+        Assert.Equal("Taken exists (2 albums, 14 tracks). Merge?", shown.Intro);
+        Assert.Empty(_mediator.Sent<RenameArtistRequest>());
+        _dialogService.Verify(x => x.ShowRenameArtistAsync(It.IsAny<ArtistRenamePreview>(), It.IsAny<Func<IProgress<ArtistRenameProgress>, Task<ArtistRenameAttempt>>>()), Times.Never);
+        _dialogService.Verify(x => x.ShowTextAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<bool>(), It.IsAny<string>()), Times.Never);
     }
 
     [Theory(DisplayName = "a_blank_or_too_long_name_is_refused_without_a_request")]
@@ -259,8 +307,31 @@ public class ArtistEditServiceRenameTests
         Assert.Equal("New", Assert.Single(_mediator.Sent<RenameArtistRequest>()).NewName);
     }
 
-    [Fact(DisplayName = "a_collision_found_after_the_dialog_shows_a_message_and_starts_no_rename")]
-    public async Task EditArtistAsync_CollisionAfterTheDialog_ShowsAMessage()
+    [Fact(DisplayName = "a_collision_found_after_the_dialog_offers_the_merge_and_starts_no_rename")]
+    public async Task EditArtistAsync_CollisionAfterTheDialog_OffersTheMerge()
+    {
+        // Arrange
+        ArtistDto artist = new() { Id = 7, Name = "Old" };
+        _mediator.Setup<GetArtistRenamePreviewRequest, Result<ArtistRenamePreview>>().Returns(Result<ArtistRenamePreview>.Ok(Preview(collision: new ArtistRenameCollision("New", 1, 2) { ArtistId = 9 })));
+        ArtistEditService sut = BuildService();
+        CaptureEditDialog(new ArtistEditValues { Name = "New" });
+        _dialogService
+            .Setup(x => x.ShowMergeArtistsAsync(It.IsAny<ArtistMergeDialogRequest>(), It.IsAny<ArtistMergeDialogActions>()))
+            .ReturnsAsync((ArtistMergeOutcome?)null);
+
+        // Act
+        ArtistEditResult result = await sut.EditArtistAsync(artist);
+
+        // Assert
+        Assert.True(result.Updated);
+        Assert.Null(result.Rename);
+        Assert.False(result.MergeApplied);
+        Assert.Empty(_mediator.Sent<RenameArtistRequest>());
+        _dialogService.Verify(x => x.ShowMergeArtistsAsync(It.Is<ArtistMergeDialogRequest>(request => request.Second!.Id == 9), It.IsAny<ArtistMergeDialogActions>()), Times.Once);
+    }
+
+    [Fact(DisplayName = "a_collision_without_the_existing_artist_id_offers_nothing")]
+    public async Task EditArtistAsync_CollisionWithoutId_OffersNothing()
     {
         // Arrange
         ArtistDto artist = new() { Id = 7, Name = "Old" };
@@ -273,9 +344,8 @@ public class ArtistEditServiceRenameTests
 
         // Assert
         Assert.True(result.Updated);
-        Assert.Null(result.Rename);
-        Assert.Empty(_mediator.Sent<RenameArtistRequest>());
-        _dialogService.Verify(x => x.ShowTextAsync("Old", It.IsAny<string>(), false, "fr"), Times.Once);
+        Assert.Null(result.Merge);
+        _dialogService.Verify(x => x.ShowMergeArtistsAsync(It.IsAny<ArtistMergeDialogRequest>(), It.IsAny<ArtistMergeDialogActions>()), Times.Never);
     }
 
     [Fact(DisplayName = "a_refused_rename_returns_the_translated_message_to_the_dialog")]

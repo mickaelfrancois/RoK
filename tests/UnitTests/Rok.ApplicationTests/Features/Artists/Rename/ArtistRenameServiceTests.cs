@@ -74,9 +74,8 @@ public class ArtistRenameServiceTests
             _tracks.Object,
             _playlists.Object,
             _renameRepository.Object,
-            _writer.Object,
+            new ArtistFileRewriter(_writer.Object, _tracks.Object, _player.Object, NullLogger<ArtistFileRewriter>.Instance),
             _picture.Object,
-            _player.Object,
             _import.Object,
             _gate,
             _options.Object,
@@ -151,7 +150,7 @@ public class ArtistRenameServiceTests
 
         // Assert
         result.Should().BeSuccess();
-        Assert.Equal(new ArtistRenameCollision("Other Band", 3, 30), result.Value.Collision);
+        Assert.Equal(new ArtistRenameCollision("Other Band", 3, 30) { ArtistId = 2 }, result.Value.Collision);
         _writer.Verify(w => w.CheckAsync(It.IsAny<IReadOnlyList<string>>(), It.IsAny<CancellationToken>()), Times.Never);
     }
 
@@ -388,6 +387,38 @@ public class ArtistRenameServiceTests
         _tracks.Verify(r => r.UpdateFileInfoAsync(11, FileDate.DateTime, 5, It.IsAny<RepositoryConnectionKind>()), Times.Once);
         _renameRepository.Verify(r => r.ApplyAsync(It.Is<ArtistRenameDbChange>(c => c.OldName == OldName && c.NewName == NewName), It.IsAny<CancellationToken>()), Times.Once);
         _renameRepository.Verify(r => r.CompleteAsync(ArtistId, It.IsAny<CancellationToken>()), Times.Once);
+    }
+
+    [Fact(DisplayName = "resume_does_not_rewrite_smart_playlist_criteria_again")]
+    public async Task RenameAsync_Resume_DoesNotRewriteCriteriaAgain()
+    {
+        // Arrange
+        Artists = [new ArtistEntity { Id = ArtistId, Name = NewName, RenamePendingFrom = OldName }];
+        PlaylistGroupDto group = new() { Filters = [new PlaylistFilterDto { Entity = SmartPlaylistEntity.Artists, Field = SmartPlaylistField.Name, Operator = SmartPlaylistOperator.Contains, Value = OldName }] };
+        PlaylistList = [new PlaylistHeaderEntity { Id = 5, Type = 0, GroupsJson = JsonSerializer.Serialize(new List<PlaylistGroupDto> { group }) }];
+
+        // Act
+        Result<ArtistRenameOutcome> result = await _sut.RenameAsync(ArtistId, NewName, null, CancellationToken.None);
+
+        // Assert
+        Assert.Equal(EArtistRenameState.Completed, result.Value.State);
+        Assert.Empty(result.Value.ChangedPlaylistIds);
+        _renameRepository.Verify(r => r.ApplyAsync(It.Is<ArtistRenameDbChange>(c => c.Criteria.Count == 0), It.IsAny<CancellationToken>()), Times.Once);
+    }
+
+    [Fact(DisplayName = "resume_does_not_move_the_picture_folder")]
+    public async Task RenameAsync_Resume_DoesNotMoveThePictureFolder()
+    {
+        // Arrange
+        Artists = [new ArtistEntity { Id = ArtistId, Name = NewName, RenamePendingFrom = OldName }];
+
+        // Act
+        Result<ArtistRenameOutcome> result = await _sut.RenameAsync(ArtistId, NewName, null, CancellationToken.None);
+
+        // Assert
+        Assert.Equal(EArtistRenameState.Completed, result.Value.State);
+        _picture.Verify(p => p.MoveFolder(It.IsAny<string>(), It.IsAny<string>()), Times.Never);
+        _picture.Verify(p => p.CheckFolderMove(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<IReadOnlyCollection<string>>()), Times.Never);
     }
 
     [Fact(DisplayName = "a_normal_rename_does_not_store_the_file_info_of_files_that_already_carry_the_new_name")]
