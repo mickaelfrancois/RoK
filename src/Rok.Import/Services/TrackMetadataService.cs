@@ -49,6 +49,15 @@ public class TrackMetadataService(TrackImport importTrack, ILogger<TrackMetadata
         if (trackFile.TrackNumber != track.TrackNumber)
             return false;
 
+        if (trackFile.Disc != track.Disc)
+            return false;
+
+        if (trackFile.Bpm != track.Bpm)
+            return false;
+
+        if (trackFile.Composers.AreDifferent(track.Composers))
+            return false;
+
         return true;
     }
 

@@ -23,6 +23,7 @@
 
 	<ItemGroup>
 	  <ProjectReference Include="..\..\..\src\Rok.Infrastructure\Rok.Infrastructure.csproj" />
+	  <ProjectReference Include="..\..\..\src\Rok.Import\Rok.Import.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>

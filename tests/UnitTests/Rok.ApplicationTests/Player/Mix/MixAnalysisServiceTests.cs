@@ -601,6 +601,32 @@ public class MixAnalysisServiceTests
         VerifyReads(Times.Exactly(2));
     }
 
+    [Fact(DisplayName = "mix_does_not_serve_lru_cues_of_the_previous_file_after_an_edit")]
+    public async Task GetOutroAsync_EditedFileSameIdAndPath_ReadsAgainAndPersistsNewBpm()
+    {
+        // Arrange
+        SetupStored(null);
+        SetupTailWithMono(Mono120());
+        CaptureUpsert();
+        var edited = Track(1, bpm: 120);
+        edited.FileDate = FileDate.AddMinutes(5);
+        edited.Size = FileSize + 500;
+
+        // Act
+        await _service.GetOutroAsync(Track(1), CancellationToken.None);
+        var cues = await _service.GetOutroAsync(edited, CancellationToken.None);
+
+        // Assert
+        VerifyReads(Times.Exactly(2));
+        Assert.NotNull(cues?.Beats);
+        Assert.Equal(BpmSource.Tag, cues.Beats.Source);
+        Assert.NotNull(_written);
+        Assert.Equal(120, _written.Bpm);
+        Assert.Equal(BpmSource.Tag, _written.BpmSource);
+        Assert.Equal(edited.FileDate, _written.FileModifiedUtc);
+        Assert.Equal(edited.Size, _written.FileSize);
+    }
+
     [Fact(DisplayName = "repository_failures_never_hide_the_cues")]
     public async Task GetOutroAsync_RepositoryThrows_StillReturnsCues()
     {

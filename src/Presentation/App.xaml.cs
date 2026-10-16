@@ -4,6 +4,7 @@ using Microsoft.Windows.AppLifecycle;
 using Rok.Application.Options;
 using Rok.Application.Player;
 using Rok.Application.Player.Output;
+using Rok.Application.Tag;
 using Rok.Import;
 using Rok.Infrastructure;
 using Rok.Services.PlayerCommand.Api;
@@ -58,6 +59,15 @@ public partial class App : Microsoft.UI.Xaml.Application
             IAppDbContext appDbContext = ServiceProvider.GetRequiredService<IAppDbContext>();
             appDbContext.GetOpenConnection();
             appDbContext.EnsureCreated();
+
+            try
+            {
+                await ServiceProvider.GetRequiredService<ITagWriteRecovery>().RecoverAsync(CancellationToken.None);
+            }
+            catch (Exception recoveryException)
+            {
+                ServiceProvider.GetService<ILogger<App>>()?.LogError(recoveryException, "Tag write recovery failed: {Message}", recoveryException.Message);
+            }
 
             NavigationService navigationService = ServiceProvider.GetRequiredService<NavigationService>();
             ResourceLoader resourceLoader = ServiceProvider.GetRequiredService<ResourceLoader>();

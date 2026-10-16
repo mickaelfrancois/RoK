@@ -2548,4 +2548,88 @@
   <data name="playerRepeatOne" xml:space="preserve">
     <value>Repeat one</value>
   </data>
+  <data name="EditTrackDialog.Title" xml:space="preserve">
+    <value>Edit track</value>
+  </data>
+  <data name="EditTrackDialog.PrimaryButtonText" xml:space="preserve">
+    <value>Save</value>
+  </data>
+  <data name="EditTrackDialog.CloseButtonText" xml:space="preserve">
+    <value>Cancel</value>
+  </data>
+  <data name="EditTrackTitleInput.Header" xml:space="preserve">
+    <value>Title</value>
+  </data>
+  <data name="EditTrackNumberInput.Header" xml:space="preserve">
+    <value>Track number</value>
+  </data>
+  <data name="EditTrackDiscInput.Header" xml:space="preserve">
+    <value>Disc number</value>
+  </data>
+  <data name="EditTrackComposerInput.Header" xml:space="preserve">
+    <value>Composer</value>
+  </data>
+  <data name="EditTrackBpmInput.Header" xml:space="preserve">
+    <value>BPM</value>
+  </data>
+  <data name="trackEditText.Text" xml:space="preserve">
+    <value>Edit</value>
+  </data>
+  <data name="OptionsWriteTagsSwitch.Header" xml:space="preserve">
+    <value>Write tags into the files</value>
+  </data>
+  <data name="OptionsWriteTagsDescription.Text" xml:space="preserve">
+    <value>Writes into your MP3, FLAC and M4A files. Test on a copy first.</value>
+  </data>
+  <data name="trackEditError_Playing" xml:space="preserve">
+    <value>This track is playing. Stop it, then try again.</value>
+  </data>
+  <data name="trackEditError_ImportInProgress" xml:space="preserve">
+    <value>A library import is running. Try again when it ends.</value>
+  </data>
+  <data name="trackEditError_UnsupportedFormat" xml:space="preserve">
+    <value>Only MP3, FLAC and M4A files can be edited.</value>
+  </data>
+  <data name="trackEditError_ReadOnly" xml:space="preserve">
+    <value>The file is read-only.</value>
+  </data>
+  <data name="trackEditError_Locked" xml:space="preserve">
+    <value>The file is in use by another program.</value>
+  </data>
+  <data name="trackEditError_CloudPlaceholder" xml:space="preserve">
+    <value>The file is not on this computer yet (cloud file). Download it first.</value>
+  </data>
+  <data name="trackEditError_NotFound" xml:space="preserve">
+    <value>The file no longer exists.</value>
+  </data>
+  <data name="trackEditError_InsufficientDiskSpace" xml:space="preserve">
+    <value>Not enough disk space to write the file.</value>
+  </data>
+  <data name="trackEditError_UnsupportedTagVersion" xml:space="preserve">
+    <value>The ID3 tag version of this file (2.2) is not supported. Nothing was changed.</value>
+  </data>
+  <data name="trackEditError_VerificationFailed" xml:space="preserve">
+    <value>The check of the written file failed. The original file was not changed.</value>
+  </data>
+  <data name="trackEditError_IoError" xml:space="preserve">
+    <value>The file could not be written. The original file was not changed.</value>
+  </data>
+  <data name="trackEditError_Disabled" xml:space="preserve">
+    <value>Writing tags is turned off in the options.</value>
+  </data>
+  <data name="trackEditError_Generic" xml:space="preserve">
+    <value>The changes could not be saved.</value>
+  </data>
+  <data name="trackEditRequired" xml:space="preserve">
+    <value>This value is required.</value>
+  </data>
+  <data name="trackEditInvalid_TrackNumber" xml:space="preserve">
+    <value>Enter a track number from 1 to 999.</value>
+  </data>
+  <data name="trackEditInvalid_Disc" xml:space="preserve">
+    <value>Enter a disc number from 1 to 99.</value>
+  </data>
+  <data name="trackEditInvalid_Bpm" xml:space="preserve">
+    <value>Enter a BPM from 1 to 999, or leave it empty to remove it.</value>
+  </data>
 </root>

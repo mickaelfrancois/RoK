@@ -1,6 +1,8 @@
 ﻿using Dapper;
 using Microsoft.Extensions.Logging.Abstractions;
+using Microsoft.Extensions.Time.Testing;
 using Rok.Application.Interfaces;
+using Rok.Application.Tag;
 using Rok.Domain.Entities;
 using Rok.Infrastructure.Repositories;
 
@@ -529,6 +531,145 @@ public class TrackRepositoryTests
         // Act & Assert
         await Assert.ThrowsAsync<ArgumentOutOfRangeException>(() => repo.UpdateFileDateAsync(0, fileDate));
         await Assert.ThrowsAsync<ArgumentOutOfRangeException>(() => repo.UpdateFileDateAsync(-1, fileDate));
+    }
+
+    [Fact(DisplayName = "update_tag_fields_and_file_info_writes_edit_date_in_local_time_like_the_import")]
+    public async Task UpdateTagFieldsAndFileInfoAsync_WritesEditDateInLocalTime()
+    {
+        // Arrange
+        using SqliteDatabaseFixture fixture = CreateFixture();
+        FakeTimeProvider timeProvider = new(new DateTimeOffset(2025, 6, 1, 10, 0, 0, TimeSpan.Zero));
+        timeProvider.SetLocalTimeZone(TimeZoneInfo.CreateCustomTimeZone("test", TimeSpan.FromHours(2), "test", "test"));
+        TrackRepository repo = new(fixture.Connection, fixture.Connection, NullLogger<TrackRepository>.Instance, timeProvider);
+        DateTime now = DateTime.UtcNow;
+        long testTrackId = 8103;
+
+        await fixture.Connection.ExecuteAsync(@"
+            INSERT INTO Tracks(id, title, duration, size, bitrate, musicFile, fileDate, isLive, score, listenCount, skipCount, creatDate, albumId, artistId, trackNumber)
+            VALUES (@id, 'Old Title', 180, 1000, 128, '/test8103', @now, 0, 0, 0, 0, @now, 1, 1, 1)",
+            new { id = testTrackId, now });
+
+        // Act
+        await repo.UpdateTagFieldsAndFileInfoAsync(testTrackId, new TagFieldValues("New Title", 1, null, "", null), now, 4242);
+
+        // Assert
+        TrackEntity? track = await repo.GetByIdAsync(testTrackId);
+        Assert.Equal(new DateTime(2025, 6, 1, 12, 0, 0), track!.EditDate);
+    }
+
+    [Fact(DisplayName = "update_tag_fields_and_file_info_round_trips_through_get_by_id")]
+    public async Task UpdateTagFieldsAndFileInfoAsync_RoundTripsThroughGetById()
+    {
+        // Arrange
+        using SqliteDatabaseFixture fixture = CreateFixture();
+        TrackRepository repo = CreateRepository(fixture);
+        DateTime now = DateTime.UtcNow;
+        long testTrackId = 8111;
+
+        await fixture.Connection.ExecuteAsync(@"
+            INSERT INTO Tracks(id, title, duration, size, bitrate, musicFile, fileDate, isLive, score, listenCount, skipCount, creatDate, albumId, artistId, trackNumber)
+            VALUES (@id, 'Old Title', 180, 1000, 128, '/test8111', @now, 0, 0, 0, 0, @now, 1, 1, 1)",
+            new { id = testTrackId, now });
+
+        DateTime newFileDate = new(2024, 3, 9, 14, 25, 36, 123, DateTimeKind.Utc);
+        TagFieldValues values = new("New Title", 7, 2, "Bach; Handel", 128);
+
+        // Act
+        bool ok = await repo.UpdateTagFieldsAndFileInfoAsync(testTrackId, values, newFileDate, 4242);
+
+        // Assert
+        Assert.True(ok);
+        TrackEntity? track = await repo.GetByIdAsync(testTrackId);
+        Assert.NotNull(track);
+        Assert.Equal("New Title", track!.Title);
+        Assert.Equal(7, track.TrackNumber);
+        Assert.Equal(2, track.Disc);
+        Assert.Equal("Bach; Handel", track.Composers);
+        Assert.Equal(128, track.Bpm);
+        Assert.Equal(newFileDate.Ticks, track.FileDate.Ticks);
+        Assert.Equal(4242, track.Size);
+        Assert.NotNull(track.EditDate);
+    }
+
+    [Fact(DisplayName = "update_tag_fields_and_file_info_stores_empty_composers_and_absent_numbers_as_null")]
+    public async Task UpdateTagFieldsAndFileInfoAsync_StoresNulls()
+    {
+        // Arrange
+        using SqliteDatabaseFixture fixture = CreateFixture();
+        TrackRepository repo = CreateRepository(fixture);
+        DateTime now = DateTime.UtcNow;
+        long testTrackId = 8112;
+
+        await fixture.Connection.ExecuteAsync(@"
+            INSERT INTO Tracks(id, title, duration, size, bitrate, musicFile, fileDate, isLive, score, listenCount, skipCount, creatDate, albumId, artistId, trackNumber, disc, composers, bpm)
+            VALUES (@id, 'Old Title', 180, 1000, 128, '/test8112', @now, 0, 0, 0, 0, @now, 1, 1, 1, 3, 'Old', 90)",
+            new { id = testTrackId, now });
+
+        // Act
+        await repo.UpdateTagFieldsAndFileInfoAsync(testTrackId, new TagFieldValues("T", 1, null, "", null), now, 10);
+
+        // Assert
+        TrackEntity? track = await repo.GetByIdAsync(testTrackId);
+        Assert.NotNull(track);
+        Assert.Null(track!.Disc);
+        Assert.Null(track.Composers);
+        Assert.Null(track.Bpm);
+    }
+
+    [Fact(DisplayName = "update_tag_fields_and_file_info_keeps_score_listen_count_album_artist_and_playlist_links")]
+    public async Task UpdateTagFieldsAndFileInfoAsync_KeepsUntouchedFields()
+    {
+        // Arrange
+        using SqliteDatabaseFixture fixture = CreateFixture();
+        TrackRepository repo = CreateRepository(fixture);
+        DateTime now = DateTime.UtcNow;
+        long testTrackId = 8113;
+        long testPlaylistId = 8113;
+
+        await fixture.Connection.ExecuteAsync(@"
+            INSERT INTO Tracks(id, title, duration, size, bitrate, musicFile, fileDate, isLive, score, listenCount, skipCount, creatDate, albumId, artistId, trackNumber)
+            VALUES (@id, 'Old Title', 180, 1000, 128, '/test8113', @now, 0, 7, 5, 2, @now, 1, 1, 1)",
+            new { id = testTrackId, now });
+
+        await fixture.Connection.ExecuteAsync(@"
+            INSERT INTO Playlists(id, name, type, creatDate)
+            VALUES (@id, 'Keep Playlist', 1, @now)",
+            new { id = testPlaylistId, now });
+
+        await fixture.Connection.ExecuteAsync(@"
+            INSERT INTO PlaylistTracks(id, playlistId, trackId, position, listened, creatDate)
+            VALUES (8113, @playlistId, @trackId, 0, 0, @now)",
+            new { playlistId = testPlaylistId, trackId = testTrackId, now });
+
+        // Act
+        bool ok = await repo.UpdateTagFieldsAndFileInfoAsync(testTrackId, new TagFieldValues("New Title", 4, 1, "C", 100), now.AddDays(-1), 2000);
+
+        // Assert
+        Assert.True(ok);
+        TrackEntity? track = await repo.GetByIdAsync(testTrackId);
+        Assert.NotNull(track);
+        Assert.Equal(7, track!.Score);
+        Assert.Equal(5, track.ListenCount);
+        Assert.Equal(2, track.SkipCount);
+        Assert.Equal(1, track.AlbumId);
+        Assert.Equal(1, track.ArtistId);
+        int links = await fixture.Connection.ExecuteScalarAsync<int>(
+            "SELECT COUNT(*) FROM playlisttracks WHERE playlistId = @playlistId AND trackId = @trackId",
+            new { playlistId = testPlaylistId, trackId = testTrackId });
+        Assert.Equal(1, links);
+    }
+
+    [Fact(DisplayName = "update_tag_fields_and_file_info_with_invalid_id_throws")]
+    public async Task UpdateTagFieldsAndFileInfoAsync_WithInvalidId_ThrowsArgumentOutOfRangeException()
+    {
+        // Arrange
+        using SqliteDatabaseFixture fixture = CreateFixture();
+        TrackRepository repo = CreateRepository(fixture);
+        TagFieldValues values = new("Title", 1, null, "", null);
+
+        // Act & Assert
+        await Assert.ThrowsAsync<ArgumentOutOfRangeException>(() => repo.UpdateTagFieldsAndFileInfoAsync(0, values, DateTime.UtcNow, 1));
+        await Assert.ThrowsAsync<ArgumentOutOfRangeException>(() => repo.UpdateTagFieldsAndFileInfoAsync(-1, values, DateTime.UtcNow, 1));
     }
 
     [Fact]

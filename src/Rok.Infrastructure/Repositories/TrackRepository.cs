@@ -3,6 +3,7 @@ using Microsoft.Extensions.Logging;
 using Rok.Application.Interfaces;
 using Rok.Application.Interfaces.Repositories;
 using Rok.Application.Randomizer;
+using Rok.Application.Tag;
 
 namespace Rok.Infrastructure.Repositories;
 
@@ -13,6 +14,7 @@ public class TrackRepository(IDbConnection db, [FromKeyedServices("BackgroundCon
     private const string ResetListenCountSql = "UPDATE tracks SET listenCount = 0";
     private const string UpdateSkipCountSql = "UPDATE tracks SET skipCount = skipCount + 1, lastSkip = @lastSkip WHERE Id = @id";
     private const string UpdateFileDateSql = "UPDATE tracks SET fileDate = @fileDate WHERE id = @id";
+    private const string UpdateTagFieldsAndFileInfoSql = "UPDATE tracks SET title = @title, trackNumber = @trackNumber, disc = @disc, composers = @composers, bpm = @bpm, fileDate = @fileDate, size = @size, editDate = @editDate WHERE id = @id";
     private const string UpdateGetLyricsLastAttemptSql = "UPDATE tracks SET getLyricsLastAttempt = @lastAttemptDate WHERE id = @id";
     private const string DefaultGroupBy = " GROUP BY tracks.id ";
 
@@ -149,6 +151,17 @@ public class TrackRepository(IDbConnection db, [FromKeyedServices("BackgroundCon
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(id);
 
         return ExecuteUpdateAsync(UpdateFileDateSql, new { fileDate, id }, kind);
+    }
+
+    public Task<bool> UpdateTagFieldsAndFileInfoAsync(long id, TagFieldValues values, DateTime fileDate, long size, RepositoryConnectionKind kind = RepositoryConnectionKind.Foreground)
+    {
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(id);
+        ArgumentNullException.ThrowIfNull(values);
+        ArgumentException.ThrowIfNullOrWhiteSpace(values.Title);
+
+        string? composers = string.IsNullOrEmpty(values.Composers) ? null : values.Composers;
+
+        return ExecuteUpdateAsync(UpdateTagFieldsAndFileInfoSql, new { title = values.Title, trackNumber = values.TrackNumber, disc = values.Disc, composers, bpm = values.Bpm, fileDate, size, editDate = _timeProvider.GetLocalNow().DateTime, id }, kind);
     }
 
     public Task<bool> UpdateGetLyricsLastAttemptAsync(long id, RepositoryConnectionKind kind = RepositoryConnectionKind.Foreground)

@@ -1,0 +1,48 @@
+<ContentDialog x:Class="Rok.Dialogs.EditTrackDialog"
+               xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+               xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+               x:Uid="EditTrackDialog"
+               Title=""
+               MinWidth="520"
+               PrimaryButtonText=""
+               CloseButtonText=""
+               DefaultButton="Primary"
+               IsPrimaryButtonEnabled="False">
+
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <StackPanel Spacing="12">
+            <TextBox x:Uid="EditTrackTitleInput"
+                     x:Name="TitleInput"
+                     Header=""
+                     Text="{x:Bind TitleText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+
+            <TextBox x:Uid="EditTrackNumberInput"
+                     x:Name="TrackNumberInput"
+                     Header=""
+                     InputScope="Number"
+                     Text="{x:Bind TrackNumberText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+
+            <TextBox x:Uid="EditTrackDiscInput"
+                     x:Name="DiscInput"
+                     Header=""
+                     InputScope="Number"
+                     Text="{x:Bind DiscText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+
+            <TextBox x:Uid="EditTrackComposerInput"
+                     x:Name="ComposersInput"
+                     Header=""
+                     Text="{x:Bind ComposersText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+
+            <TextBox x:Uid="EditTrackBpmInput"
+                     x:Name="BpmInput"
+                     Header=""
+                     InputScope="Number"
+                     Text="{x:Bind BpmText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+
+            <InfoBar x:Name="ErrorBar"
+                     Severity="Error"
+                     IsOpen="False"
+                     IsClosable="False" />
+        </StackPanel>
+    </ScrollViewer>
+</ContentDialog>

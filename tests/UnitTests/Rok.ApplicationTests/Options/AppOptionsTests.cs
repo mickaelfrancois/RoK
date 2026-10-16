@@ -100,6 +100,30 @@ public class AppOptionsTests
         Assert.True(target.MixMode);
     }
 
+    [Fact(DisplayName = "write_tags_is_disabled_by_default")]
+    public void WriteTags_IsDisabledByDefault()
+    {
+        // Act
+        AppOptions options = new();
+
+        // Assert
+        Assert.False(options.WriteTagsEnabled);
+    }
+
+    [Fact(DisplayName = "copy_from_preserves_write_tags_enabled")]
+    public void CopyFrom_PreservesWriteTagsEnabled()
+    {
+        // Arrange
+        AppOptions source = new() { WriteTagsEnabled = true };
+        AppOptions target = new();
+
+        // Act
+        target.CopyFrom(source);
+
+        // Assert
+        Assert.True(target.WriteTagsEnabled);
+    }
+
     [Fact(DisplayName = "player_modes_default_to_repeat_off_and_shuffle_disabled")]
     public void PlayerModes_DefaultToRepeatOffAndShuffleDisabled()
     {

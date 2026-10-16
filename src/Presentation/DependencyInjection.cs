@@ -209,6 +209,7 @@ public static class DependencyInjection
         services.AddTransient<TrackViewModel>();
         services.AddTransient<TrackDetailDataLoader>();
         services.AddTransient<TrackScoreService>();
+        services.AddTransient<TrackEditService>();
         services.AddTransient<TrackNavigationService>();
         // Listening ViewModel and services
         services.AddSingleton<ListeningViewModel>();

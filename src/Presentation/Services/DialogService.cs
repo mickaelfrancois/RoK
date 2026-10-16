@@ -1,5 +1,6 @@
 ﻿using Microsoft.UI;
 using Microsoft.UI.Xaml.Controls;
+using Rok.Application.Features.Tracks.Services;
 using Rok.Dialogs;
 using Windows.Foundation;
 using Windows.UI;
@@ -75,6 +76,54 @@ public sealed class DialogService(ResourceLoader resourceLoader, ITranslateServi
             Members = dialog.Members,
             Biography = dialog.Biography
         };
+    }
+
+    public async Task<TrackEditSaved?> ShowEditTrackAsync(TrackEditValues current, Func<TrackTagsEdit, Task<TrackEditAttempt>> trySaveAsync)
+    {
+        EditTrackDialog dialog = new(current, resourceLoader)
+        {
+            XamlRoot = App.MainWindow.Content.XamlRoot
+        };
+
+        TrackEditSaved? saved = null;
+
+        dialog.PrimaryButtonClick += async (_, args) =>
+        {
+            ContentDialogButtonClickDeferral deferral = args.GetDeferral();
+
+            try
+            {
+                dialog.SetBusy(true);
+
+                TrackEditEvaluation evaluation = TrackEditRules.Evaluate(current, dialog.Input);
+
+                if (!evaluation.CanSave)
+                {
+                    args.Cancel = true;
+                    return;
+                }
+
+                TrackEditAttempt attempt = await trySaveAsync(evaluation.Edit);
+
+                if (attempt.Saved is not null)
+                {
+                    saved = attempt.Saved;
+                    return;
+                }
+
+                args.Cancel = true;
+                dialog.ShowError(attempt.Error ?? string.Empty);
+            }
+            finally
+            {
+                dialog.SetBusy(false);
+                deferral.Complete();
+            }
+        };
+
+        await dialog.ShowAsync();
+
+        return saved;
     }
 
     public Task ShowTextAsync(string title, string content, bool showTranslateButton = false, string targetLanguage = "fr")

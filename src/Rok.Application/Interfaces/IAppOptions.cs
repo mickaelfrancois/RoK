@@ -51,6 +51,9 @@ public interface IAppOptions
 
     bool PauseOnCall { get; set; }
 
+    /// <summary>Whether metadata edits are written back into the audio files. Off by default.</summary>
+    bool WriteTagsEnabled { get; set; }
+
     bool HideArtistsWithoutAlbum { get; set; }
 
     bool RefreshLibraryAtStartup { get; set; }

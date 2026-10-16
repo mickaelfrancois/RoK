@@ -22,6 +22,7 @@ public partial class TrackViewModel : ObservableObject, IDisposable, IFilterable
     private readonly TrackDetailDataLoader _dataLoader;
     private readonly TrackLyricsService _lyricsService;
     private readonly TrackScoreService _scoreService;
+    private readonly TrackEditService _editService;
     private readonly TrackNavigationService _navigationService;
     private readonly IMessenger _messenger;
     private readonly IDisposable _trackScoreUpdateSubscription;
@@ -170,6 +171,9 @@ public partial class TrackViewModel : ObservableObject, IDisposable, IFilterable
 
     public bool IsLive => Track.IsLive;
 
+    /// <summary>Gets whether the user turned on the writing of tags in the files.</summary>
+    public bool CanEditTags => _appOptions.WriteTagsEnabled;
+
     public long? GenreId => Track.GenreId;
 
     public int ListenCount => Track.ListenCount;
@@ -197,6 +201,7 @@ public partial class TrackViewModel : ObservableObject, IDisposable, IFilterable
         TrackDetailDataLoader dataLoader,
         TrackLyricsService lyricsService,
         TrackScoreService scoreService,
+        TrackEditService editService,
         TrackNavigationService navigationService,
         IAppOptions appOptions,
         IMessenger messenger,
@@ -210,6 +215,7 @@ public partial class TrackViewModel : ObservableObject, IDisposable, IFilterable
         _dataLoader = Guard.NotNull(dataLoader);
         _lyricsService = Guard.NotNull(lyricsService);
         _scoreService = Guard.NotNull(scoreService);
+        _editService = Guard.NotNull(editService);
         _navigationService = Guard.NotNull(navigationService);
         _appOptions = Guard.NotNull(appOptions);
         _messenger = Guard.NotNull(messenger);
@@ -350,6 +356,31 @@ public partial class TrackViewModel : ObservableObject, IDisposable, IFilterable
 
             await _dialogService.ShowTextAsync($"{ArtistName} - {Title}", lyrics, showTranslateButton: _appOptions.NovaApiEnabled, language);
         }
+    }
+
+    [RelayCommand]
+    private async Task EditAsync()
+    {
+        TrackEditValues current = new(Track.Id, Track.Title, Track.TrackNumber, Track.Disc, Track.Composers, Track.Bpm);
+        TrackEditSaved? saved = await _editService.EditAsync(current);
+
+        if (saved is null)
+            return;
+
+        Track.Title = saved.Title;
+        Track.TrackNumber = saved.TrackNumber;
+        Track.Disc = saved.Disc;
+        Track.Composers = saved.Composers;
+        Track.Bpm = saved.Bpm;
+        Track.FileDate = saved.FileDate;
+        Track.Size = saved.Size;
+
+        OnPropertyChanged(nameof(Title));
+        OnPropertyChanged(nameof(TrackNumber));
+        OnPropertyChanged(nameof(TrackNumberStr));
+        OnPropertyChanged(nameof(SizeStr));
+        OnPropertyChanged(nameof(HeaderSummary));
+        OnPropertyChanged(nameof(Track));
     }
 
     [RelayCommand]

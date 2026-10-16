@@ -92,7 +92,7 @@ public sealed class MixAnalysisService : IMixCueProvider, IDisposable
         if (string.IsNullOrWhiteSpace(track.MusicFile))
             return null;
 
-        var key = new CacheKey(track.Id, track.MusicFile, spec.Edge);
+        var key = new CacheKey(track.Id, track.MusicFile, spec.Edge, track.FileDate, track.Size, track.Bpm);
         var onBattery = IsOnBattery();
         var withTempo = !onBattery && track.Id > 0;
 
@@ -337,7 +337,7 @@ public sealed class MixAnalysisService : IMixCueProvider, IDisposable
         }
     }
 
-    private readonly record struct CacheKey(long TrackId, string MusicFile, EAudioEdge Edge);
+    private readonly record struct CacheKey(long TrackId, string MusicFile, EAudioEdge Edge, DateTime FileDate, long Size, int? Bpm);
 
     private sealed record CacheEntry(CacheKey Key, object? Cues, bool TempoSkipped);
 

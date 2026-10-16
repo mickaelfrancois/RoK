@@ -30,12 +30,14 @@ public class TagService(ILogger<TagService> logger) : ITagService
         {
             using TagLib.File tag = TagLib.File.Create(file);
 
-            track.Title = tag.Tag.Title?.Trim() ?? "";
+            TagFieldValues values = TagFieldReader.Read(tag.Tag);
+
+            track.Title = values.Title;
             track.Artist = (tag.Tag.FirstAlbumArtist?.Trim() ?? tag.Tag.FirstPerformer?.Trim() ?? "").NormalizeIndexedName();
             track.Album = (tag.Tag.Album?.Trim() ?? "").NormalizeIndexedName();
             track.Genre = (tag.Tag.FirstGenre?.Trim() ?? "").NormalizeIndexedName();
             track.Year = tag.Tag.Year > 0 ? (int)tag.Tag.Year : null;
-            track.TrackNumber = (int)tag.Tag.Track;
+            track.TrackNumber = values.TrackNumber;
             track.Duration = tag.Properties.Duration;
             track.Bitrate = tag.Properties.AudioBitrate * 1000;
 
@@ -45,10 +47,10 @@ public class TagService(ILogger<TagService> logger) : ITagService
 
             track.Lyrics = tag.Tag.Lyrics;
 
-            track.Disc = tag.Tag.Disc > 0 ? (int)tag.Tag.Disc : null;
+            track.Disc = values.Disc;
             track.DiscCount = tag.Tag.DiscCount > 0 ? (int)tag.Tag.DiscCount : null;
-            track.Bpm = tag.Tag.BeatsPerMinute > 0 ? (int)tag.Tag.BeatsPerMinute : null;
-            track.Composers = tag.Tag.JoinedComposers?.Trim() ?? "";
+            track.Bpm = values.Bpm;
+            track.Composers = values.Composers;
 
             track.SampleRate = tag.Properties.AudioSampleRate;
             track.BitsPerSample = tag.Properties.BitsPerSample;

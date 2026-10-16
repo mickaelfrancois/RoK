@@ -85,6 +85,13 @@
                         </Button.Flyout>
                     </Button>
 
+                    <Button Visibility="{x:Bind ViewModel.CanEditTags, Mode=OneWay}" Command="{x:Bind ViewModel.EditCommand}">
+                        <StackPanel Orientation="Horizontal" Spacing="6">
+                            <SymbolIcon Symbol="Edit" />
+                            <TextBlock x:Uid="trackEditText" VerticalAlignment="Center" />
+                        </StackPanel>
+                    </Button>
+
                     <common:RatingControlLightControl Style="{StaticResource GridTracksScoreStyle}" HorizontalAlignment="Left" Margin="8,0,0,0" RatingValue="{x:Bind ViewModel.Score, Mode=TwoWay}" />
                 </StackPanel>
             </StackPanel>

@@ -36,6 +36,10 @@ public class TrackDto
 
     public int? Bpm { get; set; }
 
+    public int? Disc { get; set; }
+
+    public string? Composers { get; set; }
+
     public bool IsLive { get; set; }
 
     public int Score { get; set; }
