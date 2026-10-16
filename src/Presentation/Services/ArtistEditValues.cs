@@ -9,6 +9,9 @@ namespace Rok.Services;
 /// </remarks>
 public sealed record ArtistEditValues
 {
+    /// <summary>Gets the name typed in the dialog. It is only used when the name field is editable.</summary>
+    public string? Name { get; init; }
+
     public string? MusicBrainzID { get; init; }
 
     public string? FormedYear { get; init; }

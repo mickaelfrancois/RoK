@@ -1,5 +1,6 @@
 ﻿using Microsoft.UI;
 using Microsoft.UI.Xaml.Controls;
+using Rok.Application.Features.Artists.Rename;
 using Rok.Application.Features.Tracks.Services;
 using Rok.Dialogs;
 using Windows.Foundation;
@@ -44,10 +45,12 @@ public sealed class DialogService(ResourceLoader resourceLoader, ITranslateServi
         };
     }
 
-    public async Task<ArtistEditValues?> ShowEditArtistAsync(ArtistEditValues current)
+    public async Task<ArtistEditValues?> ShowEditArtistAsync(ArtistEditValues current, ArtistNameMode nameMode, Func<string, Task<string?>> validateNameAsync)
     {
         EditArtistDialog dialog = new()
         {
+            NameMode = nameMode,
+            NameText = current.Name ?? string.Empty,
             MusicBrainzID = current.MusicBrainzID,
             FormedYear = current.FormedYear,
             BornYear = current.BornYear,
@@ -60,6 +63,32 @@ public sealed class DialogService(ResourceLoader resourceLoader, ITranslateServi
             XamlRoot = App.MainWindow.Content.XamlRoot
         };
 
+        if (nameMode == ArtistNameMode.Editable)
+        {
+            dialog.PrimaryButtonClick += async (_, args) =>
+            {
+                ContentDialogButtonClickDeferral deferral = args.GetDeferral();
+
+                try
+                {
+                    dialog.SetBusy(true);
+
+                    string? error = await validateNameAsync(dialog.NameText);
+
+                    if (error is not null)
+                    {
+                        args.Cancel = true;
+                        dialog.ShowNameError(error);
+                    }
+                }
+                finally
+                {
+                    dialog.SetBusy(false);
+                    deferral.Complete();
+                }
+            };
+        }
+
         ContentDialogResult result = await dialog.ShowAsync();
 
         if (result != ContentDialogResult.Primary)
@@ -67,6 +96,7 @@ public sealed class DialogService(ResourceLoader resourceLoader, ITranslateServi
 
         return new ArtistEditValues
         {
+            Name = dialog.NameText,
             MusicBrainzID = dialog.MusicBrainzID,
             FormedYear = dialog.FormedYear,
             BornYear = dialog.BornYear,
@@ -76,6 +106,47 @@ public sealed class DialogService(ResourceLoader resourceLoader, ITranslateServi
             Members = dialog.Members,
             Biography = dialog.Biography
         };
+    }
+
+    public async Task<ArtistRenameOutcome?> ShowRenameArtistAsync(ArtistRenamePreview preview, Func<IProgress<ArtistRenameProgress>, Task<ArtistRenameAttempt>> renameAsync)
+    {
+        RenameArtistDialog dialog = new(preview, resourceLoader)
+        {
+            XamlRoot = App.MainWindow.Content.XamlRoot
+        };
+
+        ArtistRenameOutcome? last = null;
+
+        dialog.PrimaryButtonClick += async (_, args) =>
+        {
+            ContentDialogButtonClickDeferral deferral = args.GetDeferral();
+
+            try
+            {
+                dialog.SetRunning(true);
+
+                IProgress<ArtistRenameProgress> progress = new Progress<ArtistRenameProgress>(dialog.ReportProgress);
+                ArtistRenameAttempt attempt = await renameAsync(progress);
+
+                if (attempt.Outcome is not null)
+                    last = attempt.Outcome;
+
+                if (attempt.Outcome?.State == EArtistRenameState.Completed)
+                    return;
+
+                args.Cancel = true;
+                dialog.ShowAttempt(attempt);
+            }
+            finally
+            {
+                dialog.SetRunning(false);
+                deferral.Complete();
+            }
+        };
+
+        await dialog.ShowAsync();
+
+        return last;
     }
 
     public async Task<TrackEditSaved?> ShowEditTrackAsync(TrackEditValues current, Func<TrackTagsEdit, Task<TrackEditAttempt>> trySaveAsync)

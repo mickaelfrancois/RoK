@@ -2464,4 +2464,94 @@
   <data name="trackEditInvalid_Bpm" xml:space="preserve">
     <value>Introduzca un BPM de 1 a 999, o déjelo vacío para quitarlo.</value>
   </data>
+  <data name="artistNameInput.Header" xml:space="preserve">
+    <value>Nombre</value>
+  </data>
+  <data name="RenameArtistDialog.Title" xml:space="preserve">
+    <value>Renombrar artista</value>
+  </data>
+  <data name="RenameArtistDialog.CloseButtonText" xml:space="preserve">
+    <value>Cerrar</value>
+  </data>
+  <data name="artistRenamePendingBar.Title" xml:space="preserve">
+    <value>Cambio de nombre incompleto</value>
+  </data>
+  <data name="artistRenamePendingBar.Message" xml:space="preserve">
+    <value>Algunos archivos todavía tienen el nombre anterior. Termine el cambio de nombre para actualizarlos.</value>
+  </data>
+  <data name="artistRenameResumeButton.Content" xml:space="preserve">
+    <value>Reanudar</value>
+  </data>
+  <data name="artistRenameCollision" xml:space="preserve">
+    <value>{0} ya existe ({1} álbumes, {2} pistas).</value>
+  </data>
+  <data name="artistRenameCounts" xml:space="preserve">
+    <value>Se actualizarán {0} archivos en {1} álbumes.</value>
+  </data>
+  <data name="artistRenameBlockersHeader" xml:space="preserve">
+    <value>No se puede iniciar el cambio de nombre:</value>
+  </data>
+  <data name="artistRenameFailuresHeader" xml:space="preserve">
+    <value>No se pudieron actualizar estos archivos:</value>
+  </data>
+  <data name="artistRenameStart" xml:space="preserve">
+    <value>Renombrar</value>
+  </data>
+  <data name="artistRenameResume" xml:space="preserve">
+    <value>Reanudar</value>
+  </data>
+  <data name="artistRenameRetry" xml:space="preserve">
+    <value>Reintentar</value>
+  </data>
+  <data name="artistRenameError_Generic" xml:space="preserve">
+    <value>No se pudo renombrar el artista.</value>
+  </data>
+  <data name="artistRenameError_InvalidName" xml:space="preserve">
+    <value>El nombre no puede estar vacío ni tener más de 255 caracteres.</value>
+  </data>
+  <data name="artistRenameError_Collision" xml:space="preserve">
+    <value>Otro artista ya tiene este nombre.</value>
+  </data>
+  <data name="artistRenameError_Pending" xml:space="preserve">
+    <value>Hay un cambio de nombre pendiente de terminar.</value>
+  </data>
+  <data name="artistRenameError_Unchanged" xml:space="preserve">
+    <value>El artista ya tiene este nombre.</value>
+  </data>
+  <data name="artistRenameError_NotFound" xml:space="preserve">
+    <value>El artista ya no existe.</value>
+  </data>
+  <data name="artistRenameBlock_NotFound" xml:space="preserve">
+    <value>El archivo ya no existe.</value>
+  </data>
+  <data name="artistRenameBlock_ReadOnly" xml:space="preserve">
+    <value>El archivo es de solo lectura.</value>
+  </data>
+  <data name="artistRenameBlock_CloudPlaceholder" xml:space="preserve">
+    <value>El archivo todavía no está en este equipo (archivo en la nube). Descárguelo primero.</value>
+  </data>
+  <data name="artistRenameBlock_UnsupportedFormat" xml:space="preserve">
+    <value>Solo se pueden editar archivos MP3, FLAC y M4A.</value>
+  </data>
+  <data name="artistRenameBlock_Locked" xml:space="preserve">
+    <value>El archivo está en uso por otro programa.</value>
+  </data>
+  <data name="artistRenameBlock_InsufficientDiskSpace" xml:space="preserve">
+    <value>No hay suficiente espacio en disco para escribir el archivo.</value>
+  </data>
+  <data name="artistRenameBlock_UnsupportedTagVersion" xml:space="preserve">
+    <value>La versión ID3 de este archivo (2.2) no es compatible.</value>
+  </data>
+  <data name="artistRenameBlock_Playing" xml:space="preserve">
+    <value>Este archivo se está reproduciendo. Deténgalo e inténtelo de nuevo.</value>
+  </data>
+  <data name="artistRenameBlock_ImportInProgress" xml:space="preserve">
+    <value>Se está importando la biblioteca. Inténtelo de nuevo cuando termine.</value>
+  </data>
+  <data name="artistRenameBlock_OutOfSync" xml:space="preserve">
+    <value>El archivo se modificó fuera de Rok. Analice primero la biblioteca.</value>
+  </data>
+  <data name="artistRenameBlock_PictureFolder" xml:space="preserve">
+    <value>No se puede mover la carpeta de imágenes del artista.</value>
+  </data>
 </root>

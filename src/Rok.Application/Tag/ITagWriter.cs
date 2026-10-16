@@ -12,4 +12,12 @@ public interface ITagWriter
     /// <param name="cancellationToken">Token observed between two files.</param>
     /// <returns>One result per request.</returns>
     Task<IReadOnlyList<TagWriteResult>> WriteAsync(IReadOnlyList<TagWriteRequest> requests, CancellationToken cancellationToken);
+
+    /// <summary>
+    /// Checks whether each file could be written, and reads its current artist, without writing anything.
+    /// </summary>
+    /// <param name="paths">Full paths of the audio files.</param>
+    /// <param name="cancellationToken">Token observed between two files.</param>
+    /// <returns>One check per path, in the same order.</returns>
+    Task<IReadOnlyList<TagWriteCheck>> CheckAsync(IReadOnlyList<string> paths, CancellationToken cancellationToken);
 }

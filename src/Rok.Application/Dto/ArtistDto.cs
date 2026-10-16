@@ -98,6 +98,8 @@ public class ArtistDto
 
     public DateTime? GetMetaDataLastAttempt { get; set; }
 
+    public string? RenamePendingFrom { get; set; }
+
     public string GenreName { get; set; } = string.Empty;
 
     public bool IsGenreFavorite { get; set; }

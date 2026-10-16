@@ -55,7 +55,7 @@ public class GenreImport(IGenreRepository _genreRepository, TimeProvider _timePr
 
         GenreEntity genre = new()
         {
-            Name = genreName.Capitalize(),
+            Name = genreName,
             CreatDate = _timeProvider.GetLocalNow().DateTime,
             ArtistCount = 1
         };
@@ -77,6 +77,6 @@ public class GenreImport(IGenreRepository _genreRepository, TimeProvider _timePr
 
     private static string GetKey(string genreName)
     {
-        return genreName.NormalizeIndexedName().ToUpperInvariant();
+        return genreName.ToIndexKey();
     }
 }

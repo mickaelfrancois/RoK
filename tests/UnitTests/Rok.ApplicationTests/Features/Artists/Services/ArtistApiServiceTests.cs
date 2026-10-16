@@ -439,4 +439,66 @@ public class ArtistApiServiceTests
         Assert.False(result.DataUpdated);
         Assert.Empty(_mediator.Sent<UpdateArtistRequest>());
     }
+
+    [Fact(DisplayName = "fill_empty_only_never_overwrites_urls_and_still_fills_empty_ones")]
+    public async Task GetAndUpdateArtistDataAsync_FillEmptyOnly_KeepsExistingUrls()
+    {
+        // Arrange
+        ArtistDto artist = new() { Id = 1, Name = "Beatles", MusicBrainzID = "mbid", WikipediaUrl = "https://mine.example.com", FlickrUrl = null, YoutubeUrl = "" };
+        MusicDataArtistDto artistApi = new() { MusicBrainzID = "mbid", Wikipedia = "https://api.example.com", Flickr = "api-flickr", Youtube = "api-youtube" };
+        _musicData.Setup(m => m.IsApiRetryAllowed(It.IsAny<DateTime?>())).Returns(true);
+        _musicData.Setup(m => m.GetArtistAsync(It.IsAny<string>(), It.IsAny<string?>())).ReturnsAsync(artistApi);
+        _pictureService.Setup(p => p.PictureExists(artist.Name)).Returns(true);
+        _backdropPicture.Setup(b => b.HasBackdrops(artist.Name)).Returns(true);
+        ArtistApiService sut = BuildService();
+
+        // Act
+        ArtistApiUpdateResult result = await sut.GetAndUpdateArtistDataAsync(artist, _pictureService.Object, _backdropPicture.Object, ArtistApiMergeMode.FillEmptyOnly);
+
+        // Assert
+        UpdateArtistRequest sent = Assert.Single(_mediator.Sent<UpdateArtistRequest>());
+        Assert.True(result.DataUpdated);
+        Assert.False(sent.WikipediaUrl.IsSet);
+        Assert.Equal("api-flickr", sent.FlickrUrl.Value);
+        Assert.Equal("api-youtube", sent.YoutubeUrl.Value);
+    }
+
+    [Fact(DisplayName = "fill_empty_only_respects_the_lock")]
+    public async Task GetAndUpdateArtistDataAsync_FillEmptyOnly_RespectsTheLock()
+    {
+        // Arrange
+        ArtistDto artist = new() { Id = 1, Name = "Beatles", IsLock = true, FlickrUrl = null };
+        MusicDataArtistDto artistApi = new() { MusicBrainzID = "mbid", Flickr = "api-flickr" };
+        _musicData.Setup(m => m.IsApiRetryAllowed(It.IsAny<DateTime?>())).Returns(true);
+        _musicData.Setup(m => m.GetArtistAsync(It.IsAny<string>(), It.IsAny<string?>())).ReturnsAsync(artistApi);
+        _pictureService.Setup(p => p.PictureExists(artist.Name)).Returns(true);
+        _backdropPicture.Setup(b => b.HasBackdrops(artist.Name)).Returns(true);
+        ArtistApiService sut = BuildService();
+
+        // Act
+        ArtistApiUpdateResult result = await sut.GetAndUpdateArtistDataAsync(artist, _pictureService.Object, _backdropPicture.Object, ArtistApiMergeMode.FillEmptyOnly);
+
+        // Assert
+        Assert.False(result.DataUpdated);
+        Assert.Empty(_mediator.Sent<UpdateArtistRequest>());
+    }
+
+    [Fact(DisplayName = "default_mode_still_replaces_a_url_that_differs")]
+    public async Task GetAndUpdateArtistDataAsync_DefaultMode_ReplacesDifferentUrl()
+    {
+        // Arrange
+        ArtistDto artist = new() { Id = 1, Name = "Beatles", MusicBrainzID = "mbid", WikipediaUrl = "https://mine.example.com" };
+        MusicDataArtistDto artistApi = new() { MusicBrainzID = "mbid", Wikipedia = "https://api.example.com" };
+        _musicData.Setup(m => m.IsApiRetryAllowed(It.IsAny<DateTime?>())).Returns(true);
+        _musicData.Setup(m => m.GetArtistAsync(It.IsAny<string>(), It.IsAny<string?>())).ReturnsAsync(artistApi);
+        _pictureService.Setup(p => p.PictureExists(artist.Name)).Returns(true);
+        _backdropPicture.Setup(b => b.HasBackdrops(artist.Name)).Returns(true);
+        ArtistApiService sut = BuildService();
+
+        // Act
+        await sut.GetAndUpdateArtistDataAsync(artist, _pictureService.Object, _backdropPicture.Object, ArtistApiMergeMode.Default);
+
+        // Assert
+        Assert.Equal("https://api.example.com", Assert.Single(_mediator.Sent<UpdateArtistRequest>()).WikipediaUrl.Value);
+    }
 }

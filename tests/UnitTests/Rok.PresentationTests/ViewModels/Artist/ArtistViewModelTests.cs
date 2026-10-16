@@ -5,6 +5,7 @@ using Moq;
 using Rok.Application.Dto;
 using Rok.Application.Errors;
 using Rok.Application.Features.Albums.Requests;
+using Rok.Application.Features.Artists.Rename;
 using Rok.Application.Features.Artists.Requests;
 using Rok.Application.Features.Artists.Services;
 using Rok.Application.Features.Playlists.PlaylistMenu;
@@ -56,7 +57,7 @@ public class ArtistViewModelTests
             _apiService.Object,
             new ArtistStatisticsService(_mediator),
             _dominantColor.Object,
-            new ArtistEditService(_mediator, _dialogService.Object, NullLogger<ArtistEditService>.Instance),
+            new ArtistEditService(_mediator, _dialogService.Object, _appOptions.Object, _resources.Object, NullLogger<ArtistEditService>.Instance),
             new BackdropPicture(_appOptions.Object, NullLogger<BackdropPicture>.Instance),
             _appOptions.Object,
             _playlistMenu.Object,
@@ -126,6 +127,57 @@ public class ArtistViewModelTests
         Assert.Equal(DetailLoadState.Loaded, sut.LoadState);
         Assert.False(sut.IsNotFound);
         AssertEveryCommandIsEnabled(sut, true);
+    }
+
+    [Theory(DisplayName = "the_pending_rename_bar_shows_only_with_a_marker_and_writing_tags_on")]
+    [InlineData(true, "Old", true)]
+    [InlineData(true, null, false)]
+    [InlineData(true, "", false)]
+    [InlineData(false, "Old", false)]
+    public void SetData_ShouldShowThePendingRenameBar_OnlyWithAMarkerAndTheOptionOn(bool writeTagsEnabled, string? pendingFrom, bool expected)
+    {
+        // Arrange
+        _appOptions.SetupGet(o => o.WriteTagsEnabled).Returns(writeTagsEnabled);
+        ArtistViewModel sut = BuildViewModel();
+
+        // Act
+        sut.SetData(new ArtistDto { Id = 7, Name = "Artist X", RenamePendingFrom = pendingFrom });
+
+        // Assert
+        Assert.Equal(expected, sut.ShowPendingRename);
+        Assert.True(sut.ResumeRenameCommand.CanExecute(null));
+    }
+
+    [Theory(DisplayName = "a_resumed_rename_refills_empty_api_fields_after_a_completed_or_partial_outcome")]
+    [InlineData(EArtistRenameState.Completed)]
+    [InlineData(EArtistRenameState.Partial)]
+    public async Task ResumeRename_ShouldResyncTheApiInFillEmptyOnlyMode(EArtistRenameState state)
+    {
+        // Arrange
+        _appOptions.SetupGet(o => o.WriteTagsEnabled).Returns(true);
+        _mediator.Setup<GetArtistRenamePreviewRequest, Result<ArtistRenamePreview>>()
+                 .Returns(Result<ArtistRenamePreview>.Ok(new ArtistRenamePreview(7, "Old", "Artist X", 3, 1, [], null, true)));
+        _mediator.Setup<GetArtistByIdRequest, Result<ArtistDto>>()
+                 .Returns(Result<ArtistDto>.Ok(new ArtistDto { Id = 7, Name = "Artist X" }));
+        _mediator.Setup<GetAlbumsByArtistIdRequest, IEnumerable<AlbumDto>>()
+                 .Returns(new List<AlbumDto>());
+        _mediator.Setup<GetTracksByArtistIdRequest, Result<IEnumerable<TrackDto>>>()
+                 .Returns(Result<IEnumerable<TrackDto>>.Ok(new List<TrackDto>()));
+        _dialogService
+            .Setup(d => d.ShowRenameArtistAsync(It.IsAny<ArtistRenamePreview>(), It.IsAny<Func<IProgress<ArtistRenameProgress>, Task<ArtistRenameAttempt>>>()))
+            .ReturnsAsync(new ArtistRenameOutcome(state, "Artist X", [], [], []));
+        _apiService
+            .Setup(a => a.GetAndUpdateArtistDataAsync(It.IsAny<ArtistDto>(), It.IsAny<IArtistPictureService>(), It.IsAny<IBackdropPicture>(), ArtistApiMergeMode.FillEmptyOnly, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(ArtistApiUpdateResult.None);
+        ArtistViewModel sut = BuildViewModel();
+        sut.SetData(new ArtistDto { Id = 7, Name = "Artist X", RenamePendingFrom = "Old" });
+
+        // Act
+        await sut.ResumeRenameCommand.ExecuteAsync(null);
+
+        // Assert
+        _apiService.Verify(a => a.GetAndUpdateArtistDataAsync(It.IsAny<ArtistDto>(), It.IsAny<IArtistPictureService>(), It.IsAny<IBackdropPicture>(), ArtistApiMergeMode.FillEmptyOnly, It.IsAny<CancellationToken>()), Times.Once);
+        _apiService.Verify(a => a.GetAndUpdateArtistDataAsync(It.IsAny<ArtistDto>(), It.IsAny<IArtistPictureService>(), It.IsAny<IBackdropPicture>(), It.IsAny<CancellationToken>()), Times.Never);
     }
 
     [Fact(DisplayName = "when_the_artist_is_not_found_then_the_state_is_not_found_and_commands_stay_disabled")]

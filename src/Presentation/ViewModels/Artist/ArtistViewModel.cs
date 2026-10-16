@@ -3,6 +3,7 @@ using System.Globalization;
 using System.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Rok.Application.Features.Artists.Rename;
 using Rok.Application.Features.Artists.Services;
 using Rok.Application.Features.ListeningEvents;
 using Rok.Application.Features.Playlists.PlaylistMenu;
@@ -58,6 +59,9 @@ public partial class ArtistViewModel : ObservableObject, IFilterableArtist, IGro
     public RangeObservableCollection<TrackViewModel> Tracks { get; } = [];
     public RangeObservableCollection<AlbumViewModel> Albums { get; } = [];
 
+    /// <summary>Gets a value indicating whether an interrupted rename can be finished: one is pending and writing tags is on.</summary>
+    public bool ShowPendingRename => !string.IsNullOrEmpty(Artist.RenamePendingFrom) && _appOptions.WriteTagsEnabled;
+
     public bool HasNoAlbums => LoadState == DetailLoadState.Loaded && Albums.Count == 0;
     public bool HasNoTracks => LoadState == DetailLoadState.Loaded && Tracks.Count == 0;
 
@@ -71,6 +75,7 @@ public partial class ArtistViewModel : ObservableObject, IFilterableArtist, IGro
     [NotifyCanExecuteChangedFor(nameof(ArtistFavoriteCommand))]
     [NotifyCanExecuteChangedFor(nameof(OpenOfficialSiteCommand))]
     [NotifyCanExecuteChangedFor(nameof(EditArtistCommand))]
+    [NotifyCanExecuteChangedFor(nameof(ResumeRenameCommand))]
     [NotifyCanExecuteChangedFor(nameof(SelectPictureCommand))]
     [NotifyCanExecuteChangedFor(nameof(OpenUrlCommand))]
     [NotifyCanExecuteChangedFor(nameof(OpenBiographyCommand))]
@@ -322,6 +327,7 @@ public partial class ArtistViewModel : ObservableObject, IFilterableArtist, IGro
         OnPropertyChanged(nameof(HasCountry));
         OnPropertyChanged(nameof(HasLinks));
         OnPropertyChanged(nameof(ArtistFavoriteLabel));
+        OnPropertyChanged(nameof(ShowPendingRename));
     }
 
     public override string ToString() => Artist?.Name ?? string.Empty;
@@ -582,11 +588,13 @@ public partial class ArtistViewModel : ObservableObject, IFilterableArtist, IGro
         }
     }
 
-    private async Task GetDataFromApiAsync()
+    private async Task GetDataFromApiAsync(ArtistApiMergeMode mode = ArtistApiMergeMode.Default)
     {
         CancellationToken token = _navigationCts.Token;
 
-        ArtistApiUpdateResult result = await _apiService.GetAndUpdateArtistDataAsync(Artist, _pictureService, _backdropPicture);
+        ArtistApiUpdateResult result = mode == ArtistApiMergeMode.Default
+            ? await _apiService.GetAndUpdateArtistDataAsync(Artist, _pictureService, _backdropPicture)
+            : await _apiService.GetAndUpdateArtistDataAsync(Artist, _pictureService, _backdropPicture, mode);
 
         if (token.IsCancellationRequested)
             return;
@@ -662,14 +670,52 @@ public partial class ArtistViewModel : ObservableObject, IFilterableArtist, IGro
     [RelayCommand(CanExecute = nameof(IsEntityLoaded))]
     private async Task EditArtistAsync()
     {
-        bool updated = await _editService.EditArtistAsync(Artist);
+        ArtistEditResult result = await _editService.EditArtistAsync(Artist);
 
-        if (!updated)
+        if (result.Updated)
+        {
+            _messenger.Send(new ArtistUpdateMessage(Artist.Id, ActionType.Update));
+            OnPropertyChanged(nameof(Artist));
+            NotifyArtistDerivedProperties();
+        }
+
+        if (result.NameChanged)
+            await ApplyRenameAsync(result.Rename!);
+    }
+
+    [RelayCommand(CanExecute = nameof(IsEntityLoaded))]
+    private async Task ResumeRenameAsync()
+    {
+        ArtistEditResult result = await _editService.ResumeRenameAsync(Artist);
+
+        if (result.NameChanged)
+            await ApplyRenameAsync(result.Rename!);
+    }
+
+    private async Task ApplyRenameAsync(ArtistRenameOutcome outcome)
+    {
+        CancellationToken token = _navigationCts.Token;
+
+        ArtistDto? renamed = await _dataLoader.ReloadArtistAsync(Artist.Id);
+
+        if (renamed is null || token.IsCancellationRequested)
             return;
 
+        Artist = renamed;
+        UpdateDominantColor();
+        LoadPicture();
+        LoadBackdrop();
+
+        await LoadAlbumsAsync(Artist.Id, token);
+        await LoadTracksAsync(Artist.Id, token);
+
         _messenger.Send(new ArtistUpdateMessage(Artist.Id, ActionType.Update));
-        OnPropertyChanged(nameof(Artist));
-        NotifyArtistDerivedProperties();
+
+        foreach (long playlistId in outcome.ChangedPlaylistIds)
+            _messenger.Send(new PlaylistUpdatedMessage(playlistId, ActionType.Update));
+
+        if (outcome.State is EArtistRenameState.Completed or EArtistRenameState.Partial && !token.IsCancellationRequested)
+            await GetDataFromApiAsync(ArtistApiMergeMode.FillEmptyOnly);
     }
 
     [RelayCommand(CanExecute = nameof(IsEntityLoaded))]

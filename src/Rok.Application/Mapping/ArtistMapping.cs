@@ -60,6 +60,7 @@ public static class ArtistMapping
             CountryCode = entity.CountryCode,
             CountryName = entity.CountryName,
             GetMetaDataLastAttempt = entity.GetMetaDataLastAttempt,
+            RenamePendingFrom = entity.RenamePendingFrom,
             TagsAsString = entity.TagsAsString
         };
     }

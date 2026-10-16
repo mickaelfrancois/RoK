@@ -187,6 +187,42 @@ public class AlbumImportTests
         Assert.Equal(1, import.CountInCache);
     }
 
+    [Fact(DisplayName = "create_keeps_the_tag_casing")]
+    public async Task CreateAsync_ShouldKeepTagCasing()
+    {
+        // Arrange
+        AlbumEntity? captured = null;
+        Mock<IAlbumRepository> repository = new();
+        repository.Setup(r => r.AddAsync(It.IsAny<AlbumEntity>(), It.IsAny<RepositoryConnectionKind>()))
+            .Callback<AlbumEntity, RepositoryConnectionKind>((a, _) => captured = a)
+            .ReturnsAsync(1);
+        AlbumImport import = new(repository.Object, TimeProvider.System);
+
+        // Act
+        await import.CreateAsync(new TrackFile { Album = "Back In Black (AC/DC)", FullPath = @"C:\m\t.mp3" }, 1, null);
+
+        // Assert
+        Assert.Equal("Back In Black (AC/DC)", captured!.Name);
+    }
+
+    [Fact(DisplayName = "a_case_variant_of_an_existing_album_maps_to_it")]
+    public async Task GetFromCache_ShouldMapCaseVariant_ToExistingAlbum()
+    {
+        // Arrange
+        Mock<IAlbumRepository> repository = new();
+        repository.Setup(r => r.GetAllAsync(It.IsAny<RepositoryConnectionKind>()))
+            .ReturnsAsync(new List<AlbumEntity> { new() { Id = 8, Name = "Back In Black", ArtistId = 10, IsCompilation = false } });
+        AlbumImport import = new(repository.Object, TimeProvider.System);
+        await import.LoadCacheAsync();
+
+        // Act
+        AlbumCacheItem? hit = import.GetFromCache("back in black", false, 10);
+
+        // Assert
+        Assert.Equal(8, hit!.Id);
+        repository.Verify(r => r.AddAsync(It.IsAny<AlbumEntity>(), It.IsAny<RepositoryConnectionKind>()), Times.Never);
+    }
+
     [Fact(DisplayName = "NewlyCreatedIds should be empty on initialization")]
     public void NewlyCreatedIds_ShouldBeEmpty_OnInitialization()
     {

@@ -13,7 +13,12 @@ public class ArtistApiService(
     IMusicDataApiService musicDataApiService,
     ILogger<ArtistApiService> logger) : IArtistApiService
 {
-    public async Task<ArtistApiUpdateResult> GetAndUpdateArtistDataAsync(ArtistDto artist, IArtistPictureService pictureService, IBackdropPicture backdropPicture, CancellationToken cancellationToken = default)
+    public Task<ArtistApiUpdateResult> GetAndUpdateArtistDataAsync(ArtistDto artist, IArtistPictureService pictureService, IBackdropPicture backdropPicture, CancellationToken cancellationToken = default)
+    {
+        return GetAndUpdateArtistDataAsync(artist, pictureService, backdropPicture, ArtistApiMergeMode.Default, cancellationToken);
+    }
+
+    public async Task<ArtistApiUpdateResult> GetAndUpdateArtistDataAsync(ArtistDto artist, IArtistPictureService pictureService, IBackdropPicture backdropPicture, ArtistApiMergeMode mode, CancellationToken cancellationToken = default)
     {
         if (string.IsNullOrEmpty(artist.Name))
             return ArtistApiUpdateResult.None;
@@ -36,7 +41,7 @@ public class ArtistApiService(
 
         bool dataUpdated = false;
         if (!artist.IsLock)
-            dataUpdated = await UpdateArtistDataIfNeededAsync(artist, artistApi);
+            dataUpdated = await UpdateArtistDataIfNeededAsync(artist, artistApi, mode);
 
         return new ArtistApiUpdateResult(dataUpdated, pictureDownloaded, backdropsDownloaded);
     }
@@ -68,11 +73,11 @@ public class ArtistApiService(
         return backdropPicture.HasBackdrops(artist.Name);
     }
 
-    private async Task<bool> UpdateArtistDataIfNeededAsync(ArtistDto artist, MusicDataArtistDto artistApi)
+    private async Task<bool> UpdateArtistDataIfNeededAsync(ArtistDto artist, MusicDataArtistDto artistApi, ArtistApiMergeMode mode)
     {
         UpdateArtistRequest command = new() { Id = artist.Id };
 
-        if (!BuildPatch(command, artist, artistApi))
+        if (!BuildPatch(command, artist, artistApi, mode))
             return false;
 
         logger.LogTrace("Patch artist '{Name}' with API data.", artist.Name);
@@ -82,32 +87,33 @@ public class ArtistApiService(
         return true;
     }
 
-    private static bool BuildPatch(UpdateArtistRequest command, ArtistDto artist, MusicDataArtistDto artistApi)
+    private static bool BuildPatch(UpdateArtistRequest command, ArtistDto artist, MusicDataArtistDto artistApi, ArtistApiMergeMode mode)
     {
         bool hasChanges = false;
+        bool fillOnly = mode == ArtistApiMergeMode.FillEmptyOnly;
 
         hasChanges |= FillIfEmpty(command.MusicBrainzID, artist.MusicBrainzID, artistApi.MusicBrainzID);
         hasChanges |= FillIfEmpty(command.BornYear, artist.BornYear, artistApi.BeginYear);
         hasChanges |= FillIfEmpty(command.DiedYear, artist.DiedYear, artistApi.EndYear);
         hasChanges |= FillIfEmpty(command.Biography, artist.Biography, artistApi.Biography);
 
-        hasChanges |= UpdateIfDifferent(command.AllMusicUrl, artist.AllMusicUrl, artistApi.AllMusic);
-        hasChanges |= UpdateIfDifferent(command.WikipediaUrl, artist.WikipediaUrl, artistApi.Wikipedia);
-        hasChanges |= UpdateIfDifferent(command.OfficialSiteUrl, artist.OfficialSiteUrl, artistApi.Website);
-        hasChanges |= UpdateIfDifferent(command.FacebookUrl, artist.FacebookUrl, artistApi.Facebook);
-        hasChanges |= UpdateIfDifferent(command.TwitterUrl, artist.TwitterUrl, artistApi.Twitter);
-        hasChanges |= UpdateIfDifferent(command.FlickrUrl, artist.FlickrUrl, artistApi.Flickr);
-        hasChanges |= UpdateIfDifferent(command.InstagramUrl, artist.InstagramUrl, artistApi.Instagram);
-        hasChanges |= UpdateIfDifferent(command.TiktokUrl, artist.TiktokUrl, artistApi.TikTok);
-        hasChanges |= UpdateIfDifferent(command.ThreadsUrl, artist.ThreadsUrl, artistApi.Threads);
-        hasChanges |= UpdateIfDifferent(command.SongkickUrl, artist.SongkickUrl, artistApi.SongKick);
-        hasChanges |= UpdateIfDifferent(command.SoundcloundUrl, artist.SoundcloundUrl, artistApi.SoundCloud);
-        hasChanges |= UpdateIfDifferent(command.ImdbUrl, artist.ImdbUrl, artistApi.Imdb);
-        hasChanges |= UpdateIfDifferent(command.LastFmUrl, artist.LastFmUrl, artistApi.LastFM);
-        hasChanges |= UpdateIfDifferent(command.DiscogsUrl, artist.DiscogsUrl, artistApi.Discogs);
-        hasChanges |= UpdateIfDifferent(command.BandsintownUrl, artist.BandsintownUrl, artistApi.Bandsintown);
-        hasChanges |= UpdateIfDifferent(command.YoutubeUrl, artist.YoutubeUrl, artistApi.Youtube);
-        hasChanges |= UpdateIfDifferent(command.AudioDbID, artist.AudioDbID, artistApi.AudioDbID);
+        hasChanges |= UpdateUrl(fillOnly, command.AllMusicUrl, artist.AllMusicUrl, artistApi.AllMusic);
+        hasChanges |= UpdateUrl(fillOnly, command.WikipediaUrl, artist.WikipediaUrl, artistApi.Wikipedia);
+        hasChanges |= UpdateUrl(fillOnly, command.OfficialSiteUrl, artist.OfficialSiteUrl, artistApi.Website);
+        hasChanges |= UpdateUrl(fillOnly, command.FacebookUrl, artist.FacebookUrl, artistApi.Facebook);
+        hasChanges |= UpdateUrl(fillOnly, command.TwitterUrl, artist.TwitterUrl, artistApi.Twitter);
+        hasChanges |= UpdateUrl(fillOnly, command.FlickrUrl, artist.FlickrUrl, artistApi.Flickr);
+        hasChanges |= UpdateUrl(fillOnly, command.InstagramUrl, artist.InstagramUrl, artistApi.Instagram);
+        hasChanges |= UpdateUrl(fillOnly, command.TiktokUrl, artist.TiktokUrl, artistApi.TikTok);
+        hasChanges |= UpdateUrl(fillOnly, command.ThreadsUrl, artist.ThreadsUrl, artistApi.Threads);
+        hasChanges |= UpdateUrl(fillOnly, command.SongkickUrl, artist.SongkickUrl, artistApi.SongKick);
+        hasChanges |= UpdateUrl(fillOnly, command.SoundcloundUrl, artist.SoundcloundUrl, artistApi.SoundCloud);
+        hasChanges |= UpdateUrl(fillOnly, command.ImdbUrl, artist.ImdbUrl, artistApi.Imdb);
+        hasChanges |= UpdateUrl(fillOnly, command.LastFmUrl, artist.LastFmUrl, artistApi.LastFM);
+        hasChanges |= UpdateUrl(fillOnly, command.DiscogsUrl, artist.DiscogsUrl, artistApi.Discogs);
+        hasChanges |= UpdateUrl(fillOnly, command.BandsintownUrl, artist.BandsintownUrl, artistApi.Bandsintown);
+        hasChanges |= UpdateUrl(fillOnly, command.YoutubeUrl, artist.YoutubeUrl, artistApi.Youtube);
+        hasChanges |= UpdateUrl(fillOnly, command.AudioDbID, artist.AudioDbID, artistApi.AudioDbID);
 
         return hasChanges;
     }
@@ -130,6 +136,11 @@ public class ArtistApiService(
         field.Set(api);
 
         return true;
+    }
+
+    private static bool UpdateUrl(bool fillOnly, PatchField<string?> field, string? current, string? api)
+    {
+        return fillOnly ? FillIfEmpty(field, current, api) : UpdateIfDifferent(field, current, api);
     }
 
     private static bool UpdateIfDifferent(PatchField<string?> field, string? current, string? api)

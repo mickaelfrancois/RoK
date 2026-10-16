@@ -30,17 +30,19 @@ internal sealed class FlacTagFormat : ITagFormat
     {
         using TagLib.File file = TagLib.File.Create(path, MimeType, TagLib.ReadStyle.Average);
 
+        EArtistSource artistSource = TagFieldReader.ArtistSource(file.Tag);
+
         TagLib.Ogg.XiphComment xiph = (TagLib.Ogg.XiphComment)file.GetTag(TagLib.TagTypes.Xiph, true);
 
-        TagFormatHelpers.ApplyChanges(xiph, changes with { Bpm = null });
+        TagFormatHelpers.ApplyChanges(xiph, changes with { Bpm = null }, artistSource);
         ApplyBpm(xiph, changes.Bpm);
 
         if (file.TagTypesOnDisk.HasFlag(TagLib.TagTypes.Id3v2))
-            TagFormatHelpers.ApplyChanges(file.GetTag(TagLib.TagTypes.Id3v2, false), changes);
+            TagFormatHelpers.ApplyChanges(file.GetTag(TagLib.TagTypes.Id3v2, false), changes, artistSource);
         else
             file.RemoveTags(TagLib.TagTypes.Id3v2);
 
-        TagFormatHelpers.SyncSecondaryTags(file, changes);
+        TagFormatHelpers.SyncSecondaryTags(file, changes, artistSource);
 
         file.Save();
     }
@@ -129,6 +131,13 @@ internal sealed class FlacTagFormat : ITagFormat
         {
             names.Add(BpmFieldName);
             names.Add(TempoFieldName);
+        }
+
+        if (changes.Artist is not null)
+        {
+            names.Add("ARTIST");
+            names.Add("ALBUMARTIST");
+            names.Add("ALBUM ARTIST");
         }
 
         return names;

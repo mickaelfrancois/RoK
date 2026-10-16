@@ -92,6 +92,19 @@
 
                 <TextBlock x:Name="summaryText" Text="{x:Bind ViewModel.HeaderSummary, Mode=OneWay}" Style="{StaticResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
 
+                <InfoBar x:Uid="artistRenamePendingBar"
+                         Severity="Warning"
+                         IsOpen="True"
+                         IsClosable="False"
+                         HorizontalAlignment="Left"
+                         MaxWidth="640"
+                         Visibility="{x:Bind ViewModel.ShowPendingRename, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">
+                    <InfoBar.ActionButton>
+                        <Button x:Uid="artistRenameResumeButton"
+                                Command="{x:Bind ViewModel.ResumeRenameCommand}" />
+                    </InfoBar.ActionButton>
+                </InfoBar>
+
                 <!-- Actions -->
                 <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingSmall}" Margin="0,6,0,0">
                     <AppBarButton x:Uid="artistViewListen" Style="{StaticResource ListenAppBarButtonStyle}" Width="Auto" MinWidth="0" Command="{x:Bind ViewModel.ListenCommand}" />

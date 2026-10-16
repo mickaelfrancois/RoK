@@ -5,6 +5,7 @@ using CleanArch.DevKit.Mediator.Validation;
 using CleanArch.DevKit.Messaging;
 using Microsoft.Extensions.DependencyInjection;
 using Rok.Application.Features.Albums.Services;
+using Rok.Application.Features.Artists.Rename;
 using Rok.Application.Features.Artists.Services;
 using Rok.Application.Features.EqualizerPresets;
 using Rok.Application.Features.Playlists;
@@ -36,6 +37,7 @@ public static class DependencyInjection
 
         services.AddTransient<TrackLyricsService>();
         services.AddTransient<TrackTagEditService>();
+        services.AddTransient<ArtistRenameService>();
         services.AddTransient<IArtistApiService, ArtistApiService>();
         services.AddTransient<IAlbumApiService, AlbumApiService>();
 

@@ -33,7 +33,7 @@ public class TagService(ILogger<TagService> logger) : ITagService
             TagFieldValues values = TagFieldReader.Read(tag.Tag);
 
             track.Title = values.Title;
-            track.Artist = (tag.Tag.FirstAlbumArtist?.Trim() ?? tag.Tag.FirstPerformer?.Trim() ?? "").NormalizeIndexedName();
+            track.Artist = values.Artist;
             track.Album = (tag.Tag.Album?.Trim() ?? "").NormalizeIndexedName();
             track.Genre = (tag.Tag.FirstGenre?.Trim() ?? "").NormalizeIndexedName();
             track.Year = tag.Tag.Year > 0 ? (int)tag.Tag.Year : null;

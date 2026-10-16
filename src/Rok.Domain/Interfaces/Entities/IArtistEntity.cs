@@ -49,5 +49,6 @@ public interface IArtistEntity : IEntity
     int? YearMini { get; set; }
     string? YoutubeUrl { get; set; }
     string? TagsAsString { get; set; }
+    string? RenamePendingFrom { get; set; }
     string ToString();
 }

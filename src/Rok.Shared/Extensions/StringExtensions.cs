@@ -16,16 +16,6 @@ public static class StringExtensions
         return newName;
     }
 
-    public static string Capitalize(this string value)
-    {
-        if (value.Length > 1)
-        {
-            value = value[0].ToString().ToUpper() + value[1..].ToLower();
-        }
-        return value;
-    }
-
-
     public static string GetNameFirstLetter(this string? name)
     {
         string result = "#123";
@@ -99,5 +89,14 @@ public static class StringExtensions
         }
 
         return sb.ToString();
+    }
+
+    /// <summary>
+    /// Builds the case-insensitive key used to match a name against an indexed name:
+    /// <see cref="NormalizeIndexedName"/> followed by upper-casing with the invariant culture.
+    /// </summary>
+    public static string ToIndexKey(this string value)
+    {
+        return value.NormalizeIndexedName().ToUpperInvariant();
     }
 }

@@ -26,7 +26,7 @@ internal sealed class Mp4TagFormat : ITagFormat
     {
         using TagLib.File file = TagLib.File.Create(path, MimeType, TagLib.ReadStyle.Average);
 
-        TagFormatHelpers.ApplyChanges(file.GetTag(TagLib.TagTypes.Apple, true), changes);
+        TagFormatHelpers.ApplyChanges(file.GetTag(TagLib.TagTypes.Apple, true), changes, TagFieldReader.ArtistSource(file.Tag));
         file.Save();
     }
 
@@ -76,6 +76,12 @@ internal sealed class Mp4TagFormat : ITagFormat
 
         if (changes.Bpm is not null)
             types.Add("tmpo");
+
+        if (changes.Artist is not null)
+        {
+            types.Add("©ART");
+            types.Add("aART");
+        }
 
         return types;
     }

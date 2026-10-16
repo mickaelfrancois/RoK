@@ -66,8 +66,8 @@ public class GenreImportTests
         Assert.Equal(9, hit!.Id);
     }
 
-    [Fact(DisplayName = "CreateAsync should persist capitalized genre name with artist count seeded at one")]
-    public async Task CreateAsync_ShouldPersistCapitalizedGenreName_WithArtistCountSeededAtOne()
+    [Fact(DisplayName = "CreateAsync should persist the genre name as tagged with artist count seeded at one")]
+    public async Task CreateAsync_ShouldPersistGenreName_AsTagged_WithArtistCountSeededAtOne()
     {
         // Arrange
         GenreEntity? captured = null;
@@ -84,8 +84,62 @@ public class GenreImportTests
         Assert.NotNull(created);
         Assert.Equal(7, created!.Id);
         Assert.NotNull(captured);
-        Assert.Equal(1, captured!.ArtistCount);
+        Assert.Equal("electro", captured!.Name);
+        Assert.Equal(1, captured.ArtistCount);
         Assert.Equal(1, import.CreatedCount);
         Assert.NotNull(import.GetFromCache("electro"));
+    }
+
+    [Fact(DisplayName = "create_keeps_the_tag_casing")]
+    public async Task CreateAsync_ShouldKeepTagCasing()
+    {
+        // Arrange
+        GenreEntity? captured = null;
+        Mock<IGenreRepository> repository = new();
+        repository.Setup(r => r.AddAsync(It.IsAny<GenreEntity>(), It.IsAny<RepositoryConnectionKind>()))
+            .Callback<GenreEntity, RepositoryConnectionKind>((g, _) => captured = g)
+            .ReturnsAsync(1);
+        GenreImport import = new(repository.Object, TimeProvider.System);
+
+        // Act
+        await import.CreateAsync("R&B/Soul");
+
+        // Assert
+        Assert.Equal("R&B/Soul", captured!.Name);
+    }
+
+    [Fact(DisplayName = "a_case_variant_of_an_existing_genre_maps_to_it")]
+    public async Task GetFromCache_ShouldMapCaseVariant_ToExistingGenre()
+    {
+        // Arrange
+        Mock<IGenreRepository> repository = new();
+        repository.Setup(r => r.GetAllAsync(It.IsAny<RepositoryConnectionKind>()))
+            .ReturnsAsync(new List<GenreEntity> { new() { Id = 4, Name = "R&B/Soul" } });
+        GenreImport import = new(repository.Object, TimeProvider.System);
+        await import.LoadCacheAsync();
+
+        // Act
+        GenreCacheItem? hit = import.GetFromCache("r&b/soul");
+
+        // Assert
+        Assert.Equal(4, hit!.Id);
+        repository.Verify(r => r.AddAsync(It.IsAny<GenreEntity>(), It.IsAny<RepositoryConnectionKind>()), Times.Never);
+    }
+
+    [Fact(DisplayName = "two_case_variants_in_one_import_resolve_to_one_genre")]
+    public async Task GetFromCache_ShouldResolveSecondCaseVariant_ToTheCreatedGenre()
+    {
+        // Arrange
+        Mock<IGenreRepository> repository = new();
+        repository.Setup(r => r.AddAsync(It.IsAny<GenreEntity>(), It.IsAny<RepositoryConnectionKind>())).ReturnsAsync(1);
+        GenreImport import = new(repository.Object, TimeProvider.System);
+
+        // Act
+        await import.CreateAsync("Trip-Hop");
+        GenreCacheItem? second = import.GetFromCache("trip-hop");
+
+        // Assert
+        Assert.Equal(1, second!.Id);
+        repository.Verify(r => r.AddAsync(It.IsAny<GenreEntity>(), It.IsAny<RepositoryConnectionKind>()), Times.Once);
     }
 }

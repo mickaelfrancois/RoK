@@ -41,6 +41,38 @@ public sealed class TagFieldReaderTests : IDisposable
         AssertMatchesTagService(path);
     }
 
+    [MediaFoundationEncoderTheory(AudioFixtureFormat.Mp3, DisplayName = "tag_field_reader_reads_the_artist_like_tag_service")]
+    [InlineData(true, true)]
+    [InlineData(false, true)]
+    [InlineData(false, false)]
+    public void Read_ShouldReadTheArtistLikeTagService(bool withAlbumArtist, bool withPerformer)
+    {
+        // Arrange
+        string[] albumArtists = withAlbumArtist ? [" Album Artist "] : [];
+        string[] performers = withPerformer ? ["Performer\u2010One"] : [];
+        string path = Mp3TagFixture.CreateWithArtists(_tempDir.FullName, 4, albumArtists, performers);
+
+        // Act & Assert
+        AssertMatchesTagService(path);
+
+        using TagLib.File file = TagLib.File.Create(path);
+        string expected = withAlbumArtist ? "Album Artist" : withPerformer ? "Performer-One" : "";
+        Assert.Equal(expected, TagFieldReader.Read(file.Tag).Artist);
+    }
+
+    [Theory(DisplayName = "replace_first_artist_value_replaces_the_first_and_keeps_the_others")]
+    [InlineData("", "New", "New")]
+    [InlineData("Old", "New", "New")]
+    [InlineData("Old\u001FGuest", "New", "New\u001FGuest")]
+    public void ReplaceFirstJoinedArtistValue_ShouldKeepTheOtherValues(string joined, string first, string expected)
+    {
+        // Act
+        string result = TagFieldReader.ReplaceFirstJoinedArtistValue(joined, first);
+
+        // Assert
+        Assert.Equal(expected, result);
+    }
+
     [Theory(DisplayName = "canonical_composers_splits_trims_and_rejoins")]
     [InlineData(null, "")]
     [InlineData("  ", "")]
@@ -75,5 +107,6 @@ public sealed class TagFieldReaderTests : IDisposable
         Assert.Equal(track.Disc, values.Disc);
         Assert.Equal(track.Bpm, values.Bpm);
         Assert.Equal(track.Composers, values.Composers);
+        Assert.Equal(track.Artist, values.Artist);
     }
 }
