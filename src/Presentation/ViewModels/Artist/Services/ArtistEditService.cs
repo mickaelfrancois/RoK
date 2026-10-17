@@ -1,11 +1,14 @@
 ﻿using System.Globalization;
+using Rok.Application.Features.Artists.Merge;
 using Rok.Application.Features.Artists.Rename;
 
 namespace Rok.ViewModels.Artist.Services;
 
-/// <summary>Edits an artist: its fields, and its name through the rename dialogs.</summary>
+/// <summary>Edits an artist: its fields, its name through the rename dialogs, and its merge with another artist.</summary>
 public class ArtistEditService(IMediator mediator, IDialogService dialogService, IAppOptions appOptions, IStringResourceProvider strings, ILogger<ArtistEditService> logger)
 {
+    private const int MaxSuggestions = 8;
+
     private ArtistRenamePreview? _validatedPreview;
 
     /// <summary>Opens the edit dialog, saves the fields, then renames the artist when the name changed.</summary>
@@ -75,9 +78,25 @@ public class ArtistEditService(IMediator mediator, IDialogService dialogService,
         if (preview is null)
             return new ArtistEditResult(true, null);
 
+        if (preview.Collision is not null)
+            return new ArtistEditResult(true, null) { Merge = await OfferMergeAsync(artist, preview.Collision) };
+
         ArtistRenameOutcome? outcome = await ShowRenameAsync(artist.Id, preview);
 
         return new ArtistEditResult(true, outcome);
+    }
+
+    /// <summary>Opens the merge dialog so the user picks the other artist, after the displayed artist.</summary>
+    /// <param name="artist">The displayed artist; it stays by default.</param>
+    /// <returns>The outcome of the merge; <see langword="null"/> when merging is not available or the user left without merging.</returns>
+    public Task<ArtistMergeOutcome?> MergeWithAsync(ArtistDto artist)
+    {
+        if (!appOptions.WriteTagsEnabled || !string.IsNullOrEmpty(artist.RenamePendingFrom))
+            return Task.FromResult<ArtistMergeOutcome?>(null);
+
+        ArtistMergeDialogRequest request = new(new ArtistMergeChoice(artist.Id, artist.Name), null, true, null);
+
+        return dialogService.ShowMergeArtistsAsync(request, BuildMergeActions(artist.Id));
     }
 
     /// <summary>Finishes a rename that was interrupted, after the user confirmed it in the rename dialog.</summary>
@@ -115,9 +134,6 @@ public class ArtistEditService(IMediator mediator, IDialogService dialogService,
             if (!result.IsSuccess)
                 return ArtistRenameTexts.ErrorMessage(result.Errors.FirstOrDefault()?.Code, Localize);
 
-            if (result.Value.Collision is not null)
-                return ArtistRenameTexts.CollisionMessage(result.Value.Collision, Localize);
-
             _validatedPreview = result.Value;
 
             return null;
@@ -138,12 +154,10 @@ public class ArtistEditService(IMediator mediator, IDialogService dialogService,
         {
             Result<ArtistRenamePreview> result = await mediator.Send(new GetArtistRenamePreviewRequest(artist.Id, newName));
 
-            if (result.IsSuccess && result.Value.Collision is null)
+            if (result.IsSuccess)
                 return result.Value;
 
-            error = result.IsSuccess
-                ? ArtistRenameTexts.CollisionMessage(result.Value.Collision!, Localize)
-                : ArtistRenameTexts.ErrorMessage(result.Errors.FirstOrDefault()?.Code, Localize);
+            error = ArtistRenameTexts.ErrorMessage(result.Errors.FirstOrDefault()?.Code, Localize);
         }
         catch (Exception ex)
         {
@@ -180,7 +194,138 @@ public class ArtistEditService(IMediator mediator, IDialogService dialogService,
         }
     }
 
+    private Task<ArtistMergeOutcome?> OfferMergeAsync(ArtistDto artist, ArtistRenameCollision collision)
+    {
+        if (collision.ArtistId <= 0 || !appOptions.WriteTagsEnabled)
+            return Task.FromResult<ArtistMergeOutcome?>(null);
+
+        ArtistMergeDialogRequest request = new(
+            new ArtistMergeChoice(artist.Id, artist.Name),
+            new ArtistMergeChoice(collision.ArtistId, collision.Name),
+            false,
+            ArtistMergeTexts.CollisionIntro(collision, Localize));
+
+        return dialogService.ShowMergeArtistsAsync(request, BuildMergeActions(artist.Id));
+    }
+
+    private ArtistMergeDialogActions BuildMergeActions(long displayedArtistId)
+    {
+        MergeSession session = new();
+
+        return new ArtistMergeDialogActions(
+            PreviewMergeAsync,
+            (sourceId, targetId, progress) => TryMergeAsync(sourceId, targetId, session, progress),
+            text => SearchArtistsAsync(session, displayedArtistId, text));
+    }
+
+    private async Task<ArtistMergePreviewAttempt> PreviewMergeAsync(long sourceId, long targetId)
+    {
+        try
+        {
+            Result<ArtistMergePreview> result = await mediator.Send(new GetArtistMergePreviewRequest(sourceId, targetId));
+
+            if (result.IsSuccess)
+                return ArtistMergePreviewAttempt.Success(result.Value);
+
+            return ArtistMergePreviewAttempt.Failure(ArtistMergeTexts.ErrorMessage(result.Errors.FirstOrDefault()?.Code, Localize));
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Failed to preview the merge of artist {SourceId} into {TargetId}", sourceId, targetId);
+
+            return ArtistMergePreviewAttempt.Failure(ArtistMergeTexts.ErrorMessage(null, Localize));
+        }
+    }
+
+    private async Task<ArtistMergeAttempt> TryMergeAsync(long sourceId, long targetId, MergeSession session, IProgress<ArtistRenameProgress> progress)
+    {
+        try
+        {
+            if (session.Partial is not null)
+                return await TryResumeMergeAsync(session, progress);
+
+            Result<ArtistMergeOutcome> result = await mediator.Send(new MergeArtistsRequest(sourceId, targetId) { Progress = progress });
+
+            if (!result.IsSuccess)
+                return ArtistMergeAttempt.Failure(ArtistMergeTexts.ErrorMessage(result.Errors.FirstOrDefault()?.Code, Localize));
+
+            if (result.Value.State == EArtistRenameState.Partial)
+                session.Partial = result.Value;
+
+            return ArtistMergeAttempt.Success(result.Value);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Failed to merge artist {SourceId} into {TargetId}", sourceId, targetId);
+
+            return ArtistMergeAttempt.Failure(ArtistMergeTexts.ErrorMessage(null, Localize));
+        }
+    }
+
+    private async Task<ArtistMergeAttempt> TryResumeMergeAsync(MergeSession session, IProgress<ArtistRenameProgress> progress)
+    {
+        ArtistMergeOutcome partial = session.Partial!;
+
+        Result<ArtistRenameOutcome> result = await mediator.Send(new RenameArtistRequest(partial.ArtistId, partial.Name) { Progress = progress });
+
+        if (!result.IsSuccess)
+            return ArtistMergeAttempt.Failure(ArtistRenameTexts.ErrorMessage(result.Errors.FirstOrDefault()?.Code, Localize));
+
+        ArtistRenameOutcome resumed = result.Value;
+
+        ArtistMergeOutcome next = partial with
+        {
+            State = resumed.State,
+            Blockers = resumed.Blockers,
+            Failures = resumed.Failures,
+            ChangedPlaylistIds = [.. partial.ChangedPlaylistIds.Union(resumed.ChangedPlaylistIds)]
+        };
+
+        if (resumed.State == EArtistRenameState.Completed)
+            session.Partial = null;
+        else if (resumed.State == EArtistRenameState.Partial)
+            session.Partial = next;
+
+        return ArtistMergeAttempt.Success(next);
+    }
+
+    private async Task<IReadOnlyList<ArtistMergeChoice>> SearchArtistsAsync(MergeSession session, long displayedArtistId, string text)
+    {
+        try
+        {
+            if (session.Artists is null)
+            {
+                IEnumerable<ArtistDto> all = await mediator.Send(new GetAllArtistsRequest());
+
+                session.Artists = [.. all.Select(artist => new ArtistMergeChoice(artist.Id, artist.Name))];
+            }
+
+            string typed = text.Trim();
+
+            return
+            [
+                .. session.Artists
+                    .Where(artist => artist.Id != displayedArtistId && artist.Name.Contains(typed, StringComparison.CurrentCultureIgnoreCase))
+                    .OrderBy(artist => artist.Name, StringComparer.CurrentCultureIgnoreCase)
+                    .Take(MaxSuggestions)
+            ];
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Failed to search the artists to merge with artist {ArtistId}", displayedArtistId);
+
+            return [];
+        }
+    }
+
     private string Localize(string key) => strings.GetString(key);
+
+    private sealed class MergeSession
+    {
+        public ArtistMergeOutcome? Partial { get; set; }
+
+        public IReadOnlyList<ArtistMergeChoice>? Artists { get; set; }
+    }
 
     /// <summary>Parses a year typed in the dialog; empty or non-numeric input maps to <see langword="null"/>.</summary>
     private static int? ParseYear(string? value)

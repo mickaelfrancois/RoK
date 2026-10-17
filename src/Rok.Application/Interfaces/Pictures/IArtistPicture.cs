@@ -25,4 +25,13 @@ public interface IArtistPicture
     /// </summary>
     /// <returns>The outcome applied. <see cref="ArtistFolderMoveOutcome.Blocked"/> means nothing was moved.</returns>
     ArtistFolderMoveOutcome MoveFolder(string oldName, string newName);
+
+    /// <summary>
+    /// Merges the image folder of the source artist into the folder of the target artist. The target wins:
+    /// a file already present in the target is never overwritten. Never touches the <c>@Artists</c> root.
+    /// </summary>
+    /// <param name="sourceName">Name of the artist that disappears.</param>
+    /// <param name="targetName">Name of the artist that stays.</param>
+    /// <param name="otherArtistNames">Names of the other living artists. A source folder shared with one of them is left alone.</param>
+    ArtistFolderMergeOutcome MergeFolderInto(string sourceName, string targetName, IReadOnlyCollection<string> otherArtistNames);
 }

@@ -125,6 +125,68 @@ public class ArtistPicture : IArtistPicture
     }
 
 
+    public ArtistFolderMergeOutcome MergeFolderInto(string sourceName, string targetName, IReadOnlyCollection<string> otherArtistNames)
+    {
+        Guard.NotNullOrEmpty(sourceName);
+        Guard.NotNullOrEmpty(targetName);
+        ArgumentNullException.ThrowIfNull(otherArtistNames);
+
+        string sourceFolderName = sourceName.ToFileName();
+        string targetFolderName = targetName.ToFileName();
+
+        if (string.IsNullOrWhiteSpace(sourceFolderName) || string.IsNullOrWhiteSpace(targetFolderName))
+            return ArtistFolderMergeOutcome.NothingToDo;
+
+        if (string.Equals(sourceFolderName, targetFolderName, StringComparison.OrdinalIgnoreCase))
+            return ArtistFolderMergeOutcome.NothingToDo;
+
+        string source = Path.Combine(RepositoryArtistPath, sourceFolderName);
+
+        if (!Directory.Exists(source))
+            return ArtistFolderMergeOutcome.NothingToDo;
+
+        if (otherArtistNames.Any(name => IsFolderOf(name, sourceFolderName)))
+            return ArtistFolderMergeOutcome.NothingToDo;
+
+        string target = Path.Combine(RepositoryArtistPath, targetFolderName);
+
+        if (!Directory.Exists(target))
+        {
+            Directory.Move(source, target);
+            return ArtistFolderMergeOutcome.Moved;
+        }
+
+        if (IsEmpty(target))
+        {
+            Directory.Delete(target);
+            Directory.Move(source, target);
+            return ArtistFolderMergeOutcome.Moved;
+        }
+
+        MergeDirectoryKeepingTarget(source, target);
+        Directory.Delete(source, true);
+
+        return ArtistFolderMergeOutcome.Merged;
+    }
+
+
+    private static void MergeDirectoryKeepingTarget(string source, string target)
+    {
+        Directory.CreateDirectory(target);
+
+        foreach (string file in Directory.GetFiles(source))
+        {
+            string destination = Path.Combine(target, Path.GetFileName(file));
+
+            if (!File.Exists(destination))
+                File.Move(file, destination);
+        }
+
+        foreach (string directory in Directory.GetDirectories(source))
+            MergeDirectoryKeepingTarget(directory, Path.Combine(target, Path.GetFileName(directory)));
+    }
+
+
     private static void MoveDirectory(string source, string target)
     {
         if (!string.Equals(source, target, StringComparison.OrdinalIgnoreCase))

@@ -2721,4 +2721,79 @@
   <data name="artistRenameBlock_PictureFolder" xml:space="preserve">
     <value>Le dossier d'images de l'artiste ne peut pas être déplacé.</value>
   </data>
+  <data name="MergeArtistDialog.Title" xml:space="preserve">
+    <value>Fusionner des artistes</value>
+  </data>
+  <data name="artistMenuMerge.Text" xml:space="preserve">
+    <value>Fusionner avec…</value>
+  </data>
+  <data name="artistMergeCollision" xml:space="preserve">
+    <value>{0} existe déjà ({1} albums, {2} titres). Fusionner les deux artistes ?</value>
+  </data>
+  <data name="artistMergeSummary" xml:space="preserve">
+    <value>{0} sera fusionné dans {1}.</value>
+  </data>
+  <data name="artistMergeCounts" xml:space="preserve">
+    <value>{0} fichiers de {1} albums seront mis à jour.</value>
+  </data>
+  <data name="artistMergeAlbumsHeader" xml:space="preserve">
+    <value>Albums qui n'en feront qu'un :</value>
+  </data>
+  <data name="artistMergeAlbumLine" xml:space="preserve">
+    <value>{0} ({1} albums)</value>
+  </data>
+  <data name="artistMergeConflictsHeader" xml:space="preserve">
+    <value>Valeurs différentes (la valeur de l'artiste conservé est utilisée) :</value>
+  </data>
+  <data name="artistMergeConflictLine" xml:space="preserve">
+    <value>{0} : {1} (conservée) / {2} (perdue)</value>
+  </data>
+  <data name="artistMergePlaylistsHeader" xml:space="preserve">
+    <value>Playlists intelligentes dont le résultat peut changer :</value>
+  </data>
+  <data name="artistMergePlaylistRewritten" xml:space="preserve">
+    <value>critères mis à jour</value>
+  </data>
+  <data name="artistMergePictureTarget" xml:space="preserve">
+    <value>L'image de {0} est conservée.</value>
+  </data>
+  <data name="artistMergePictureSource" xml:space="preserve">
+    <value>L'image de {0} sera utilisée.</value>
+  </data>
+  <data name="artistMergeBlockersHeader" xml:space="preserve">
+    <value>La fusion ne peut pas démarrer :</value>
+  </data>
+  <data name="artistMergeFailuresHeader" xml:space="preserve">
+    <value>Ces fichiers n'ont pas pu être mis à jour :</value>
+  </data>
+  <data name="artistMergeKeepHeader" xml:space="preserve">
+    <value>Artiste à conserver</value>
+  </data>
+  <data name="artistMergeOtherPlaceholder" xml:space="preserve">
+    <value>Rechercher l'artiste à fusionner</value>
+  </data>
+  <data name="artistMergeStart" xml:space="preserve">
+    <value>Fusionner</value>
+  </data>
+  <data name="artistMergeResume" xml:space="preserve">
+    <value>Relancer</value>
+  </data>
+  <data name="artistMergeCancel" xml:space="preserve">
+    <value>Annuler</value>
+  </data>
+  <data name="artistMergeClose" xml:space="preserve">
+    <value>Fermer</value>
+  </data>
+  <data name="artistMergeError_Generic" xml:space="preserve">
+    <value>Les artistes n'ont pas pu être fusionnés.</value>
+  </data>
+  <data name="artistMergeError_SameArtist" xml:space="preserve">
+    <value>Choisissez deux artistes différents.</value>
+  </data>
+  <data name="artistMergeError_PendingRename" xml:space="preserve">
+    <value>Un renommage attend d'être terminé sur l'un de ces artistes. Relancez-le d'abord.</value>
+  </data>
+  <data name="artistMergeError_NotFound" xml:space="preserve">
+    <value>Un artiste n'existe plus.</value>
+  </data>
 </root>

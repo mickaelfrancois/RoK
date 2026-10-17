@@ -2612,4 +2612,79 @@
   <data name="artistRenameBlock_PictureFolder" xml:space="preserve">
     <value>Папку із зображеннями виконавця не можна перемістити.</value>
   </data>
+  <data name="MergeArtistDialog.Title" xml:space="preserve">
+    <value>Об'єднати виконавців</value>
+  </data>
+  <data name="artistMenuMerge.Text" xml:space="preserve">
+    <value>Об'єднати з…</value>
+  </data>
+  <data name="artistMergeCollision" xml:space="preserve">
+    <value>{0} уже існує ({1} альбомів, {2} треків). Об'єднати двох виконавців?</value>
+  </data>
+  <data name="artistMergeSummary" xml:space="preserve">
+    <value>{0} буде об'єднано з {1}.</value>
+  </data>
+  <data name="artistMergeCounts" xml:space="preserve">
+    <value>Буде оновлено {0} файлів у {1} альбомах.</value>
+  </data>
+  <data name="artistMergeAlbumsHeader" xml:space="preserve">
+    <value>Альбоми, які стануть одним:</value>
+  </data>
+  <data name="artistMergeAlbumLine" xml:space="preserve">
+    <value>{0} ({1} альбомів)</value>
+  </data>
+  <data name="artistMergeConflictsHeader" xml:space="preserve">
+    <value>Різні значення (використовується значення збереженого виконавця):</value>
+  </data>
+  <data name="artistMergeConflictLine" xml:space="preserve">
+    <value>{0}: {1} (збережено) / {2} (втрачено)</value>
+  </data>
+  <data name="artistMergePlaylistsHeader" xml:space="preserve">
+    <value>Розумні плейлисти, результат яких може змінитися:</value>
+  </data>
+  <data name="artistMergePlaylistRewritten" xml:space="preserve">
+    <value>критерії оновлено</value>
+  </data>
+  <data name="artistMergePictureTarget" xml:space="preserve">
+    <value>Зображення {0} зберігається.</value>
+  </data>
+  <data name="artistMergePictureSource" xml:space="preserve">
+    <value>Буде використано зображення {0}.</value>
+  </data>
+  <data name="artistMergeBlockersHeader" xml:space="preserve">
+    <value>Об'єднання не може початися:</value>
+  </data>
+  <data name="artistMergeFailuresHeader" xml:space="preserve">
+    <value>Ці файли не вдалося оновити:</value>
+  </data>
+  <data name="artistMergeKeepHeader" xml:space="preserve">
+    <value>Виконавець, якого зберегти</value>
+  </data>
+  <data name="artistMergeOtherPlaceholder" xml:space="preserve">
+    <value>Знайдіть виконавця для об'єднання</value>
+  </data>
+  <data name="artistMergeStart" xml:space="preserve">
+    <value>Об'єднати</value>
+  </data>
+  <data name="artistMergeResume" xml:space="preserve">
+    <value>Відновити</value>
+  </data>
+  <data name="artistMergeCancel" xml:space="preserve">
+    <value>Скасувати</value>
+  </data>
+  <data name="artistMergeClose" xml:space="preserve">
+    <value>Закрити</value>
+  </data>
+  <data name="artistMergeError_Generic" xml:space="preserve">
+    <value>Не вдалося об'єднати виконавців.</value>
+  </data>
+  <data name="artistMergeError_SameArtist" xml:space="preserve">
+    <value>Виберіть двох різних виконавців.</value>
+  </data>
+  <data name="artistMergeError_PendingRename" xml:space="preserve">
+    <value>Для одного з цих виконавців очікує завершення перейменування. Спочатку відновіть його.</value>
+  </data>
+  <data name="artistMergeError_NotFound" xml:space="preserve">
+    <value>Виконавця більше не існує.</value>
+  </data>
 </root>

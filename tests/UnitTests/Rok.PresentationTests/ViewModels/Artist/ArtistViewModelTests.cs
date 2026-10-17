@@ -5,6 +5,7 @@ using Moq;
 using Rok.Application.Dto;
 using Rok.Application.Errors;
 using Rok.Application.Features.Albums.Requests;
+using Rok.Application.Features.Artists.Merge;
 using Rok.Application.Features.Artists.Rename;
 using Rok.Application.Features.Artists.Requests;
 using Rok.Application.Features.Artists.Services;
@@ -13,10 +14,12 @@ using Rok.Application.Features.Tags.Requests;
 using Rok.Application.Features.Tracks.Requests;
 using Rok.Application.Interfaces;
 using Rok.Application.Interfaces.Pictures;
+using Rok.Application.Messages;
 using Rok.Application.Player;
 using Rok.Commons;
 using Rok.Infrastructure.Files;
 using Rok.Services;
+using Rok.Shared.Enums;
 using Rok.ViewModels.Albums.Interfaces;
 using Rok.ViewModels.Artist;
 using Rok.ViewModels.Artist.Services;
@@ -41,14 +44,21 @@ public class ArtistViewModelTests
     private readonly Mock<IAppOptions> _appOptions = new();
     private readonly IMessenger _messenger = new Messenger();
 
-    private ArtistViewModel BuildViewModel()
+    private sealed class RecordingNavigationService() : NavigationService(Mock.Of<ITelemetryClient>())
+    {
+        public List<long> NavigatedArtists { get; } = [];
+
+        public override void NavigateToArtist(long artistId) => NavigatedArtists.Add(artistId);
+    }
+
+    private ArtistViewModel BuildViewModel(NavigationService? navigationService = null)
     {
         _resources.Setup(r => r.GetString(It.IsAny<string>())).Returns(string.Empty);
         _appOptions.SetupGet(o => o.CachePath).Returns(Path.GetTempPath());
 
         return new ArtistViewModel(
             _backdropLoader.Object,
-            new NavigationService(Mock.Of<ITelemetryClient>()),
+            navigationService ?? new NavigationService(Mock.Of<ITelemetryClient>()),
             _player.Object,
             _dialogService.Object,
             _resources.Object,
@@ -146,6 +156,125 @@ public class ArtistViewModelTests
         // Assert
         Assert.Equal(expected, sut.ShowPendingRename);
         Assert.True(sut.ResumeRenameCommand.CanExecute(null));
+    }
+
+    [Theory(DisplayName = "merge_is_hidden_when_writing_tags_is_off_or_a_rename_is_pending")]
+    [InlineData(true, null, true)]
+    [InlineData(true, "", true)]
+    [InlineData(false, null, false)]
+    [InlineData(true, "Old", false)]
+    [InlineData(false, "Old", false)]
+    public void SetData_ShouldAllowTheMerge_OnlyWithTheOptionOnAndNoPendingRename(bool writeTagsEnabled, string? pendingFrom, bool expected)
+    {
+        // Arrange
+        _appOptions.SetupGet(o => o.WriteTagsEnabled).Returns(writeTagsEnabled);
+        ArtistViewModel sut = BuildViewModel();
+
+        // Act
+        sut.SetData(new ArtistDto { Id = 7, Name = "Artist X", RenamePendingFrom = pendingFrom });
+
+        // Assert
+        Assert.Equal(expected, sut.CanMerge);
+        Assert.Equal(expected, sut.MergeWithCommand.CanExecute(null));
+    }
+
+    [Fact(DisplayName = "the_merge_command_is_disabled_until_the_artist_is_loaded")]
+    public void NewViewModel_ShouldNotAllowTheMerge_WhileLoading()
+    {
+        // Arrange
+        _appOptions.SetupGet(o => o.WriteTagsEnabled).Returns(true);
+
+        // Act
+        ArtistViewModel sut = BuildViewModel();
+
+        // Assert
+        Assert.False(sut.MergeWithCommand.CanExecute(null));
+    }
+
+    [Fact(DisplayName = "merging_the_displayed_artist_away_navigates_to_the_target")]
+    public async Task MergeWith_WhenTheDisplayedArtistDisappears_ShouldNavigateToTheTarget()
+    {
+        // Arrange
+        _appOptions.SetupGet(o => o.WriteTagsEnabled).Returns(true);
+        ArtistMergeOutcome outcome = new(EArtistRenameState.Completed, 9, "Target", [], [], [4], 7, [21], [22, 23]);
+        _dialogService
+            .Setup(d => d.ShowMergeArtistsAsync(It.IsAny<ArtistMergeDialogRequest>(), It.IsAny<ArtistMergeDialogActions>()))
+            .ReturnsAsync(outcome);
+        RecordingNavigationService navigation = new();
+        ArtistViewModel sut = BuildViewModel(navigation);
+        sut.SetData(new ArtistDto { Id = 7, Name = "Source" });
+        List<(string Kind, long Id, ActionType Action)> sent = [];
+        _messenger.Subscribe<ArtistUpdateMessage>(m => sent.Add(("artist", m.Id, m.Action)));
+        _messenger.Subscribe<AlbumUpdateMessage>(m => sent.Add(("album", m.Id, m.Action)));
+        _messenger.Subscribe<PlaylistUpdatedMessage>(m => sent.Add(("playlist", m.Id, m.Action)));
+
+        // Act
+        await sut.MergeWithCommand.ExecuteAsync(null);
+
+        // Assert
+        Assert.Equal([9L], navigation.NavigatedArtists);
+        Assert.Contains(("artist", 7L, ActionType.Delete), sent);
+        Assert.Contains(("artist", 9L, ActionType.Update), sent);
+        Assert.Contains(("album", 21L, ActionType.Delete), sent);
+        Assert.Contains(("album", 22L, ActionType.Update), sent);
+        Assert.Contains(("album", 23L, ActionType.Update), sent);
+        Assert.Contains(("playlist", 4L, ActionType.Update), sent);
+        Assert.Empty(_mediator.Sent<GetArtistByIdRequest>());
+        _apiService.Verify(a => a.GetAndUpdateArtistDataAsync(It.IsAny<ArtistDto>(), It.IsAny<IArtistPictureService>(), It.IsAny<IBackdropPicture>(), It.IsAny<ArtistApiMergeMode>(), It.IsAny<CancellationToken>()), Times.Never);
+    }
+
+    [Fact(DisplayName = "merging_another_artist_into_the_displayed_one_reloads_it_without_navigating_or_calling_the_api")]
+    public async Task MergeWith_WhenTheDisplayedArtistStays_ShouldReloadItWithoutTheApi()
+    {
+        // Arrange
+        _appOptions.SetupGet(o => o.WriteTagsEnabled).Returns(true);
+        ArtistMergeOutcome outcome = new(EArtistRenameState.Partial, 7, "Kept", [], [], [], 9, [], [31]);
+        _dialogService
+            .Setup(d => d.ShowMergeArtistsAsync(It.IsAny<ArtistMergeDialogRequest>(), It.IsAny<ArtistMergeDialogActions>()))
+            .ReturnsAsync(outcome);
+        _mediator.Setup<GetArtistByIdRequest, Result<ArtistDto>>().Returns(Result<ArtistDto>.Ok(new ArtistDto { Id = 7, Name = "Kept", RenamePendingFrom = "Other" }));
+        _mediator.Setup<GetAlbumsByArtistIdRequest, IEnumerable<AlbumDto>>().Returns(new List<AlbumDto>());
+        _mediator.Setup<GetTracksByArtistIdRequest, Result<IEnumerable<TrackDto>>>().Returns(Result<IEnumerable<TrackDto>>.Ok(new List<TrackDto>()));
+        RecordingNavigationService navigation = new();
+        ArtistViewModel sut = BuildViewModel(navigation);
+        sut.SetData(new ArtistDto { Id = 7, Name = "Kept" });
+
+        // Act
+        await sut.MergeWithCommand.ExecuteAsync(null);
+
+        // Assert
+        Assert.Empty(navigation.NavigatedArtists);
+        Assert.Single(_mediator.Sent<GetArtistByIdRequest>());
+        Assert.Equal("Kept", sut.Artist.Name);
+        Assert.False(sut.CanMerge);
+        Assert.True(sut.ShowPendingRename);
+        _apiService.Verify(a => a.GetAndUpdateArtistDataAsync(It.IsAny<ArtistDto>(), It.IsAny<IArtistPictureService>(), It.IsAny<IBackdropPicture>(), It.IsAny<ArtistApiMergeMode>(), It.IsAny<CancellationToken>()), Times.Never);
+    }
+
+    [Theory(DisplayName = "a_blocked_or_cancelled_merge_changes_nothing_on_the_page")]
+    [InlineData(true)]
+    [InlineData(false)]
+    public async Task MergeWith_WhenNothingWasMerged_ShouldSendNoMessage(bool blocked)
+    {
+        // Arrange
+        _appOptions.SetupGet(o => o.WriteTagsEnabled).Returns(true);
+        ArtistMergeOutcome? outcome = blocked ? new ArtistMergeOutcome(EArtistRenameState.Blocked, 9, "Target", [], [], [], 0, [], []) : null;
+        _dialogService
+            .Setup(d => d.ShowMergeArtistsAsync(It.IsAny<ArtistMergeDialogRequest>(), It.IsAny<ArtistMergeDialogActions>()))
+            .ReturnsAsync(outcome);
+        RecordingNavigationService navigation = new();
+        ArtistViewModel sut = BuildViewModel(navigation);
+        sut.SetData(new ArtistDto { Id = 7, Name = "Source" });
+        int messages = 0;
+        _messenger.Subscribe<ArtistUpdateMessage>(_ => messages++);
+
+        // Act
+        await sut.MergeWithCommand.ExecuteAsync(null);
+
+        // Assert
+        Assert.Equal(0, messages);
+        Assert.Empty(navigation.NavigatedArtists);
+        Assert.Empty(_mediator.Sent<GetArtistByIdRequest>());
     }
 
     [Theory(DisplayName = "a_resumed_rename_refills_empty_api_fields_after_a_completed_or_partial_outcome")]

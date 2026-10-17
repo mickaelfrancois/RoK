@@ -1,5 +1,6 @@
 using Microsoft.Extensions.DependencyInjection;
 using Rok.Application;
+using Rok.Application.Features.Artists.Merge;
 using Rok.Application.Features.Artists.Rename;
 using Rok.Application.Features.Artists.Requests;
 using Rok.Application.Player.Mix;
@@ -37,6 +38,20 @@ public class DependencyInjectionTests
         Assert.Equal(ServiceLifetime.Transient, descriptor.Lifetime);
     }
 
+    [Fact(DisplayName = "artist_file_rewriter_is_registered")]
+    public void AddApplication_RegistersArtistFileRewriter()
+    {
+        // Arrange
+        var services = new ServiceCollection();
+
+        // Act
+        services.AddApplication();
+
+        // Assert
+        var descriptor = Assert.Single(services, d => d.ServiceType == typeof(ArtistFileRewriter));
+        Assert.Equal(ServiceLifetime.Transient, descriptor.Lifetime);
+    }
+
     [Fact(DisplayName = "artist_rename_handlers_are_registered")]
     public void AddApplication_RegistersArtistRenameHandlers()
     {
@@ -49,5 +64,33 @@ public class DependencyInjectionTests
         // Assert
         Assert.Contains(services, d => d.ServiceType == typeof(IRequestHandler<RenameArtistRequest, Result<ArtistRenameOutcome>>));
         Assert.Contains(services, d => d.ServiceType == typeof(IRequestHandler<GetArtistRenamePreviewRequest, Result<ArtistRenamePreview>>));
+    }
+
+    [Fact(DisplayName = "artist_merge_service_is_registered")]
+    public void AddApplication_RegistersArtistMergeService()
+    {
+        // Arrange
+        var services = new ServiceCollection();
+
+        // Act
+        services.AddApplication();
+
+        // Assert
+        var descriptor = Assert.Single(services, d => d.ServiceType == typeof(ArtistMergeService));
+        Assert.Equal(ServiceLifetime.Transient, descriptor.Lifetime);
+    }
+
+    [Fact(DisplayName = "artist_merge_handlers_are_registered")]
+    public void AddApplication_RegistersArtistMergeHandlers()
+    {
+        // Arrange
+        var services = new ServiceCollection();
+
+        // Act
+        services.AddApplication();
+
+        // Assert
+        Assert.Contains(services, d => d.ServiceType == typeof(IRequestHandler<MergeArtistsRequest, Result<ArtistMergeOutcome>>));
+        Assert.Contains(services, d => d.ServiceType == typeof(IRequestHandler<GetArtistMergePreviewRequest, Result<ArtistMergePreview>>));
     }
 }
