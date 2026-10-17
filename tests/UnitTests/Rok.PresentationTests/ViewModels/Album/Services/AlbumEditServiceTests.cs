@@ -1,6 +1,8 @@
+using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using Rok.Application.Dto;
 using Rok.Application.Features.Albums.Requests;
+using Rok.Application.Interfaces;
 using Rok.Services;
 using Rok.ViewModels.Album.Services;
 
@@ -12,7 +14,23 @@ public class AlbumEditServiceTests
 
     private readonly Mock<IDialogService> _dialogService = new();
 
-    private AlbumEditService BuildService() => new(_mediator, _dialogService.Object);
+    private readonly Mock<IAppOptions> _appOptions = new();
+
+    private readonly Mock<IStringResourceProvider> _strings = new();
+
+    private AlbumEditService BuildService()
+    {
+        _strings.Setup(strings => strings.GetString(It.IsAny<string>())).Returns<string>(key => key);
+
+        return new AlbumEditService(_mediator, _dialogService.Object, _appOptions.Object, _strings.Object, NullLogger<AlbumEditService>.Instance);
+    }
+
+    private void SetupEditDialog(AlbumEditValues? returned)
+    {
+        _dialogService
+            .Setup(x => x.ShowEditAlbumAsync(It.IsAny<AlbumEditValues>(), It.IsAny<AlbumTaggedFieldsMode>(), It.IsAny<AlbumEditSuggestions>(), It.IsAny<Func<AlbumEditValues, Task<string?>>>()))
+            .ReturnsAsync(returned);
+    }
 
     [Fact(DisplayName = "UpdateFavoriteAsync should send the favorite command and update the album state")]
     public async Task UpdateFavoriteAsync_ShouldSendCommandAndUpdateState()
@@ -93,17 +111,16 @@ public class AlbumEditServiceTests
             ReleaseGroupMusicBrainzID = "new-rg"
         };
 
-        _dialogService
-            .Setup(x => x.ShowEditAlbumAsync(It.IsAny<AlbumEditValues>()))
-            .ReturnsAsync(edited);
+        SetupEditDialog(edited);
 
         AlbumEditService sut = BuildService();
 
         // Act
-        bool result = await sut.EditAlbumAsync(album);
+        AlbumEditResult result = await sut.EditAlbumAsync(album);
 
         // Assert
-        Assert.True(result);
+        Assert.True(result.Updated);
+        Assert.Null(result.Outcome);
         Assert.True(album.IsLive);
         Assert.True(album.IsBestOf);
         Assert.True(album.IsCompilation);
@@ -132,9 +149,7 @@ public class AlbumEditServiceTests
             ReleaseGroupMusicBrainzID = "rg"
         };
 
-        _dialogService
-            .Setup(x => x.ShowEditAlbumAsync(It.IsAny<AlbumEditValues>()))
-            .ReturnsAsync(edited);
+        SetupEditDialog(edited);
 
         AlbumEditService sut = BuildService();
 
@@ -169,17 +184,15 @@ public class AlbumEditServiceTests
             Biography = "old bio"
         };
 
-        _dialogService
-            .Setup(x => x.ShowEditAlbumAsync(It.IsAny<AlbumEditValues>()))
-            .ReturnsAsync((AlbumEditValues?)null);
+        SetupEditDialog(null);
 
         AlbumEditService sut = BuildService();
 
         // Act
-        bool result = await sut.EditAlbumAsync(album);
+        AlbumEditResult result = await sut.EditAlbumAsync(album);
 
         // Assert
-        Assert.False(result);
+        Assert.False(result.Updated);
         Assert.Empty(_mediator.Sent<UpdateAlbumRequest>());
         Assert.False(album.IsLive);
         Assert.Equal("old bio", album.Biography);

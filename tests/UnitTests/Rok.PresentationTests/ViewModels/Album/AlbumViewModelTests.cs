@@ -6,17 +6,21 @@ using Rok.Application.Dto;
 using Rok.Application.Errors;
 using Rok.Application.Features.Albums.Requests;
 using Rok.Application.Features.Albums.Services;
+using Rok.Application.Features.Artists.Rename;
 using Rok.Application.Features.Playlists.PlaylistMenu;
 using Rok.Application.Features.Tracks.Requests;
 using Rok.Application.Interfaces;
 using Rok.Application.Interfaces.Pictures;
+using Rok.Application.Messages;
 using Rok.Application.Player;
 using Rok.Commons;
 using Rok.Services;
+using Rok.Shared.Enums;
 using Rok.ViewModels.Album;
 using Rok.ViewModels.Album.Services;
 using Rok.ViewModels.Common;
 using Rok.ViewModels.Tracks.Interfaces;
+using AlbumTagWriteOutcome = Rok.Application.Features.Albums.Edit.AlbumTagWriteOutcome;
 
 namespace Rok.PresentationTests.ViewModels.Album;
 
@@ -36,14 +40,21 @@ public class AlbumViewModelTests
     private readonly Mock<ILastFmClient> _lastFm = new();
     private readonly IMessenger _messenger = new Messenger();
 
-    private AlbumViewModel BuildViewModel()
+    private sealed class RecordingNavigationService() : NavigationService(Mock.Of<ITelemetryClient>())
+    {
+        public List<long> NavigatedAlbums { get; } = [];
+
+        public override void NavigateToAlbum(long albumId) => NavigatedAlbums.Add(albumId);
+    }
+
+    private AlbumViewModel BuildViewModel(NavigationService? navigationService = null)
     {
         _resources.Setup(r => r.GetString(It.IsAny<string>())).Returns(string.Empty);
 
         return new AlbumViewModel(
             _backdropLoader.Object,
             _lastFm.Object,
-            new NavigationService(Mock.Of<ITelemetryClient>()),
+            navigationService ?? new NavigationService(Mock.Of<ITelemetryClient>()),
             _player.Object,
             _resources.Object,
             new AlbumDataLoader(_mediator, _trackFactory.Object, NullLogger<AlbumDataLoader>.Instance),
@@ -51,7 +62,7 @@ public class AlbumViewModelTests
             _apiService.Object,
             new AlbumStatisticsService(_mediator),
             _dominantColor.Object,
-            new AlbumEditService(_mediator, _dialogService.Object),
+            new AlbumEditService(_mediator, _dialogService.Object, _appOptions.Object, _resources.Object, NullLogger<AlbumEditService>.Instance),
             _appOptions.Object,
             _dialogService.Object,
             _playlistMenu.Object,
@@ -78,6 +89,7 @@ public class AlbumViewModelTests
         Watch(nameof(sut.AlbumFavoriteCommand), sut.AlbumFavoriteCommand);
         Watch(nameof(sut.GetDataFromApiCommand), sut.GetDataFromApiCommand);
         Watch(nameof(sut.EditAlbumCommand), sut.EditAlbumCommand);
+        Watch(nameof(sut.ResumeTagWriteCommand), sut.ResumeTagWriteCommand);
         Watch(nameof(sut.SelectPictureCommand), sut.SelectPictureCommand);
         Watch(nameof(sut.OpenUrlCommand), sut.OpenUrlCommand);
         Watch(nameof(sut.OpenBiographyCommand), sut.OpenBiographyCommand);
@@ -95,6 +107,7 @@ public class AlbumViewModelTests
         Assert.Equal(expected, sut.AlbumFavoriteCommand.CanExecute(null));
         Assert.Equal(expected, sut.GetDataFromApiCommand.CanExecute(null));
         Assert.Equal(expected, sut.EditAlbumCommand.CanExecute(null));
+        Assert.Equal(expected, sut.ResumeTagWriteCommand.CanExecute(null));
         Assert.Equal(expected, sut.SelectPictureCommand.CanExecute(null));
         Assert.Equal(expected, sut.OpenUrlCommand.CanExecute(null));
         Assert.Equal(expected, sut.OpenBiographyCommand.CanExecute(null));
@@ -392,6 +405,222 @@ public class AlbumViewModelTests
         // Assert
         Assert.Equal(expected, sut.HeaderDetails);
         Assert.Equal(hasDetails, sut.HasDetails);
+    }
+
+    [Theory(DisplayName = "a_completed_or_partial_resume_reloads_the_album_and_sends_the_messages")]
+    [InlineData(EArtistRenameState.Completed, false)]
+    [InlineData(EArtistRenameState.Partial, true)]
+    public async Task ResumeTagWrite_AfterAnOutcome_ShouldReloadTheAlbumAndSendTheMessages(EArtistRenameState state, bool stillPending)
+    {
+        // Arrange
+        _appOptions.SetupGet(o => o.WriteTagsEnabled).Returns(true);
+        _dialogService
+            .Setup(d => d.ShowAlbumTagWriteAsync(It.IsAny<AlbumTagWritePrompt>(), It.IsAny<Func<IProgress<ArtistRenameProgress>, Task<AlbumTagWriteAttempt>>>()))
+            .ReturnsAsync(new AlbumTagWriteOutcome(state, 42, [], [], [3, 4], [90]));
+        _mediator.Setup<GetAlbumByIdRequest, Result<AlbumDto>>()
+                 .Returns(Result<AlbumDto>.Ok(new AlbumDto { Id = 42, Name = "Renamed" }));
+        _mediator.Setup<GetTracksByAlbumIdRequest, Result<IEnumerable<TrackDto>>>()
+                 .Returns(Result<IEnumerable<TrackDto>>.Ok(new List<TrackDto>()));
+        List<(string Kind, long Id, ActionType Action)> sent = [];
+        _messenger.Subscribe<AlbumUpdateMessage>(m => sent.Add(("album", m.Id, m.Action)));
+        _messenger.Subscribe<ArtistUpdateMessage>(m => sent.Add(("artist", m.Id, m.Action)));
+        AlbumViewModel sut = BuildViewModel();
+        sut.SetData(new AlbumDto { Id = 42, Name = "Old" });
+
+        // Act
+        await sut.ResumeTagWriteCommand.ExecuteAsync(null);
+
+        // Assert
+        Assert.Equal("Renamed", sut.Album.Name);
+        Assert.Equal(stillPending, sut.HasPendingTagWrite);
+        Assert.Equal(stillPending, sut.ShowPendingTagWrite);
+        Assert.Contains(("album", 42L, ActionType.Update), sent);
+        Assert.Contains(("album", 90L, ActionType.Delete), sent);
+        Assert.Contains(("artist", 3L, ActionType.Update), sent);
+        Assert.Contains(("artist", 4L, ActionType.Update), sent);
+    }
+
+    [Fact(DisplayName = "a_resume_that_was_blocked_or_dismissed_changes_nothing_on_the_page")]
+    public async Task ResumeTagWrite_WhenNothingWasWritten_ShouldSendNoMessage()
+    {
+        // Arrange
+        _appOptions.SetupGet(o => o.WriteTagsEnabled).Returns(true);
+        _dialogService
+            .Setup(d => d.ShowAlbumTagWriteAsync(It.IsAny<AlbumTagWritePrompt>(), It.IsAny<Func<IProgress<ArtistRenameProgress>, Task<AlbumTagWriteAttempt>>>()))
+            .ReturnsAsync(new AlbumTagWriteOutcome(EArtistRenameState.Blocked, 42, [], [], [], []));
+        int messages = 0;
+        _messenger.Subscribe<AlbumUpdateMessage>(_ => messages++);
+        AlbumViewModel sut = BuildViewModel();
+        sut.SetData(new AlbumDto { Id = 42, Name = "Old" });
+
+        // Act
+        await sut.ResumeTagWriteCommand.ExecuteAsync(null);
+
+        // Assert
+        Assert.Equal(0, messages);
+        Assert.Empty(_mediator.Sent<GetAlbumByIdRequest>());
+    }
+
+    [Fact(DisplayName = "the_pending_bar_shows_only_when_a_write_is_pending_and_writing_tags_is_on")]
+    public async Task ShowPendingTagWrite_FollowsThePendingStateAndTheOption()
+    {
+        // Arrange
+        _appOptions.SetupGet(o => o.WriteTagsEnabled).Returns(true);
+        _mediator.Setup<GetAlbumByIdRequest, Result<AlbumDto>>()
+                 .Returns(Result<AlbumDto>.Ok(new AlbumDto { Id = 42, Name = "Greatest Hits" }));
+        _mediator.Setup<GetTracksByAlbumIdRequest, Result<IEnumerable<TrackDto>>>()
+                 .Returns(Result<IEnumerable<TrackDto>>.Ok(new List<TrackDto>()));
+        _mediator.Setup<GetAlbumPendingTagWriteRequest, Result<bool>>().Returns(Result<bool>.Ok(true));
+        AlbumViewModel sut = BuildViewModel();
+
+        // Act
+        await sut.LoadDataAsync(42);
+
+        // Assert
+        Assert.True(sut.HasPendingTagWrite);
+        Assert.True(sut.ShowPendingTagWrite);
+
+        _appOptions.SetupGet(o => o.WriteTagsEnabled).Returns(false);
+        sut.SetData(new AlbumDto { Id = 42, Name = "Greatest Hits" });
+
+        Assert.False(sut.ShowPendingTagWrite);
+    }
+
+    [Theory(DisplayName = "merge_is_hidden_when_writing_tags_is_off_or_the_album_is_a_compilation")]
+    [InlineData(true, false, true)]
+    [InlineData(false, false, false)]
+    [InlineData(true, true, false)]
+    [InlineData(false, true, false)]
+    public void SetData_ShouldAllowTheMerge_OnlyWithTheOptionOnAndNoCompilation(bool writeTagsEnabled, bool isCompilation, bool expected)
+    {
+        // Arrange
+        _appOptions.SetupGet(o => o.WriteTagsEnabled).Returns(writeTagsEnabled);
+        AlbumViewModel sut = BuildViewModel();
+
+        // Act
+        sut.SetData(new AlbumDto { Id = 42, Name = "Greatest Hits", IsCompilation = isCompilation });
+
+        // Assert
+        Assert.Equal(expected, sut.CanMerge);
+        Assert.Equal(expected, sut.MergeWithCommand.CanExecute(null));
+    }
+
+    [Fact(DisplayName = "merge_is_hidden_while_a_tag_write_is_pending")]
+    public async Task LoadDataAsync_WithAPendingWrite_ShouldNotAllowTheMerge()
+    {
+        // Arrange
+        _appOptions.SetupGet(o => o.WriteTagsEnabled).Returns(true);
+        _mediator.Setup<GetAlbumByIdRequest, Result<AlbumDto>>()
+                 .Returns(Result<AlbumDto>.Ok(new AlbumDto { Id = 42, Name = "Greatest Hits" }));
+        _mediator.Setup<GetTracksByAlbumIdRequest, Result<IEnumerable<TrackDto>>>()
+                 .Returns(Result<IEnumerable<TrackDto>>.Ok(new List<TrackDto>()));
+        _mediator.Setup<GetAlbumPendingTagWriteRequest, Result<bool>>().Returns(Result<bool>.Ok(true));
+        AlbumViewModel sut = BuildViewModel();
+
+        // Act
+        await sut.LoadDataAsync(42);
+
+        // Assert
+        Assert.True(sut.HasPendingTagWrite);
+        Assert.False(sut.CanMerge);
+        Assert.False(sut.MergeWithCommand.CanExecute(null));
+    }
+
+    [Fact(DisplayName = "the_merge_command_is_disabled_until_the_album_is_loaded")]
+    public void NewViewModel_ShouldNotAllowTheMerge_WhileLoading()
+    {
+        // Arrange
+        _appOptions.SetupGet(o => o.WriteTagsEnabled).Returns(true);
+
+        // Act
+        AlbumViewModel sut = BuildViewModel();
+
+        // Assert
+        Assert.False(sut.MergeWithCommand.CanExecute(null));
+    }
+
+    [Fact(DisplayName = "merging_the_displayed_album_away_navigates_to_the_target_and_sends_the_messages")]
+    public async Task MergeWith_WhenTheDisplayedAlbumDisappears_ShouldNavigateToTheTarget()
+    {
+        // Arrange
+        _appOptions.SetupGet(o => o.WriteTagsEnabled).Returns(true);
+        _dialogService
+            .Setup(d => d.ShowMergeAlbumsAsync(It.IsAny<AlbumMergeDialogRequest>(), It.IsAny<AlbumMergeDialogActions>()))
+            .ReturnsAsync(new AlbumTagWriteOutcome(EArtistRenameState.Completed, 9, [], [], [3, 4], [42]));
+        RecordingNavigationService navigation = new();
+        AlbumViewModel sut = BuildViewModel(navigation);
+        sut.SetData(new AlbumDto { Id = 42, Name = "Source" });
+        List<(string Kind, long Id, ActionType Action)> sent = [];
+        _messenger.Subscribe<AlbumUpdateMessage>(m => sent.Add(("album", m.Id, m.Action)));
+        _messenger.Subscribe<ArtistUpdateMessage>(m => sent.Add(("artist", m.Id, m.Action)));
+
+        // Act
+        await sut.MergeWithCommand.ExecuteAsync(null);
+
+        // Assert
+        Assert.Equal([9L], navigation.NavigatedAlbums);
+        Assert.Contains(("album", 42L, ActionType.Delete), sent);
+        Assert.Contains(("album", 9L, ActionType.Update), sent);
+        Assert.DoesNotContain(("album", 42L, ActionType.Update), sent);
+        Assert.Contains(("artist", 3L, ActionType.Update), sent);
+        Assert.Contains(("artist", 4L, ActionType.Update), sent);
+        Assert.Empty(_mediator.Sent<GetAlbumByIdRequest>());
+    }
+
+    [Fact(DisplayName = "merging_another_album_into_the_displayed_one_reloads_it_without_navigating")]
+    public async Task MergeWith_WhenTheDisplayedAlbumStays_ShouldReloadIt()
+    {
+        // Arrange
+        _appOptions.SetupGet(o => o.WriteTagsEnabled).Returns(true);
+        _dialogService
+            .Setup(d => d.ShowMergeAlbumsAsync(It.IsAny<AlbumMergeDialogRequest>(), It.IsAny<AlbumMergeDialogActions>()))
+            .ReturnsAsync(new AlbumTagWriteOutcome(EArtistRenameState.Partial, 42, [], [], [3], [90]));
+        _mediator.Setup<GetAlbumByIdRequest, Result<AlbumDto>>()
+                 .Returns(Result<AlbumDto>.Ok(new AlbumDto { Id = 42, Name = "Kept" }));
+        _mediator.Setup<GetTracksByAlbumIdRequest, Result<IEnumerable<TrackDto>>>()
+                 .Returns(Result<IEnumerable<TrackDto>>.Ok(new List<TrackDto>()));
+        RecordingNavigationService navigation = new();
+        AlbumViewModel sut = BuildViewModel(navigation);
+        sut.SetData(new AlbumDto { Id = 42, Name = "Old" });
+        List<(string Kind, long Id, ActionType Action)> sent = [];
+        _messenger.Subscribe<AlbumUpdateMessage>(m => sent.Add(("album", m.Id, m.Action)));
+
+        // Act
+        await sut.MergeWithCommand.ExecuteAsync(null);
+
+        // Assert
+        Assert.Empty(navigation.NavigatedAlbums);
+        Assert.Equal("Kept", sut.Album.Name);
+        Assert.True(sut.HasPendingTagWrite);
+        Assert.False(sut.CanMerge);
+        Assert.Contains(("album", 42L, ActionType.Update), sent);
+        Assert.Contains(("album", 90L, ActionType.Delete), sent);
+    }
+
+    [Theory(DisplayName = "a_blocked_or_cancelled_merge_changes_nothing_on_the_page")]
+    [InlineData(true)]
+    [InlineData(false)]
+    public async Task MergeWith_WhenNothingWasMerged_ShouldSendNoMessage(bool blocked)
+    {
+        // Arrange
+        _appOptions.SetupGet(o => o.WriteTagsEnabled).Returns(true);
+        AlbumTagWriteOutcome? outcome = blocked ? new AlbumTagWriteOutcome(EArtistRenameState.Blocked, 9, [], [], [], []) : null;
+        _dialogService
+            .Setup(d => d.ShowMergeAlbumsAsync(It.IsAny<AlbumMergeDialogRequest>(), It.IsAny<AlbumMergeDialogActions>()))
+            .ReturnsAsync(outcome);
+        RecordingNavigationService navigation = new();
+        AlbumViewModel sut = BuildViewModel(navigation);
+        sut.SetData(new AlbumDto { Id = 42, Name = "Source" });
+        int messages = 0;
+        _messenger.Subscribe<AlbumUpdateMessage>(_ => messages++);
+
+        // Act
+        await sut.MergeWithCommand.ExecuteAsync(null);
+
+        // Assert
+        Assert.Equal(0, messages);
+        Assert.Empty(navigation.NavigatedAlbums);
+        Assert.Empty(_mediator.Sent<GetAlbumByIdRequest>());
     }
 
     [Theory(DisplayName = "when_the_album_has_a_country_code_then_the_country_flag_is_shown")]

@@ -2,6 +2,7 @@
 using Rok.Application.Interfaces;
 using Rok.Application.Interfaces.Repositories;
 using Rok.Domain.Entities;
+using Rok.Domain.Enums;
 
 namespace Rok.Import;
 
@@ -13,6 +14,7 @@ public class TrackImport(ITrackRepository _trackRepository)
 
     private readonly Dictionary<string, TrackEntity> _cache = new(StringComparer.InvariantCultureIgnoreCase);
 
+    private readonly Dictionary<long, ETagWriteFields> _pendingFields = [];
 
     public async Task LoadCacheAsync(CancellationToken cancellationToken = default)
     {
@@ -26,6 +28,19 @@ public class TrackImport(ITrackRepository _trackRepository)
 
             _cache.TryAdd(key, track);
         }
+
+        await LoadPendingFieldsAsync();
+    }
+
+
+    /// <summary>
+    /// Gets the tag fields of a track whose file has not been rewritten yet after an album edit or merge.
+    /// </summary>
+    /// <param name="trackId">The track identifier.</param>
+    /// <returns>The pending fields, or <see cref="ETagWriteFields.None"/> when the file is up to date.</returns>
+    public ETagWriteFields GetPendingFields(long trackId)
+    {
+        return _pendingFields.GetValueOrDefault(trackId, ETagWriteFields.None);
     }
 
 
@@ -72,6 +87,22 @@ public class TrackImport(ITrackRepository _trackRepository)
         Guard.NotNegativeOrZero(trackId);
 
         return _trackRepository.UpdateFileDateAsync(trackId, fileDate, RepositoryConnectionKind.Background);
+    }
+
+
+    private async Task LoadPendingFieldsAsync()
+    {
+        _pendingFields.Clear();
+
+        IEnumerable<PendingTagWrite>? pending = await _trackRepository.GetPendingTagWritesAsync(RepositoryConnectionKind.Background);
+
+        if (pending is null)
+            return;
+
+        foreach (PendingTagWrite write in pending)
+        {
+            _pendingFields[write.TrackId] = write.Fields;
+        }
     }
 
 

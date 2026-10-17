@@ -4,6 +4,7 @@ using System.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Rok.Application.Features.Albums.Services;
+using Rok.Application.Features.Artists.Rename;
 using Rok.Application.Features.ListeningEvents;
 using Rok.Application.Features.Playlists.PlaylistMenu;
 using Rok.Application.Player;
@@ -14,6 +15,7 @@ using Rok.ViewModels.Album.Services;
 using Rok.ViewModels.Common;
 using Rok.ViewModels.Listening.Services;
 using Rok.ViewModels.Track;
+using AlbumTagWriteOutcome = Rok.Application.Features.Albums.Edit.AlbumTagWriteOutcome;
 
 namespace Rok.ViewModels.Album;
 
@@ -57,6 +59,8 @@ public partial class AlbumViewModel : ObservableObject, IFilterableAlbum, IGroup
     [NotifyCanExecuteChangedFor(nameof(AlbumFavoriteCommand))]
     [NotifyCanExecuteChangedFor(nameof(GetDataFromApiCommand))]
     [NotifyCanExecuteChangedFor(nameof(EditAlbumCommand))]
+    [NotifyCanExecuteChangedFor(nameof(ResumeTagWriteCommand))]
+    [NotifyCanExecuteChangedFor(nameof(MergeWithCommand))]
     [NotifyCanExecuteChangedFor(nameof(SelectPictureCommand))]
     [NotifyCanExecuteChangedFor(nameof(OpenUrlCommand))]
     [NotifyCanExecuteChangedFor(nameof(OpenBiographyCommand))]
@@ -79,6 +83,21 @@ public partial class AlbumViewModel : ObservableObject, IFilterableAlbum, IGroup
     }
 
     public IPlaylistMenuService PlaylistMenuService { get; }
+
+    /// <summary>Gets or sets a value indicating whether some files of the album still wait for a tag write.</summary>
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(ShowPendingTagWrite))]
+    [NotifyPropertyChangedFor(nameof(CanMerge))]
+    [NotifyCanExecuteChangedFor(nameof(MergeWithCommand))]
+    public partial bool HasPendingTagWrite { get; set; }
+
+    /// <summary>Gets a value indicating whether an interrupted write can be finished: one is pending and writing tags is on.</summary>
+    public bool ShowPendingTagWrite => HasPendingTagWrite && _appOptions.WriteTagsEnabled;
+
+    /// <summary>Gets a value indicating whether the album can be merged with another: writing tags is on, it is not a compilation and no write is pending.</summary>
+    public bool CanMerge => _appOptions.WriteTagsEnabled && !Album.IsCompilation && !HasPendingTagWrite;
+
+    private bool CanExecuteMerge => IsEntityLoaded && CanMerge;
 
     public bool IsFavorite
     {
@@ -158,6 +177,9 @@ public partial class AlbumViewModel : ObservableObject, IFilterableAlbum, IGroup
         OnPropertyChanged(nameof(HasCountry));
         OnPropertyChanged(nameof(CountryName));
         OnPropertyChanged(nameof(AlbumFavoriteLabel));
+        OnPropertyChanged(nameof(ShowPendingTagWrite));
+        OnPropertyChanged(nameof(CanMerge));
+        MergeWithCommand.NotifyCanExecuteChanged();
     }
 
     public override string ToString()
@@ -344,6 +366,7 @@ public partial class AlbumViewModel : ObservableObject, IFilterableAlbum, IGroup
     public async Task LoadDataAsync(long albumId)
     {
         LoadState = DetailLoadState.Loading;
+        HasPendingTagWrite = false;
 
         CancellationToken cancellationToken = InitNavigationCancellation();
 
@@ -359,6 +382,13 @@ public partial class AlbumViewModel : ObservableObject, IFilterableAlbum, IGroup
 
         if (cancellationToken.IsCancellationRequested)
             return;
+
+        bool hasPendingTagWrite = await _editService.HasPendingTagWriteAsync(albumId);
+
+        if (cancellationToken.IsCancellationRequested)
+            return;
+
+        HasPendingTagWrite = hasPendingTagWrite;
 
         stopwatch.Stop();
         _logger.LogInformation("Album {AlbumId} essential data loaded in {ElapsedMilliseconds} ms", albumId, stopwatch.ElapsedMilliseconds);
@@ -637,14 +667,67 @@ public partial class AlbumViewModel : ObservableObject, IFilterableAlbum, IGroup
     [RelayCommand(CanExecute = nameof(IsEntityLoaded))]
     private async Task EditAlbumAsync()
     {
-        bool updated = await _editService.EditAlbumAsync(Album);
+        AlbumEditResult result = await _editService.EditAlbumAsync(Album);
 
-        if (!updated)
+        if (result.Updated)
+        {
+            _messenger.Send(new AlbumUpdateMessage(Album.Id, ActionType.Update));
+            OnPropertyChanged(nameof(Album));
+            NotifyAlbumDerivedProperties();
+        }
+
+        if (result.TagsChanged)
+            await ApplyTagWriteAsync(result.Outcome!);
+    }
+
+    [RelayCommand(CanExecute = nameof(IsEntityLoaded))]
+    private async Task ResumeTagWriteAsync()
+    {
+        AlbumEditResult result = await _editService.ResumeTagWriteAsync(Album);
+
+        if (result.TagsChanged)
+            await ApplyTagWriteAsync(result.Outcome!);
+    }
+
+    [RelayCommand(CanExecute = nameof(CanExecuteMerge))]
+    private async Task MergeWithAsync()
+    {
+        AlbumTagWriteOutcome? outcome = await _editService.MergeWithAsync(Album);
+
+        if (outcome?.State is EArtistRenameState.Completed or EArtistRenameState.Partial)
+            await ApplyTagWriteAsync(outcome);
+    }
+
+    private async Task ApplyTagWriteAsync(AlbumTagWriteOutcome outcome)
+    {
+        CancellationToken token = _navigationCts.Token;
+        bool displayedIsMerged = outcome.DeletedAlbumIds.Contains(Album.Id);
+
+        HasPendingTagWrite = outcome.State == EArtistRenameState.Partial;
+
+        _messenger.Send(new AlbumUpdateMessage(outcome.AlbumId, ActionType.Update));
+
+        foreach (long artistId in outcome.UpdatedArtistIds)
+            _messenger.Send(new ArtistUpdateMessage(artistId, ActionType.Update));
+
+        foreach (long albumId in outcome.DeletedAlbumIds)
+            _messenger.Send(new AlbumUpdateMessage(albumId, ActionType.Delete));
+
+        if (displayedIsMerged)
+        {
+            _navigationService.NavigateToAlbum(outcome.AlbumId);
+            return;
+        }
+
+        AlbumDto? reloaded = await _dataLoader.ReloadAlbumAsync(Album.Id);
+
+        if (reloaded is null || token.IsCancellationRequested)
             return;
 
-        _messenger.Send(new AlbumUpdateMessage(Album.Id, ActionType.Update));
-        OnPropertyChanged(nameof(Album));
-        NotifyAlbumDerivedProperties();
+        Album = reloaded;
+        UpdateDominantColor();
+
+        await LoadTracksAsync(Album.Id, token);
     }
 
     [RelayCommand(CanExecute = nameof(IsEntityLoaded))]

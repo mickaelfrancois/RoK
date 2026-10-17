@@ -140,6 +140,18 @@ internal sealed class FlacTagFormat : ITagFormat
             names.Add("ALBUM ARTIST");
         }
 
+        if (changes.Album is not null)
+            names.Add("ALBUM");
+
+        if (changes.Genre is not null)
+            names.Add("GENRE");
+
+        if (changes.Year is not null)
+        {
+            names.Add("DATE");
+            names.Add("YEAR");
+        }
+
         return names;
     }
 

@@ -83,6 +83,18 @@ internal sealed class Mp4TagFormat : ITagFormat
             types.Add("aART");
         }
 
+        if (changes.Album is not null)
+            types.Add("©alb");
+
+        if (changes.Genre is not null)
+        {
+            types.Add("©gen");
+            types.Add("gnre");
+        }
+
+        if (changes.Year is not null)
+            types.Add("©day");
+
         return types;
     }
 }

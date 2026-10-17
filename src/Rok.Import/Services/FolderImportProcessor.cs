@@ -58,6 +58,7 @@ public class FolderImportProcessor(
             return;
 
         _trackFileProcessor.ReadMusicProperties(files);
+        PendingTagWriteOverlay.Apply(files, _importTrack);
         _trackFileProcessor.DetectCompilations(files);
 
         IReadOnlyDictionary<string, KnownFolderAlbum> knownAlbums = FolderAlbumIdentity.Resolve(files, _importTrack, _importAlbum);

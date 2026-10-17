@@ -2687,4 +2687,211 @@
   <data name="artistMergeError_NotFound" xml:space="preserve">
     <value>Виконавця більше не існує.</value>
   </data>
+  <data name="albumNameInput.Header" xml:space="preserve">
+    <value>Назва</value>
+  </data>
+  <data name="albumArtistInput.Header" xml:space="preserve">
+    <value>Виконавець</value>
+  </data>
+  <data name="albumYearInput.Header" xml:space="preserve">
+    <value>Рік</value>
+  </data>
+  <data name="albumGenreInput.Header" xml:space="preserve">
+    <value>Жанр</value>
+  </data>
+  <data name="albumEditError_GenreFromArtist" xml:space="preserve">
+    <value>Імпорт надає кожній композиції жанр її виконавця, тому жанр альбому не можна змінити, поки ця опція ввімкнена.</value>
+  </data>
+  <data name="albumGenreLockedNote.Text" xml:space="preserve">
+    <value>Заблоковано: імпорт надає кожній композиції жанр її виконавця (див. Параметри).</value>
+  </data>
+  <data name="AlbumTagWriteDialog.Title" xml:space="preserve">
+    <value>Змінити альбом</value>
+  </data>
+  <data name="AlbumTagWriteDialog.CloseButtonText" xml:space="preserve">
+    <value>Закрити</value>
+  </data>
+  <data name="albumTagWritePendingBar.Title" xml:space="preserve">
+    <value>Незавершена зміна</value>
+  </data>
+  <data name="albumTagWritePendingBar.Message" xml:space="preserve">
+    <value>Деякі файли досі мають старі значення. Завершіть зміну, щоб оновити їх.</value>
+  </data>
+  <data name="albumTagWriteResumeButton.Content" xml:space="preserve">
+    <value>Відновити</value>
+  </data>
+  <data name="albumEditChangeName" xml:space="preserve">
+    <value>Назва: {0} → {1}</value>
+  </data>
+  <data name="albumEditChangeArtist" xml:space="preserve">
+    <value>Виконавець: {0} → {1}</value>
+  </data>
+  <data name="albumEditChangeYear" xml:space="preserve">
+    <value>Рік: {0} → {1}</value>
+  </data>
+  <data name="albumEditChangeGenre" xml:space="preserve">
+    <value>Жанр: {0} → {1}</value>
+  </data>
+  <data name="albumEditCounts" xml:space="preserve">
+    <value>Буде оновлено файлів: {0}.</value>
+  </data>
+  <data name="albumEditArtistCreated" xml:space="preserve">
+    <value>Буде створено виконавця «{0}».</value>
+  </data>
+  <data name="albumEditGenreCreated" xml:space="preserve">
+    <value>Буде створено жанр «{0}».</value>
+  </data>
+  <data name="albumEditGenreKept" xml:space="preserve">
+    <value>Композицій зі своїм жанром: {0}. Вони його зберігають.</value>
+  </data>
+  <data name="albumEditOtherArtistKept" xml:space="preserve">
+    <value>Композицій іншого виконавця: {0}. Вони зберігають свого виконавця.</value>
+  </data>
+  <data name="albumEditOrphanArtist" xml:space="preserve">
+    <value>У «{0}» не залишиться жодної композиції, тож наступне очищення бібліотеки видалить його разом із його прослуховуваннями ({1}).</value>
+  </data>
+  <data name="albumEditOrphanFavoriteArtist" xml:space="preserve">
+    <value>«{0}» — улюблений виконавець, і в нього не залишиться жодної композиції. Наступне очищення бібліотеки видалить його разом із його прослуховуваннями ({1}).</value>
+  </data>
+  <data name="albumEditResumeIntro" xml:space="preserve">
+    <value>Файли, що досі мають старі значення, буде записано знову зі значеннями з бібліотеки.</value>
+  </data>
+  <data name="albumEditCollision" xml:space="preserve">
+    <value>Альбом «{0}» виконавця {1} уже існує (композицій: {2}).</value>
+  </data>
+  <data name="albumEditBlockersHeader" xml:space="preserve">
+    <value>Зміну неможливо розпочати:</value>
+  </data>
+  <data name="albumEditFailuresHeader" xml:space="preserve">
+    <value>Ці файли не вдалося оновити:</value>
+  </data>
+  <data name="albumEditStart" xml:space="preserve">
+    <value>Змінити</value>
+  </data>
+  <data name="albumEditResume" xml:space="preserve">
+    <value>Відновити</value>
+  </data>
+  <data name="albumEditRetry" xml:space="preserve">
+    <value>Повторити</value>
+  </data>
+  <data name="albumEditError_Generic" xml:space="preserve">
+    <value>Не вдалося змінити альбом.</value>
+  </data>
+  <data name="albumEditError_InvalidName" xml:space="preserve">
+    <value>Назва не може бути порожньою або довшою за 255 символів.</value>
+  </data>
+  <data name="albumEditError_InvalidArtist" xml:space="preserve">
+    <value>Виконавець не може бути порожнім або довшим за 255 символів.</value>
+  </data>
+  <data name="albumEditError_InvalidGenre" xml:space="preserve">
+    <value>Жанр не може бути довшим за 255 символів.</value>
+  </data>
+  <data name="albumEditError_InvalidYear" xml:space="preserve">
+    <value>Рік має бути числом від 1 до 9999.</value>
+  </data>
+  <data name="albumEditError_NoArtist" xml:space="preserve">
+    <value>Цей альбом не має виконавця, тому його неможливо змінити.</value>
+  </data>
+  <data name="albumEditError_Pending" xml:space="preserve">
+    <value>Деякі файли цього альбому очікують завершення зміни. Спершу відновіть її.</value>
+  </data>
+  <data name="albumEditError_CompilationArtist" xml:space="preserve">
+    <value>Виконавця збірки змінити не можна.</value>
+  </data>
+  <data name="albumEditError_ArtistPendingRename" xml:space="preserve">
+    <value>Виконавець, якого стосується ця зміна, має незавершене перейменування.</value>
+  </data>
+  <data name="albumEditError_Unchanged" xml:space="preserve">
+    <value>Альбом уже має ці значення.</value>
+  </data>
+  <data name="albumEditError_GenreUnused" xml:space="preserve">
+    <value>Жодна композиція не має жанру альбому, тому наступне очищення бібліотеки видалило б новий жанр.</value>
+  </data>
+  <data name="albumEditError_Collision" xml:space="preserve">
+    <value>Інший альбом уже має цю назву.</value>
+  </data>
+  <data name="albumEditError_NotFound" xml:space="preserve">
+    <value>Альбому більше не існує.</value>
+  </data>
+  <data name="MergeAlbumDialog.Title" xml:space="preserve">
+    <value>Об'єднати альбоми</value>
+  </data>
+  <data name="albumMenuMerge.Text" xml:space="preserve">
+    <value>Об'єднати з…</value>
+  </data>
+  <data name="albumMergeCollision" xml:space="preserve">
+    <value>Альбом «{0}» виконавця {1} уже існує (композицій: {2}). Об'єднати ці два альбоми?</value>
+  </data>
+  <data name="albumMergeSummary" xml:space="preserve">
+    <value>«{0}» виконавця {1} буде об'єднано з «{2}» виконавця {3}.</value>
+  </data>
+  <data name="albumMergeArtistChange" xml:space="preserve">
+    <value>Композиції виконавця {0} перейдуть до {1}.</value>
+  </data>
+  <data name="albumMergeSeparateFolders" xml:space="preserve">
+    <value>Обидва альбоми лежать у різних папках. Файли залишаються на місці.</value>
+  </data>
+  <data name="albumMergeConflictsHeader" xml:space="preserve">
+    <value>Різні значення (використовується значення збереженого альбому):</value>
+  </data>
+  <data name="albumMergeConflictLine" xml:space="preserve">
+    <value>{0}: {1} (збережено) / {2} (втрачено)</value>
+  </data>
+  <data name="albumMergeDiscConflictsHeader" xml:space="preserve">
+    <value>Композиції з однаковим диском і номером доріжки:</value>
+  </data>
+  <data name="albumMergeDiscConflictLine" xml:space="preserve">
+    <value>Диск {0}, доріжка {1}: «{2}» і «{3}»</value>
+  </data>
+  <data name="albumMergeShiftDiscs" xml:space="preserve">
+    <value>Пересунути диски об'єднуваного альбому після дисків збереженого (+{0})</value>
+  </data>
+  <data name="albumMergeBlockersHeader" xml:space="preserve">
+    <value>Об'єднання не може початися:</value>
+  </data>
+  <data name="albumMergeFailuresHeader" xml:space="preserve">
+    <value>Ці файли не вдалося оновити:</value>
+  </data>
+  <data name="albumMergeKeepHeader" xml:space="preserve">
+    <value>Альбом, який зберегти</value>
+  </data>
+  <data name="albumMergeOtherPlaceholder" xml:space="preserve">
+    <value>Знайдіть альбом для об'єднання</value>
+  </data>
+  <data name="albumMergeStart" xml:space="preserve">
+    <value>Об'єднати</value>
+  </data>
+  <data name="albumMergeResume" xml:space="preserve">
+    <value>Відновити</value>
+  </data>
+  <data name="albumMergeCancel" xml:space="preserve">
+    <value>Скасувати</value>
+  </data>
+  <data name="albumMergeClose" xml:space="preserve">
+    <value>Закрити</value>
+  </data>
+  <data name="albumMergeError_Generic" xml:space="preserve">
+    <value>Не вдалося об'єднати альбоми.</value>
+  </data>
+  <data name="albumMergeError_SameAlbum" xml:space="preserve">
+    <value>Виберіть два різні альбоми.</value>
+  </data>
+  <data name="albumMergeError_Compilation" xml:space="preserve">
+    <value>Збірку не можна об'єднати.</value>
+  </data>
+  <data name="albumMergeError_NoArtist" xml:space="preserve">
+    <value>Альбом без виконавця не можна об'єднати.</value>
+  </data>
+  <data name="albumMergeError_Pending" xml:space="preserve">
+    <value>Деякі файли альбому очікують завершення редагування. Спершу відновіть його.</value>
+  </data>
+  <data name="albumMergeError_ArtistPendingRename" xml:space="preserve">
+    <value>Перейменування одного з виконавців очікує завершення. Спершу відновіть його.</value>
+  </data>
+  <data name="albumMergeError_Conflicts" xml:space="preserve">
+    <value>Деякі композиції мають однаковий диск і номер доріжки. Пересуньте диски, щоб об'єднати.</value>
+  </data>
+  <data name="albumMergeError_NotFound" xml:space="preserve">
+    <value>Альбому більше не існує.</value>
+  </data>
 </root>

@@ -1,6 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
 using Rok.Application.Tag;
-using Rok.Shared.Extensions;
 
 namespace Rok.Infrastructure.Tag;
 
@@ -34,9 +33,9 @@ public class TagService(ILogger<TagService> logger) : ITagService
 
             track.Title = values.Title;
             track.Artist = values.Artist;
-            track.Album = (tag.Tag.Album?.Trim() ?? "").NormalizeIndexedName();
-            track.Genre = (tag.Tag.FirstGenre?.Trim() ?? "").NormalizeIndexedName();
-            track.Year = tag.Tag.Year > 0 ? (int)tag.Tag.Year : null;
+            track.Album = values.Album;
+            track.Genre = values.Genre;
+            track.Year = values.Year;
             track.TrackNumber = values.TrackNumber;
             track.Duration = tag.Properties.Duration;
             track.Bitrate = tag.Properties.AudioBitrate * 1000;

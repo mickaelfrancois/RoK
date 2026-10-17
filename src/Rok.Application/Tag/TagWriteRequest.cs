@@ -37,9 +37,25 @@ public sealed record TagChanges
     public string? Artist { get; init; }
 
     /// <summary>
+    /// New album name, or null to keep the current one.
+    /// </summary>
+    public string? Album { get; init; }
+
+    /// <summary>
+    /// New year (positive), or null to keep the current one. A full date in the file is replaced by the year.
+    /// </summary>
+    public int? Year { get; init; }
+
+    /// <summary>
+    /// New first genre, or null to keep it. Only the first value is replaced, the other ones are kept.
+    /// </summary>
+    public string? Genre { get; init; }
+
+    /// <summary>
     /// Tells whether at least one field is to be changed.
     /// </summary>
-    public bool HasChanges => Title is not null || TrackNumber is not null || Disc is not null || Composers is not null || Bpm is not null || Artist is not null;
+    public bool HasChanges => Title is not null || TrackNumber is not null || Disc is not null || Composers is not null || Bpm is not null || Artist is not null
+        || Album is not null || Year is not null || Genre is not null;
 }
 
 /// <summary>

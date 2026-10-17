@@ -2797,4 +2797,211 @@
   <data name="artistMergeError_NotFound" xml:space="preserve">
     <value>An artist no longer exists.</value>
   </data>
+  <data name="albumNameInput.Header" xml:space="preserve">
+    <value>Name</value>
+  </data>
+  <data name="albumArtistInput.Header" xml:space="preserve">
+    <value>Artist</value>
+  </data>
+  <data name="albumYearInput.Header" xml:space="preserve">
+    <value>Year</value>
+  </data>
+  <data name="albumGenreInput.Header" xml:space="preserve">
+    <value>Genre</value>
+  </data>
+  <data name="albumEditError_GenreFromArtist" xml:space="preserve">
+    <value>The import gives each track the genre of its artist, so the album genre cannot be edited while that option is on.</value>
+  </data>
+  <data name="albumGenreLockedNote.Text" xml:space="preserve">
+    <value>Locked: the import gives each track the genre of its artist (see Options).</value>
+  </data>
+  <data name="AlbumTagWriteDialog.Title" xml:space="preserve">
+    <value>Edit the album</value>
+  </data>
+  <data name="AlbumTagWriteDialog.CloseButtonText" xml:space="preserve">
+    <value>Close</value>
+  </data>
+  <data name="albumTagWritePendingBar.Title" xml:space="preserve">
+    <value>Incomplete edit</value>
+  </data>
+  <data name="albumTagWritePendingBar.Message" xml:space="preserve">
+    <value>Some files still carry the old values. Finish the edit to update them.</value>
+  </data>
+  <data name="albumTagWriteResumeButton.Content" xml:space="preserve">
+    <value>Resume</value>
+  </data>
+  <data name="albumEditChangeName" xml:space="preserve">
+    <value>Name: {0} → {1}</value>
+  </data>
+  <data name="albumEditChangeArtist" xml:space="preserve">
+    <value>Artist: {0} → {1}</value>
+  </data>
+  <data name="albumEditChangeYear" xml:space="preserve">
+    <value>Year: {0} → {1}</value>
+  </data>
+  <data name="albumEditChangeGenre" xml:space="preserve">
+    <value>Genre: {0} → {1}</value>
+  </data>
+  <data name="albumEditCounts" xml:space="preserve">
+    <value>{0} files will be updated.</value>
+  </data>
+  <data name="albumEditArtistCreated" xml:space="preserve">
+    <value>The artist “{0}” will be created.</value>
+  </data>
+  <data name="albumEditGenreCreated" xml:space="preserve">
+    <value>The genre “{0}” will be created.</value>
+  </data>
+  <data name="albumEditGenreKept" xml:space="preserve">
+    <value>{0} tracks keep their own genre.</value>
+  </data>
+  <data name="albumEditOtherArtistKept" xml:space="preserve">
+    <value>{0} tracks of another artist keep their artist.</value>
+  </data>
+  <data name="albumEditOrphanArtist" xml:space="preserve">
+    <value>“{0}” will have no track left and will be removed by the next library cleaning, with its {1} listens.</value>
+  </data>
+  <data name="albumEditOrphanFavoriteArtist" xml:space="preserve">
+    <value>“{0}” is a favorite and will have no track left. The next library cleaning will remove it, with its {1} listens.</value>
+  </data>
+  <data name="albumEditResumeIntro" xml:space="preserve">
+    <value>The files that still carry the old values will be written again with the values of the library.</value>
+  </data>
+  <data name="albumEditCollision" xml:space="preserve">
+    <value>An album “{0}” by {1} already exists ({2} tracks).</value>
+  </data>
+  <data name="albumEditBlockersHeader" xml:space="preserve">
+    <value>The edit cannot start:</value>
+  </data>
+  <data name="albumEditFailuresHeader" xml:space="preserve">
+    <value>These files could not be updated:</value>
+  </data>
+  <data name="albumEditStart" xml:space="preserve">
+    <value>Edit</value>
+  </data>
+  <data name="albumEditResume" xml:space="preserve">
+    <value>Resume</value>
+  </data>
+  <data name="albumEditRetry" xml:space="preserve">
+    <value>Try again</value>
+  </data>
+  <data name="albumEditError_Generic" xml:space="preserve">
+    <value>The album could not be edited.</value>
+  </data>
+  <data name="albumEditError_InvalidName" xml:space="preserve">
+    <value>The name cannot be empty or longer than 255 characters.</value>
+  </data>
+  <data name="albumEditError_InvalidArtist" xml:space="preserve">
+    <value>The artist cannot be empty or longer than 255 characters.</value>
+  </data>
+  <data name="albumEditError_InvalidGenre" xml:space="preserve">
+    <value>The genre cannot be longer than 255 characters.</value>
+  </data>
+  <data name="albumEditError_InvalidYear" xml:space="preserve">
+    <value>The year must be a number between 1 and 9999.</value>
+  </data>
+  <data name="albumEditError_NoArtist" xml:space="preserve">
+    <value>This album has no artist and cannot be edited.</value>
+  </data>
+  <data name="albumEditError_Pending" xml:space="preserve">
+    <value>Some files of this album are waiting for an edit to finish. Resume it first.</value>
+  </data>
+  <data name="albumEditError_CompilationArtist" xml:space="preserve">
+    <value>The artist of a compilation cannot be changed.</value>
+  </data>
+  <data name="albumEditError_ArtistPendingRename" xml:space="preserve">
+    <value>An artist involved in this edit has a rename waiting to finish.</value>
+  </data>
+  <data name="albumEditError_Unchanged" xml:space="preserve">
+    <value>The album already has these values.</value>
+  </data>
+  <data name="albumEditError_GenreUnused" xml:space="preserve">
+    <value>No track carries the album genre, so the new genre would be removed by the next library cleaning.</value>
+  </data>
+  <data name="albumEditError_Collision" xml:space="preserve">
+    <value>Another album already has this name.</value>
+  </data>
+  <data name="albumEditError_NotFound" xml:space="preserve">
+    <value>The album no longer exists.</value>
+  </data>
+  <data name="MergeAlbumDialog.Title" xml:space="preserve">
+    <value>Merge albums</value>
+  </data>
+  <data name="albumMenuMerge.Text" xml:space="preserve">
+    <value>Merge with…</value>
+  </data>
+  <data name="albumMergeCollision" xml:space="preserve">
+    <value>An album “{0}” by {1} already exists ({2} tracks). Merge the two albums?</value>
+  </data>
+  <data name="albumMergeSummary" xml:space="preserve">
+    <value>“{0}” by {1} will be merged into “{2}” by {3}.</value>
+  </data>
+  <data name="albumMergeArtistChange" xml:space="preserve">
+    <value>The tracks of {0} will move to {1}.</value>
+  </data>
+  <data name="albumMergeSeparateFolders" xml:space="preserve">
+    <value>The two albums are in different folders. The files stay where they are.</value>
+  </data>
+  <data name="albumMergeConflictsHeader" xml:space="preserve">
+    <value>Different values (the value of the kept album is used):</value>
+  </data>
+  <data name="albumMergeConflictLine" xml:space="preserve">
+    <value>{0}: {1} (kept) / {2} (lost)</value>
+  </data>
+  <data name="albumMergeDiscConflictsHeader" xml:space="preserve">
+    <value>Tracks that share a disc and a track number:</value>
+  </data>
+  <data name="albumMergeDiscConflictLine" xml:space="preserve">
+    <value>Disc {0}, track {1}: “{2}” and “{3}”</value>
+  </data>
+  <data name="albumMergeShiftDiscs" xml:space="preserve">
+    <value>Move the discs of the merged album after those of the kept one (+{0})</value>
+  </data>
+  <data name="albumMergeBlockersHeader" xml:space="preserve">
+    <value>The merge cannot start:</value>
+  </data>
+  <data name="albumMergeFailuresHeader" xml:space="preserve">
+    <value>These files could not be updated:</value>
+  </data>
+  <data name="albumMergeKeepHeader" xml:space="preserve">
+    <value>Album to keep</value>
+  </data>
+  <data name="albumMergeOtherPlaceholder" xml:space="preserve">
+    <value>Search the album to merge with</value>
+  </data>
+  <data name="albumMergeStart" xml:space="preserve">
+    <value>Merge</value>
+  </data>
+  <data name="albumMergeResume" xml:space="preserve">
+    <value>Resume</value>
+  </data>
+  <data name="albumMergeCancel" xml:space="preserve">
+    <value>Cancel</value>
+  </data>
+  <data name="albumMergeClose" xml:space="preserve">
+    <value>Close</value>
+  </data>
+  <data name="albumMergeError_Generic" xml:space="preserve">
+    <value>The albums could not be merged.</value>
+  </data>
+  <data name="albumMergeError_SameAlbum" xml:space="preserve">
+    <value>Choose two different albums.</value>
+  </data>
+  <data name="albumMergeError_Compilation" xml:space="preserve">
+    <value>A compilation cannot be merged.</value>
+  </data>
+  <data name="albumMergeError_NoArtist" xml:space="preserve">
+    <value>An album without an artist cannot be merged.</value>
+  </data>
+  <data name="albumMergeError_Pending" xml:space="preserve">
+    <value>Some files of an album are waiting for an edit to finish. Resume it first.</value>
+  </data>
+  <data name="albumMergeError_ArtistPendingRename" xml:space="preserve">
+    <value>A rename is waiting to be finished on one of the artists. Resume it first.</value>
+  </data>
+  <data name="albumMergeError_Conflicts" xml:space="preserve">
+    <value>Some tracks share a disc and a track number. Move the discs to merge.</value>
+  </data>
+  <data name="albumMergeError_NotFound" xml:space="preserve">
+    <value>An album no longer exists.</value>
+  </data>
 </root>

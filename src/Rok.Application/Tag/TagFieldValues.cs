@@ -15,4 +15,22 @@ public sealed record TagFieldValues(string Title, int TrackNumber, int? Disc, st
     /// A tag write fills it only when the write changed the artist.
     /// </summary>
     public string Artist { get; init; } = "";
+
+    /// <summary>
+    /// Album as the library import reads it (trimmed, normalized), empty when absent.
+    /// A tag write fills it only when the write changed the album.
+    /// </summary>
+    public string Album { get; init; } = "";
+
+    /// <summary>
+    /// Year as the library import reads it, null when absent or not positive.
+    /// A tag write fills it only when the write changed the year.
+    /// </summary>
+    public int? Year { get; init; }
+
+    /// <summary>
+    /// First genre as the library import reads it (trimmed, normalized), empty when absent.
+    /// A tag write fills it only when the write changed the genre.
+    /// </summary>
+    public string Genre { get; init; } = "";
 }

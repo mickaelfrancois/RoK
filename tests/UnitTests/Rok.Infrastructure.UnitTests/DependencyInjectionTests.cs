@@ -37,6 +37,46 @@ public class DependencyInjectionTests
         Assert.Contains(services, d => d.ServiceType == typeof(IMigration) && d.ImplementationType == typeof(Migration20));
     }
 
+    [Fact(DisplayName = "migration_21_is_registered")]
+    public void AddInfrastructure_RegistersMigration21()
+    {
+        // Act
+        var services = Register();
+
+        // Assert
+        Assert.Contains(services, d => d.ServiceType == typeof(IMigration) && d.ImplementationType == typeof(Migration21));
+    }
+
+    [Fact(DisplayName = "pending_tag_write_repository_is_registered")]
+    public void AddInfrastructure_RegistersPendingTagWriteRepository()
+    {
+        // Act
+        var services = Register();
+
+        // Assert
+        Assert.Contains(services, d => d.ServiceType == typeof(IPendingTagWriteRepository) && d.ImplementationType == typeof(PendingTagWriteRepository));
+    }
+
+    [Fact(DisplayName = "album_edit_repository_is_registered")]
+    public void AddInfrastructure_RegistersAlbumEditRepository()
+    {
+        // Act
+        var services = Register();
+
+        // Assert
+        Assert.Contains(services, d => d.ServiceType == typeof(IAlbumEditRepository) && d.ImplementationType == typeof(AlbumEditRepository));
+    }
+
+    [Fact(DisplayName = "album_merge_repository_is_registered")]
+    public void AddInfrastructure_RegistersAlbumMergeRepository()
+    {
+        // Act
+        var services = Register();
+
+        // Assert
+        Assert.Contains(services, d => d.ServiceType == typeof(IAlbumMergeRepository) && d.ImplementationType == typeof(AlbumMergeRepository));
+    }
+
     [Fact(DisplayName = "artist_rename_repository_is_registered")]
     public void AddInfrastructure_RegistersArtistRenameRepository()
     {

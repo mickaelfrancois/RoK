@@ -41,4 +41,7 @@ public interface ITrackRepository : IRepository<TrackEntity>
     Task<bool> UpdateGetLyricsLastAttemptAsync(long id, RepositoryConnectionKind kind = RepositoryConnectionKind.Foreground);
 
     Task<TrackEntity?> GetByFilePathAsync(string filePath, CancellationToken cancellationToken);
+
+    /// <summary>Gets the tracks whose file does not carry yet the tag fields held by the database. Rows of deleted tracks are ignored.</summary>
+    Task<IEnumerable<PendingTagWrite>> GetPendingTagWritesAsync(RepositoryConnectionKind kind = RepositoryConnectionKind.Foreground);
 }

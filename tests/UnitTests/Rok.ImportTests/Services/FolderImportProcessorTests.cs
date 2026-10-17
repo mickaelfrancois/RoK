@@ -3,6 +3,7 @@ using Microsoft.Extensions.Time.Testing;
 using Moq;
 using Rok.Application.Interfaces.Repositories;
 using Rok.Application.Services;
+using Rok.Domain.Enums;
 using Rok.Import;
 using Rok.Import.Services;
 
@@ -270,6 +271,114 @@ public sealed class FolderImportProcessorTests : IDisposable
         VerifyNoCompilationUpdate(albumRepository);
     }
 
+    [Fact(DisplayName = "pending_old_artist_file_does_not_switch_the_album_to_compilation")]
+    public async Task ImportFolder_PendingFileKeepsOldArtist_ShouldNotSwitchTheAlbumToCompilation()
+    {
+        // Arrange
+        string[] paths = CreateFiles("a-written", "b-pending");
+        PendingScenario scenario = await BuildPendingScenarioAsync(
+            paths,
+            file => file.Artist = file.FullPath == paths[1] ? "Old Artist" : "Artist A",
+            new PendingTagWrite(2, ETagWriteFields.Artist));
+
+        // Act
+        await scenario.Sut.ImportFolderAsync(_folder.FullName, new ImportStatisticsDto(), CancellationToken.None);
+
+        // Assert
+        VerifyNoCompilationUpdate(scenario.Albums);
+        scenario.Artists.Verify(r => r.AddAsync(It.IsAny<ArtistEntity>(), It.IsAny<RepositoryConnectionKind>()), Times.Never);
+        _trackRepository.Verify(r => r.UpdateAsync(It.IsAny<TrackEntity>(), It.IsAny<RepositoryConnectionKind>()), Times.Never);
+    }
+
+    [Fact(DisplayName = "old_artist_file_without_pending_row_still_switches_the_album_to_compilation")]
+    public async Task ImportFolder_OldArtistFileWithoutPendingRow_ShouldSwitchTheAlbumToCompilation()
+    {
+        // Arrange
+        string[] paths = CreateFiles("a-written", "b-stale");
+        PendingScenario scenario = await BuildPendingScenarioAsync(
+            paths,
+            file => file.Artist = file.FullPath == paths[1] ? "Old Artist" : "Artist A");
+
+        // Act
+        await scenario.Sut.ImportFolderAsync(_folder.FullName, new ImportStatisticsDto(), CancellationToken.None);
+
+        // Assert
+        scenario.Albums.Verify(
+            r => r.UpdateCompilationAsync(10, true, It.IsAny<long?>(), RepositoryConnectionKind.Background),
+            Times.Once);
+    }
+
+    [Fact(DisplayName = "pending_renamed_file_never_creates_the_old_album")]
+    public async Task ImportFolder_PendingFileKeepsOldAlbumName_ShouldNotCreateAnAlbum()
+    {
+        // Arrange
+        string[] paths = CreateFiles("a-pending", "b-pending");
+        PendingScenario scenario = await BuildPendingScenarioAsync(
+            paths,
+            file => file.Album = "Old Name",
+            new PendingTagWrite(1, ETagWriteFields.Album),
+            new PendingTagWrite(2, ETagWriteFields.Album));
+
+        // Act
+        await scenario.Sut.ImportFolderAsync(_folder.FullName, new ImportStatisticsDto(), CancellationToken.None);
+
+        // Assert
+        scenario.Albums.Verify(r => r.AddAsync(It.IsAny<AlbumEntity>(), It.IsAny<RepositoryConnectionKind>()), Times.Never);
+        _trackRepository.Verify(r => r.UpdateAsync(It.IsAny<TrackEntity>(), It.IsAny<RepositoryConnectionKind>()), Times.Never);
+    }
+
+    [Fact(DisplayName = "renamed_file_without_pending_row_creates_the_old_album")]
+    public async Task ImportFolder_OldAlbumNameWithoutPendingRow_ShouldCreateAnAlbum()
+    {
+        // Arrange
+        string[] paths = CreateFiles("a-stale", "b-stale");
+        PendingScenario scenario = await BuildPendingScenarioAsync(paths, file => file.Album = "Old Name");
+
+        // Act
+        await scenario.Sut.ImportFolderAsync(_folder.FullName, new ImportStatisticsDto(), CancellationToken.None);
+
+        // Assert
+        scenario.Albums.Verify(r => r.AddAsync(It.IsAny<AlbumEntity>(), It.IsAny<RepositoryConnectionKind>()), Times.Once);
+    }
+
+    [Fact(DisplayName = "pending_genre_and_disc_are_not_reverted_by_the_file")]
+    public async Task ImportFolder_PendingFileKeepsOldGenreAndDisc_ShouldLeaveTheTrackUnchanged()
+    {
+        // Arrange
+        string[] paths = CreateFiles("a-pending", "b-known");
+        PendingScenario scenario = await BuildPendingScenarioAsync(
+            paths,
+            file =>
+            {
+                file.Genre = file.FullPath == paths[0] ? "Old Genre" : "New Genre";
+                file.Disc = file.FullPath == paths[0] ? 1 : 2;
+            },
+            new PendingTagWrite(1, ETagWriteFields.Genre | ETagWriteFields.Disc));
+
+        // Act
+        await scenario.Sut.ImportFolderAsync(_folder.FullName, new ImportStatisticsDto(), CancellationToken.None);
+
+        // Assert
+        scenario.Genres.Verify(r => r.AddAsync(It.IsAny<GenreEntity>(), It.IsAny<RepositoryConnectionKind>()), Times.Never);
+        _trackRepository.Verify(r => r.UpdateAsync(It.IsAny<TrackEntity>(), It.IsAny<RepositoryConnectionKind>()), Times.Never);
+    }
+
+    [Fact(DisplayName = "old_disc_file_without_pending_row_updates_the_track")]
+    public async Task ImportFolder_OldDiscWithoutPendingRow_ShouldUpdateTheTrack()
+    {
+        // Arrange
+        string[] paths = CreateFiles("a-stale", "b-known");
+        PendingScenario scenario = await BuildPendingScenarioAsync(
+            paths,
+            file => file.Disc = file.FullPath == paths[0] ? 1 : 2);
+
+        // Act
+        await scenario.Sut.ImportFolderAsync(_folder.FullName, new ImportStatisticsDto(), CancellationToken.None);
+
+        // Assert
+        _trackRepository.Verify(r => r.UpdateAsync(It.IsAny<TrackEntity>(), It.IsAny<RepositoryConnectionKind>()), Times.Once);
+    }
+
     public void Dispose()
     {
         try
@@ -380,5 +489,89 @@ public sealed class FolderImportProcessorTests : IDisposable
         _trackRepository.Setup(r => r.GetAllAsync(It.IsAny<RepositoryConnectionKind>())).ReturnsAsync(tracks);
 
         return _trackImport.LoadCacheAsync();
+    }
+
+    private sealed record PendingScenario(
+        FolderImportProcessor Sut,
+        Mock<IAlbumRepository> Albums,
+        Mock<IArtistRepository> Artists,
+        Mock<IGenreRepository> Genres);
+
+    private async Task<PendingScenario> BuildPendingScenarioAsync(
+        string[] paths,
+        Action<TrackFile> fileValues,
+        params PendingTagWrite[] pending)
+    {
+        _tagService.Setup(t => t.FillMusicProperties(It.IsAny<string>(), It.IsAny<TrackFile>()))
+            .Callback<string, TrackFile>((_, file) =>
+            {
+                file.Album = "Edited Album";
+                file.Artist = "Artist A";
+                file.Genre = "New Genre";
+                file.Disc = 2;
+                fileValues(file);
+            });
+
+        Mock<IAlbumRepository> albums = new();
+        albums.Setup(r => r.GetAllAsync(It.IsAny<RepositoryConnectionKind>()))
+            .ReturnsAsync([new AlbumEntity { Id = 10, Name = "Edited Album", ArtistId = 1, GenreId = 7, IsCompilation = false }]);
+
+        Mock<IArtistRepository> artists = new();
+        artists.Setup(r => r.GetAllAsync(It.IsAny<RepositoryConnectionKind>()))
+            .ReturnsAsync([new ArtistEntity { Id = 1, Name = "Artist A" }]);
+
+        Mock<IGenreRepository> genres = new();
+        genres.Setup(r => r.GetAllAsync(It.IsAny<RepositoryConnectionKind>()))
+            .ReturnsAsync([new GenreEntity { Id = 7, Name = "New Genre" }]);
+
+        FakeTimeProvider time = new();
+        AlbumImport albumImport = new(albums.Object, time);
+        ArtistImport artistImport = new(artists.Object, time);
+        GenreImport genreImport = new(genres.Object, time);
+
+        await albumImport.LoadCacheAsync();
+        await artistImport.LoadCacheAsync();
+        await genreImport.LoadCacheAsync();
+
+        _trackRepository.Setup(r => r.GetPendingTagWritesAsync(It.IsAny<RepositoryConnectionKind>())).ReturnsAsync(pending);
+
+        await LoadCacheAsync(
+            StoredInEditedAlbum(1, paths[0]),
+            StoredInEditedAlbum(2, paths[1]));
+
+        FolderImportProcessor sut = new(
+            Mock.Of<IAppOptions>(),
+            _trackImport,
+            artistImport,
+            albumImport,
+            genreImport,
+            new FileSystemService(NullLogger<FileSystemService>.Instance),
+            new TrackFileProcessor(_tagService.Object, NullLogger<TrackFileProcessor>.Instance),
+            new TrackMetadataService(_trackImport, NullLogger<TrackMetadataService>.Instance, time),
+            new EmbeddedLyricsImporter(Mock.Of<ILyricsService>(), NullLogger<EmbeddedLyricsImporter>.Instance),
+            _tracking,
+            _tagService.Object,
+            new ImportMessageThrottler(),
+            Mock.Of<IMessenger>(),
+            NullLogger<FolderImportProcessor>.Instance);
+
+        return new PendingScenario(sut, albums, artists, genres);
+    }
+
+    private TrackEntity StoredInEditedAlbum(long id, string path)
+    {
+        return new TrackEntity
+        {
+            Id = id,
+            MusicFile = path,
+            FileDate = _fileDate.AddDays(-1),
+            ArtistId = 1,
+            AlbumId = 10,
+            GenreId = 7,
+            ArtistName = "Artist A",
+            AlbumName = "Edited Album",
+            GenreName = "New Genre",
+            Disc = 2,
+        };
     }
 }

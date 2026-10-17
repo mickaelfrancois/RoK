@@ -16,6 +16,10 @@ internal static class TagFormatHelpers
     private const string BpmFrameId = "TBPM";
     private const string PerformerFrameId = "TPE1";
     private const string AlbumArtistFrameId = "TPE2";
+    private const string AlbumFrameId = "TALB";
+    private const string GenreFrameId = "TCON";
+
+    private static readonly string[] YearFrameIds = ["TDRC", "TYER", "TDAT", "TIME"];
 
     private static readonly TagLib.TagTypes[] SecondaryTagTypes = [TagLib.TagTypes.Id3v1, TagLib.TagTypes.Ape];
 
@@ -57,6 +61,18 @@ internal static class TagFormatHelpers
         {
             ids.Add(PerformerFrameId);
             ids.Add(AlbumArtistFrameId);
+        }
+
+        if (changes.Album is not null)
+            ids.Add(AlbumFrameId);
+
+        if (changes.Genre is not null)
+            ids.Add(GenreFrameId);
+
+        if (changes.Year is not null)
+        {
+            foreach (string id in YearFrameIds)
+                ids.Add(id);
         }
 
         return ids;
@@ -105,6 +121,15 @@ internal static class TagFormatHelpers
 
         if (changes.Artist is not null)
             ApplyArtist(tag, changes.Artist, artistSource);
+
+        if (changes.Album is not null)
+            tag.Album = changes.Album;
+
+        if (changes.Genre is not null)
+            tag.Genres = TagFieldReader.ReplaceFirstArtistValue(tag.Genres, changes.Genre);
+
+        if (changes.Year is not null)
+            tag.Year = (uint)changes.Year.Value;
     }
 
     private static void ApplyArtist(TagLib.Tag tag, string artist, EArtistSource artistSource)

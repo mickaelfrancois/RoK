@@ -1,5 +1,6 @@
 ﻿using Microsoft.UI;
 using Microsoft.UI.Xaml.Controls;
+using Rok.Application.Features.Albums.Edit;
 using Rok.Application.Features.Artists.Merge;
 using Rok.Application.Features.Artists.Rename;
 using Rok.Application.Features.Tracks.Services;
@@ -12,7 +13,7 @@ namespace Rok.Services;
 
 public sealed class DialogService(ResourceLoader resourceLoader, ITranslateService translateService) : IDialogService
 {
-    public async Task<AlbumEditValues?> ShowEditAlbumAsync(AlbumEditValues current)
+    public async Task<AlbumEditValues?> ShowEditAlbumAsync(AlbumEditValues current, AlbumTaggedFieldsMode taggedMode, AlbumEditSuggestions suggestions, Func<AlbumEditValues, Task<string?>> validateAsync)
     {
         EditAlbumDialog dialog = new()
         {
@@ -28,6 +29,46 @@ public sealed class DialogService(ResourceLoader resourceLoader, ITranslateServi
             XamlRoot = App.MainWindow.Content.XamlRoot
         };
 
+        dialog.ApplyMode(taggedMode);
+        dialog.ApplyGenreLock(current.GenreLocked);
+        dialog.SetSuggestions(suggestions);
+        dialog.NameText = current.Name ?? string.Empty;
+        dialog.ArtistText = current.ArtistName ?? string.Empty;
+        dialog.YearText = current.Year ?? string.Empty;
+        dialog.GenreText = current.GenreName ?? string.Empty;
+
+        if (taggedMode != AlbumTaggedFieldsMode.Hidden)
+        {
+            dialog.PrimaryButtonClick += async (_, args) =>
+            {
+                ContentDialogButtonClickDeferral deferral = args.GetDeferral();
+
+                try
+                {
+                    dialog.SetBusy(true);
+
+                    string? error = await validateAsync(new AlbumEditValues
+                    {
+                        Name = dialog.NameText,
+                        ArtistName = dialog.ArtistText,
+                        Year = dialog.YearText,
+                        GenreName = dialog.GenreText
+                    });
+
+                    if (error is not null)
+                    {
+                        args.Cancel = true;
+                        dialog.ShowError(error);
+                    }
+                }
+                finally
+                {
+                    dialog.SetBusy(false);
+                    deferral.Complete();
+                }
+            };
+        }
+
         ContentDialogResult result = await dialog.ShowAsync();
 
         if (result != ContentDialogResult.Primary)
@@ -35,6 +76,10 @@ public sealed class DialogService(ResourceLoader resourceLoader, ITranslateServi
 
         return new AlbumEditValues
         {
+            Name = dialog.NameText,
+            ArtistName = dialog.ArtistText,
+            Year = dialog.YearText,
+            GenreName = dialog.GenreText,
             IsBestOf = dialog.IsBestOf,
             IsLive = dialog.IsLive,
             IsCompilation = dialog.IsCompilation,
@@ -44,6 +89,96 @@ public sealed class DialogService(ResourceLoader resourceLoader, ITranslateServi
             Biography = dialog.Biography,
             LastFmUrl = dialog.LastFmUrl
         };
+    }
+
+    public async Task<AlbumTagWriteOutcome?> ShowAlbumTagWriteAsync(AlbumTagWritePrompt prompt, Func<IProgress<ArtistRenameProgress>, Task<AlbumTagWriteAttempt>> writeAsync)
+    {
+        AlbumTagWriteDialog dialog = new(prompt, resourceLoader)
+        {
+            XamlRoot = App.MainWindow.Content.XamlRoot
+        };
+
+        AlbumTagWriteOutcome? last = null;
+
+        dialog.PrimaryButtonClick += async (_, args) =>
+        {
+            ContentDialogButtonClickDeferral deferral = args.GetDeferral();
+
+            try
+            {
+                dialog.SetRunning(true);
+
+                IProgress<ArtistRenameProgress> progress = new Progress<ArtistRenameProgress>(dialog.ReportProgress);
+                AlbumTagWriteAttempt attempt = await writeAsync(progress);
+
+                if (attempt.Outcome?.State is EArtistRenameState.Completed or EArtistRenameState.Partial)
+                    last = attempt.Outcome;
+
+                if (attempt.Outcome?.State == EArtistRenameState.Completed)
+                    return;
+
+                args.Cancel = true;
+                dialog.ShowAttempt(attempt);
+            }
+            finally
+            {
+                dialog.SetRunning(false);
+                deferral.Complete();
+            }
+        };
+
+        await dialog.ShowAsync();
+
+        return last;
+    }
+
+    public async Task<AlbumTagWriteOutcome?> ShowMergeAlbumsAsync(AlbumMergeDialogRequest request, AlbumMergeDialogActions actions)
+    {
+        MergeAlbumDialog dialog = new(request, actions, resourceLoader)
+        {
+            XamlRoot = App.MainWindow.Content.XamlRoot
+        };
+
+        AlbumTagWriteOutcome? last = null;
+
+        dialog.PrimaryButtonClick += async (_, args) =>
+        {
+            ContentDialogButtonClickDeferral deferral = args.GetDeferral();
+
+            try
+            {
+                (long SourceId, long TargetId)? pair = dialog.CurrentPair();
+
+                if (pair is null)
+                {
+                    args.Cancel = true;
+                    return;
+                }
+
+                dialog.SetRunning(true);
+
+                IProgress<ArtistRenameProgress> progress = new Progress<ArtistRenameProgress>(dialog.ReportProgress);
+                AlbumTagWriteAttempt attempt = await actions.MergeAsync(pair.Value.SourceId, pair.Value.TargetId, dialog.ShiftDiscs, progress);
+
+                if (attempt.Outcome?.State is EArtistRenameState.Completed or EArtistRenameState.Partial)
+                    last = attempt.Outcome;
+
+                if (attempt.Outcome?.State == EArtistRenameState.Completed)
+                    return;
+
+                args.Cancel = true;
+                dialog.ShowAttempt(attempt);
+            }
+            finally
+            {
+                dialog.SetRunning(false);
+                deferral.Complete();
+            }
+        };
+
+        await dialog.ShowAsync();
+
+        return last;
     }
 
     public async Task<ArtistEditValues?> ShowEditArtistAsync(ArtistEditValues current, ArtistNameMode nameMode, Func<string, Task<string?>> validateNameAsync)

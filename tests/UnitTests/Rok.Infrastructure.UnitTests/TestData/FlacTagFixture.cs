@@ -125,6 +125,31 @@ internal static class FlacTagFixture
         return path;
     }
 
+    /// <summary>
+    /// Creates the rich FLAC with the given <c>ALBUM</c>, <c>GENRE</c> values and raw <c>DATE</c> text (null for none).
+    /// </summary>
+    public static string CreateWithAlbumFields(string folder, string album, string[] genres, string? date, string fileName = "song.flac")
+    {
+        string path = CreateRich(folder, fileName);
+
+        using (TagLib.File file = TagLib.File.Create(path, "taglib/flac", TagLib.ReadStyle.Average))
+        {
+            TagLib.Ogg.XiphComment xiph = (TagLib.Ogg.XiphComment)file.GetTag(TagLib.TagTypes.Xiph, true);
+
+            xiph.Album = album;
+            xiph.Genres = genres;
+
+            if (date is not null)
+                xiph.SetField("DATE", date);
+
+            file.Save();
+        }
+
+        LowercaseFieldNameOnDisk(path);
+
+        return path;
+    }
+
     /// <summary>Creates a FLAC holding only STREAMINFO and audio frames: no Xiph comment, no padding.</summary>
     public static string CreateWithoutTags(string folder, string fileName = "song.flac")
     {

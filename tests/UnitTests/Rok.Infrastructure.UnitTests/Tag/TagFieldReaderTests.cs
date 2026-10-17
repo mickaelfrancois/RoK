@@ -60,6 +60,25 @@ public sealed class TagFieldReaderTests : IDisposable
         Assert.Equal(expected, TagFieldReader.Read(file.Tag).Artist);
     }
 
+    [Theory(DisplayName = "tag_field_reader_reads_album_genre_and_year_like_tag_service")]
+    [InlineData("  Spaced ‐ Album ", " Rock‐Pop ", "2001-05-12", "Spaced - Album", "Rock-Pop", 2001)]
+    [InlineData("Plain", "Jazz", "1999", "Plain", "Jazz", 1999)]
+    [InlineData("Plain", "Jazz", null, "Plain", "Jazz", null)]
+    public void Read_ShouldReadAlbumGenreAndYearLikeTagService(string album, string genre, string? date, string expectedAlbum, string expectedGenre, int? expectedYear)
+    {
+        // Arrange
+        string path = FlacTagFixture.CreateWithAlbumFields(_tempDir.FullName, album, [genre, "Other"], date);
+
+        // Act & Assert
+        AssertMatchesTagService(path);
+
+        using TagLib.File file = TagLib.File.Create(path);
+        TagFieldValues values = TagFieldReader.Read(file.Tag);
+        Assert.Equal(expectedAlbum, values.Album);
+        Assert.Equal(expectedGenre, values.Genre);
+        Assert.Equal(expectedYear, values.Year);
+    }
+
     [Theory(DisplayName = "replace_first_artist_value_replaces_the_first_and_keeps_the_others")]
     [InlineData("", "New", "New")]
     [InlineData("Old", "New", "New")]
@@ -108,5 +127,8 @@ public sealed class TagFieldReaderTests : IDisposable
         Assert.Equal(track.Bpm, values.Bpm);
         Assert.Equal(track.Composers, values.Composers);
         Assert.Equal(track.Artist, values.Artist);
+        Assert.Equal(track.Album, values.Album);
+        Assert.Equal(track.Genre, values.Genre);
+        Assert.Equal(track.Year, values.Year);
     }
 }

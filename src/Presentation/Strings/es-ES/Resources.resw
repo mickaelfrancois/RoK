@@ -2629,4 +2629,211 @@
   <data name="artistMergeError_NotFound" xml:space="preserve">
     <value>Un artista ya no existe.</value>
   </data>
+  <data name="albumNameInput.Header" xml:space="preserve">
+    <value>Nombre</value>
+  </data>
+  <data name="albumArtistInput.Header" xml:space="preserve">
+    <value>Artista</value>
+  </data>
+  <data name="albumYearInput.Header" xml:space="preserve">
+    <value>Año</value>
+  </data>
+  <data name="albumGenreInput.Header" xml:space="preserve">
+    <value>Género</value>
+  </data>
+  <data name="albumEditError_GenreFromArtist" xml:space="preserve">
+    <value>La importación asigna a cada canción el género de su artista: el género del álbum no se puede editar mientras esa opción esté activada.</value>
+  </data>
+  <data name="albumGenreLockedNote.Text" xml:space="preserve">
+    <value>Bloqueado: la importación asigna a cada canción el género de su artista (ver Opciones).</value>
+  </data>
+  <data name="AlbumTagWriteDialog.Title" xml:space="preserve">
+    <value>Modificar el álbum</value>
+  </data>
+  <data name="AlbumTagWriteDialog.CloseButtonText" xml:space="preserve">
+    <value>Cerrar</value>
+  </data>
+  <data name="albumTagWritePendingBar.Title" xml:space="preserve">
+    <value>Modificación incompleta</value>
+  </data>
+  <data name="albumTagWritePendingBar.Message" xml:space="preserve">
+    <value>Algunos archivos aún tienen los valores antiguos. Termina la modificación para actualizarlos.</value>
+  </data>
+  <data name="albumTagWriteResumeButton.Content" xml:space="preserve">
+    <value>Reanudar</value>
+  </data>
+  <data name="albumEditChangeName" xml:space="preserve">
+    <value>Nombre: {0} → {1}</value>
+  </data>
+  <data name="albumEditChangeArtist" xml:space="preserve">
+    <value>Artista: {0} → {1}</value>
+  </data>
+  <data name="albumEditChangeYear" xml:space="preserve">
+    <value>Año: {0} → {1}</value>
+  </data>
+  <data name="albumEditChangeGenre" xml:space="preserve">
+    <value>Género: {0} → {1}</value>
+  </data>
+  <data name="albumEditCounts" xml:space="preserve">
+    <value>Se actualizarán {0} archivos.</value>
+  </data>
+  <data name="albumEditArtistCreated" xml:space="preserve">
+    <value>Se creará el artista «{0}».</value>
+  </data>
+  <data name="albumEditGenreCreated" xml:space="preserve">
+    <value>Se creará el género «{0}».</value>
+  </data>
+  <data name="albumEditGenreKept" xml:space="preserve">
+    <value>{0} canciones conservan su propio género.</value>
+  </data>
+  <data name="albumEditOtherArtistKept" xml:space="preserve">
+    <value>{0} canciones de otro artista conservan su artista.</value>
+  </data>
+  <data name="albumEditOrphanArtist" xml:space="preserve">
+    <value>«{0}» se quedará sin canciones y la próxima limpieza de la biblioteca lo eliminará, con sus {1} reproducciones.</value>
+  </data>
+  <data name="albumEditOrphanFavoriteArtist" xml:space="preserve">
+    <value>«{0}» es un artista favorito y se quedará sin canciones. La próxima limpieza de la biblioteca lo eliminará, con sus {1} reproducciones.</value>
+  </data>
+  <data name="albumEditResumeIntro" xml:space="preserve">
+    <value>Los archivos que aún tienen los valores antiguos se escribirán de nuevo con los valores de la biblioteca.</value>
+  </data>
+  <data name="albumEditCollision" xml:space="preserve">
+    <value>Ya existe un álbum «{0}» de {1} ({2} canciones).</value>
+  </data>
+  <data name="albumEditBlockersHeader" xml:space="preserve">
+    <value>La modificación no puede empezar:</value>
+  </data>
+  <data name="albumEditFailuresHeader" xml:space="preserve">
+    <value>No se pudieron actualizar estos archivos:</value>
+  </data>
+  <data name="albumEditStart" xml:space="preserve">
+    <value>Modificar</value>
+  </data>
+  <data name="albumEditResume" xml:space="preserve">
+    <value>Reanudar</value>
+  </data>
+  <data name="albumEditRetry" xml:space="preserve">
+    <value>Reintentar</value>
+  </data>
+  <data name="albumEditError_Generic" xml:space="preserve">
+    <value>No se pudo modificar el álbum.</value>
+  </data>
+  <data name="albumEditError_InvalidName" xml:space="preserve">
+    <value>El nombre no puede estar vacío ni superar los 255 caracteres.</value>
+  </data>
+  <data name="albumEditError_InvalidArtist" xml:space="preserve">
+    <value>El artista no puede estar vacío ni superar los 255 caracteres.</value>
+  </data>
+  <data name="albumEditError_InvalidGenre" xml:space="preserve">
+    <value>El género no puede superar los 255 caracteres.</value>
+  </data>
+  <data name="albumEditError_InvalidYear" xml:space="preserve">
+    <value>El año debe ser un número entre 1 y 9999.</value>
+  </data>
+  <data name="albumEditError_NoArtist" xml:space="preserve">
+    <value>Este álbum no tiene artista y no se puede modificar.</value>
+  </data>
+  <data name="albumEditError_Pending" xml:space="preserve">
+    <value>Algunos archivos de este álbum esperan que termine una modificación. Reanúdala primero.</value>
+  </data>
+  <data name="albumEditError_CompilationArtist" xml:space="preserve">
+    <value>El artista de una compilación no se puede cambiar.</value>
+  </data>
+  <data name="albumEditError_ArtistPendingRename" xml:space="preserve">
+    <value>Un artista afectado por esta modificación tiene un cambio de nombre pendiente.</value>
+  </data>
+  <data name="albumEditError_Unchanged" xml:space="preserve">
+    <value>El álbum ya tiene estos valores.</value>
+  </data>
+  <data name="albumEditError_GenreUnused" xml:space="preserve">
+    <value>Ninguna canción tiene el género del álbum: la próxima limpieza de la biblioteca eliminaría el nuevo género.</value>
+  </data>
+  <data name="albumEditError_Collision" xml:space="preserve">
+    <value>Otro álbum ya tiene este nombre.</value>
+  </data>
+  <data name="albumEditError_NotFound" xml:space="preserve">
+    <value>El álbum ya no existe.</value>
+  </data>
+  <data name="MergeAlbumDialog.Title" xml:space="preserve">
+    <value>Fusionar álbumes</value>
+  </data>
+  <data name="albumMenuMerge.Text" xml:space="preserve">
+    <value>Fusionar con…</value>
+  </data>
+  <data name="albumMergeCollision" xml:space="preserve">
+    <value>Ya existe un álbum «{0}» de {1} ({2} canciones). ¿Fusionar los dos álbumes?</value>
+  </data>
+  <data name="albumMergeSummary" xml:space="preserve">
+    <value>«{0}» de {1} se fusionará en «{2}» de {3}.</value>
+  </data>
+  <data name="albumMergeArtistChange" xml:space="preserve">
+    <value>Las canciones de {0} pasarán a {1}.</value>
+  </data>
+  <data name="albumMergeSeparateFolders" xml:space="preserve">
+    <value>Los dos álbumes están en carpetas distintas. Los archivos se quedan donde están.</value>
+  </data>
+  <data name="albumMergeConflictsHeader" xml:space="preserve">
+    <value>Valores distintos (se usa el valor del álbum conservado):</value>
+  </data>
+  <data name="albumMergeConflictLine" xml:space="preserve">
+    <value>{0}: {1} (conservado) / {2} (perdido)</value>
+  </data>
+  <data name="albumMergeDiscConflictsHeader" xml:space="preserve">
+    <value>Canciones que comparten disco y número de pista:</value>
+  </data>
+  <data name="albumMergeDiscConflictLine" xml:space="preserve">
+    <value>Disco {0}, pista {1}: «{2}» y «{3}»</value>
+  </data>
+  <data name="albumMergeShiftDiscs" xml:space="preserve">
+    <value>Mover los discos del álbum fusionado después de los del álbum conservado (+{0})</value>
+  </data>
+  <data name="albumMergeBlockersHeader" xml:space="preserve">
+    <value>La fusión no puede empezar:</value>
+  </data>
+  <data name="albumMergeFailuresHeader" xml:space="preserve">
+    <value>No se pudieron actualizar estos archivos:</value>
+  </data>
+  <data name="albumMergeKeepHeader" xml:space="preserve">
+    <value>Álbum que se conserva</value>
+  </data>
+  <data name="albumMergeOtherPlaceholder" xml:space="preserve">
+    <value>Buscar el álbum con el que fusionar</value>
+  </data>
+  <data name="albumMergeStart" xml:space="preserve">
+    <value>Fusionar</value>
+  </data>
+  <data name="albumMergeResume" xml:space="preserve">
+    <value>Reanudar</value>
+  </data>
+  <data name="albumMergeCancel" xml:space="preserve">
+    <value>Cancelar</value>
+  </data>
+  <data name="albumMergeClose" xml:space="preserve">
+    <value>Cerrar</value>
+  </data>
+  <data name="albumMergeError_Generic" xml:space="preserve">
+    <value>No se pudieron fusionar los álbumes.</value>
+  </data>
+  <data name="albumMergeError_SameAlbum" xml:space="preserve">
+    <value>Elige dos álbumes distintos.</value>
+  </data>
+  <data name="albumMergeError_Compilation" xml:space="preserve">
+    <value>Una recopilación no se puede fusionar.</value>
+  </data>
+  <data name="albumMergeError_NoArtist" xml:space="preserve">
+    <value>Un álbum sin artista no se puede fusionar.</value>
+  </data>
+  <data name="albumMergeError_Pending" xml:space="preserve">
+    <value>Algunos archivos de un álbum esperan a que termine una edición. Reanúdala primero.</value>
+  </data>
+  <data name="albumMergeError_ArtistPendingRename" xml:space="preserve">
+    <value>Un cambio de nombre está pendiente en uno de los artistas. Reanúdalo primero.</value>
+  </data>
+  <data name="albumMergeError_Conflicts" xml:space="preserve">
+    <value>Algunas canciones comparten disco y número de pista. Mueve los discos para fusionar.</value>
+  </data>
+  <data name="albumMergeError_NotFound" xml:space="preserve">
+    <value>Un álbum ya no existe.</value>
+  </data>
 </root>

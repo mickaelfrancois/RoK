@@ -117,6 +117,19 @@
                     <TextBlock Text="{x:Bind ViewModel.HeaderDetails, Mode=OneWay}" Style="{StaticResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" Visibility="{x:Bind ViewModel.HasDetails, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" />
                 </StackPanel>
 
+                <InfoBar x:Uid="albumTagWritePendingBar"
+                         Severity="Warning"
+                         IsOpen="True"
+                         IsClosable="False"
+                         HorizontalAlignment="Left"
+                         MaxWidth="640"
+                         Visibility="{x:Bind ViewModel.ShowPendingTagWrite, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">
+                    <InfoBar.ActionButton>
+                        <Button x:Uid="albumTagWriteResumeButton"
+                                Command="{x:Bind ViewModel.ResumeTagWriteCommand}" />
+                    </InfoBar.ActionButton>
+                </InfoBar>
+
                 <!-- Actions -->
                 <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingSmall}" Margin="0,6,0,0">
                     <AppBarButton x:Uid="albumViewListen" Style="{StaticResource ListenAppBarButtonStyle}" Width="Auto" MinWidth="0" Command="{x:Bind ViewModel.ListenCommand}" />
@@ -152,6 +165,7 @@
                         <Button.Flyout>
                             <MenuFlyout Placement="Bottom">
                                 <MenuFlyoutItem x:Uid="albumMenuEdit" Icon="Edit" Command="{x:Bind ViewModel.EditAlbumCommand}" />
+                                <MenuFlyoutItem x:Uid="albumMenuMerge" Icon="Switch" Command="{x:Bind ViewModel.MergeWithCommand}" Visibility="{x:Bind ViewModel.CanMerge, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" />
                                 <MenuFlyoutItem x:Uid="albumMenuBiography" Icon="Library" Command="{x:Bind ViewModel.OpenBiographyCommand}" Visibility="{x:Bind ViewModel.Album.Biography, Mode=OneWay, Converter={StaticResource StringToVisibilityConverter}}" />
                                 <MenuFlyoutItem x:Uid="listeningLinkLastFm" Command="{x:Bind ViewModel.OpenUrlCommand, Mode=OneWay}" CommandParameter="{x:Bind ViewModel.Album.LastFmUrl, Mode=OneWay}" Visibility="{x:Bind ViewModel.Album.LastFmUrl, Mode=OneWay, Converter={StaticResource StringToVisibilityConverter}}" />
                                 <MenuFlyoutSeparator />

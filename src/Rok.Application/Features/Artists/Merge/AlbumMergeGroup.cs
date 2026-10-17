@@ -18,6 +18,26 @@ public sealed record AlbumMergeGroup(
     DateTime? LastListen)
 {
     /// <summary>
+    /// Builds the group for an explicit pair: <paramref name="target"/> stays, <paramref name="source"/> is folded into it.
+    /// </summary>
+    /// <param name="target">Album that stays.</param>
+    /// <param name="source">Album that is merged then deleted.</param>
+    public static AlbumMergeGroup ForPair(AlbumEntity target, AlbumEntity source)
+    {
+        DateTime? lastListen = target.LastListen is null || source.LastListen is null
+            ? target.LastListen ?? source.LastListen
+            : target.LastListen > source.LastListen ? target.LastListen : source.LastListen;
+
+        return new AlbumMergeGroup(
+            target.Id,
+            [source.Id],
+            target.Name,
+            target.IsFavorite || source.IsFavorite,
+            target.ListenCount + source.ListenCount,
+            lastListen);
+    }
+
+    /// <summary>
     /// Summary shown in the merge preview.
     /// </summary>
     public AlbumMergeGroupPreview ToPreview() => new(Name, MergedIds.Count + 1);
