@@ -1,4 +1,6 @@
-﻿namespace Rok.Import.Models;
+﻿using Rok.Domain.Enums;
+
+namespace Rok.Import.Models;
 
 public record AlbumCacheItem
 {
@@ -9,6 +11,8 @@ public record AlbumCacheItem
     public long? ArtistId { get; set; }
 
     public bool IsCompilation { get; set; }
+
+    public ECompilationSource CompilationSource { get; set; }
 
     public long? GenreId { get; set; }
 

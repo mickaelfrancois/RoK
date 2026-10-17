@@ -396,6 +396,26 @@ public class ArtistMergeRepositoryTests
         Assert.Equal(0, (await CreateGenreRepository(fixture).GetByIdAsync(2))!.CompilationCount);
     }
 
+    [Theory(DisplayName = "apply_merge_keeps_a_tag_or_manual_compilation_as_a_compilation")]
+    [InlineData(1)]
+    [InlineData(2)]
+    public async Task ApplyAsync_NonDerivedCompilation_StaysACompilation(int compilationSource)
+    {
+        // Arrange
+        using SqliteDatabaseFixture fixture = new();
+        await SeedAsync(fixture);
+        await SeedCompilationAsync(fixture);
+        await fixture.Connection.ExecuteAsync("UPDATE albums SET compilationSource = @compilationSource WHERE id = 12", new { compilationSource });
+        ArtistMergeDbChange change = BuildChange() with { ConvertedCompilationIds = [12] };
+
+        // Act
+        await CreateRepository(fixture).ApplyAsync(change);
+
+        // Assert
+        AlbumEntity? album = await CreateAlbumRepository(fixture).GetByIdAsync(12);
+        Assert.True(album!.IsCompilation);
+    }
+
     [Fact(DisplayName = "apply_merge_folds_a_converted_compilation_into_its_homonym")]
     public async Task ApplyAsync_FoldsTheConvertedCompilationIntoItsHomonym()
     {

@@ -203,6 +203,34 @@ public sealed class TagLibTagWriterFieldsM4aTests : IDisposable
         Assert.Equal(SHA256.HashData(before), SHA256.HashData(await File.ReadAllBytesAsync(path)));
     }
 
+    [MediaFoundationEncoderFact(AudioFixtureFormat.M4a, DisplayName = "m4a_write_should_set_then_remove_the_compilation_flag")]
+    public async Task WriteAsync_ShouldSetThenRemoveCompilationFlag()
+    {
+        // Arrange
+        string path = M4aTagFixture.CreateRich(MusicFolder, EMp4Layout.MoovBeforeMdat);
+
+        // Act
+        TagWriteResult set = await WriteSingleAsync(path, new TagChanges { IsCompilation = true });
+        bool afterSet = ReadFlag(path);
+        TagWriteResult removed = await WriteSingleAsync(path, new TagChanges { IsCompilation = false });
+        bool afterRemove = ReadFlag(path);
+
+        // Assert
+        Assert.Equal(ETagWriteOutcome.Succeeded, set.Outcome);
+        Assert.True(afterSet);
+        Assert.True(set.Values!.IsCompilation);
+        Assert.Equal(ETagWriteOutcome.Succeeded, removed.Outcome);
+        Assert.False(afterRemove);
+        Assert.False(removed.Values!.IsCompilation);
+    }
+
+    private static bool ReadFlag(string path)
+    {
+        using TagLib.File file = OpenM4a(path);
+
+        return TagFieldReader.ReadCompilationFlag(file);
+    }
+
     private async Task<TagWriteResult> WriteSingleAsync(string path, TagChanges changes)
     {
         IReadOnlyList<TagWriteResult> results = await _sut.WriteAsync([new TagWriteRequest(path, changes)], CancellationToken.None);

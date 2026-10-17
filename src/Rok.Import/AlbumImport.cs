@@ -3,6 +3,7 @@ using Rok.Application.Interfaces;
 using Rok.Application.Interfaces.Repositories;
 using Rok.Application.Tag;
 using Rok.Domain.Entities;
+using Rok.Domain.Enums;
 using Rok.Import.Models;
 using Rok.Import.Services;
 using Rok.Shared.Extensions;
@@ -54,6 +55,7 @@ public class AlbumImport(IAlbumRepository _albumRepository, TimeProvider _timePr
                 ArtistId = album.ArtistId,
                 GenreId = album.GenreId,
                 IsCompilation = album.IsCompilation,
+                CompilationSource = album.CompilationSource,
                 AlbumPath = album.AlbumPath
             };
 
@@ -83,10 +85,11 @@ public class AlbumImport(IAlbumRepository _albumRepository, TimeProvider _timePr
     /// <param name="album">The cached album to update.</param>
     /// <param name="isCompilation">The new compilation flag.</param>
     /// <param name="artistId">The new artist identifier, or <see langword="null"/> when not applicable.</param>
+    /// <param name="source">The origin of the new compilation status.</param>
     /// <returns>A task that represents the asynchronous operation.</returns>
-    public async Task UpdateCompilationAsync(AlbumCacheItem album, bool isCompilation, long? artistId)
+    public async Task UpdateCompilationAsync(AlbumCacheItem album, bool isCompilation, long? artistId, ECompilationSource source)
     {
-        await _albumRepository.UpdateCompilationAsync(album.Id, isCompilation, artistId, RepositoryConnectionKind.Background);
+        await _albumRepository.UpdateCompilationAsync(album.Id, isCompilation, artistId, source, RepositoryConnectionKind.Background);
 
         string oldKey = GetKey(album.Name, album.IsCompilation, album.ArtistId);
 
@@ -94,6 +97,7 @@ public class AlbumImport(IAlbumRepository _albumRepository, TimeProvider _timePr
             _cache.Remove(oldKey);
 
         album.IsCompilation = isCompilation;
+        album.CompilationSource = source;
         album.ArtistId = artistId;
 
         _cache.TryAdd(GetKey(album.Name, album.IsCompilation, album.ArtistId), album);
@@ -154,6 +158,7 @@ public class AlbumImport(IAlbumRepository _albumRepository, TimeProvider _timePr
             GenreId = genreId,
             Year = track.Year,
             IsCompilation = track.IsCompilation,
+            CompilationSource = track.IsTaggedCompilation ? ECompilationSource.Tag : ECompilationSource.Derived,
             IsBestOf = isBestOf,
             IsLive = isLive,
             AlbumPath = Path.GetDirectoryName(track.FullPath)!,
@@ -172,6 +177,7 @@ public class AlbumImport(IAlbumRepository _albumRepository, TimeProvider _timePr
             ArtistId = artistId,
             GenreId = genreId,
             IsCompilation = album.IsCompilation,
+            CompilationSource = album.CompilationSource,
             AlbumPath = album.AlbumPath
         };
         _cache.Add(key, cacheItem);

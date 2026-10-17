@@ -9,6 +9,7 @@ using Rok.Application.Interfaces.Repositories;
 using Rok.Application.Player;
 using Rok.Application.Services;
 using Rok.Application.Tag;
+using Rok.Domain.Enums;
 using Rok.Domain.Interfaces.Entities;
 using Rok.Shared.Enums;
 
@@ -522,6 +523,31 @@ public class ArtistMergeServiceTests
         result.Should().BeSuccess();
         Assert.Equal([102L], change!.ConvertedCompilationIds);
         Assert.Contains(102L, result.Value.UpdatedAlbumIds);
+    }
+
+    [Theory(DisplayName = "merge_leaves_a_tag_or_manual_compilation_untouched")]
+    [InlineData(ECompilationSource.Tag)]
+    [InlineData(ECompilationSource.Manual)]
+    public async Task MergeAsync_NonDerivedCompilation_IsNotConverted(ECompilationSource source)
+    {
+        // Arrange
+        SourceAlbums.Add(new AlbumEntity { Id = 102, Name = "Same Folder", ArtistId = SourceId, IsCompilation = true, CompilationSource = source });
+        _tracks.Setup(r => r.GetByAlbumIdAsync(102L, It.IsAny<RepositoryConnectionKind>())).ReturnsAsync(
+        [
+            new TrackEntity { Id = 30, AlbumId = 102, ArtistId = SourceId },
+            new TrackEntity { Id = 31, AlbumId = 102, ArtistId = TargetId }
+        ]);
+        ArtistMergeDbChange? change = null;
+        _mergeRepository.Setup(r => r.ApplyAsync(It.IsAny<ArtistMergeDbChange>(), It.IsAny<CancellationToken>()))
+            .Callback<ArtistMergeDbChange, CancellationToken>((c, _) => change = c)
+            .Returns(Task.CompletedTask);
+
+        // Act
+        Result<ArtistMergeOutcome> result = await _sut.MergeAsync(SourceId, TargetId, null, CancellationToken.None);
+
+        // Assert
+        result.Should().BeSuccess();
+        Assert.Empty(change!.ConvertedCompilationIds!);
     }
 
     [Fact(DisplayName = "merge_leaves_a_compilation_with_a_third_artist_untouched")]

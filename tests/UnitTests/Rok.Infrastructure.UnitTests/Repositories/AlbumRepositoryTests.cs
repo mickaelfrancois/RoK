@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Logging.Abstractions;
 using Rok.Application.Interfaces;
 using Rok.Domain.Entities;
+using Rok.Domain.Enums;
 using Rok.Domain.Interfaces.Entities;
 using Rok.Infrastructure.Repositories;
 
@@ -198,9 +199,9 @@ public class AlbumRepositoryTests
             new { id = testAlbumId, now });
 
         // Act
-        bool toCompilation = await repo.UpdateCompilationAsync(testAlbumId, true, null);
+        bool toCompilation = await repo.UpdateCompilationAsync(testAlbumId, true, null, ECompilationSource.Manual);
         AlbumEntity? compilation = await repo.GetByIdAsync(testAlbumId);
-        bool backToArtist = await repo.UpdateCompilationAsync(testAlbumId, false, 1);
+        bool backToArtist = await repo.UpdateCompilationAsync(testAlbumId, false, 1, ECompilationSource.Derived);
         AlbumEntity? restored = await repo.GetByIdAsync(testAlbumId);
 
         // Assert
@@ -212,7 +213,9 @@ public class AlbumRepositoryTests
         Assert.Equal(7, compilation.ListenCount);
         Assert.True(backToArtist);
         Assert.NotNull(restored);
+        Assert.Equal(ECompilationSource.Manual, compilation.CompilationSource);
         Assert.False(restored!.IsCompilation);
+        Assert.Equal(ECompilationSource.Derived, restored.CompilationSource);
         Assert.Equal(1, restored.ArtistId);
         Assert.True(restored.IsFavorite);
         Assert.Equal(7, restored.ListenCount);

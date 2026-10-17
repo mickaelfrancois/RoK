@@ -100,6 +100,7 @@ public static class DependencyInjection
         services.AddSingleton<IMigration, Migration19>();
         services.AddSingleton<IMigration, Migration20>();
         services.AddSingleton<IMigration, Migration21>();
+        services.AddSingleton<IMigration, Migration22>();
 
         services.AddScoped<IArtistRepository, ArtistRepository>();
         services.AddScoped<IArtistRenameRepository, ArtistRenameRepository>();
@@ -107,6 +108,7 @@ public static class DependencyInjection
         services.AddScoped<IPendingTagWriteRepository, PendingTagWriteRepository>();
         services.AddScoped<IAlbumEditRepository, AlbumEditRepository>();
         services.AddScoped<IAlbumMergeRepository, AlbumMergeRepository>();
+        services.AddScoped<IAlbumCompilationRepository, AlbumCompilationRepository>();
         services.AddScoped<IAlbumRepository, AlbumRepository>();
         services.AddScoped<IGenreRepository, GenreRepository>();
         services.AddScoped<ITrackRepository, TrackRepository>();

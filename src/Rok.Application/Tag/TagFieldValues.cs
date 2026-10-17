@@ -33,4 +33,10 @@ public sealed record TagFieldValues(string Title, int TrackNumber, int? Disc, st
     /// A tag write fills it only when the write changed the genre.
     /// </summary>
     public string Genre { get; init; } = "";
+
+    /// <summary>
+    /// Compilation flag as the library import reads it (TCMP, COMPILATION or cpil).
+    /// A tag write fills it only when the write changed the flag.
+    /// </summary>
+    public bool IsCompilation { get; init; }
 }

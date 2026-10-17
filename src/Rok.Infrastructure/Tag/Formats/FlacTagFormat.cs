@@ -43,6 +43,7 @@ internal sealed class FlacTagFormat : ITagFormat
             file.RemoveTags(TagLib.TagTypes.Id3v2);
 
         TagFormatHelpers.SyncSecondaryTags(file, changes, artistSource);
+        TagFormatHelpers.ApplyCompilation(file, changes.IsCompilation);
 
         file.Save();
     }
@@ -67,7 +68,7 @@ internal sealed class FlacTagFormat : ITagFormat
             duration = file.Properties.Duration;
             bitrate = file.Properties.AudioBitrate;
             sampleRate = file.Properties.AudioSampleRate;
-            values = TagFieldReader.ReadRaw(file.Tag);
+            values = TagFieldReader.ReadRaw(file.Tag) with { IsCompilation = TagFieldReader.ReadCompilationFlag(file) };
             id3v2Frames = TagFormatHelpers.Id3v2FrameIdsExcept(file, TagFormatHelpers.ChangedId3v2FrameIds(changes));
             parasiticTags = file.TagTypesOnDisk & ParasiticTags;
         }
@@ -151,6 +152,9 @@ internal sealed class FlacTagFormat : ITagFormat
             names.Add("DATE");
             names.Add("YEAR");
         }
+
+        if (changes.IsCompilation is not null)
+            names.Add("COMPILATION");
 
         return names;
     }

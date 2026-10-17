@@ -150,6 +150,20 @@ internal static class TagFieldReader
     }
 
     /// <summary>
+    /// Reads the compilation flag of a file: ID3v2 TCMP, Xiph COMPILATION or Apple cpil.
+    /// Several tags can be present on one file (a FLAC with a stray ID3v2), the flag is set when any of them carries it.
+    /// This is the single rule shared by the import, the tag write and its verification.
+    /// </summary>
+    /// <param name="file">Open file.</param>
+    /// <returns>True when a tag of the file marks it as part of a compilation.</returns>
+    public static bool ReadCompilationFlag(TagLib.File file)
+    {
+        return file.GetTag(TagLib.TagTypes.Id3v2, false) is TagLib.Id3v2.Tag { IsCompilation: true }
+            || file.GetTag(TagLib.TagTypes.Xiph, false) is TagLib.Ogg.XiphComment { IsCompilation: true }
+            || file.GetTag(TagLib.TagTypes.Apple, false) is TagLib.Mpeg4.AppleTag { IsCompilation: true };
+    }
+
+    /// <summary>
     /// Reads the normalized fields of a file.
     /// </summary>
     /// <param name="path">File to read.</param>
@@ -159,7 +173,7 @@ internal static class TagFieldReader
     {
         using TagLib.File file = TagLib.File.Create(path, mimeType, TagLib.ReadStyle.Average);
 
-        return Read(file.Tag);
+        return Read(file.Tag) with { IsCompilation = ReadCompilationFlag(file) };
     }
 
     /// <summary>

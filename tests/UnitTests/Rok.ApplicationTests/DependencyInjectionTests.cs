@@ -1,5 +1,6 @@
 using Microsoft.Extensions.DependencyInjection;
 using Rok.Application;
+using Rok.Application.Features.Albums.Compilation;
 using Rok.Application.Features.Albums.Edit;
 using Rok.Application.Features.Albums.Merge;
 using Rok.Application.Features.Albums.Requests;
@@ -139,6 +140,21 @@ public class DependencyInjectionTests
         Assert.Contains(services, d => d.ServiceType == typeof(IRequestHandler<GetAlbumEditPreviewRequest, Result<AlbumEditPreview>>));
         Assert.Contains(services, d => d.ServiceType == typeof(IRequestHandler<EditAlbumTagsRequest, Result<AlbumTagWriteOutcome>>));
         Assert.Contains(services, d => d.ServiceType == typeof(IRequestHandler<ResumeAlbumTagWriteRequest, Result<AlbumTagWriteOutcome>>));
+    }
+
+    [Fact(DisplayName = "album_compilation_service_and_handler_are_registered")]
+    public void AddApplication_RegistersAlbumCompilationServiceAndHandler()
+    {
+        // Arrange
+        var services = new ServiceCollection();
+
+        // Act
+        services.AddApplication();
+
+        // Assert
+        var descriptor = Assert.Single(services, d => d.ServiceType == typeof(AlbumCompilationService));
+        Assert.Equal(ServiceLifetime.Transient, descriptor.Lifetime);
+        Assert.Contains(services, d => d.ServiceType == typeof(IRequestHandler<SetAlbumCompilationRequest, Result<AlbumTagWriteOutcome>>));
     }
 
     [Fact(DisplayName = "album_merge_service_is_registered")]

@@ -39,6 +39,12 @@ public static class AlbumEditTextKeys
     /// <summary>Key of the line shown when an interrupted write is finished.</summary>
     public const string ResumeIntro = "albumEditResumeIntro";
 
+    /// <summary>Key of the line shown when the album is about to be marked as a compilation.</summary>
+    public const string CompilationOn = "albumEditCompilationOn";
+
+    /// <summary>Key of the line shown when the album is about to stop being a compilation.</summary>
+    public const string CompilationOff = "albumEditCompilationOff";
+
     /// <summary>Key of the message shown when another album already carries the name. Takes the name, the artist and the track count.</summary>
     public const string Collision = "albumEditCollision";
 
@@ -83,7 +89,10 @@ public static class AlbumEditTextKeys
         ["album.edit.genre_unused"] = "albumEditError_GenreUnused",
         ["album.edit.genre_from_artist"] = "albumEditError_GenreFromArtist",
         ["album.rename.collision"] = "albumEditError_Collision",
-        ["album.not_found"] = "albumEditError_NotFound"
+        ["album.not_found"] = "albumEditError_NotFound",
+        ["album.compilation.unchanged"] = "albumEditError_CompilationUnchanged",
+        ["album.compilation.no_artist"] = "albumEditError_CompilationNoArtist",
+        ["album.compilation.collision"] = "albumEditError_CompilationCollision"
     };
 
     /// <summary>Gets every key of the screens of the album edit that the resource files must hold, the blocker texts excluded.</summary>
@@ -101,6 +110,8 @@ public static class AlbumEditTextKeys
         OrphanArtist,
         OrphanFavoriteArtist,
         ResumeIntro,
+        CompilationOn,
+        CompilationOff,
         Collision,
         BlockersHeader,
         FailuresHeader,

@@ -669,6 +669,57 @@ public class AlbumEditServiceTests
         _writer.Verify(w => w.WriteAsync(It.IsAny<IReadOnlyList<TagWriteRequest>>(), It.IsAny<CancellationToken>()), Times.Never);
     }
 
+    [Fact(DisplayName = "resume_writes_the_compilation_flag_from_the_database_status")]
+    public async Task ResumeAsync_CompilationBit_WritesTheDatabaseStatus()
+    {
+        // Arrange
+        Album.IsCompilation = true;
+        PendingRows = [new PendingTagWrite(100, ETagWriteFields.Compilation)];
+        SetupChecks(path => Check(path, current: Values() with { IsCompilation = false }));
+
+        // Act
+        Result<AlbumTagWriteOutcome> result = await _sut.ResumeAsync(AlbumId, null, CancellationToken.None);
+
+        // Assert
+        Assert.Equal(EArtistRenameState.Completed, result.Value.State);
+        _writer.Verify(w => w.WriteAsync(It.Is<IReadOnlyList<TagWriteRequest>>(r =>
+            r[0].FilePath.EndsWith("a.flac") && r[0].Changes.IsCompilation == true && r[0].Changes.Album == null),
+            It.IsAny<CancellationToken>()), Times.Once);
+    }
+
+    [Fact(DisplayName = "resume_removes_the_compilation_flag_when_the_database_says_not_a_compilation")]
+    public async Task ResumeAsync_CompilationBitUnchecked_RemovesTheFlag()
+    {
+        // Arrange
+        Album.IsCompilation = false;
+        PendingRows = [new PendingTagWrite(100, ETagWriteFields.Compilation)];
+        SetupChecks(path => Check(path, current: Values() with { IsCompilation = true }));
+
+        // Act
+        Result<AlbumTagWriteOutcome> result = await _sut.ResumeAsync(AlbumId, null, CancellationToken.None);
+
+        // Assert
+        Assert.Equal(EArtistRenameState.Completed, result.Value.State);
+        _writer.Verify(w => w.WriteAsync(It.Is<IReadOnlyList<TagWriteRequest>>(r => r[0].Changes.IsCompilation == false), It.IsAny<CancellationToken>()), Times.Once);
+    }
+
+    [Fact(DisplayName = "resume_completes_without_writing_a_file_that_already_has_the_compilation_flag")]
+    public async Task ResumeAsync_CompilationFlagAlreadyThere_CompletesWithoutWriting()
+    {
+        // Arrange
+        Album.IsCompilation = true;
+        PendingRows = [new PendingTagWrite(101, ETagWriteFields.Compilation)];
+        SetupChecks(path => Check(path, current: Values() with { IsCompilation = true }));
+
+        // Act
+        Result<AlbumTagWriteOutcome> result = await _sut.ResumeAsync(AlbumId, null, CancellationToken.None);
+
+        // Assert
+        Assert.Equal(EArtistRenameState.Completed, result.Value.State);
+        Assert.Equal(["orphans", "complete:101"], _calls);
+        _writer.Verify(w => w.WriteAsync(It.IsAny<IReadOnlyList<TagWriteRequest>>(), It.IsAny<CancellationToken>()), Times.Never);
+    }
+
     [Fact(DisplayName = "resume_never_blocks_on_an_out_of_sync_file")]
     public async Task ResumeAsync_FileWithAnotherName_IsStillWritten()
     {

@@ -1,4 +1,5 @@
 ﻿using System.Globalization;
+using Rok.Application.Features.Albums.Compilation;
 using Rok.Application.Features.Albums.Edit;
 using Rok.Application.Features.Albums.Merge;
 using Rok.Application.Features.Albums.Requests;
@@ -57,7 +58,6 @@ public class AlbumEditService(IMediator mediator, IDialogService dialogService, 
 
         command.IsBestOf.Set(edited.IsBestOf);
         command.IsLive.Set(edited.IsLive);
-        command.IsCompilation.Set(edited.IsCompilation);
         command.MusicBrainzID.Set(edited.MusicBrainzID);
         command.ReleaseGroupMusicBrainzID.Set(edited.ReleaseGroupMusicBrainzID);
         command.Biography.Set(edited.Biography);
@@ -68,35 +68,142 @@ public class AlbumEditService(IMediator mediator, IDialogService dialogService, 
 
         album.IsBestOf = edited.IsBestOf;
         album.IsLive = edited.IsLive;
-        album.IsCompilation = edited.IsCompilation;
         album.MusicBrainzID = edited.MusicBrainzID;
         album.ReleaseGroupMusicBrainzID = edited.ReleaseGroupMusicBrainzID;
         album.Biography = edited.Biography;
         album.IsLock = edited.IsLock;
         album.LastFmUrl = edited.LastFmUrl;
 
+        (bool proceed, AlbumTagWriteOutcome? taggedOutcome) = await ApplyTaggedEditAsync(album, mode, genreLocked, edited);
+
+        if (!proceed || edited.IsCompilation == album.IsCompilation)
+            return new AlbumEditResult(true, taggedOutcome);
+
+        AlbumTagWriteOutcome? compilationOutcome = await ApplyCompilationAsync(album, edited.IsCompilation);
+
+        return new AlbumEditResult(true, MergeOutcomes(taggedOutcome, compilationOutcome));
+    }
+
+    private static AlbumTagWriteOutcome? MergeOutcomes(AlbumTagWriteOutcome? first, AlbumTagWriteOutcome? second)
+    {
+        if (first is null || second is null)
+            return second ?? first;
+
+        return second with
+        {
+            UpdatedArtistIds = [.. first.UpdatedArtistIds.Union(second.UpdatedArtistIds)],
+            DeletedAlbumIds = [.. first.DeletedAlbumIds.Union(second.DeletedAlbumIds)]
+        };
+    }
+
+    private async Task<(bool Proceed, AlbumTagWriteOutcome? Outcome)> ApplyTaggedEditAsync(AlbumDto album, AlbumTaggedFieldsMode mode, bool genreLocked, AlbumEditValues edited)
+    {
         if (mode == AlbumTaggedFieldsMode.Hidden)
-            return new AlbumEditResult(true, null);
+            return (true, null);
 
         TaggedEdit? edit = ReadEdit(album, mode, genreLocked, edited);
 
         if (edit is null || !edit.ChangesAnything(album))
-            return new AlbumEditResult(true, null);
+            return (true, null);
 
         AlbumEditPreview? preview = _validated is not null && _validated.Edit == edit
             ? _validated.Preview
             : await LoadPreviewAsync(album, edit);
 
         if (preview is null)
-            return new AlbumEditResult(true, null);
+            return (true, null);
 
         if (preview.Collision is not null)
-            return new AlbumEditResult(true, await OfferCollisionAsync(album, preview.Collision));
+            return (false, await OfferCollisionAsync(album, preview.Collision));
 
         WriteSession session = new();
         AlbumTagWriteOutcome? outcome = await dialogService.ShowAlbumTagWriteAsync(AlbumEditTexts.Prompt(preview, Localize), progress => TryWriteAsync(album.Id, edit, session, progress));
 
-        return new AlbumEditResult(true, outcome);
+        return (outcome is null || outcome.State == EArtistRenameState.Completed, outcome);
+    }
+
+    private async Task<AlbumTagWriteOutcome?> ApplyCompilationAsync(AlbumDto album, bool isCompilation)
+    {
+        AlbumTagWriteOutcome? outcome;
+
+        if (appOptions.WriteTagsEnabled)
+        {
+            WriteSession session = new();
+
+            outcome = await dialogService.ShowAlbumTagWriteAsync(AlbumEditTexts.CompilationPrompt(isCompilation, Localize), progress => TryCompilationAsync(album.Id, isCompilation, session, progress));
+        }
+        else
+        {
+            outcome = await SendCompilationDirectAsync(album, isCompilation);
+        }
+
+        if (outcome is not null && outcome.State is EArtistRenameState.Completed or EArtistRenameState.Partial)
+            album.IsCompilation = isCompilation;
+
+        return outcome;
+    }
+
+    private async Task<AlbumTagWriteOutcome?> SendCompilationDirectAsync(AlbumDto album, bool isCompilation)
+    {
+        string error;
+
+        try
+        {
+            Result<AlbumTagWriteOutcome> result = await mediator.Send(new SetAlbumCompilationRequest(album.Id, isCompilation));
+
+            if (result.IsSuccess)
+                return result.Value;
+
+            error = AlbumEditTexts.ErrorMessage(result.Errors.FirstOrDefault()?.Code, Localize);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Failed to set the compilation status of album {AlbumId}", album.Id);
+            error = AlbumEditTexts.ErrorMessage(null, Localize);
+        }
+
+        await dialogService.ShowTextAsync(album.Name, error);
+
+        return null;
+    }
+
+    private async Task<AlbumTagWriteAttempt> TryCompilationAsync(long albumId, bool isCompilation, WriteSession session, IProgress<ArtistRenameProgress> progress)
+    {
+        try
+        {
+            AlbumTagWriteOutcome? partial = session.Partial;
+
+            Result<AlbumTagWriteOutcome> result = partial is not null
+                ? await mediator.Send(new ResumeAlbumTagWriteRequest(albumId) { Progress = progress })
+                : await mediator.Send(new SetAlbumCompilationRequest(albumId, isCompilation) { Progress = progress });
+
+            if (!result.IsSuccess)
+                return AlbumTagWriteAttempt.Failure(AlbumEditTexts.ErrorMessage(result.Errors.FirstOrDefault()?.Code, Localize));
+
+            AlbumTagWriteOutcome outcome = partial is null
+                ? result.Value
+                : partial with
+                {
+                    State = result.Value.State,
+                    Blockers = result.Value.Blockers,
+                    Failures = result.Value.Failures,
+                    UpdatedArtistIds = [.. partial.UpdatedArtistIds.Union(result.Value.UpdatedArtistIds)],
+                    DeletedAlbumIds = [.. partial.DeletedAlbumIds.Union(result.Value.DeletedAlbumIds)]
+                };
+
+            if (result.Value.State == EArtistRenameState.Partial)
+                session.Partial = outcome;
+            else if (result.Value.State == EArtistRenameState.Completed)
+                session.Partial = null;
+
+            return AlbumTagWriteAttempt.Success(outcome);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Failed to set the compilation status of album {AlbumId}", albumId);
+
+            return AlbumTagWriteAttempt.Failure(AlbumEditTexts.ErrorMessage(null, Localize));
+        }
     }
 
     /// <summary>Tells whether some files of an album still wait for a tag write.</summary>

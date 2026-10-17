@@ -182,7 +182,7 @@ public sealed class FolderImportProcessorTests : IDisposable
         await sut.ImportFolderAsync(_folder.FullName, new ImportStatisticsDto(), CancellationToken.None);
 
         // Assert
-        albumRepository.Verify(r => r.UpdateCompilationAsync(10, false, 2, RepositoryConnectionKind.Background), Times.Once);
+        albumRepository.Verify(r => r.UpdateCompilationAsync(10, false, 2, Rok.Domain.Enums.ECompilationSource.Derived, RepositoryConnectionKind.Background), Times.Once);
         Assert.Contains(1L, _tracking.GetUpdatedArtists());
         Assert.Contains(2L, _tracking.GetUpdatedArtists());
         Assert.Contains(5L, _tracking.GetUpdatedGenres());
@@ -247,7 +247,7 @@ public sealed class FolderImportProcessorTests : IDisposable
         await sut.ImportFolderAsync(_folder.FullName, new ImportStatisticsDto(), CancellationToken.None);
 
         // Assert
-        albumRepository.Verify(r => r.UpdateCompilationAsync(10, false, 2, RepositoryConnectionKind.Background), Times.Once);
+        albumRepository.Verify(r => r.UpdateCompilationAsync(10, false, 2, Rok.Domain.Enums.ECompilationSource.Derived, RepositoryConnectionKind.Background), Times.Once);
     }
 
     [Fact(DisplayName = "reconcile_keeps_the_compilation_when_a_track_outside_the_folder_has_another_artist")]
@@ -304,7 +304,7 @@ public sealed class FolderImportProcessorTests : IDisposable
 
         // Assert
         scenario.Albums.Verify(
-            r => r.UpdateCompilationAsync(10, true, It.IsAny<long?>(), RepositoryConnectionKind.Background),
+            r => r.UpdateCompilationAsync(10, true, It.IsAny<long?>(), It.IsAny<Rok.Domain.Enums.ECompilationSource>(), RepositoryConnectionKind.Background),
             Times.Once);
     }
 
@@ -398,7 +398,7 @@ public sealed class FolderImportProcessorTests : IDisposable
     private static void VerifyNoCompilationUpdate(Mock<IAlbumRepository> albumRepository)
     {
         albumRepository.Verify(
-            r => r.UpdateCompilationAsync(It.IsAny<long>(), It.IsAny<bool>(), It.IsAny<long?>(), It.IsAny<RepositoryConnectionKind>()),
+            r => r.UpdateCompilationAsync(It.IsAny<long>(), It.IsAny<bool>(), It.IsAny<long?>(), It.IsAny<Rok.Domain.Enums.ECompilationSource>(), It.IsAny<RepositoryConnectionKind>()),
             Times.Never);
     }
 

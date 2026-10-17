@@ -27,6 +27,8 @@ internal sealed class Mp4TagFormat : ITagFormat
         using TagLib.File file = TagLib.File.Create(path, MimeType, TagLib.ReadStyle.Average);
 
         TagFormatHelpers.ApplyChanges(file.GetTag(TagLib.TagTypes.Apple, true), changes, TagFieldReader.ArtistSource(file.Tag));
+        TagFormatHelpers.ApplyCompilation(file, changes.IsCompilation);
+
         file.Save();
     }
 
@@ -43,7 +45,7 @@ internal sealed class Mp4TagFormat : ITagFormat
             duration = file.Properties.Duration;
             bitrate = file.Properties.AudioBitrate;
             sampleRate = file.Properties.AudioSampleRate;
-            values = TagFieldReader.ReadRaw(file.Tag);
+            values = TagFieldReader.ReadRaw(file.Tag) with { IsCompilation = TagFieldReader.ReadCompilationFlag(file) };
         }
 
         IReadOnlySet<string> changedAtoms = ChangedAtomTypes(changes);
@@ -94,6 +96,9 @@ internal sealed class Mp4TagFormat : ITagFormat
 
         if (changes.Year is not null)
             types.Add("©day");
+
+        if (changes.IsCompilation is not null)
+            types.Add("cpil");
 
         return types;
     }

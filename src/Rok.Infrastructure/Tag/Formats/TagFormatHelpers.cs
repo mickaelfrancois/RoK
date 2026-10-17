@@ -18,6 +18,7 @@ internal static class TagFormatHelpers
     private const string AlbumArtistFrameId = "TPE2";
     private const string AlbumFrameId = "TALB";
     private const string GenreFrameId = "TCON";
+    private const string CompilationFrameId = "TCMP";
 
     private static readonly string[] YearFrameIds = ["TDRC", "TYER", "TDAT", "TIME"];
 
@@ -75,6 +76,9 @@ internal static class TagFormatHelpers
                 ids.Add(id);
         }
 
+        if (changes.IsCompilation is not null)
+            ids.Add(CompilationFrameId);
+
         return ids;
     }
 
@@ -130,6 +134,27 @@ internal static class TagFormatHelpers
 
         if (changes.Year is not null)
             tag.Year = (uint)changes.Year.Value;
+    }
+
+    /// <summary>
+    /// Sets or removes the compilation flag on every tag of the file that can carry it (ID3v2, Xiph, Apple),
+    /// so that a removed flag cannot come back from a stray tag. Does nothing when the value is null.
+    /// </summary>
+    /// <param name="file">Open file.</param>
+    /// <param name="isCompilation">New flag, or null to keep it.</param>
+    public static void ApplyCompilation(TagLib.File file, bool? isCompilation)
+    {
+        if (isCompilation is null)
+            return;
+
+        if (file.GetTag(TagLib.TagTypes.Id3v2, false) is TagLib.Id3v2.Tag id3v2)
+            id3v2.IsCompilation = isCompilation.Value;
+
+        if (file.GetTag(TagLib.TagTypes.Xiph, false) is TagLib.Ogg.XiphComment xiph)
+            xiph.IsCompilation = isCompilation.Value;
+
+        if (file.GetTag(TagLib.TagTypes.Apple, false) is TagLib.Mpeg4.AppleTag apple)
+            apple.IsCompilation = isCompilation.Value;
     }
 
     private static void ApplyArtist(TagLib.Tag tag, string artist, EArtistSource artistSource)

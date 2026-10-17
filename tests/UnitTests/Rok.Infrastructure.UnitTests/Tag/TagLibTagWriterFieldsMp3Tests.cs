@@ -236,6 +236,45 @@ public sealed class TagLibTagWriterFieldsMp3Tests : IDisposable
         Assert.Equal(SHA256.HashData(before), SHA256.HashData(await File.ReadAllBytesAsync(path)));
     }
 
+    [MediaFoundationEncoderFact(AudioFixtureFormat.Mp3, DisplayName = "mp3_write_should_set_then_remove_the_compilation_flag")]
+    public async Task WriteAsync_ShouldSetThenRemoveCompilationFlag()
+    {
+        // Arrange
+        string path = Mp3TagFixture.CreateRich(MusicFolder, 3);
+        List<string> framesBefore = RenderFramesExcept(path, "TCMP");
+
+        // Act
+        TagWriteResult set = await WriteSingleAsync(path, new TagChanges { IsCompilation = true });
+        bool afterSet = ReadFlag(path);
+        TagWriteResult removed = await WriteSingleAsync(path, new TagChanges { IsCompilation = false });
+        bool afterRemove = ReadFlag(path);
+
+        // Assert
+        Assert.Equal(ETagWriteOutcome.Succeeded, set.Outcome);
+        Assert.True(afterSet);
+        Assert.True(set.Values!.IsCompilation);
+        Assert.Equal(ETagWriteOutcome.Succeeded, removed.Outcome);
+        Assert.False(afterRemove);
+        Assert.False(removed.Values!.IsCompilation);
+        Assert.DoesNotContain("TCMP", FrameIds(path));
+        Assert.Equal(framesBefore, RenderFramesExcept(path, "TCMP"));
+        Assert.Equal(Mp3TagFixture.OriginalTitle, ReadId3v2(path).Title);
+    }
+
+    [Fact(DisplayName = "tag_changes_with_only_a_compilation_flag_has_changes")]
+    public void HasChanges_ShouldBeTrue_ForCompilationFlagOnly()
+    {
+        Assert.True(new TagChanges { IsCompilation = false }.HasChanges);
+        Assert.False(new TagChanges().HasChanges);
+    }
+
+    private static bool ReadFlag(string path)
+    {
+        using TagLib.File file = OpenMp3(path);
+
+        return TagFieldReader.ReadCompilationFlag(file);
+    }
+
     private async Task<TagWriteResult> WriteSingleAsync(string path, TagChanges changes)
     {
         IReadOnlyList<TagWriteResult> results = await _sut.WriteAsync([new TagWriteRequest(path, changes)], CancellationToken.None);

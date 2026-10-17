@@ -2810,6 +2810,21 @@
   <data name="albumEditError_Collision" xml:space="preserve">
     <value>Інший альбом уже має цю назву.</value>
   </data>
+  <data name="albumEditCompilationOn" xml:space="preserve">
+    <value>Цей альбом буде позначено як збірку. Його файли буде позначено як збірку.</value>
+  </data>
+  <data name="albumEditCompilationOff" xml:space="preserve">
+    <value>Цей альбом більше не буде збіркою. Його файли більше не буде позначено як збірку.</value>
+  </data>
+  <data name="albumEditError_CompilationUnchanged" xml:space="preserve">
+    <value>Альбом уже має такий статус збірки.</value>
+  </data>
+  <data name="albumEditError_CompilationNoArtist" xml:space="preserve">
+    <value>Альбом не має виконавця, тому не може перестати бути збіркою.</value>
+  </data>
+  <data name="albumEditError_CompilationCollision" xml:space="preserve">
+    <value>Інший альбом матиме таку саму назву та виконавця. Спершу перейменуйте один із них.</value>
+  </data>
   <data name="albumEditError_NotFound" xml:space="preserve">
     <value>Альбому більше не існує.</value>
   </data>

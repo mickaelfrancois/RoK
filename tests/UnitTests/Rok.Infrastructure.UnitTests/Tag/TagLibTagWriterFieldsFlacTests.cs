@@ -251,6 +251,60 @@ public sealed class TagLibTagWriterFieldsFlacTests : IDisposable
         Assert.Equal(SHA256.HashData(before), SHA256.HashData(await File.ReadAllBytesAsync(path)));
     }
 
+    [Fact(DisplayName = "flac_write_should_set_then_remove_the_compilation_flag")]
+    public async Task WriteAsync_ShouldSetThenRemoveCompilationFlag()
+    {
+        // Arrange
+        string path = FlacTagFixture.CreateRich(MusicFolder);
+
+        // Act
+        TagWriteResult set = await WriteSingleAsync(path, new TagChanges { IsCompilation = true });
+        bool afterSet = ReadFlag(path);
+        TagWriteResult removed = await WriteSingleAsync(path, new TagChanges { IsCompilation = false });
+        bool afterRemove = ReadFlag(path);
+
+        // Assert
+        Assert.Equal(ETagWriteOutcome.Succeeded, set.Outcome);
+        Assert.True(afterSet);
+        Assert.True(set.Values!.IsCompilation);
+        Assert.Equal(ETagWriteOutcome.Succeeded, removed.Outcome);
+        Assert.False(afterRemove);
+        Assert.False(removed.Values!.IsCompilation);
+        Assert.Empty(Field(path, "COMPILATION"));
+    }
+
+    [Fact(DisplayName = "flac_write_should_remove_the_compilation_flag_from_a_parasitic_id3v2_too")]
+    public async Task WriteAsync_ShouldRemoveCompilationFlag_FromAParasiticId3v2Too()
+    {
+        // Arrange
+        string path = FlacTagFixture.CreateWithParasiticId3v2(MusicFolder, 3);
+
+        using (TagLib.File file = OpenFlac(path))
+        {
+            ((TagLib.Id3v2.Tag)file.GetTag(TagLib.TagTypes.Id3v2, false)).IsCompilation = true;
+            ((TagLib.Ogg.XiphComment)file.GetTag(TagLib.TagTypes.Xiph, true)).IsCompilation = true;
+            file.Save();
+        }
+
+        // Act
+        TagWriteResult result = await WriteSingleAsync(path, new TagChanges { IsCompilation = false });
+
+        // Assert
+        Assert.Equal(ETagWriteOutcome.Succeeded, result.Outcome);
+
+        using TagLib.File reopened = OpenFlac(path);
+        Assert.False(((TagLib.Id3v2.Tag)reopened.GetTag(TagLib.TagTypes.Id3v2, false)).IsCompilation);
+        Assert.False(((TagLib.Ogg.XiphComment)reopened.GetTag(TagLib.TagTypes.Xiph, false)).IsCompilation);
+        Assert.False(TagFieldReader.ReadCompilationFlag(reopened));
+    }
+
+    private static bool ReadFlag(string path)
+    {
+        using TagLib.File file = OpenFlac(path);
+
+        return TagFieldReader.ReadCompilationFlag(file);
+    }
+
     private async Task<TagWriteResult> WriteSingleAsync(string path, TagChanges changes)
     {
         IReadOnlyList<TagWriteResult> results = await _sut.WriteAsync([new TagWriteRequest(path, changes)], CancellationToken.None);

@@ -1,4 +1,6 @@
-﻿namespace Rok.Domain.Entities;
+﻿using Rok.Domain.Enums;
+
+namespace Rok.Domain.Entities;
 
 
 [Table("Albums")]
@@ -39,6 +41,8 @@ public class AlbumEntity : BaseEntity, IAlbumEntity
     public bool IsLive { get; set; } = false;
 
     public bool IsCompilation { get; set; } = false;
+
+    public ECompilationSource CompilationSource { get; set; } = ECompilationSource.Derived;
 
     public bool IsBestOf { get; set; } = false;
 

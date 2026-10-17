@@ -216,7 +216,8 @@ public class AlbumEditService(
             Artist = fields.HasFlag(ETagWriteFields.Artist) && !string.IsNullOrEmpty(track.ArtistName) ? track.ArtistName : null,
             Year = fields.HasFlag(ETagWriteFields.Year) ? album.Year : null,
             Genre = fields.HasFlag(ETagWriteFields.Genre) && !string.IsNullOrEmpty(track.GenreName) ? track.GenreName : null,
-            Disc = fields.HasFlag(ETagWriteFields.Disc) ? track.Disc : null
+            Disc = fields.HasFlag(ETagWriteFields.Disc) ? track.Disc : null,
+            IsCompilation = fields.HasFlag(ETagWriteFields.Compilation) ? album.IsCompilation : null
         };
     }
 
@@ -229,7 +230,8 @@ public class AlbumEditService(
             && (changes.Artist is null || string.Equals(current.Artist, changes.Artist, StringComparison.Ordinal))
             && (changes.Genre is null || string.Equals(current.Genre, changes.Genre, StringComparison.Ordinal))
             && (changes.Year is null || current.Year == changes.Year)
-            && (changes.Disc is null || current.Disc == changes.Disc);
+            && (changes.Disc is null || current.Disc == changes.Disc)
+            && (changes.IsCompilation is null || current.IsCompilation == changes.IsCompilation);
     }
 
     private async Task<AlbumTagWriteOutcome> ApplyAsync(Context context, AlbumEditPlan plan, IProgress<ArtistRenameProgress>? progress, CancellationToken cancellationToken)

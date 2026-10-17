@@ -2920,6 +2920,21 @@
   <data name="albumEditError_Collision" xml:space="preserve">
     <value>Another album already has this name.</value>
   </data>
+  <data name="albumEditCompilationOn" xml:space="preserve">
+    <value>This album will be marked as a compilation. Its files will be tagged as a compilation.</value>
+  </data>
+  <data name="albumEditCompilationOff" xml:space="preserve">
+    <value>This album will no longer be a compilation. Its files will no longer be tagged as a compilation.</value>
+  </data>
+  <data name="albumEditError_CompilationUnchanged" xml:space="preserve">
+    <value>The album already has this compilation status.</value>
+  </data>
+  <data name="albumEditError_CompilationNoArtist" xml:space="preserve">
+    <value>The album has no artist, so it cannot stop being a compilation.</value>
+  </data>
+  <data name="albumEditError_CompilationCollision" xml:space="preserve">
+    <value>Another album would end up with the same name and artist. Rename one of them first.</value>
+  </data>
   <data name="albumEditError_NotFound" xml:space="preserve">
     <value>The album no longer exists.</value>
   </data>

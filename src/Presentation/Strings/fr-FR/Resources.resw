@@ -2919,6 +2919,21 @@
   <data name="albumEditError_Collision" xml:space="preserve">
     <value>Un autre album porte déjà ce nom.</value>
   </data>
+  <data name="albumEditCompilationOn" xml:space="preserve">
+    <value>Cet album sera marqué comme compilation. Ses fichiers seront étiquetés comme compilation.</value>
+  </data>
+  <data name="albumEditCompilationOff" xml:space="preserve">
+    <value>Cet album ne sera plus une compilation. Ses fichiers ne seront plus étiquetés comme compilation.</value>
+  </data>
+  <data name="albumEditError_CompilationUnchanged" xml:space="preserve">
+    <value>L’album a déjà ce statut de compilation.</value>
+  </data>
+  <data name="albumEditError_CompilationNoArtist" xml:space="preserve">
+    <value>L’album n’a pas d’artiste : il ne peut pas cesser d’être une compilation.</value>
+  </data>
+  <data name="albumEditError_CompilationCollision" xml:space="preserve">
+    <value>Un autre album porterait le même nom et le même artiste. Renommez-en un d’abord.</value>
+  </data>
   <data name="albumEditError_NotFound" xml:space="preserve">
     <value>L’album n’existe plus.</value>
   </data>

@@ -52,6 +52,9 @@ public class AlbumEditTextKeysTests
     [InlineData("album.edit.genre_from_artist")]
     [InlineData("album.rename.collision")]
     [InlineData("album.not_found")]
+    [InlineData("album.compilation.unchanged")]
+    [InlineData("album.compilation.no_artist")]
+    [InlineData("album.compilation.collision")]
     public void KnownCode_MapsToASpecificKey(string code)
     {
         // Act

@@ -1,10 +1,13 @@
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using Rok.Application.Dto;
+using Rok.Application.Features.Albums.Compilation;
 using Rok.Application.Features.Albums.Requests;
+using Rok.Application.Features.Artists.Rename;
 using Rok.Application.Interfaces;
 using Rok.Services;
 using Rok.ViewModels.Album.Services;
+using AlbumTagWriteOutcome = Rok.Application.Features.Albums.Edit.AlbumTagWriteOutcome;
 
 namespace Rok.PresentationTests.ViewModels.Album.Services;
 
@@ -112,6 +115,7 @@ public class AlbumEditServiceTests
         };
 
         SetupEditDialog(edited);
+        _mediator.Setup<SetAlbumCompilationRequest, Result<AlbumTagWriteOutcome>>().Returns(Result<AlbumTagWriteOutcome>.Ok(new AlbumTagWriteOutcome(EArtistRenameState.Completed, 7, [], [], [], [])));
 
         AlbumEditService sut = BuildService();
 
@@ -120,7 +124,7 @@ public class AlbumEditServiceTests
 
         // Assert
         Assert.True(result.Updated);
-        Assert.Null(result.Outcome);
+        Assert.NotNull(result.Outcome);
         Assert.True(album.IsLive);
         Assert.True(album.IsBestOf);
         Assert.True(album.IsCompilation);
@@ -163,8 +167,6 @@ public class AlbumEditServiceTests
         Assert.True(sent.IsLive.Value);
         Assert.True(sent.IsBestOf.IsSet);
         Assert.False(sent.IsBestOf.Value);
-        Assert.True(sent.IsCompilation.IsSet);
-        Assert.True(sent.IsCompilation.Value);
         Assert.True(sent.IsLock.IsSet);
         Assert.True(sent.IsLock.Value);
         Assert.Equal("bio", sent.Biography.Value);

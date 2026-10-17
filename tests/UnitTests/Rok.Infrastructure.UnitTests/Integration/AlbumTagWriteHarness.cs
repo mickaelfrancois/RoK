@@ -5,6 +5,7 @@ using Dapper;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using Rok.Application.Dto;
+using Rok.Application.Features.Albums.Compilation;
 using Rok.Application.Features.Albums.Edit;
 using Rok.Application.Features.Albums.Merge;
 using Rok.Application.Features.Albums.Requests;
@@ -124,6 +125,7 @@ internal sealed class AlbumTagWriteHarness : IDisposable
     private readonly Func<string, string, string, string[], string[], string, uint, string> _createFile;
     private readonly AlbumEditService _service;
     private readonly AlbumMergeService _mergeService;
+    private readonly AlbumCompilationService _compilationService;
 
     /// <summary>
     /// Creates the harness and the library: an album of three tracks (the third one has its own genre), a neighbour in
@@ -178,6 +180,17 @@ internal sealed class AlbumTagWriteHarness : IDisposable
             _writeGate,
             _options,
             NullLogger<AlbumEditService>.Instance);
+
+        _compilationService = new AlbumCompilationService(
+            _albumRepository,
+            _trackRepository,
+            new AlbumCompilationRepository(_fixture.Connection, _pendingRepository, TimeProvider.System, NullLogger<AlbumCompilationRepository>.Instance),
+            _pendingRepository,
+            fileWriter,
+            import.Object,
+            _writeGate,
+            _options,
+            NullLogger<AlbumCompilationService>.Instance);
 
         AddFile("album", FirstFile, AlbumName, OldArtist, OldGenre, OldYear);
         AddFile("album", SecondFile, AlbumName, OldArtist, OldGenre, OldYear);
@@ -391,6 +404,46 @@ internal sealed class AlbumTagWriteHarness : IDisposable
         Assert.True(result.IsSuccess);
 
         return result.Value;
+    }
+
+    /// <summary>
+    /// Sets the compilation status through <see cref="SetAlbumCompilationRequestHandler"/>, the production caller of the service.
+    /// </summary>
+    public async Task<AlbumTagWriteOutcome> SetCompilationAsync(long albumId, bool isCompilation)
+    {
+        SetAlbumCompilationRequestHandler handler = new(_compilationService);
+
+        Result<AlbumTagWriteOutcome> result = await handler.Handle(new SetAlbumCompilationRequest(albumId, isCompilation), CancellationToken.None);
+
+        Assert.True(result.IsSuccess);
+
+        return result.Value;
+    }
+
+    /// <summary>
+    /// Writes the compilation flag of a file directly, as another tagger would.
+    /// </summary>
+    public void WriteCompilationFlag(string name, bool flag)
+    {
+        using TagLib.File file = TagLib.File.Create(_paths[name]);
+
+        TagLib.Ogg.XiphComment xiph = (TagLib.Ogg.XiphComment)file.GetTag(TagLib.TagTypes.Xiph, true);
+
+        xiph.IsCompilation = flag;
+
+        file.Save();
+    }
+
+    public bool ReadCompilationFlag(string name)
+    {
+        using TagLib.File file = TagLib.File.Create(_paths[name]);
+
+        return file.GetTag(TagLib.TagTypes.Xiph, false) is TagLib.Ogg.XiphComment xiph && xiph.IsCompilation;
+    }
+
+    public void SetWriteTagsEnabled(bool enabled)
+    {
+        _options.WriteTagsEnabled = enabled;
     }
 
     public void FailWritesTo(string name)
