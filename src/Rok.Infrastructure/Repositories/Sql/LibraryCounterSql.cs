@@ -6,9 +6,9 @@ namespace Rok.Infrastructure.Repositories.Sql;
 /// </summary>
 internal static class LibraryCounterSql
 {
-    private const string UpdateAlbumSql = "UPDATE albums SET trackCount = (SELECT COUNT(*) FROM tracks WHERE albumId = @albumId), duration = (SELECT COALESCE(SUM(duration), 0) FROM tracks WHERE albumId = @albumId) WHERE id = @albumId";
+    internal const string UpdateAlbumSql = "UPDATE albums SET trackCount = (SELECT COUNT(*) FROM tracks WHERE albumId = @albumId), duration = (SELECT COALESCE(SUM(duration), 0) FROM tracks WHERE albumId = @albumId) WHERE id = @albumId";
 
-    private const string UpdateArtistSql = """
+    internal const string UpdateArtistSql = """
         UPDATE artists SET
             trackCount = (SELECT COUNT(*) FROM tracks WHERE artistId = @artistId),
             totalDurationSeconds = (SELECT COALESCE(SUM(duration), 0) FROM tracks WHERE artistId = @artistId),
@@ -21,11 +21,11 @@ internal static class LibraryCounterSql
         WHERE id = @artistId
         """;
 
-    private const string UpdateGenreArtistCountSql = "UPDATE genres SET artistCount = (SELECT COUNT(*) FROM artists WHERE genreId = @genreId AND EXISTS (SELECT 1 FROM tracks WHERE tracks.artistId = artists.id)) WHERE id = @genreId";
+    internal const string UpdateGenreArtistCountSql = "UPDATE genres SET artistCount = (SELECT COUNT(*) FROM artists WHERE genreId = @genreId AND EXISTS (SELECT 1 FROM tracks WHERE tracks.artistId = artists.id)) WHERE id = @genreId";
 
     private const string SelectGenresOfArtistsSql = "SELECT DISTINCT genreId FROM artists WHERE id IN @artistIds AND genreId IS NOT NULL";
 
-    private const string UpdateGenreAlbumCountersSql = """
+    internal const string UpdateGenreAlbumCountersSql = """
         UPDATE genres SET
             albumCount = (SELECT COUNT(*) FROM albums WHERE genreId = @genreId AND isCompilation = 0 AND isLive = 0 AND isBestof = 0),
             bestofCount = (SELECT COUNT(*) FROM albums WHERE genreId = @genreId AND isBestof = 1 AND isCompilation = 0),
@@ -34,7 +34,7 @@ internal static class LibraryCounterSql
         WHERE id = @genreId
         """;
 
-    private const string UpdateGenreTrackCountersSql = """
+    internal const string UpdateGenreTrackCountersSql = """
         UPDATE genres SET
             trackCount = (SELECT COUNT(*) FROM tracks WHERE genreId = @genreId),
             totalDurationSeconds = (SELECT COALESCE(SUM(duration), 0) FROM tracks WHERE genreId = @genreId)

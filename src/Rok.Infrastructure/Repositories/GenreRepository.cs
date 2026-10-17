@@ -13,6 +13,7 @@ public class GenreRepository(IDbConnection connection, [FromKeyedServices("Backg
     private const string UpdateStatisticsSql = "UPDATE genres SET trackCount = @trackCount, artistCount = @artistCount, albumCount = @albumCount, bestOfCount = @bestOfCount, liveCount = @liveCount, compilationCount = @compilationCount, totalDurationSeconds = @totalDurationSeconds WHERE id = @id";
     private const string DeleteOrphansSql = "DELETE FROM genres WHERE id NOT IN (SELECT DISTINCT genreId FROM tracks WHERE genreId IS NOT NULL)";
 
+    protected override string NameCollation => " COLLATE NOCASE";
 
     public Task<bool> UpdateFavoriteAsync(long id, bool isFavorite, RepositoryConnectionKind kind = RepositoryConnectionKind.Foreground)
     {

@@ -98,10 +98,12 @@ public class FolderImportProcessor(
 
         track ??= new TrackEntity();
 
+        (long? ArtistId, long? AlbumId, long? GenreId) previous = (track.ArtistId, track.AlbumId, track.GenreId);
+
         _metadataService.EnsureTrackTimestamps(track, file);
         TrackMetadataService.FillTrackEntity(track, file, artist?.Id, album?.Id, genreId);
 
-        UpdateStatisticsForTrack(track);
+        UpdateStatisticsForTrack(track, previous);
 
         await UpdateTrackAsync(track, statistics).ConfigureAwait(false);
 
@@ -115,11 +117,15 @@ public class FolderImportProcessor(
             : genre?.Id;
     }
 
-    private void UpdateStatisticsForTrack(TrackEntity track)
+    private void UpdateStatisticsForTrack(TrackEntity track, (long? ArtistId, long? AlbumId, long? GenreId) previous)
     {
         _trackingService.ArtistUpdated(track.ArtistId);
         _trackingService.GenreUpdated(track.GenreId);
         _trackingService.AlbumUpdated(track.AlbumId);
+
+        _trackingService.ArtistUpdated(previous.ArtistId);
+        _trackingService.GenreUpdated(previous.GenreId);
+        _trackingService.AlbumUpdated(previous.AlbumId);
     }
 
     private async Task UpdateTrackAsync(TrackEntity track, ImportStatisticsDto statistics)
@@ -257,7 +263,7 @@ public class FolderImportProcessor(
             }
         }
 
-        AlbumCacheItem? album = _importAlbum.GetFromCache(file.Album, file.IsCompilation, artistId);
+        AlbumCacheItem? album = _importAlbum.GetFromCache(file.Album, file.IsCompilation, artistId, Path.GetDirectoryName(file.FullPath));
         if (album != null)
             return album;
 

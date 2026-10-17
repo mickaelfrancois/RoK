@@ -4,6 +4,7 @@ using Dapper.Contrib.Extensions;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Rok.Application.Interfaces;
+using Rok.Shared.Extensions;
 
 namespace Rok.Infrastructure.Repositories;
 
@@ -69,9 +70,14 @@ public partial class GenericRepository<T>(IDbConnection db, [FromKeyedServices("
 
     public Task<T?> GetByNameAsync(string name, RepositoryConnectionKind kind = RepositoryConnectionKind.Foreground)
     {
-        string sql = GetSelectQuery("name") + GetDefaultGroupBy();
-        return QuerySingleOrDefaultAsync(sql, kind, new { name });
+        string sql = GetSelectQuery("name") + NameCollation + GetDefaultGroupBy();
+        return QuerySingleOrDefaultAsync(sql, kind, new { name = name.NormalizeIndexedName() });
     }
+
+    /// <summary>
+    /// SQL collation clause appended to the name comparison of <see cref="GetByNameAsync"/>. Empty keeps the column collation.
+    /// </summary>
+    protected virtual string NameCollation => string.Empty;
 
     public virtual string GetSelectQuery(string? whereParam = null)
     {

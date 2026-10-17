@@ -42,6 +42,21 @@ public class GenreRepositoryTests
         Assert.Equal("Rock", result!.Name);
     }
 
+    [Fact(DisplayName = "genre_get_by_name_ignores_case")]
+    public async Task GetByName_ShouldFindGenre_IgnoringCase()
+    {
+        // Arrange
+        using SqliteDatabaseFixture fixture = new();
+        GenreRepository repo = CreateRepository(fixture);
+
+        // Act
+        GenreEntity? result = await repo.GetByNameAsync("rOCK");
+
+        // Assert
+        Assert.NotNull(result);
+        Assert.Equal("Rock", result!.Name);
+    }
+
     [Fact(DisplayName = "UpdateFavorite should toggle favorite flag")]
     public async Task UpdateFavorite_ShouldToggleFavoriteFlag()
     {

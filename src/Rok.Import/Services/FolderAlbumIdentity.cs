@@ -31,11 +31,11 @@ internal static class FolderAlbumIdentity
 
         IEnumerable<IGrouping<string, TrackFile>> groups = files
             .Where(file => !string.IsNullOrEmpty(file.Album))
-            .GroupBy(file => file.Album, StringComparer.OrdinalIgnoreCase);
+            .GroupBy(file => file.Album.ToIndexKey(), StringComparer.Ordinal);
 
         foreach (IGrouping<string, TrackFile> group in groups)
         {
-            string groupName = group.Key.NormalizeIndexedName();
+            string groupName = group.Key;
 
             List<TrackEntity> known = group
                 .Select(file => tracks.GetFromCache(file.FullPath))
@@ -61,7 +61,10 @@ internal static class FolderAlbumIdentity
                 .Distinct()
                 .Count() > 1;
 
-            result[group.Key] = new KnownFolderAlbum(albumId, wasCompilation, attached.Select(track => track.Id).ToHashSet());
+            KnownFolderAlbum knownAlbum = new(albumId, wasCompilation, attached.Select(track => track.Id).ToHashSet());
+
+            foreach (TrackFile file in group)
+                result[file.Album] = knownAlbum;
         }
 
         return result;
@@ -70,6 +73,6 @@ internal static class FolderAlbumIdentity
 
     private static bool HasSameName(AlbumCacheItem? album, string normalizedName)
     {
-        return album is not null && album.Name.NormalizeIndexedName() == normalizedName;
+        return album is not null && album.Name.ToIndexKey() == normalizedName;
     }
 }
