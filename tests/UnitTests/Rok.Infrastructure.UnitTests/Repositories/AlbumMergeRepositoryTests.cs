@@ -148,6 +148,28 @@ public class AlbumMergeRepositoryTests
         Assert.Equal(3, jazz!.TrackCount);
     }
 
+    [Fact(DisplayName = "apply_merge_recomputes_the_artist_count_of_the_genre_of_an_emptied_artist")]
+    public async Task ApplyAsync_InterArtistMerge_EmptiedArtistLeavesItsGenreArtistCount()
+    {
+        // Arrange
+        using SqliteDatabaseFixture fixture = new();
+        DateTime now = DateTime.UtcNow;
+        await fixture.Connection.ExecuteAsync(@"
+            INSERT INTO Genres(id, name, totalDurationSeconds, trackCount, artistCount, compilationCount, bestofCount, albumCount, liveCount, listenCount, isFavorite, creatDate)
+            VALUES (3, 'Blues', 0, 0, 1, 0, 0, 0, 0, 0, 0, @now);
+            INSERT INTO Artists(id, name, trackCount, albumCount, liveCount, compilationCount, bestofCount, totalDurationSeconds, disbanded, isFavorite, listenCount, creatDate, genreId)
+            VALUES (3, 'Artist C', 0, 0, 0, 0, 0, 0, 0, 0, 0, @now, 3)", new { now });
+        await SeedAsync(fixture, sourceArtistId: 3);
+        AlbumMergeRepository repo = CreateRepository(fixture);
+        AlbumMergeDbChange change = await BuildChangeAsync(fixture);
+
+        // Act
+        await repo.ApplyAsync(change);
+
+        // Assert
+        Assert.Equal(0, (await CreateGenreRepository(fixture).GetByIdAsync(3))!.ArtistCount);
+    }
+
     [Fact(DisplayName = "apply_merge_of_the_same_artist_keeps_artist_and_discs")]
     public async Task ApplyAsync_SameArtistWithoutOffset_KeepsArtistAndDiscs()
     {

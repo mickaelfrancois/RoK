@@ -152,6 +152,8 @@ public class Statistics(ITrackRepository trackRepository, IAlbumRepository album
         IEnumerable<ArtistEntity> artists = await GetArtistsCacheAsync();
         IEnumerable<GenreEntity> genres = await GetGenresCacheAsync();
 
+        HashSet<long?> artistIdsWithTracks = tracks.Select(t => t.ArtistId).ToHashSet();
+
         foreach (long genreId in genresId)
         {
             GenreEntity? genre = genres.FirstOrDefault(a => a.Id == genreId);
@@ -160,7 +162,7 @@ public class Statistics(ITrackRepository trackRepository, IAlbumRepository album
 
             List<TrackEntity> genreTracks = tracks.Where(t => t.GenreId == genreId).ToList();
             List<AlbumEntity> genreAlbums = albums.Where(a => a.GenreId == genreId).ToList();
-            List<ArtistEntity> genreArtists = artists.Where(a => a.GenreId == genreId).ToList();
+            List<ArtistEntity> genreArtists = artists.Where(a => a.GenreId == genreId && artistIdsWithTracks.Contains(a.Id)).ToList();
 
             int trackCount = genreTracks.Count;
             int artistCount = genreArtists.Count;

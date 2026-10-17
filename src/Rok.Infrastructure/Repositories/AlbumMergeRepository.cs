@@ -118,10 +118,14 @@ public class AlbumMergeRepository(IDbConnection connection, IPendingTagWriteRepo
     {
         await LibraryCounterSql.UpdateAlbumAsync(connection, targetId, transaction, cancellationToken);
 
-        foreach (long artistId in artistIds.OfType<long>().Distinct())
+        long[] distinctArtistIds = [.. artistIds.OfType<long>().Distinct()];
+
+        foreach (long artistId in distinctArtistIds)
         {
             await LibraryCounterSql.UpdateArtistAsync(connection, artistId, transaction, cancellationToken);
         }
+
+        await LibraryCounterSql.UpdateGenresOfArtistsAsync(connection, distinctArtistIds, transaction, cancellationToken);
 
         foreach (long genreId in genreIds.OfType<long>().Distinct())
         {

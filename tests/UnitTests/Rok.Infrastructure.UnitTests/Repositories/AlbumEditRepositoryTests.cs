@@ -132,6 +132,22 @@ public class AlbumEditRepositoryTests
         Assert.Equal(2, newGenre.AlbumCount);
     }
 
+    [Fact(DisplayName = "apply_edit_recomputes_the_artist_count_of_the_genre_of_an_emptied_artist")]
+    public async Task ApplyAsync_EmptiedArtistLeavesItsGenreArtistCount()
+    {
+        // Arrange
+        using SqliteDatabaseFixture fixture = new();
+        await SeedAsync(fixture);
+        await fixture.Connection.ExecuteAsync("UPDATE artists SET genreId = 3 WHERE id IN (1, 2); UPDATE genres SET artistCount = 2 WHERE id = 3");
+        AlbumEditRepository repo = CreateRepository(fixture);
+
+        // Act
+        await repo.ApplyAsync(BuildChange());
+
+        // Assert
+        Assert.Equal(1, (await CreateGenreRepository(fixture).GetByIdAsync(OwnGenreId))!.ArtistCount);
+    }
+
     [Fact(DisplayName = "apply_edit_creates_the_missing_artist_and_genre")]
     public async Task ApplyAsync_CreatesTheMissingArtistAndGenre()
     {
