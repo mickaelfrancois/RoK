@@ -2752,6 +2752,21 @@
   <data name="albumEditError_Collision" xml:space="preserve">
     <value>Otro álbum ya tiene este nombre.</value>
   </data>
+  <data name="albumEditCompilationOn" xml:space="preserve">
+    <value>Este álbum se marcará como recopilatorio. Sus archivos se etiquetarán como recopilatorio.</value>
+  </data>
+  <data name="albumEditCompilationOff" xml:space="preserve">
+    <value>Este álbum dejará de ser un recopilatorio. Sus archivos dejarán de etiquetarse como recopilatorio.</value>
+  </data>
+  <data name="albumEditError_CompilationUnchanged" xml:space="preserve">
+    <value>El álbum ya tiene este estado de recopilatorio.</value>
+  </data>
+  <data name="albumEditError_CompilationNoArtist" xml:space="preserve">
+    <value>El álbum no tiene artista: no puede dejar de ser un recopilatorio.</value>
+  </data>
+  <data name="albumEditError_CompilationCollision" xml:space="preserve">
+    <value>Otro álbum tendría el mismo nombre y artista. Renombra uno de ellos primero.</value>
+  </data>
   <data name="albumEditError_NotFound" xml:space="preserve">
     <value>El álbum ya no existe.</value>
   </data>

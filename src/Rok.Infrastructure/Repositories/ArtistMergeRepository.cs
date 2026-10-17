@@ -26,7 +26,7 @@ public class ArtistMergeRepository(IDbConnection connection, ILogger<ArtistMerge
     private const string SelectSourceGenreSql = "SELECT genreId FROM artists WHERE id = @sourceId";
     private const string MoveTracksSql = "UPDATE tracks SET artistId = @targetId WHERE artistId = @sourceId";
     private const string MoveAlbumsSql = "UPDATE albums SET artistId = @targetId WHERE artistId = @sourceId";
-    private const string ConvertCompilationsSql = "UPDATE albums SET isCompilation = 0, artistId = @targetId WHERE id IN @ids";
+    private const string ConvertCompilationsSql = "UPDATE albums SET isCompilation = 0, artistId = @targetId WHERE id IN @ids AND compilationSource = 0";
     private const string MoveArtistEventsSql = "UPDATE ListeningEvents SET artistId = @targetId WHERE artistId = @sourceId";
     private const string UnionArtistTagsSql = "INSERT OR IGNORE INTO ArtistTags(artistId, tagId) SELECT @targetId, tagId FROM ArtistTags WHERE artistId = @sourceId";
     private const string DeleteArtistTagsSql = "DELETE FROM ArtistTags WHERE artistId = @sourceId";

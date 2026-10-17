@@ -18,6 +18,21 @@ public class TrackFile
 
     public bool IsCompilation { get; set; }
 
+    /// <summary>
+    /// Raw compilation flag of this file (TCMP, COMPILATION or cpil).
+    /// </summary>
+    public bool HasCompilationFlag { get; set; }
+
+    /// <summary>
+    /// True when at least one file of the album group carries the compilation flag.
+    /// </summary>
+    public bool IsTaggedCompilation { get; set; }
+
+    /// <summary>
+    /// True when the files of the album group have several artists.
+    /// </summary>
+    public bool IsMultiArtist { get; set; }
+
     public string IsRemix { get; set; } = string.Empty;
 
     public int? Year { get; set; }

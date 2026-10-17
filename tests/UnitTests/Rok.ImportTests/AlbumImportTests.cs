@@ -257,7 +257,7 @@ public class AlbumImportTests
         AlbumCacheItem album = import.GetById(8)!;
 
         // Act
-        await import.UpdateCompilationAsync(album, false, 20);
+        await import.UpdateCompilationAsync(album, false, 20, Rok.Domain.Enums.ECompilationSource.Derived);
 
         // Assert
         Assert.Null(import.GetFromCache("Mix", true, null));
@@ -265,7 +265,7 @@ public class AlbumImportTests
         Assert.False(album.IsCompilation);
         Assert.Equal(20, album.ArtistId);
         Assert.Same(album, import.GetById(8));
-        repository.Verify(r => r.UpdateCompilationAsync(8, false, 20, RepositoryConnectionKind.Background), Times.Once);
+        repository.Verify(r => r.UpdateCompilationAsync(8, false, 20, Rok.Domain.Enums.ECompilationSource.Derived, RepositoryConnectionKind.Background), Times.Once);
     }
 
     [Fact(DisplayName = "update_compilation_never_steals_another_album_key")]
@@ -284,7 +284,7 @@ public class AlbumImportTests
         AlbumCacheItem converted = import.GetById(8)!;
 
         // Act
-        await import.UpdateCompilationAsync(converted, false, 20);
+        await import.UpdateCompilationAsync(converted, false, 20, Rok.Domain.Enums.ECompilationSource.Derived);
 
         // Assert
         Assert.Equal(9, import.GetFromCache("Mix", false, 20)!.Id);
@@ -307,7 +307,7 @@ public class AlbumImportTests
         await import.LoadCacheAsync();
 
         // Act
-        await import.UpdateCompilationAsync(import.GetById(9)!, false, 30);
+        await import.UpdateCompilationAsync(import.GetById(9)!, false, 30, Rok.Domain.Enums.ECompilationSource.Derived);
 
         // Assert
         Assert.Equal(8, import.GetFromCache("Mix", true, null)!.Id);

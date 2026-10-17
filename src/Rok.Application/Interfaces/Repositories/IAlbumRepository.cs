@@ -1,4 +1,5 @@
-﻿using Rok.Domain.Interfaces.Entities;
+﻿using Rok.Domain.Enums;
+using Rok.Domain.Interfaces.Entities;
 
 namespace Rok.Application.Interfaces.Repositories;
 
@@ -30,7 +31,8 @@ public interface IAlbumRepository : IRepository<AlbumEntity>
     /// <param name="id">Album id.</param>
     /// <param name="isCompilation">New compilation flag.</param>
     /// <param name="artistId">New owning artist id, or <c>null</c> for a compilation without artist.</param>
+    /// <param name="source">Origin of the compilation status.</param>
     /// <param name="kind">Connection to use.</param>
     /// <returns><c>true</c> when a row was updated.</returns>
-    Task<bool> UpdateCompilationAsync(long id, bool isCompilation, long? artistId, RepositoryConnectionKind kind = RepositoryConnectionKind.Foreground);
+    Task<bool> UpdateCompilationAsync(long id, bool isCompilation, long? artistId, ECompilationSource source, RepositoryConnectionKind kind = RepositoryConnectionKind.Foreground);
 }

@@ -36,6 +36,7 @@ public class TagService(ILogger<TagService> logger) : ITagService
             track.Album = values.Album;
             track.Genre = values.Genre;
             track.Year = values.Year;
+            track.HasCompilationFlag = TagFieldReader.ReadCompilationFlag(tag);
             track.TrackNumber = values.TrackNumber;
             track.Duration = tag.Properties.Duration;
             track.Bitrate = tag.Properties.AudioBitrate * 1000;

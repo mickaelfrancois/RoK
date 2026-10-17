@@ -34,6 +34,11 @@ internal sealed record TagFieldSnapshot(
     uint Year)
 {
     /// <summary>
+    /// Compilation flag of the file (TCMP, COMPILATION or cpil on any tag).
+    /// </summary>
+    public bool IsCompilation { get; init; }
+
+    /// <summary>
     /// Gives the snapshot a verified copy must have once the changes are applied.
     /// </summary>
     /// <param name="changes">Changes written to the copy.</param>
@@ -58,6 +63,7 @@ internal sealed record TagFieldSnapshot(
             Album = changes.Album ?? Album,
             Genres = genres,
             Year = (uint?)changes.Year ?? Year,
+            IsCompilation = changes.IsCompilation ?? IsCompilation,
             AlbumArtists = albumArtists,
             Performers = performers,
             Title = changes.Title ?? Title,

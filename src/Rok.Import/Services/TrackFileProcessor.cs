@@ -21,16 +21,20 @@ public class TrackFileProcessor(ITagService _tagService, ILogger<TrackFileProces
 
         foreach (IGrouping<string, TrackFile> albumGroup in albumGroups)
         {
-            bool isCompilation = albumGroup
+            bool isMultiArtist = albumGroup
                 .Select(file => file.Artist)
                 .Distinct(StringComparer.OrdinalIgnoreCase)
                 .Count() > 1;
+            bool isTagged = albumGroup.Any(file => file.HasCompilationFlag);
+            bool isCompilation = isMultiArtist || isTagged;
 
             if (isCompilation)
                 _logger.LogInformation("Album '{Album}' is marked as a compilation.", albumGroup.Key);
 
             foreach (TrackFile file in albumGroup)
             {
+                file.IsMultiArtist = isMultiArtist;
+                file.IsTaggedCompilation = isTagged;
                 file.IsCompilation = isCompilation;
             }
         }

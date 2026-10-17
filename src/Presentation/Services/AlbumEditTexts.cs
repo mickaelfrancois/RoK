@@ -26,6 +26,17 @@ public static class AlbumEditTexts
         return new AlbumTagWritePrompt([], [localize(AlbumEditTextKeys.ResumeIntro)], [], true);
     }
 
+    /// <summary>Builds what the write dialog shows when the compilation status of an album is about to change.</summary>
+    /// <param name="isCompilation">The status asked by the user.</param>
+    /// <param name="localize">Gives a resource string from its key.</param>
+    /// <returns>The prompt.</returns>
+    public static AlbumTagWritePrompt CompilationPrompt(bool isCompilation, Func<string, string> localize)
+    {
+        string key = isCompilation ? AlbumEditTextKeys.CompilationOn : AlbumEditTextKeys.CompilationOff;
+
+        return new AlbumTagWritePrompt([], [localize(key)], [], false);
+    }
+
     /// <summary>Lists the fields that change, one line each, old value to new value.</summary>
     /// <param name="preview">What the edit would do.</param>
     /// <param name="localize">Gives a resource string from its key.</param>

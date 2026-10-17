@@ -4,6 +4,7 @@ using CleanArch.DevKit.Mediator.Results;
 using CleanArch.DevKit.Mediator.Validation;
 using CleanArch.DevKit.Messaging;
 using Microsoft.Extensions.DependencyInjection;
+using Rok.Application.Features.Albums.Compilation;
 using Rok.Application.Features.Albums.Edit;
 using Rok.Application.Features.Albums.Merge;
 using Rok.Application.Features.Albums.Services;
@@ -47,6 +48,7 @@ public static class DependencyInjection
         services.AddTransient<ArtistMergeService>();
         services.AddTransient<AlbumEditService>();
         services.AddTransient<AlbumMergeService>();
+        services.AddTransient<AlbumCompilationService>();
         services.AddTransient<IArtistApiService, ArtistApiService>();
         services.AddTransient<IAlbumApiService, AlbumApiService>();
 

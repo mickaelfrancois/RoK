@@ -7,6 +7,7 @@ using Rok.Application.Interfaces;
 using Rok.Application.Interfaces.Pictures;
 using Rok.Application.Interfaces.Repositories;
 using Rok.Domain.Entities;
+using Rok.Domain.Enums;
 
 namespace Rok.Application.Features.Artists.Merge;
 
@@ -306,7 +307,7 @@ public class ArtistMergeService(
     {
         HashSet<long> convertible = [];
 
-        foreach (AlbumEntity album in albums.Where(a => a.IsCompilation))
+        foreach (AlbumEntity album in albums.Where(a => a.IsCompilation && a.CompilationSource == ECompilationSource.Derived))
         {
             List<TrackEntity> tracks = (await trackRepository.GetByAlbumIdAsync(album.Id)).ToList();
 

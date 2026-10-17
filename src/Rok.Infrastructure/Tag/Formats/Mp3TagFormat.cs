@@ -31,6 +31,7 @@ internal sealed class Mp3TagFormat : ITagFormat
         TagFormatHelpers.ApplyChanges(id3v2, changes, artistSource);
 
         TagFormatHelpers.SyncSecondaryTags(file, changes, artistSource);
+        TagFormatHelpers.ApplyCompilation(file, changes.IsCompilation);
 
         file.Save();
     }
@@ -53,7 +54,7 @@ internal sealed class Mp3TagFormat : ITagFormat
             duration = file.Properties.Duration;
             bitrate = file.Properties.AudioBitrate;
             sampleRate = file.Properties.AudioSampleRate;
-            values = TagFieldReader.ReadRaw(file.Tag);
+            values = TagFieldReader.ReadRaw(file.Tag) with { IsCompilation = TagFieldReader.ReadCompilationFlag(file) };
             frameIds = TagFormatHelpers.Id3v2FrameIdsExcept(file, TagFormatHelpers.ChangedId3v2FrameIds(changes));
         }
 

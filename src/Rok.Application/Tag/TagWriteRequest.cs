@@ -52,10 +52,15 @@ public sealed record TagChanges
     public string? Genre { get; init; }
 
     /// <summary>
+    /// New compilation flag (TCMP, COMPILATION or cpil), or null to keep it. False removes the flag from every tag of the file.
+    /// </summary>
+    public bool? IsCompilation { get; init; }
+
+    /// <summary>
     /// Tells whether at least one field is to be changed.
     /// </summary>
     public bool HasChanges => Title is not null || TrackNumber is not null || Disc is not null || Composers is not null || Bpm is not null || Artist is not null
-        || Album is not null || Year is not null || Genre is not null;
+        || Album is not null || Year is not null || Genre is not null || IsCompilation is not null;
 }
 
 /// <summary>

@@ -44,8 +44,6 @@ public class UpdateAlbumRequest : IRequest<Result<bool>>
 
     public PatchField<bool> IsBestOf { get; set; } = new();
 
-    public PatchField<bool> IsCompilation { get; set; } = new();
-
     public PatchField<string?> Biography { get; set; } = new();
 
     public PatchField<bool> IsLock { get; set; } = new();
@@ -133,9 +131,6 @@ public class UpdateAlbumRequestHandler(IAlbumRepository _albumRepository) : IReq
 
         if (command.IsBestOf.TryGetValue(out bool isBestOf))
             entity.IsBestOf = isBestOf;
-
-        if (command.IsCompilation.TryGetValue(out bool isCompilation))
-            entity.IsCompilation = isCompilation;
 
         if (command.IsLock.TryGetValue(out bool isLock))
             entity.IsLock = isLock;

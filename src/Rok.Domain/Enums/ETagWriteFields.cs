@@ -20,5 +20,8 @@ public enum ETagWriteFields
     Genre = 8,
 
     /// <summary>Disc number.</summary>
-    Disc = 16
+    Disc = 16,
+
+    /// <summary>Compilation flag.</summary>
+    Compilation = 32
 }

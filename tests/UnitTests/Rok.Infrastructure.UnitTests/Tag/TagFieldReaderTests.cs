@@ -79,6 +79,45 @@ public sealed class TagFieldReaderTests : IDisposable
         Assert.Equal(expectedYear, values.Year);
     }
 
+    [MediaFoundationEncoderTheory(AudioFixtureFormat.Mp3, DisplayName = "read_compilation_flag_reads_tcmp_on_mp3")]
+    [InlineData(true)]
+    [InlineData(false)]
+    public void ReadCompilationFlag_ShouldReadTcmp_OnMp3(bool flag)
+    {
+        // Arrange
+        string path = Mp3TagFixture.CreateRich(_tempDir.FullName, 3);
+        SetCompilationFlag(path, flag);
+
+        // Act & Assert
+        AssertFlagIsRead(path, flag);
+    }
+
+    [Theory(DisplayName = "read_compilation_flag_reads_compilation_field_on_flac")]
+    [InlineData(true)]
+    [InlineData(false)]
+    public void ReadCompilationFlag_ShouldReadCompilationField_OnFlac(bool flag)
+    {
+        // Arrange
+        string path = FlacTagFixture.CreateRich(_tempDir.FullName);
+        SetCompilationFlag(path, flag);
+
+        // Act & Assert
+        AssertFlagIsRead(path, flag);
+    }
+
+    [MediaFoundationEncoderTheory(AudioFixtureFormat.M4a, DisplayName = "read_compilation_flag_reads_cpil_on_m4a")]
+    [InlineData(true)]
+    [InlineData(false)]
+    public void ReadCompilationFlag_ShouldReadCpil_OnM4a(bool flag)
+    {
+        // Arrange
+        string path = M4aTagFixture.CreateRich(_tempDir.FullName, EMp4Layout.MoovBeforeMdat);
+        SetCompilationFlag(path, flag);
+
+        // Act & Assert
+        AssertFlagIsRead(path, flag);
+    }
+
     [Theory(DisplayName = "replace_first_artist_value_replaces_the_first_and_keeps_the_others")]
     [InlineData("", "New", "New")]
     [InlineData("Old", "New", "New")]
@@ -104,6 +143,53 @@ public sealed class TagFieldReaderTests : IDisposable
 
         // Assert
         Assert.Equal(expected, result);
+    }
+
+    private static void SetCompilationFlag(string path, bool flag)
+    {
+        using TagLib.File file = TagLib.File.Create(path);
+
+        foreach (TagLib.TagTypes type in new[] { TagLib.TagTypes.Id3v2, TagLib.TagTypes.Xiph, TagLib.TagTypes.Apple })
+        {
+            switch (file.GetTag(type, false))
+            {
+                case TagLib.Id3v2.Tag id3v2:
+                    id3v2.IsCompilation = flag;
+                    break;
+                case TagLib.Ogg.XiphComment xiph:
+                    xiph.IsCompilation = flag;
+                    break;
+                case TagLib.Mpeg4.AppleTag apple:
+                    apple.IsCompilation = flag;
+                    break;
+            }
+        }
+
+        file.Save();
+    }
+
+    private static void AssertFlagIsRead(string path, bool expected)
+    {
+        // Arrange
+        TagService service = new(NullLogger<TagService>.Instance);
+        TrackFile track = new();
+
+        // Act
+        service.FillMusicProperties(path, track);
+
+        bool flag;
+        string mimeType;
+
+        using (TagLib.File file = TagLib.File.Create(path))
+        {
+            flag = TagFieldReader.ReadCompilationFlag(file);
+            mimeType = file.MimeType;
+        }
+
+        // Assert
+        Assert.Equal(expected, flag);
+        Assert.Equal(expected, track.HasCompilationFlag);
+        Assert.Equal(expected, TagFieldReader.ReadFile(path, mimeType).IsCompilation);
     }
 
     private static void AssertMatchesTagService(string path)

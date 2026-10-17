@@ -396,7 +396,8 @@ public sealed class TagLibTagWriter : ITagWriter, ITagWriteRecovery
             Artist = changes.Artist is null ? "" : values.Artist,
             Album = changes.Album is null ? "" : values.Album,
             Genre = changes.Genre is null ? "" : values.Genre,
-            Year = changes.Year is null ? null : values.Year
+            Year = changes.Year is null ? null : values.Year,
+            IsCompilation = changes.IsCompilation is not null && values.IsCompilation
         };
 
         return Succeeded(path) with { Values = values };

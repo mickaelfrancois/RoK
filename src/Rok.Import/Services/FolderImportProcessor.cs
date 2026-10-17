@@ -2,10 +2,12 @@ using CleanArch.DevKit.Guards;
 using CleanArch.DevKit.Messaging;
 using Microsoft.Extensions.Logging;
 using Rok.Application.Dto;
+using Rok.Application.Features.Albums.Compilation;
 using Rok.Application.Interfaces;
 using Rok.Application.Messages;
 using Rok.Application.Tag;
 using Rok.Domain.Entities;
+using Rok.Domain.Enums;
 using Rok.Import.Models;
 
 namespace Rok.Import.Services;
@@ -294,7 +296,7 @@ public class FolderImportProcessor(
         long? genreId,
         KnownFolderAlbum known)
     {
-        (bool isCompilation, long? albumArtistId)? target = ComputeTarget(album, file, artistId, known);
+        (bool isCompilation, long? albumArtistId, ECompilationSource source)? target = ComputeTarget(album, file, artistId, known);
 
         if (target == null)
             return;
@@ -304,7 +306,7 @@ public class FolderImportProcessor(
 
         try
         {
-            await _importAlbum.UpdateCompilationAsync(album, target.Value.isCompilation, target.Value.albumArtistId).ConfigureAwait(false);
+            await _importAlbum.UpdateCompilationAsync(album, target.Value.isCompilation, target.Value.albumArtistId, target.Value.source).ConfigureAwait(false);
         }
         catch (Exception ex)
         {
@@ -323,32 +325,43 @@ public class FolderImportProcessor(
             album.Id, album.Name, oldIsCompilation, album.IsCompilation, oldArtistId, album.ArtistId);
     }
 
-    private (bool isCompilation, long? albumArtistId)? ComputeTarget(
+    private (bool isCompilation, long? albumArtistId, ECompilationSource source)? ComputeTarget(
         AlbumCacheItem album,
         TrackFile file,
         long? artistId,
         KnownFolderAlbum known)
     {
-        if (file.IsCompilation != known.WasCompilation)
-        {
-            if (file.IsCompilation)
-                return album.IsCompilation ? null : (true, album.ArtistId);
+        CompilationStatus status = CompilationStatusPolicy.Resolve(
+            album.CompilationSource,
+            album.IsCompilation,
+            file.IsTaggedCompilation,
+            file.IsMultiArtist,
+            known.WasCompilation);
 
-            if (!album.IsCompilation)
-                return AlignArtist(album, artistId);
+        bool sourceChanged = status.Source != album.CompilationSource;
 
-            return HasOtherArtistOutsideFolder(album, artistId, known) ? null : (false, artistId);
-        }
+        if (status.IsCompilation && !album.IsCompilation)
+            return (true, album.ArtistId, status.Source);
 
-        if (!file.IsCompilation && !album.IsCompilation)
-            return AlignArtist(album, artistId);
+        if (!status.IsCompilation && album.IsCompilation)
+            return HasOtherArtistOutsideFolder(album, artistId, known) ? null : (false, artistId, status.Source);
 
-        return null;
+        if (!album.IsCompilation)
+            return AlignArtist(album, artistId, status.Source, sourceChanged);
+
+        return sourceChanged ? (true, album.ArtistId, status.Source) : null;
     }
 
-    private static (bool isCompilation, long? albumArtistId)? AlignArtist(AlbumCacheItem album, long? artistId)
+    private static (bool isCompilation, long? albumArtistId, ECompilationSource source)? AlignArtist(
+        AlbumCacheItem album,
+        long? artistId,
+        ECompilationSource source,
+        bool sourceChanged)
     {
-        return artistId.HasValue && artistId != album.ArtistId ? (false, artistId) : null;
+        if (artistId.HasValue && artistId != album.ArtistId)
+            return (false, artistId, source);
+
+        return sourceChanged ? (false, album.ArtistId, source) : null;
     }
 
     private bool HasOtherArtistOutsideFolder(AlbumCacheItem album, long? artistId, KnownFolderAlbum known)
