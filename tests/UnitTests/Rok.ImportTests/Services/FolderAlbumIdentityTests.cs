@@ -137,6 +137,22 @@ public class FolderAlbumIdentityTests
         Assert.False(Assert.Single(result).Value.WasCompilation);
     }
 
+    [Fact(DisplayName = "folder_album_identity_matches_album_differing_by_case")]
+    public async Task Resolve_ShouldMatchKnownAlbum_WhenTagDiffersOnlyByCase()
+    {
+        // Arrange
+        (TrackImport tracks, AlbumImport albums) = await BuildCachesAsync(
+            new List<TrackEntity> { Track(1, @"C:\m\a.flac", 1, 10) },
+            new List<AlbumEntity> { new() { Id = 1, Name = "Greatest Hits" } });
+        List<TrackFile> files = new() { File(@"C:\m\a.flac", "greatest hits") };
+
+        // Act
+        IReadOnlyDictionary<string, KnownFolderAlbum> result = FolderAlbumIdentity.Resolve(files, tracks, albums);
+
+        // Assert
+        Assert.Equal(1, Assert.Single(result).Value.AlbumId);
+    }
+
     [Fact(DisplayName = "resolve_groups_files_case_insensitively")]
     public async Task Resolve_ShouldGroupFiles_CaseInsensitively()
     {

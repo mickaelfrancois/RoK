@@ -16,7 +16,7 @@ public class AlbumImport(IAlbumRepository _albumRepository, TimeProvider _timePr
 
     public int CountInCache => _cache.Count;
 
-    private readonly Dictionary<string, AlbumCacheItem> _cache = new(StringComparer.InvariantCultureIgnoreCase);
+    private readonly Dictionary<string, AlbumCacheItem> _cache = new(StringComparer.Ordinal);
 
     private readonly Dictionary<long, AlbumCacheItem> _byId = new();
 
@@ -46,7 +46,7 @@ public class AlbumImport(IAlbumRepository _albumRepository, TimeProvider _timePr
 
         foreach (AlbumEntity album in albums)
         {
-            string key = GetKey(album.Name, album.IsCompilation, album.ArtistId);
+            string key = GetKey(album.Name, album.IsCompilation, album.ArtistId, album.AlbumPath);
 
             AlbumCacheItem item = new()
             {
@@ -91,7 +91,7 @@ public class AlbumImport(IAlbumRepository _albumRepository, TimeProvider _timePr
     {
         await _albumRepository.UpdateCompilationAsync(album.Id, isCompilation, artistId, source, RepositoryConnectionKind.Background);
 
-        string oldKey = GetKey(album.Name, album.IsCompilation, album.ArtistId);
+        string oldKey = GetKey(album.Name, album.IsCompilation, album.ArtistId, album.AlbumPath);
 
         if (_cache.TryGetValue(oldKey, out AlbumCacheItem? indexed) && indexed.Id == album.Id)
             _cache.Remove(oldKey);
@@ -100,7 +100,7 @@ public class AlbumImport(IAlbumRepository _albumRepository, TimeProvider _timePr
         album.CompilationSource = source;
         album.ArtistId = artistId;
 
-        _cache.TryAdd(GetKey(album.Name, album.IsCompilation, album.ArtistId), album);
+        _cache.TryAdd(GetKey(album.Name, album.IsCompilation, album.ArtistId, album.AlbumPath), album);
     }
 
 
@@ -110,13 +110,14 @@ public class AlbumImport(IAlbumRepository _albumRepository, TimeProvider _timePr
     /// <param name="albumName">The name of the album to retrieve. Cannot be null or empty.</param>
     /// <param name="isCompilation">A value indicating whether the album is a compilation.</param>
     /// <param name="artistId">The identifier of the artist associated with the album, or <see langword="null"/> if not applicable.</param>
+    /// <param name="albumFolder">The folder of the track. A compilation is identified by its name and this folder (a disc subfolder counts as its parent).</param>
     /// <returns>An <see cref="AlbumCacheItem"/> representing the cached album if found; otherwise, <see langword="null"/>.</returns>
-    public AlbumCacheItem? GetFromCache(string albumName, bool isCompilation, long? artistId)
+    public AlbumCacheItem? GetFromCache(string albumName, bool isCompilation, long? artistId, string? albumFolder = null)
     {
         if (string.IsNullOrEmpty(albumName))
             return null;
 
-        string key = GetKey(albumName, isCompilation, artistId);
+        string key = GetKey(albumName, isCompilation, artistId, albumFolder);
 
         _cache.TryGetValue(key, out AlbumCacheItem? album);
 
@@ -169,7 +170,7 @@ public class AlbumImport(IAlbumRepository _albumRepository, TimeProvider _timePr
 
         long id = await _albumRepository.AddAsync(album, RepositoryConnectionKind.Background);
 
-        string key = GetKey(album.Name, album.IsCompilation, artistId);
+        string key = GetKey(album.Name, album.IsCompilation, artistId, album.AlbumPath);
         AlbumCacheItem cacheItem = new()
         {
             Id = id,
@@ -190,13 +191,16 @@ public class AlbumImport(IAlbumRepository _albumRepository, TimeProvider _timePr
         return cacheItem;
     }
 
-    private static string GetKey(string albumName, bool isCompilation, long? artistId)
+    private static string GetKey(string albumName, bool isCompilation, long? artistId, string? albumFolder)
     {
-        string normalized = albumName.NormalizeIndexedName();
+        string normalized = albumName.ToIndexKey();
 
-        if (isCompilation || !artistId.HasValue)
+        if (isCompilation)
+            return $"{normalized}@@{AlbumFolderKey.Of(albumFolder).ToUpperInvariant()}";
+
+        if (!artistId.HasValue)
             return normalized;
-        else
-            return $"{artistId}___{normalized}";
+
+        return $"{artistId}___{normalized}";
     }
 }

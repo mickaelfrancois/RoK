@@ -13,7 +13,7 @@ public class GenreImport(IGenreRepository _genreRepository, TimeProvider _timePr
     public int CountInCache => _cache.Count;
 
 
-    private readonly Dictionary<string, GenreCacheItem> _cache = new(StringComparer.InvariantCultureIgnoreCase);
+    private readonly Dictionary<string, GenreCacheItem> _cache = new(StringComparer.Ordinal);
 
 
     public async Task LoadCacheAsync(CancellationToken cancellationToken = default)

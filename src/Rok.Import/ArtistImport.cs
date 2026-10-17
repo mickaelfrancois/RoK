@@ -13,7 +13,7 @@ public class ArtistImport(IArtistRepository _artistRepository, TimeProvider _tim
 
     public int CountInCache => _cache.Count;
 
-    private readonly Dictionary<string, ArtistCacheItem> _cache = new(StringComparer.InvariantCultureIgnoreCase);
+    private readonly Dictionary<string, ArtistCacheItem> _cache = new(StringComparer.Ordinal);
 
     private const int MaxArtistsApiEnrichment = 100;
 

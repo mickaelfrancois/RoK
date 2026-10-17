@@ -390,6 +390,90 @@ public sealed class FolderImportProcessorTests : IDisposable
         }
     }
 
+    [Fact(DisplayName = "homonymous_compilations_in_two_folders_stay_two_albums")]
+    public async Task ImportFolder_HomonymousCompilationsInTwoFolders_ShouldCreateTwoAlbums()
+    {
+        // Arrange
+        long nextId = 100;
+        Mock<IAlbumRepository> albumRepository = new();
+        albumRepository.Setup(r => r.AddAsync(It.IsAny<AlbumEntity>(), It.IsAny<RepositoryConnectionKind>())).ReturnsAsync(() => nextId++);
+        FolderImportProcessor sut = await BuildReconcilingProcessorAsync(
+            albumRepository,
+            new AlbumEntity { Id = 10, Name = "Unrelated", ArtistId = 1 },
+            path => path.Contains("a-one") || path.Contains("c-one") ? "Artist A" : "Artist B");
+        string firstFolder = CreateFilesIn("Hits 1", "a-one", "b-one");
+        string secondFolder = CreateFilesIn("Hits 2", "c-one", "d-one");
+
+        // Act
+        await sut.ImportFolderAsync(firstFolder, new ImportStatisticsDto(), CancellationToken.None);
+        await sut.ImportFolderAsync(secondFolder, new ImportStatisticsDto(), CancellationToken.None);
+
+        // Assert
+        albumRepository.Verify(r => r.AddAsync(It.IsAny<AlbumEntity>(), It.IsAny<RepositoryConnectionKind>()), Times.Exactly(2));
+    }
+
+    [Fact(DisplayName = "compilation_split_on_disc_subfolders_stays_one_album")]
+    public async Task ImportFolder_CompilationSplitOnDiscSubfolders_ShouldCreateOneAlbum()
+    {
+        // Arrange
+        long nextId = 100;
+        Mock<IAlbumRepository> albumRepository = new();
+        albumRepository.Setup(r => r.AddAsync(It.IsAny<AlbumEntity>(), It.IsAny<RepositoryConnectionKind>())).ReturnsAsync(() => nextId++);
+        FolderImportProcessor sut = await BuildReconcilingProcessorAsync(
+            albumRepository,
+            new AlbumEntity { Id = 10, Name = "Unrelated", ArtistId = 1 },
+            path => path.Contains("a-one") || path.Contains("c-one") ? "Artist A" : "Artist B");
+        string firstDisc = CreateFilesIn(Path.Combine("Hits", "CD1"), "a-one", "b-one");
+        string secondDisc = CreateFilesIn(Path.Combine("Hits", "CD2"), "c-one", "d-one");
+
+        // Act
+        await sut.ImportFolderAsync(firstDisc, new ImportStatisticsDto(), CancellationToken.None);
+        await sut.ImportFolderAsync(secondDisc, new ImportStatisticsDto(), CancellationToken.None);
+
+        // Assert
+        albumRepository.Verify(r => r.AddAsync(It.IsAny<AlbumEntity>(), It.IsAny<RepositoryConnectionKind>()), Times.Once);
+    }
+
+    [Fact(DisplayName = "reassigned_track_marks_previous_artist_album_genre")]
+    public async Task ImportFolder_ReassignedTrack_ShouldMarkPreviousArtistAlbumAndGenre()
+    {
+        // Arrange
+        string[] paths = CreateFiles("a-known");
+        Mock<IAlbumRepository> albumRepository = new();
+        FolderImportProcessor sut = await BuildReconcilingProcessorAsync(
+            albumRepository,
+            new AlbumEntity { Id = 10, Name = "Album", ArtistId = 2, IsCompilation = false },
+            _ => "Artist B",
+            new TrackEntity { Id = 1, MusicFile = paths[0], FileDate = _fileDate.AddDays(-1), ArtistId = 1, AlbumId = 99, GenreId = 5 });
+
+        // Act
+        await sut.ImportFolderAsync(_folder.FullName, new ImportStatisticsDto(), CancellationToken.None);
+
+        // Assert
+        Assert.Contains(1L, _tracking.GetUpdatedArtists());
+        Assert.Contains(2L, _tracking.GetUpdatedArtists());
+        Assert.Contains(99L, _tracking.GetUpdatedAlbums());
+        Assert.Contains(10L, _tracking.GetUpdatedAlbums());
+        Assert.Contains(5L, _tracking.GetUpdatedGenres());
+    }
+
+    private string CreateFilesIn(string relativeFolder, params string[] names)
+    {
+        string folder = Path.Combine(_folder.FullName, relativeFolder);
+
+        Directory.CreateDirectory(folder);
+
+        foreach (string name in names)
+        {
+            string path = Path.Combine(folder, name + ".mp3");
+
+            File.WriteAllBytes(path, [0]);
+            File.SetLastWriteTimeUtc(path, _fileDate);
+        }
+
+        return folder;
+    }
+
     private static TrackEntity Known(long id, string path, DateTime fileDate, long? artistId = null, long? albumId = null)
     {
         return new TrackEntity { Id = id, MusicFile = path, FileDate = fileDate, ArtistId = artistId, AlbumId = albumId };

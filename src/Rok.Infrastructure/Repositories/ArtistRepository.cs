@@ -18,6 +18,8 @@ public class ArtistRepository(IDbConnection connection, [FromKeyedServices("Back
     private const string DeleteOrphansSql = "DELETE FROM artists WHERE id NOT IN (SELECT DISTINCT artistId FROM tracks WHERE artistId IS NOT NULL)";
     private const string DefaultGroupBy = " GROUP BY artists.id ";
 
+    protected override string NameCollation => " COLLATE NOCASE";
+
     public async Task<IEnumerable<IArtistEntity>> SearchAsync(string name, RepositoryConnectionKind kind = RepositoryConnectionKind.Foreground)
     {
         if (string.IsNullOrWhiteSpace(name))

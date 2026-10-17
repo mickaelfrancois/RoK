@@ -314,6 +314,71 @@ public class AlbumImportTests
         Assert.Equal(9, import.GetFromCache("Mix", false, 30)!.Id);
     }
 
+    [Fact(DisplayName = "homonymous_compilations_in_two_folders_stay_two_albums")]
+    public async Task GetFromCache_ShouldKeepHomonymousCompilationsApart_WhenFoldersDiffer()
+    {
+        // Arrange
+        Mock<IAlbumRepository> repository = new();
+        repository.Setup(r => r.GetAllAsync(It.IsAny<RepositoryConnectionKind>()))
+            .ReturnsAsync(new List<AlbumEntity>
+            {
+                new() { Id = 1, Name = "Hits", IsCompilation = true, AlbumPath = @"C:\m\Hits 1" },
+                new() { Id = 2, Name = "Hits", IsCompilation = true, AlbumPath = @"C:\m\Hits 2" }
+            });
+        AlbumImport import = new(repository.Object, TimeProvider.System);
+        await import.LoadCacheAsync();
+
+        // Act
+        AlbumCacheItem? first = import.GetFromCache("Hits", true, null, @"C:\m\Hits 1");
+        AlbumCacheItem? second = import.GetFromCache("Hits", true, null, @"C:\m\Hits 2");
+        AlbumCacheItem? other = import.GetFromCache("Hits", true, null, @"C:\m\Hits 3");
+
+        // Assert
+        Assert.Equal(1, first!.Id);
+        Assert.Equal(2, second!.Id);
+        Assert.Null(other);
+    }
+
+    [Fact(DisplayName = "compilation_split_on_cd1_cd2_stays_one_album")]
+    public async Task GetFromCache_ShouldMergeDiscSubfolders_OfTheSameCompilation()
+    {
+        // Arrange
+        Mock<IAlbumRepository> repository = new();
+        repository.Setup(r => r.GetAllAsync(It.IsAny<RepositoryConnectionKind>()))
+            .ReturnsAsync(new List<AlbumEntity> { new() { Id = 1, Name = "Hits", IsCompilation = true, AlbumPath = @"C:\m\Hits\CD1" } });
+        AlbumImport import = new(repository.Object, TimeProvider.System);
+        await import.LoadCacheAsync();
+
+        // Act
+        AlbumCacheItem? hit = import.GetFromCache("Hits", true, null, @"C:\m\Hits\CD2");
+
+        // Assert
+        Assert.Equal(1, hit!.Id);
+    }
+
+    [Fact(DisplayName = "non_compilation_key_unchanged")]
+    public async Task GetFromCache_ShouldIgnoreFolder_WhenNotACompilation()
+    {
+        // Arrange
+        Mock<IAlbumRepository> repository = new();
+        repository.Setup(r => r.GetAllAsync(It.IsAny<RepositoryConnectionKind>()))
+            .ReturnsAsync(new List<AlbumEntity>
+            {
+                new() { Id = 1, Name = "Album", ArtistId = 10, AlbumPath = @"C:\m\a" },
+                new() { Id = 2, Name = "Orphan", AlbumPath = @"C:\m\b" }
+            });
+        AlbumImport import = new(repository.Object, TimeProvider.System);
+        await import.LoadCacheAsync();
+
+        // Act
+        AlbumCacheItem? withArtist = import.GetFromCache("Album", false, 10, @"C:\m\other");
+        AlbumCacheItem? withoutArtist = import.GetFromCache("Orphan", false, null, @"C:\m\elsewhere");
+
+        // Assert
+        Assert.Equal(1, withArtist!.Id);
+        Assert.Equal(2, withoutArtist!.Id);
+    }
+
     [Fact(DisplayName = "NewlyCreatedIds should be empty on initialization")]
     public void NewlyCreatedIds_ShouldBeEmpty_OnInitialization()
     {

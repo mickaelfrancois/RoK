@@ -57,6 +57,16 @@ public class DependencyInjectionTests
         Assert.Contains(services, d => d.ServiceType == typeof(IMigration) && d.ImplementationType == typeof(Migration22));
     }
 
+    [Fact(DisplayName = "migration_23_is_registered")]
+    public void AddInfrastructure_RegistersMigration23()
+    {
+        // Act
+        var services = Register();
+
+        // Assert
+        Assert.Contains(services, d => d.ServiceType == typeof(IMigration) && d.ImplementationType == typeof(Migration23));
+    }
+
     [Fact(DisplayName = "pending_tag_write_repository_is_registered")]
     public void AddInfrastructure_RegistersPendingTagWriteRepository()
     {

@@ -596,6 +596,21 @@ public class ArtistRepositoryTests
         Assert.Equal("Artist A", result!.Name);
     }
 
+    [Fact(DisplayName = "artist_get_by_name_ignores_case")]
+    public async Task GetByNameAsync_WithDifferentCase_ReturnsArtist()
+    {
+        // Arrange
+        using SqliteDatabaseFixture fixture = CreateFixture();
+        ArtistRepository repo = CreateRepository(fixture);
+
+        // Act
+        ArtistEntity? result = await repo.GetByNameAsync("aRTIST a");
+
+        // Assert
+        Assert.NotNull(result);
+        Assert.Equal("Artist A", result!.Name);
+    }
+
     [Fact]
     public async Task GetByNameAsync_WithNonExistentName_ReturnsNull()
     {
