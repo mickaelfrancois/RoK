@@ -1,4 +1,5 @@
 using Microsoft.Extensions.Logging;
+using Rok.Application.Features.Tags;
 using Rok.Application.Interfaces.Repositories;
 using Rok.Application.Player;
 using Rok.Application.Tag;
@@ -9,13 +10,32 @@ namespace Rok.Application.Features.Artists.Rename;
 /// <summary>
 /// Checks the files of an artist, then writes the artist name in their tags.
 /// Shared by the rename and the merge: both turn the files that carry the old name into files that carry the new one.
+/// The checking and the writing are delegated to <see cref="TrackFileTagWriter"/>.
 /// </summary>
-public class ArtistFileRewriter(
-    ITagWriter tagWriter,
-    ITrackRepository trackRepository,
-    IPlayerService playerService,
-    ILogger<ArtistFileRewriter> logger)
+public class ArtistFileRewriter
 {
+    private readonly TrackFileTagWriter _writer;
+    private readonly ITrackRepository _trackRepository;
+    private readonly ILogger<ArtistFileRewriter> _logger;
+
+    /// <summary>
+    /// Creates the rewriter.
+    /// </summary>
+    /// <param name="tagWriter">Writes and checks the tags of the files.</param>
+    /// <param name="trackRepository">Stores the file date and size of the written files.</param>
+    /// <param name="playerService">Tells which track is playing.</param>
+    /// <param name="logger">Receives the write incidents.</param>
+    public ArtistFileRewriter(
+        ITagWriter tagWriter,
+        ITrackRepository trackRepository,
+        IPlayerService playerService,
+        ILogger<ArtistFileRewriter> logger)
+    {
+        _writer = new TrackFileTagWriter(tagWriter, playerService, logger);
+        _trackRepository = trackRepository;
+        _logger = logger;
+    }
+
     /// <summary>
     /// Checks every file and tells which ones still carry the old name.
     /// </summary>
@@ -32,46 +52,19 @@ public class ArtistFileRewriter(
         IReadOnlyList<TrackEntity> playbackOnlyTracks,
         CancellationToken cancellationToken)
     {
-        List<ArtistRenameBlocker> blockers = [];
-        IReadOnlyList<TagWriteCheck> checks = await tagWriter.CheckAsync(tracks.Select(t => t.MusicFile).ToList(), cancellationToken);
-        TrackDto? playing = playerService.CurrentTrack;
-        List<ArtistFileState> files = [];
+        TrackFileAnalysis analysis = await _writer.AnalyzeAsync(
+            tracks,
+            playbackOnlyTracks,
+            cancellationToken,
+            (track, check) => NeedsWrite(check.CurrentArtist, oldName, newName) is null
+                ? new ArtistRenameBlocker(track.MusicFile, EArtistRenameBlock.OutOfSync, check.CurrentArtist)
+                : null);
 
-        for (int i = 0; i < tracks.Count; i++)
-        {
-            TrackEntity track = tracks[i];
-            TagWriteCheck check = checks[i];
+        List<ArtistFileState> files = analysis.Files
+            .Select(f => new ArtistFileState(f.Track, f.Check, NeedsWrite(f.Check.CurrentArtist, oldName, newName)!.Value))
+            .ToList();
 
-            if (IsPlaying(playing, track))
-            {
-                blockers.Add(new ArtistRenameBlocker(track.MusicFile, EArtistRenameBlock.Playing, null));
-                continue;
-            }
-
-            if (check.Reason != ETagWriteReason.None)
-            {
-                blockers.Add(new ArtistRenameBlocker(track.MusicFile, ToBlock(check.Reason), check.Reason.ToString()));
-                continue;
-            }
-
-            bool? needsWrite = NeedsWrite(check.CurrentArtist, oldName, newName);
-
-            if (needsWrite is null)
-            {
-                blockers.Add(new ArtistRenameBlocker(track.MusicFile, EArtistRenameBlock.OutOfSync, check.CurrentArtist));
-                continue;
-            }
-
-            files.Add(new ArtistFileState(track, check, needsWrite.Value));
-        }
-
-        foreach (TrackEntity track in playbackOnlyTracks)
-        {
-            if (IsPlaying(playing, track))
-                blockers.Add(new ArtistRenameBlocker(track.MusicFile, EArtistRenameBlock.Playing, null));
-        }
-
-        return new ArtistFileAnalysis(tracks, files, blockers);
+        return new ArtistFileAnalysis(tracks, files, analysis.Blockers);
     }
 
     /// <summary>
@@ -85,9 +78,10 @@ public class ArtistFileRewriter(
     /// <returns>The files that could not be written.</returns>
     public async Task<List<ArtistRenameFailure>> WriteAsync(ArtistFileAnalysis analysis, string newName, bool storeInfoOfDoneFiles, IProgress<ArtistRenameProgress>? progress, CancellationToken cancellationToken)
     {
-        List<ArtistRenameFailure> failures = [];
-        List<ArtistFileState> toWrite = analysis.Files.Where(f => f.NeedsWrite).ToList();
-        int done = 0;
+        List<PlannedFileWrite> toWrite = analysis.Files
+            .Where(f => f.NeedsWrite)
+            .Select(f => new PlannedFileWrite(f.Track, new TagChanges { Artist = newName }))
+            .ToList();
 
         if (storeInfoOfDoneFiles)
         {
@@ -95,51 +89,7 @@ public class ArtistFileRewriter(
                 await StoreFileInfoAsync(file.Track.Id, file.Check.FileDateModified, file.Check.Size);
         }
 
-        foreach (ArtistFileState file in toWrite)
-        {
-            if (cancellationToken.IsCancellationRequested)
-            {
-                failures.Add(new ArtistRenameFailure(file.Track.MusicFile, ETagWriteReason.Cancelled));
-                continue;
-            }
-
-            ETagWriteReason failure = await WriteFileAsync(newName, file);
-
-            if (failure != ETagWriteReason.None)
-                failures.Add(new ArtistRenameFailure(file.Track.MusicFile, failure));
-
-            done++;
-            progress?.Report(new ArtistRenameProgress(done, toWrite.Count));
-        }
-
-        return failures;
-    }
-
-    private async Task<ETagWriteReason> WriteFileAsync(string newName, ArtistFileState file)
-    {
-        TagWriteRequest request = new(file.Track.MusicFile, new TagChanges { Artist = newName });
-
-        try
-        {
-            IReadOnlyList<TagWriteResult> results = await tagWriter.WriteAsync([request], CancellationToken.None);
-            TagWriteResult result = results[0];
-
-            if (result.Outcome != ETagWriteOutcome.Succeeded)
-                return result.Reason == ETagWriteReason.None ? ETagWriteReason.IoError : result.Reason;
-
-            if (result.Values is null || !string.Equals(result.Values.Artist, newName, StringComparison.Ordinal))
-                return ETagWriteReason.VerificationFailed;
-
-            await StoreFileInfoAsync(file.Track.Id, result.FileDateModified, result.Size);
-
-            return ETagWriteReason.None;
-        }
-        catch (Exception ex)
-        {
-            logger.LogError(ex, "Could not write the artist name in {File}.", file.Track.MusicFile);
-
-            return ETagWriteReason.IoError;
-        }
+        return await _writer.WriteAsync(toWrite, StoreFileInfoAsync, progress, cancellationToken);
     }
 
     private async Task StoreFileInfoAsync(long trackId, DateTimeOffset? fileDate, long? size)
@@ -149,11 +99,11 @@ public class ArtistFileRewriter(
 
         try
         {
-            await trackRepository.UpdateFileInfoAsync(trackId, fileDate.Value.DateTime, size.Value);
+            await _trackRepository.UpdateFileInfoAsync(trackId, fileDate.Value.DateTime, size.Value);
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Artist written in the file of track id {Id} but its file info could not be stored. The next rescan will realign it.", trackId);
+            _logger.LogError(ex, "Artist written in the file of track id {Id} but its file info could not be stored. The next rescan will realign it.", trackId);
         }
     }
 
@@ -171,30 +121,6 @@ public class ArtistFileRewriter(
             return false;
 
         return null;
-    }
-
-    private static bool IsPlaying(TrackDto? current, TrackEntity track)
-    {
-        if (current is null)
-            return false;
-
-        return current.Id == track.Id || string.Equals(current.MusicFile, track.MusicFile, StringComparison.OrdinalIgnoreCase);
-    }
-
-    private static EArtistRenameBlock ToBlock(ETagWriteReason reason)
-    {
-        return reason switch
-        {
-            ETagWriteReason.NotFound => EArtistRenameBlock.NotFound,
-            ETagWriteReason.ReadOnly => EArtistRenameBlock.ReadOnly,
-            ETagWriteReason.CloudPlaceholder => EArtistRenameBlock.CloudPlaceholder,
-            ETagWriteReason.UnsupportedFormat => EArtistRenameBlock.UnsupportedFormat,
-            ETagWriteReason.InsufficientDiskSpace => EArtistRenameBlock.InsufficientDiskSpace,
-            ETagWriteReason.UnsupportedTagVersion => EArtistRenameBlock.UnsupportedTagVersion,
-            ETagWriteReason.Playing => EArtistRenameBlock.Playing,
-            ETagWriteReason.ImportInProgress => EArtistRenameBlock.ImportInProgress,
-            _ => EArtistRenameBlock.Locked
-        };
     }
 }
 

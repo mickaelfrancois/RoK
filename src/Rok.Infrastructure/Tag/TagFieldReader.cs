@@ -36,6 +36,36 @@ internal static class TagFieldReader
     }
 
     /// <summary>
+    /// Reads the album with the normalization the library import applies.
+    /// </summary>
+    /// <param name="tag">Combined tag of an open file.</param>
+    /// <returns>The trimmed, normalized album, empty when absent.</returns>
+    public static string ReadAlbum(TagLib.Tag tag)
+    {
+        return (tag.Album?.Trim() ?? "").NormalizeIndexedName();
+    }
+
+    /// <summary>
+    /// Reads the first genre with the normalization the library import applies.
+    /// </summary>
+    /// <param name="tag">Combined tag of an open file.</param>
+    /// <returns>The trimmed, normalized first genre, empty when absent.</returns>
+    public static string ReadGenre(TagLib.Tag tag)
+    {
+        return (tag.FirstGenre?.Trim() ?? "").NormalizeIndexedName();
+    }
+
+    /// <summary>
+    /// Reads the year as the library import does.
+    /// </summary>
+    /// <param name="tag">Combined tag of an open file.</param>
+    /// <returns>The year, null when absent or not positive.</returns>
+    public static int? ReadYear(TagLib.Tag tag)
+    {
+        return tag.Year > 0 ? (int)tag.Year : null;
+    }
+
+    /// <summary>
     /// Joins artist values into the canonical text kept in a snapshot.
     /// </summary>
     /// <param name="values">Values of an artist field.</param>
@@ -89,7 +119,10 @@ internal static class TagFieldReader
             tag.JoinedComposers?.Trim() ?? "",
             tag.BeatsPerMinute > 0 ? (int)tag.BeatsPerMinute : null)
         {
-            Artist = ReadArtist(tag)
+            Artist = ReadArtist(tag),
+            Album = ReadAlbum(tag),
+            Genre = ReadGenre(tag),
+            Year = ReadYear(tag)
         };
     }
 
@@ -110,7 +143,10 @@ internal static class TagFieldReader
             CanonicalComposers(tag.JoinedComposers),
             JoinArtistValues(tag.AlbumArtists),
             JoinArtistValues(tag.Performers),
-            ArtistSource(tag));
+            ArtistSource(tag),
+            tag.Album,
+            JoinArtistValues(tag.Genres),
+            tag.Year);
     }
 
     /// <summary>

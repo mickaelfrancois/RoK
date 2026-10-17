@@ -1,4 +1,5 @@
-﻿using Rok.Application.Features.Artists.Merge;
+﻿using Rok.Application.Features.Albums.Edit;
+using Rok.Application.Features.Artists.Merge;
 using Rok.Application.Features.Artists.Rename;
 using Rok.Application.Features.Tracks.Services;
 
@@ -9,8 +10,24 @@ public interface IDialogService
     Task ShowTextAsync(string title, string content, bool showTranslateButton = false, string targetLanguage = "fr");
 
     /// <summary>Shows the album edit dialog seeded with <paramref name="current"/>.</summary>
+    /// <param name="current">The values the album has now.</param>
+    /// <param name="taggedMode">Whether the fields written into the tags are hidden, locked or editable.</param>
+    /// <param name="suggestions">The names the artist and genre fields suggest.</param>
+    /// <param name="validateAsync">Judges the typed values when the user saves; returns the message to show, or <see langword="null"/> when they are accepted.</param>
     /// <returns>The edited values when the user confirms; <see langword="null"/> when the dialog is dismissed.</returns>
-    Task<AlbumEditValues?> ShowEditAlbumAsync(AlbumEditValues current);
+    Task<AlbumEditValues?> ShowEditAlbumAsync(AlbumEditValues current, AlbumTaggedFieldsMode taggedMode, AlbumEditSuggestions suggestions, Func<AlbumEditValues, Task<string?>> validateAsync);
+
+    /// <summary>Shows the album tag write dialog: the confirmation, then the progress, then the result.</summary>
+    /// <param name="prompt">What the write would do.</param>
+    /// <param name="writeAsync">Runs the write and reports its progress; called again when the user retries.</param>
+    /// <returns>The last outcome that changed the library (completed or partial); <see langword="null"/> when nothing was written.</returns>
+    Task<AlbumTagWriteOutcome?> ShowAlbumTagWriteAsync(AlbumTagWritePrompt prompt, Func<IProgress<ArtistRenameProgress>, Task<AlbumTagWriteAttempt>> writeAsync);
+
+    /// <summary>Shows the album merge dialog: the choice of the albums, the preview, then the progress and the result.</summary>
+    /// <param name="request">What the dialog starts with.</param>
+    /// <param name="actions">What the dialog calls to preview, run and search.</param>
+    /// <returns>The last outcome that changed the library (completed or partial); <see langword="null"/> when nothing was merged.</returns>
+    Task<AlbumTagWriteOutcome?> ShowMergeAlbumsAsync(AlbumMergeDialogRequest request, AlbumMergeDialogActions actions);
 
     /// <summary>Shows the artist edit dialog seeded with <paramref name="current"/>.</summary>
     /// <param name="current">The values the artist has now.</param>

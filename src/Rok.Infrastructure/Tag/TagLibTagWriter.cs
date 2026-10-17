@@ -137,11 +137,12 @@ public sealed class TagLibTagWriter : ITagWriter, ITagWriteRecovery
             if (reason != ETagWriteReason.None || format is null)
                 return new TagWriteCheck(path, reason, null);
 
-            string artist = TagFieldReader.ReadFile(path, format.MimeType).Artist;
+            TagFieldValues current = TagFieldReader.ReadFile(path, format.MimeType);
             FileInfo info = new(path);
 
-            return new TagWriteCheck(path, ETagWriteReason.None, artist)
+            return new TagWriteCheck(path, ETagWriteReason.None, current.Artist)
             {
+                Current = current,
                 FileDateModified = new DateTimeOffset(info.LastWriteTimeUtc),
                 Size = info.Length
             };
@@ -390,8 +391,13 @@ public sealed class TagLibTagWriter : ITagWriter, ITagWriteRecovery
     {
         TagFieldValues values = TagFieldReader.ReadFile(path, format.MimeType);
 
-        if (changes.Artist is null)
-            values = values with { Artist = "" };
+        values = values with
+        {
+            Artist = changes.Artist is null ? "" : values.Artist,
+            Album = changes.Album is null ? "" : values.Album,
+            Genre = changes.Genre is null ? "" : values.Genre,
+            Year = changes.Year is null ? null : values.Year
+        };
 
         return Succeeded(path) with { Values = values };
     }

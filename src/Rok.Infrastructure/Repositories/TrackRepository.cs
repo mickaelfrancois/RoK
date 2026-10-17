@@ -18,6 +18,9 @@ public class TrackRepository(IDbConnection db, [FromKeyedServices("BackgroundCon
     private const string UpdateTagFieldsAndFileInfoSql = "UPDATE tracks SET title = @title, trackNumber = @trackNumber, disc = @disc, composers = @composers, bpm = @bpm, fileDate = @fileDate, size = @size, editDate = @editDate WHERE id = @id";
     private const string UpdateGetLyricsLastAttemptSql = "UPDATE tracks SET getLyricsLastAttempt = @lastAttemptDate WHERE id = @id";
     private const string DefaultGroupBy = " GROUP BY tracks.id ";
+    private const string SelectPendingTagWritesSql = "SELECT p.trackId AS TrackId, p.fields AS Fields FROM pendingTagWrites p INNER JOIN tracks t ON t.id = p.trackId";
+
+    private sealed record PendingTagWriteRow(long TrackId, long Fields);
 
     public async Task<IEnumerable<TrackEntity>> SearchAsync(string name, RepositoryConnectionKind kind = RepositoryConnectionKind.Foreground)
     {
@@ -188,6 +191,14 @@ public class TrackRepository(IDbConnection db, [FromKeyedServices("BackgroundCon
 
         IDbConnection localConnection = ResolveConnection(RepositoryConnectionKind.Foreground);
         return await localConnection.QueryFirstOrDefaultAsync<TrackEntity>(new CommandDefinition(sql, new { filePath }, cancellationToken: cancellationToken));
+    }
+
+    public async Task<IEnumerable<PendingTagWrite>> GetPendingTagWritesAsync(RepositoryConnectionKind kind = RepositoryConnectionKind.Foreground)
+    {
+        IDbConnection localConnection = ResolveConnection(kind);
+        IEnumerable<PendingTagWriteRow> rows = await localConnection.QueryAsync<PendingTagWriteRow>(new CommandDefinition(SelectPendingTagWritesSql, transaction: _transaction));
+
+        return rows.Select(r => new PendingTagWrite(r.TrackId, (Rok.Domain.Enums.ETagWriteFields)(int)r.Fields)).ToList();
     }
 
     public override string GetSelectQuery(string? whereParam = null)

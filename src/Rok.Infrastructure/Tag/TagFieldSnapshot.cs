@@ -15,6 +15,9 @@ namespace Rok.Infrastructure.Tag;
 /// <param name="AlbumArtists">Album artists joined by a separator that cannot occur in a name.</param>
 /// <param name="Performers">Performers joined by a separator that cannot occur in a name.</param>
 /// <param name="ArtistSource">Field that defines the artist.</param>
+/// <param name="Album">Album as read.</param>
+/// <param name="Genres">Genres joined by a separator that cannot occur in a name.</param>
+/// <param name="Year">Year, 0 when absent.</param>
 internal sealed record TagFieldSnapshot(
     string? Title,
     uint Track,
@@ -25,7 +28,10 @@ internal sealed record TagFieldSnapshot(
     string Composers,
     string AlbumArtists,
     string Performers,
-    EArtistSource ArtistSource)
+    EArtistSource ArtistSource,
+    string? Album,
+    string Genres,
+    uint Year)
 {
     /// <summary>
     /// Gives the snapshot a verified copy must have once the changes are applied.
@@ -45,8 +51,13 @@ internal sealed record TagFieldSnapshot(
                 performers = TagFieldReader.ReplaceFirstJoinedArtistValue(Performers, changes.Artist);
         }
 
+        string genres = changes.Genre is null ? Genres : TagFieldReader.ReplaceFirstJoinedArtistValue(Genres, changes.Genre);
+
         return this with
         {
+            Album = changes.Album ?? Album,
+            Genres = genres,
+            Year = (uint?)changes.Year ?? Year,
             AlbumArtists = albumArtists,
             Performers = performers,
             Title = changes.Title ?? Title,

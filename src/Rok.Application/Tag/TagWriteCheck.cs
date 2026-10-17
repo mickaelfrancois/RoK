@@ -17,4 +17,9 @@ public sealed record TagWriteCheck(string FilePath, ETagWriteReason Reason, stri
     /// Size in bytes of the file, when it could be read.
     /// </summary>
     public long? Size { get; init; }
+
+    /// <summary>
+    /// Every editable value read as the library import reads it, null when the file cannot be read.
+    /// </summary>
+    public TagFieldValues? Current { get; init; }
 }

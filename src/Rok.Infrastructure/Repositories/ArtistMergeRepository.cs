@@ -3,6 +3,7 @@ using Rok.Application.Features.Artists.Merge;
 using Rok.Application.Features.Artists.Rename;
 using Rok.Application.Interfaces.Repositories;
 using Rok.Domain.Enums;
+using Rok.Infrastructure.Repositories.Sql;
 
 namespace Rok.Infrastructure.Repositories;
 
@@ -26,49 +27,15 @@ public class ArtistMergeRepository(IDbConnection connection, ILogger<ArtistMerge
     private const string MoveTracksSql = "UPDATE tracks SET artistId = @targetId WHERE artistId = @sourceId";
     private const string MoveAlbumsSql = "UPDATE albums SET artistId = @targetId WHERE artistId = @sourceId";
     private const string ConvertCompilationsSql = "UPDATE albums SET isCompilation = 0, artistId = @targetId WHERE id IN @ids";
-    private const string MoveAlbumTracksSql = "UPDATE tracks SET albumId = @survivorId WHERE albumId IN @mergedIds";
-    private const string MoveAlbumEventsSql = "UPDATE ListeningEvents SET albumId = @survivorId WHERE albumId IN @mergedIds";
-    private const string UnionAlbumTagsSql = "INSERT OR IGNORE INTO AlbumTags(albumId, tagId) SELECT @survivorId, tagId FROM AlbumTags WHERE albumId IN @mergedIds";
-    private const string DeleteAlbumTagsSql = "DELETE FROM AlbumTags WHERE albumId IN @mergedIds";
-    private const string UpdateSurvivorSql = "UPDATE albums SET isFavorite = @isFavorite, listenCount = @listenCount, lastListen = @lastListen WHERE id = @survivorId";
-    private const string DeleteAlbumsSql = "DELETE FROM albums WHERE id IN @mergedIds";
     private const string MoveArtistEventsSql = "UPDATE ListeningEvents SET artistId = @targetId WHERE artistId = @sourceId";
     private const string UnionArtistTagsSql = "INSERT OR IGNORE INTO ArtistTags(artistId, tagId) SELECT @targetId, tagId FROM ArtistTags WHERE artistId = @sourceId";
     private const string DeleteArtistTagsSql = "DELETE FROM ArtistTags WHERE artistId = @sourceId";
     private const string CountPresetsSql = "SELECT COUNT(*) FROM EqualizerPreset WHERE Scope = @scope AND ScopeId = @scopeId";
     private const string DeletePresetSql = "DELETE FROM EqualizerPreset WHERE Scope = @scope AND ScopeId = @scopeId";
     private const string MovePresetSql = "UPDATE EqualizerPreset SET ScopeId = @scopeId WHERE Scope = @scope AND ScopeId = @fromId";
-    private const string SelectSmallestPresetOwnerSql = "SELECT MIN(ScopeId) FROM EqualizerPreset WHERE Scope = @scope AND ScopeId IN @ids";
-    private const string DeletePresetsOfSql = "DELETE FROM EqualizerPreset WHERE Scope = @scope AND ScopeId IN @ids";
     private const string UpdatePlaylistPictureSql = "UPDATE playlists SET picture = @targetName WHERE picture = @sourceName COLLATE NOCASE";
     private const string UpdatePlaylistCriteriaSql = "UPDATE playlists SET groupsJson = @groupsJson WHERE id = @playlistId";
-    private const string UpdateAlbumStatisticsSql = "UPDATE albums SET trackCount = (SELECT COUNT(*) FROM tracks WHERE albumId = @survivorId), duration = (SELECT COALESCE(SUM(duration), 0) FROM tracks WHERE albumId = @survivorId) WHERE id = @survivorId";
-
-    private const string UpdateTargetStatisticsSql = """
-        UPDATE artists SET
-            trackCount = (SELECT COUNT(*) FROM tracks WHERE artistId = @targetId),
-            totalDurationSeconds = (SELECT COALESCE(SUM(duration), 0) FROM tracks WHERE artistId = @targetId),
-            albumCount = (SELECT COUNT(*) FROM albums WHERE artistId = @targetId AND isCompilation = 0 AND isLive = 0 AND isBestof = 0),
-            bestofCount = (SELECT COUNT(*) FROM albums WHERE artistId = @targetId AND isBestof = 1 AND isCompilation = 0),
-            liveCount = (SELECT COUNT(*) FROM albums WHERE artistId = @targetId AND isLive = 1 AND isCompilation = 0),
-            compilationCount = (SELECT COUNT(*) FROM albums WHERE artistId = @targetId AND isCompilation = 1),
-            yearMini = NULLIF((SELECT MIN(year) FROM albums WHERE artistId = @targetId AND year IS NOT NULL AND isCompilation = 0 AND isLive = 0 AND isBestof = 0), 0),
-            yearMaxi = NULLIF((SELECT MAX(year) FROM albums WHERE artistId = @targetId AND year IS NOT NULL AND isCompilation = 0 AND isLive = 0 AND isBestof = 0), 0)
-        WHERE id = @targetId
-        """;
-
     private const string SelectGenresOfAlbumsSql = "SELECT DISTINCT genreId FROM albums WHERE id IN @ids AND genreId IS NOT NULL";
-    private const string UpdateGenreArtistCountSql = "UPDATE genres SET artistCount = (SELECT COUNT(*) FROM artists WHERE genreId = @genreId) WHERE id = @genreId";
-
-    private const string UpdateGenreAlbumCountersSql = """
-        UPDATE genres SET
-            albumCount = (SELECT COUNT(*) FROM albums WHERE genreId = @genreId AND isCompilation = 0 AND isLive = 0 AND isBestof = 0),
-            bestofCount = (SELECT COUNT(*) FROM albums WHERE genreId = @genreId AND isBestof = 1 AND isCompilation = 0),
-            liveCount = (SELECT COUNT(*) FROM albums WHERE genreId = @genreId AND isLive = 1 AND isCompilation = 0),
-            compilationCount = (SELECT COUNT(*) FROM albums WHERE genreId = @genreId AND isCompilation = 1)
-        WHERE id = @genreId
-        """;
-
     private const string DeleteSourceSql = "DELETE FROM artists WHERE id = @sourceId";
 
     public async Task ApplyAsync(ArtistMergeDbChange change, CancellationToken cancellationToken = default)
@@ -129,7 +96,7 @@ public class ArtistMergeRepository(IDbConnection connection, ILogger<ArtistMerge
 
         foreach (AlbumMergeGroup group in change.AlbumGroups)
         {
-            await MergeAlbumGroupAsync(group, transaction, cancellationToken);
+            await AlbumGroupMergeSql.MergeAsync(connection, group, transaction, cancellationToken);
         }
 
         await ExecuteAsync(MoveArtistEventsSql, new { targetId, sourceId }, transaction, cancellationToken);
@@ -155,35 +122,6 @@ public class ArtistMergeRepository(IDbConnection connection, ILogger<ArtistMerge
         await UpdateGenreCountersAsync(sourceGenreId, change.Merged.GenreId, albumGenreIds, transaction, cancellationToken);
     }
 
-    private async Task MergeAlbumGroupAsync(AlbumMergeGroup group, IDbTransaction transaction, CancellationToken cancellationToken)
-    {
-        long survivorId = group.SurvivorId;
-        long[] mergedIds = [.. group.MergedIds];
-
-        if (mergedIds.Length == 0)
-            return;
-
-        await ExecuteAsync(MoveAlbumTracksSql, new { survivorId, mergedIds }, transaction, cancellationToken);
-        await ExecuteAsync(MoveAlbumEventsSql, new { survivorId, mergedIds }, transaction, cancellationToken);
-        await ExecuteAsync(UnionAlbumTagsSql, new { survivorId, mergedIds }, transaction, cancellationToken);
-        await ExecuteAsync(DeleteAlbumTagsSql, new { mergedIds }, transaction, cancellationToken);
-
-        string scope = nameof(EqualizerScope.Album);
-        bool survivorHasPreset = await connection.ExecuteScalarAsync<int>(Command(CountPresetsSql, new { scope, scopeId = survivorId }, transaction, cancellationToken)) > 0;
-
-        if (!survivorHasPreset)
-        {
-            long? presetOwner = await connection.ExecuteScalarAsync<long?>(Command(SelectSmallestPresetOwnerSql, new { scope, ids = mergedIds }, transaction, cancellationToken));
-
-            if (presetOwner is not null)
-                await ExecuteAsync(MovePresetSql, new { scope, scopeId = survivorId, fromId = presetOwner.Value }, transaction, cancellationToken);
-        }
-
-        await ExecuteAsync(DeletePresetsOfSql, new { scope, ids = mergedIds }, transaction, cancellationToken);
-        await ExecuteAsync(UpdateSurvivorSql, new { isFavorite = group.IsFavorite, listenCount = group.ListenCount, lastListen = group.LastListen, survivorId }, transaction, cancellationToken);
-        await ExecuteAsync(DeleteAlbumsSql, new { mergedIds }, transaction, cancellationToken);
-    }
-
     private async Task MoveArtistPresetAsync(long sourceId, long targetId, IDbTransaction transaction, CancellationToken cancellationToken)
     {
         string scope = nameof(EqualizerScope.Artist);
@@ -203,22 +141,22 @@ public class ArtistMergeRepository(IDbConnection connection, ILogger<ArtistMerge
     {
         foreach (AlbumMergeGroup group in change.AlbumGroups)
         {
-            await ExecuteAsync(UpdateAlbumStatisticsSql, new { survivorId = group.SurvivorId }, transaction, cancellationToken);
+            await LibraryCounterSql.UpdateAlbumAsync(connection, group.SurvivorId, transaction, cancellationToken);
         }
 
-        await ExecuteAsync(UpdateTargetStatisticsSql, new { targetId = change.TargetId }, transaction, cancellationToken);
+        await LibraryCounterSql.UpdateArtistAsync(connection, change.TargetId, transaction, cancellationToken);
     }
 
     private async Task UpdateGenreCountersAsync(long? sourceGenreId, long? targetGenreId, IReadOnlyCollection<long> mergedAlbumGenreIds, IDbTransaction transaction, CancellationToken cancellationToken)
     {
         foreach (long genreId in new[] { sourceGenreId, targetGenreId }.OfType<long>().Distinct())
         {
-            await ExecuteAsync(UpdateGenreArtistCountSql, new { genreId }, transaction, cancellationToken);
+            await LibraryCounterSql.UpdateGenreArtistCountAsync(connection, genreId, transaction, cancellationToken);
         }
 
         foreach (long genreId in mergedAlbumGenreIds.Concat(new[] { sourceGenreId, targetGenreId }.OfType<long>()).Distinct())
         {
-            await ExecuteAsync(UpdateGenreAlbumCountersSql, new { genreId }, transaction, cancellationToken);
+            await LibraryCounterSql.UpdateGenreAlbumCountersAsync(connection, genreId, transaction, cancellationToken);
         }
     }
 

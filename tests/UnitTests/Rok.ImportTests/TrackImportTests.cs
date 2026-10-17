@@ -1,5 +1,6 @@
 using Moq;
 using Rok.Application.Interfaces.Repositories;
+using Rok.Domain.Enums;
 using Rok.Import;
 
 namespace Rok.ImportTests;
@@ -76,6 +77,46 @@ public class TrackImportTests
         Assert.Equal(2, result.Count);
         Assert.All(result, t => Assert.Equal(5, t.AlbumId));
         Assert.Empty(import.GetCachedTracksOfAlbum(99));
+    }
+
+    [Fact(DisplayName = "load_cache_reads_the_pending_fields_by_track_and_reload_replaces_them")]
+    public async Task LoadCache_ShouldReadPendingFields_AndReplaceThemOnReload()
+    {
+        // Arrange
+        Mock<ITrackRepository> repository = new();
+        repository.SetupSequence(r => r.GetPendingTagWritesAsync(It.IsAny<RepositoryConnectionKind>()))
+            .ReturnsAsync([new PendingTagWrite(1, ETagWriteFields.Album | ETagWriteFields.Disc)])
+            .ReturnsAsync([]);
+        TrackImport import = new(repository.Object);
+
+        // Act
+        await import.LoadCacheAsync();
+        ETagWriteFields loaded = import.GetPendingFields(1);
+        ETagWriteFields other = import.GetPendingFields(2);
+
+        await import.LoadCacheAsync();
+        ETagWriteFields reloaded = import.GetPendingFields(1);
+
+        // Assert
+        Assert.Equal(ETagWriteFields.Album | ETagWriteFields.Disc, loaded);
+        Assert.Equal(ETagWriteFields.None, other);
+        Assert.Equal(ETagWriteFields.None, reloaded);
+    }
+
+    [Fact(DisplayName = "load_cache_treats_a_null_pending_list_as_empty")]
+    public async Task LoadCache_NullPendingList_ShouldReportNoPendingFields()
+    {
+        // Arrange
+        Mock<ITrackRepository> repository = new();
+        repository.Setup(r => r.GetPendingTagWritesAsync(It.IsAny<RepositoryConnectionKind>()))
+            .ReturnsAsync((IEnumerable<PendingTagWrite>)null!);
+        TrackImport import = new(repository.Object);
+
+        // Act
+        await import.LoadCacheAsync();
+
+        // Assert
+        Assert.Equal(ETagWriteFields.None, import.GetPendingFields(1));
     }
 
     [Fact(DisplayName = "UpdateTrackAsync should delegate to repository UpdateAsync")]

@@ -1,0 +1,74 @@
+<ContentDialog x:Class="Rok.Dialogs.MergeAlbumDialog"
+               xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+               xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+               x:Uid="MergeAlbumDialog"
+               Title=""
+               MinWidth="560"
+               PrimaryButtonText=""
+               CloseButtonText=""
+               DefaultButton="Close">
+
+    <StackPanel Spacing="12">
+        <TextBlock x:Name="IntroText"
+                   TextWrapping="Wrap"
+                   Visibility="Collapsed" />
+
+        <AutoSuggestBox x:Name="OtherBox"
+                        TextMemberPath="Label"
+                        QueryIcon="Find"
+                        Visibility="Collapsed"
+                        TextChanged="OtherBox_TextChanged"
+                        SuggestionChosen="OtherBox_SuggestionChosen" />
+
+        <StackPanel x:Name="KeepPanel"
+                    Spacing="4"
+                    Visibility="Collapsed">
+            <TextBlock x:Name="KeepHeader"
+                       Style="{StaticResource BodyStrongTextBlockStyle}"
+                       TextWrapping="Wrap" />
+            <RadioButton x:Name="KeepFirstButton"
+                         GroupName="AlbumMergeKeep"
+                         Checked="KeepButton_Checked" />
+            <RadioButton x:Name="KeepSecondButton"
+                         GroupName="AlbumMergeKeep"
+                         Checked="KeepButton_Checked" />
+        </StackPanel>
+
+        <TextBlock x:Name="SummaryText"
+                   Style="{StaticResource BodyStrongTextBlockStyle}"
+                   TextWrapping="Wrap"
+                   IsTextSelectionEnabled="True" />
+
+        <TextBlock x:Name="CountsText"
+                   TextWrapping="Wrap" />
+
+        <ScrollViewer x:Name="DetailScroll"
+                      MaxHeight="260"
+                      VerticalScrollBarVisibility="Auto"
+                      Visibility="Collapsed">
+            <StackPanel x:Name="DetailPanel"
+                        Spacing="2" />
+        </ScrollViewer>
+
+        <CheckBox x:Name="ShiftBox"
+                  Visibility="Collapsed"
+                  Checked="ShiftBox_Changed"
+                  Unchecked="ShiftBox_Changed" />
+
+        <StackPanel x:Name="ProgressPanel"
+                    Spacing="4"
+                    Visibility="Collapsed">
+            <ProgressBar x:Name="MergeProgress"
+                         Minimum="0"
+                         Maximum="1"
+                         Value="0"
+                         IsIndeterminate="True" />
+            <TextBlock x:Name="ProgressText" />
+        </StackPanel>
+
+        <InfoBar x:Name="ErrorBar"
+                 Severity="Error"
+                 IsOpen="False"
+                 IsClosable="False" />
+    </StackPanel>
+</ContentDialog>

@@ -99,10 +99,14 @@ public static class DependencyInjection
         services.AddSingleton<IMigration, Migration18>();
         services.AddSingleton<IMigration, Migration19>();
         services.AddSingleton<IMigration, Migration20>();
+        services.AddSingleton<IMigration, Migration21>();
 
         services.AddScoped<IArtistRepository, ArtistRepository>();
         services.AddScoped<IArtistRenameRepository, ArtistRenameRepository>();
         services.AddScoped<IArtistMergeRepository, ArtistMergeRepository>();
+        services.AddScoped<IPendingTagWriteRepository, PendingTagWriteRepository>();
+        services.AddScoped<IAlbumEditRepository, AlbumEditRepository>();
+        services.AddScoped<IAlbumMergeRepository, AlbumMergeRepository>();
         services.AddScoped<IAlbumRepository, AlbumRepository>();
         services.AddScoped<IGenreRepository, GenreRepository>();
         services.AddScoped<ITrackRepository, TrackRepository>();

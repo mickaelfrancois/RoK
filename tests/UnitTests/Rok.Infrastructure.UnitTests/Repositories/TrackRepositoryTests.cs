@@ -2,7 +2,9 @@
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Time.Testing;
 using Rok.Application.Interfaces;
+using Rok.Application.Interfaces.Repositories;
 using Rok.Application.Tag;
+using Rok.Domain.Enums;
 using Rok.Domain.Entities;
 using Rok.Infrastructure.Repositories;
 
@@ -18,6 +20,58 @@ public class TrackRepositoryTests
     private static TrackRepository CreateRepository(SqliteDatabaseFixture fixture)
     {
         return new TrackRepository(fixture.Connection, fixture.Connection, NullLogger<TrackRepository>.Instance, TimeProvider.System);
+    }
+
+    [Fact]
+    public async Task GetPendingTagWritesAsync_ReturnsRowsOfExistingTracksOnly()
+    {
+        // Arrange
+        using SqliteDatabaseFixture fixture = CreateFixture();
+        TrackRepository repo = CreateRepository(fixture);
+        fixture.Connection.Execute("INSERT INTO pendingTagWrites(trackId, fields) VALUES (1, 3), (3, 16)");
+        fixture.Connection.Execute("PRAGMA foreign_keys = OFF");
+        fixture.Connection.Execute("INSERT INTO pendingTagWrites(trackId, fields) VALUES (9999, 8)");
+        fixture.Connection.Execute("PRAGMA foreign_keys = ON");
+
+        // Act
+        List<PendingTagWrite> result = (await repo.GetPendingTagWritesAsync()).OrderBy(p => p.TrackId).ToList();
+
+        // Assert
+        Assert.Equal(
+            [new PendingTagWrite(1, ETagWriteFields.Album | ETagWriteFields.Artist), new PendingTagWrite(3, ETagWriteFields.Disc)],
+            result);
+    }
+
+    [Fact]
+    public async Task GetPendingTagWritesAsync_WithoutRows_ReturnsEmptyCollection()
+    {
+        // Arrange
+        using SqliteDatabaseFixture fixture = CreateFixture();
+        TrackRepository repo = CreateRepository(fixture);
+
+        // Act
+        IEnumerable<PendingTagWrite> result = await repo.GetPendingTagWritesAsync(RepositoryConnectionKind.Background);
+
+        // Assert
+        Assert.Empty(result);
+    }
+
+    [Fact(DisplayName = "track_import_loads_pending_fields_through_the_real_repository")]
+    public async Task TrackImport_LoadCache_ReadsPendingFieldsThroughTheRealRepository()
+    {
+        // Arrange
+        using SqliteDatabaseFixture fixture = CreateFixture();
+        TrackRepository repo = CreateRepository(fixture);
+        fixture.Connection.Execute("INSERT INTO pendingTagWrites(trackId, fields) VALUES (1, 5), (3, 16)");
+        Rok.Import.TrackImport import = new(repo);
+
+        // Act
+        await import.LoadCacheAsync();
+
+        // Assert
+        Assert.Equal(ETagWriteFields.Album | ETagWriteFields.Year, import.GetPendingFields(1));
+        Assert.Equal(ETagWriteFields.Disc, import.GetPendingFields(3));
+        Assert.Equal(ETagWriteFields.None, import.GetPendingFields(2));
     }
 
     [Fact]

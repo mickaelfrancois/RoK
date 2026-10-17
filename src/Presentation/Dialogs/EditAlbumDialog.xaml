@@ -11,6 +11,47 @@
                CloseButtonText="">
 
     <StackPanel>
+        <StackPanel x:Name="TaggedPanel"
+                    Spacing="8"
+                    Margin="0,0,0,8">
+            <TextBox x:Uid="albumNameInput"
+                     x:Name="NameInput"
+                     Header=""
+                     TextChanged="Input_TextChanged" />
+
+            <AutoSuggestBox x:Uid="albumArtistInput"
+                            x:Name="ArtistInput"
+                            Header=""
+                            TextChanged="ArtistInput_TextChanged" />
+
+            <StackPanel Orientation="Horizontal"
+                        Spacing="16">
+                <TextBox x:Uid="albumYearInput"
+                         x:Name="YearInput"
+                         Header=""
+                         Width="180"
+                         TextChanged="Input_TextChanged" />
+                <AutoSuggestBox x:Uid="albumGenreInput"
+                                x:Name="GenreInput"
+                                Header=""
+                                Width="400"
+                                TextChanged="GenreInput_TextChanged" />
+            </StackPanel>
+
+            <TextBlock x:Uid="albumGenreLockedNote"
+                       x:Name="GenreLockedNote"
+                       Visibility="Collapsed"
+                       TextWrapping="Wrap"
+                       Style="{StaticResource CaptionTextBlockStyle}" />
+
+            <InfoBar x:Name="ErrorBar"
+                     Severity="Error"
+                     IsOpen="False"
+                     IsClosable="False" />
+
+            <MenuFlyoutSeparator></MenuFlyoutSeparator>
+        </StackPanel>
+
         <StackPanel Orientation="Horizontal">
             <ToggleSwitch x:Uid="liveSwitch"
                           IsOn="{x:Bind IsLive, Mode=TwoWay}"></ToggleSwitch>

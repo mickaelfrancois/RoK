@@ -87,6 +87,29 @@ internal static class M4aTagFixture
         return path;
     }
 
+    /// <summary>
+    /// Creates the rich M4A with the given <c>©alb</c>, <c>©gen</c> values and raw <c>©day</c> text (null for none).
+    /// </summary>
+    public static string CreateWithAlbumFields(string folder, EMp4Layout layout, string album, string[] genres, string? releaseDate, string fileName = "song.m4a")
+    {
+        string path = CreateRich(folder, layout, fileName);
+
+        using (TagLib.File file = TagLib.File.Create(path, "taglib/m4a", TagLib.ReadStyle.Average))
+        {
+            TagLib.Mpeg4.AppleTag tag = (TagLib.Mpeg4.AppleTag)file.GetTag(TagLib.TagTypes.Apple, true);
+
+            tag.Album = album;
+            tag.Genres = genres;
+
+            if (releaseDate is not null)
+                tag.SetText(new TagLib.ByteVector(new byte[] { 0xA9, (byte)'d', (byte)'a', (byte)'y' }), releaseDate);
+
+            file.Save();
+        }
+
+        return path;
+    }
+
     /// <summary>Creates an AAC M4A with no tag at all, with <c>moov</c> in the requested position.</summary>
     public static string CreateWithoutTags(string folder, EMp4Layout layout, string fileName = "song.m4a")
     {

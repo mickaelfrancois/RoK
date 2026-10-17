@@ -106,6 +106,48 @@ internal static class Mp3TagFixture
         return path;
     }
 
+    /// <summary>
+    /// Creates a rich MP3 whose ID3v2 carries the given album, genres (TCON) and release date text (TDRC, null for none),
+    /// with optional ID3v1 and APE tags repeating the album, first genre and year.
+    /// </summary>
+    public static string CreateWithAlbumFields(string folder, byte version, string album, string[] genres, string? releaseDate, bool withId3v1 = false, bool withApe = false, string fileName = "song.mp3")
+    {
+        string path = CreateRich(folder, version, fileName);
+
+        using TagLib.File file = TagLib.File.Create(path, "taglib/mp3", TagLib.ReadStyle.Average);
+        TagLib.Id3v2.Tag id3v2 = (TagLib.Id3v2.Tag)file.GetTag(TagLib.TagTypes.Id3v2, false);
+
+        id3v2.Album = album;
+        id3v2.Genres = genres;
+
+        if (releaseDate is not null)
+            id3v2.SetTextFrame("TDRC", releaseDate);
+
+        if (withId3v1)
+        {
+            TagLib.Tag id3v1 = file.GetTag(TagLib.TagTypes.Id3v1, true);
+
+            id3v1.Title = OriginalTitle;
+            id3v1.Album = album;
+            id3v1.Genres = [genres[0]];
+            id3v1.Year = 1999;
+        }
+
+        if (withApe)
+        {
+            TagLib.Tag ape = file.GetTag(TagLib.TagTypes.Ape, true);
+
+            ape.Title = OriginalTitle;
+            ape.Album = album;
+            ape.Genres = [genres[0]];
+            ape.Year = 1999;
+        }
+
+        file.Save();
+
+        return path;
+    }
+
     /// <summary>Creates an MP3 with no tag at all.</summary>
     public static string CreateWithoutTags(string folder, string fileName = "song.mp3")
     {

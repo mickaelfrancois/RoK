@@ -132,7 +132,7 @@ public class NavigationService(ITelemetryClient telemetryClient, NavigationTrail
         MainFrame.Navigate(typeof(AlbumsPage));
     }
 
-    public void NavigateToAlbum(long albumId)
+    public virtual void NavigateToAlbum(long albumId)
     {
         Guard.NotNegativeOrZero(albumId);
         _ = telemetryClient.CaptureScreenAsync("AlbumPage");

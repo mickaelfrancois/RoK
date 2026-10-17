@@ -4,12 +4,15 @@ using CleanArch.DevKit.Mediator.Results;
 using CleanArch.DevKit.Mediator.Validation;
 using CleanArch.DevKit.Messaging;
 using Microsoft.Extensions.DependencyInjection;
+using Rok.Application.Features.Albums.Edit;
+using Rok.Application.Features.Albums.Merge;
 using Rok.Application.Features.Albums.Services;
 using Rok.Application.Features.Artists.Merge;
 using Rok.Application.Features.Artists.Rename;
 using Rok.Application.Features.Artists.Services;
 using Rok.Application.Features.EqualizerPresets;
 using Rok.Application.Features.Playlists;
+using Rok.Application.Features.Tags;
 using Rok.Application.Features.Tracks.Services;
 using Rok.Application.Interfaces;
 using Rok.Application.Options;
@@ -38,9 +41,12 @@ public static class DependencyInjection
 
         services.AddTransient<TrackLyricsService>();
         services.AddTransient<TrackTagEditService>();
+        services.AddTransient<TrackFileTagWriter>();
         services.AddTransient<ArtistFileRewriter>();
         services.AddTransient<ArtistRenameService>();
         services.AddTransient<ArtistMergeService>();
+        services.AddTransient<AlbumEditService>();
+        services.AddTransient<AlbumMergeService>();
         services.AddTransient<IArtistApiService, ArtistApiService>();
         services.AddTransient<IAlbumApiService, AlbumApiService>();
 
