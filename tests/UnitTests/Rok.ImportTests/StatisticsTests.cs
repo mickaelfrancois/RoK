@@ -180,4 +180,96 @@ public class StatisticsTests
             It.IsAny<int>(), It.IsAny<int>(), It.IsAny<long>(), It.IsAny<RepositoryConnectionKind>()),
             Times.Never);
     }
+    [Fact(DisplayName = "UpdateAlbumsAsync should see new tracks on a second call")]
+    public async Task UpdateAlbumsAsync_ShouldSeeNewTracks_OnSecondCall()
+    {
+        // Arrange
+        List<AlbumEntity> albums = new() { new() { Id = 10, TrackCount = 0, Duration = 0 } };
+        (Statistics service, Mock<ITrackRepository> track, Mock<IAlbumRepository> album, _, _) = Build(new List<TrackEntity> { new() { Id = 1, AlbumId = 10, Duration = 100 } }, albums);
+        await service.UpdateAlbumsAsync(new[] { 10L });
+        track.Setup(r => r.GetAllAsync(It.IsAny<RepositoryConnectionKind>())).ReturnsAsync(new List<TrackEntity>
+        {
+            new() { Id = 1, AlbumId = 10, Duration = 100 },
+            new() { Id = 2, AlbumId = 10, Duration = 200 }
+        });
+
+        service.Reset();
+
+        // Act
+        await service.UpdateAlbumsAsync(new[] { 10L });
+
+        // Assert
+        album.Verify(r => r.UpdateStatisticsAsync(10, 2, 300, RepositoryConnectionKind.Background), Times.Once);
+    }
+
+    [Fact(DisplayName = "UpdateArtistsAsync should see new tracks and albums on a second call")]
+    public async Task UpdateArtistsAsync_ShouldSeeNewData_OnSecondCall()
+    {
+        // Arrange
+        List<ArtistEntity> artists = new() { new() { Id = 1 } };
+        (Statistics service, Mock<ITrackRepository> track, Mock<IAlbumRepository> album, Mock<IArtistRepository> artist, _) = Build(
+            new List<TrackEntity> { new() { Id = 1, ArtistId = 1, Duration = 100 } },
+            new List<AlbumEntity> { new() { Id = 1, ArtistId = 1, Year = 1990 } },
+            artists);
+        await service.UpdateArtistsAsync(new[] { 1L });
+        track.Setup(r => r.GetAllAsync(It.IsAny<RepositoryConnectionKind>())).ReturnsAsync(new List<TrackEntity>
+        {
+            new() { Id = 1, ArtistId = 1, Duration = 100 },
+            new() { Id = 2, ArtistId = 1, Duration = 200 }
+        });
+        album.Setup(r => r.GetAllAsync(It.IsAny<RepositoryConnectionKind>())).ReturnsAsync(new List<AlbumEntity>
+        {
+            new() { Id = 1, ArtistId = 1, Year = 1990 },
+            new() { Id = 2, ArtistId = 1, Year = 2000 }
+        });
+        service.Reset();
+
+        // Act
+        await service.UpdateArtistsAsync(new[] { 1L });
+
+        // Assert
+        artist.Verify(r => r.UpdateStatisticsAsync(1, 2, 300, 2, 0, 0, 0, 1990, 2000, RepositoryConnectionKind.Background), Times.Once);
+    }
+
+    [Fact(DisplayName = "UpdateGenresAsync should see new tracks on a second call")]
+    public async Task UpdateGenresAsync_ShouldSeeNewTracks_OnSecondCall()
+    {
+        // Arrange
+        List<GenreEntity> genres = new() { new() { Id = 1 } };
+        (Statistics service, Mock<ITrackRepository> track, _, _, Mock<IGenreRepository> genre) = Build(
+            new List<TrackEntity> { new() { Id = 1, GenreId = 1, Duration = 100 } }, genres: genres);
+        await service.UpdateGenresAsync(new[] { 1L });
+        track.Setup(r => r.GetAllAsync(It.IsAny<RepositoryConnectionKind>())).ReturnsAsync(new List<TrackEntity>
+        {
+            new() { Id = 1, GenreId = 1, Duration = 100 },
+            new() { Id = 2, GenreId = 1, Duration = 200 }
+        });
+        service.Reset();
+
+        // Act
+        await service.UpdateGenresAsync(new[] { 1L });
+
+        // Assert
+        genre.Verify(r => r.UpdateStatisticsAsync(1, 2, 0, 0, 0, 0, 0, 300, RepositoryConnectionKind.Background), Times.Once);
+    }
+
+    [Fact(DisplayName = "a full statistics pass loads the tracks only once")]
+    public async Task StatisticsPass_ShouldLoadTracksOnce()
+    {
+        // Arrange
+        (Statistics service, Mock<ITrackRepository> track, _, _, _) = Build(
+            new List<TrackEntity> { new() { Id = 1, AlbumId = 10, ArtistId = 1, GenreId = 1, Duration = 100 } },
+            new List<AlbumEntity> { new() { Id = 10, ArtistId = 1, GenreId = 1 } },
+            new List<ArtistEntity> { new() { Id = 1 } },
+            new List<GenreEntity> { new() { Id = 1 } });
+
+        // Act
+        service.Reset();
+        await service.UpdateArtistsAsync(new[] { 1L });
+        await service.UpdateAlbumsAsync(new[] { 10L });
+        await service.UpdateGenresAsync(new[] { 1L });
+
+        // Assert
+        track.Verify(r => r.GetAllAsync(It.IsAny<RepositoryConnectionKind>()), Times.Once);
+    }
 }

@@ -223,6 +223,97 @@ public class AlbumImportTests
         repository.Verify(r => r.AddAsync(It.IsAny<AlbumEntity>(), It.IsAny<RepositoryConnectionKind>()), Times.Never);
     }
 
+    [Fact(DisplayName = "get_by_id_returns_loaded_and_created_albums")]
+    public async Task GetById_ShouldReturnLoadedAndCreatedAlbums()
+    {
+        // Arrange
+        Mock<IAlbumRepository> repository = new();
+        repository.Setup(r => r.GetAllAsync(It.IsAny<RepositoryConnectionKind>()))
+            .ReturnsAsync(new List<AlbumEntity> { new() { Id = 8, Name = "Back In Black", ArtistId = 10, GenreId = 4 } });
+        repository.Setup(r => r.AddAsync(It.IsAny<AlbumEntity>(), It.IsAny<RepositoryConnectionKind>())).ReturnsAsync(99L);
+        AlbumImport import = new(repository.Object, TimeProvider.System);
+        await import.LoadCacheAsync();
+
+        // Act
+        AlbumCacheItem? created = await import.CreateAsync(new TrackFile { Album = "Other", FullPath = @"C:\m\t.mp3" }, 1, 7);
+
+        // Assert
+        Assert.Same(import.GetFromCache("Back In Black", false, 10), import.GetById(8));
+        Assert.Equal(4, import.GetById(8)!.GenreId);
+        Assert.Same(created, import.GetById(99));
+        Assert.Equal(7, import.GetById(99)!.GenreId);
+        Assert.Null(import.GetById(1234));
+    }
+
+    [Fact(DisplayName = "update_compilation_rekeys_the_cache")]
+    public async Task UpdateCompilationAsync_ShouldRekeyTheCache()
+    {
+        // Arrange
+        Mock<IAlbumRepository> repository = new();
+        repository.Setup(r => r.GetAllAsync(It.IsAny<RepositoryConnectionKind>()))
+            .ReturnsAsync(new List<AlbumEntity> { new() { Id = 8, Name = "Mix", IsCompilation = true, ArtistId = 10 } });
+        AlbumImport import = new(repository.Object, TimeProvider.System);
+        await import.LoadCacheAsync();
+        AlbumCacheItem album = import.GetById(8)!;
+
+        // Act
+        await import.UpdateCompilationAsync(album, false, 20);
+
+        // Assert
+        Assert.Null(import.GetFromCache("Mix", true, null));
+        Assert.Same(album, import.GetFromCache("Mix", false, 20));
+        Assert.False(album.IsCompilation);
+        Assert.Equal(20, album.ArtistId);
+        Assert.Same(album, import.GetById(8));
+        repository.Verify(r => r.UpdateCompilationAsync(8, false, 20, RepositoryConnectionKind.Background), Times.Once);
+    }
+
+    [Fact(DisplayName = "update_compilation_never_steals_another_album_key")]
+    public async Task UpdateCompilationAsync_ShouldNeverStealAnotherAlbumKey()
+    {
+        // Arrange
+        Mock<IAlbumRepository> repository = new();
+        repository.Setup(r => r.GetAllAsync(It.IsAny<RepositoryConnectionKind>()))
+            .ReturnsAsync(new List<AlbumEntity>
+            {
+                new() { Id = 8, Name = "Mix", IsCompilation = true },
+                new() { Id = 9, Name = "Mix", IsCompilation = false, ArtistId = 20 }
+            });
+        AlbumImport import = new(repository.Object, TimeProvider.System);
+        await import.LoadCacheAsync();
+        AlbumCacheItem converted = import.GetById(8)!;
+
+        // Act
+        await import.UpdateCompilationAsync(converted, false, 20);
+
+        // Assert
+        Assert.Equal(9, import.GetFromCache("Mix", false, 20)!.Id);
+        Assert.Null(import.GetFromCache("Mix", true, null));
+        Assert.Equal(8, import.GetById(8)!.Id);
+    }
+
+    [Fact(DisplayName = "update_compilation_keeps_the_old_key_when_it_points_to_another_album")]
+    public async Task UpdateCompilationAsync_ShouldKeepOldKey_WhenItPointsToAnotherAlbum()
+    {
+        // Arrange
+        Mock<IAlbumRepository> repository = new();
+        repository.Setup(r => r.GetAllAsync(It.IsAny<RepositoryConnectionKind>()))
+            .ReturnsAsync(new List<AlbumEntity>
+            {
+                new() { Id = 8, Name = "Mix", IsCompilation = true },
+                new() { Id = 9, Name = "Mix", IsCompilation = true }
+            });
+        AlbumImport import = new(repository.Object, TimeProvider.System);
+        await import.LoadCacheAsync();
+
+        // Act
+        await import.UpdateCompilationAsync(import.GetById(9)!, false, 30);
+
+        // Assert
+        Assert.Equal(8, import.GetFromCache("Mix", true, null)!.Id);
+        Assert.Equal(9, import.GetFromCache("Mix", false, 30)!.Id);
+    }
+
     [Fact(DisplayName = "NewlyCreatedIds should be empty on initialization")]
     public void NewlyCreatedIds_ShouldBeEmpty_OnInitialization()
     {

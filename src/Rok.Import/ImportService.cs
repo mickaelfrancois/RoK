@@ -252,6 +252,8 @@ ILogger<ImportService> logger) : IImport
 
         using (PerfLogger perfLogger = new PerfLogger(_logger).Parameters("Update statistics"))
         {
+            _statistics.Reset();
+
             await _statistics.UpdateArtistsAsync(_trackingService.GetUpdatedArtists(), cancellationToken);
             await _statistics.UpdateAlbumsAsync(_trackingService.GetUpdatedAlbums(), cancellationToken);
             await _statistics.UpdateGenresAsync(_trackingService.GetUpdatedGenres(), cancellationToken);

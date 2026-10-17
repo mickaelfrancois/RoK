@@ -10,5 +10,7 @@ public record AlbumCacheItem
 
     public bool IsCompilation { get; set; }
 
+    public long? GenreId { get; set; }
+
     public string AlbumPath { get; set; } = string.Empty;
 }

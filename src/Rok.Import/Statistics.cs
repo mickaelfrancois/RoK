@@ -13,6 +13,15 @@ public class Statistics(ITrackRepository trackRepository, IAlbumRepository album
     private IEnumerable<ArtistEntity>? _artists;
 
 
+    /// <summary>Clears the cached repository snapshots; call once at the start of each statistics pass.</summary>
+    public void Reset()
+    {
+        _tracks = null;
+        _albums = null;
+        _genres = null;
+        _artists = null;
+    }
+
     private async Task<IEnumerable<TrackEntity>> GetTracksCacheAsync()
     {
         _tracks ??= await trackRepository.GetAllAsync(RepositoryConnectionKind.Background);
