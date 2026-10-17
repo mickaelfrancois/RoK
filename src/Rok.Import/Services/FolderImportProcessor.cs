@@ -83,11 +83,16 @@ public class FolderImportProcessor(
         if (!await _metadataService.ShouldUpdateMetadataAsync(file, track, cancellationToken).ConfigureAwait(false))
             return;
 
-        GenreCacheItem? genre = await GetOrCreateGenreAsync(file.Genre, statistics).ConfigureAwait(false);
-        ArtistCacheItem? artist = await GetOrCreateArtistAsync(file, genre?.Id, statistics).ConfigureAwait(false);
-        AlbumCacheItem? album = await GetOrCreateAlbumAsync(file, artist?.Id, genre?.Id, knownAlbums, statistics).ConfigureAwait(false);
+        ArtistCacheItem? knownArtist = string.IsNullOrWhiteSpace(file.Artist) ? null : _importArtist.GetFromCache(file.Artist);
+        bool artistImposesGenre = _options.ImportTrackWithArtistGenre && knownArtist?.GenreId.HasValue == true;
+
+        GenreCacheItem? genre = artistImposesGenre
+            ? null
+            : await GetOrCreateGenreAsync(file.Genre, statistics).ConfigureAwait(false);
+        ArtistCacheItem? artist = knownArtist ?? await GetOrCreateArtistAsync(file, genre?.Id, statistics).ConfigureAwait(false);
 
         long? genreId = DetermineGenreId(artist, genre);
+        AlbumCacheItem? album = await GetOrCreateAlbumAsync(file, artist?.Id, genreId, knownAlbums, statistics).ConfigureAwait(false);
 
         track ??= new TrackEntity();
 

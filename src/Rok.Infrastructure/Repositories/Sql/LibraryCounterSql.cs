@@ -21,7 +21,9 @@ internal static class LibraryCounterSql
         WHERE id = @artistId
         """;
 
-    private const string UpdateGenreArtistCountSql = "UPDATE genres SET artistCount = (SELECT COUNT(*) FROM artists WHERE genreId = @genreId) WHERE id = @genreId";
+    private const string UpdateGenreArtistCountSql = "UPDATE genres SET artistCount = (SELECT COUNT(*) FROM artists WHERE genreId = @genreId AND EXISTS (SELECT 1 FROM tracks WHERE tracks.artistId = artists.id)) WHERE id = @genreId";
+
+    private const string SelectGenresOfArtistsSql = "SELECT DISTINCT genreId FROM artists WHERE id IN @artistIds AND genreId IS NOT NULL";
 
     private const string UpdateGenreAlbumCountersSql = """
         UPDATE genres SET
@@ -50,6 +52,20 @@ internal static class LibraryCounterSql
     /// <summary>Recomputes the artist count of a genre.</summary>
     public static Task UpdateGenreArtistCountAsync(IDbConnection connection, long genreId, IDbTransaction transaction, CancellationToken cancellationToken) =>
         connection.ExecuteAsync(new CommandDefinition(UpdateGenreArtistCountSql, new { genreId }, transaction, cancellationToken: cancellationToken));
+
+    /// <summary>Recomputes the artist count of the genres carried by the given artists.</summary>
+    public static async Task UpdateGenresOfArtistsAsync(IDbConnection connection, IReadOnlyCollection<long> artistIds, IDbTransaction transaction, CancellationToken cancellationToken)
+    {
+        if (artistIds.Count == 0)
+            return;
+
+        long[] genreIds = [.. await connection.QueryAsync<long>(new CommandDefinition(SelectGenresOfArtistsSql, new { artistIds }, transaction, cancellationToken: cancellationToken))];
+
+        foreach (long genreId in genreIds)
+        {
+            await UpdateGenreArtistCountAsync(connection, genreId, transaction, cancellationToken);
+        }
+    }
 
     /// <summary>Recomputes the album counters (albums, best of, live, compilations) of a genre.</summary>
     public static Task UpdateGenreAlbumCountersAsync(IDbConnection connection, long genreId, IDbTransaction transaction, CancellationToken cancellationToken) =>

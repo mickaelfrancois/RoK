@@ -142,8 +142,8 @@ public class StatisticsTests
         // Arrange
         List<TrackEntity> tracks = new()
         {
-            new() { Id = 1, GenreId = 1, Duration = 100 },
-            new() { Id = 2, GenreId = 1, Duration = 200 }
+            new() { Id = 1, GenreId = 1, ArtistId = 1, Duration = 100 },
+            new() { Id = 2, GenreId = 1, ArtistId = 1, Duration = 200 }
         };
         List<AlbumEntity> albums = new()
         {
@@ -162,6 +162,29 @@ public class StatisticsTests
 
         // Assert
         genre.Verify(r => r.UpdateStatisticsAsync(1, 2, 1, 1, 0, 1, 0, 300, RepositoryConnectionKind.Background), Times.Once);
+    }
+
+    [Fact(DisplayName = "UpdateGenresAsync should not count an artist without any track in the genre")]
+    public async Task UpdateGenresAsync_ShouldNotCountArtist_WithoutTrackInGenre()
+    {
+        // Arrange
+        List<TrackEntity> tracks = new()
+        {
+            new() { Id = 1, GenreId = 1, ArtistId = 1, Duration = 100 }
+        };
+        List<ArtistEntity> artists = new()
+        {
+            new() { Id = 1, GenreId = 1 },
+            new() { Id = 2, GenreId = 1 }
+        };
+        List<GenreEntity> genres = new() { new() { Id = 1 } };
+        (Statistics service, _, _, _, Mock<IGenreRepository> genre) = Build(tracks, null, artists, genres);
+
+        // Act
+        await service.UpdateGenresAsync(new[] { 1L });
+
+        // Assert
+        genre.Verify(r => r.UpdateStatisticsAsync(1, 1, 1, 0, 0, 0, 0, 100, RepositoryConnectionKind.Background), Times.Once);
     }
 
     [Fact(DisplayName = "UpdateGenresAsync should skip update when statistics already match")]

@@ -42,20 +42,86 @@ public sealed class AlbumEditRescanTests
         await AssertRenameThenRescanAsync(harness, genreFromArtist: true);
     }
 
-    [Fact(DisplayName = "rescan_without_any_edit_recreates_the_own_genre_of_a_track_when_tracks_take_the_genre_of_their_artist")]
-    public async Task Rescan_WithoutEditAndArtistGenreOption_ShouldRecreateTheOwnGenre()
+    [Fact(DisplayName = "rescan_without_any_edit_does_not_recreate_the_own_genre_of_a_track_when_tracks_take_the_genre_of_their_artist")]
+    public async Task Rescan_WithoutEditAndArtistGenreOption_ShouldNotRecreateTheOwnGenre()
     {
         // Arrange
         using AlbumTagWriteHarness harness = new(AlbumTagWriteHarness.CreateFlac, importTrackWithArtistGenre: true);
         await harness.ImportTwiceAsync();
+        long neighbourId = harness.TrackId(AlbumTagWriteHarness.NeighbourFile);
         harness.Retitle(AlbumTagWriteHarness.NeighbourFile, NeighbourRetitled, 2);
 
         // Act
         ImportStatisticsDto rescan = await harness.ImportAsync();
+        WriteSnapshot after = harness.TakeSnapshot();
 
         // Assert
-        Assert.Equal(1, rescan.GenresImported);
-        Assert.Equal(1, rescan.GenresDeleted);
+        Assert.True(rescan.TracksUpdated >= 1);
+        Assert.Equal(NeighbourRetitled, after.Value("Tracks", neighbourId, "title"));
+        Assert.Equal(0, rescan.GenresImported);
+        Assert.Equal(0, rescan.GenresDeleted);
+    }
+
+    [Fact(DisplayName = "new_track_of_a_known_artist_does_not_create_its_file_genre_when_tracks_take_the_genre_of_their_artist")]
+    public async Task Import_NewTrackOfKnownArtistWithArtistGenreOption_ShouldNotCreateFileGenreAndUseArtistGenre()
+    {
+        // Arrange
+        using AlbumTagWriteHarness harness = new(AlbumTagWriteHarness.CreateFlac, importTrackWithArtistGenre: true);
+        await harness.ImportTwiceAsync();
+        long artistGenreId = harness.GenreId(AlbumTagWriteHarness.OldGenre);
+        harness.AddFile("fresh", "f1-track", "Fresh Album", AlbumTagWriteHarness.OldArtist, NewGenre, NewYear);
+
+        // Act
+        ImportStatisticsDto statistics = await harness.ImportAsync();
+
+        // Assert
+        long trackId = harness.TrackId("f1-track");
+
+        Assert.Equal(1, statistics.TracksImported);
+        Assert.Equal(0, statistics.GenresImported);
+        Assert.Equal(0, harness.Scalar<int>("SELECT COUNT(*) FROM Genres WHERE name = @name COLLATE NOCASE", new { name = NewGenre }));
+        Assert.Equal(artistGenreId, harness.Scalar<long>("SELECT genreId FROM Tracks WHERE id = @trackId", new { trackId }));
+        Assert.Equal(artistGenreId, harness.Scalar<long>("SELECT genreId FROM Albums WHERE id = @albumId", new { albumId = harness.AlbumIdOf("f1-track") }));
+    }
+
+    [Fact(DisplayName = "new_track_of_a_known_artist_without_genre_creates_and_uses_its_file_genre_when_tracks_take_the_genre_of_their_artist")]
+    public async Task Import_NewTrackOfKnownArtistWithoutGenreWithArtistGenreOption_ShouldCreateAndUseFileGenre()
+    {
+        // Arrange
+        using AlbumTagWriteHarness harness = new(AlbumTagWriteHarness.CreateFlac, importTrackWithArtistGenre: true);
+        harness.AddFile("nogenre", "n1-track", "No Genre Album", "No Genre Artist", string.Empty, NewYear);
+        await harness.ImportAsync();
+        harness.AddFile("nogenre2", "n2-track", "No Genre Album Two", "No Genre Artist", NewGenre, NewYear);
+
+        // Act
+        ImportStatisticsDto statistics = await harness.ImportAsync();
+
+        // Assert
+        long trackId = harness.TrackId("n2-track");
+
+        Assert.Equal(1, statistics.TracksImported);
+        Assert.Equal(1, harness.Scalar<int>("SELECT COUNT(*) FROM Genres WHERE name = @name COLLATE NOCASE", new { name = NewGenre }));
+        Assert.Equal(harness.GenreId(NewGenre), harness.Scalar<long>("SELECT genreId FROM Tracks WHERE id = @trackId", new { trackId }));
+    }
+
+    [Fact(DisplayName = "new_track_of_a_known_artist_creates_and_uses_its_file_genre_when_the_artist_genre_option_is_off")]
+    public async Task Import_NewTrackOfKnownArtistWithoutArtistGenreOption_ShouldCreateAndUseFileGenre()
+    {
+        // Arrange
+        using AlbumTagWriteHarness harness = new(AlbumTagWriteHarness.CreateFlac);
+        await harness.ImportTwiceAsync();
+        harness.AddFile("fresh", "f1-track", "Fresh Album", AlbumTagWriteHarness.OldArtist, NewGenre, NewYear);
+
+        // Act
+        ImportStatisticsDto statistics = await harness.ImportAsync();
+
+        // Assert
+        long trackId = harness.TrackId("f1-track");
+
+        Assert.Equal(1, statistics.TracksImported);
+        Assert.Equal(1, statistics.GenresImported);
+        Assert.Equal(harness.GenreId(NewGenre), harness.Scalar<long>("SELECT genreId FROM Tracks WHERE id = @trackId", new { trackId }));
+        Assert.Equal(harness.GenreId(NewGenre), harness.Scalar<long>("SELECT genreId FROM Albums WHERE id = @albumId", new { albumId = harness.AlbumIdOf("f1-track") }));
     }
 
     [Fact(DisplayName = "genre_edit_is_refused_and_leaves_database_and_files_untouched_when_tracks_take_the_genre_of_their_artist")]
@@ -363,7 +429,7 @@ public sealed class AlbumEditRescanTests
         long[] reprocessed = genreFromArtist ? [neighbourId, harness.TrackId(AlbumTagWriteHarness.OwnGenreFile)] : [neighbourId];
 
         Assert.Equal(reprocessed.Length, rescan.TracksUpdated);
-        AssertNothingRecreated(rescan, artistsDeleted: 0, genresRecreated: genreFromArtist ? 1 : 0);
+        AssertNothingRecreated(rescan, artistsDeleted: 0);
 
         Assert.Equal(albumCount, after.Rows("Albums").Count);
         Assert.Equal(0, harness.Scalar<int>("SELECT COUNT(*) FROM Albums WHERE name = @name COLLATE NOCASE", new { name = AlbumTagWriteHarness.AlbumName }));
@@ -429,16 +495,16 @@ public sealed class AlbumEditRescanTests
         AlbumTagWriteHarness.AssertSameExceptTouched(before, after, neighbourId);
     }
 
-    private static void AssertNothingRecreated(ImportStatisticsDto statistics, int artistsDeleted, int genresRecreated = 0)
+    private static void AssertNothingRecreated(ImportStatisticsDto statistics, int artistsDeleted)
     {
         Assert.Equal(0, statistics.TracksImported);
         Assert.Equal(0, statistics.AlbumsImported);
         Assert.Equal(0, statistics.ArtistsImported);
-        Assert.Equal(genresRecreated, statistics.GenresImported);
+        Assert.Equal(0, statistics.GenresImported);
         Assert.Equal(0, statistics.TracksDeleted);
         Assert.Equal(0, statistics.AlbumsDeleted);
         Assert.Equal(artistsDeleted, statistics.ArtistsDeleted);
-        Assert.Equal(genresRecreated, statistics.GenresDeleted);
+        Assert.Equal(0, statistics.GenresDeleted);
     }
 
     private static void AssertUserDataKept(AlbumTagWriteHarness harness, WriteSnapshot snapshot, long albumId)

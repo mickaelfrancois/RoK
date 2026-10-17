@@ -262,7 +262,7 @@ public sealed class AlbumMergeRescanTests
         Assert.Equal("0", final.Value("Albums", targetId, "isCompilation"));
         AssertMergedUserData(harness, final, targetId, sourceId, TargetEvents + 2);
         harness.AssertCountersMatchTracks();
-        Assert.Equal("2", final.Value("Genres", harness.GenreId(AlbumTagWriteHarness.OldGenre), "artistCount"));
+        Assert.Equal(harness.Scalar<int>("SELECT COUNT(*) FROM Artists a WHERE a.genreId = @genreId AND EXISTS (SELECT 1 FROM Tracks t WHERE t.artistId = a.id)", new { genreId = harness.GenreId(AlbumTagWriteHarness.OldGenre) }).ToString(CultureInfo.InvariantCulture), final.Value("Genres", harness.GenreId(AlbumTagWriteHarness.OldGenre), "artistCount"));
         AlbumTagWriteHarness.AssertSameExceptTouched(afterResume, final, ["Genres"], [failedId, doneId]);
     }
 

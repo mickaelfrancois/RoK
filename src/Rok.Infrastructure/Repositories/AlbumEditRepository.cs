@@ -124,10 +124,14 @@ public class AlbumEditRepository(IDbConnection connection, IPendingTagWriteRepos
     {
         await LibraryCounterSql.UpdateAlbumAsync(connection, albumId, transaction, cancellationToken);
 
-        foreach (long artistId in artistIds.Distinct())
+        long[] distinctArtistIds = [.. artistIds.Distinct()];
+
+        foreach (long artistId in distinctArtistIds)
         {
             await LibraryCounterSql.UpdateArtistAsync(connection, artistId, transaction, cancellationToken);
         }
+
+        await LibraryCounterSql.UpdateGenresOfArtistsAsync(connection, distinctArtistIds, transaction, cancellationToken);
 
         foreach (long genreId in genreIds.OfType<long>().Distinct())
         {
