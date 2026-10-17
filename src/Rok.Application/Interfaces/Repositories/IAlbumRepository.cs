@@ -23,4 +23,14 @@ public interface IAlbumRepository : IRepository<AlbumEntity>
     Task<bool> UpdateStatisticsAsync(long id, int trackCount, long duration, RepositoryConnectionKind kind = RepositoryConnectionKind.Foreground);
 
     Task<bool> UpdateGetMetaDataLastAttemptAsync(long id, RepositoryConnectionKind kind = RepositoryConnectionKind.Foreground);
+
+    /// <summary>
+    /// Sets the compilation flag and the owning artist of an album, leaving every other column untouched.
+    /// </summary>
+    /// <param name="id">Album id.</param>
+    /// <param name="isCompilation">New compilation flag.</param>
+    /// <param name="artistId">New owning artist id, or <c>null</c> for a compilation without artist.</param>
+    /// <param name="kind">Connection to use.</param>
+    /// <returns><c>true</c> when a row was updated.</returns>
+    Task<bool> UpdateCompilationAsync(long id, bool isCompilation, long? artistId, RepositoryConnectionKind kind = RepositoryConnectionKind.Foreground);
 }

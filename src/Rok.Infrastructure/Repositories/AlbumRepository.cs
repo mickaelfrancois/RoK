@@ -13,6 +13,7 @@ public class AlbumRepository(IDbConnection connection, [FromKeyedServices("Backg
     private const string ResetListenCountSql = "UPDATE albums SET listenCount = 0";
     private const string UpdateStatisticsSql = "UPDATE albums SET trackCount = @trackCount, duration = @duration WHERE id = @id";
     private const string UpdateMetadataAttemptSql = "UPDATE albums SET getMetaDataLastAttempt = @lastAttemptDate WHERE id = @id";
+    private const string UpdateCompilationSql = "UPDATE albums SET isCompilation = @isCompilation, artistId = @artistId WHERE id = @id";
     private const string DeleteOrphansSql = "DELETE FROM albums WHERE id NOT IN (SELECT DISTINCT albumId FROM tracks WHERE albumId IS NOT NULL)";
     private const string DefaultGroupBy = " GROUP BY albums.id ";
     private const string UpdateDominantColorSql = "UPDATE albums SET pictureDominantColor = @colorValue WHERE Id = @id";
@@ -85,6 +86,13 @@ public class AlbumRepository(IDbConnection connection, [FromKeyedServices("Backg
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(id);
 
         return ExecuteUpdateAsync(UpdateMetadataAttemptSql, new { lastAttemptDate = _timeProvider.GetUtcNow().UtcDateTime, id });
+    }
+
+    public Task<bool> UpdateCompilationAsync(long id, bool isCompilation, long? artistId, RepositoryConnectionKind kind = RepositoryConnectionKind.Foreground)
+    {
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(id);
+
+        return ExecuteUpdateAsync(UpdateCompilationSql, new { isCompilation, artistId, id }, kind);
     }
 
     public Task<int> DeleteOrphansAsync(RepositoryConnectionKind kind = RepositoryConnectionKind.Foreground)

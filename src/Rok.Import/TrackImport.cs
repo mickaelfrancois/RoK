@@ -42,6 +42,12 @@ public class TrackImport(ITrackRepository _trackRepository)
     }
 
 
+    public IEnumerable<TrackEntity> GetCachedTracksOfAlbum(long albumId)
+    {
+        return _cache.Values.Where(track => track.AlbumId == albumId);
+    }
+
+
     public async Task<TrackEntity?> CreateAsync(TrackEntity track, CancellationToken cancellationToken = default)
     {
         await _trackRepository.AddAsync(track, RepositoryConnectionKind.Background);

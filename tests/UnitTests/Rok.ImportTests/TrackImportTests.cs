@@ -54,6 +54,30 @@ public class TrackImportTests
         Assert.Same(track, import.GetFromCache(@"C:\music\new.mp3"));
     }
 
+    [Fact(DisplayName = "get_cached_tracks_of_album_returns_only_that_album")]
+    public async Task GetCachedTracksOfAlbum_ShouldReturnOnlyTracksOfThatAlbum()
+    {
+        // Arrange
+        List<TrackEntity> tracks = new()
+        {
+            new() { Id = 1, Title = "a", MusicFile = @"C:\m\a.mp3", AlbumId = 5 },
+            new() { Id = 2, Title = "b", MusicFile = @"C:\m\b.mp3", AlbumId = 5 },
+            new() { Id = 3, Title = "c", MusicFile = @"C:\m\c.mp3", AlbumId = 6 }
+        };
+        Mock<ITrackRepository> repository = new();
+        repository.Setup(r => r.GetAllAsync(It.IsAny<RepositoryConnectionKind>())).ReturnsAsync(tracks);
+        TrackImport import = new(repository.Object);
+        await import.LoadCacheAsync();
+
+        // Act
+        List<TrackEntity> result = import.GetCachedTracksOfAlbum(5).ToList();
+
+        // Assert
+        Assert.Equal(2, result.Count);
+        Assert.All(result, t => Assert.Equal(5, t.AlbumId));
+        Assert.Empty(import.GetCachedTracksOfAlbum(99));
+    }
+
     [Fact(DisplayName = "UpdateTrackAsync should delegate to repository UpdateAsync")]
     public async Task UpdateTrackAsync_ShouldDelegateToRepository_UpdateAsync()
     {

@@ -17,6 +17,8 @@ public class AlbumImport(IAlbumRepository _albumRepository, TimeProvider _timePr
 
     private readonly Dictionary<string, AlbumCacheItem> _cache = new(StringComparer.InvariantCultureIgnoreCase);
 
+    private readonly Dictionary<long, AlbumCacheItem> _byId = new();
+
     private static readonly Regex _liveRegex = new(@"\b(live|concert|performance)\b", RegexOptions.IgnoreCase | RegexOptions.Compiled);
 
     private const int MaxAlbumsApiEnrichment = 100;
@@ -36,6 +38,7 @@ public class AlbumImport(IAlbumRepository _albumRepository, TimeProvider _timePr
     public async Task LoadCacheAsync(CancellationToken cancellationToken = default)
     {
         _cache.Clear();
+        _byId.Clear();
         _newlyCreatedIds.Clear();
 
         IEnumerable<AlbumEntity> albums = await _albumRepository.GetAllAsync(RepositoryConnectionKind.Background);
@@ -44,15 +47,56 @@ public class AlbumImport(IAlbumRepository _albumRepository, TimeProvider _timePr
         {
             string key = GetKey(album.Name, album.IsCompilation, album.ArtistId);
 
-            _cache.TryAdd(key, new AlbumCacheItem
+            AlbumCacheItem item = new()
             {
                 Id = album.Id,
                 Name = album.Name,
                 ArtistId = album.ArtistId,
+                GenreId = album.GenreId,
                 IsCompilation = album.IsCompilation,
                 AlbumPath = album.AlbumPath
-            });
+            };
+
+            _cache.TryAdd(key, item);
+            _byId.TryAdd(album.Id, item);
         }
+    }
+
+
+    /// <summary>
+    /// Retrieves an album from the cache by its identifier.
+    /// </summary>
+    /// <param name="albumId">The album identifier.</param>
+    /// <returns>The cached album, or <see langword="null"/> when the identifier is unknown.</returns>
+    public AlbumCacheItem? GetById(long albumId)
+    {
+        _byId.TryGetValue(albumId, out AlbumCacheItem? album);
+
+        return album;
+    }
+
+
+    /// <summary>
+    /// Updates the compilation flag and the artist of a cached album, then re-indexes it under its new key.
+    /// </summary>
+    /// <remarks>The previous key is removed only when it points to this album. The new key never replaces another album.</remarks>
+    /// <param name="album">The cached album to update.</param>
+    /// <param name="isCompilation">The new compilation flag.</param>
+    /// <param name="artistId">The new artist identifier, or <see langword="null"/> when not applicable.</param>
+    /// <returns>A task that represents the asynchronous operation.</returns>
+    public async Task UpdateCompilationAsync(AlbumCacheItem album, bool isCompilation, long? artistId)
+    {
+        await _albumRepository.UpdateCompilationAsync(album.Id, isCompilation, artistId, RepositoryConnectionKind.Background);
+
+        string oldKey = GetKey(album.Name, album.IsCompilation, album.ArtistId);
+
+        if (_cache.TryGetValue(oldKey, out AlbumCacheItem? indexed) && indexed.Id == album.Id)
+            _cache.Remove(oldKey);
+
+        album.IsCompilation = isCompilation;
+        album.ArtistId = artistId;
+
+        _cache.TryAdd(GetKey(album.Name, album.IsCompilation, album.ArtistId), album);
     }
 
 
@@ -126,10 +170,12 @@ public class AlbumImport(IAlbumRepository _albumRepository, TimeProvider _timePr
             Id = id,
             Name = album.Name,
             ArtistId = artistId,
+            GenreId = genreId,
             IsCompilation = album.IsCompilation,
             AlbumPath = album.AlbumPath
         };
         _cache.Add(key, cacheItem);
+        _byId[id] = cacheItem;
         CreatedCount++;
 
         if (_newlyCreatedIds.Count < MaxAlbumsApiEnrichment)

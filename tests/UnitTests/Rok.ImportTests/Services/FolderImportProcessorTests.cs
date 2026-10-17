@@ -164,6 +164,112 @@ public sealed class FolderImportProcessorTests : IDisposable
         _tagService.Verify(t => t.FillMusicProperties(It.IsAny<string>(), It.IsAny<TrackFile>()), Times.Never);
     }
 
+    [Fact(DisplayName = "reconcile_marks_old_and_new_artist_genre_and_album_as_updated")]
+    public async Task ImportFolder_CompilationBecomesSingleArtist_ShouldMarkOldAndNewArtistGenreAndAlbum()
+    {
+        // Arrange
+        string[] paths = CreateFiles("a-known", "b-known");
+        Mock<IAlbumRepository> albumRepository = new();
+        FolderImportProcessor sut = await BuildReconcilingProcessorAsync(
+            albumRepository,
+            new AlbumEntity { Id = 10, Name = "Album", ArtistId = 1, GenreId = 5, IsCompilation = true },
+            _ => "Artist B",
+            Known(1, paths[0], _fileDate.AddDays(-1), artistId: 1, albumId: 10),
+            Known(2, paths[1], _fileDate.AddDays(-1), artistId: 2, albumId: 10));
+
+        // Act
+        await sut.ImportFolderAsync(_folder.FullName, new ImportStatisticsDto(), CancellationToken.None);
+
+        // Assert
+        albumRepository.Verify(r => r.UpdateCompilationAsync(10, false, 2, RepositoryConnectionKind.Background), Times.Once);
+        Assert.Contains(1L, _tracking.GetUpdatedArtists());
+        Assert.Contains(2L, _tracking.GetUpdatedArtists());
+        Assert.Contains(5L, _tracking.GetUpdatedGenres());
+        Assert.Contains(10L, _tracking.GetUpdatedAlbums());
+    }
+
+    [Fact(DisplayName = "reconcile_writes_nothing_when_the_state_is_unchanged")]
+    public async Task ImportFolder_StateUnchanged_ShouldNotUpdateTheAlbum()
+    {
+        // Arrange
+        string[] paths = CreateFiles("a-known", "b-known");
+        Mock<IAlbumRepository> albumRepository = new();
+        FolderImportProcessor sut = await BuildReconcilingProcessorAsync(
+            albumRepository,
+            new AlbumEntity { Id = 10, Name = "Album", ArtistId = 1, GenreId = 5, IsCompilation = false },
+            _ => "Artist A",
+            Known(1, paths[0], _fileDate.AddDays(-1), artistId: 1, albumId: 10),
+            Known(2, paths[1], _fileDate.AddDays(-1), artistId: 1, albumId: 10));
+
+        // Act
+        await sut.ImportFolderAsync(_folder.FullName, new ImportStatisticsDto(), CancellationToken.None);
+
+        // Assert
+        VerifyNoCompilationUpdate(albumRepository);
+        Assert.Empty(_tracking.GetUpdatedGenres());
+    }
+
+    [Fact(DisplayName = "reconcile_keeps_a_manual_compilation_flag_when_the_folder_state_is_unchanged")]
+    public async Task ImportFolder_ManualCompilationFlag_ShouldNotUpdateTheAlbum()
+    {
+        // Arrange
+        string[] paths = CreateFiles("a-known", "b-known");
+        Mock<IAlbumRepository> albumRepository = new();
+        FolderImportProcessor sut = await BuildReconcilingProcessorAsync(
+            albumRepository,
+            new AlbumEntity { Id = 10, Name = "Album", ArtistId = 1, GenreId = 5, IsCompilation = true },
+            _ => "Artist A",
+            Known(1, paths[0], _fileDate.AddDays(-1), artistId: 1, albumId: 10),
+            Known(2, paths[1], _fileDate.AddDays(-1), artistId: 1, albumId: 10));
+
+        // Act
+        await sut.ImportFolderAsync(_folder.FullName, new ImportStatisticsDto(), CancellationToken.None);
+
+        // Assert
+        VerifyNoCompilationUpdate(albumRepository);
+    }
+
+    [Fact(DisplayName = "reconcile_moves_a_normal_album_to_the_new_artist_of_a_single_artist_folder")]
+    public async Task ImportFolder_SingleArtistFolderRetagged_ShouldMoveTheAlbumToTheNewArtist()
+    {
+        // Arrange
+        string[] paths = CreateFiles("a-known", "b-known");
+        Mock<IAlbumRepository> albumRepository = new();
+        FolderImportProcessor sut = await BuildReconcilingProcessorAsync(
+            albumRepository,
+            new AlbumEntity { Id = 10, Name = "Album", ArtistId = 1, GenreId = 5, IsCompilation = false },
+            _ => "Artist B",
+            Known(1, paths[0], _fileDate.AddDays(-1), artistId: 1, albumId: 10),
+            Known(2, paths[1], _fileDate.AddDays(-1), artistId: 1, albumId: 10));
+
+        // Act
+        await sut.ImportFolderAsync(_folder.FullName, new ImportStatisticsDto(), CancellationToken.None);
+
+        // Assert
+        albumRepository.Verify(r => r.UpdateCompilationAsync(10, false, 2, RepositoryConnectionKind.Background), Times.Once);
+    }
+
+    [Fact(DisplayName = "reconcile_keeps_the_compilation_when_a_track_outside_the_folder_has_another_artist")]
+    public async Task ImportFolder_OtherFolderKeepsAnotherArtist_ShouldKeepTheCompilation()
+    {
+        // Arrange
+        string[] paths = CreateFiles("a-known", "b-known");
+        Mock<IAlbumRepository> albumRepository = new();
+        FolderImportProcessor sut = await BuildReconcilingProcessorAsync(
+            albumRepository,
+            new AlbumEntity { Id = 10, Name = "Album", ArtistId = 1, GenreId = 5, IsCompilation = true },
+            _ => "Artist B",
+            Known(1, paths[0], _fileDate.AddDays(-1), artistId: 1, albumId: 10),
+            Known(2, paths[1], _fileDate.AddDays(-1), artistId: 2, albumId: 10),
+            Known(3, Path.Combine(Path.GetTempPath(), "elsewhere.mp3"), _fileDate, artistId: 1, albumId: 10));
+
+        // Act
+        await sut.ImportFolderAsync(_folder.FullName, new ImportStatisticsDto(), CancellationToken.None);
+
+        // Assert
+        VerifyNoCompilationUpdate(albumRepository);
+    }
+
     public void Dispose()
     {
         try
@@ -175,9 +281,60 @@ public sealed class FolderImportProcessorTests : IDisposable
         }
     }
 
-    private static TrackEntity Known(long id, string path, DateTime fileDate)
+    private static TrackEntity Known(long id, string path, DateTime fileDate, long? artistId = null, long? albumId = null)
     {
-        return new TrackEntity { Id = id, MusicFile = path, FileDate = fileDate };
+        return new TrackEntity { Id = id, MusicFile = path, FileDate = fileDate, ArtistId = artistId, AlbumId = albumId };
+    }
+
+    private static void VerifyNoCompilationUpdate(Mock<IAlbumRepository> albumRepository)
+    {
+        albumRepository.Verify(
+            r => r.UpdateCompilationAsync(It.IsAny<long>(), It.IsAny<bool>(), It.IsAny<long?>(), It.IsAny<RepositoryConnectionKind>()),
+            Times.Never);
+    }
+
+    private async Task<FolderImportProcessor> BuildReconcilingProcessorAsync(
+        Mock<IAlbumRepository> albumRepository,
+        AlbumEntity album,
+        Func<string, string> artistOfFile,
+        params TrackEntity[] tracks)
+    {
+        _tagService.Setup(t => t.FillMusicProperties(It.IsAny<string>(), It.IsAny<TrackFile>()))
+            .Callback<string, TrackFile>((_, file) =>
+            {
+                file.Album = "Album";
+                file.Artist = artistOfFile(file.FullPath);
+            });
+
+        albumRepository.Setup(r => r.GetAllAsync(It.IsAny<RepositoryConnectionKind>())).ReturnsAsync([album]);
+
+        Mock<IArtistRepository> artistRepository = new();
+        artistRepository.Setup(r => r.GetAllAsync(It.IsAny<RepositoryConnectionKind>()))
+            .ReturnsAsync([new ArtistEntity { Id = 1, Name = "Artist A" }, new ArtistEntity { Id = 2, Name = "Artist B" }]);
+
+        FakeTimeProvider time = new();
+        AlbumImport albumImport = new(albumRepository.Object, time);
+        ArtistImport artistImport = new(artistRepository.Object, time);
+
+        await albumImport.LoadCacheAsync();
+        await artistImport.LoadCacheAsync();
+        await LoadCacheAsync(tracks);
+
+        return new FolderImportProcessor(
+            Mock.Of<IAppOptions>(),
+            _trackImport,
+            artistImport,
+            albumImport,
+            new GenreImport(Mock.Of<IGenreRepository>(), time),
+            new FileSystemService(NullLogger<FileSystemService>.Instance),
+            new TrackFileProcessor(_tagService.Object, NullLogger<TrackFileProcessor>.Instance),
+            new TrackMetadataService(_trackImport, NullLogger<TrackMetadataService>.Instance, time),
+            new EmbeddedLyricsImporter(Mock.Of<ILyricsService>(), NullLogger<EmbeddedLyricsImporter>.Instance),
+            _tracking,
+            _tagService.Object,
+            new ImportMessageThrottler(),
+            Mock.Of<IMessenger>(),
+            NullLogger<FolderImportProcessor>.Instance);
     }
 
     private string[] CreateFiles(params string[] names)

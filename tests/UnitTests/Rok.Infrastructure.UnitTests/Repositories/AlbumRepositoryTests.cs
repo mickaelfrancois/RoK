@@ -183,6 +183,41 @@ public class AlbumRepositoryTests
         Assert.True(album!.IsFavorite);
     }
 
+    [Fact(DisplayName = "update_compilation_writes_both_columns_and_keeps_favorite_and_listen_count")]
+    public async Task UpdateCompilationAsync_WritesBothColumnsAndKeepsOtherColumns()
+    {
+        // Arrange
+        using SqliteDatabaseFixture fixture = CreateFixture();
+        AlbumRepository repo = CreateRepository(fixture);
+        DateTime now = DateTime.UtcNow;
+        long testAlbumId = 5003;
+
+        await fixture.Connection.ExecuteAsync(@"
+            INSERT INTO Albums(id, name, isLive, isCompilation, isBestof, trackCount, duration, isFavorite, listenCount, creatDate, artistId, genreId)
+            VALUES (@id, 'Test Album Compilation', 0, 0, 0, 5, 1200, 1, 7, @now, 1, 1)",
+            new { id = testAlbumId, now });
+
+        // Act
+        bool toCompilation = await repo.UpdateCompilationAsync(testAlbumId, true, null);
+        AlbumEntity? compilation = await repo.GetByIdAsync(testAlbumId);
+        bool backToArtist = await repo.UpdateCompilationAsync(testAlbumId, false, 1);
+        AlbumEntity? restored = await repo.GetByIdAsync(testAlbumId);
+
+        // Assert
+        Assert.True(toCompilation);
+        Assert.NotNull(compilation);
+        Assert.True(compilation!.IsCompilation);
+        Assert.Null(compilation.ArtistId);
+        Assert.True(compilation.IsFavorite);
+        Assert.Equal(7, compilation.ListenCount);
+        Assert.True(backToArtist);
+        Assert.NotNull(restored);
+        Assert.False(restored!.IsCompilation);
+        Assert.Equal(1, restored.ArtistId);
+        Assert.True(restored.IsFavorite);
+        Assert.Equal(7, restored.ListenCount);
+    }
+
     [Fact]
     public async Task UpdateFavoriteAsync_TogglesFavoriteToFalse()
     {

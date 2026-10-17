@@ -60,16 +60,22 @@ public class FolderImportProcessor(
         _trackFileProcessor.ReadMusicProperties(files);
         _trackFileProcessor.DetectCompilations(files);
 
+        IReadOnlyDictionary<string, KnownFolderAlbum> knownAlbums = FolderAlbumIdentity.Resolve(files, _importTrack, _importAlbum);
+
         foreach (TrackFile file in files)
         {
             if (cancellationToken.IsCancellationRequested)
                 return;
 
-            await ProcessTrackFileAsync(file, statistics, cancellationToken).ConfigureAwait(false);
+            await ProcessTrackFileAsync(file, knownAlbums, statistics, cancellationToken).ConfigureAwait(false);
         }
     }
 
-    private async Task ProcessTrackFileAsync(TrackFile file, ImportStatisticsDto statistics, CancellationToken cancellationToken)
+    private async Task ProcessTrackFileAsync(
+        TrackFile file,
+        IReadOnlyDictionary<string, KnownFolderAlbum> knownAlbums,
+        ImportStatisticsDto statistics,
+        CancellationToken cancellationToken)
     {
         TrackEntity? track = GetTrackByFile(file);
 
@@ -78,7 +84,7 @@ public class FolderImportProcessor(
 
         GenreCacheItem? genre = await GetOrCreateGenreAsync(file.Genre, statistics).ConfigureAwait(false);
         ArtistCacheItem? artist = await GetOrCreateArtistAsync(file, genre?.Id, statistics).ConfigureAwait(false);
-        AlbumCacheItem? album = await GetOrCreateAlbumAsync(file, artist?.Id, genre?.Id, statistics).ConfigureAwait(false);
+        AlbumCacheItem? album = await GetOrCreateAlbumAsync(file, artist?.Id, genre?.Id, knownAlbums, statistics).ConfigureAwait(false);
 
         long? genreId = DetermineGenreId(artist, genre);
 
@@ -225,10 +231,23 @@ public class FolderImportProcessor(
         TrackFile file,
         long? artistId,
         long? genreId,
+        IReadOnlyDictionary<string, KnownFolderAlbum> knownAlbums,
         ImportStatisticsDto statistics)
     {
         if (string.IsNullOrWhiteSpace(file.Album))
             return null;
+
+        if (knownAlbums.TryGetValue(file.Album, out KnownFolderAlbum? known))
+        {
+            AlbumCacheItem? knownAlbum = _importAlbum.GetById(known.AlbumId);
+
+            if (knownAlbum != null)
+            {
+                await ReconcileAlbumAsync(knownAlbum, file, artistId, genreId, known).ConfigureAwait(false);
+
+                return knownAlbum;
+            }
+        }
 
         AlbumCacheItem? album = _importAlbum.GetFromCache(file.Album, file.IsCompilation, artistId);
         if (album != null)
@@ -260,5 +279,75 @@ public class FolderImportProcessor(
         }
 
         return album;
+    }
+
+    private async Task ReconcileAlbumAsync(
+        AlbumCacheItem album,
+        TrackFile file,
+        long? artistId,
+        long? genreId,
+        KnownFolderAlbum known)
+    {
+        (bool isCompilation, long? albumArtistId)? target = ComputeTarget(album, file, artistId, known);
+
+        if (target == null)
+            return;
+
+        long? oldArtistId = album.ArtistId;
+        bool oldIsCompilation = album.IsCompilation;
+
+        try
+        {
+            await _importAlbum.UpdateCompilationAsync(album, target.Value.isCompilation, target.Value.albumArtistId).ConfigureAwait(false);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "Failed to reconcile album id {Id} ('{Album}')", album.Id, album.Name);
+            return;
+        }
+
+        _trackingService.ArtistUpdated(oldArtistId);
+        _trackingService.ArtistUpdated(album.ArtistId);
+        _trackingService.GenreUpdated(album.GenreId);
+        _trackingService.GenreUpdated(genreId);
+        _trackingService.AlbumUpdated(album.Id);
+
+        _logger.LogInformation(
+            "Album id {Id} ('{Album}') reconciled: compilation {OldIsCompilation} -> {IsCompilation}, artist {OldArtistId} -> {ArtistId}",
+            album.Id, album.Name, oldIsCompilation, album.IsCompilation, oldArtistId, album.ArtistId);
+    }
+
+    private (bool isCompilation, long? albumArtistId)? ComputeTarget(
+        AlbumCacheItem album,
+        TrackFile file,
+        long? artistId,
+        KnownFolderAlbum known)
+    {
+        if (file.IsCompilation != known.WasCompilation)
+        {
+            if (file.IsCompilation)
+                return album.IsCompilation ? null : (true, album.ArtistId);
+
+            if (!album.IsCompilation)
+                return AlignArtist(album, artistId);
+
+            return HasOtherArtistOutsideFolder(album, artistId, known) ? null : (false, artistId);
+        }
+
+        if (!file.IsCompilation && !album.IsCompilation)
+            return AlignArtist(album, artistId);
+
+        return null;
+    }
+
+    private static (bool isCompilation, long? albumArtistId)? AlignArtist(AlbumCacheItem album, long? artistId)
+    {
+        return artistId.HasValue && artistId != album.ArtistId ? (false, artistId) : null;
+    }
+
+    private bool HasOtherArtistOutsideFolder(AlbumCacheItem album, long? artistId, KnownFolderAlbum known)
+    {
+        return _importTrack.GetCachedTracksOfAlbum(album.Id)
+            .Any(track => !known.FolderTrackIds.Contains(track.Id) && track.ArtistId.HasValue && track.ArtistId != artistId);
     }
 }
