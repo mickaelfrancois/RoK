@@ -1,5 +1,27 @@
 ﻿# ChangeLog
 
+## [2.0.4] Store – 24 octobre 2026
+
+### Ajouté
+
+- Édition des tags d'une piste (titre, numéro de piste et de disque, compositeur, BPM) avec écriture sécurisée dans les fichiers MP3, FLAC et M4A (#519)
+- Renommage d'un artiste, avec mise à jour du nom dans les tags de ses fichiers (#526)
+- Fusion de deux artistes sans perte de données : pistes, albums, écoutes, historique, tags et playlists sont conservés (#527)
+- Édition du nom, de l'artiste, de l'année et du genre d'un album, et fusion de deux albums (#530)
+- Statut de compilation d'un album selon son origine : tag du fichier, choix manuel ou déduction depuis le dossier ; cocher ou décocher la case met à jour les fichiers (#534)
+
+### Modifié
+
+- Les noms d'artistes, d'albums et de genres ne sont plus distingués par la casse, et deux compilations de même nom dans deux dossiers restent deux albums (#536)
+
+### Corrigé
+
+- Un album n'est plus recréé au rescan quand son dossier passe de plusieurs artistes à un seul (ou l'inverse) : favori, écoutes et tags sont conservés (#529)
+- Le rescan ne recrée plus le genre lu dans le fichier quand l'artiste a déjà un genre, et le nombre d'artistes par genre est juste (#533)
+- La colonne Album de l'onglet Titres de la fiche artiste affiche bien l'album au lieu de l'artiste (#537)
+
+--
+
 ## [2.0.3] Store – 14 octobre 2026
 
 ### Corrigé
