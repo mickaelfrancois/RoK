@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Time.Testing;
 using Moq;
+using Rok.Application.Interfaces;
 using Rok.Application.Interfaces.Repositories;
 using Rok.Application.Tag;
 using Rok.Domain.Entities;
@@ -392,6 +393,60 @@ public class TrackMetadataServiceTests
         bool result = await service.ShouldUpdateMetadataAsync(file, track);
 
         Assert.False(result);
+    }
+
+    [Fact(DisplayName = "rescan_does_not_update_file_date_when_stored_utc_date_matches_the_file")]
+    public async Task ShouldUpdateMetadataAsync_StoredUnspecifiedUtcDateMatchesFile_ShouldNotUpdateFileDate()
+    {
+        // Arrange
+        Mock<ITrackRepository> mockRepo = new();
+        TrackMetadataService service = new(new TrackImport(mockRepo.Object), Mock.Of<ILogger<TrackMetadataService>>(), TimeProvider.System);
+
+        TrackEntity track = BuildTrack(fileDate: new DateTime(2024, 1, 1, 12, 0, 0, DateTimeKind.Unspecified));
+        TrackFile file = BuildFile(fileDate: new DateTimeOffset(2024, 1, 1, 12, 0, 0, TimeSpan.Zero));
+
+        // Act
+        bool result = await service.ShouldUpdateMetadataAsync(file, track);
+
+        // Assert
+        Assert.False(result);
+        mockRepo.Verify(r => r.UpdateFileDateAsync(It.IsAny<long>(), It.IsAny<DateTime>(), It.IsAny<RepositoryConnectionKind>()), Times.Never);
+    }
+
+    [Fact(DisplayName = "rescan_updates_file_date_when_the_file_is_newer_than_the_stored_utc_date")]
+    public async Task ShouldUpdateMetadataAsync_FileNewerThanStoredUnspecifiedUtcDate_ShouldUpdateFileDate()
+    {
+        // Arrange
+        Mock<ITrackRepository> mockRepo = new();
+        TrackMetadataService service = new(new TrackImport(mockRepo.Object), Mock.Of<ILogger<TrackMetadataService>>(), TimeProvider.System);
+
+        TrackEntity track = BuildTrack(fileDate: new DateTime(2024, 1, 1, 12, 0, 0, DateTimeKind.Unspecified));
+        TrackFile file = BuildFile(fileDate: new DateTimeOffset(2024, 1, 1, 12, 30, 0, TimeSpan.Zero));
+
+        // Act
+        bool result = await service.ShouldUpdateMetadataAsync(file, track);
+
+        // Assert
+        Assert.False(result);
+        mockRepo.Verify(r => r.UpdateFileDateAsync(track.Id, new DateTime(2024, 1, 1, 12, 30, 0), It.IsAny<RepositoryConnectionKind>()), Times.Once);
+    }
+
+    [Fact(DisplayName = "rescan_does_not_update_file_date_when_the_stored_utc_date_is_newer_than_the_file")]
+    public async Task ShouldUpdateMetadataAsync_StoredUnspecifiedUtcDateNewerThanFile_ShouldNotUpdateFileDate()
+    {
+        // Arrange
+        Mock<ITrackRepository> mockRepo = new();
+        TrackMetadataService service = new(new TrackImport(mockRepo.Object), Mock.Of<ILogger<TrackMetadataService>>(), TimeProvider.System);
+
+        TrackEntity track = BuildTrack(fileDate: new DateTime(2024, 1, 1, 12, 30, 0, DateTimeKind.Unspecified));
+        TrackFile file = BuildFile(fileDate: new DateTimeOffset(2024, 1, 1, 12, 0, 0, TimeSpan.Zero));
+
+        // Act
+        bool result = await service.ShouldUpdateMetadataAsync(file, track);
+
+        // Assert
+        Assert.False(result);
+        mockRepo.Verify(r => r.UpdateFileDateAsync(It.IsAny<long>(), It.IsAny<DateTime>(), It.IsAny<RepositoryConnectionKind>()), Times.Never);
     }
 
     #endregion

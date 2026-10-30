@@ -15,7 +15,7 @@ public class TrackMetadataService(TrackImport importTrack, ILogger<TrackMetadata
         if (!AreTrackAndFileEquals(track, file))
             return true;
 
-        DateTime trackDateTimeUtc = track.FileDate.ToUniversalTime().TruncateToMinutes();
+        DateTime trackDateTimeUtc = DateTime.SpecifyKind(track.FileDate, DateTimeKind.Utc).TruncateToMinutes();
         DateTime fileDateUtcTrunc = file.FileDateModified.UtcDateTime.TruncateToMinutes();
 
         if (trackDateTimeUtc == fileDateUtcTrunc)
