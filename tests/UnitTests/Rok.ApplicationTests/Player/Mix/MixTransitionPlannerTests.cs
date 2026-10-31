@@ -199,6 +199,71 @@ public class MixTransitionPlannerTests
         Assert.Equal(plan.DurationSeconds - 0.5, duration, 6);
     }
 
+    [Fact(DisplayName = "resolve_at_ends_a_late_mix_point_plan_on_its_planned_end")]
+    public void ResolveAt_LateMixPointPlan_EndsOnThePlannedEnd()
+    {
+        // Arrange
+        var plan = new MixPlan(1, 2, StartSeconds: 180, DurationSeconds: 8, MusicEndSeconds: 200, IncomingStartSeconds: 0, BassSwapAtSeconds: 4, MixPointScore: 0.9);
+
+        // Act
+        var (duration, _, _) = MixTransitionPlanner.ResolveAt(plan, 182);
+
+        // Assert
+        Assert.Equal(6, duration, 6);
+    }
+
+    [Fact(DisplayName = "resolve_at_keeps_a_late_base_plan_ending_on_the_music_end")]
+    public void ResolveAt_LateBasePlan_EndsOnTheMusicEnd()
+    {
+        // Arrange
+        var plan = new MixPlan(1, 2, StartSeconds: 192, DurationSeconds: 8, MusicEndSeconds: 200, IncomingStartSeconds: 0, BassSwapAtSeconds: 4);
+
+        // Act
+        var (duration, _, _) = MixTransitionPlanner.ResolveAt(plan, 194);
+
+        // Assert
+        Assert.Equal(6, duration, 6);
+    }
+
+    [Fact(DisplayName = "resolve_at_ends_a_late_stretched_plan_on_its_planned_end")]
+    public void ResolveAt_LateStretchedPlan_EndsOnThePlannedEnd()
+    {
+        // Arrange
+        var plan = new MixPlan(1, 2, StartSeconds: 180, DurationSeconds: 8, MusicEndSeconds: 200, IncomingStartSeconds: 0, BassSwapAtSeconds: 4, Stretch: new MixTempoStretch(1.02, 4, 2));
+
+        // Act
+        var (duration, _, _) = MixTransitionPlanner.ResolveAt(plan, 182);
+
+        // Assert
+        Assert.Equal(6, duration, 6);
+    }
+
+    [Fact(DisplayName = "resolve_at_keeps_a_mix_point_plan_on_time")]
+    public void ResolveAt_MixPointPlanOnTime_KeepsThePlannedDuration()
+    {
+        // Arrange
+        var plan = new MixPlan(1, 2, StartSeconds: 180, DurationSeconds: 8, MusicEndSeconds: 200, IncomingStartSeconds: 0, BassSwapAtSeconds: 4, MixPointScore: 0.9);
+
+        // Act
+        var (duration, _, _) = MixTransitionPlanner.ResolveAt(plan, 180.2);
+
+        // Assert
+        Assert.Equal(8, duration, 6);
+    }
+
+    [Fact(DisplayName = "resolve_at_uses_the_minimum_for_a_mix_point_plan_reached_after_its_planned_end")]
+    public void ResolveAt_MixPointPlanReachedAfterItsEnd_UsesTheMinimumDuration()
+    {
+        // Arrange
+        var plan = new MixPlan(1, 2, StartSeconds: 180, DurationSeconds: 8, MusicEndSeconds: 200, IncomingStartSeconds: 0, BassSwapAtSeconds: 4, MixPointScore: 0.9);
+
+        // Act
+        var (duration, _, _) = MixTransitionPlanner.ResolveAt(plan, 187.5);
+
+        // Assert
+        Assert.Equal(MixThresholds.MinMixSeconds, duration, 6);
+    }
+
     [Fact(DisplayName = "aligned_mix_starts_on_an_outgoing_beat")]
     public void Plan_WithCompatibleGrids_StartsOnAnOutgoingBeat()
     {
