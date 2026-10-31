@@ -275,7 +275,7 @@ public static class MixTransitionPlanner
 
         if (position > plan.StartSeconds + LateToleranceSeconds)
         {
-            var end = plan.Stretch is null ? plan.MusicEndSeconds : plan.StartSeconds + plan.DurationSeconds;
+            var end = plan.StartSeconds + plan.DurationSeconds;
             var remaining = end - position;
             duration = Math.Min(Math.Max(remaining, MixThresholds.MinMixSeconds), plan.DurationSeconds);
         }
