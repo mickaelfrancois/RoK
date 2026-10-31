@@ -25,10 +25,12 @@ public class TrackMetadataServiceTests
         DateTimeOffset? fileDate = null,
         int? disc = null,
         int? bpm = null,
-        string composers = "")
+        string composers = "",
+        bool hasCompilationFlag = false)
     {
         return new TrackFile
         {
+            HasCompilationFlag = hasCompilationFlag,
             Disc = disc,
             Bpm = bpm,
             Composers = composers,
@@ -56,10 +58,12 @@ public class TrackMetadataServiceTests
         DateTime? fileDate = null,
         int? disc = null,
         int? bpm = null,
-        string? composers = null)
+        string? composers = null,
+        bool hasCompilationFlag = false)
     {
         return new TrackEntity
         {
+            HasCompilationFlag = hasCompilationFlag,
             Disc = disc,
             Bpm = bpm,
             Composers = composers,
@@ -218,6 +222,26 @@ public class TrackMetadataServiceTests
         Assert.False(TrackMetadataService.AreTrackAndFileEquals(track, file));
     }
 
+    [Theory(DisplayName = "are_track_and_file_equal_is_false_when_only_the_compilation_flag_differs")]
+    [InlineData(true, false)]
+    [InlineData(false, true)]
+    public void AreTrackAndFileEquals_OnlyCompilationFlagDiffers_ReturnsFalse(bool fileFlag, bool trackFlag)
+    {
+        TrackEntity track = BuildTrack(hasCompilationFlag: trackFlag);
+        TrackFile file = BuildFile(hasCompilationFlag: fileFlag);
+
+        Assert.False(TrackMetadataService.AreTrackAndFileEquals(track, file));
+    }
+
+    [Fact(DisplayName = "are_track_and_file_equal_is_true_when_the_compilation_flags_match")]
+    public void AreTrackAndFileEquals_CompilationFlagsMatch_ReturnsTrue()
+    {
+        TrackEntity track = BuildTrack(hasCompilationFlag: true);
+        TrackFile file = BuildFile(hasCompilationFlag: true);
+
+        Assert.True(TrackMetadataService.AreTrackAndFileEquals(track, file));
+    }
+
     #endregion
 
     #region EnsureTrackTimestamps
@@ -326,6 +350,19 @@ public class TrackMetadataServiceTests
         Assert.Equal(fileDate.DateTime, track.FileDate);
     }
 
+    [Theory(DisplayName = "fill_track_entity_copies_the_compilation_flag")]
+    [InlineData(true)]
+    [InlineData(false)]
+    public void FillTrackEntity_CopiesTheCompilationFlag(bool flag)
+    {
+        TrackEntity track = new() { HasCompilationFlag = !flag };
+        TrackFile file = BuildFile(hasCompilationFlag: flag);
+
+        TrackMetadataService.FillTrackEntity(track, file, artistId: 1, albumId: 1, genreId: 1);
+
+        Assert.Equal(flag, track.HasCompilationFlag);
+    }
+
     #endregion
 
     #region ShouldUpdateMetadataAsync
@@ -376,6 +413,23 @@ public class TrackMetadataServiceTests
         bool result = await service.ShouldUpdateMetadataAsync(file, track);
 
         Assert.False(result);
+    }
+
+    [Fact(DisplayName = "should_update_metadata_when_only_the_compilation_flag_changed")]
+    public async Task ShouldUpdateMetadataAsync_OnlyCompilationFlagChanged_ShouldReturnTrue()
+    {
+        Mock<ITrackRepository> mockRepo = new();
+        TrackImport importTrack = new(mockRepo.Object);
+        Mock<ILogger<TrackMetadataService>> mockLogger = new();
+        TrackMetadataService service = new(importTrack, mockLogger.Object, TimeProvider.System);
+
+        var date = new DateTime(2024, 1, 1, 12, 0, 0, DateTimeKind.Utc);
+        TrackEntity track = BuildTrack(fileDate: date, hasCompilationFlag: false);
+        TrackFile file = BuildFile(fileDate: new DateTimeOffset(date), hasCompilationFlag: true);
+
+        bool result = await service.ShouldUpdateMetadataAsync(file, track);
+
+        Assert.True(result);
     }
 
     [Fact(DisplayName = "rescan_is_neutral_for_a_track_aligned_with_a_written_file")]

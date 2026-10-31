@@ -102,6 +102,7 @@ public static class DependencyInjection
         services.AddSingleton<IMigration, Migration21>();
         services.AddSingleton<IMigration, Migration22>();
         services.AddSingleton<IMigration, Migration23>();
+        services.AddSingleton<IMigration, Migration24>();
 
         services.AddScoped<IArtistRepository, ArtistRepository>();
         services.AddScoped<IArtistRenameRepository, ArtistRenameRepository>();
