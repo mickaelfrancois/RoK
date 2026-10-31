@@ -58,6 +58,9 @@ public class TrackMetadataService(TrackImport importTrack, ILogger<TrackMetadata
         if (trackFile.Composers.AreDifferent(track.Composers))
             return false;
 
+        if (trackFile.HasCompilationFlag != track.HasCompilationFlag)
+            return false;
+
         return true;
     }
 
@@ -86,6 +89,7 @@ public class TrackMetadataService(TrackImport importTrack, ILogger<TrackMetadata
         track.TrackNumber = file.TrackNumber;
         track.Duration = (long)Math.Round(file.Duration.TotalSeconds, 0);
         track.FileDate = file.FileDateModified.DateTime;
+        track.HasCompilationFlag = file.HasCompilationFlag;
 
         TagMetadataMapper.ApplyTrackMetadata(track, file, MetadataWritePolicy.Mirror);
     }

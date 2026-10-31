@@ -800,6 +800,42 @@ public class TrackRepositoryTests
         Assert.Equal("Brand New Track", fetched!.Title);
     }
 
+    [Fact(DisplayName = "track_repository_round_trips_the_compilation_flag")]
+    public async Task AddAndUpdateAsync_HasCompilationFlag_IsReadBackUnchanged()
+    {
+        // Arrange
+        using SqliteDatabaseFixture fixture = CreateFixture();
+        TrackRepository repo = CreateRepository(fixture);
+        TrackEntity newTrack = new()
+        {
+            Title = "Flagged Track",
+            Duration = 240,
+            Size = 5000,
+            Bitrate = 320,
+            MusicFile = "/music/flagged-track-8011.mp3",
+            FileDate = DateTime.UtcNow,
+            CreatDate = DateTime.UtcNow,
+            AlbumId = 1,
+            ArtistId = 1,
+            TrackNumber = 11,
+            HasCompilationFlag = true
+        };
+
+        // Act
+        long id = await repo.AddAsync(newTrack);
+        TrackEntity? added = await repo.GetByIdAsync(id);
+        TrackEntity? listed = (await repo.GetAllAsync()).SingleOrDefault(t => t.Id == id);
+
+        added!.HasCompilationFlag = false;
+        await repo.UpdateAsync(added);
+        TrackEntity? updated = await repo.GetByIdAsync(id);
+
+        // Assert
+        Assert.NotNull(listed);
+        Assert.True(listed!.HasCompilationFlag);
+        Assert.False(updated!.HasCompilationFlag);
+    }
+
     [Fact]
     public async Task UpdateAsync_UpdatesExistingTrack_ReturnsTrue()
     {

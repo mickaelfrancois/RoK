@@ -58,6 +58,8 @@ public class TrackEntity : BaseEntity
 
     public double? ReplayGainTrackPeak { get; set; }
 
+    public bool HasCompilationFlag { get; set; }
+
 
     [Write(false)]
     public string AlbumName { get; set; } = string.Empty;

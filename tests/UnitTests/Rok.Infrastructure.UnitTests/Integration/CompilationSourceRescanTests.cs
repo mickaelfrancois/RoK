@@ -154,6 +154,91 @@ public sealed class CompilationSourceRescanTests
         Assert.Equal((int)ECompilationSource.Derived, harness.Source(albumId));
     }
 
+    [Fact(DisplayName = "rescan_turns_an_album_into_a_tag_compilation_when_only_the_flag_is_added_at_the_same_size")]
+    public async Task Rescan_WhenOnlyTheFlagIsAddedAtTheSameSize_ShouldBecomeATagCompilation()
+    {
+        // Arrange
+        using Harness harness = new();
+
+        harness.AddFile("flagadd", "fa1", "Flag Owner", "Flag Add Album", flag: false);
+        harness.AddFile("flagadd", "fa2", "Flag Owner", "Flag Add Album", flag: false);
+
+        await harness.ImportTwiceAsync();
+
+        long albumId = harness.AlbumIdOf("fa1");
+
+        Assert.Equal((int)ECompilationSource.Derived, harness.Source(albumId));
+
+        // Act
+        long sizeBefore = harness.FileLength("fa2");
+        harness.SetFlagOnly("fa2", true, 2);
+        long sizeAfter = harness.FileLength("fa2");
+        ImportStatisticsDto rescan = await harness.ImportAsync();
+
+        // Assert
+        Assert.Equal(sizeBefore, sizeAfter);
+        Assert.True(rescan.TracksUpdated >= 1, "positive control: the flagged file must be processed again");
+        Assert.Equal(albumId, harness.AlbumIdOf("fa1"));
+        Assert.Equal(1, harness.IsCompilation(albumId));
+        Assert.Equal((int)ECompilationSource.Tag, harness.Source(albumId));
+        Assert.Equal(1, harness.TrackFlagOf("fa2"));
+    }
+
+    [Fact(DisplayName = "rescan_drops_the_tag_status_when_only_the_flag_is_removed_at_the_same_size")]
+    public async Task Rescan_WhenOnlyTheFlagIsRemovedAtTheSameSize_ShouldFallBackToDerived()
+    {
+        // Arrange
+        using Harness harness = new();
+
+        harness.AddFile("flagdrop", "fd1", "Drop Owner", "Flag Drop Album", flag: true);
+        harness.AddFile("flagdrop", "fd2", "Drop Owner", "Flag Drop Album", flag: false);
+
+        await harness.ImportTwiceAsync();
+
+        long albumId = harness.AlbumIdOf("fd1");
+
+        Assert.Equal((int)ECompilationSource.Tag, harness.Source(albumId));
+
+        // Act
+        long sizeBefore = harness.FileLength("fd1");
+        harness.SetFlagOnly("fd1", false, 2);
+        long sizeAfter = harness.FileLength("fd1");
+        ImportStatisticsDto rescan = await harness.ImportAsync();
+
+        // Assert
+        Assert.Equal(sizeBefore, sizeAfter);
+        Assert.True(rescan.TracksUpdated >= 1, "positive control: the unflagged file must be processed again");
+        Assert.Equal(albumId, harness.AlbumIdOf("fd1"));
+        Assert.Equal(0, harness.IsCompilation(albumId));
+        Assert.Equal((int)ECompilationSource.Derived, harness.Source(albumId));
+        Assert.Equal(0, harness.TrackFlagOf("fd1"));
+    }
+
+    [Fact(DisplayName = "rescan_with_only_a_newer_mtime_does_not_reprocess_a_flagged_track")]
+    public async Task Rescan_WhenOnlyTheModificationDateChangesOnAFlaggedTrack_ShouldNotReprocessIt()
+    {
+        // Arrange
+        using Harness harness = new();
+
+        harness.AddFile("flagkeep", "fk1", "Keep Owner", "Flag Keep Album", flag: true);
+        harness.AddFile("flagkeep", "fk2", "Keep Owner", "Flag Keep Album", flag: false);
+
+        await harness.ImportTwiceAsync();
+
+        long albumId = harness.AlbumIdOf("fk1");
+
+        Assert.Equal(1, harness.TrackFlagOf("fk1"));
+
+        // Act
+        harness.TouchOnly("fk1", 2);
+        ImportStatisticsDto rescan = await harness.ImportAsync();
+
+        // Assert
+        Assert.Equal(0, rescan.TracksUpdated);
+        Assert.Equal(albumId, harness.AlbumIdOf("fk1"));
+        Assert.Equal((int)ECompilationSource.Tag, harness.Source(albumId));
+    }
+
     [Fact(DisplayName = "set_compilation_writes_the_flag_in_the_files_and_survives_a_rescan")]
     public async Task SetCompilation_WhenCheckedOnASingleArtistAlbum_ShouldWriteTheFlagAndSurviveARescan()
     {
@@ -361,6 +446,27 @@ public sealed class CompilationSourceRescanTests
             }
 
             Touch(name, days);
+        }
+
+        public void SetFlagOnly(string name, bool flag, int days)
+        {
+            WriteFlag(name, flag);
+            Touch(name, days);
+        }
+
+        public void TouchOnly(string name, int days)
+        {
+            Touch(name, days);
+        }
+
+        public long FileLength(string name)
+        {
+            return new FileInfo(_paths[name]).Length;
+        }
+
+        public int TrackFlagOf(string name)
+        {
+            return Scalar<int>("SELECT hasCompilationFlag FROM Tracks WHERE musicFile LIKE @pattern", new { pattern = $"%{name}.flac" });
         }
 
         public long AlbumIdOf(string name)
