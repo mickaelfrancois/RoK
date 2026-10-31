@@ -96,6 +96,14 @@ internal sealed class IcyStreamHandler : IDisposable
         public override void SetLength(long value) => throw new NotSupportedException();
         public override void Write(byte[] buffer, int offset, int count) => throw new NotSupportedException();
 
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing)
+                _source.Dispose();
+
+            base.Dispose(disposing);
+        }
+
         public override int Read(byte[] buffer, int offset, int count)
         {
             if (_bytesUntilMeta == 0)
