@@ -339,11 +339,12 @@ public class NAudioMediaPlayer : IPlayerEngine, IDisposable
     {
         Stop();
 
-        _streaming = new StreamingPlayback(_httpClientFactory.CreateClient("RadioStream"), _logger, OpenRadioOutput);
-        _streaming.MetadataChanged += (_, title) => OnMetadataChanged?.Invoke(this, title);
-        _streaming.PlaybackEnded += (_, _) => OnMediaEnded?.Invoke(this, EventArgs.Empty);
-        _streaming.BufferingChanged += (_, _) => OnMediaStateChanged?.Invoke(this, EventArgs.Empty);
-        _streaming.OutputLost += Streaming_OutputLost;
+        StreamingPlayback streaming = new(_httpClientFactory.CreateClient("RadioStream"), _logger, OpenRadioOutput);
+        _streaming = streaming;
+        streaming.MetadataChanged += (_, title) => OnMetadataChanged?.Invoke(this, title);
+        streaming.PlaybackEnded += (_, _) => OnMediaEnded?.Invoke(this, EventArgs.Empty);
+        streaming.BufferingChanged += (_, _) => OnMediaStateChanged?.Invoke(this, EventArgs.Empty);
+        streaming.OutputLost += Streaming_OutputLost;
 
         _isLive = true;
         _isPlaying = true;
@@ -353,7 +354,11 @@ public class NAudioMediaPlayer : IPlayerEngine, IDisposable
         {
             try
             {
-                await _streaming.StartAsync(station, CancellationToken.None);
+                await streaming.StartAsync(station, CancellationToken.None);
+
+                if (!ReferenceEquals(_streaming, streaming))
+                    return;
+
                 OnMediaChanged?.Invoke(this, EventArgs.Empty);
                 OnMediaStateChanged?.Invoke(this, EventArgs.Empty);
                 RaiseOutputStateChanged();
@@ -361,7 +366,11 @@ public class NAudioMediaPlayer : IPlayerEngine, IDisposable
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Failed to start stream {Url}", station.StreamUrl);
-                _streaming?.Dispose();
+                streaming.Dispose();
+
+                if (!ReferenceEquals(_streaming, streaming))
+                    return;
+
                 _streaming = null;
                 _isLive = false;
                 OnMediaEnded?.Invoke(this, EventArgs.Empty);
