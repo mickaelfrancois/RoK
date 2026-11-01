@@ -1,5 +1,16 @@
 ﻿# ChangeLog
 
+## [2.0.5] Store – 1 novembre 2026
+
+### Corrigé
+
+- Une transition en mode Mix démarrée en retard se termine bien à sa fin prévue (#540)
+- Le rescan retraite une piste dont seul le drapeau de compilation a changé (#541)
+- L'arrêt d'une radio en streaming ne provoque plus d'exceptions non observées (#543)
+- Le rescan relit les dates de fichiers des pistes en UTC, ce qui évite des retraitements inutiles (#539)
+
+--
+
 ## [2.0.4] Store – 24 octobre 2026
 
 ### Ajouté
