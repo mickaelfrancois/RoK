@@ -362,6 +362,26 @@ public class ListeningEventRepositoryTests
         Assert.Equal("Jazz", insights.TopGenres[1].GenreName);
     }
 
+    [Fact(DisplayName = "GetInsightsAsync should rank TopGenres by played duration like PlayPercentage")]
+    public async Task GetInsightsAsync_TopGenres_RankedByPlayedDuration()
+    {
+        // Arrange
+        using SqliteDatabaseFixture fixture = CreateFixture();
+        ListeningEventRepository repo = CreateRepository(fixture);
+        DateTime start = new(2026, 4, 5, 14, 0, 0, DateTimeKind.Utc);
+        for (int i = 0; i < 3; i++)
+            await InsertEventAsync(fixture, 1, 1, 1, 1, start.AddMinutes(i * 5), durationPlayed: 10);
+        await InsertEventAsync(fixture, 2, 1, 1, 2, start.AddMinutes(20), durationPlayed: 200);
+
+        // Act
+        InsightsDto insights = await repo.GetInsightsAsync(CurrentMonth);
+
+        // Assert
+        Assert.Equal("Jazz", insights.TopGenres[0].GenreName);
+        Assert.Equal("Rock", insights.TopGenres[1].GenreName);
+        Assert.True(insights.TopGenres[0].PlayPercentage > insights.TopGenres[1].PlayPercentage);
+    }
+
     [Fact(DisplayName = "GetInsightsAsync should always return one heatmap cell per day-hour pair")]
     public async Task GetInsightsAsync_HeatmapShouldHave168Cells()
     {

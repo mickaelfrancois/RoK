@@ -354,7 +354,8 @@ public class ListeningEventRepository(IDbConnection connection, [FromKeyedServic
 
         return genreEvents
                     .GroupBy(e => e.GenreId!.Value)
-                    .OrderByDescending(g => g.Count())
+                    .OrderByDescending(g => g.Sum(e => e.DurationPlayed))
+                    .ThenByDescending(g => g.Count())
                     .Take(take)
                     .Select((g, index) =>
                     {
