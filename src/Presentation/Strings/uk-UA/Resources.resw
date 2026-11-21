@@ -1566,7 +1566,7 @@
     <value>🏆 Ваші найважливіші назви</value>
   </data>
   <data name="Insights_TopAlbums.Text" xml:space="preserve">
-    <value>🏆 Ваші найважливіші назви</value>
+    <value>Найпопулярніші альбоми</value>
   </data>
   <data name="Insights_TopTracks.Text" xml:space="preserve">
     <value>Найпопулярніші назви</value>

@@ -1625,7 +1625,7 @@
     <value>🏆 Your most important titles</value>
   </data>
   <data name="Insights_TopAlbums.Text" xml:space="preserve">
-    <value>🏆 Your most important titles</value>
+    <value>Top albums</value>
   </data>
   <data name="Insights_TopTracks.Text" xml:space="preserve">
     <value>Top titles</value>
